@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public struct CameraInput {
+    public enum CameraState { normal, wallPress }
+    public CameraState state;
     public enum RotateInput { none, left, right }
     public float deltaTime;
     public RotateInput rotation;
+    public Vector3 wallNormal;
 }
 public class NeoCharacterCamera : MonoBehaviour {
     [Header("Framing")]
@@ -77,49 +80,98 @@ public class NeoCharacterCamera : MonoBehaviour {
     public void UpdateWithInput(CameraInput input) {
         if (FollowTransform) {
 
-            // Process rotation input
-            float rotationInput = 0f;
-            switch (input.rotation) {
-                case CameraInput.RotateInput.left:
-                    rotationInput = 90f;
-                    break;
-                case CameraInput.RotateInput.right:
-                    rotationInput = -90f;
-                    break;
+            switch (input.state) {
                 default:
-                case CameraInput.RotateInput.none:
+                case CameraInput.CameraState.normal:
+                    NormalUpdate(input);
+                    break;
+                case CameraInput.CameraState.wallPress:
+                    WallPressUpdate(input);
                     break;
             }
-            Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
-            PlanarDirection = rotationFromInput * PlanarDirection;
-            PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
-            Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
 
-            Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
-            targetRotation = Quaternion.Slerp(targetRotation, planarRot * verticalRot, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
-
-            // Apply rotation
-            Transform.rotation = targetRotation;
-
-            // Process distance input
-            // if (_distanceIsObstructed) {//&& Mathf.Abs(zoomInput) > 0f) {
-            //     TargetDistance = _currentDistance;
-            // }
-            // TargetDistance += zoomInput * DistanceMovementSpeed;
-            TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
-
-            // Find the smoothed follow position
-            _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, FollowTransform.position, 1f - Mathf.Exp(-FollowingSharpness * input.deltaTime));
-
-            // Find the smoothed camera orbit position
-            Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);
-
-            // Handle framing
-            targetPosition += Transform.right * FollowPointFraming.x;
-            targetPosition += Transform.up * FollowPointFraming.y;
-
-            // Apply position
-            Transform.position = targetPosition;
         }
+    }
+
+    public void NormalUpdate(CameraInput input) {
+
+        // Process rotation input
+        float rotationInput = 0f;
+        switch (input.rotation) {
+            case CameraInput.RotateInput.left:
+                rotationInput = 90f;
+                break;
+            case CameraInput.RotateInput.right:
+                rotationInput = -90f;
+                break;
+            default:
+            case CameraInput.RotateInput.none:
+                break;
+        }
+
+        Camera.orthographic = true;
+
+        Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
+        PlanarDirection = rotationFromInput * PlanarDirection;
+        PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
+
+        Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
+        targetRotation = Quaternion.Slerp(targetRotation, planarRot * verticalRot, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
+
+        // Apply rotation
+        Transform.rotation = targetRotation;
+
+        // Process distance input
+        // if (_distanceIsObstructed) {//&& Mathf.Abs(zoomInput) > 0f) {
+        //     TargetDistance = _currentDistance;
+        // }
+        // TargetDistance += zoomInput * DistanceMovementSpeed;
+        TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
+
+        // Find the smoothed follow position
+        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, FollowTransform.position, 1f - Mathf.Exp(-FollowingSharpness * input.deltaTime));
+
+        // Find the smoothed camera orbit position
+        Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);
+
+        // Handle framing
+        targetPosition += Transform.right * FollowPointFraming.x;
+        targetPosition += Transform.up * FollowPointFraming.y;
+
+        // Apply position
+        Transform.position = targetPosition;
+    }
+    public void WallPressUpdate(CameraInput input) {
+        // Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
+        if (input.wallNormal == Vector3.zero) {
+            NormalUpdate(input);
+            return;
+        }
+        Camera.orthographic = false;
+
+        PlanarDirection = -1f * input.wallNormal;
+        PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
+        // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
+        targetRotation = Quaternion.Slerp(targetRotation, planarRot, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
+
+        // Apply rotation
+        Transform.rotation = targetRotation;
+
+        TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
+
+        // Find the smoothed follow position
+        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, FollowTransform.position, 1f - Mathf.Exp(-FollowingSharpness * input.deltaTime));
+
+        // Find the smoothed camera orbit position
+        Vector3 targetPosition = _currentFollowPosition + (input.wallNormal * _currentDistance);
+
+        // Handle framing
+        targetPosition += Transform.right * FollowPointFraming.x;
+        targetPosition += Transform.up * FollowPointFraming.y;
+
+        // Apply position
+        Transform.position = targetPosition;
     }
 }

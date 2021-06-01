@@ -110,17 +110,22 @@ public class NeoPlayer : MonoBehaviour {
     }
 
     private void HandleCameraInput() {
-
         CameraInput.RotateInput rotation = CameraInput.RotateInput.none;
         if (rotateCameraRightPressedThisFrame) {
             rotation = CameraInput.RotateInput.right;
         } else if (rotateCameraLeftPressedThisFrame) {
             rotation = CameraInput.RotateInput.left;
         }
+        CameraInput.CameraState state = CameraInput.CameraState.normal;
+        if (Character.wallPress) {
+            state = CameraInput.CameraState.wallPress;
+        }
 
         CameraInput input = new CameraInput {
             deltaTime = Time.deltaTime,
-            rotation = rotation
+            rotation = rotation,
+            state = state,
+            wallNormal = Character.wallNormal
         };
 
         // Apply inputs to the camera

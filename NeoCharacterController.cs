@@ -63,7 +63,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     private bool _shouldBeCrouching = false;
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
-
+    public bool wallPress = false;
+    public Vector3 wallNormal = Vector3.zero;
 
     private void Start() {
         // Assign to motor
@@ -110,7 +111,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         } else {
             _shouldBeCrouching = false;
         }
-
     }
 
     /// <summary>
@@ -130,12 +130,15 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             Vector3 target = _shootLookDirection - transform.position;
             target.y = 0;
             currentRotation = Quaternion.LookRotation(target, Motor.CharacterUp);
-        } else if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
+        } else if (!wallPress && _lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
             // Smoothly interpolate from current to target look direction
             Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
             // Set the current rotation (which will be used by the KinematicCharacterMotor)
             currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
+        } else if (wallPress) {
+            // Set the current rotation (which will be used by the KinematicCharacterMotor)
+            currentRotation = Quaternion.LookRotation(wallNormal, Motor.CharacterUp);
         }
         direction = Motor.CharacterForward;
     }
@@ -291,8 +294,14 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             _canWallJump = true;
             _wallJumpNormal = hitNormal;
         }
-
-
+        if (Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable && Vector3.Dot(_moveInputVector, hitNormal) < -0.9 && Vector3.Dot(_moveInputVector, hitNormal) > -1.1) {
+            Debug.Log("wall press");
+            wallPress = true;
+            wallNormal = hitNormal;
+        } else {
+            wallPress = false;
+            wallNormal = Vector3.zero;
+        }
     }
 
     public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {
