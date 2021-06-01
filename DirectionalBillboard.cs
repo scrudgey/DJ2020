@@ -47,6 +47,8 @@ public class DirectionalBillboard : MonoBehaviour {
     enum Mode { idle, walk, crawl, crouch }
     Mode mode;
     public SpriteRenderer spriteRenderer;
+    public Material billboardMaterial;
+    public Material flatMaterial;
     // public SpriteRenderer gunRenderer;
     public GunAnimation gunAnimation;
     public NeoCharacterController controller;
@@ -70,6 +72,18 @@ public class DirectionalBillboard : MonoBehaviour {
         return controller.Motor.Velocity.magnitude > 0.1;
     }
     void Update() {
+
+        if (controller.wallPressTimer > 0 && !controller.wallPress) {
+            spriteRenderer.material = flatMaterial;
+            gunAnimation.spriteRenderer.material = flatMaterial;
+        } else if (controller.wallPress) {
+            spriteRenderer.material = billboardMaterial;
+            gunAnimation.spriteRenderer.material = billboardMaterial;
+        } else {
+            spriteRenderer.material = billboardMaterial;
+            gunAnimation.spriteRenderer.material = billboardMaterial;
+        }
+
         Vector2 camDir = new Vector2(cam.PlanarDirection.x, cam.PlanarDirection.z);
         Vector2 playerDir = new Vector2(controller.direction.x, controller.direction.z);
         float angle = Vector2.SignedAngle(camDir, playerDir);
@@ -131,16 +145,18 @@ public class DirectionalBillboard : MonoBehaviour {
             if (controller.isCrouching) {
                 mode = Mode.crawl;
                 gunAnimation.gameObject.SetActive(false);
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
             } else {
                 mode = Mode.walk;
                 gunAnimation.gameObject.SetActive(true);
-
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             }
             if (animator.clip != walkAnimation) {
                 animator.clip = walkAnimation;
                 animator.Play();
             }
         } else {    // idle
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             if (controller.isCrouching) {
                 gunAnimation.gameObject.SetActive(false);
                 mode = Mode.crouch;

@@ -49,6 +49,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public Transform MeshRoot;
     public Vector3 direction;
     private Collider[] _probedColliders = new Collider[8];
+    private Vector2 _moveAxis;
     private Vector3 _moveInputVector;
     private Vector3 _lookInputVector;
     private bool _jumpRequested = false;
@@ -64,7 +65,13 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
     public bool wallPress = false;
+
+    public float wallPressTimer = 0f;
+    public float wallPressThreshold = 0.5f;
+    public bool wallPressRatchet = false;
+
     public Vector3 wallNormal = Vector3.zero;
+    public Vector2 lastWallInput = Vector2.zero;
 
     private void Start() {
         // Assign to motor
@@ -87,6 +94,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
         // Move and look inputs
         _moveInputVector = cameraPlanarRotation * moveInputVector;
+        _moveAxis = new Vector2(inputs.MoveAxisRight, inputs.MoveAxisForward);
 
         // Fire
         _shootLookDirection = gunHandler.ProcessInput(inputs);
@@ -111,6 +119,21 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         } else {
             _shouldBeCrouching = false;
         }
+
+        if (wallPress) {
+
+            if (_moveAxis != Vector2.zero) {
+                lastWallInput = _moveAxis;
+            } else {
+                wallPressRatchet = true;
+            }
+            if (!wallPressRatchet) {
+                _moveInputVector = Vector3.zero;
+                _moveAxis = Vector2.zero;
+            }
+        } else {
+            wallPressRatchet = false;
+        }
     }
 
     /// <summary>
@@ -130,6 +153,12 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             Vector3 target = _shootLookDirection - transform.position;
             target.y = 0;
             currentRotation = Quaternion.LookRotation(target, Motor.CharacterUp);
+        } else if (!wallPress && wallPressTimer > 0 && wallNormal != Vector3.zero) {
+            // Smoothly interpolate from current to target look direction
+            Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+
+            // Set the current rotation (which will be used by the KinematicCharacterMotor)
+            currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
         } else if (!wallPress && _lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
             // Smoothly interpolate from current to target look direction
             Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
@@ -149,17 +178,42 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     /// This is the ONLY place where you can set the character's velocity
     /// </summary>
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
+
         Vector3 targetMovementVelocity = Vector3.zero;
         if (Motor.GroundingStatus.IsStableOnGround) {
             // Reorient velocity on slope
             currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
 
-            // Calculate target velocity
-            Vector3 inputRight = Vector3.Cross(_moveInputVector, Motor.CharacterUp);
-            Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
-            targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
-            if (isCrouching) {
-                targetMovementVelocity *= crawlSpeedFraction;
+            // TODO: implement state enum
+            // TODO: tighten up the push angle requirement
+            if (wallPress) {
+                // wall style input is relative to the wall normal
+                targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
+
+                // if (Vector3.Dot(wallNormal, _moveAxis) > 0.02f) {
+                if (_moveAxis.y < -0.02f) {
+                    wallPress = false;
+                }
+            } else {
+                if (Vector3.Dot(_moveInputVector, wallNormal) < -0.9 && Vector3.Dot(_moveInputVector, wallNormal) > -1.1) {
+                    wallPressTimer += Time.deltaTime;
+                    if (wallPressTimer > wallPressThreshold) {
+                        wallPress = true;
+                        wallPressTimer = 0;
+                    }
+                } else if (_moveInputVector == Vector3.zero) {
+                    wallPressTimer = 0;
+                    wallNormal = Vector3.zero;
+                } else if (wallPressTimer > 0) {
+                    wallPressTimer -= Time.deltaTime;
+                }
+                // Calculate target velocity
+                Vector3 inputRight = Vector3.Cross(_moveInputVector, Motor.CharacterUp);
+                Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
+                targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
+                if (isCrouching) {
+                    targetMovementVelocity *= crawlSpeedFraction;
+                }
             }
 
             // Smooth movement Velocity
@@ -236,6 +290,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             currentVelocity += _internalVelocityAdd;
             _internalVelocityAdd = Vector3.zero;
         }
+
     }
 
     /// <summary>
@@ -295,12 +350,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             _wallJumpNormal = hitNormal;
         }
         if (Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable && Vector3.Dot(_moveInputVector, hitNormal) < -0.9 && Vector3.Dot(_moveInputVector, hitNormal) > -1.1) {
-            Debug.Log("wall press");
-            wallPress = true;
+            // wallPress = true;
             wallNormal = hitNormal;
-        } else {
-            wallPress = false;
-            wallNormal = Vector3.zero;
         }
     }
 

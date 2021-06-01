@@ -9,12 +9,14 @@ public struct CameraInput {
     public float deltaTime;
     public RotateInput rotation;
     public Vector3 wallNormal;
+    public Vector2 lastWallInput;
 }
 public class NeoCharacterCamera : MonoBehaviour {
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
     public float FollowingSharpness = 10000f;
+    public Quaternion isometricRotation;
 
     [Header("Distance")]
     public float DefaultDistance = 6f;
@@ -110,6 +112,8 @@ public class NeoCharacterCamera : MonoBehaviour {
         }
 
         Camera.orthographic = true;
+        Camera.fieldOfView = 70;
+
 
         Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
         PlanarDirection = rotationFromInput * PlanarDirection;
@@ -141,31 +145,39 @@ public class NeoCharacterCamera : MonoBehaviour {
 
         // Apply position
         Transform.position = targetPosition;
+        isometricRotation = Transform.rotation;
     }
     public void WallPressUpdate(CameraInput input) {
-        // Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
         if (input.wallNormal == Vector3.zero) {
             NormalUpdate(input);
             return;
         }
         Camera.orthographic = false;
+        Camera.fieldOfView = 38;
 
-        PlanarDirection = -1f * input.wallNormal;
-        PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
-        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
-        // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
-        targetRotation = Quaternion.Slerp(targetRotation, planarRot, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
+        Vector3 camDirection = -1f * input.wallNormal;
+        camDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(camDirection, FollowTransform.up));
+        Quaternion planarRot = Quaternion.LookRotation(camDirection, FollowTransform.up);
+        targetRotation = Quaternion.Slerp(targetRotation, planarRot, 1f - Mathf.Exp(-RotationSharpness / 2 * input.deltaTime));
 
         // Apply rotation
         Transform.rotation = targetRotation;
 
-        TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
+        // TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
+        TargetDistance = 3f;
 
         // Find the smoothed follow position
-        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, FollowTransform.position, 1f - Mathf.Exp(-FollowingSharpness * input.deltaTime));
+        Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
+        Vector3 distOffset = input.wallNormal * TargetDistance;
+        Vector3 heightOffset = new Vector3(0, -0.5f, 0);
+        _currentFollowPosition = Vector3.Lerp(
+            _currentFollowPosition,
+            FollowTransform.position + distOffset + LROffset + heightOffset,
+            1f - Mathf.Exp(-FollowingSharpness / 10 * input.deltaTime)
+        );
 
         // Find the smoothed camera orbit position
-        Vector3 targetPosition = _currentFollowPosition + (input.wallNormal * _currentDistance);
+        Vector3 targetPosition = _currentFollowPosition;
 
         // Handle framing
         targetPosition += Transform.right * FollowPointFraming.x;

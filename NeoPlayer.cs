@@ -125,7 +125,8 @@ public class NeoPlayer : MonoBehaviour {
             deltaTime = Time.deltaTime,
             rotation = rotation,
             state = state,
-            wallNormal = Character.wallNormal
+            wallNormal = Character.wallNormal,
+            lastWallInput = Character.lastWallInput
         };
 
         // Apply inputs to the camera
@@ -139,7 +140,7 @@ public class NeoPlayer : MonoBehaviour {
         PlayerCharacterInputs characterInputs = new PlayerCharacterInputs() {
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
-            CameraRotation = OrbitCamera.Transform.rotation,
+            CameraRotation = OrbitCamera.isometricRotation,
             JumpDown = jumpPressedThisFrame,
             CrouchDown = crouchHeld,
             Fire = new PlayerCharacterInputs.FireInputs() {
@@ -148,7 +149,7 @@ public class NeoPlayer : MonoBehaviour {
                 cursorPosition = Mouse.current.position.ReadValue()
             },
             reload = reloadPressedThisFrame,
-            switchToGun = switchToGunThisFrame
+            switchToGun = switchToGunThisFrame,
         };
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
