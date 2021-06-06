@@ -8,6 +8,10 @@ public class RandomizeSprite : MonoBehaviour {
     public bool flipY;
     public float scalemagnitude;
     void Start() {
+        Randomize();
+    }
+
+    public void Randomize() {
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprites[Random.Range(0, sprites.Length)];
 

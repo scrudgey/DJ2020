@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-
+using System.Linq;
 
 public class GunHandler : MonoBehaviour {
     static readonly float height = 1.2f;
@@ -28,19 +28,15 @@ public class GunHandler : MonoBehaviour {
         }
         return targetPoint;
     }
-    public BulletRay SpawnBulletRay() {
+    public void SpawnBulletRay(Vector3 startPoint, Vector3 endPoint) {
+        // if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
         GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/bulletRay"), transform.position, Quaternion.identity) as GameObject;
         BulletRay ray = obj.GetComponent<BulletRay>();
+        ray.SetFadeStyle(BulletRay.FadeStyle.streak);
 
-        // ray.SetFadeStyle(BulletRay.FadeStyle.timer);
-
-        if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
-            ray.SetFadeStyle(BulletRay.FadeStyle.streak);
-        } else {
-            ray.SetFadeStyle(BulletRay.FadeStyle.invisible);
-        }
-
-        return ray;
+        ray.lineRenderer.SetPosition(0, startPoint);
+        ray.lineRenderer.SetPosition(1, endPoint);
+        // }
     }
     private Vector3 gunPosition() {
         return new Vector3(transform.position.x, height, transform.position.z);
@@ -66,21 +62,28 @@ public class GunHandler : MonoBehaviour {
 
         Ray bulletRay = new Ray(gunPosition, direction);
 
-        RaycastHit raycastHit;
-        if (Physics.Raycast(bulletRay, out raycastHit, gunInstance.baseGun.range)) {
-            endPosition = raycastHit.point;
-            GameObject decalObject = DecalPool.I.SpawnDecal(raycastHit.point + (raycastHit.normal * 0.025f));
-
-            var sparks = Resources.Load("prefabs/impactSpark");
-            GameObject sparkObject = GameObject.Instantiate(sparks,
-            raycastHit.point + (raycastHit.normal * 0.025f),
-            Quaternion.LookRotation(raycastHit.normal)) as GameObject;
+        RaycastHit[] hits = Physics.RaycastAll(bulletRay, gunInstance.baseGun.range); // get all hits
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found
+            if (hit.collider.tag == "glass") {
+                Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
+                if (glass != null) {
+                    glass.BulletHit(hit);
+                }
+            } else {
+                endPosition = hit.point;
+                GameObject decalObject = DecalPool.I.SpawnDecal(hit, DecalPool.DecalType.normal);
+                var sparks = Resources.Load("prefabs/impactSpark");
+                GameObject sparkObject = GameObject.Instantiate(sparks,
+                hit.point + (hit.normal * 0.025f),
+                Quaternion.LookRotation(hit.normal)) as GameObject;
+                break;
+            }
         }
-
-        BulletRay obj = SpawnBulletRay();
-        obj.lineRenderer.SetPosition(0, gunPosition);
-        obj.lineRenderer.SetPosition(1, endPosition);
+        if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+            SpawnBulletRay(gunPosition, endPosition);
+        }
     }
+
     public void Shoot(PlayerCharacterInputs.FireInputs input) {
         if (!gunInstance.CanShoot())
             return;

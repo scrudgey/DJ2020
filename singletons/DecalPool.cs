@@ -1,4 +1,4 @@
-using System.Collections;
+// using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,17 +8,23 @@ using UnityEngine;
 // TODO: allow multiple pools
 // TODO: actions to take on enable / disable to reset object state
 public class DecalPool : Singleton<DecalPool> {
+    public enum DecalType { normal, glass }
     [SerializeField]
     private GameObject decalPrefab;
 
     [SerializeField]
     private int maxConcurrentDecals = 100;
-
     private Queue<GameObject> decalsInPool;
     private Queue<GameObject> decalsActiveInWorld;
-
+    public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
+        {DecalType.normal, "sprites/bulletholes"},
+        {DecalType.glass, "sprites/Bullet decals"}
+    };
+    private static readonly Dictionary<DecalType, Sprite[]> decalSprites = new Dictionary<DecalType, Sprite[]>();
     private void Awake() {
-        // decalPrefab = Resources.Load("prefabs/bullethole") as GameObject;
+        foreach (KeyValuePair<DecalType, string> kvp in decalPaths) {
+            decalSprites[kvp.Key] = Resources.LoadAll<Sprite>(kvp.Value) as Sprite[];
+        }
         InitializeDecals();
     }
 
@@ -39,19 +45,31 @@ public class DecalPool : Singleton<DecalPool> {
         spawned.SetActive(false);
     }
 
-    public GameObject SpawnDecal(Vector3 position) {
+    public GameObject SpawnDecal(RaycastHit hit, DecalType type) {
         GameObject decal = GetNextAvailableDecal();
         if (decal != null) {
-            decal.transform.position = position;
-            // decal.transform.rotation = Quaternion.FromToRotation(-Vector3.forward, hit.normal);
-
+            decal.transform.position = hit.point + (hit.normal * 0.025f);
+            decal.transform.rotation = Quaternion.FromToRotation(-Vector3.forward, hit.normal);
             decal.SetActive(true);
-
             decalsActiveInWorld.Enqueue(decal);
+            RandomizeSprite decalRandomizer = decal.GetComponent<RandomizeSprite>();
+            decalRandomizer.sprites = decalSprites[type];
+            decalRandomizer.Randomize();
         }
         return decal;
     }
-
+    public void RecallDecal(GameObject decal) {
+        if (decal == null) {
+            Debug.LogWarning("RecallDecal called with null value");
+        }
+        decal.SetActive(false);
+        decalsInPool.Enqueue(decal);
+    }
+    public void RecallDecals(GameObject[] decals) {
+        foreach (GameObject decal in decals) {
+            RecallDecal(decal);
+        }
+    }
     private GameObject GetNextAvailableDecal() {
         if (decalsInPool.Count > 0)
             return decalsInPool.Dequeue();

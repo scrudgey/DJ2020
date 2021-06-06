@@ -121,12 +121,17 @@ public class NeoPlayer : MonoBehaviour {
             state = CameraInput.CameraState.wallPress;
         }
 
+        Vector2 lastWallInput = Character.lastWallInput;
+        if (!Character.wallPressRatchet) {
+            lastWallInput = Vector2.zero;
+        }
+
         CameraInput input = new CameraInput {
             deltaTime = Time.deltaTime,
             rotation = rotation,
             state = state,
             wallNormal = Character.wallNormal,
-            lastWallInput = Character.lastWallInput
+            lastWallInput = lastWallInput
         };
 
         // Apply inputs to the camera

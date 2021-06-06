@@ -23,6 +23,7 @@ public struct PlayerCharacterInputs {
 public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public KinematicCharacterMotor Motor;
     public GunHandler gunHandler;
+    public float defaultRadius = 0.25f;
 
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;
@@ -64,12 +65,13 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     private bool _shouldBeCrouching = false;
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
-    public bool wallPress = false;
 
+    [Header("Wall press")]
+    public float pressRadius = 0.1f;
+    public bool wallPress = false;
     public float wallPressTimer = 0f;
     public float wallPressThreshold = 0.5f;
     public bool wallPressRatchet = false;
-
     public Vector3 wallNormal = Vector3.zero;
     public Vector2 lastWallInput = Vector2.zero;
 
@@ -113,14 +115,15 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
             if (!isCrouching) {
                 isCrouching = true;
-                Motor.SetCapsuleDimensions(0.5f, 1f, 0.5f);
-                MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);
+                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
+                // MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);
             }
         } else {
             _shouldBeCrouching = false;
         }
 
         if (wallPress) {
+            Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.8f);
 
             if (_moveAxis != Vector2.zero) {
                 lastWallInput = _moveAxis;
@@ -322,15 +325,21 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         if (isCrouching && !_shouldBeCrouching) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
             Motor.SetCapsuleDimensions(0.5f, 2f, 1f);
+            // Motor.SetCapsuleDimensions(defaultRadius, 2f, 0.8f);
+
             if (Motor.CharacterCollisionsOverlap(
                     Motor.TransientPosition,
                     Motor.TransientRotation,
                     _probedColliders) > 0) {
                 // If obstructions, just stick to crouching dimensions
                 Motor.SetCapsuleDimensions(0.5f, 1f, 0.5f);
+                // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
+
             } else {
                 // If no obstructions, uncrouch
-                MeshRoot.localScale = new Vector3(1f, 1f, 1f);
+                // MeshRoot.localScale = new Vector3(1f, 1f, 1f);
+                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
+
                 isCrouching = false;
             }
         }
