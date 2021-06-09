@@ -29,14 +29,12 @@ public class GunHandler : MonoBehaviour {
         return targetPoint;
     }
     public void SpawnBulletRay(Vector3 startPoint, Vector3 endPoint) {
-        // if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
         GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/bulletRay"), transform.position, Quaternion.identity) as GameObject;
         BulletRay ray = obj.GetComponent<BulletRay>();
         ray.SetFadeStyle(BulletRay.FadeStyle.streak);
 
         ray.lineRenderer.SetPosition(0, startPoint);
         ray.lineRenderer.SetPosition(1, endPoint);
-        // }
     }
     private Vector3 gunPosition() {
         return new Vector3(transform.position.x, height, transform.position.z);
@@ -67,7 +65,7 @@ public class GunHandler : MonoBehaviour {
             if (hit.collider.tag == "glass") {
                 Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
                 if (glass != null) {
-                    glass.BulletHit(hit);
+                    glass.BulletHit(hit, bulletRay);
                 }
             } else {
                 endPosition = hit.point;

@@ -3,26 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RandomizeSprite : MonoBehaviour {
+    public SpriteRenderer spriteRenderer;
     public Sprite[] sprites;
     public bool flipX;
     public bool flipY;
-    public float scalemagnitude;
     void Start() {
         Randomize();
     }
 
     public void Randomize() {
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprites[Random.Range(0, sprites.Length)];
-
-        Vector3 scale = Vector3.one;
         if (flipX && Random.Range(0f, 1f) > 0.5f) {
-            scale.x = -1f;
+            spriteRenderer.flipX = !spriteRenderer.flipX;
         }
         if (flipY && Random.Range(0f, 1f) > 0.5f) {
-            scale.y = -1f;
+            spriteRenderer.flipY = !spriteRenderer.flipY;
         }
-        transform.localScale = scale * scalemagnitude;
     }
 
 }

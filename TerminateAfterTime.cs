@@ -12,6 +12,7 @@ public class TerminateAfterTime : MonoBehaviour {
             Toolbox.DestroyIfExists<Collider>(gameObject);
             Toolbox.DestroyIfExists<AudioSource>(gameObject);
             Toolbox.DestroyIfExists<PlaySound>(gameObject);
+            Toolbox.DestroyIfExists<FlipScintillator>(gameObject);
             Destroy(this);
         }
     }
