@@ -146,7 +146,11 @@ public class GunHandler : MonoBehaviour {
         if (instance == null || instance == gunInstance)
             return;
         gunInstance = instance;
+
+        // TODO:
         gunAnimation.Unholster();
+
+        // TODO: don't call this! maybe?
         gunAnimation.EndShoot();
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.unholster);
     }
@@ -185,7 +189,6 @@ public class GunHandler : MonoBehaviour {
                 if (input.Fire.FirePressed && !shooting) {
                     gunAnimation.StartShooting();
                     shooting = true;
-                    return CursorToTargetPoint(input.Fire);
                 }
                 if (input.Fire.FireHeld) {
                     return CursorToTargetPoint(input.Fire);
@@ -196,12 +199,16 @@ public class GunHandler : MonoBehaviour {
                     return CursorToTargetPoint(input.Fire);
                 }
             } else { // semiautomatic
-                if (input.Fire.FirePressed && !shooting) {
+                if (input.Fire.FirePressed) {//&& !shooting) {
                     gunAnimation.StartShooting();
                     shooting = true;
                     return CursorToTargetPoint(input.Fire);
                 }
             }
+        } else {
+
+            // cancel out the shoot here for automatics
+
         }
 
 

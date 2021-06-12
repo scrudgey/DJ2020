@@ -18,8 +18,10 @@ public class Gun : ScriptableObject {
     public AudioClip[] clipOut;
     public AudioClip[] unholster;
     public AnimationClip shootAnimation;
-    public Octet<Sprite[]> gunIdle;
-    public Octet<Sprite[]> gunShoot;
+    public AnimationClip walkAnimation;
+    public Octet<Sprite> idle;
+    public Octet<Sprite[]> walk;
+    public Octet<Sprite[]> shoot;
     public GameObject muzzleFlash;
     public GameObject shellCasing;
     public static Gun Load(string name) {

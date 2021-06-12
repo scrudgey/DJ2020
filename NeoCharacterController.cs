@@ -99,7 +99,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         _moveAxis = new Vector2(inputs.MoveAxisRight, inputs.MoveAxisForward);
 
         // Fire
-        _shootLookDirection = gunHandler.ProcessInput(inputs);
+        Vector3 shootVector = gunHandler.ProcessInput(inputs);
+        if (shootVector != Vector3.zero) {
+            _shootLookDirection = shootVector;
+        }
 
         _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
 
@@ -172,7 +175,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             // Set the current rotation (which will be used by the KinematicCharacterMotor)
             currentRotation = Quaternion.LookRotation(wallNormal, Motor.CharacterUp);
         }
-        direction = Motor.CharacterForward;
+        _shootLookDirection = Vector3.zero;
     }
 
     /// <summary>
@@ -343,6 +346,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                 isCrouching = false;
             }
         }
+        direction = Motor.CharacterForward;
     }
 
     public bool IsColliderValidForCollisions(Collider coll) {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-
+[System.Serializable]
 public class GunInstance {
     public Gun baseGun;
     public int clip;

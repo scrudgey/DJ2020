@@ -25,3 +25,29 @@ if timer becomes full
     change material back to billboard
 
 also, Q/E breaks mode
+
+separate torso and legs animation
+    leave bob up to torso animation, to dynamically adjust height: this will greatly simplify all torso graphics.
+    requires a slightly more complicated walk animation
+    or more triggers in animation and let code handle it <- preferred
+    separate leg and torso sprite renderers
+unarmed walking animation
+unarmed idle
+pistol idle
+pistol shoot
+pistol reload
+
+smg idle
+smg shoot
+smg reload
+
+how will it work?
+    two sprite renderers under regular animation
+        * easy to manage walking animation
+        * complicates gun logic
+            * one code path for unarmed, separate code path for gun handling
+    two animators: torso and legs
+        * allows gun logic to be managed readily
+        * a special case for unarmed
+            * torso modes all have idle, some have walking animations
+

@@ -9,6 +9,9 @@ public class NeoPlayer : MonoBehaviour {
     public NeoCharacterCamera OrbitCamera;
     public Transform CameraFollowPoint;
     public NeoCharacterController Character;
+    public DirectionalBillboard legsAnimator;
+    public GunAnimation torsoAnimator;
+
     [Header("Inputs")]
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
@@ -107,6 +110,23 @@ public class NeoPlayer : MonoBehaviour {
 
     private void LateUpdate() {
         HandleCameraInput();
+
+        // update view
+        Vector2 camDir = new Vector2(OrbitCamera.PlanarDirection.x, OrbitCamera.PlanarDirection.z);
+        Vector2 playerDir = new Vector2(Character.direction.x, Character.direction.z);
+        float angle = Vector2.SignedAngle(camDir, playerDir);
+
+        // if (Character.OrientationSharpness.)
+        AnimationInput animationInput = new AnimationInput {
+            direction = Toolbox.DirectionFromAngle(angle),
+            isMoving = Character.Motor.Velocity.magnitude > 0.1 && Character.Motor.GroundingStatus.IsStableOnGround,
+            isCrouching = Character.isCrouching,
+            wallPressTimer = Character.wallPressTimer,
+            wallPress = Character.wallPress
+        };
+
+        legsAnimator.UpdateView(animationInput);
+        torsoAnimator.UpdateView(animationInput);
     }
 
     private void HandleCameraInput() {
