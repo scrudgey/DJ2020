@@ -64,8 +64,8 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
             //          " is needed in the scene, so '" + singleton +
             //          "' was created with DontDestroyOnLoad.");
         } else {
-            Debug.Log("[Singleton] Using instance already created: " +
-                        _instance.gameObject.name);
+            // Debug.Log("[Singleton] Using instance already created: " +
+            // _instance.gameObject.name);
         }
     }
     private static bool applicationIsQuitting = false;

@@ -26,15 +26,16 @@ public class GunInstance {
         }
         cooldownTimer = baseGun.shootInterval;
         chamber = 0;
-        if (clip > 0) { // automatic chambering
-            clip--;
-            chamber++;
+        if (clip > 0 && baseGun.automatic) { // automatic chambering
+            Rack();
         }
     }
     public void Update() {
         if (cooldownTimer > 0) {
             cooldownTimer -= Time.deltaTime;
         }
+    }
+    public void Rack() {
         if (chamber == 0 && clip > 0) {
             clip--;
             chamber++;

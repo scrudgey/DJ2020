@@ -51,3 +51,24 @@ how will it work?
         * a special case for unarmed
             * torso modes all have idle, some have walking animations
 
+
+lift up the leg a bit more on walk left/right
+downright walk needs a straighter leg
+
+torso graphics cannot be tied to gun!
+systematize resource loading
+    directory structure
+separate unarmed from armed graphics.
+    legs
+    torso
+    pistol
+    smg
+    shotgun
+    rifle
+instead:
+    a skin object
+        unarmed idle / walk
+        pistol idle / shoot
+        smg idle / shoot
+        shotgun idle / shoot
+        rifle idle / shoot

@@ -45,6 +45,42 @@ public class Octet<T> {
                     return rightDown;       // sprite flipped
             }
         }
+
+        set {
+            switch (key) {
+                default:
+                case Direction.left:
+                    right = value;       // sprite flipped
+                    break;
+                case Direction.leftUp:
+                    rightUp = value;       // sprite flipped
+                    break;
+
+                case Direction.up:
+                    up = value;
+                    break;
+
+                case Direction.rightUp:
+                    rightUp = value;
+                    break;
+
+                case Direction.right:
+                    right = value;
+                    break;
+
+                case Direction.rightDown:
+                    rightDown = value;
+                    break;
+
+                case Direction.down:
+                    down = value;
+                    break;
+                case Direction.leftDown:
+                    rightDown = value;       // sprite flipped
+                    break;
+
+            }
+        }
     }
 
 }
@@ -58,36 +94,34 @@ public class DirectionalBillboard : MonoBehaviour {
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip walkAnimation;
-    public Octet<Sprite> idle;
-    public Octet<Sprite[]> walk;
-    public Octet<Sprite[]> crawl;
-    public Octet<Sprite> crouch;
-    private Sprite _idleSprite;
-    private Sprite _crouchSprite;
-    private Sprite[] _walkSprites;
-    private Sprite[] _crawlSprites;
+    public Skin skin;
+    public Direction direction;
+    void Awake() {
+        skin = Skin.LoadSkin("generic");
+    }
 
     // used by animation
     public void SetFrame(int frame) {
         // Debug.Log($"{mode} {frame}");
         switch (mode) {
             case Mode.walk:
-                spriteRenderer.sprite = _walkSprites[frame];
+                spriteRenderer.sprite = skin.legsWalk[direction][frame];
                 break;
             case Mode.crawl:
-                spriteRenderer.sprite = _crawlSprites[frame];
+                // spriteRenderer.sprite = _crawlSprites[frame];
                 break;
             case Mode.crouch:
-                spriteRenderer.sprite = _crouchSprite;
+                spriteRenderer.sprite = skin.legsCrouch[direction][0];
                 break;
             default:
             case Mode.idle:
-                spriteRenderer.sprite = _idleSprite;
+                spriteRenderer.sprite = skin.legsIdle[direction][0];
                 break;
         }
     }
 
     public void UpdateView(AnimationInput input) {
+        direction = input.direction;
 
         if (input.wallPressTimer > 0 && !input.wallPress) {
             spriteRenderer.material = flatMaterial;
@@ -98,11 +132,6 @@ public class DirectionalBillboard : MonoBehaviour {
         }
 
         spriteRenderer.flipX = input.direction == Direction.left || input.direction == Direction.leftUp || input.direction == Direction.leftDown;
-
-        _idleSprite = idle[input.direction];
-        _walkSprites = walk[input.direction];
-        _crawlSprites = crawl[input.direction];
-        _crouchSprite = crouch[input.direction];
 
         if (input.isMoving) {
             if (input.isCrouching) {
@@ -120,15 +149,14 @@ public class DirectionalBillboard : MonoBehaviour {
             spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             if (input.isCrouching) {
                 mode = Mode.crouch;
-                spriteRenderer.sprite = _crouchSprite;
-
+                spriteRenderer.sprite = skin.legsCrouch[direction][0];
             } else {
                 mode = Mode.idle;
-                spriteRenderer.sprite = _idleSprite;
+                spriteRenderer.sprite = skin.legsIdle[direction][0];
             }
             if (animator.clip != idleAnimation) {
                 animator.clip = idleAnimation;
-                animator.Stop();
+                animator.Play();
             }
         }
 

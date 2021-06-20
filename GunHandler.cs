@@ -8,6 +8,7 @@ public class GunHandler : MonoBehaviour {
     static readonly float height = 1.2f;
 
     public GunAnimation gunAnimation;
+    public LightmapPixelPicker pixelPicker;
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
@@ -17,6 +18,23 @@ public class GunHandler : MonoBehaviour {
     public GunInstance primary;
     public GunInstance third;
 
+    public void Update() {
+        if (gunInstance == null) {
+            return;
+        } else {
+            gunInstance.Update();
+        }
+
+        // TODO: use gun functional spec instead of type here
+        if (!shooting && gunInstance.chamber == 0 && gunInstance.clip > 0) {
+            if (gunInstance.baseGun.type != GunType.shotgun) {
+                gunInstance.Rack();
+            } else {
+                gunAnimation.StartRack();
+            }
+        }
+
+    }
     public Vector3 CursorToTargetPoint(PlayerCharacterInputs.FireInputs input) {
         Vector3 targetPoint = Vector3.zero;
         Plane plane = new Plane(Vector3.up, transform.position);
@@ -100,8 +118,10 @@ public class GunHandler : MonoBehaviour {
         // flash
         // TODO: change depending on silencer
         muzzleFlashLight.enabled = true;
+        pixelPicker.localLightOverride = true;
         StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
             muzzleFlashLight.enabled = false;
+            pixelPicker.localLightOverride = false;
         }));
 
         // muzzleflash obj
@@ -115,6 +135,13 @@ public class GunHandler : MonoBehaviour {
         GameObject.Destroy(muzzleFlashObj, 0.05f);
 
         // shell casing
+        if (gunInstance.baseGun.type != GunType.shotgun) {
+            EmitShell();
+        }
+    }
+    public void EmitShell() {
+        // TODO: don't emit shell if the chamber is empty
+
         GameObject shell = GameObject.Instantiate(
             gunInstance.baseGun.shellCasing,
             gunPosition() + 0.2f * transform.right + 0.2f * transform.forward,
@@ -128,9 +155,13 @@ public class GunHandler : MonoBehaviour {
             ForceMode.Impulse); // TODO: what does force mode mean?
         body.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
     }
-    public void Update() {
-        if (gunInstance != null)
-            gunInstance.Update();
+    public void Aim() {
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.aimSounds);
+    }
+    public void Rack() {
+        EmitShell();
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.rackSounds);
+        gunInstance.Rack();
     }
     public void Reload() {
         gunInstance.Reload();

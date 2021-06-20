@@ -41,6 +41,7 @@ public class GameManager : Singleton<GameManager> {
         // gunHandler.gunInstance = new GunInstance(Gun.Load("smg"));
         gunHandler.primary = new GunInstance(Gun.Load("smg"));
         gunHandler.secondary = new GunInstance(Gun.Load("pistol"));
+        gunHandler.third = new GunInstance(Gun.Load("shotgun"));
         gunHandler.SwitchToGun(2);
     }
 }

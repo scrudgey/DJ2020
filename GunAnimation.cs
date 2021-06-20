@@ -6,10 +6,11 @@ using KinematicCharacterController;
 
 // TODO: don't shoot at cursor position but shoot in direction. ?
 public class GunAnimation : MonoBehaviour {
-    public enum State { idle, walking, shooting, crouching }
+    public enum State { idle, walking, shooting, crouching, racking }
     private State _state;
     private int _frame;
     private bool _isShooting;
+    private bool _isRacking;
     private Direction _direction;
     public GunHandler gunHandler;
     public SpriteRenderer spriteRenderer;
@@ -19,14 +20,22 @@ public class GunAnimation : MonoBehaviour {
     public Material flatMaterial;
 
     public AnimationClip idleAnimation;
-    private Octet<Sprite> _idleSprites;
-    private Octet<Sprite[]> _walkSprites;
-    private Octet<Sprite[]> _shootSprites;
+    public AnimationClip unarmedWalkAnimation;
+    public Skin skin;
     public PlayerCharacterInputs.FireInputs input;
+    public bool holstered;
+
+    void Awake() {
+        skin = Skin.LoadSkin("generic");
+    }
 
     // used by animator
     public void ShootCallback() {
         gunHandler.Shoot(input);
+    }
+    // used by animator
+    public void AimCallback() {
+        gunHandler.Aim();
     }
     // used by animator
     public void SetFrame(int frame) {
@@ -39,24 +48,40 @@ public class GunAnimation : MonoBehaviour {
         gunHandler.shooting = false;
         _isShooting = false;
     }
+    // used by animator
+    public void EndRack() {
+        _isRacking = false;
+    }
+    // used by animator
+    public void RackCallback() {
+        gunHandler.Rack();
+    }
     public void StartShooting() {
-        if (animator.clip != gunHandler.gunInstance.baseGun.shootAnimation) {
-            animator.clip = gunHandler.gunInstance.baseGun.shootAnimation;
-        }
-        if (!animator.isPlaying)
-            animator.Play();
+        animator.clip = gunHandler.gunInstance.baseGun.shootAnimation;
+        animator.Play();
         _isShooting = true;
-        UpdateFrame(_frame);
+        UpdateFrame();
+    }
+    public void StartRack() {
+        if (!_isRacking) {
+            animator.clip = gunHandler.gunInstance.baseGun.rackAnimation;
+            animator.Play();
+            _isRacking = true;
+            UpdateFrame();
+        }
     }
 
     public void Holster() {
+        holstered = true;
         EndShoot();
-        spriteRenderer.enabled = false;
     }
     public void Unholster() {
-        spriteRenderer.enabled = true;
+        holstered = false;
+        _isShooting = false;
+        _isRacking = false;
     }
 
+    // TODO: why is there separate private state variables and input
     public void UpdateView(AnimationInput input) {
         if (input.wallPressTimer > 0 && !input.wallPress) {
             spriteRenderer.material = flatMaterial;
@@ -66,53 +91,58 @@ public class GunAnimation : MonoBehaviour {
             spriteRenderer.material = billboardMaterial;
         }
 
-        if (gunHandler != null && gunHandler.gunInstance != null) {
-            _idleSprites = gunHandler.gunInstance.baseGun.idle;
-            _walkSprites = gunHandler.gunInstance.baseGun.walk;
-            _shootSprites = gunHandler.gunInstance.baseGun.shoot;
-        }
+        AnimationClip walkAnimation = unarmedWalkAnimation;
 
         spriteRenderer.flipX = input.direction == Direction.left || input.direction == Direction.leftUp || input.direction == Direction.leftDown;
         _direction = input.direction;
 
-        if (_isShooting) {
+        // order state settings by priority
+
+        if (_isShooting) { // shooting
             _state = State.shooting;
-        } else if (input.isMoving && gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun.walkAnimation != null) {
+        } else if (_isRacking) { // racking
+            _state = State.racking;
+        } else if (input.isMoving) { // walking
             _state = State.walking;
-            if (animator.clip != gunHandler.gunInstance.baseGun.walkAnimation) {
-                animator.clip = gunHandler.gunInstance.baseGun.walkAnimation;
+            if (animator.clip != walkAnimation) {
+                animator.clip = walkAnimation;
                 animator.Play();
             }
-        } else if (input.isCrouching) {
+        } else if (input.isCrouching) { // crouching
             _state = State.crouching;
-        } else {
+        } else { // idle
             _state = State.idle;
             _frame = 0;
-            if (gunHandler.gunInstance != null)
-                spriteRenderer.sprite = gunHandler.gunInstance.baseGun.idle[input.direction];
             if (animator.clip != idleAnimation) {
                 animator.clip = idleAnimation;
-                animator.Stop();
+                animator.Play();
             }
         }
 
-        UpdateFrame(_frame);
+        UpdateFrame();
     }
 
 
-    public void UpdateFrame(int frame) {
+    public void UpdateFrame() {
         Octet<Sprite[]> _sprites = null;
+        GunType type = GunType.unarmed;
+        if (gunHandler != null && gunHandler.gunInstance != null && !holstered) {
+            type = gunHandler.gunInstance.baseGun.type;
+        }
+
         switch (_state) {
-            default:
-            case State.idle:
-                if (gunHandler.gunInstance != null)
-                    spriteRenderer.sprite = gunHandler.gunInstance.baseGun.idle[_direction];
-                return;
-            case State.walking:
-                _sprites = _walkSprites;
+            case State.racking:
+                _sprites = skin.shotgunRack;
                 break;
             case State.shooting:
-                _sprites = _shootSprites;
+                _sprites = skin.shootSprites(type);
+                break;
+            case State.walking:
+                _sprites = skin.walkSprites(type);
+                break;
+            default:
+            case State.idle:
+                _sprites = skin.idleSprites(type);
                 break;
         }
 
@@ -121,7 +151,7 @@ public class GunAnimation : MonoBehaviour {
         if (_sprites[_direction] == null)
             return;
 
-        frame = Math.Min(frame, _sprites[_direction].Length - 1);
+        int frame = Math.Min(_frame, _sprites[_direction].Length - 1);
         if (_sprites[_direction][frame] == null)
             return;
         spriteRenderer.sprite = _sprites[_direction][frame];

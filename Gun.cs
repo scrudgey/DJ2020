@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+public enum GunType { unarmed, pistol, smg, shotgun, rifle, sword }
 
 [CreateAssetMenu(menuName = "ScriptableObjects/Gun")]
 public class Gun : ScriptableObject {
+
+    // TODO: separate guntype as graphics from gun functionality. allow gun to specify manual cycling, e.g.
+    public GunType type;
+
     [Header("Stats")]
     public float shootInterval;
     public bool automatic;
@@ -17,11 +21,11 @@ public class Gun : ScriptableObject {
     public AudioClip[] shootSounds;
     public AudioClip[] clipOut;
     public AudioClip[] unholster;
+    public AudioClip[] aimSounds;
+    public AudioClip[] rackSounds;
     public AnimationClip shootAnimation;
     public AnimationClip walkAnimation;
-    public Octet<Sprite> idle;
-    public Octet<Sprite[]> walk;
-    public Octet<Sprite[]> shoot;
+    public AnimationClip rackAnimation;
     public GameObject muzzleFlash;
     public GameObject shellCasing;
     public static Gun Load(string name) {
