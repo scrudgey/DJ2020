@@ -24,6 +24,10 @@ public class Skin {
     public Octet<Sprite[]> shotgunShoot = new Octet<Sprite[]>();
     public Octet<Sprite[]> shotgunRack = new Octet<Sprite[]>();
 
+    // rifle
+    public Octet<Sprite[]> rifleIdle = new Octet<Sprite[]>();
+    public Octet<Sprite[]> rifleShoot = new Octet<Sprite[]>();
+
     public Octet<Sprite[]> idleSprites(GunType type) {
         switch (type) {
             case GunType.smg:
@@ -32,6 +36,8 @@ public class Skin {
                 return shotgunIdle;
             case GunType.pistol:
                 return pistolIdle;
+            case GunType.rifle:
+                return rifleIdle;
             default:
             case GunType.unarmed:
                 return unarmedIdle;
@@ -45,6 +51,8 @@ public class Skin {
                 return shotgunIdle;
             case GunType.pistol:
                 return pistolIdle;
+            case GunType.rifle:
+                return rifleIdle;
             default:
             case GunType.unarmed:
                 return unarmedWalk;
@@ -56,6 +64,8 @@ public class Skin {
                 return smgShoot;
             case GunType.shotgun:
                 return shotgunShoot;
+            case GunType.rifle:
+                return rifleShoot;
             default:
             case GunType.pistol:
                 return pistolShoot;
@@ -68,6 +78,7 @@ public class Skin {
         Sprite[] pistolSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/pistol") as Sprite[];
         Sprite[] smgSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/smg") as Sprite[];
         Sprite[] shotgunSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/shotgun") as Sprite[];
+        Sprite[] rifleSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/rifle") as Sprite[];
 
         Skin skin = new Skin();
 
@@ -152,6 +163,21 @@ public class Skin {
         skin.shotgunRack[Direction.right] = new Sprite[] { shotgunSprites[11], shotgunSprites[13], shotgunSprites[11] };
         skin.shotgunRack[Direction.rightUp] = new Sprite[] { shotgunSprites[15], shotgunSprites[17], shotgunSprites[15] };
         skin.shotgunRack[Direction.up] = new Sprite[] { shotgunSprites[19] };
+
+
+        // rifle
+
+        skin.rifleIdle[Direction.down] = new Sprite[] { rifleSprites[0] };
+        skin.rifleIdle[Direction.rightDown] = new Sprite[] { rifleSprites[3] };
+        skin.rifleIdle[Direction.right] = new Sprite[] { rifleSprites[6] };
+        skin.rifleIdle[Direction.rightUp] = new Sprite[] { rifleSprites[9] };
+        skin.rifleIdle[Direction.up] = new Sprite[] { rifleSprites[12] };
+
+        skin.rifleShoot[Direction.down] = new Sprite[] { rifleSprites[1], rifleSprites[2] };
+        skin.rifleShoot[Direction.rightDown] = new Sprite[] { rifleSprites[4], rifleSprites[5] };
+        skin.rifleShoot[Direction.right] = new Sprite[] { rifleSprites[7], rifleSprites[8] };
+        skin.rifleShoot[Direction.rightUp] = new Sprite[] { rifleSprites[10], rifleSprites[11] };
+        skin.rifleShoot[Direction.up] = new Sprite[] { rifleSprites[13], rifleSprites[13] };
 
         return skin;
     }
