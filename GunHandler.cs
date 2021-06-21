@@ -14,6 +14,7 @@ public class GunHandler : MonoBehaviour {
     public KinematicCharacterMotor motor;
     public GunInstance gunInstance;
     public bool shooting;
+    public bool reloading;
     public GunInstance secondary;
     public GunInstance primary;
     public GunInstance third;
@@ -25,15 +26,9 @@ public class GunHandler : MonoBehaviour {
             gunInstance.Update();
         }
 
-        // TODO: use gun functional spec instead of type here
-        if (!shooting && gunInstance.chamber == 0 && gunInstance.clip > 0) {
-            if (gunInstance.baseGun.type != GunType.shotgun) {
-                gunInstance.Rack();
-            } else {
-                gunAnimation.StartRack();
-            }
+        if (!shooting && !reloading && gunInstance.chamber == 0 && gunInstance.clip > 0) {
+            gunAnimation.StartRack();
         }
-
     }
     public Vector3 CursorToTargetPoint(PlayerCharacterInputs.FireInputs input) {
         Vector3 targetPoint = Vector3.zero;
@@ -101,8 +96,10 @@ public class GunHandler : MonoBehaviour {
     }
 
     public void Shoot(PlayerCharacterInputs.FireInputs input) {
-        if (!gunInstance.CanShoot())
+        if (!gunInstance.CanShoot()) {
+            gunAnimation.EndShoot();
             return;
+        }
 
         // update state
         gunInstance.Shoot();
@@ -140,8 +137,6 @@ public class GunHandler : MonoBehaviour {
         }
     }
     public void EmitShell() {
-        // TODO: don't emit shell if the chamber is empty
-
         GameObject shell = GameObject.Instantiate(
             gunInstance.baseGun.shellCasing,
             gunPosition() + 0.2f * transform.right + 0.2f * transform.forward,
@@ -155,23 +150,62 @@ public class GunHandler : MonoBehaviour {
             ForceMode.Impulse); // TODO: what does force mode mean?
         body.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
     }
+    public void EmitMagazine() {
+        GameObject mag = GameObject.Instantiate(
+                   gunInstance.baseGun.magazine,
+                   gunPosition() + 0.2f * transform.right + 0.2f * transform.forward - 0.2f * transform.up,
+                   Quaternion.identity
+               );
+    }
     public void Aim() {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.aimSounds);
     }
     public void Rack() {
-        EmitShell();
+        if (gunInstance == null) {
+            return;
+        }
+        if (gunInstance.baseGun.cycle == CycleType.manual) {
+            EmitShell();
+        }
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.rackSounds);
         gunInstance.Rack();
     }
     public void Reload() {
-        gunInstance.Reload();
+        if (reloading)
+            return;
+
+        reloading = true;
+
+        // gunInstance.Reload();
+        gunInstance.ClipOut();
 
         // drop clip
+        EmitMagazine();
 
         // play sound
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipOut);
 
         // start animation
+        gunAnimation.StartReload();
+    }
+    public void ReloadShell() {
+        if (reloading)
+            return;
+        reloading = true;
+
+        // start animation
+        gunAnimation.StartReload();
+    }
+    public void ClipIn() {
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipIn);
+        gunInstance.ClipIn();
+    }
+    public void ShellIn() {
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipIn);
+        gunInstance.ShellIn();
+    }
+    public void StopReload() {
+        reloading = false;
     }
     private void SwitchGun(GunInstance instance) {
         if (instance == null || instance == gunInstance)
@@ -213,10 +247,14 @@ public class GunHandler : MonoBehaviour {
         if (input.switchToGun != -1) {
             SwitchToGun(input.switchToGun);
         } else if (input.reload) {
-            Reload();
+            if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
+                ReloadShell();
+            } else if (gunInstance.baseGun.type != GunType.shotgun) {
+                Reload();
+            }
         } else if (gunInstance != null && gunInstance.CanShoot()) {
 
-            if (gunInstance.baseGun.automatic) {
+            if (gunInstance.baseGun.cycle == CycleType.automatic) {
                 if (input.Fire.FirePressed && !shooting) {
                     gunAnimation.StartShooting();
                     shooting = true;

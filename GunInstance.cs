@@ -26,7 +26,7 @@ public class GunInstance {
         }
         cooldownTimer = baseGun.shootInterval;
         chamber = 0;
-        if (clip > 0 && baseGun.automatic) { // automatic chambering
+        if (clip > 0 && baseGun.cycle == CycleType.semiautomatic || baseGun.cycle == CycleType.automatic) { // automatic chambering
             Rack();
         }
     }
@@ -41,7 +41,15 @@ public class GunInstance {
             chamber++;
         }
     }
-    public void Reload() {
+    public void ClipOut() {
+        clip = 0;
+    }
+    public void ClipIn() {
         clip = baseGun.clipSize;
+    }
+    public void ShellIn() {
+        if (clip < baseGun.clipSize) {
+            clip++;
+        }
     }
 }

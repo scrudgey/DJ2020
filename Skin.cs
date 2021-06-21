@@ -14,19 +14,26 @@ public class Skin {
     // pistol
     public Octet<Sprite[]> pistolIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> pistolShoot = new Octet<Sprite[]>();
+    public Octet<Sprite[]> pistolRack = new Octet<Sprite[]>();
+    public Octet<Sprite[]> pistolReload = new Octet<Sprite[]>();
 
     // smg
     public Octet<Sprite[]> smgIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> smgShoot = new Octet<Sprite[]>();
+    public Octet<Sprite[]> smgRack = new Octet<Sprite[]>();
+    public Octet<Sprite[]> smgReload = new Octet<Sprite[]>();
 
     // shotgun
     public Octet<Sprite[]> shotgunIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> shotgunShoot = new Octet<Sprite[]>();
     public Octet<Sprite[]> shotgunRack = new Octet<Sprite[]>();
+    public Octet<Sprite[]> shotgunReload = new Octet<Sprite[]>();
 
     // rifle
     public Octet<Sprite[]> rifleIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleShoot = new Octet<Sprite[]>();
+    public Octet<Sprite[]> rifleRack = new Octet<Sprite[]>();
+    public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
 
     public Octet<Sprite[]> idleSprites(GunType type) {
         switch (type) {
@@ -69,6 +76,32 @@ public class Skin {
             default:
             case GunType.pistol:
                 return pistolShoot;
+        }
+    }
+    public Octet<Sprite[]> rackSprites(GunType type) {
+        switch (type) {
+            case GunType.smg:
+                return smgRack;
+            case GunType.rifle:
+                return rifleRack;
+            case GunType.shotgun:
+                return shotgunRack;
+            default:
+            case GunType.pistol:
+                return pistolRack;
+        }
+    }
+    public Octet<Sprite[]> reloadSprites(GunType type) {
+        switch (type) {
+            default:
+            case GunType.smg:
+                return smgReload;
+            case GunType.rifle:
+                return rifleReload;
+            case GunType.shotgun:
+                return shotgunReload;
+            case GunType.pistol:
+                return pistolReload;
         }
     }
 
@@ -130,6 +163,18 @@ public class Skin {
         skin.pistolShoot[Direction.rightUp] = new Sprite[] { pistolSprites[10] };
         skin.pistolShoot[Direction.up] = new Sprite[] { pistolSprites[13] };
 
+        skin.pistolReload[Direction.down] = new Sprite[] { pistolSprites[15], pistolSprites[16], pistolSprites[17], pistolSprites[18], pistolSprites[19], pistolSprites[20] };
+        skin.pistolReload[Direction.rightDown] = new Sprite[] { pistolSprites[24], pistolSprites[25], pistolSprites[26], pistolSprites[27], pistolSprites[28], pistolSprites[29] };
+        skin.pistolReload[Direction.right] = new Sprite[] { pistolSprites[33], pistolSprites[34], pistolSprites[35], pistolSprites[36], pistolSprites[37], pistolSprites[38] };
+        skin.pistolReload[Direction.rightUp] = new Sprite[] { pistolSprites[42], pistolSprites[43], pistolSprites[44], pistolSprites[45], pistolSprites[46], pistolSprites[47] };
+        skin.pistolReload[Direction.up] = new Sprite[] { pistolSprites[51], pistolSprites[52], pistolSprites[53] };
+
+        skin.pistolRack[Direction.down] = new Sprite[] { pistolSprites[21], pistolSprites[22], pistolSprites[23], pistolSprites[22] };
+        skin.pistolRack[Direction.rightDown] = new Sprite[] { pistolSprites[30], pistolSprites[31], pistolSprites[32], pistolSprites[31] };
+        skin.pistolRack[Direction.right] = new Sprite[] { pistolSprites[39], pistolSprites[40], pistolSprites[41], pistolSprites[40] };
+        skin.pistolRack[Direction.rightUp] = new Sprite[] { pistolSprites[48], pistolSprites[49], pistolSprites[50], pistolSprites[49] };
+        skin.pistolRack[Direction.up] = new Sprite[] { pistolSprites[53] };
+
         // smg
 
         skin.smgIdle[Direction.down] = new Sprite[] { smgSprites[0] };
@@ -143,6 +188,18 @@ public class Skin {
         skin.smgShoot[Direction.right] = new Sprite[] { smgSprites[7], smgSprites[8] };
         skin.smgShoot[Direction.rightUp] = new Sprite[] { smgSprites[10], smgSprites[11] };
         skin.smgShoot[Direction.up] = new Sprite[] { smgSprites[13], smgSprites[13] };
+
+        skin.smgReload[Direction.down] = new Sprite[] { smgSprites[14], smgSprites[15], smgSprites[16], smgSprites[17], smgSprites[18], smgSprites[19] };
+        skin.smgReload[Direction.rightDown] = new Sprite[] { smgSprites[22], smgSprites[23], smgSprites[24], smgSprites[25], smgSprites[26], smgSprites[27] };
+        skin.smgReload[Direction.right] = new Sprite[] { smgSprites[30], smgSprites[31], smgSprites[32], smgSprites[33], smgSprites[34], smgSprites[35] };
+        skin.smgReload[Direction.rightUp] = new Sprite[] { smgSprites[38], smgSprites[39], smgSprites[40], smgSprites[41], smgSprites[42], smgSprites[43] };
+        skin.smgReload[Direction.up] = new Sprite[] { smgSprites[46], smgSprites[47], smgSprites[48], smgSprites[49], smgSprites[49], smgSprites[49] };
+
+        skin.smgRack[Direction.down] = new Sprite[] { smgSprites[19], smgSprites[20], smgSprites[21], smgSprites[20] };
+        skin.smgRack[Direction.rightDown] = new Sprite[] { smgSprites[27], smgSprites[28], smgSprites[29], smgSprites[28] };
+        skin.smgRack[Direction.right] = new Sprite[] { smgSprites[35], smgSprites[36], smgSprites[37], smgSprites[36] };
+        skin.smgRack[Direction.rightUp] = new Sprite[] { smgSprites[43], smgSprites[44], smgSprites[45], smgSprites[44] };
+        skin.smgRack[Direction.up] = new Sprite[] { pistolSprites[49] };
 
         // shotgun
 
@@ -164,6 +221,11 @@ public class Skin {
         skin.shotgunRack[Direction.rightUp] = new Sprite[] { shotgunSprites[15], shotgunSprites[17], shotgunSprites[15] };
         skin.shotgunRack[Direction.up] = new Sprite[] { shotgunSprites[19] };
 
+        skin.shotgunReload[Direction.down] = new Sprite[] { shotgunSprites[20], shotgunSprites[21], shotgunSprites[22], shotgunSprites[23], shotgunSprites[24], shotgunSprites[25] };
+        skin.shotgunReload[Direction.rightDown] = new Sprite[] { shotgunSprites[26], shotgunSprites[27], shotgunSprites[28], shotgunSprites[29], shotgunSprites[30], shotgunSprites[31] };
+        skin.shotgunReload[Direction.right] = new Sprite[] { shotgunSprites[32], shotgunSprites[33], shotgunSprites[34], shotgunSprites[35], shotgunSprites[36], shotgunSprites[37] };
+        skin.shotgunReload[Direction.rightUp] = new Sprite[] { shotgunSprites[38], shotgunSprites[39], shotgunSprites[40], shotgunSprites[41], shotgunSprites[42], shotgunSprites[43] };
+        skin.shotgunReload[Direction.up] = new Sprite[] { shotgunSprites[44], shotgunSprites[45], shotgunSprites[46], shotgunSprites[47], shotgunSprites[48], shotgunSprites[49] };
 
         // rifle
 
@@ -178,6 +240,19 @@ public class Skin {
         skin.rifleShoot[Direction.right] = new Sprite[] { rifleSprites[7], rifleSprites[8] };
         skin.rifleShoot[Direction.rightUp] = new Sprite[] { rifleSprites[10], rifleSprites[11] };
         skin.rifleShoot[Direction.up] = new Sprite[] { rifleSprites[13], rifleSprites[13] };
+
+        skin.rifleReload[Direction.down] = new Sprite[] { rifleSprites[14], rifleSprites[15], rifleSprites[16], rifleSprites[17], rifleSprites[18], rifleSprites[19] };
+        skin.rifleReload[Direction.rightDown] = new Sprite[] { rifleSprites[22], rifleSprites[23], rifleSprites[24], rifleSprites[25], rifleSprites[26], rifleSprites[27] };
+        skin.rifleReload[Direction.right] = new Sprite[] { rifleSprites[30], rifleSprites[31], rifleSprites[32], rifleSprites[33], rifleSprites[34], rifleSprites[35] };
+        skin.rifleReload[Direction.rightUp] = new Sprite[] { rifleSprites[38], rifleSprites[39], rifleSprites[40], rifleSprites[41], rifleSprites[42], rifleSprites[43] };
+        skin.rifleReload[Direction.up] = new Sprite[] { rifleSprites[46], rifleSprites[47], rifleSprites[48], rifleSprites[49], rifleSprites[49], rifleSprites[49] };
+
+        skin.rifleRack[Direction.down] = new Sprite[] { rifleSprites[19], rifleSprites[20], rifleSprites[21], rifleSprites[20] };
+        skin.rifleRack[Direction.rightDown] = new Sprite[] { rifleSprites[27], rifleSprites[28], rifleSprites[29], rifleSprites[28] };
+        skin.rifleRack[Direction.right] = new Sprite[] { rifleSprites[35], rifleSprites[36], rifleSprites[37], rifleSprites[36] };
+        skin.rifleRack[Direction.rightUp] = new Sprite[] { rifleSprites[43], rifleSprites[44], rifleSprites[45], rifleSprites[44] };
+        skin.rifleRack[Direction.up] = new Sprite[] { rifleSprites[49] };
+
 
         return skin;
     }

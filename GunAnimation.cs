@@ -6,11 +6,12 @@ using KinematicCharacterController;
 
 // TODO: don't shoot at cursor position but shoot in direction. ?
 public class GunAnimation : MonoBehaviour {
-    public enum State { idle, walking, shooting, crouching, racking }
+    public enum State { idle, walking, shooting, crouching, racking, reloading }
     private State _state;
     private int _frame;
     private bool _isShooting;
     private bool _isRacking;
+    private bool _isReloading;
     private Direction _direction;
     public GunHandler gunHandler;
     public SpriteRenderer spriteRenderer;
@@ -56,10 +57,13 @@ public class GunAnimation : MonoBehaviour {
     public void RackCallback() {
         gunHandler.Rack();
     }
+
     public void StartShooting() {
         animator.clip = gunHandler.gunInstance.baseGun.shootAnimation;
         animator.Play();
         _isShooting = true;
+        _isRacking = false;
+        _isReloading = false;
         UpdateFrame();
     }
     public void StartRack() {
@@ -67,9 +71,31 @@ public class GunAnimation : MonoBehaviour {
             animator.clip = gunHandler.gunInstance.baseGun.rackAnimation;
             animator.Play();
             _isRacking = true;
+            _isReloading = false;
+            _isShooting = false;
             UpdateFrame();
         }
     }
+    public void StartReload() {
+        if (!_isReloading) {
+            animator.clip = gunHandler.gunInstance.baseGun.reloadAnimation;
+            animator.Play();
+            _isReloading = true;
+            _isRacking = false;
+            _isShooting = false;
+            UpdateFrame();
+        }
+    }
+    public void StopReload() {
+        _isReloading = false;
+        gunHandler.reloading = false;
+    }
+    public void ClipIn() {
+        gunHandler.ClipIn();
+    }
+    // public void ShellIn() {
+    //     gunHandler.ShellIn();
+    // }
 
     public void Holster() {
         holstered = true;
@@ -100,6 +126,8 @@ public class GunAnimation : MonoBehaviour {
 
         if (_isShooting) { // shooting
             _state = State.shooting;
+        } else if (_isReloading) {
+            _state = State.reloading;
         } else if (_isRacking) { // racking
             _state = State.racking;
         } else if (input.isMoving) { // walking
@@ -131,8 +159,11 @@ public class GunAnimation : MonoBehaviour {
         }
 
         switch (_state) {
+            case State.reloading:
+                _sprites = skin.reloadSprites(type);
+                break;
             case State.racking:
-                _sprites = skin.shotgunRack;
+                _sprites = skin.rackSprites(type);
                 break;
             case State.shooting:
                 _sprites = skin.shootSprites(type);
