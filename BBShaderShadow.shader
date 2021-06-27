@@ -1,10 +1,12 @@
-Shader "Billboard Lock Y" {
+Shader "Sprites/Custom/BillboardShadow" {
     Properties{
         _ShadowColor ("Shadow Color", Color) = (0.5,0.5,0.5,1)
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
 		_Color ("Tint", Color) = (1,1,1,1)
         _ScaleX ("Scale X", Float) = 1.0
         _ScaleY ("Scale Y", Float) = 1.0
+        [PerRendererData] _EnableExternalAlpha("Enable External Alpha", Float) = 0
+        _Cutoff("Alpha Cutoff", Range(0,1)) = 0.5
     }
     
     SubShader
@@ -28,8 +30,9 @@ Shader "Billboard Lock Y" {
         {
             CGPROGRAM
             
-            #pragma vertex vert
+            #pragma vertex vert alphatest:_Cutoff addshadow
             #pragma fragment frag
+
 
             // Use shader model 3.0 target, to get nicer looking lighting
             #pragma target 3.0
@@ -86,4 +89,6 @@ Shader "Billboard Lock Y" {
             ENDCG
         }
     }
+        Fallback "Transparent/VertexLit"
+
 }

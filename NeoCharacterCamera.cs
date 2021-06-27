@@ -121,7 +121,8 @@ public class NeoCharacterCamera : MonoBehaviour {
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
 
         // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
-        Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
+        // Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
+        Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
         targetRotation = Quaternion.Slerp(targetRotation, planarRot * verticalRot, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
 
         // Apply rotation
@@ -154,7 +155,8 @@ public class NeoCharacterCamera : MonoBehaviour {
             return;
         }
         Camera.orthographic = false;
-        Camera.fieldOfView = 38;
+        // Camera.fieldOfView = 38;
+        Camera.fieldOfView = 45;
 
         Vector3 camDirection = -1f * input.wallNormal;
         camDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(camDirection, FollowTransform.up));

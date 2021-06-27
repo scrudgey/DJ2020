@@ -37,7 +37,8 @@ public class GunHandler : MonoBehaviour {
         float distance = 0;
         if (plane.Raycast(projection, out distance)) {
             Vector3 hitPoint = projection.GetPoint(distance);
-            targetPoint = new Vector3(hitPoint.x, height, hitPoint.z);
+            // targetPoint = new Vector3(hitPoint.x, hitPoint.y + height, hitPoint.z);
+            targetPoint = new Vector3(hitPoint.x, hitPoint.y, hitPoint.z);
         }
         return targetPoint;
     }
@@ -50,7 +51,8 @@ public class GunHandler : MonoBehaviour {
         ray.lineRenderer.SetPosition(1, endPoint);
     }
     private Vector3 gunPosition() {
-        return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
+        // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
+        return new Vector3(transform.position.x, transform.position.y, transform.position.z);
     }
     private Vector3 gunDirection(PlayerCharacterInputs.FireInputs input) {
         Vector3 targetPoint = CursorToTargetPoint(input);
@@ -168,7 +170,7 @@ public class GunHandler : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.aimSounds);
     }
     public void Rack() {
-        if (gunInstance == null) {
+        if (gunInstance == null || gunInstance.baseGun == null) {
             return;
         }
         if (gunInstance.baseGun.cycle == CycleType.manual) {
