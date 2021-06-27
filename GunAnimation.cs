@@ -30,6 +30,10 @@ public class GunAnimation : MonoBehaviour {
         skin = Skin.LoadSkin("generic");
     }
 
+    void OnEnable() {
+        animator.Play();
+    }
+
     // used by animator
     public void ShootCallback() {
         gunHandler.Shoot(input);
@@ -188,4 +192,9 @@ public class GunAnimation : MonoBehaviour {
         spriteRenderer.sprite = _sprites[_direction][frame];
     }
 
+    // public void Update() {
+    //     if (gunHandler.gunInstance == null) {
+    //         // animator.clip.sp/
+    //     }
+    // }
 }

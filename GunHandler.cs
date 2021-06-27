@@ -50,7 +50,7 @@ public class GunHandler : MonoBehaviour {
         ray.lineRenderer.SetPosition(1, endPoint);
     }
     private Vector3 gunPosition() {
-        return new Vector3(transform.position.x, height, transform.position.z);
+        return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     private Vector3 gunDirection(PlayerCharacterInputs.FireInputs input) {
         Vector3 targetPoint = CursorToTargetPoint(input);
@@ -152,10 +152,17 @@ public class GunHandler : MonoBehaviour {
     }
     public void EmitMagazine() {
         GameObject mag = GameObject.Instantiate(
-                   gunInstance.baseGun.magazine,
-                   gunPosition() + 0.2f * transform.right + 0.2f * transform.forward - 0.2f * transform.up,
-                   Quaternion.identity
-               );
+                gunInstance.baseGun.magazine,
+                gunPosition() + 0.2f * transform.right + 0.2f * transform.forward - 0.2f * transform.up,
+                Quaternion.identity
+            );
+        Rigidbody body = mag.GetComponent<Rigidbody>();
+
+        body.AddRelativeForce(
+            UnityEngine.Random.Range(-0.1f, 0.1f) * transform.right +
+            UnityEngine.Random.Range(-0.1f, 0.1f) * transform.forward,
+            ForceMode.Impulse);
+        body.AddRelativeTorque(UnityEngine.Random.Range(2f, 3f) * mag.transform.forward);
     }
     public void Aim() {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.aimSounds);

@@ -14,81 +14,11 @@ public struct AnimationInput {
     public bool wallPress;
 }
 
-[Serializable]
-public class Octet<T> {
-    Dictionary<Direction, T> items;
-    public T down;
-    public T rightDown;
-    public T right;
-    public T rightUp;
-    public T up;
-
-    public T this[Direction key] {
-        get {
-            switch (key) {
-                default:
-                case Direction.left:
-                    return right;       // sprite flipped
-                case Direction.leftUp:
-                    return rightUp;       // sprite flipped
-                case Direction.up:
-                    return up;
-                case Direction.rightUp:
-                    return rightUp;
-                case Direction.right:
-                    return right;
-                case Direction.rightDown:
-                    return rightDown;
-                case Direction.down:
-                    return down;
-                case Direction.leftDown:
-                    return rightDown;       // sprite flipped
-            }
-        }
-
-        set {
-            switch (key) {
-                default:
-                case Direction.left:
-                    right = value;       // sprite flipped
-                    break;
-                case Direction.leftUp:
-                    rightUp = value;       // sprite flipped
-                    break;
-
-                case Direction.up:
-                    up = value;
-                    break;
-
-                case Direction.rightUp:
-                    rightUp = value;
-                    break;
-
-                case Direction.right:
-                    right = value;
-                    break;
-
-                case Direction.rightDown:
-                    rightDown = value;
-                    break;
-
-                case Direction.down:
-                    down = value;
-                    break;
-                case Direction.leftDown:
-                    rightDown = value;       // sprite flipped
-                    break;
-
-            }
-        }
-    }
-
-}
-
 public class DirectionalBillboard : MonoBehaviour {
     enum Mode { idle, walk, crawl, crouch }
     Mode mode;
     public SpriteRenderer spriteRenderer;
+    public GameObject torso;
     public Material billboardMaterial;
     public Material flatMaterial;
     public Animation animator;
@@ -150,6 +80,7 @@ public class DirectionalBillboard : MonoBehaviour {
             if (input.isCrouching) {
                 mode = Mode.crouch;
                 spriteRenderer.sprite = skin.legsCrouch[direction][0];
+
             } else {
                 mode = Mode.idle;
                 spriteRenderer.sprite = skin.legsIdle[direction][0];
@@ -157,6 +88,16 @@ public class DirectionalBillboard : MonoBehaviour {
             if (animator.clip != idleAnimation) {
                 animator.clip = idleAnimation;
                 animator.Play();
+            }
+        }
+
+        if (input.isCrouching) {
+            if (torso.activeInHierarchy) {
+                torso.SetActive(false);
+            }
+        } else {
+            if (!torso.activeInHierarchy) {
+                torso.SetActive(true);
             }
         }
 

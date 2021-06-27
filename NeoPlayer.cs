@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class NeoPlayer : MonoBehaviour {
     public NeoCharacterCamera OrbitCamera;
+    public ClearSighter sighter;
     public Transform CameraFollowPoint;
     public NeoCharacterController Character;
     public DirectionalBillboard legsAnimator;
@@ -156,6 +157,7 @@ public class NeoPlayer : MonoBehaviour {
 
         // Apply inputs to the camera
         OrbitCamera.UpdateWithInput(input);
+        sighter.UpdateWithInput(input);
 
         rotateCameraLeftPressedThisFrame = false;
         rotateCameraRightPressedThisFrame = false;

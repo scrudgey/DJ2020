@@ -38,8 +38,8 @@ public class GameManager : Singleton<GameManager> {
 
         // initialize gun instance
         GunHandler gunHandler = playerObject.GetComponentInChildren<GunHandler>();
-        // gunHandler.primary = new GunInstance(Gun.Load("smg"));
-        gunHandler.primary = new GunInstance(Gun.Load("rifle"));
+        gunHandler.primary = new GunInstance(Gun.Load("smg"));
+        // gunHandler.primary = new GunInstance(Gun.Load("rifle"));
         gunHandler.secondary = new GunInstance(Gun.Load("pistol"));
         gunHandler.third = new GunInstance(Gun.Load("shotgun"));
         // gunHandler.third = new GunInstance(Gun.Load("smg"));

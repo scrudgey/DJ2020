@@ -6,6 +6,7 @@ public class Skin {
     public Octet<Sprite[]> legsIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsWalk = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsCrouch = new Octet<Sprite[]>();
+    public Octet<Sprite[]> legsCrawl = new Octet<Sprite[]>();
 
     // unarmed
     public Octet<Sprite[]> unarmedIdle = new Octet<Sprite[]>();
@@ -131,6 +132,9 @@ public class Skin {
         skin.legsWalk[Direction.right] = new Sprite[] { legSprites[13], legSprites[14], legSprites[15], legSprites[16] };
         skin.legsWalk[Direction.rightUp] = new Sprite[] { legSprites[17], legSprites[18], legSprites[19], legSprites[20] };
         skin.legsWalk[Direction.up] = new Sprite[] { legSprites[21], legSprites[22], legSprites[23], legSprites[24] };
+
+        skin.legsCrouch[Direction.rightDown] = new Sprite[] { legSprites[25] };
+        skin.legsCrouch[Direction.rightUp] = new Sprite[] { legSprites[26] };
 
         // TODO: set crouch sprite
         // TODO: set crawl sprite

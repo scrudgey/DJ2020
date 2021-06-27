@@ -72,3 +72,37 @@ instead:
         smg idle / shoot
         shotgun idle / shoot
         rifle idle / shoot
+
+new material using texture
+    set texture to cutout or transparent
+import objects
+    set material
+
+bake lightmap with readable texture
+    have at least one baked light with shadows turned on
+    have at least one mesh renderer
+        receive shadows
+        contribute to global illumination
+        receive global illumination
+    generate light data
+at least one light marked static / contribute to GI
+at least one light with mode Mixed (not baked)
+select the generated texture
+    read/write enabled, apply
+    '
+
+
+potential strategies
+a collider zone based approach
+    put floor 1, floor 2 etc. under different roots
+    place zones that turn floors invisible
+    cons: requires good practices when desiging level.
+
+programmatic raytrace approach
+    disable anything above the player
+        kind of works maybe
+        what about light fixtures?
+        performance hit
+        what about approaching a hill from below?
+
+objects in front, but not above
