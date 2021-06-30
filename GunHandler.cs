@@ -5,7 +5,7 @@ using KinematicCharacterController;
 using System.Linq;
 
 public class GunHandler : MonoBehaviour {
-    static readonly float height = 1.2f;
+    static readonly float height = 0.5f;
 
     public GunAnimation gunAnimation;
     public LightmapPixelPicker pixelPicker;
@@ -38,7 +38,7 @@ public class GunHandler : MonoBehaviour {
         if (plane.Raycast(projection, out distance)) {
             Vector3 hitPoint = projection.GetPoint(distance);
             // targetPoint = new Vector3(hitPoint.x, hitPoint.y + height, hitPoint.z);
-            targetPoint = new Vector3(hitPoint.x, hitPoint.y, hitPoint.z);
+            targetPoint = new Vector3(hitPoint.x, hitPoint.y + height, hitPoint.z);
         }
         return targetPoint;
     }
@@ -52,7 +52,7 @@ public class GunHandler : MonoBehaviour {
     }
     private Vector3 gunPosition() {
         // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
-        return new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     private Vector3 gunDirection(PlayerCharacterInputs.FireInputs input) {
         Vector3 targetPoint = CursorToTargetPoint(input);

@@ -57,9 +57,15 @@ Shader "Sprites/Custom/SpriteShadowBillboard"
             float3 right = normalize(UNITY_MATRIX_V._m00_m01_m02);
  
             // rotate to face camera
+            // float4x4 rotationMatrix = float4x4( right,      0,
+            //                                     up,         0,
+            //                                     forward,    0,
+            //                                     0, 0, 0,    1);
+
+            // rotate to face camera but leave height dimension alone.
             float4x4 rotationMatrix = float4x4( right,      0,
                                                 up,         0,
-                                                forward,    0,
+                                                float3(1, 1, 1),    0,
                                                 0, 0, 0,    1);
 
             v.vertex = mul(v.vertex, rotationMatrix);

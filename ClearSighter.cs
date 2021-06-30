@@ -49,7 +49,7 @@ public class ClearSighter : MonoBehaviour {
             Vector3 otherFloor = collider.bounds.center - new Vector3(0f, collider.bounds.extents.y, 0f);
             Vector3 direction = otherFloor - myTransform.position;
 
-            if (direction.y > 2.0f) {
+            if (direction.y > 1.0f) {
                 // renderer.enabled = false;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 // Debug.DrawRay(myTransform.position, direction, Color.white, 0.0f, true);

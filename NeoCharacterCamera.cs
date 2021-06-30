@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 public struct CameraInput {
     public enum CameraState { normal, wallPress }
     public CameraState state;
@@ -12,6 +13,9 @@ public struct CameraInput {
     public Vector2 lastWallInput;
 }
 public class NeoCharacterCamera : MonoBehaviour {
+    // public Volume postProcessVolume;
+    // public PostProcessProfile normalProfile;
+    // public VolumeProfile wallPressProfile;
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
@@ -76,7 +80,18 @@ public class NeoCharacterCamera : MonoBehaviour {
         PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward;
         _currentFollowPosition = FollowTransform.position;
 
-        targetRotation = Quaternion.identity;
+        // targetRotation = Quaternion.identity;
+        // VolumeManager.instance.stack;
+
+        Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * 110f);// * RotationSpeed));
+        PlanarDirection = rotationFromInput * PlanarDirection;
+        PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
+        // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
+        // Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
+        // Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
+        Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
+        targetRotation = planarRot * verticalRot;
     }
 
     public void UpdateWithInput(CameraInput input) {
@@ -85,9 +100,11 @@ public class NeoCharacterCamera : MonoBehaviour {
             switch (input.state) {
                 default:
                 case CameraInput.CameraState.normal:
+                    // postProcessVolume.profile = normalProfile;
                     NormalUpdate(input);
                     break;
                 case CameraInput.CameraState.wallPress:
+                    // postProcessVolume.profile = wallPressProfile;
                     WallPressUpdate(input);
                     break;
             }
@@ -119,21 +136,22 @@ public class NeoCharacterCamera : MonoBehaviour {
         PlanarDirection = rotationFromInput * PlanarDirection;
         PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
-
         // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
         // Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
-        Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
+        // Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
+        Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
         targetRotation = Quaternion.Slerp(targetRotation, planarRot * verticalRot, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
 
         // Apply rotation
         Transform.rotation = targetRotation;
 
         // Process distance input
-        // if (_distanceIsObstructed) {//&& Mathf.Abs(zoomInput) > 0f) {
-        //     TargetDistance = _currentDistance;
-        // }
+        if (_distanceIsObstructed) {//&& Mathf.Abs(zoomInput) > 0f) {
+            TargetDistance = _currentDistance;
+        }
         // TargetDistance += zoomInput * DistanceMovementSpeed;
         TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
+        _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-DistanceMovementSharpness * input.deltaTime));
 
         // Find the smoothed follow position
         _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, FollowTransform.position, 1f - Mathf.Exp(-FollowingSharpness * input.deltaTime));

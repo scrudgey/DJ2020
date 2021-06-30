@@ -103,6 +103,8 @@ programmatic raytrace approach
         kind of works maybe
         what about light fixtures?
         performance hit
+            implement threaded approach
         what about approaching a hill from below?
+        what about moving up a floor, and the above is now all disabled
 
 objects in front, but not above
