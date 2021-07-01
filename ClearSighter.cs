@@ -4,9 +4,7 @@ using UnityEngine;
 using System.Linq;
 public class ClearSighter : MonoBehaviour {
     public static Dictionary<GameObject, MeshRenderer> renderers = new Dictionary<GameObject, MeshRenderer>();
-    // public static Dictionary<Material, Material> transparentMaterials = new Dictionary<Material, Material>();
     public static Dictionary<GameObject, TransparentMesh> transparentMeshes = new Dictionary<GameObject, TransparentMesh>();
-    // public Camera myCamera;
     public NeoCharacterCamera myCamera;
     Transform myTransform;
     public bool active;
@@ -28,7 +26,6 @@ public class ClearSighter : MonoBehaviour {
             return transparent;
         }
     }
-    // Start is called before the first frame update
     void Start() {
         myTransform = transform;
     }
@@ -36,9 +33,7 @@ public class ClearSighter : MonoBehaviour {
         active = input.state != CameraInput.CameraState.wallPress;
     }
 
-    // Update is called once per frame
     void Update() {
-
         // colliders above me
         Collider[] others = Physics.OverlapSphere(transform.position, 20f);
         foreach (Collider collider in others) {
@@ -75,19 +70,13 @@ public class ClearSighter : MonoBehaviour {
         }
 
         // collider between me and the camera
-        // Vector3 gazePosition = transform.position + new Vector3(0f, 2f, 0f);
         float distance = Vector3.Distance(myCamera.transform.position, transform.position) + 1f;
-        // Debug.DrawRay(myCamera.transform.position, distance * myCamera.transform.forward, Color.red, 0.1f);
         foreach (RaycastHit hit in Physics.RaycastAll(myCamera.transform.position, myCamera.transform.forward, distance).OrderBy(x => x.distance)) {
             if (hit.collider.transform.IsChildOf(transform)) {
                 break;
             }
-            // MeshRenderer mesh = Renderer(hit.collider.gameObject);
-            // if (mesh.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly)
-            //     continue;
             TransparentMesh transparent = TransparentMaterial(hit.collider.gameObject);
             if (transparent != null) {
-                // mesh.material = transparent;
                 transparent.timer = 1f;
             }
         }
