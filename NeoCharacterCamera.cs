@@ -13,6 +13,7 @@ public struct CameraInput {
     public Vector2 lastWallInput;
 }
 public class NeoCharacterCamera : MonoBehaviour {
+    public static Quaternion rotationOffset;
     // public Volume postProcessVolume;
     // public PostProcessProfile normalProfile;
     // public VolumeProfile wallPressProfile;
@@ -77,19 +78,19 @@ public class NeoCharacterCamera : MonoBehaviour {
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(Transform t) {
         FollowTransform = t;
-        PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward;
+        PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
 
         // targetRotation = Quaternion.identity;
         // VolumeManager.instance.stack;
 
-        Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * 110f);// * RotationSpeed));
+        // the initial rotation here will be an offset to all subsequent rotations
+        // rotationOffset = Quaternion.Euler(FollowTransform.up * 110f);
+        rotationOffset = Quaternion.Euler(FollowTransform.up * 20f);
+        Quaternion rotationFromInput = rotationOffset;
         PlanarDirection = rotationFromInput * PlanarDirection;
         PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
-        // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
-        // Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
-        // Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
         Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
         targetRotation = planarRot * verticalRot;
     }

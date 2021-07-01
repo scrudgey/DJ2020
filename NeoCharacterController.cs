@@ -86,8 +86,12 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public void SetInputs(ref PlayerCharacterInputs inputs) {
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
+        if (moveInputVector.y != 0 && moveInputVector.x != 0) {
+            moveInputVector = NeoCharacterCamera.rotationOffset * moveInputVector;
+        }
 
         // Calculate camera direction and rotation on the character plane
+        // TODO: use NeoCharacterCamera.rotationOffset when moving up-right, up-left, etc.
         Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.forward, Motor.CharacterUp).normalized;
         if (cameraPlanarDirection.sqrMagnitude == 0f) {
             cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.up, Motor.CharacterUp).normalized;
@@ -96,6 +100,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
         // Move and look inputs
         _moveInputVector = cameraPlanarRotation * moveInputVector;
+        if (inputs.MoveAxisRight != 0 && inputs.MoveAxisForward != 0) {
+            _moveInputVector = Quaternion.Inverse(NeoCharacterCamera.rotationOffset) * _moveInputVector;
+        }
         _moveAxis = new Vector2(inputs.MoveAxisRight, inputs.MoveAxisForward);
 
         // Fire

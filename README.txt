@@ -108,3 +108,5 @@ programmatic raytrace approach
         what about moving up a floor, and the above is now all disabled
 
 objects in front, but not above
+    raytrace to camera
+    change material to be partly transparent?
