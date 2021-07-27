@@ -137,9 +137,9 @@ public class NeoPlayer : MonoBehaviour {
         } else if (rotateCameraLeftPressedThisFrame) {
             rotation = CameraInput.RotateInput.left;
         }
-        CameraInput.CameraState state = CameraInput.CameraState.normal;
+        CameraState state = CameraState.normal;
         if (Character.wallPress) {
-            state = CameraInput.CameraState.wallPress;
+            state = CameraState.wallPress;
         }
 
         Vector2 lastWallInput = Character.lastWallInput;
@@ -157,7 +157,6 @@ public class NeoPlayer : MonoBehaviour {
 
         // Apply inputs to the camera
         OrbitCamera.UpdateWithInput(input);
-        sighter.UpdateWithInput(input);
 
         rotateCameraLeftPressedThisFrame = false;
         rotateCameraRightPressedThisFrame = false;

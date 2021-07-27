@@ -7,7 +7,6 @@ public class TransparentMesh : MonoBehaviour {
     public MeshRenderer mesh;
     public Material transparentMaterial;
     public Material material;
-    // Update is called once per frame
     void Start() {
         mesh = GetComponentInChildren<MeshRenderer>();
         if (mesh == null) {

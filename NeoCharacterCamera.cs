@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.Rendering.PostProcessing;
+public enum CameraState { normal, wallPress }
 public struct CameraInput {
-    public enum CameraState { normal, wallPress }
     public CameraState state;
     public enum RotateInput { none, left, right }
     public float deltaTime;
@@ -13,7 +13,13 @@ public struct CameraInput {
     public Vector2 lastWallInput;
 }
 public class NeoCharacterCamera : MonoBehaviour {
+    public CameraState state;
     public static Quaternion rotationOffset;
+    public PostProcessVolume volume;
+    public PostProcessProfile isometricProfile;
+    public PostProcessProfile wallPressProfile;
+    public Material isometricSkybox;
+    public Material wallPressSkybox;
     // public Volume postProcessVolume;
     // public PostProcessProfile normalProfile;
     // public VolumeProfile wallPressProfile;
@@ -81,9 +87,6 @@ public class NeoCharacterCamera : MonoBehaviour {
         PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
 
-        // targetRotation = Quaternion.identity;
-        // VolumeManager.instance.stack;
-
         // the initial rotation here will be an offset to all subsequent rotations
         // rotationOffset = Quaternion.Euler(FollowTransform.up * 110f);
         rotationOffset = Quaternion.Euler(FollowTransform.up * 20f);
@@ -96,16 +99,19 @@ public class NeoCharacterCamera : MonoBehaviour {
     }
 
     public void UpdateWithInput(CameraInput input) {
+        state = input.state;
         if (FollowTransform) {
 
             switch (input.state) {
                 default:
-                case CameraInput.CameraState.normal:
+                case CameraState.normal:
                     // postProcessVolume.profile = normalProfile;
+                    RenderSettings.skybox = isometricSkybox;
                     NormalUpdate(input);
                     break;
-                case CameraInput.CameraState.wallPress:
+                case CameraState.wallPress:
                     // postProcessVolume.profile = wallPressProfile;
+                    RenderSettings.skybox = wallPressSkybox;
                     WallPressUpdate(input);
                     break;
             }

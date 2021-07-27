@@ -1,4 +1,4 @@
-// Sprite Shadow Shader - AllenDevs
+// billboarded sprite with shadows
 
 Shader "Sprites/Custom/SpriteShadowBillboard"
 {
@@ -22,6 +22,11 @@ Shader "Sprites/Custom/SpriteShadowBillboard"
         "RenderType" = "Transparent"
         "PreviewType" = "Plane"
         "CanUseSpriteAtlas" = "True"
+        }
+        
+        Pass {
+            ZWrite On            // write depth data to z-buffer
+            ColorMask 0            // but won't write color to frame buffer
         }
 
         Cull Off

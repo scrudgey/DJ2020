@@ -7,7 +7,6 @@ public class ClearSighter : MonoBehaviour {
     public static Dictionary<GameObject, TransparentMesh> transparentMeshes = new Dictionary<GameObject, TransparentMesh>();
     public NeoCharacterCamera myCamera;
     Transform myTransform;
-    public bool active;
     public static MeshRenderer Renderer(GameObject key) {
         if (renderers.ContainsKey(key)) {
             return renderers[key];
@@ -29,9 +28,6 @@ public class ClearSighter : MonoBehaviour {
     void Start() {
         myTransform = transform;
     }
-    public void UpdateWithInput(CameraInput input) {
-        active = input.state != CameraInput.CameraState.wallPress;
-    }
 
     void Update() {
         // colliders above me
@@ -42,30 +38,22 @@ public class ClearSighter : MonoBehaviour {
             MeshRenderer renderer = Renderer(collider.gameObject);
             if (renderer == null)
                 continue;
-            if (!active) {
-                // renderer.enabled = true;
+            if (myCamera.state == CameraState.wallPress) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
                 continue;
             }
 
             if (collider.bounds.center.y < myTransform.position.y) {
-                // renderer.enabled = true;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-
                 continue;
             }
 
             Vector3 otherFloor = collider.bounds.center - new Vector3(0f, collider.bounds.extents.y, 0f);
             Vector3 direction = otherFloor - myTransform.position;
-
-            if (direction.y > 1.0f) {
-                // renderer.enabled = false;
+            if (direction.y > 2.0f) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                // Debug.DrawRay(myTransform.position, direction, Color.white, 0.0f, true);
             } else {
-                // renderer.enabled = true;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-
             }
         }
 
@@ -77,7 +65,11 @@ public class ClearSighter : MonoBehaviour {
             }
             TransparentMesh transparent = TransparentMaterial(hit.collider.gameObject);
             if (transparent != null) {
-                transparent.timer = 1f;
+                if (myCamera.state == CameraState.wallPress) {
+                    transparent.timer = 0f;
+                } else {
+                    transparent.timer = 1f;
+                }
             }
         }
     }
