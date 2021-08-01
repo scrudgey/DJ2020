@@ -39,19 +39,35 @@ inline float4 calculateLocalPos(float4 vertex)  // billboard
     vertex.xy *= _Flip.xy;
 #endif
 
-	// float4 pos = UnityObjectToClipPos(vertex);
-    // Transforms a point from object space to the camera’s
-    // clip space in homogeneous coordinates. This is the equivalent of UnityObjectToClipPos(float4(pos, 1.0)), and should be used in its place.
+	// // float4 pos = UnityObjectToClipPos(vertex);
+    // // Transforms a point from object space to the camera’s
+    // // clip space in homogeneous coordinates. This is the equivalent of UnityObjectToClipPos(float4(pos, 1.0)), and should be used in its place.
 	
-    float4 view = mul(
-                    UNITY_MATRIX_MV, 
-                    float4(0, vertex.y * 1.0f, 0.0, 1.0)
-                ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+    // float4 view = mul(
+    //                 UNITY_MATRIX_MV, 
+    //                 float4(0, vertex.y * 1.0f, 0.0, 1.0)
+    //             ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
 
-    float4 pos = mul(
-        UNITY_MATRIX_P, 
-        view 
-    );
+    // float4 pos = mul(
+    //     UNITY_MATRIX_P, 
+    //     view 
+    // );
+    float4 pos;
+    #ifdef _BILLBOARD
+
+        float4 view = mul(
+                        UNITY_MATRIX_MV, 
+                        float4(0, vertex.y * 1.0f, 0.0, 1.0)
+                    ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+
+        pos = mul(
+            UNITY_MATRIX_P, 
+            view 
+        );
+
+    #else
+        pos = UnityObjectToClipPos(vertex);
+    #endif
 
 #ifdef PIXELSNAP_ON
 	pos = UnityPixelSnap(pos);

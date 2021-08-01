@@ -40,6 +40,7 @@ public class SpriteShaderGUI : ShaderGUI {
     protected MaterialEditor _materialEditor;
     private MaterialProperty _mainTexture = null;
     private MaterialProperty _color = null;
+    private MaterialProperty _billboard = null;
 
     private MaterialProperty _pixelSnap = null;
 
@@ -76,6 +77,7 @@ public class SpriteShaderGUI : ShaderGUI {
     private MaterialProperty _smoothnessScale = null;
 
 
+    private static GUIContent _billboardText = new GUIContent("Billboard", "Billboard");
     private static GUIContent _albedoText = new GUIContent("Albedo", "Albedo (RGB) and Transparency (A)");
     private static GUIContent _altAlbedoText = new GUIContent("Secondary Albedo", "When a secondary albedo texture is set the albedo will be a blended mix of the two textures based on the blend value.");
     private static GUIContent _metallicMapText = new GUIContent("Metallic", "Metallic (R) and Smoothness (A)");
@@ -146,6 +148,7 @@ public class SpriteShaderGUI : ShaderGUI {
     protected virtual void FindProperties(MaterialProperty[] props) {
         _mainTexture = FindProperty("_MainTex", props);
         _color = FindProperty("_Color", props);
+        _billboard = FindProperty("_BILLBOARD", props);
 
         _pixelSnap = FindProperty("PixelSnap", props);
 
@@ -201,6 +204,11 @@ public class SpriteShaderGUI : ShaderGUI {
         GUILayout.Label(_primaryMapsText, EditorStyles.boldLabel);
         {
             dataChanged |= RenderTextureProperties();
+        }
+
+        GUILayout.Label(_billboardText, EditorStyles.boldLabel);
+        {
+            dataChanged |= RenderBillboardProperties();
         }
 
         GUILayout.Label(_depthLabelText, EditorStyles.boldLabel);
@@ -353,6 +361,20 @@ public class SpriteShaderGUI : ShaderGUI {
 
 
     protected virtual bool RenderCustomProperties() {
+        return false;
+    }
+    protected virtual bool RenderBillboardProperties() {
+        EditorGUI.BeginChangeCheck();
+        bool mixedValue;
+        bool billboard = IsKeywordEnabled(_materialEditor, "_BILLBOARD", out mixedValue);
+        EditorGUI.showMixedValue = mixedValue;
+        billboard = BoldToggleField(_billboardText, billboard);
+        EditorGUI.showMixedValue = false;
+
+        if (EditorGUI.EndChangeCheck()) {
+            SetKeyword(_materialEditor, "_BILLBOARD", billboard);
+            return true;
+        }
         return false;
     }
 

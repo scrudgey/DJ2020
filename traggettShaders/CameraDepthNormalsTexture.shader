@@ -10,24 +10,53 @@ Properties {
 
 CGINCLUDE
 
-// TODO: toggleable billboard
+// // TODO: toggleable billboard
+// float4 billboardPos(float4 vertex){
+    
+//     float4 view = mul(
+//                     UNITY_MATRIX_MV, 
+//                     float4(0, vertex.y * 1.0f, 0.0, 1.0)
+//                 ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+
+//     float4 pos = mul(
+//         UNITY_MATRIX_P, 
+//         view 
+//     );
+
+//     #ifdef UNITY_INSTANCING_ENABLED
+//         pos.xy *= _Flip.xy;
+//     #endif
+
+//     return pos;
+// }
 float4 billboardPos(float4 vertex){
     
-    float4 view = mul(
-                    UNITY_MATRIX_MV, 
-                    float4(0, vertex.y * 1.0f, 0.0, 1.0)
-                ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+    #ifdef _BILLBOARD
 
-    float4 pos = mul(
-        UNITY_MATRIX_P, 
-        view 
-    );
+        float4 view = mul(
+                        UNITY_MATRIX_MV, 
+                        float4(0, vertex.y * 1.0f, 0.0, 1.0)
+                    ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
 
-    #ifdef UNITY_INSTANCING_ENABLED
-        pos.xy *= _Flip.xy;
+        float4 pos = mul(
+            UNITY_MATRIX_P, 
+            view 
+        );
+
+        #ifdef UNITY_INSTANCING_ENABLED
+            pos.xy *= _Flip.xy;
+        #endif
+        return pos;
+    #else
+        float4 pos = UnityObjectToClipPos(vertex);
+        #ifdef UNITY_INSTANCING_ENABLED
+            pos.xy *= _Flip.xy;
+        #endif
+        return pos;
     #endif
 
-    return pos;
+    // o.pos = UnityObjectToClipPos(v.vertex); // TODO: billboard?
+
 }
 ENDCG
 
@@ -117,7 +146,7 @@ ENDCG
 	}
 
 SubShader {
-	Tags { "RenderType"="SpriteModelSpaceFixedNormal" }
+Tags { "RenderType"="SpriteModelSpaceFixedNormal" }
 	Pass {
 		Cull Off
 CGPROGRAM
