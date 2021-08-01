@@ -39,7 +39,6 @@ public class SpriteShaderGUI : ShaderGUI {
 
     protected MaterialEditor _materialEditor;
     private MaterialProperty _mainTexture = null;
-    private MaterialProperty _mainTexture = null;
     private MaterialProperty _color = null;
 
     private MaterialProperty _pixelSnap = null;
