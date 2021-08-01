@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 #ifndef SHADER_SHARED_INCLUDED
 #define SHADER_SHARED_INCLUDED
 
@@ -27,17 +29,30 @@ CBUFFER_END
 
 inline float4 calculateWorldPos(float4 vertex)
 {
-	return mul(unity_ObjectToWorld, vertex);
+    // object to world space
+	return mul(unity_ObjectToWorld, vertex); // Current model matrix.
 }
 
-inline float4 calculateLocalPos(float4 vertex)
+inline float4 calculateLocalPos(float4 vertex)  // billboard
 {
 #ifdef UNITY_INSTANCING_ENABLED
     vertex.xy *= _Flip.xy;
 #endif
 
-	float4 pos = UnityObjectToClipPos(vertex);
+	// float4 pos = UnityObjectToClipPos(vertex);
+    // Transforms a point from object space to the camera’s
+    // clip space in homogeneous coordinates. This is the equivalent of UnityObjectToClipPos(float4(pos, 1.0)), and should be used in its place.
 	
+    float4 view = mul(
+                    UNITY_MATRIX_MV, 
+                    float4(0, vertex.y * 1.0f, 0.0, 1.0)
+                ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+
+    float4 pos = mul(
+        UNITY_MATRIX_P, 
+        view 
+    );
+
 #ifdef PIXELSNAP_ON
 	pos = UnityPixelSnap(pos);
 #endif

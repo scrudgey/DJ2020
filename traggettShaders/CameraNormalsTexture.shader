@@ -29,7 +29,7 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = UnityObjectToClipPos(v.vertex); // TODO: billboard? 
 	o.uv = calculateTextureCoord(v.texcoord);
 	o.nz.xyz = COMPUTE_VIEW_NORMAL;
 	o.nz.w = COMPUTE_DEPTH_01;
@@ -67,7 +67,7 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = UnityObjectToClipPos(v.vertex); 
 	o.uv = calculateTextureCoord(v.texcoord);
 	o.nz.xyz = getFixedNormal();
 	o.nz.w = COMPUTE_DEPTH_01;

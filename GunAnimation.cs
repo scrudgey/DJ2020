@@ -6,7 +6,7 @@ using KinematicCharacterController;
 
 // TODO: don't shoot at cursor position but shoot in direction. ?
 public class GunAnimation : MonoBehaviour {
-    public enum State { idle, walking, shooting, crouching, racking, reloading }
+    public enum State { idle, walking, shooting, crouching, racking, reloading, running }
     private State _state;
     private int _frame;
     private bool _isShooting;
@@ -113,12 +113,25 @@ public class GunAnimation : MonoBehaviour {
 
     // TODO: why is there separate private state variables and input
     public void UpdateView(AnimationInput input) {
-        if (input.wallPressTimer > 0 && !input.wallPress) {
-            spriteRenderer.material = flatMaterial;
-        } else if (input.wallPress) {
-            spriteRenderer.material = billboardMaterial;
-        } else {
-            spriteRenderer.material = billboardMaterial;
+        // if (input.wallPressTimer > 0 && !input.wallPress) {
+        //     spriteRenderer.material = flatMaterial;
+        // } else if (input.wallPress) {
+        //     spriteRenderer.material = billboardMaterial;
+        // } else {
+        //     spriteRenderer.material = billboardMaterial;
+        // }
+        switch (input.state) {
+            default:
+            case CharacterState.normal:
+                if (input.wallPressTimer > 0) {
+                    spriteRenderer.material = flatMaterial;
+                } else {
+                    spriteRenderer.material = billboardMaterial;
+                }
+                break;
+            case CharacterState.wallPress:
+                spriteRenderer.material = billboardMaterial;
+                break;
         }
 
         AnimationClip walkAnimation = unarmedWalkAnimation;
@@ -135,7 +148,11 @@ public class GunAnimation : MonoBehaviour {
         } else if (_isRacking) { // racking
             _state = State.racking;
         } else if (input.isMoving) { // walking
-            _state = State.walking;
+            if (input.isRunning) {
+                _state = State.running;
+            } else {
+                _state = State.walking;
+            }
             if (animator.clip != walkAnimation) {
                 animator.clip = walkAnimation;
                 animator.Play();
@@ -171,6 +188,9 @@ public class GunAnimation : MonoBehaviour {
                 break;
             case State.shooting:
                 _sprites = skin.shootSprites(type);
+                break;
+            case State.running:
+                _sprites = skin.runSprites(type);
                 break;
             case State.walking:
                 _sprites = skin.walkSprites(type);

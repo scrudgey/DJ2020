@@ -10,12 +10,14 @@ public struct AnimationInput {
     public Direction direction;
     public bool isMoving;
     public bool isCrouching;
+    public bool isRunning;
     public float wallPressTimer;
-    public bool wallPress;
+    // public bool wallPress;
+    public CharacterState state;
 }
 
 public class DirectionalBillboard : MonoBehaviour {
-    enum Mode { idle, walk, crawl, crouch }
+    enum Mode { idle, walk, crawl, crouch, run }
     Mode mode;
     public SpriteRenderer spriteRenderer;
     public GameObject torso;
@@ -38,10 +40,13 @@ public class DirectionalBillboard : MonoBehaviour {
                 spriteRenderer.sprite = skin.legsWalk[direction][frame];
                 break;
             case Mode.crawl:
-                // spriteRenderer.sprite = _crawlSprites[frame];
+                spriteRenderer.sprite = skin.legsCrawl[direction][frame];
                 break;
             case Mode.crouch:
                 spriteRenderer.sprite = skin.legsCrouch[direction][0];
+                break;
+            case Mode.run:
+                spriteRenderer.sprite = skin.legsRun[direction][frame];
                 break;
             default:
             case Mode.idle:
@@ -53,30 +58,44 @@ public class DirectionalBillboard : MonoBehaviour {
     public void UpdateView(AnimationInput input) {
         direction = input.direction;
 
-        if (input.wallPressTimer > 0 && !input.wallPress) {
-            spriteRenderer.material = flatMaterial;
-        } else if (input.wallPress) {
-            spriteRenderer.material = billboardMaterial;
-        } else {
-            spriteRenderer.material = billboardMaterial;
+        switch (input.state) {
+            default:
+            case CharacterState.normal:
+                if (input.wallPressTimer > 0) {
+                    spriteRenderer.material = flatMaterial;
+                } else {
+                    spriteRenderer.material = billboardMaterial;
+                }
+                break;
+            case CharacterState.wallPress:
+                spriteRenderer.material = billboardMaterial;
+                break;
         }
 
-        spriteRenderer.flipX = input.direction == Direction.left || input.direction == Direction.leftUp || input.direction == Direction.leftDown;
 
-        if (input.isMoving) {
-            if (input.isCrouching) {
+
+        spriteRenderer.flipX = input.direction == Direction.left || input.direction == Direction.leftUp || input.direction == Direction.leftDown;
+        Debug.Log($"{spriteRenderer.flipX} {input.direction}");
+        Vector3 scale = transform.localScale;
+        if (spriteRenderer.flipX) {
+            scale.x = -1f * Mathf.Abs(scale.x);
+        }
+        transform.localScale = scale;
+
+        spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+        if (input.isMoving) { //
+            if (input.isRunning) {
+                mode = Mode.run;
+            } else if (input.isCrouching) {
                 mode = Mode.crawl;
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
             } else {
                 mode = Mode.walk;
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             }
             if (animator.clip != walkAnimation) {
                 animator.clip = walkAnimation;
                 animator.Play();
             }
-        } else {
-            spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+        } else { // stopped
             if (input.isCrouching) {
                 mode = Mode.crouch;
                 spriteRenderer.sprite = skin.legsCrouch[direction][0];

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+// TODO: eliminate this enum
 public enum CameraState { normal, wallPress }
 public struct CameraInput {
     public CameraState state;
@@ -84,16 +85,17 @@ public class NeoCharacterCamera : MonoBehaviour {
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(Transform t) {
         FollowTransform = t;
-        PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward; // TODO: configurable per level
+        // PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward; // TODO: configurable per level
+        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
 
         // the initial rotation here will be an offset to all subsequent rotations
         // rotationOffset = Quaternion.Euler(FollowTransform.up * 110f);
-        rotationOffset = Quaternion.Euler(FollowTransform.up * 20f);
+        rotationOffset = Quaternion.Euler(Vector3.up * 20f);
         Quaternion rotationFromInput = rotationOffset;
         PlanarDirection = rotationFromInput * PlanarDirection;
-        PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
-        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
+        PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
         Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
         targetRotation = planarRot * verticalRot;
     }
@@ -139,10 +141,17 @@ public class NeoCharacterCamera : MonoBehaviour {
         Camera.fieldOfView = 70;
 
 
-        Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
+        Quaternion rotationFromInput = Quaternion.Euler(Vector3.up * rotationInput);// * RotationSpeed));
         PlanarDirection = rotationFromInput * PlanarDirection;
-        PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
-        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
+        PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
+
+
+        // Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
+        // PlanarDirection = rotationFromInput * PlanarDirection;
+        // PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
+        // Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
+
         // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
         // Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
         // Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
@@ -168,7 +177,8 @@ public class NeoCharacterCamera : MonoBehaviour {
 
         // Handle framing
         targetPosition += Transform.right * FollowPointFraming.x;
-        targetPosition += Transform.up * FollowPointFraming.y;
+        // targetPosition += Transform.up * FollowPointFraming.y;
+        targetPosition += Vector3.up * FollowPointFraming.y;
 
         // Apply position
         Transform.position = targetPosition;
@@ -184,8 +194,8 @@ public class NeoCharacterCamera : MonoBehaviour {
         Camera.fieldOfView = 45;
 
         Vector3 camDirection = -1f * input.wallNormal;
-        camDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(camDirection, FollowTransform.up));
-        Quaternion planarRot = Quaternion.LookRotation(camDirection, FollowTransform.up);
+        camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
         targetRotation = Quaternion.Slerp(targetRotation, planarRot, 1f - Mathf.Exp(-RotationSharpness / 2 * input.deltaTime));
 
         // Apply rotation
@@ -209,7 +219,8 @@ public class NeoCharacterCamera : MonoBehaviour {
 
         // Handle framing
         targetPosition += Transform.right * FollowPointFraming.x;
-        targetPosition += Transform.up * FollowPointFraming.y;
+        // targetPosition += Transform.up * FollowPointFraming.y;
+        targetPosition += Vector3.up * FollowPointFraming.y;
 
         // Apply position
         Transform.position = targetPosition;

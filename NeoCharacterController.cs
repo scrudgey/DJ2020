@@ -15,10 +15,12 @@ public struct PlayerCharacterInputs {
     public Quaternion CameraRotation;
     public bool JumpDown;
     public bool CrouchDown;
+    public bool runDown;
     public FireInputs Fire;
     public bool reload;
     public int switchToGun;
 }
+public enum CharacterState { normal, wallPress }
 
 public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public KinematicCharacterMotor Motor;
@@ -31,6 +33,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public float OrientationSharpness = 10;
     [Header("Crawling")]
     public float crawlSpeedFraction = 1f;
+    [Header("Running")]
+    public float runSpeedFraction = 2f;
 
     [Header("Air Movement")]
     public float MaxAirMoveSpeed = 10f;
@@ -63,18 +67,20 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     private Vector3 _wallJumpNormal;
     private Vector3 _internalVelocityAdd = Vector3.zero;
     private bool _shouldBeCrouching = false;
+    private bool _shouldBeRunning = false;
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
+    public bool isRunning = false;
 
     [Header("Wall press")]
     public float pressRadius = 0.1f;
-    public bool wallPress = false;
+    // public bool wallPress = false;
     public float wallPressTimer = 0f;
     public float wallPressThreshold = 0.5f;
     public bool wallPressRatchet = false;
     public Vector3 wallNormal = Vector3.zero;
     public Vector2 lastWallInput = Vector2.zero;
-
+    public CharacterState state;
     private void Start() {
         // Assign to motor
         Motor.CharacterController = this;
@@ -92,11 +98,11 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
         // Calculate camera direction and rotation on the character plane
         // TODO: use NeoCharacterCamera.rotationOffset when moving up-right, up-left, etc.
-        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.forward, Motor.CharacterUp).normalized;
+        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.forward, Vector3.up).normalized;
         if (cameraPlanarDirection.sqrMagnitude == 0f) {
-            cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.up, Motor.CharacterUp).normalized;
+            cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.up, Vector3.up).normalized;
         }
-        Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Motor.CharacterUp);
+        Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
 
         // Move and look inputs
         _moveInputVector = cameraPlanarRotation * moveInputVector;
@@ -125,15 +131,25 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
             if (!isCrouching) {
                 isCrouching = true;
-                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
+                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 // MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);
             }
         } else {
             _shouldBeCrouching = false;
         }
 
-        if (wallPress) {
-            Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.8f);
+        if (inputs.runDown) {
+            _shouldBeRunning = true;
+            if (!isRunning) {
+                isRunning = true;
+            }
+        } else {
+            isRunning = false;
+            _shouldBeRunning = false;
+        }
+
+        if (state == CharacterState.wallPress) {
+            Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.75f);
 
             if (_moveAxis != Vector2.zero) {
                 lastWallInput = _moveAxis;
@@ -162,26 +178,34 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     /// This is the ONLY place where you should set the character's rotation
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-        if (_shootLookDirection != Vector3.zero) {
-            Vector3 target = _shootLookDirection - transform.position;
-            target.y = 0;
-            currentRotation = Quaternion.LookRotation(target, Motor.CharacterUp);
-        } else if (!wallPress && wallPressTimer > 0 && wallNormal != Vector3.zero) {
-            // Smoothly interpolate from current to target look direction
-            Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
-            // Set the current rotation (which will be used by the KinematicCharacterMotor)
-            currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
-        } else if (!wallPress && _lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
-            // Smoothly interpolate from current to target look direction
-            Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+        switch (state) {
+            default:
+            case CharacterState.normal:
+                if (_shootLookDirection != Vector3.zero) {
+                    Vector3 target = _shootLookDirection - transform.position;
+                    target.y = 0;
+                    currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) {
+                    // Smoothly interpolate from current to target look direction
+                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
-            // Set the current rotation (which will be used by the KinematicCharacterMotor)
-            currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
-        } else if (wallPress) {
-            // Set the current rotation (which will be used by the KinematicCharacterMotor)
-            currentRotation = Quaternion.LookRotation(wallNormal, Motor.CharacterUp);
+                    // Set the current rotation (which will be used by the KinematicCharacterMotor)
+                    // currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
+                    currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
+                } else if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
+                    // Smoothly interpolate from current to target look direction
+                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+
+                    // Set the current rotation (which will be used by the KinematicCharacterMotor)
+                    currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
+                }
+                break;
+            case CharacterState.wallPress:
+                currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);
+                break;
         }
+
         _shootLookDirection = Vector3.zero;
     }
 
@@ -199,34 +223,46 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
             // TODO: implement state enum
             // TODO: tighten up the push angle requirement
-            if (wallPress) {
-                // wall style input is relative to the wall normal
-                targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
+            switch (state) {
+                case CharacterState.wallPress:
+                    // wall style input is relative to the wall normal
+                    targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
 
-                // if (Vector3.Dot(wallNormal, _moveAxis) > 0.02f) {
-                if (_moveAxis.y < -0.02f) {
-                    wallPress = false;
-                }
-            } else {
-                if (Vector3.Dot(_moveInputVector, wallNormal) < -0.9 && Vector3.Dot(_moveInputVector, wallNormal) > -1.1) {
-                    wallPressTimer += Time.deltaTime;
-                    if (wallPressTimer > wallPressThreshold) {
-                        wallPress = true;
-                        wallPressTimer = 0;
+                    // if (Vector3.Dot(wallNormal, _moveAxis) > 0.02f) {
+                    if (_moveAxis.y < -0.02f) {
+                        // wallPress = false;
+                        state = CharacterState.normal;
                     }
-                } else if (_moveInputVector == Vector3.zero) {
-                    wallPressTimer = 0;
-                    wallNormal = Vector3.zero;
-                } else if (wallPressTimer > 0) {
-                    wallPressTimer -= Time.deltaTime;
-                }
-                // Calculate target velocity
-                Vector3 inputRight = Vector3.Cross(_moveInputVector, Motor.CharacterUp);
-                Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
-                targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
-                if (isCrouching) {
-                    targetMovementVelocity *= crawlSpeedFraction;
-                }
+
+                    // TODO: use a collider to determine if we are on the wall or not.
+                    break;
+                default:
+                case CharacterState.normal:
+                    if (Vector3.Dot(_moveInputVector, wallNormal) < -0.9 && Vector3.Dot(_moveInputVector, wallNormal) > -1.1) {
+                        wallPressTimer += Time.deltaTime;
+                        if (wallPressTimer > wallPressThreshold) {
+                            // wallPress = true;
+                            state = CharacterState.wallPress;
+                            wallPressTimer = 0;
+                        }
+                    } else if (_moveInputVector == Vector3.zero) {
+                        wallPressTimer = 0;
+                        wallNormal = Vector3.zero;
+                    } else if (wallPressTimer > 0) {
+                        wallPressTimer -= Time.deltaTime;
+                    }
+                    // Calculate target velocity
+                    // Vector3 inputRight = Vector3.Cross(_moveInputVector, Motor.CharacterUp);
+                    Vector3 inputRight = Vector3.Cross(_moveInputVector, Vector3.up);
+                    Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
+                    targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
+
+                    if (isRunning) {
+                        targetMovementVelocity *= runSpeedFraction;
+                    } else if (isCrouching) {
+                        targetMovementVelocity *= crawlSpeedFraction;
+                    }
+                    break;
             }
 
             // Smooth movement Velocity
@@ -264,7 +300,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                         Motor.ForceUnground(0.1f);
 
                         // Add to the return velocity and reset jump state
-                        currentVelocity += (Motor.CharacterUp * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
+                        // currentVelocity += (Motor.CharacterUp * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
+                        currentVelocity += (Vector3.up * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
                         _jumpRequested = false;
                         _doubleJumpConsumed = true;
                         _jumpedThisFrame = true;
@@ -275,7 +312,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                 if (_canWallJump ||
                     (!_jumpConsumed && ((AllowJumpingWhenSliding ? Motor.GroundingStatus.FoundAnyGround : Motor.GroundingStatus.IsStableOnGround) || _timeSinceLastAbleToJump <= JumpPostGroundingGraceTime))) {
                     // Calculate jump direction before ungrounding
-                    Vector3 jumpDirection = Motor.CharacterUp;
+                    // Vector3 jumpDirection = Motor.CharacterUp;
+                    Vector3 jumpDirection = Vector3.up;
                     if (_canWallJump) {
                         jumpDirection = _wallJumpNormal;
                     } else if (Motor.GroundingStatus.FoundAnyGround && !Motor.GroundingStatus.IsStableOnGround) {
@@ -287,7 +325,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                     Motor.ForceUnground(0.1f);
 
                     // Add to the return velocity and reset jump state
-                    currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
+                    // currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
+                    currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
                     _jumpRequested = false;
                     _jumpConsumed = true;
                     _jumpedThisFrame = true;
@@ -348,7 +387,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             } else {
                 // If no obstructions, uncrouch
                 // MeshRoot.localScale = new Vector3(1f, 1f, 1f);
-                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
+                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
 
                 isCrouching = false;
             }

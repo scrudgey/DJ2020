@@ -17,6 +17,7 @@ public class NeoPlayer : MonoBehaviour {
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
     public InputActionReference CrouchAction;
+    public InputActionReference RunAction;
     public InputActionReference JumpAction;
     public InputActionReference RotateCameraRight;
     public InputActionReference RotateCameraLeft;
@@ -30,6 +31,7 @@ public class NeoPlayer : MonoBehaviour {
     private bool firePressedHeld;
     private bool firePressedThisFrame;
     private bool crouchHeld;
+    private bool runHeld;
     private bool rotateCameraRightPressedThisFrame;
     private bool rotateCameraLeftPressedThisFrame;
     private bool jumpPressedThisFrame;
@@ -49,6 +51,11 @@ public class NeoPlayer : MonoBehaviour {
         // Crouch
         CrouchAction.action.performed += ctx => {
             crouchHeld = ctx.ReadValueAsButton();
+        };
+
+        // Run
+        RunAction.action.performed += ctx => {
+            runHeld = ctx.ReadValueAsButton();
         };
 
         // Jump
@@ -94,6 +101,7 @@ public class NeoPlayer : MonoBehaviour {
         // Button up
         FireAction.action.canceled += _ => firePressedHeld = false;
         CrouchAction.action.canceled += _ => crouchHeld = false;
+        RunAction.action.canceled += _ => runHeld = false;
         MoveAction.action.canceled += _ => inputVector = Vector2.zero;
     }
     private void Start() {
@@ -122,8 +130,10 @@ public class NeoPlayer : MonoBehaviour {
             direction = Toolbox.DirectionFromAngle(angle),
             isMoving = Character.Motor.Velocity.magnitude > 0.1 && Character.Motor.GroundingStatus.IsStableOnGround,
             isCrouching = Character.isCrouching,
+            isRunning = Character.isRunning,
             wallPressTimer = Character.wallPressTimer,
-            wallPress = Character.wallPress
+            // wallPress = Character.wallPress
+            state = Character.state
         };
 
         legsAnimator.UpdateView(animationInput);
@@ -138,7 +148,7 @@ public class NeoPlayer : MonoBehaviour {
             rotation = CameraInput.RotateInput.left;
         }
         CameraState state = CameraState.normal;
-        if (Character.wallPress) {
+        if (Character.state == CharacterState.wallPress) {
             state = CameraState.wallPress;
         }
 
@@ -169,6 +179,7 @@ public class NeoPlayer : MonoBehaviour {
             CameraRotation = OrbitCamera.isometricRotation,
             JumpDown = jumpPressedThisFrame,
             CrouchDown = crouchHeld,
+            runDown = runHeld,
             Fire = new PlayerCharacterInputs.FireInputs() {
                 FirePressed = firePressedThisFrame,
                 FireHeld = firePressedHeld,

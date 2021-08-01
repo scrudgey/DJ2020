@@ -4,6 +4,9 @@ Shader "Sprite (Pixel Lit)"
 	{
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_Color ("Color", Color) = (1,1,1,1)
+        
+        _ScaleX ("Scale X", Float) = 1.0
+        _ScaleY ("Scale Y", Float) = 1.0
 		
 		_BumpScale("Scale", Float) = 1.0
 		_BumpMap ("Normal Map", 2D) = "bump" {}
