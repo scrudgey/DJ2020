@@ -6,10 +6,12 @@ using UnityEngine.Rendering;
 public class MaterialController {
     public MeshRenderer renderer;
     public GameObject gameObject;
+    public NeoCharacterCamera camera;
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableBecauseAbove;
-    public MaterialController(GameObject gameObject) {
+    public MaterialController(GameObject gameObject, NeoCharacterCamera camera) {
+        this.camera = camera;
         this.gameObject = gameObject;
         this.renderer = gameObject.GetComponent<MeshRenderer>();
     }
@@ -18,7 +20,6 @@ public class MaterialController {
     }
     public void CeilingCheck(Collider collider, Vector3 position) {
         if (collider.bounds.center.y < position.y) {
-            // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             disableBecauseAbove = false;
             return;
         }
@@ -26,14 +27,11 @@ public class MaterialController {
         Vector3 direction = otherFloor - position;
         if (direction.y > 2.0f) {
             disableBecauseAbove = true;
-            // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
         } else {
             disableBecauseAbove = false;
-            // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
         }
     }
     public void MakeTransparent() {
-        // StandardShaderUtils.ChangeRenderMode(renderer, StandardShaderUtils.BlendMode.Transparent);
         if (renderer.shadowCastingMode != ShadowCastingMode.ShadowsOnly)
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
@@ -51,7 +49,7 @@ public class MaterialController {
             disableBecauseInterloper = true;
         }
 
-        if (active()) {
+        if (active() && camera.state == CameraState.normal) {
             MakeTransparent();
         } else {
             MakeApparent();
@@ -59,21 +57,18 @@ public class MaterialController {
     }
 
     public bool active() { return disableBecauseInterloper || disableBecauseAbove; }
-
-    // wallpress handling
-    // if (myCamera.state == CameraState.wallPress) {
-    //     renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-    //     continue;
-    // }
 }
 public class MaterialControllerCache {
+    public NeoCharacterCamera camera;
     public Dictionary<GameObject, MaterialController> controllers = new Dictionary<GameObject, MaterialController>();
-    // public static Dictionary<GameObject, MeshRenderer> renderers = new Dictionary<GameObject, MeshRenderer>();
+    public MaterialControllerCache(NeoCharacterCamera camera) {
+        this.camera = camera;
+    }
     public MaterialController get(GameObject key) {
         if (controllers.ContainsKey(key)) {
             return controllers[key];
         } else {
-            MaterialController controller = new MaterialController(key);
+            MaterialController controller = new MaterialController(key, camera);
             if (controller.renderer == null) {
                 Debug.Log($"{key} null controller");
                 controller = null;
@@ -84,10 +79,11 @@ public class MaterialControllerCache {
     }
 }
 public class ClearSighter : MonoBehaviour {
-    public MaterialControllerCache controllers = new MaterialControllerCache();
+    public MaterialControllerCache controllers;
     public NeoCharacterCamera myCamera;
     Transform myTransform;
     void Start() {
+        controllers = new MaterialControllerCache(GameObject.FindObjectOfType<NeoCharacterCamera>());
         myTransform = transform;
     }
 

@@ -119,12 +119,22 @@ changes to wall mode
         requires: send input direction together with player direction.
             when in wall press mode, set orientation direction away from wall. (? already done ?)
 
-    stop before i walk off the edge
-    use a collider to detect if i'm pressing against a wall for real, and break the wall ratchet if not.
-    different y offset depending on if crouched or not.
-    focus camera on nearby enemy if applicable
 
 
 layer weirdness
     trigger zone is tagged glass so it doesn't block bullets
     shell has its own layer
+
+
+wall press: how do i implement the next version?
+it seems it relies on fine-tuned collision detection.
+ray 1: the condition for wall press to hold at all is that there is a wall directly behind the player.
+ray 2, 3: the condition for detecting edges is if there is a wall to the left or right of ray 1.
+
+
+stop before i walk off the edge
+    ray 2, 3
+use a collider to detect if i'm pressing against a wall for real, and break the wall ratchet if not.
+    ray 1
+different y offset depending on if crouched or not.
+focus camera on nearby enemy if applicable
