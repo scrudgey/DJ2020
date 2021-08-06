@@ -10,6 +10,7 @@ public class Skin {
     public Octet<Sprite[]> legsRun = new Octet<Sprite[]>();
 
     // unarmed
+    public Octet<Sprite[]> unarmedCrouch = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedWalk = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedRun = new Octet<Sprite[]>();
@@ -85,14 +86,15 @@ public class Skin {
     }
     public Octet<Sprite[]> runSprites(GunType type) {
         switch (type) {
-            case GunType.smg:
-                return smgRun;
+            default:
+            case GunType.unarmed:
+                return unarmedRun;
             case GunType.pistol:
                 return pistolRun;
             case GunType.shotgun:
             case GunType.rifle:
-            default:
-                return unarmedRun;
+            case GunType.smg:
+                return smgRun;
         }
     }
     public Octet<Sprite[]> rackSprites(GunType type) {
@@ -149,8 +151,8 @@ public class Skin {
         skin.legsWalk[Direction.rightUp] = new Sprite[] { legSprites[17], legSprites[18], legSprites[19], legSprites[20] };
         skin.legsWalk[Direction.up] = new Sprite[] { legSprites[21], legSprites[22], legSprites[23], legSprites[24] };
 
-        skin.legsCrouch[Direction.rightDown] = new Sprite[] { legSprites[25] };
-        skin.legsCrouch[Direction.rightUp] = new Sprite[] { legSprites[26] };
+        skin.legsCrouch[Direction.rightDown] = new Sprite[] { legSprites[67] };
+        skin.legsCrouch[Direction.rightUp] = new Sprite[] { legSprites[68] };
 
         skin.legsCrawl[Direction.down] = new Sprite[] { legSprites[27], legSprites[28], legSprites[29], legSprites[30] };
         skin.legsCrawl[Direction.rightDown] = new Sprite[] { legSprites[31], legSprites[32], legSprites[33], legSprites[34] };
@@ -166,6 +168,9 @@ public class Skin {
 
 
         // unarmed
+
+        skin.unarmedCrouch[Direction.rightDown] = new Sprite[] { legSprites[25] };
+        skin.unarmedCrouch[Direction.rightUp] = new Sprite[] { legSprites[26] };
 
         skin.unarmedIdle[Direction.down] = new Sprite[] { torsoSprites[0] };
         skin.unarmedIdle[Direction.rightDown] = new Sprite[] { torsoSprites[1] };

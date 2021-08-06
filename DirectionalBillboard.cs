@@ -7,13 +7,14 @@ using System;
 public enum Direction { left, leftUp, up, rightUp, right, rightDown, down, leftDown }
 
 public struct AnimationInput {
-    public Direction direction;
+    public Direction orientation;
+    public PlayerCharacterInputs playerInputs;
     public bool isMoving;
     public bool isCrouching;
     public bool isRunning;
     public float wallPressTimer;
-    // public bool wallPress;
     public CharacterState state;
+    public GunType gunType;
 }
 
 public class DirectionalBillboard : MonoBehaviour {
@@ -21,8 +22,6 @@ public class DirectionalBillboard : MonoBehaviour {
     Mode mode;
     public SpriteRenderer spriteRenderer;
     public GameObject torso;
-    public Material billboardMaterial;
-    public Material flatMaterial;
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip walkAnimation;
@@ -34,7 +33,6 @@ public class DirectionalBillboard : MonoBehaviour {
 
     // used by animation
     public void SetFrame(int frame) {
-        // Debug.Log($"{mode} {frame}");
         switch (mode) {
             case Mode.walk:
                 spriteRenderer.sprite = skin.legsWalk[direction][frame];
@@ -56,32 +54,34 @@ public class DirectionalBillboard : MonoBehaviour {
     }
 
     public void UpdateView(AnimationInput input) {
-        direction = input.direction;
 
         switch (input.state) {
             default:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {
-                    spriteRenderer.material = flatMaterial;
+                    spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 } else {
-                    spriteRenderer.material = billboardMaterial;
+                    spriteRenderer.material.EnableKeyword("_BILLBOARD");
                 }
+                spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
             case CharacterState.wallPress:
-                spriteRenderer.material = billboardMaterial;
+                spriteRenderer.material.DisableKeyword("_BILLBOARD");
+                if (input.playerInputs.MoveAxisRight != 0) {
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
+                }
                 break;
         }
 
-
-
-        spriteRenderer.flipX = input.direction == Direction.left || input.direction == Direction.leftUp || input.direction == Direction.leftDown;
-        Debug.Log($"{spriteRenderer.flipX} {input.direction}");
+        // set direction
+        direction = input.orientation;
         Vector3 scale = transform.localScale;
         if (spriteRenderer.flipX) {
             scale.x = -1f * Mathf.Abs(scale.x);
         }
         transform.localScale = scale;
 
+        // set mode and animation
         spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
         if (input.isMoving) { //
             if (input.isRunning) {
@@ -98,8 +98,13 @@ public class DirectionalBillboard : MonoBehaviour {
         } else { // stopped
             if (input.isCrouching) {
                 mode = Mode.crouch;
-                spriteRenderer.sprite = skin.legsCrouch[direction][0];
 
+                // TODO: if unarmed, use unarmedcrouch. otherwise, use legscrouch.
+                if (input.gunType == GunType.unarmed) {
+                    spriteRenderer.sprite = skin.unarmedCrouch[direction][0];
+                } else {
+                    spriteRenderer.sprite = skin.legsCrouch[direction][0];
+                }
             } else {
                 mode = Mode.idle;
                 spriteRenderer.sprite = skin.legsIdle[direction][0];
@@ -107,16 +112,6 @@ public class DirectionalBillboard : MonoBehaviour {
             if (animator.clip != idleAnimation) {
                 animator.clip = idleAnimation;
                 animator.Play();
-            }
-        }
-
-        if (input.isCrouching) {
-            if (torso.activeInHierarchy) {
-                torso.SetActive(false);
-            }
-        } else {
-            if (!torso.activeInHierarchy) {
-                torso.SetActive(true);
             }
         }
 

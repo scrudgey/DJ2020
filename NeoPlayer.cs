@@ -37,6 +37,8 @@ public class NeoPlayer : MonoBehaviour {
     private bool jumpPressedThisFrame;
     private bool reloadPressedThisFrame;
     private int switchToGunThisFrame;
+    private PlayerCharacterInputs _lastInput;
+
 
     public void Awake() {
         // Move
@@ -125,15 +127,20 @@ public class NeoPlayer : MonoBehaviour {
         Vector2 playerDir = new Vector2(Character.direction.x, Character.direction.z);
         float angle = Vector2.SignedAngle(camDir, playerDir);
 
-        // if (Character.OrientationSharpness.)
+        GunType gunType = GunType.unarmed;
+        if (torsoAnimator.gunHandler.gunInstance != null && torsoAnimator.gunHandler.gunInstance.baseGun != null) {
+            gunType = torsoAnimator.gunHandler.gunInstance.baseGun.type;
+        }
+
         AnimationInput animationInput = new AnimationInput {
-            direction = Toolbox.DirectionFromAngle(angle),
+            orientation = Toolbox.DirectionFromAngle(angle),
             isMoving = Character.Motor.Velocity.magnitude > 0.1 && Character.Motor.GroundingStatus.IsStableOnGround,
             isCrouching = Character.isCrouching,
             isRunning = Character.isRunning,
             wallPressTimer = Character.wallPressTimer,
-            // wallPress = Character.wallPress
-            state = Character.state
+            state = Character.state,
+            playerInputs = _lastInput,
+            gunType = gunType
         };
 
         legsAnimator.UpdateView(animationInput);
@@ -195,5 +202,7 @@ public class NeoPlayer : MonoBehaviour {
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
         switchToGunThisFrame = -1;
+
+        _lastInput = characterInputs;
     }
 }

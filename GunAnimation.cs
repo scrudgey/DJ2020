@@ -4,7 +4,6 @@ using UnityEngine;
 using System;
 using KinematicCharacterController;
 
-// TODO: don't shoot at cursor position but shoot in direction. ?
 public class GunAnimation : MonoBehaviour {
     public enum State { idle, walking, shooting, crouching, racking, reloading, running }
     private State _state;
@@ -16,10 +15,6 @@ public class GunAnimation : MonoBehaviour {
     public GunHandler gunHandler;
     public SpriteRenderer spriteRenderer;
     public Animation animator;
-
-    public Material billboardMaterial;
-    public Material flatMaterial;
-
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
     public Skin skin;
@@ -97,9 +92,6 @@ public class GunAnimation : MonoBehaviour {
     public void ClipIn() {
         gunHandler.ClipIn();
     }
-    // public void ShellIn() {
-    //     gunHandler.ShellIn();
-    // }
 
     public void Holster() {
         holstered = true;
@@ -113,33 +105,59 @@ public class GunAnimation : MonoBehaviour {
 
     // TODO: why is there separate private state variables and input
     public void UpdateView(AnimationInput input) {
-        // if (input.wallPressTimer > 0 && !input.wallPress) {
-        //     spriteRenderer.material = flatMaterial;
-        // } else if (input.wallPress) {
-        //     spriteRenderer.material = billboardMaterial;
-        // } else {
-        //     spriteRenderer.material = billboardMaterial;
-        // }
         switch (input.state) {
             default:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {
-                    spriteRenderer.material = flatMaterial;
+                    spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 } else {
-                    spriteRenderer.material = billboardMaterial;
+                    spriteRenderer.material.EnableKeyword("_BILLBOARD");
                 }
+                spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
+
                 break;
             case CharacterState.wallPress:
-                spriteRenderer.material = billboardMaterial;
+                spriteRenderer.material.DisableKeyword("_BILLBOARD");
+                if (input.playerInputs.MoveAxisRight != 0) {
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
+                }
                 break;
         }
 
         AnimationClip walkAnimation = unarmedWalkAnimation;
 
-        spriteRenderer.flipX = input.direction == Direction.left || input.direction == Direction.leftUp || input.direction == Direction.leftDown;
-        _direction = input.direction;
+        _direction = input.orientation;
 
         // order state settings by priority
+        if (input.isCrouching) { // crouching
+                                 // TODO: change based on orientation (UR / DR) and flip
+            switch (input.orientation) {
+                case Direction.right:
+                case Direction.left:
+                    break;
+                case Direction.leftUp:
+                case Direction.up:
+                case Direction.rightUp:
+                    transform.localPosition = new Vector3(0.0f, -0.04f, -0.13f);
+                    break;
+                case Direction.rightDown:
+                case Direction.down:
+                case Direction.leftDown:
+                default:
+                    transform.localPosition = new Vector3(0.0f, -0.04f, -0.13f);
+                    break;
+            }
+
+            _state = State.crouching;
+            if (input.gunType == GunType.unarmed || input.isMoving) {
+                spriteRenderer.enabled = false;
+            } else {
+                spriteRenderer.enabled = true;
+            }
+        } else {
+            transform.localPosition = Vector3.zero;
+        }
+
 
         if (_isShooting) { // shooting
             _state = State.shooting;
@@ -157,8 +175,6 @@ public class GunAnimation : MonoBehaviour {
                 animator.clip = walkAnimation;
                 animator.Play();
             }
-        } else if (input.isCrouching) { // crouching
-            _state = State.crouching;
         } else { // idle
             _state = State.idle;
             _frame = 0;
@@ -175,7 +191,7 @@ public class GunAnimation : MonoBehaviour {
     public void UpdateFrame() {
         Octet<Sprite[]> _sprites = null;
         GunType type = GunType.unarmed;
-        if (gunHandler != null && gunHandler.gunInstance != null && !holstered) {
+        if (gunHandler != null && gunHandler.gunInstance != null && !holstered) { //
             type = gunHandler.gunInstance.baseGun.type;
         }
 
@@ -211,10 +227,4 @@ public class GunAnimation : MonoBehaviour {
             return;
         spriteRenderer.sprite = _sprites[_direction][frame];
     }
-
-    // public void Update() {
-    //     if (gunHandler.gunInstance == null) {
-    //         // animator.clip.sp/
-    //     }
-    // }
 }

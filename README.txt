@@ -110,3 +110,21 @@ programmatic raytrace approach
 objects in front, but not above
     raytrace to camera
     change material to be partly transparent?
+ghengis dong, khan of the dongolians
+
+
+changes to wall mode
+    different sprite flipping in wall mode
+        when i move left, flip x. don't flip again until i move right.
+        requires: send input direction together with player direction.
+            when in wall press mode, set orientation direction away from wall. (? already done ?)
+
+    stop before i walk off the edge
+    use a collider to detect if i'm pressing against a wall for real, and break the wall ratchet if not.
+    different y offset depending on if crouched or not.
+    focus camera on nearby enemy if applicable
+
+
+layer weirdness
+    trigger zone is tagged glass so it doesn't block bullets
+    shell has its own layer

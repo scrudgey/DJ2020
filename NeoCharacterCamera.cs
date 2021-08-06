@@ -21,7 +21,6 @@ public class NeoCharacterCamera : MonoBehaviour {
     public PostProcessProfile wallPressProfile;
     public Material isometricSkybox;
     public Material wallPressSkybox;
-    // public Volume postProcessVolume;
     // public PostProcessProfile normalProfile;
     // public VolumeProfile wallPressProfile;
     [Header("Framing")]
@@ -85,12 +84,10 @@ public class NeoCharacterCamera : MonoBehaviour {
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(Transform t) {
         FollowTransform = t;
-        // PlanarDirection = Quaternion.Euler(0, -45, 0) * FollowTransform.forward; // TODO: configurable per level
         PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
 
         // the initial rotation here will be an offset to all subsequent rotations
-        // rotationOffset = Quaternion.Euler(FollowTransform.up * 110f);
         rotationOffset = Quaternion.Euler(Vector3.up * 20f);
         Quaternion rotationFromInput = rotationOffset;
         PlanarDirection = rotationFromInput * PlanarDirection;
@@ -103,16 +100,13 @@ public class NeoCharacterCamera : MonoBehaviour {
     public void UpdateWithInput(CameraInput input) {
         state = input.state;
         if (FollowTransform) {
-
             switch (input.state) {
                 default:
                 case CameraState.normal:
-                    // postProcessVolume.profile = normalProfile;
                     RenderSettings.skybox = isometricSkybox;
                     NormalUpdate(input);
                     break;
                 case CameraState.wallPress:
-                    // postProcessVolume.profile = wallPressProfile;
                     RenderSettings.skybox = wallPressSkybox;
                     WallPressUpdate(input);
                     break;
@@ -146,12 +140,6 @@ public class NeoCharacterCamera : MonoBehaviour {
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
 
-
-        // Quaternion rotationFromInput = Quaternion.Euler(FollowTransform.up * rotationInput);// * RotationSpeed));
-        // PlanarDirection = rotationFromInput * PlanarDirection;
-        // PlanarDirection = Vector3.Cross(FollowTransform.up, Vector3.Cross(PlanarDirection, FollowTransform.up));
-        // Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, FollowTransform.up);
-
         // Quaternion verticalRot = Quaternion.Euler(33f, 0, 0);
         // Quaternion verticalRot = Quaternion.Euler(40f, 0, 0);
         // Quaternion verticalRot = Quaternion.Euler(45f, 0, 0);
@@ -177,7 +165,6 @@ public class NeoCharacterCamera : MonoBehaviour {
 
         // Handle framing
         targetPosition += Transform.right * FollowPointFraming.x;
-        // targetPosition += Transform.up * FollowPointFraming.y;
         targetPosition += Vector3.up * FollowPointFraming.y;
 
         // Apply position
@@ -190,7 +177,6 @@ public class NeoCharacterCamera : MonoBehaviour {
             return;
         }
         Camera.orthographic = false;
-        // Camera.fieldOfView = 38;
         Camera.fieldOfView = 45;
 
         Vector3 camDirection = -1f * input.wallNormal;
@@ -207,7 +193,7 @@ public class NeoCharacterCamera : MonoBehaviour {
         // Find the smoothed follow position
         Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         Vector3 distOffset = input.wallNormal * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, -0.5f, 0);
+        Vector3 heightOffset = new Vector3(0, 0f, 0);
         _currentFollowPosition = Vector3.Lerp(
             _currentFollowPosition,
             FollowTransform.position + distOffset + LROffset + heightOffset,
@@ -219,7 +205,6 @@ public class NeoCharacterCamera : MonoBehaviour {
 
         // Handle framing
         targetPosition += Transform.right * FollowPointFraming.x;
-        // targetPosition += Transform.up * FollowPointFraming.y;
         targetPosition += Vector3.up * FollowPointFraming.y;
 
         // Apply position

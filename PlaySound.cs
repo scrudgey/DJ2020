@@ -3,28 +3,60 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaySound : MonoBehaviour {
-    public enum TriggerType { impact, start }
+    public enum TriggerType { impact, start, enter }
+    public enum RepeatType { repeatedly, once, cooldown }
     public TriggerType trigger;
+    public RepeatType repeat;
     public AudioClip[] sounds;
     public AudioSource audioSource;
     public float probability = 1f;
     public float velocityThreshold = 0f;
+    public float cooldownInterval = 1f;
+    public float cooldownTimer = 0f;
+    public float randomPitchWidth = 0.2f;
     private void Play() {
-        Toolbox.RandomizeOneShot(audioSource, sounds);
+        if (cooldownTimer > 0)
+            return;
+        if (Random.Range(0, 1f) < probability) {
+            Toolbox.RandomizeOneShot(audioSource, sounds, randomPitchWidth: randomPitchWidth);
+            if (repeat == RepeatType.once) {
+                Destroy(this);
+            } else if (repeat == RepeatType.cooldown) {
+                cooldownTimer = cooldownInterval;
+            }
+        }
     }
 
     void OnCollisionEnter(Collision collision) {
         if (trigger != TriggerType.impact)
             return;
-        if (Random.Range(0, 1f) < probability && collision.relativeVelocity.magnitude > velocityThreshold) {
+        if (collision.relativeVelocity.magnitude > velocityThreshold) {
+            Play();
+        }
+    }
+    void OnKinematicCharacterImpact() {
+        // TODO: use parameters
+        if (trigger != TriggerType.impact)
+            return;
+        Play();
+    }
+
+    void Start() {
+        if (trigger == TriggerType.start) {
             Play();
         }
     }
 
-    void Start() {
-        if (trigger == TriggerType.start && Random.Range(0, 1f) < probability) {
+    void OnTriggerEnter(Collider other) {
+        if (other.tag != "actor")
+            return;
+        if (trigger == TriggerType.enter) {
             Play();
-            // Destroy(this);
+        }
+    }
+    void Update() {
+        if (cooldownTimer > 0) {
+            cooldownTimer -= Time.deltaTime;
         }
     }
 }
