@@ -12,6 +12,7 @@ public struct CameraInput {
     public RotateInput rotation;
     public Vector3 wallNormal;
     public Vector2 lastWallInput;
+    public bool crouchHeld;
 }
 public class NeoCharacterCamera : MonoBehaviour {
     public CameraState state;
@@ -193,7 +194,10 @@ public class NeoCharacterCamera : MonoBehaviour {
         // Find the smoothed follow position
         Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         Vector3 distOffset = input.wallNormal * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, 0f, 0);
+        Vector3 heightOffset = new Vector3(0, -0.2f, 0);
+        if (input.crouchHeld) {
+            heightOffset = new Vector3(0, -0.5f, 0);
+        }
         _currentFollowPosition = Vector3.Lerp(
             _currentFollowPosition,
             FollowTransform.position + distOffset + LROffset + heightOffset,

@@ -138,3 +138,4 @@ use a collider to detect if i'm pressing against a wall for real, and break the 
     ray 1
 different y offset depending on if crouched or not.
 focus camera on nearby enemy if applicable
+overall: rely less on wallNormal for state, it is more of an exposed parameter

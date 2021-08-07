@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 using System;
+using System.Linq;
 
 public struct PlayerCharacterInputs {
     public struct FireInputs {
@@ -74,10 +75,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
     [Header("Wall press")]
     public float pressRadius = 0.1f;
-    // public bool wallPress = false;
     public float wallPressTimer = 0f;
     public float wallPressThreshold = 0.5f;
     public bool wallPressRatchet = false;
+    public float wallPressHeight = 0.8f;
     public Vector3 wallNormal = Vector3.zero;
     public Vector2 lastWallInput = Vector2.zero;
     public CharacterState state;
@@ -186,7 +187,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                     Vector3 target = _shootLookDirection - transform.position;
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
-                } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) {
+                } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
                     // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
@@ -208,6 +209,35 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
         _shootLookDirection = Vector3.zero;
     }
+    bool ColliderRay(Vector3 offset) {
+        // TODO: filter on layer
+        Vector3 start = transform.position + offset;
+        Vector3 dir = -1f * wallNormal;
+        float length = 0.4f;
+        Debug.DrawRay(start, length * dir);
+        foreach (RaycastHit hit in Physics.RaycastAll(start, dir, length).OrderBy(x => x.distance)) {
+            if (hit.collider.transform.IsChildOf(transform)) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+    bool DetectWallPress() {
+        if (wallNormal == Vector3.zero)
+            return false;
+        return ColliderRay(new Vector3(0f, wallPressHeight, 0f));
+    }
+    bool AtRightEdge() {
+        if (wallNormal == Vector3.zero)
+            return false;
+        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + 0.1f * Motor.CharacterRight);
+    }
+    bool AtLeftEdge() {
+        if (wallNormal == Vector3.zero)
+            return false;
+        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.1f * Motor.CharacterRight);
+    }
 
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
@@ -216,43 +246,57 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     /// </summary>
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
 
+        bool pressingOnWall = DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
         if (Motor.GroundingStatus.IsStableOnGround) {
             // Reorient velocity on slope
             currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
 
-            // TODO: implement state enum
-            // TODO: tighten up the push angle requirement
             switch (state) {
                 case CharacterState.wallPress:
+
                     // wall style input is relative to the wall normal
+                    // TODO: use ray 2, 3 to determine if we have hit an edge
+
+                    if (AtRightEdge()) {
+                        _moveAxis.x = Mathf.Max(0, _moveAxis.x);
+                    }
+                    if (AtLeftEdge()) {
+                        _moveAxis.x = Mathf.Min(0, _moveAxis.x);
+                    }
                     targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
 
-                    // if (Vector3.Dot(wallNormal, _moveAxis) > 0.02f) {
-                    if (_moveAxis.y < -0.02f) {
-                        // wallPress = false;
+                    // transition from wall press 
+                    // if (_moveAxis.y < -0.02f) {
+                    if (!pressingOnWall) {
                         state = CharacterState.normal;
                     }
 
-                    // TODO: use a collider to determine if we are on the wall or not.
                     break;
                 default:
                 case CharacterState.normal:
-                    if (Vector3.Dot(_moveInputVector, wallNormal) < -0.9 && Vector3.Dot(_moveInputVector, wallNormal) > -1.1) {
+
+                    // I am pressing on the wall, but not yet in wall press mode
+                    if (pressingOnWall && Vector3.Dot(_moveInputVector, wallNormal) < -0.9 && Vector3.Dot(_moveInputVector, wallNormal) > -1.1) {
                         wallPressTimer += Time.deltaTime;
+
+                        // transition to wallpress mode
                         if (wallPressTimer > wallPressThreshold) {
-                            // wallPress = true;
                             state = CharacterState.wallPress;
                             wallPressTimer = 0;
                         }
-                    } else if (_moveInputVector == Vector3.zero) {
+                    }
+                    // I have let off input to press on wall. reset the state 
+                    else if (_moveInputVector == Vector3.zero) {
                         wallPressTimer = 0;
                         wallNormal = Vector3.zero;
-                    } else if (wallPressTimer > 0) {
+                    }
+                    // I am not pressing on the wall, cool down the timer.
+                    else if (wallPressTimer > 0) {
                         wallPressTimer -= Time.deltaTime;
                     }
+
                     // Calculate target velocity
-                    // Vector3 inputRight = Vector3.Cross(_moveInputVector, Motor.CharacterUp);
                     Vector3 inputRight = Vector3.Cross(_moveInputVector, Vector3.up);
                     Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
                     targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
@@ -408,6 +452,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             _canWallJump = true;
             _wallJumpNormal = hitNormal;
         }
+
+        // use Ray 1 here ?
         if (Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable && Vector3.Dot(_moveInputVector, hitNormal) < -0.9 && Vector3.Dot(_moveInputVector, hitNormal) > -1.1) {
             // wallPress = true;
             wallNormal = hitNormal;

@@ -169,7 +169,8 @@ public class NeoPlayer : MonoBehaviour {
             rotation = rotation,
             state = state,
             wallNormal = Character.wallNormal,
-            lastWallInput = lastWallInput
+            lastWallInput = lastWallInput,
+            crouchHeld = crouchHeld
         };
 
         // Apply inputs to the camera
