@@ -156,6 +156,7 @@ public class GunAnimation : MonoBehaviour {
             }
         } else {
             transform.localPosition = Vector3.zero;
+            spriteRenderer.enabled = true;
         }
 
 

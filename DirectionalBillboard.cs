@@ -21,6 +21,7 @@ public class DirectionalBillboard : MonoBehaviour {
     enum Mode { idle, walk, crawl, crouch, run }
     Mode mode;
     public SpriteRenderer spriteRenderer;
+    public Transform shadowCaster;
     public GameObject torso;
     public Animation animator;
     public AnimationClip idleAnimation;
@@ -82,11 +83,15 @@ public class DirectionalBillboard : MonoBehaviour {
         transform.localScale = scale;
 
         // set mode and animation
+        shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
+        shadowCaster.localPosition = new Vector3(0f, 0.7f, 0f);
         spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
         if (input.isMoving) { //
             if (input.isRunning) {
                 mode = Mode.run;
             } else if (input.isCrouching) {
+                shadowCaster.localScale = new Vector3(0.5f, 0.1f, 0.5f);
+                shadowCaster.localPosition = new Vector3(0f, 0.1f, 0f);
                 mode = Mode.crawl;
             } else {
                 mode = Mode.walk;
@@ -97,9 +102,10 @@ public class DirectionalBillboard : MonoBehaviour {
             }
         } else { // stopped
             if (input.isCrouching) {
+                shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
+                shadowCaster.localPosition = new Vector3(0f, 0.3f, 0f);
                 mode = Mode.crouch;
 
-                // TODO: if unarmed, use unarmedcrouch. otherwise, use legscrouch.
                 if (input.gunType == GunType.unarmed) {
                     spriteRenderer.sprite = skin.unarmedCrouch[direction][0];
                 } else {

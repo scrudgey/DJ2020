@@ -113,10 +113,13 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         _moveAxis = new Vector2(inputs.MoveAxisRight, inputs.MoveAxisForward);
 
         // Fire
-        Vector3 shootVector = gunHandler.ProcessInput(inputs);
-        if (shootVector != Vector3.zero) {
-            _shootLookDirection = shootVector;
+        if (state == CharacterState.normal) {
+            Vector3 shootVector = gunHandler.ProcessInput(inputs);
+            if (shootVector != Vector3.zero) {
+                _shootLookDirection = shootVector;
+            }
         }
+
 
         _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
 
@@ -133,7 +136,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             if (!isCrouching) {
                 isCrouching = true;
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
-                // MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);
+                // MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);\
             }
         } else {
             _shouldBeCrouching = false;
@@ -150,7 +153,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         }
 
         if (state == CharacterState.wallPress) {
-            Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.75f);
+            // Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.75f);
+            Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+
 
             if (_moveAxis != Vector2.zero) {
                 lastWallInput = _moveAxis;
@@ -231,12 +236,12 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     bool AtRightEdge() {
         if (wallNormal == Vector3.zero)
             return false;
-        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + 0.1f * Motor.CharacterRight);
+        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + 0.2f * Motor.CharacterRight);
     }
     bool AtLeftEdge() {
         if (wallNormal == Vector3.zero)
             return false;
-        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.1f * Motor.CharacterRight);
+        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.2f * Motor.CharacterRight);
     }
 
     /// <summary>
@@ -257,7 +262,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
                     // wall style input is relative to the wall normal
                     // TODO: use ray 2, 3 to determine if we have hit an edge
-
                     if (AtRightEdge()) {
                         _moveAxis.x = Mathf.Max(0, _moveAxis.x);
                     }
@@ -417,7 +421,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         // Handle uncrouching
         if (isCrouching && !_shouldBeCrouching) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
-            Motor.SetCapsuleDimensions(0.5f, 2f, 1f);
+            Motor.SetCapsuleDimensions(defaultRadius, 2f, 1f);
             // Motor.SetCapsuleDimensions(defaultRadius, 2f, 0.8f);
 
             if (Motor.CharacterCollisionsOverlap(
@@ -425,7 +429,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                     Motor.TransientRotation,
                     _probedColliders) > 0) {
                 // If obstructions, just stick to crouching dimensions
-                Motor.SetCapsuleDimensions(0.5f, 1f, 0.5f);
+                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
                 // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
 
             } else {
@@ -434,6 +438,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
 
                 isCrouching = false;
+
+
             }
         }
         direction = Motor.CharacterForward;

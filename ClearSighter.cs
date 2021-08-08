@@ -70,7 +70,7 @@ public class MaterialControllerCache {
         } else {
             MaterialController controller = new MaterialController(key, camera);
             if (controller.renderer == null) {
-                Debug.Log($"{key} null controller");
+                // Debug.Log($"{key} null controller");
                 controller = null;
             }
             controllers[key] = controller;
@@ -79,6 +79,8 @@ public class MaterialControllerCache {
     }
 }
 public class ClearSighter : MonoBehaviour {
+    static List<string> forbiddenTags = new List<string> { "glass", "donthide" };
+
     public MaterialControllerCache controllers;
     public NeoCharacterCamera myCamera;
     Transform myTransform;
@@ -104,6 +106,9 @@ public class ClearSighter : MonoBehaviour {
         foreach (RaycastHit hit in Physics.RaycastAll(myCamera.transform.position, myCamera.transform.forward, distance).OrderBy(x => x.distance)) {
             if (hit.collider.transform.IsChildOf(transform)) {
                 break;
+            }
+            if (forbiddenTags.Contains(hit.collider.tag)) {
+                continue;
             }
             MaterialController controller = controllers.get(hit.collider.gameObject);
             if (controller != null) {

@@ -80,7 +80,12 @@ public class GunHandler : MonoBehaviour {
             if (hit.collider.tag == "glass") {
                 Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
                 if (glass != null) {
-                    glass.BulletHit(hit, bulletRay);
+                    BulletImpact impact = new BulletImpact() {
+                        hit = hit,
+                        ray = bulletRay,
+                        damage = gunInstance.baseGun.getBaseDamage()
+                    };
+                    glass.BulletHit(impact);
                 }
             } else {
                 endPosition = hit.point;

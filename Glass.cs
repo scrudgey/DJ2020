@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Glass : MonoBehaviour {
     public float health = 100f;
     public AudioClip[] hitSounds;
@@ -12,17 +13,17 @@ public class Glass : MonoBehaviour {
     RaycastHit lastImpact;
     Ray lastRay;
     public bool doDestruct;
-    public void BulletHit(RaycastHit hit, Ray ray) {
+    public void BulletHit(BulletImpact impact) {
 
-        GameObject decalObject = DecalPool.I.SpawnDecal(hit, DecalPool.DecalType.glass);
+        GameObject decalObject = DecalPool.I.SpawnDecal(impact.hit, DecalPool.DecalType.glass);
         decals.Add(decalObject);
-        health -= Random.Range(5f, 10f);
+        health -= impact.damage;
         Toolbox.RandomizeOneShot(audioSource, hitSounds);
         if (health <= 0) {
             doDestruct = true;
         }
-        lastImpact = hit;
-        lastRay = ray;
+        lastImpact = impact.hit;
+        lastRay = impact.ray;
         // var sparks = Resources.Load("prefabs/impactSpark");
         // GameObject sparkObject = GameObject.Instantiate(sparks,
         // hit.point + (hit.normal * 0.025f),
@@ -40,8 +41,10 @@ public class Glass : MonoBehaviour {
         DecalPool.I.RecallDecals(decals.ToArray()); // return decals to the pool
         // TODO: amortize this expensive operation
         // TODO: use a pooling structure
+        Collider myCollider = GetComponent<Collider>();
+
         for (int i = 0; i < Random.Range(10, 20); i++) {
-            Vector3 initialPosition = transform.position;
+            Vector3 initialPosition = myCollider.bounds.center;
             initialPosition += Random.Range(-1.2f, 1.2f) * Vector3.Cross(Vector3.up, lastImpact.normal);
             initialPosition += Random.Range(-0.1f, 0.1f) * lastRay.direction;
             initialPosition += Random.Range(-0.25f, 0.25f) * transform.up;

@@ -18,6 +18,7 @@ public class Gun : ScriptableObject {
     public int clipSize;
     public float range;
     public float spread;
+    public LoHi baseDamage;
 
     [Header("Resources")]
     public AudioClip[] shootSounds;
@@ -36,5 +37,7 @@ public class Gun : ScriptableObject {
     public static Gun Load(string name) {
         return Resources.Load($"data/guns/{name}") as Gun;
     }
-
+    public float getBaseDamage() {
+        return Random.Range(baseDamage.low, baseDamage.high);
+    }
 }
