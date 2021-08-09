@@ -26,6 +26,7 @@ public class NeoPlayer : MonoBehaviour {
     public InputActionReference gunSecondary;
     public InputActionReference gunPrimary;
     public InputActionReference gunThird;
+    public InputActionReference actionButton;
 
     private Vector2 inputVector;
     private bool firePressedHeld;
@@ -37,6 +38,7 @@ public class NeoPlayer : MonoBehaviour {
     private bool jumpPressedThisFrame;
     private bool reloadPressedThisFrame;
     private int switchToGunThisFrame;
+    private bool actionButtonPressedThisFrame;
     private PlayerCharacterInputs _lastInput;
 
 
@@ -97,6 +99,11 @@ public class NeoPlayer : MonoBehaviour {
         gunThird.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
                 switchToGunThisFrame = 3;
+            }
+        };
+        actionButton.action.performed += ctx => {
+            if (ctx.ReadValueAsButton()) {
+                actionButtonPressedThisFrame = ctx.ReadValueAsButton();
             }
         };
 
@@ -181,6 +188,9 @@ public class NeoPlayer : MonoBehaviour {
     }
 
     private void HandleCharacterInput() {
+
+        // TODO: set climb ladder
+
         PlayerCharacterInputs characterInputs = new PlayerCharacterInputs() {
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
@@ -195,6 +205,7 @@ public class NeoPlayer : MonoBehaviour {
             },
             reload = reloadPressedThisFrame,
             switchToGun = switchToGunThisFrame,
+            climbLadder = actionButtonPressedThisFrame
         };
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
@@ -203,6 +214,7 @@ public class NeoPlayer : MonoBehaviour {
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
         switchToGunThisFrame = -1;
+        actionButtonPressedThisFrame = false;
 
         _lastInput = characterInputs;
     }

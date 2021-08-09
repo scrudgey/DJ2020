@@ -20,8 +20,14 @@ public struct PlayerCharacterInputs {
     public FireInputs Fire;
     public bool reload;
     public int switchToGun;
+    public bool climbLadder;
 }
-public enum CharacterState { normal, wallPress }
+public enum CharacterState { normal, wallPress, climbing }
+public enum ClimbingState {
+    Anchoring,
+    Climbing,
+    DeAnchoring
+}
 
 public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public KinematicCharacterMotor Motor;
@@ -49,6 +55,11 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public float JumpSpeed = 10f;
     public float JumpPreGroundingGraceTime = 0f;
     public float JumpPostGroundingGraceTime = 0f;
+
+    [Header("Ladder Climbing")]
+    public float ClimbingSpeed = 4f;
+    public float AnchoringDuration = 0.25f;
+    public LayerMask InteractionLayer;
 
     [Header("Misc")]
     public Vector3 Gravity = new Vector3(0, -30f, 0);
@@ -81,7 +92,68 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public float wallPressHeight = 0.8f;
     public Vector3 wallNormal = Vector3.zero;
     public Vector2 lastWallInput = Vector2.zero;
-    public CharacterState state;
+    private CharacterState _state;
+    public CharacterState state {
+        get { return _state; }
+    }
+    // Ladder vars
+    private float _ladderUpDownInput;
+    private Ladder _activeLadder { get; set; }
+    private ClimbingState _internalClimbingState;
+    private ClimbingState _climbingState {
+        get {
+            return _internalClimbingState;
+        }
+        set {
+            _internalClimbingState = value;
+            _anchoringTimer = 0f;
+            _anchoringStartPosition = Motor.TransientPosition;
+            _anchoringStartRotation = Motor.TransientRotation;
+        }
+    }
+    private Vector3 _ladderTargetPosition;
+    private Quaternion _ladderTargetRotation;
+    private float _onLadderSegmentState = 0;
+    private float _anchoringTimer = 0f;
+    private Vector3 _anchoringStartPosition = Vector3.zero;
+    private Quaternion _anchoringStartRotation = Quaternion.identity;
+    private Quaternion _rotationBeforeClimbing = Quaternion.identity;
+    public void TransitionToState(CharacterState newState) {
+        CharacterState tmpInitialState = state;
+        OnStateExit(tmpInitialState, newState);
+        _state = newState;
+        OnStateEnter(newState, tmpInitialState);
+    }
+    private void OnStateEnter(CharacterState state, CharacterState fromState) {
+        switch (state) {
+            default:
+                break;
+            case CharacterState.climbing: {
+                    _rotationBeforeClimbing = Motor.TransientRotation;
+
+                    Motor.SetMovementCollisionsSolvingActivation(false);
+                    Motor.SetGroundSolvingActivation(false);
+                    _climbingState = ClimbingState.Anchoring;
+
+                    // Store the target position and rotation to snap to
+                    _ladderTargetPosition = _activeLadder.ClosestPointOnLadderSegment(Motor.TransientPosition, out _onLadderSegmentState);
+                    _ladderTargetRotation = _activeLadder.transform.rotation;
+                    break;
+                }
+        }
+    }
+    public void OnStateExit(CharacterState state, CharacterState toState) {
+        switch (state) {
+            default:
+                break;
+            case CharacterState.climbing: {
+                    Motor.SetMovementCollisionsSolvingActivation(true);
+                    Motor.SetGroundSolvingActivation(true);
+                    break;
+                }
+        }
+    }
+
     private void Start() {
         // Assign to motor
         Motor.CharacterController = this;
@@ -91,6 +163,35 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     /// This is called every frame by MyPlayer in order to tell the character what its inputs are
     /// </summary>
     public void SetInputs(ref PlayerCharacterInputs inputs) {
+        // Handle ladder transitions
+        _ladderUpDownInput = inputs.MoveAxisForward;
+        if (inputs.climbLadder) {
+            if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
+                // if (_probedColliders[0] != null) {
+                foreach (Collider collider in _probedColliders) {
+                    // Handle ladders
+                    if (collider == null || collider.gameObject == null)
+                        continue;
+                    Ladder ladder = collider.gameObject.GetComponent<Ladder>();
+                    if (ladder) {
+                        // Transition to ladder climbing state
+                        if (state == CharacterState.normal) {
+                            _activeLadder = ladder;
+                            TransitionToState(CharacterState.climbing);
+                        }
+                        // Transition back to default movement state
+                        else if (state == CharacterState.climbing) {
+                            _climbingState = ClimbingState.DeAnchoring;
+                            _ladderTargetPosition = Motor.TransientPosition;
+                            _ladderTargetRotation = _rotationBeforeClimbing;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -105,6 +206,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         }
         Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
 
+
         // Move and look inputs
         _moveInputVector = cameraPlanarRotation * moveInputVector;
         if (inputs.MoveAxisRight != 0 && inputs.MoveAxisForward != 0) {
@@ -112,63 +214,65 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
         }
         _moveAxis = new Vector2(inputs.MoveAxisRight, inputs.MoveAxisForward);
 
-        // Fire
-        if (state == CharacterState.normal) {
-            Vector3 shootVector = gunHandler.ProcessInput(inputs);
-            if (shootVector != Vector3.zero) {
-                _shootLookDirection = shootVector;
-            }
-        }
-
-
-        _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
-
-        // Jumping input
-        if (inputs.JumpDown) {
-            _timeSinceJumpRequested = 0f;
-            _jumpRequested = true;
-        }
 
         // Crouching input
         if (inputs.CrouchDown) {
             _shouldBeCrouching = true;
-
             if (!isCrouching) {
                 isCrouching = true;
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
-                // MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);\
             }
         } else {
             _shouldBeCrouching = false;
         }
 
-        if (inputs.runDown) {
-            _shouldBeRunning = true;
-            if (!isRunning) {
-                isRunning = true;
-            }
-        } else {
-            isRunning = false;
-            _shouldBeRunning = false;
+        switch (state) {
+            default:
+            case CharacterState.normal:
+                wallPressRatchet = false;
+
+                // Fire
+                Vector3 shootVector = gunHandler.ProcessInput(inputs);
+                if (shootVector != Vector3.zero) {
+                    _shootLookDirection = shootVector;
+                }
+                _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
+
+                // Jumping input
+                if (inputs.JumpDown) {
+                    _timeSinceJumpRequested = 0f;
+                    _jumpRequested = true;
+                }
+
+
+                if (inputs.runDown) {
+                    _shouldBeRunning = true;
+                    if (!isRunning) {
+                        isRunning = true;
+                    }
+                } else {
+                    isRunning = false;
+                    _shouldBeRunning = false;
+                }
+                break;
+            case CharacterState.wallPress:
+                // Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.75f);
+                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                if (_moveAxis != Vector2.zero) {
+                    lastWallInput = _moveAxis;
+                } else {
+                    wallPressRatchet = true;
+                }
+                if (!wallPressRatchet) {
+                    _moveInputVector = Vector3.zero;
+                    _moveAxis = Vector2.zero;
+                }
+                break;
+            case CharacterState.climbing:
+                break;
         }
 
-        if (state == CharacterState.wallPress) {
-            // Motor.SetCapsuleDimensions(pressRadius, 1.5f, 0.75f);
-            Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
 
-
-            if (_moveAxis != Vector2.zero) {
-                lastWallInput = _moveAxis;
-            } else {
-                wallPressRatchet = true;
-            }
-            if (!wallPressRatchet) {
-                _moveInputVector = Vector3.zero;
-                _moveAxis = Vector2.zero;
-            }
-        } else {
-            wallPressRatchet = false;
-        }
     }
 
     /// <summary>
@@ -210,6 +314,17 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             case CharacterState.wallPress:
                 currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);
                 break;
+            case CharacterState.climbing:
+                switch (_climbingState) {
+                    case ClimbingState.Climbing:
+                        currentRotation = _activeLadder.transform.rotation;
+                        break;
+                    case ClimbingState.Anchoring:
+                    case ClimbingState.DeAnchoring:
+                        currentRotation = Quaternion.Slerp(_anchoringStartRotation, _ladderTargetRotation, (_anchoringTimer / AnchoringDuration));
+                        break;
+                }
+                break;
         }
 
         _shootLookDirection = Vector3.zero;
@@ -250,35 +365,36 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     /// This is the ONLY place where you can set the character's velocity
     /// </summary>
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-
         bool pressingOnWall = DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
-        if (Motor.GroundingStatus.IsStableOnGround) {
-            // Reorient velocity on slope
-            currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
+        switch (state) {
+            case CharacterState.wallPress:
+                currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
 
-            switch (state) {
-                case CharacterState.wallPress:
+                // wall style input is relative to the wall normal
+                if (AtRightEdge()) {
+                    _moveAxis.x = Mathf.Max(0, _moveAxis.x);
+                }
+                if (AtLeftEdge()) {
+                    _moveAxis.x = Mathf.Min(0, _moveAxis.x);
+                }
+                targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
 
-                    // wall style input is relative to the wall normal
-                    // TODO: use ray 2, 3 to determine if we have hit an edge
-                    if (AtRightEdge()) {
-                        _moveAxis.x = Mathf.Max(0, _moveAxis.x);
-                    }
-                    if (AtLeftEdge()) {
-                        _moveAxis.x = Mathf.Min(0, _moveAxis.x);
-                    }
-                    targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
+                // transition from wall press 
+                if (!pressingOnWall) {
+                    TransitionToState(CharacterState.normal);
+                }
 
-                    // transition from wall press 
-                    // if (_moveAxis.y < -0.02f) {
-                    if (!pressingOnWall) {
-                        state = CharacterState.normal;
-                    }
+                // Smooth movement Velocity
+                currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
 
-                    break;
-                default:
-                case CharacterState.normal:
+                break;
+            default:
+            case CharacterState.normal:
+
+                if (Motor.GroundingStatus.IsStableOnGround) {
+                    // Reorient velocity on slope
+                    currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
 
                     // I am pressing on the wall, but not yet in wall press mode
                     if (pressingOnWall && Vector3.Dot(_moveInputVector, wallNormal) < -0.9 && Vector3.Dot(_moveInputVector, wallNormal) > -1.1) {
@@ -286,7 +402,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
                         // transition to wallpress mode
                         if (wallPressTimer > wallPressThreshold) {
-                            state = CharacterState.wallPress;
+                            TransitionToState(CharacterState.wallPress);
                             wallPressTimer = 0;
                         }
                     }
@@ -310,86 +426,100 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                     } else if (isCrouching) {
                         targetMovementVelocity *= crawlSpeedFraction;
                     }
-                    break;
-            }
 
-            // Smooth movement Velocity
-            currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
-        } else {
-            // Add move input
-            if (_moveInputVector.sqrMagnitude > 0f) {
-                targetMovementVelocity = _moveInputVector * MaxAirMoveSpeed;
+                    // Smooth movement Velocity
+                    currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
 
-                // Prevent climbing on un-stable slopes with air movement
-                if (Motor.GroundingStatus.FoundAnyGround) {
-                    Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(Motor.CharacterUp, Motor.GroundingStatus.GroundNormal), Motor.CharacterUp).normalized;
-                    targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
+                } else {
+                    // Add move input
+                    if (_moveInputVector.sqrMagnitude > 0f) {
+                        targetMovementVelocity = _moveInputVector * MaxAirMoveSpeed;
+
+                        // Prevent climbing on un-stable slopes with air movement
+                        if (Motor.GroundingStatus.FoundAnyGround) {
+                            Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(Motor.CharacterUp, Motor.GroundingStatus.GroundNormal), Motor.CharacterUp).normalized;
+                            targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
+                        }
+
+                        Vector3 velocityDiff = Vector3.ProjectOnPlane(targetMovementVelocity - currentVelocity, Gravity);
+                        currentVelocity += velocityDiff * AirAccelerationSpeed * deltaTime;
+                    }
+
+                    // Gravity
+                    currentVelocity += Gravity * deltaTime;
+
+                    // Drag
+                    currentVelocity *= (1f / (1f + (Drag * deltaTime)));
                 }
 
-                Vector3 velocityDiff = Vector3.ProjectOnPlane(targetMovementVelocity - currentVelocity, Gravity);
-                currentVelocity += velocityDiff * AirAccelerationSpeed * deltaTime;
-            }
+                // Handle jumping
+                _jumpedThisFrame = false;
+                _timeSinceJumpRequested += deltaTime;
+                if (_jumpRequested) {
+                    // Handle double jump
+                    if (AllowDoubleJump) {
+                        if (_jumpConsumed && !_doubleJumpConsumed && (AllowJumpingWhenSliding ? !Motor.GroundingStatus.FoundAnyGround : !Motor.GroundingStatus.IsStableOnGround)) {
+                            Motor.ForceUnground(0.1f);
 
-            // Gravity
-            currentVelocity += Gravity * deltaTime;
+                            // Add to the return velocity and reset jump state
+                            // currentVelocity += (Motor.CharacterUp * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
+                            currentVelocity += (Vector3.up * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
+                            _jumpRequested = false;
+                            _doubleJumpConsumed = true;
+                            _jumpedThisFrame = true;
+                        }
+                    }
 
-            // Drag
-            currentVelocity *= (1f / (1f + (Drag * deltaTime)));
-        }
+                    // See if we actually are allowed to jump
+                    if (_canWallJump ||
+                        (!_jumpConsumed && ((AllowJumpingWhenSliding ? Motor.GroundingStatus.FoundAnyGround : Motor.GroundingStatus.IsStableOnGround) || _timeSinceLastAbleToJump <= JumpPostGroundingGraceTime))) {
+                        // Calculate jump direction before ungrounding
+                        // Vector3 jumpDirection = Motor.CharacterUp;
+                        Vector3 jumpDirection = Vector3.up;
+                        if (_canWallJump) {
+                            jumpDirection = _wallJumpNormal;
+                        } else if (Motor.GroundingStatus.FoundAnyGround && !Motor.GroundingStatus.IsStableOnGround) {
+                            jumpDirection = Motor.GroundingStatus.GroundNormal;
+                        }
 
-        // Handle jumping
-        {
-            _jumpedThisFrame = false;
-            _timeSinceJumpRequested += deltaTime;
-            if (_jumpRequested) {
-                // Handle double jump
-                if (AllowDoubleJump) {
-                    if (_jumpConsumed && !_doubleJumpConsumed && (AllowJumpingWhenSliding ? !Motor.GroundingStatus.FoundAnyGround : !Motor.GroundingStatus.IsStableOnGround)) {
+                        // Makes the character skip ground probing/snapping on its next update. 
+                        // If this line weren't here, the character would remain snapped to the ground when trying to jump. Try commenting this line out and see.
                         Motor.ForceUnground(0.1f);
 
                         // Add to the return velocity and reset jump state
-                        // currentVelocity += (Motor.CharacterUp * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
-                        currentVelocity += (Vector3.up * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
+                        currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
                         _jumpRequested = false;
-                        _doubleJumpConsumed = true;
+                        _jumpConsumed = true;
                         _jumpedThisFrame = true;
                     }
                 }
 
-                // See if we actually are allowed to jump
-                if (_canWallJump ||
-                    (!_jumpConsumed && ((AllowJumpingWhenSliding ? Motor.GroundingStatus.FoundAnyGround : Motor.GroundingStatus.IsStableOnGround) || _timeSinceLastAbleToJump <= JumpPostGroundingGraceTime))) {
-                    // Calculate jump direction before ungrounding
-                    // Vector3 jumpDirection = Motor.CharacterUp;
-                    Vector3 jumpDirection = Vector3.up;
-                    if (_canWallJump) {
-                        jumpDirection = _wallJumpNormal;
-                    } else if (Motor.GroundingStatus.FoundAnyGround && !Motor.GroundingStatus.IsStableOnGround) {
-                        jumpDirection = Motor.GroundingStatus.GroundNormal;
-                    }
+                // Reset wall jump
+                _canWallJump = false;
 
-                    // Makes the character skip ground probing/snapping on its next update. 
-                    // If this line weren't here, the character would remain snapped to the ground when trying to jump. Try commenting this line out and see.
-                    Motor.ForceUnground(0.1f);
-
-                    // Add to the return velocity and reset jump state
-                    // currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Motor.CharacterUp);
-                    currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
-                    _jumpRequested = false;
-                    _jumpConsumed = true;
-                    _jumpedThisFrame = true;
+                // Take into account additive velocity
+                if (_internalVelocityAdd.sqrMagnitude > 0f) {
+                    currentVelocity += _internalVelocityAdd;
+                    _internalVelocityAdd = Vector3.zero;
                 }
-            }
+                break;
 
-            // Reset wall jump
-            _canWallJump = false;
+            case CharacterState.climbing:
+                currentVelocity = Vector3.zero;
+
+                switch (_climbingState) {
+                    case ClimbingState.Climbing:
+                        currentVelocity = (_ladderUpDownInput * _activeLadder.transform.up).normalized * ClimbingSpeed;
+                        break;
+                    case ClimbingState.Anchoring:
+                    case ClimbingState.DeAnchoring:
+                        Vector3 tmpPosition = Vector3.Lerp(_anchoringStartPosition, _ladderTargetPosition, (_anchoringTimer / AnchoringDuration));
+                        currentVelocity = Motor.GetVelocityForMovePosition(Motor.TransientPosition, tmpPosition, deltaTime);
+                        break;
+                }
+                break;
         }
 
-        // Take into account additive velocity
-        if (_internalVelocityAdd.sqrMagnitude > 0f) {
-            currentVelocity += _internalVelocityAdd;
-            _internalVelocityAdd = Vector3.zero;
-        }
 
     }
 
@@ -398,51 +528,88 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     /// This is called after the character has finished its movement update
     /// </summary>
     public void AfterCharacterUpdate(float deltaTime) {
-        // Handle jump-related values
-        {
-            // Handle jumping pre-ground grace period
-            if (_jumpRequested && _timeSinceJumpRequested > JumpPreGroundingGraceTime) {
-                _jumpRequested = false;
-            }
-
-            if (AllowJumpingWhenSliding ? Motor.GroundingStatus.FoundAnyGround : Motor.GroundingStatus.IsStableOnGround) {
-                // If we're on a ground surface, reset jumping values
-                if (!_jumpedThisFrame) {
-                    _doubleJumpConsumed = false;
-                    _jumpConsumed = false;
+        switch (state) {
+            default:
+            case CharacterState.normal:
+                // Handle jump-related values
+                // Handle jumping pre-ground grace period
+                if (_jumpRequested && _timeSinceJumpRequested > JumpPreGroundingGraceTime) {
+                    _jumpRequested = false;
                 }
-                _timeSinceLastAbleToJump = 0f;
-            } else {
-                // Keep track of time since we were last able to jump (for grace period)
-                _timeSinceLastAbleToJump += deltaTime;
-            }
+
+                if (AllowJumpingWhenSliding ? Motor.GroundingStatus.FoundAnyGround : Motor.GroundingStatus.IsStableOnGround) {
+                    // If we're on a ground surface, reset jumping values
+                    if (!_jumpedThisFrame) {
+                        _doubleJumpConsumed = false;
+                        _jumpConsumed = false;
+                    }
+                    _timeSinceLastAbleToJump = 0f;
+                } else {
+                    // Keep track of time since we were last able to jump (for grace period)
+                    _timeSinceLastAbleToJump += deltaTime;
+                }
+
+                // Handle uncrouching
+                if (isCrouching && !_shouldBeCrouching) {
+                    // Do an overlap test with the character's standing height to see if there are any obstructions
+                    Motor.SetCapsuleDimensions(defaultRadius, 2f, 1f);
+
+                    if (Motor.CharacterCollisionsOverlap(
+                            Motor.TransientPosition,
+                            Motor.TransientRotation,
+                            _probedColliders) > 0) {
+                        // If obstructions, just stick to crouching dimensions
+                        Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
+
+                    } else {
+                        // If no obstructions, uncrouch
+                        Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+
+                        isCrouching = false;
+
+
+                    }
+                }
+                direction = Motor.CharacterForward;
+                break;
+            case CharacterState.climbing:
+                switch (_climbingState) {
+                    case ClimbingState.Climbing:
+                        // Detect getting off ladder during climbing
+                        _activeLadder.ClosestPointOnLadderSegment(Motor.TransientPosition, out _onLadderSegmentState);
+                        if (Mathf.Abs(_onLadderSegmentState) > 0.05f) {
+                            _climbingState = ClimbingState.DeAnchoring;
+
+                            // If we're higher than the ladder top point
+                            if (_onLadderSegmentState > 0) {
+                                _ladderTargetPosition = _activeLadder.TopReleasePoint.position;
+                                _ladderTargetRotation = _activeLadder.TopReleasePoint.rotation;
+                            }
+                            // If we're lower than the ladder bottom point
+                            else if (_onLadderSegmentState < 0) {
+                                _ladderTargetPosition = _activeLadder.BottomReleasePoint.position;
+                                _ladderTargetRotation = _activeLadder.BottomReleasePoint.rotation;
+                            }
+                        }
+                        break;
+                    case ClimbingState.Anchoring:
+                    case ClimbingState.DeAnchoring:
+                        // Detect transitioning out from anchoring states
+                        if (_anchoringTimer >= AnchoringDuration) {
+                            if (_climbingState == ClimbingState.Anchoring) {
+                                _climbingState = ClimbingState.Climbing;
+                            } else if (_climbingState == ClimbingState.DeAnchoring) {
+                                TransitionToState(CharacterState.normal);
+                            }
+                        }
+
+                        // Keep track of time since we started anchoring
+                        _anchoringTimer += deltaTime;
+                        break;
+                }
+                break;
         }
 
-        // Handle uncrouching
-        if (isCrouching && !_shouldBeCrouching) {
-            // Do an overlap test with the character's standing height to see if there are any obstructions
-            Motor.SetCapsuleDimensions(defaultRadius, 2f, 1f);
-            // Motor.SetCapsuleDimensions(defaultRadius, 2f, 0.8f);
-
-            if (Motor.CharacterCollisionsOverlap(
-                    Motor.TransientPosition,
-                    Motor.TransientRotation,
-                    _probedColliders) > 0) {
-                // If obstructions, just stick to crouching dimensions
-                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
-                // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.8f);
-
-            } else {
-                // If no obstructions, uncrouch
-                // MeshRoot.localScale = new Vector3(1f, 1f, 1f);
-                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
-
-                isCrouching = false;
-
-
-            }
-        }
-        direction = Motor.CharacterForward;
     }
 
     public bool IsColliderValidForCollisions(Collider coll) {
@@ -453,6 +620,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     }
 
     public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
+
+        // TODO: consider breaking out by state
+
         // We can wall jump only if we are not stable on ground and are moving against an obstruction
         if (AllowWallJump && !Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable) {
             _canWallJump = true;
