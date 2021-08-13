@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Ladder : MonoBehaviour {
+    public SurfaceType surfaceType;
     // Ladder segment
     public Vector3 LadderSegmentBottom;
     public float LadderSegmentLength;

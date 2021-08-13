@@ -77,7 +77,7 @@ public class GunHandler : MonoBehaviour {
 
         RaycastHit[] hits = Physics.RaycastAll(bulletRay, gunInstance.baseGun.range); // get all hits
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found
-            if (hit.collider.tag == "glass") {
+            if (Toolbox.GetTagData(hit.collider.gameObject).bulletPassthrough) {
                 Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
                 if (glass != null) {
                     BulletImpact impact = new BulletImpact() {

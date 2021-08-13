@@ -48,7 +48,7 @@ public class PlaySound : MonoBehaviour {
     }
 
     void OnTriggerEnter(Collider other) {
-        if (other.tag != "actor")
+        if (!Toolbox.GetTagData(other.gameObject).isActor)
             return;
         if (trigger == TriggerType.enter) {
             Play();

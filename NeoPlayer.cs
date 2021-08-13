@@ -189,8 +189,6 @@ public class NeoPlayer : MonoBehaviour {
 
     private void HandleCharacterInput() {
 
-        // TODO: set climb ladder
-
         PlayerCharacterInputs characterInputs = new PlayerCharacterInputs() {
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,

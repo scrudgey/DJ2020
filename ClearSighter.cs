@@ -79,8 +79,6 @@ public class MaterialControllerCache {
     }
 }
 public class ClearSighter : MonoBehaviour {
-    static List<string> forbiddenTags = new List<string> { "glass", "donthide" };
-
     public MaterialControllerCache controllers;
     public NeoCharacterCamera myCamera;
     Transform myTransform;
@@ -107,7 +105,7 @@ public class ClearSighter : MonoBehaviour {
             if (hit.collider.transform.IsChildOf(transform)) {
                 break;
             }
-            if (forbiddenTags.Contains(hit.collider.tag)) {
+            if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInClearsight) {
                 continue;
             }
             MaterialController controller = controllers.get(hit.collider.gameObject);

@@ -32,6 +32,7 @@ public enum ClimbingState {
 public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public KinematicCharacterMotor Motor;
     public GunHandler gunHandler;
+    public Footsteps footsteps;
     public float defaultRadius = 0.25f;
 
     [Header("Stable Movement")]
@@ -424,11 +425,13 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                     if (isRunning) {
                         targetMovementVelocity *= runSpeedFraction;
                     } else if (isCrouching) {
+                        // crawling
                         targetMovementVelocity *= crawlSpeedFraction;
                     }
 
                     // Smooth movement Velocity
                     currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
+
 
                 } else {
                     // Add move input
@@ -502,14 +505,19 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
                     currentVelocity += _internalVelocityAdd;
                     _internalVelocityAdd = Vector3.zero;
                 }
-                break;
 
+                if (!isCrouching && Motor.GroundingStatus.IsStableOnGround)
+                    footsteps.UpdateWithVelocity(currentVelocity);
+
+                break;
             case CharacterState.climbing:
                 currentVelocity = Vector3.zero;
 
                 switch (_climbingState) {
                     case ClimbingState.Climbing:
                         currentVelocity = (_ladderUpDownInput * _activeLadder.transform.up).normalized * ClimbingSpeed;
+                        footsteps.SetFootstepSounds(_activeLadder.surfaceType);
+                        footsteps.UpdateWithVelocity(currentVelocity);
                         break;
                     case ClimbingState.Anchoring:
                     case ClimbingState.DeAnchoring:
