@@ -139,3 +139,78 @@ use a collider to detect if i'm pressing against a wall for real, and break the 
 different y offset depending on if crouched or not.
 focus camera on nearby enemy if applicable
 overall: rely less on wallNormal for state, it is more of an exposed parameter
+
+smoothing camera transitions:
+unified code for determining target values, 
+unified code for lerping to target values,
+
+two functions each for determining position, rotation, camera values
+calculate them both and then lerp between the two values using the easing function
+
+
+CONTROL QUESTIONS
+use a controller, and change the way wall press works to hold instead of toggle
+    analog input makes it easier to slide
+toggle crouch instead of hold
+
+jumping / highjump / vault
+
+
+
+skybox:
+possibilities:
+    move the camera like before.
+        this means there is more detail on distant objects, and not a fixed pixel scale 
+        can involve real 3 dimensionality, rotation handled
+        Q: what does the final skybox look like?
+            concentric squares? 
+            concentric cylinders?
+            a bunch of sprites
+        Q: how to make concentric cylinders that work?
+            1. invert normals with shader
+
+            2. cylinder from...... Crocotile??
+                if i do this, then i might as well render the whole thing in Crocotile.
+                    its image editing is a pain, so i would import texture
+                    but then scale of image is tied to the scale of the cylinder. 
+    camera fixed, move pixel layers independently
+        this is consistent with how 2D parallax works. somewhat simpler
+        how to handle rotation?
+        Q: 
+
+
+To make your skybox more believable split your image to 3 different level textures and you can map them on 3 different radius rings 
+(make sure your materials are transparent/alpha cutout). This give you fast and nice parralax effect without much effort.
+
+jump mode:
+
+hold jump to start timer
+    (this part is unclear exactly)
+        crouch down
+        prevent movement
+        release before timer full: regular jump
+
+    timer full:
+        change display:
+            linerenderer shows parabolic arc
+            input now moves the parabolic arc 
+            so at this point, we must be in a different state
+        on release:
+            super jump
+
+p direction is a culprit,
+magnitude is a culprit.
+
+p issue is orientation-dependent.
+right now we are calculating in local coordinates.
+we need to apply velocity in world coordinates.
+inputs are relative to camera orientation
+
+
+
+1. rotation of character is affecting the tragectory.
+    fixed (0, 0, 1) tragectory faces forward
+    player rotates as indicator moves, moving the tragectory to coincidentally match the indicator.
+    therefore, the tragectory needs to de-rotate (?)
+2. z=1 is forward
+3. line renderer and indicator position are local

@@ -4,6 +4,7 @@ Shader "Sprite (Unlit)"
 	{
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_Color ("Color", Color) = (1,1,1,1)
+		[MaterialToggle] _BILLBOARD ("_BILLBOARD", Float) = 0
 		
 		PixelSnap ("Pixel snap", Float) = 0
 		_AlphaTex ("External Alpha", 2D) = "white" {}
@@ -48,6 +49,7 @@ Shader "Sprite (Unlit)"
 				#pragma shader_feature _TEXTURE_BLEND
 				#pragma shader_feature _COLOR_ADJUST
 				#pragma shader_feature _FOG
+                #pragma shader_feature _BILLBOARD
 				
 				#pragma fragmentoption ARB_precision_hint_fastest
 				#pragma multi_compile_fog
@@ -73,7 +75,9 @@ Shader "Sprite (Unlit)"
 			Cull Off
 			Lighting Off
 			
-			CGPROGRAM		
+			CGPROGRAM
+                #pragma shader_feature _BILLBOARD
+
 				#pragma fragmentoption ARB_precision_hint_fastest
 				#pragma multi_compile_shadowcaster
 				#pragma multi_compile_instancing

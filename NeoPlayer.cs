@@ -10,7 +10,9 @@ public class NeoPlayer : MonoBehaviour {
     public ClearSighter sighter;
     public Transform CameraFollowPoint;
     public NeoCharacterController Character;
-    public DirectionalBillboard legsAnimator;
+    public JumpIndicatorController jumpIndicatorController;
+    public JumpIndicatorView jumpIndicatorView;
+    public HumanoidView legsAnimator;
     public GunAnimation torsoAnimator;
 
     [Header("Inputs")]
@@ -36,6 +38,8 @@ public class NeoPlayer : MonoBehaviour {
     private bool rotateCameraRightPressedThisFrame;
     private bool rotateCameraLeftPressedThisFrame;
     private bool jumpPressedThisFrame;
+    private bool jumpReleasedThisFrame;
+    private bool jumpHeld;
     private bool reloadPressedThisFrame;
     private int switchToGunThisFrame;
     private bool actionButtonPressedThisFrame;
@@ -55,6 +59,8 @@ public class NeoPlayer : MonoBehaviour {
         // Crouch
         CrouchAction.action.performed += ctx => {
             crouchHeld = ctx.ReadValueAsButton();
+            // ctx.rea
+            // Debug.Log(crouchHeld);
         };
 
         // Run
@@ -65,6 +71,7 @@ public class NeoPlayer : MonoBehaviour {
         // Jump
         JumpAction.action.performed += ctx => {
             jumpPressedThisFrame = ctx.ReadValueAsButton();
+            jumpHeld = ctx.ReadValueAsButton();
         };
 
         // Camera rotation
@@ -112,6 +119,10 @@ public class NeoPlayer : MonoBehaviour {
         CrouchAction.action.canceled += _ => crouchHeld = false;
         RunAction.action.canceled += _ => runHeld = false;
         MoveAction.action.canceled += _ => inputVector = Vector2.zero;
+        JumpAction.action.canceled += _ => {
+            jumpHeld = false;
+            jumpReleasedThisFrame = true;
+        };
     }
     private void Start() {
         // Tell camera to follow transform
@@ -152,6 +163,7 @@ public class NeoPlayer : MonoBehaviour {
 
         legsAnimator.UpdateView(animationInput);
         torsoAnimator.UpdateView(animationInput);
+        jumpIndicatorView.UpdateView(animationInput);
     }
 
     private void HandleCameraInput() {
@@ -190,10 +202,13 @@ public class NeoPlayer : MonoBehaviour {
     private void HandleCharacterInput() {
 
         PlayerCharacterInputs characterInputs = new PlayerCharacterInputs() {
+            state = Character.state,
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
             CameraRotation = OrbitCamera.isometricRotation,
             JumpDown = jumpPressedThisFrame,
+            jumpHeld = jumpHeld,
+            jumpReleased = jumpReleasedThisFrame,
             CrouchDown = crouchHeld,
             runDown = runHeld,
             Fire = new PlayerCharacterInputs.FireInputs() {
@@ -208,9 +223,13 @@ public class NeoPlayer : MonoBehaviour {
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
 
+        // apply inputs to jump indicator
+        jumpIndicatorController.SetInputs(ref characterInputs);
+
         firePressedThisFrame = false;
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
+        jumpReleasedThisFrame = false;
         switchToGunThisFrame = -1;
         actionButtonPressedThisFrame = false;
 

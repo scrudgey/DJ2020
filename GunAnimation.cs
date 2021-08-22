@@ -21,6 +21,9 @@ public class GunAnimation : MonoBehaviour {
     public PlayerCharacterInputs.FireInputs input;
     public bool holstered;
 
+    private float trailTimer;
+    public float trailInterval = 0.05f;
+
     void Awake() {
         skin = Skin.LoadSkin("generic");
     }
@@ -103,9 +106,22 @@ public class GunAnimation : MonoBehaviour {
         _isRacking = false;
     }
 
+    private void SpawnTrail() {
+        GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
+        DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
+        billboard.skin = GetCurrentOctet(GetCurrentGunType());
+    }
+
     // TODO: why is there separate private state variables and input
     public void UpdateView(AnimationInput input) {
         switch (input.state) {
+            case CharacterState.superJump:
+                trailTimer += Time.deltaTime;
+                if (trailTimer > trailInterval) {
+                    trailTimer = 0f;
+                    SpawnTrail();
+                }
+                break;
             default:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {
@@ -188,35 +204,34 @@ public class GunAnimation : MonoBehaviour {
         UpdateFrame();
     }
 
-
-    public void UpdateFrame() {
-        Octet<Sprite[]> _sprites = null;
+    private Octet<Sprite[]> GetCurrentOctet(GunType type) {
+        switch (_state) {
+            case State.reloading:
+                return skin.reloadSprites(type);
+            case State.racking:
+                return skin.rackSprites(type);
+            case State.shooting:
+                return skin.shootSprites(type);
+            case State.running:
+                return skin.runSprites(type);
+            case State.walking:
+                return skin.walkSprites(type);
+            default:
+            case State.idle:
+                return skin.idleSprites(type);
+        }
+    }
+    private GunType GetCurrentGunType() {
         GunType type = GunType.unarmed;
         if (gunHandler != null && gunHandler.gunInstance != null && !holstered) { //
             type = gunHandler.gunInstance.baseGun.type;
         }
+        return type;
+    }
+    public void UpdateFrame() {
+        GunType type = GetCurrentGunType();
+        Octet<Sprite[]> _sprites = GetCurrentOctet(type);
 
-        switch (_state) {
-            case State.reloading:
-                _sprites = skin.reloadSprites(type);
-                break;
-            case State.racking:
-                _sprites = skin.rackSprites(type);
-                break;
-            case State.shooting:
-                _sprites = skin.shootSprites(type);
-                break;
-            case State.running:
-                _sprites = skin.runSprites(type);
-                break;
-            case State.walking:
-                _sprites = skin.walkSprites(type);
-                break;
-            default:
-            case State.idle:
-                _sprites = skin.idleSprites(type);
-                break;
-        }
 
         if (_sprites == null)
             return;

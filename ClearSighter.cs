@@ -100,8 +100,11 @@ public class ClearSighter : MonoBehaviour {
 
 
         // collider between me and the camera
-        float distance = Vector3.Distance(myCamera.transform.position, transform.position) + 1f;
-        foreach (RaycastHit hit in Physics.RaycastAll(myCamera.transform.position, myCamera.transform.forward, distance).OrderBy(x => x.distance)) {
+        // float distance = Vector3.Distance(myCamera.transform.position, transform.position) + 1f;
+        Vector3 mypos = transform.position + new Vector3(0, 1f, 0);
+        float distance = Vector3.Distance(myCamera.transform.position, mypos);
+        Vector3 direction = (mypos - myCamera.transform.position).normalized;
+        foreach (RaycastHit hit in Physics.RaycastAll(myCamera.transform.position, direction, distance).OrderBy(x => x.distance)) {
             if (hit.collider.transform.IsChildOf(transform)) {
                 break;
             }
