@@ -349,6 +349,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
             case CharacterState.wallPress:
                 currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);
                 break;
+            case CharacterState.jumpPrep:
+                break;
             case CharacterState.climbing:
                 switch (_climbingState) {
                     case ClimbingState.Climbing:

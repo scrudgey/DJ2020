@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using KinematicCharacterController;
 
-public class GunAnimation : MonoBehaviour {
+public class GunAnimation : MonoBehaviour, ISaveable {
     public enum State { idle, walking, shooting, crouching, racking, reloading, running }
     private State _state;
     private int _frame;
@@ -24,9 +24,7 @@ public class GunAnimation : MonoBehaviour {
     private float trailTimer;
     public float trailInterval = 0.05f;
 
-    void Awake() {
-        skin = Skin.LoadSkin("generic");
-    }
+
 
     void OnEnable() {
         animator.Play();
@@ -165,7 +163,7 @@ public class GunAnimation : MonoBehaviour {
             }
 
             _state = State.crouching;
-            if (input.gunType == GunType.unarmed || input.isMoving) {
+            if (input.gunType == GunType.unarmed || input.isMoving || input.isJumping || input.isClimbing) {
                 spriteRenderer.enabled = false;
             } else {
                 spriteRenderer.enabled = true;
@@ -174,7 +172,6 @@ public class GunAnimation : MonoBehaviour {
             transform.localPosition = Vector3.zero;
             spriteRenderer.enabled = true;
         }
-
 
         if (_isShooting) { // shooting
             _state = State.shooting;
@@ -242,5 +239,8 @@ public class GunAnimation : MonoBehaviour {
         if (_sprites[_direction][frame] == null)
             return;
         spriteRenderer.sprite = _sprites[_direction][frame];
+    }
+    public void LoadState(PlayerData data) {
+        skin = Skin.LoadSkin(data.bodySkin);
     }
 }

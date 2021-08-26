@@ -4,11 +4,11 @@ using UnityEngine;
 using KinematicCharacterController;
 using System.Linq;
 
-public class GunHandler : MonoBehaviour {
+public class GunHandler : MonoBehaviour, ISaveable {
     static readonly float height = 0.5f;
 
     public GunAnimation gunAnimation;
-    public LightmapPixelPicker pixelPicker;
+    // public LightmapPixelPicker pixelPicker;
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
@@ -122,11 +122,11 @@ public class GunHandler : MonoBehaviour {
         // flash
         // TODO: change depending on silencer
         muzzleFlashLight.enabled = true;
-        pixelPicker.localLightOverride = true;
-        StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
-            muzzleFlashLight.enabled = false;
-            pixelPicker.localLightOverride = false;
-        }));
+        // pixelPicker.localLightOverride = true;
+        // StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
+        //     muzzleFlashLight.enabled = false;
+        //     pixelPicker.localLightOverride = false;
+        // }));
 
         // muzzleflash obj
         // TODO: change depending on silencer
@@ -296,5 +296,14 @@ public class GunHandler : MonoBehaviour {
 
 
         return Vector2.zero;
+    }
+
+    // TODO: abstract out this load method
+    // TODO: save method
+    public void LoadState(PlayerData data) {
+        primary = data.primaryGun;
+        secondary = data.secondaryGun;
+        third = data.tertiaryGun;
+        SwitchToGun(data.activeGun);
     }
 }

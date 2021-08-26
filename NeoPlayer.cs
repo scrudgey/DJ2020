@@ -155,6 +155,8 @@ public class NeoPlayer : MonoBehaviour {
             isMoving = Character.Motor.Velocity.magnitude > 0.1 && Character.Motor.GroundingStatus.IsStableOnGround,
             isCrouching = Character.isCrouching,
             isRunning = Character.isRunning,
+            isJumping = Character.state == CharacterState.superJump,
+            isClimbing = Character.state == CharacterState.climbing,
             wallPressTimer = Character.wallPressTimer,
             state = Character.state,
             playerInputs = _lastInput,
@@ -218,13 +220,13 @@ public class NeoPlayer : MonoBehaviour {
             },
             reload = reloadPressedThisFrame,
             switchToGun = switchToGunThisFrame,
-            climbLadder = actionButtonPressedThisFrame
+            climbLadder = actionButtonPressedThisFrame,
         };
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
 
         // apply inputs to jump indicator
-        jumpIndicatorController.SetInputs(ref characterInputs);
+        jumpIndicatorController.SetInputs(ref characterInputs, Character);
 
         firePressedThisFrame = false;
         jumpPressedThisFrame = false;

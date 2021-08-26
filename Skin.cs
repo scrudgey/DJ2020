@@ -41,6 +41,12 @@ public class Skin {
     public Octet<Sprite[]> rifleRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
 
+    // climb
+    public Octet<Sprite[]> climb = new Octet<Sprite[]>();
+
+    // jump
+    public Octet<Sprite[]> jump = new Octet<Sprite[]>();
+
     public Octet<Sprite[]> idleSprites(GunType type) {
         switch (type) {
             case GunType.smg:
@@ -308,7 +314,38 @@ public class Skin {
         skin.rifleRack[Direction.rightUp] = new Sprite[] { rifleSprites[43], rifleSprites[44], rifleSprites[45], rifleSprites[44] };
         skin.rifleRack[Direction.up] = new Sprite[] { rifleSprites[49] };
 
+        // climb
+        skin.climb[Direction.up] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+
+        // jump
+        skin.jump[Direction.down] = new Sprite[] { legSprites[73] };
+        skin.jump[Direction.rightDown] = new Sprite[] { legSprites[74] };
+        skin.jump[Direction.right] = new Sprite[] { legSprites[75] };
+        skin.jump[Direction.rightUp] = new Sprite[] { legSprites[76] };
+        skin.jump[Direction.up] = new Sprite[] { legSprites[77] };
+
+
 
         return skin;
+    }
+
+    public Octet<Sprite[]> GetCurrentOctet(HumanoidView.Mode mode) {
+        switch (mode) {
+            case HumanoidView.Mode.walk:
+                return legsWalk;
+            case HumanoidView.Mode.crawl:
+                return legsCrawl;
+            case HumanoidView.Mode.crouch:
+                return legsCrouch;
+            case HumanoidView.Mode.run:
+                return legsRun;
+            case HumanoidView.Mode.jump:
+                return jump;
+            case HumanoidView.Mode.climb:
+                return climb;
+            default:
+            case HumanoidView.Mode.idle:
+                return legsIdle;
+        }
     }
 }

@@ -4,26 +4,34 @@ using UnityEngine;
 
 public enum GameState { none, levelPlay }
 public class GameManager : Singleton<GameManager> {
-    private GameState _state;
-    public GameState state {
-        get { return _state; }
-        set {
-            GameState previous = _state;
-            _state = value;
-            ChangeGameState(previous);
-        }
-    }
+    public GameData gameData;
     public GameObject playerObject;
     public void Start() {
-        if (state == GameState.none) {
-            state = GameState.levelPlay;
-        }
+        // TODO: set level in gamedata
+        gameData = GameData.TestInitialData();
+
+        TransitionToState(GameState.levelPlay);
     }
-    private void ChangeGameState(GameState previousState) {
+    public void TransitionToState(GameState newState) {
+        GameState tmpInitialState = gameData.state;
+        OnStateExit(tmpInitialState, newState);
+        gameData.state = newState;
+        OnStateEnter(newState, tmpInitialState);
+    }
+    private void OnStateEnter(GameState state, GameState fromState) {
+        // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
-                if (previousState == GameState.none)
-                    InitializeLevel();
+                // TODO: data-driven level load
+                break;
+            default:
+                break;
+        }
+    }
+    public void OnStateExit(GameState state, GameState toState) {
+        switch (state) {
+            case GameState.none:
+                InitializeLevel();
                 break;
             default:
                 break;
@@ -33,16 +41,15 @@ public class GameManager : Singleton<GameManager> {
         this.playerObject = focus;
         UI.I.SetFocus(focus);
     }
-    private void InitializeLevel() {
+    private void InitializeLevel() { // TODO: level enum input
         SetFocus(GameObject.Find("playerCharacter"));
 
-        // initialize gun instance
-        GunHandler gunHandler = playerObject.GetComponentInChildren<GunHandler>();
-        gunHandler.primary = new GunInstance(Gun.Load("smg"));
-        // gunHandler.primary = new GunInstance(Gun.Load("rifle"));
-        gunHandler.secondary = new GunInstance(Gun.Load("pistol"));
-        gunHandler.third = new GunInstance(Gun.Load("shotgun"));
-        // gunHandler.third = new GunInstance(Gun.Load("smg"));
-        gunHandler.SwitchToGun(2);
+        LoadPlayerState(gameData.playerState);
+    }
+    public void LoadPlayerState(PlayerData data) {
+        foreach (ISaveable saveable in playerObject.GetComponentsInChildren<ISaveable>()) {
+            Debug.Log("loading " + saveable.ToString());
+            saveable.LoadState(data);
+        }
     }
 }

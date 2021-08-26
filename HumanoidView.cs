@@ -12,13 +12,15 @@ public struct AnimationInput {
     public bool isMoving;
     public bool isCrouching;
     public bool isRunning;
+    public bool isJumping;
+    public bool isClimbing;
     public float wallPressTimer;
     public CharacterState state;
     public GunType gunType;
 }
 
-public class HumanoidView : MonoBehaviour {
-    enum Mode { idle, walk, crawl, crouch, run }
+public class HumanoidView : MonoBehaviour, ISaveable {
+    public enum Mode { idle, walk, crawl, crouch, run, jump, climb }
     Mode mode;
     public SpriteRenderer spriteRenderer;
     public Transform shadowCaster;
@@ -30,34 +32,16 @@ public class HumanoidView : MonoBehaviour {
     public Direction direction;
     private float trailTimer;
     public float trailInterval = 0.05f;
-    void Awake() {
-        skin = Skin.LoadSkin("generic");
-    }
 
-    private Octet<Sprite[]> GetCurrentOctet() {
-        switch (mode) {
-            case Mode.walk:
-                return skin.legsWalk;
-            case Mode.crawl:
-                return skin.legsCrawl;
-            case Mode.crouch:
-                return skin.legsCrouch;
-            case Mode.run:
-                return skin.legsRun;
-            default:
-            case Mode.idle:
-                return skin.legsIdle;
-        }
-    }
     // used by animation
     public void SetFrame(int frame) {
-        Octet<Sprite[]> octet = GetCurrentOctet();
+        Octet<Sprite[]> octet = skin.GetCurrentOctet(mode);
         spriteRenderer.sprite = octet[direction][frame];
     }
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
-        billboard.skin = GetCurrentOctet();
+        billboard.skin = skin.GetCurrentOctet(mode);
     }
     public void UpdateView(AnimationInput input) {
 
@@ -68,6 +52,7 @@ public class HumanoidView : MonoBehaviour {
                     trailTimer = 0f;
                     SpawnTrail();
                 }
+                spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
             default:
             case CharacterState.normal:
@@ -99,7 +84,11 @@ public class HumanoidView : MonoBehaviour {
         shadowCaster.localPosition = new Vector3(0f, 0.7f, 0f);
         spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
         if (input.isMoving) { //
-            if (input.isRunning) {
+            if (input.isJumping) {
+                mode = Mode.jump;
+            } else if (input.isClimbing) {
+                mode = Mode.climb;
+            } else if (input.isRunning) {
                 mode = Mode.run;
             } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.5f, 0.1f, 0.5f);
@@ -113,7 +102,13 @@ public class HumanoidView : MonoBehaviour {
                 animator.Play();
             }
         } else { // stopped
-            if (input.isCrouching) {
+            if (input.isJumping) {
+                mode = Mode.jump;
+                spriteRenderer.sprite = skin.jump[direction][0];
+            } else if (input.isClimbing) {
+                mode = Mode.climb;
+                spriteRenderer.sprite = skin.climb[Direction.up][0];
+            } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
                 shadowCaster.localPosition = new Vector3(0f, 0.3f, 0f);
                 mode = Mode.crouch;
@@ -133,5 +128,9 @@ public class HumanoidView : MonoBehaviour {
             }
         }
 
+    }
+
+    public void LoadState(PlayerData data) {
+        skin = Skin.LoadSkin(data.legSkin);
     }
 }

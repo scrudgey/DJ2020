@@ -17,6 +17,7 @@ public class UI : Singleton<UI> {
         canvas.worldCamera = Camera.main;
     }
     void Update() {
+        // TODO: don't use Update, but call Update from GameManager with view input
         if (focus == null)
             return;
 
