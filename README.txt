@@ -214,3 +214,59 @@ inputs are relative to camera orientation
     therefore, the tragectory needs to de-rotate (?)
 2. z=1 is forward
 3. line renderer and indicator position are local
+
+
+what does robust binding UI look like?
+
+1. on player change (or whatever) gamemanager publishes a static action OnTargetChanged
+2. UIController: 
+    start: 
+        listens to OnTargetChanged.
+        OnTargetChanged(GameManager.target)
+
+    OnTargetChanged: 
+        gun display bind to new target.getcomponent<gun>
+        health display bind to new target.getcomponent<health>
+
+3. Binding: 
+    fetch target component IBindable
+    target?.onValueChange -= HandleValueChange
+    this.target = target
+    if target != null:
+        set up display
+        target.onValueChange += HandleValueChange
+        HandleValueChange(target)
+    
+    HandleValueChange:
+        update view
+
+    it desubscribes frow whatever it is listening to and subscribes to the new component's OnValueChanged
+4. When OnValueChanged, update our view.
+
+let's trace out how console works as an example.
+gamemanager listens to ~ input action.
+on ~, transition to state inMenu.
+    either we communicate with UIController, or we load a new scene
+    OnUIInput(UIInput)
+        -> UIController.handleUIInput()
+    Showmenu(Menutype.console)
+        scenemanager.loadscene("console")
+
+
+when leaving state gameplay, set time delta to 0.
+on player input, check game state.
+when transitioning back to gameplay, set time delta to 0.
+
+UIController: 
+    handling callbacks from control elements
+    eventually, something 
+
+
+TODO: how can we use event callbacks while maintaining split state?
+problem: two state machines that communicate by binding. instead one state should be subordinate to the other.
+the problem is: 
+
+GameManager can tell UI to open menu, and to close menu. Game State enters a different state.
+UI should be able to close its own menu. easy for it to encapsulate its own responsibility, but when it closes its menu, gamestate also needs to change.
+
+state tracking (gameplay, which menu) should all belong to a single class. UI just needs to react to the opening and closing of menu state.

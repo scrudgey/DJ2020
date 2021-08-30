@@ -129,14 +129,30 @@ public class Skin {
                 return pistolReload;
         }
     }
-
+    private static Sprite[] loadSprites(string name, string sheet) {
+        Sprite[] output = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/{sheet}") as Sprite[];
+        if (output.Length == 0) {
+            return Resources.LoadAll<Sprite>($"sprites/spritesheets/generic/{sheet}") as Sprite[];
+        } else return output;
+    }
     public static Skin LoadSkin(string name) {
-        Sprite[] legSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/legs") as Sprite[];
-        Sprite[] torsoSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/torso") as Sprite[];
-        Sprite[] pistolSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/pistol") as Sprite[];
-        Sprite[] smgSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/smg") as Sprite[];
-        Sprite[] shotgunSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/shotgun") as Sprite[];
-        Sprite[] rifleSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/rifle") as Sprite[];
+        // Sprite[] legSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/legs") as Sprite[];
+        Sprite[] legSprites = loadSprites(name, "legs");
+
+        // Sprite[] torsoSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/torso") as Sprite[];
+        Sprite[] torsoSprites = loadSprites(name, "torso");
+
+        // Sprite[] pistolSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/pistol") as Sprite[];
+        Sprite[] pistolSprites = loadSprites(name, "pistol");
+
+        // Sprite[] smgSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/smg") as Sprite[];
+        Sprite[] smgSprites = loadSprites(name, "smg");
+
+        // Sprite[] shotgunSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/shotgun") as Sprite[];
+        Sprite[] shotgunSprites = loadSprites(name, "shotgun");
+
+        // Sprite[] rifleSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/rifle") as Sprite[];
+        Sprite[] rifleSprites = loadSprites(name, "rifle");
 
         Skin skin = new Skin();
 

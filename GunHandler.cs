@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 using System.Linq;
+using System;
 
 public class GunHandler : MonoBehaviour, ISaveable {
     static readonly float height = 0.5f;
-
+    public Action<GunHandler> OnValueChanged;
     public GunAnimation gunAnimation;
     // public LightmapPixelPicker pixelPicker;
     public AudioSource audioSource;
@@ -45,10 +46,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
     public void SpawnBulletRay(Vector3 startPoint, Vector3 endPoint) {
         GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/bulletRay"), transform.position, Quaternion.identity) as GameObject;
         BulletRay ray = obj.GetComponent<BulletRay>();
-        ray.SetFadeStyle(BulletRay.FadeStyle.streak);
+        ray.Initialize(BulletRay.FadeStyle.streak, startPoint, endPoint);
 
-        ray.lineRenderer.SetPosition(0, startPoint);
-        ray.lineRenderer.SetPosition(1, endPoint);
     }
     private Vector3 gunPosition() {
         // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
@@ -97,7 +96,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
                 break;
             }
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+        if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {
             SpawnBulletRay(gunPosition, endPosition);
         }
     }
@@ -122,11 +121,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
         // flash
         // TODO: change depending on silencer
         muzzleFlashLight.enabled = true;
-        // pixelPicker.localLightOverride = true;
-        // StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
-        //     muzzleFlashLight.enabled = false;
-        //     pixelPicker.localLightOverride = false;
-        // }));
+        StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
+            muzzleFlashLight.enabled = false;
+        }));
 
         // muzzleflash obj
         // TODO: change depending on silencer
@@ -142,6 +139,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
         if (gunInstance.baseGun.type != GunType.shotgun) {
             EmitShell();
         }
+
+        // state change callbacks
+        OnValueChanged?.Invoke(this);
     }
     public void EmitShell() {
         GameObject shell = GameObject.Instantiate(
@@ -201,6 +201,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
 
         // start animation
         gunAnimation.StartReload();
+
+        OnValueChanged?.Invoke(this);
     }
     public void ReloadShell() {
         if (reloading)
@@ -213,10 +215,12 @@ public class GunHandler : MonoBehaviour, ISaveable {
     public void ClipIn() {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipIn);
         gunInstance.ClipIn();
+        OnValueChanged?.Invoke(this);
     }
     public void ShellIn() {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipIn);
         gunInstance.ShellIn();
+        OnValueChanged?.Invoke(this);
     }
     public void StopReload() {
         reloading = false;
@@ -232,6 +236,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
         // TODO: don't call this! maybe?
         gunAnimation.EndShoot();
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.unholster);
+
+        OnValueChanged?.Invoke(this);
     }
     public void Holster() {
         gunInstance = null;
@@ -256,49 +262,55 @@ public class GunHandler : MonoBehaviour, ISaveable {
     }
 
     public Vector3 ProcessInput(PlayerCharacterInputs input) {
+        // if (gunInstance == null)
+        // return Vector3.zero;
+
         gunAnimation.input = input.Fire;
 
         if (input.switchToGun != -1) {
             SwitchToGun(input.switchToGun);
-        } else if (input.reload) {
-            if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
-                ReloadShell();
-            } else if (gunInstance.baseGun.type != GunType.shotgun) {
-                Reload();
-            }
-        } else if (gunInstance != null && gunInstance.CanShoot()) {
-
-            if (gunInstance.baseGun.cycle == CycleType.automatic) {
-                if (input.Fire.FirePressed && !shooting) {
-                    gunAnimation.StartShooting();
-                    shooting = true;
-                }
-                if (input.Fire.FireHeld) {
-                    return CursorToTargetPoint(input.Fire);
-                }
-                if (shooting && !input.Fire.FireHeld) {
-                    gunAnimation.EndShoot();
-                    shooting = false;
-                    return CursorToTargetPoint(input.Fire);
-                }
-            } else { // semiautomatic
-                if (input.Fire.FirePressed) {//&& !shooting) {
-                    gunAnimation.StartShooting();
-                    shooting = true;
-                    return CursorToTargetPoint(input.Fire);
+        } else if (gunInstance != null) {
+            if (input.reload) {
+                if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
+                    ReloadShell();
+                } else if (gunInstance.baseGun.type != GunType.shotgun) {
+                    Reload();
                 }
             }
-        } else {
+            if (gunInstance.CanShoot()) {
 
-            // cancel out the shoot here for automatics
+                if (gunInstance.baseGun.cycle == CycleType.automatic) {
+                    if (input.Fire.FirePressed && !shooting) {
+                        gunAnimation.StartShooting();
+                        shooting = true;
+                    }
+                    if (input.Fire.FireHeld) {
+                        return CursorToTargetPoint(input.Fire);
+                    }
+                    if (shooting && !input.Fire.FireHeld) {
+                        gunAnimation.EndShoot();
+                        shooting = false;
+                        return CursorToTargetPoint(input.Fire);
+                    }
+                } else { // semiautomatic
+                    if (input.Fire.FirePressed) {//&& !shooting) {
+                        gunAnimation.StartShooting();
+                        shooting = true;
+                        return CursorToTargetPoint(input.Fire);
+                    }
+                }
+            } else {
 
+                // cancel out the shoot here for automatics
+
+            }
         }
+
 
 
         return Vector2.zero;
     }
 
-    // TODO: abstract out this load method
     // TODO: save method
     public void LoadState(PlayerData data) {
         primary = data.primaryGun;

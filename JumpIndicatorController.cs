@@ -8,9 +8,6 @@ public class JumpIndicatorController : MonoBehaviour {
     public Transform indicator;
     public float moveRatio = 0.01f;
 
-    // public void Start() {
-    // indicator.localPosition = new Vector3(0f, 0.01f, 0f);
-    // }
     public void SetInputs(ref PlayerCharacterInputs inputs, NeoCharacterController characterController) {
         if (inputs.state != CharacterState.jumpPrep)
             return;
@@ -35,12 +32,9 @@ public class JumpIndicatorController : MonoBehaviour {
         }
 
         // Move and look inputs
-        // indicator.position = transform.position + moveInputVector + new Vector3(0f, 0.01f, 0f);
         indicator.position += moveInputVector * moveRatio;
-
         indicator.localPosition = Vector3.ClampMagnitude(
             indicator.localPosition,
-            Toolbox.SuperJumpRange(characterController.superJumpSpeed, characterController.Gravity.y)
-            );
+            Toolbox.SuperJumpRange(characterController.superJumpSpeed, characterController.Gravity.y));
     }
 }

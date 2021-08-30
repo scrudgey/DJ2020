@@ -9,21 +9,23 @@ public class PlayerData {
     public GunInstance tertiaryGun;
     public int activeGun;
 
-
+    // stats
+    public int cyberlegsLevel;
 
     public static PlayerData TestInitialData() {
         return new PlayerData() {
 
-            // gunHandler.primary = new GunInstance(Gun.Load("rifle"));
-            // gunHandler.third = new GunInstance(Gun.Load("smg"));
-
-            primaryGun = new GunInstance(Gun.Load("smg")),
+            primaryGun = new GunInstance(Gun.Load("rifle")),
+            // primaryGun = new GunInstance(Gun.Load("smg")),
             secondaryGun = new GunInstance(Gun.Load("pistol")),
             tertiaryGun = new GunInstance(Gun.Load("shotgun")),
             activeGun = 2,
 
             legSkin = "generic",
-            bodySkin = "generic"
+            // legSkin = "cyber",
+            bodySkin = "generic",
+
+            cyberlegsLevel = 1
         };
     }
 }

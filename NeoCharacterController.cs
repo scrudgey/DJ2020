@@ -32,13 +32,14 @@ public enum ClimbingState {
     DeAnchoring
 }
 
-public class NeoCharacterController : MonoBehaviour, ICharacterController {
+public class NeoCharacterController : MonoBehaviour, ICharacterController, ISaveable {
     public KinematicCharacterMotor Motor;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
     public Footsteps footsteps;
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
+
 
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;
@@ -66,6 +67,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     public float jumpTimerThreshold = 0.5f;
     public AudioClip[] superJumpSounds;
     public AudioClip[] jumpPrepSounds;
+    public bool superJumpEnabled;
 
     [Header("Ladder Climbing")]
     public float ClimbingSpeed = 4f;
@@ -249,7 +251,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
 
         if (inputs.jumpHeld) {
             jumpHeldTimer += Time.deltaTime;
-            if (jumpHeldTimer > jumpTimerThreshold && state != CharacterState.jumpPrep) {
+            if (superJumpEnabled && jumpHeldTimer > jumpTimerThreshold && state != CharacterState.jumpPrep) {
                 TransitionToState(CharacterState.jumpPrep);
             }
         } else {
@@ -737,5 +739,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController {
     }
 
     public void OnDiscreteCollisionDetected(Collider hitCollider) {
+    }
+
+
+    public void LoadState(PlayerData data) {
+        superJumpEnabled = data.cyberlegsLevel > 0;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using KinematicCharacterController;
 using KinematicCharacterController.Examples;
 using UnityEngine.InputSystem;
+using System;
 
 public class NeoPlayer : MonoBehaviour {
     public NeoCharacterCamera OrbitCamera;
@@ -44,7 +45,6 @@ public class NeoPlayer : MonoBehaviour {
     private int switchToGunThisFrame;
     private bool actionButtonPressedThisFrame;
     private PlayerCharacterInputs _lastInput;
-
 
     public void Awake() {
         // Move
