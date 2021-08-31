@@ -332,6 +332,10 @@ public class Skin {
 
         // climb
         skin.climb[Direction.up] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.climb[Direction.rightUp] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.climb[Direction.right] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.climb[Direction.rightDown] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.climb[Direction.down] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
 
         // jump
         skin.jump[Direction.down] = new Sprite[] { legSprites[73] };

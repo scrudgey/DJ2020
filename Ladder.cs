@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Easings;
 public class Ladder : MonoBehaviour {
     public SurfaceType surfaceType;
     // Ladder segment
@@ -11,6 +11,7 @@ public class Ladder : MonoBehaviour {
     // Points to move to when reaching one of the extremities and moving off of the ladder
     public Transform BottomReleasePoint;
     public Transform TopReleasePoint;
+    public AudioClip[] sounds;
 
     // Gets the position of the bottom point of the ladder segment
     public Vector3 BottomAnchorPoint {
@@ -55,4 +56,5 @@ public class Ladder : MonoBehaviour {
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(BottomAnchorPoint, TopAnchorPoint);
     }
+
 }

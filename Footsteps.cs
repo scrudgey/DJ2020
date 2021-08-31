@@ -8,6 +8,7 @@ public class Footsteps : MonoBehaviour {
     public AudioClip[] grassSounds;
     public AudioClip[] defaultSounds;
     public AudioClip[] metalSounds;
+    public AudioClip[] bushSounds;
     public float timer;
     private AudioClip leftFoot;
     private AudioClip rightFoot;
@@ -64,6 +65,9 @@ public class Footsteps : MonoBehaviour {
                 break;
             case SurfaceType.metal:
                 soundSet = metalSounds;
+                break;
+            case SurfaceType.tree:
+                soundSet = bushSounds;
                 break;
         }
         leftFoot = Toolbox.RandomFromList(soundSet);

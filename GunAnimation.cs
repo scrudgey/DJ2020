@@ -168,6 +168,8 @@ public class GunAnimation : MonoBehaviour, ISaveable {
             } else {
                 spriteRenderer.enabled = true;
             }
+        } else if (input.isClimbing) {
+            spriteRenderer.enabled = false;
         } else {
             transform.localPosition = Vector3.zero;
             spriteRenderer.enabled = true;

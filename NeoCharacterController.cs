@@ -25,7 +25,13 @@ public struct PlayerCharacterInputs {
     public int switchToGun;
     public bool climbLadder;
 }
-public enum CharacterState { normal, wallPress, climbing, jumpPrep, superJump }
+public enum CharacterState {
+    normal,
+    wallPress,
+    climbing,
+    jumpPrep,
+    superJump
+}
 public enum ClimbingState {
     Anchoring,
     Climbing,
@@ -83,9 +89,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     private Vector3 _moveInputVector;
     private Vector3 _lookInputVector;
     private bool _jumpRequested = false;
-    // private bool _superJumpRequested = false;
     private bool _jumpConsumed = false;
     private bool _jumpedThisFrame = false;
+    private bool _jumpedFromLadder = false;
     private float _timeSinceJumpRequested = Mathf.Infinity;
     private float _timeSinceLastAbleToJump = 0f;
     private bool _doubleJumpConsumed = false;
@@ -163,6 +169,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 // Store the target position and rotation to snap to
                 _ladderTargetPosition = _activeLadder.ClosestPointOnLadderSegment(Motor.TransientPosition, out _onLadderSegmentState);
                 _ladderTargetRotation = _activeLadder.transform.rotation;
+                Toolbox.RandomizeOneShot(audioSource, _activeLadder.sounds);
                 break;
         }
     }
@@ -172,8 +179,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 break;
             case CharacterState.superJump:
                 Time.timeScale = 1f;
+                _jumpedFromLadder = false;
                 break;
             case CharacterState.climbing:
+                Toolbox.RandomizeOneShot(audioSource, _activeLadder.sounds);
                 Motor.SetMovementCollisionsSolvingActivation(true);
                 Motor.SetGroundSolvingActivation(true);
                 break;
@@ -249,7 +258,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
             _shouldBeCrouching = false;
         }
 
-        if (inputs.jumpHeld) {
+        if (inputs.jumpHeld && Motor.GroundingStatus.IsStableOnGround) {
             jumpHeldTimer += Time.deltaTime;
             if (superJumpEnabled && jumpHeldTimer > jumpTimerThreshold && state != CharacterState.jumpPrep) {
                 TransitionToState(CharacterState.jumpPrep);
@@ -305,6 +314,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 }
                 break;
             case CharacterState.climbing:
+                if (inputs.jumpReleased) {
+                    _timeSinceJumpRequested = 0f;
+                    _jumpRequested = true;
+                }
                 break;
 
         }
@@ -398,6 +411,20 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.2f * Motor.CharacterRight);
     }
 
+    Ladder GetOverlappingLadder() {
+        if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
+            foreach (Collider collider in _probedColliders) {
+                if (collider == null || collider.gameObject == null)
+                    continue;
+                Ladder ladder = collider.gameObject.GetComponent<Ladder>();
+                if (ladder) {
+                    return ladder;
+                }
+            }
+        }
+        return null;
+    }
+
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
     /// This is where you tell your character what its velocity should be right now. 
@@ -425,6 +452,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                         _jumpRequested = false;
                         _jumpConsumed = true;
                         _jumpedThisFrame = true;
+
+                        _jumpedFromLadder = GetOverlappingLadder() != null;
+
                         TransitionToState(CharacterState.superJump);
                     }
                 } else {
@@ -447,6 +477,15 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     TransitionToState(CharacterState.normal);
                 }
                 _jumpedThisFrame = false;
+                Ladder ladder = GetOverlappingLadder();
+                if (ladder != null) {
+                    if (!_jumpedFromLadder) {
+                        _activeLadder = ladder;
+                        TransitionToState(CharacterState.climbing);
+                    }
+                } else {
+                    _jumpedFromLadder = false;
+                }
                 break;
             case CharacterState.wallPress:
                 currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
@@ -604,6 +643,18 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                         Vector3 tmpPosition = Vector3.Lerp(_anchoringStartPosition, _ladderTargetPosition, (_anchoringTimer / AnchoringDuration));
                         currentVelocity = Motor.GetVelocityForMovePosition(Motor.TransientPosition, tmpPosition, deltaTime);
                         break;
+                }
+
+                if (_jumpRequested && !_jumpConsumed) {
+                    Vector3 jumpDirection = Vector3.up;
+                    // jumpDirection = Motor.GroundingStatus.GroundNormal;
+
+                    Motor.ForceUnground(0.1f);
+                    currentVelocity += (jumpDirection * JumpSpeed) - Vector3.Project(currentVelocity, Vector3.up);
+                    _jumpRequested = false;
+                    _jumpConsumed = true;
+                    _jumpedThisFrame = true;
+                    TransitionToState(CharacterState.normal);
                 }
                 break;
         }

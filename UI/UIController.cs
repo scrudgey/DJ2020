@@ -29,7 +29,7 @@ public class UIController : MonoBehaviour {
     }
 
     void BindToNewTarget(GameObject target) {
-        Debug.Log($"bind: {target}");
+        // Debug.Log($"bind: {target}");
         ammoIndicator.Bind(target);
     }
 

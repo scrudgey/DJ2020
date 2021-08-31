@@ -152,7 +152,7 @@ public class NeoPlayer : MonoBehaviour {
 
         AnimationInput animationInput = new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
-            isMoving = Character.Motor.Velocity.magnitude > 0.1 && Character.Motor.GroundingStatus.IsStableOnGround,
+            isMoving = Character.Motor.Velocity.magnitude > 0.1 && (Character.Motor.GroundingStatus.IsStableOnGround || Character.state == CharacterState.climbing),
             isCrouching = Character.isCrouching,
             isRunning = Character.isRunning,
             isJumping = Character.state == CharacterState.superJump,
