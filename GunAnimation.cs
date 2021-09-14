@@ -168,7 +168,7 @@ public class GunAnimation : MonoBehaviour, ISaveable {
             } else {
                 spriteRenderer.enabled = true;
             }
-        } else if (input.isClimbing) {
+        } else if (input.isClimbing || input.isJumping) {
             spriteRenderer.enabled = false;
         } else {
             transform.localPosition = Vector3.zero;

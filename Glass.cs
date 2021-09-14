@@ -15,7 +15,7 @@ public class Glass : MonoBehaviour {
     public bool doDestruct;
     public void BulletHit(BulletImpact impact) {
 
-        GameObject decalObject = DecalPool.I.SpawnDecal(impact.hit, DecalPool.DecalType.glass);
+        GameObject decalObject = PoolManager.I.decalPool.CreateDecal(impact.hit, DecalPool.DecalType.glass);
         decals.Add(decalObject);
         health -= impact.damage;
         Toolbox.RandomizeOneShot(audioSource, hitSounds);
@@ -38,7 +38,7 @@ public class Glass : MonoBehaviour {
     public void Destruct() {
         Toolbox.AudioSpeaker(transform.position, destroySounds);
         Destroy(gameObject);
-        DecalPool.I.RecallDecals(decals.ToArray()); // return decals to the pool
+        PoolManager.I.decalPool.RecallDecals(decals.ToArray()); // return decals to the pool
         // TODO: amortize this expensive operation
         // TODO: use a pooling structure
         Collider myCollider = GetComponent<Collider>();

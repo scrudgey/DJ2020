@@ -36,7 +36,9 @@ public class HumanoidView : MonoBehaviour, ISaveable {
     // used by animation
     public void SetFrame(int frame) {
         Octet<Sprite[]> octet = skin.GetCurrentOctet(mode);
-        spriteRenderer.sprite = octet[direction][frame];
+        Sprite[] sprites = octet[direction];
+        frame = Math.Min(frame, sprites.Length - 1);
+        spriteRenderer.sprite = sprites[frame];
     }
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
@@ -44,7 +46,6 @@ public class HumanoidView : MonoBehaviour, ISaveable {
         billboard.skin = skin.GetCurrentOctet(mode);
     }
     public void UpdateView(AnimationInput input) {
-
         switch (input.state) {
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
@@ -74,9 +75,9 @@ public class HumanoidView : MonoBehaviour, ISaveable {
         // set direction
         direction = input.orientation;
         Vector3 scale = transform.localScale;
-        if (spriteRenderer.flipX) {
-            scale.x = -1f * Mathf.Abs(scale.x);
-        }
+        // if (spriteRenderer.flipX) {
+        //     scale.x = -1f * Mathf.Abs(scale.x);
+        // }
         transform.localScale = scale;
 
         // set mode and animation
@@ -127,7 +128,6 @@ public class HumanoidView : MonoBehaviour, ISaveable {
                 animator.Play();
             }
         }
-
     }
 
     public void LoadState(PlayerData data) {

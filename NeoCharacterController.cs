@@ -30,7 +30,8 @@ public enum CharacterState {
     wallPress,
     climbing,
     jumpPrep,
-    superJump
+    superJump,
+    landStun,
 }
 public enum ClimbingState {
     Anchoring,
@@ -73,6 +74,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     public float jumpTimerThreshold = 0.5f;
     public AudioClip[] superJumpSounds;
     public AudioClip[] jumpPrepSounds;
+    public AudioClip[] landingSounds;
     public bool superJumpEnabled;
 
     [Header("Ladder Climbing")]
@@ -141,6 +143,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     private Vector3 _anchoringStartPosition = Vector3.zero;
     private Quaternion _anchoringStartRotation = Quaternion.identity;
     private Quaternion _rotationBeforeClimbing = Quaternion.identity;
+
+    private float landStunTimer;
+
+
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
         OnStateExit(tmpInitialState, newState);
@@ -159,6 +165,11 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 Toolbox.RandomizeOneShot(audioSource, superJumpSounds);
                 Time.timeScale = 0.75f;
                 break;
+            case CharacterState.landStun:
+                landStunTimer = 0.5f;
+                Toolbox.RandomizeOneShot(audioSource, landingSounds);
+                isCrouching = true;
+                break;
             case CharacterState.climbing:
                 _rotationBeforeClimbing = Motor.TransientRotation;
 
@@ -176,6 +187,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     public void OnStateExit(CharacterState state, CharacterState toState) {
         switch (state) {
             default:
+                break;
+            case CharacterState.landStun:
+                isCrouching = true;
                 break;
             case CharacterState.superJump:
                 Time.timeScale = 1f;
@@ -467,14 +481,14 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
                 break;
             case CharacterState.superJump:
-                // Gravity
                 currentVelocity += Gravity * deltaTime;
-
-                // Drag
                 // currentVelocity *= (1f / (1f + (Drag * deltaTime)));
-
                 if (Motor.GroundingStatus.IsStableOnGround && !_jumpedThisFrame) {
-                    TransitionToState(CharacterState.normal);
+                    if (Motor.Velocity.y < -0.3f) {
+                        TransitionToState(CharacterState.landStun);
+                    } else {
+                        TransitionToState(CharacterState.normal);
+                    }
                 }
                 _jumpedThisFrame = false;
                 Ladder ladder = GetOverlappingLadder();
@@ -507,6 +521,28 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 // Smooth movement Velocity
                 currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
 
+                break;
+            case CharacterState.landStun:
+                if (Motor.GroundingStatus.IsStableOnGround) {
+                    currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
+                    currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
+                } else {
+                    if (_moveInputVector.sqrMagnitude > 0f) {
+                        targetMovementVelocity = Vector3.zero;
+                        if (Motor.GroundingStatus.FoundAnyGround) {
+                            Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(Motor.CharacterUp, Motor.GroundingStatus.GroundNormal), Motor.CharacterUp).normalized;
+                            targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
+                        }
+                        Vector3 velocityDiff = Vector3.ProjectOnPlane(targetMovementVelocity - currentVelocity, Gravity);
+                        currentVelocity += velocityDiff * AirAccelerationSpeed * deltaTime;
+                    }
+                    currentVelocity += Gravity * deltaTime;
+                    currentVelocity *= (1f / (1f + (Drag * deltaTime)));
+                }
+                landStunTimer -= deltaTime;
+                if (landStunTimer < 0) {
+                    TransitionToState(CharacterState.normal);
+                }
                 break;
             default:
             case CharacterState.normal:
@@ -668,11 +704,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     /// </summary>
     public void AfterCharacterUpdate(float deltaTime) {
         switch (state) {
+            case CharacterState.landStun:
+                break;
             default:
             case CharacterState.normal:
-
-                // TODO: deal with superjump request?
-
                 // Handle jump-related values
                 // Handle jumping pre-ground grace period
                 if (_jumpRequested && _timeSinceJumpRequested > JumpPreGroundingGraceTime) {

@@ -270,3 +270,24 @@ GameManager can tell UI to open menu, and to close menu. Game State enters a dif
 UI should be able to close its own menu. easy for it to encapsulate its own responsibility, but when it closes its menu, gamestate also needs to change.
 
 state tracking (gameplay, which menu) should all belong to a single class. UI just needs to react to the opening and closing of menu state.
+
+
+
+damage decals
+can we apply a decal to a specific face?
+    either this requires instancing of materials, or spawning a new textured object on the face.
+    decal material can prevent z fighting.
+        1. get triangles
+can we modify vertex colors?
+    yes, provided:
+        1. material property block with vertex color is used for instancing
+        2. we duplicate the standard shader to support vertex coloring from material property block
+
+damage decal system
+    1. set up the monobehavior on each damageable object.
+        initialize vertices, etc. here.
+    2. track which faces have been hit. don't double-apply.
+    3. use object pool
+    4. expose a method for damaging the struck face
+    5. configurable damage decal
+    6. proper geometry for damage decal

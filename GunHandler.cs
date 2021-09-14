@@ -75,6 +75,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
         Ray bulletRay = new Ray(gunPosition, direction);
 
         RaycastHit[] hits = Physics.RaycastAll(bulletRay, gunInstance.baseGun.range); // get all hits
+
+        // TODO: move this method to something else
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found
             if (Toolbox.GetTagData(hit.collider.gameObject).bulletPassthrough) {
                 Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
@@ -88,11 +90,13 @@ public class GunHandler : MonoBehaviour, ISaveable {
                 }
             } else {
                 endPosition = hit.point;
-                GameObject decalObject = DecalPool.I.SpawnDecal(hit, DecalPool.DecalType.normal);
+                GameObject decalObject = PoolManager.I.decalPool.CreateDecal(hit, DecalPool.DecalType.normal);
                 var sparks = Resources.Load("prefabs/impactSpark");
                 GameObject sparkObject = GameObject.Instantiate(sparks,
                 hit.point + (hit.normal * 0.025f),
                 Quaternion.LookRotation(hit.normal)) as GameObject;
+                DamageableMesh damageableMesh = hit.transform.GetComponent<DamageableMesh>();
+                damageableMesh?.OnImpact(hit);
                 break;
             }
         }

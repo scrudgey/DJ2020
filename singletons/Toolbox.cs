@@ -112,5 +112,14 @@ public class Toolbox {
         // TODO: data-driven range, potentially
         return Mathf.Abs((Mathf.Pow(superJumpSpeed, 2) / gravity)) / 2f;
     }
+    static public Vector3 RandomInsideBounds(Collider collider, float padding = 1f) {
+        float x = UnityEngine.Random.Range(collider.bounds.center.x - (collider.bounds.extents.x * padding) / 2f, collider.bounds.center.x + (collider.bounds.extents.x * padding) / 2f);
+        float y = UnityEngine.Random.Range(collider.bounds.center.y - (collider.bounds.extents.y * padding) / 2f, collider.bounds.center.y + (collider.bounds.extents.y * padding) / 2f);
+        float z = UnityEngine.Random.Range(collider.bounds.center.z - (collider.bounds.extents.z * padding) / 2f, collider.bounds.center.z + (collider.bounds.extents.z * padding) / 2f);
+        return new Vector3(x, y, z);
+    }
+    public static Vector3 GetVertexWorldPosition(Vector3 vertex, Transform owner) {
+        return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
+    }
 }
 

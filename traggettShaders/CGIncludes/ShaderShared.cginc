@@ -55,10 +55,14 @@ inline float4 calculateLocalPos(float4 vertex)  // billboard
     float4 pos;
     #ifdef _BILLBOARD
 
+        float xscale = length(unity_ObjectToWorld._m00_m10_m20);
+
         float4 view = mul(
                         UNITY_MATRIX_MV, 
-                        float4(0, vertex.y * 1.0f, 0.0, 1.0)
-                    ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+                        float4(0, vertex.y, 0.0, 1.0)
+                    // ) + mul(UNITY_MATRIX_M, float4(vertex.x, 0.0, vertex.z, 0.0) );
+                    // ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0);
+                    ) + float4(vertex.x * xscale, 0.0, 0.0, 0.0);
 
         pos = mul(
             UNITY_MATRIX_P, 
