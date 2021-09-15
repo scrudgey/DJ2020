@@ -291,3 +291,24 @@ damage decal system
     4. expose a method for damaging the struck face
     5. configurable damage decal
     6. proper geometry for damage decal
+
+
+glass shard uses sprites-default
+
+leaf uses octo
+
+magazine uses shadowspriteused
+bullethole uses shadowspriteused
+
+damagedecal uses decalMaterial
+
+
+lit/unlit
+billboard/normal
+
+normal unlit = sprites-default
+billboard unlit = ???
+normal lit = shadowspriteused
+billboard lit = octo
+
+decalMaterial : overlay

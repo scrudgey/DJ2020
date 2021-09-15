@@ -72,8 +72,8 @@ public class DecalPool : Pool {
         this.prefab = Resources.Load("prefabs/bullethole") as GameObject;
     }
     public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
-        {DecalType.normal, "sprites/bulletholes"},
-        {DecalType.glass, "sprites/Bullet decals"}
+        {DecalType.normal, "sprites/particles/bulletholes_normal"},
+        {DecalType.glass, "sprites/particles/bulletholes_glass"}
     };
     private static readonly Dictionary<DecalType, Sprite[]> decalSprites = new Dictionary<DecalType, Sprite[]>();
 
@@ -104,7 +104,7 @@ public class PoolManager : Singleton<PoolManager> {
     public PrefabPool damageDecalPool;
     void Awake() {
         decalPool = new DecalPool();
-        leafPool = new PrefabPool("prefabs/leaf");
+        leafPool = new PrefabPool("prefabs/fx/leaf");
         damageDecalPool = new PrefabPool("prefabs/damageDecal");
 
         decalPool.InitializeAllDecals();

@@ -18,7 +18,8 @@ public class Glass : MonoBehaviour {
         GameObject decalObject = PoolManager.I.decalPool.CreateDecal(impact.hit, DecalPool.DecalType.glass);
         decals.Add(decalObject);
         health -= impact.damage;
-        Toolbox.RandomizeOneShot(audioSource, hitSounds);
+        // Toolbox.RandomizeOneShot(audioSource, hitSounds);
+        Toolbox.AudioSpeaker(impact.hit.point, hitSounds);
         if (health <= 0) {
             doDestruct = true;
         }
