@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Easings;
 
-public class Shrub : MonoBehaviour {
+public class Bush : MonoBehaviour {
+    public GameObject leafPrefab;
+    private PrefabPool leafPool;
     public AudioSource audioSource;
     public AudioClip[] sounds;
     private float shakeAmount;
@@ -16,6 +18,7 @@ public class Shrub : MonoBehaviour {
     new private Collider collider;
     void Awake() {
         collider = GetComponent<Collider>();
+        leafPool = PoolManager.I.RegisterPool(leafPrefab);
     }
     public NeoCharacterController GetRigidbody(Collider key) {
         NeoCharacterController outBody;
@@ -49,7 +52,7 @@ public class Shrub : MonoBehaviour {
         shakeRoutines.Add(newRoutine);
 
         if (Random.Range(0f, 1f) < leafProbability) {
-            PoolManager.I.leafPool.SpawnDecal(Toolbox.RandomInsideBounds(collider, padding: 1.5f));
+            leafPool.GetObject(Toolbox.RandomInsideBounds(collider, padding: 1.5f));
         }
     }
     public IEnumerator ShakeTree(Transform target) {

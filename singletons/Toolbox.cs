@@ -72,7 +72,7 @@ public class Toolbox {
             return Direction.rightUp;
         } else return Direction.right;
     }
-    static public T GetOrReturnComponent<T>(GameObject target) where T : Component {
+    static public T GetOrCreateComponent<T>(GameObject target) where T : Component {
         T component = target.GetComponent<T>();
         if (component != null) {
             return component;
@@ -120,6 +120,9 @@ public class Toolbox {
     }
     public static Vector3 GetVertexWorldPosition(Vector3 vertex, Transform owner) {
         return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
+    }
+    public static float RandomFromLoHi(LoHi input) {
+        return UnityEngine.Random.Range(input.low, input.high);
     }
 }
 

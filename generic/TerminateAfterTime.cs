@@ -8,12 +8,13 @@ public class TerminateAfterTime : MonoBehaviour {
     void Update() {
         timer += Time.deltaTime;
         if (timer > lifetime) {
-            Toolbox.DestroyIfExists<Rigidbody>(gameObject);
-            Toolbox.DestroyIfExists<Collider>(gameObject);
-            Toolbox.DestroyIfExists<AudioSource>(gameObject);
-            Toolbox.DestroyIfExists<PlaySound>(gameObject);
-            Toolbox.DestroyIfExists<FlipScintillator>(gameObject);
-            Destroy(this);
+            // Toolbox.DestroyIfExists<Rigidbody>(gameObject);
+            // Toolbox.DestroyIfExists<Collider>(gameObject);
+            // Toolbox.DestroyIfExists<AudioSource>(gameObject);
+            // Toolbox.DestroyIfExists<PlaySound>(gameObject);
+            // Toolbox.DestroyIfExists<FlipScintillator>(gameObject);
+            // Destroy(this);
+
         }
     }
 }

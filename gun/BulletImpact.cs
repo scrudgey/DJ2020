@@ -1,7 +1,10 @@
 using UnityEngine;
 
 public class BulletImpact {
-    public float damage;
     public RaycastHit hit;
-    public Ray ray;
+    public Bullet bullet;
+    public BulletImpact(Bullet bullet, RaycastHit hit) {
+        this.bullet = bullet;
+        this.hit = hit;
+    }
 }

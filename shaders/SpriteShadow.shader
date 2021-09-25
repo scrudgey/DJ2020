@@ -29,6 +29,7 @@ Shader "Sprites/Custom/SpriteShadow"
         Lighting Off
         ZWrite Off
         Blend One OneMinusSrcAlpha
+		Offset -1, -1
 
         CGPROGRAM
 #pragma surface surf Lambert vertex:vert alphatest:_Cutoff addshadow nofog nolightmap nodynlightmap keepalpha noinstancing

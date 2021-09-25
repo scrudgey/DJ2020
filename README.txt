@@ -294,14 +294,10 @@ damage decal system
 
 
 glass shard uses sprites-default
-
 leaf uses octo
-
 magazine uses shadowspriteused
 bullethole uses shadowspriteused
-
 damagedecal uses decalMaterial
-
 
 lit/unlit
 billboard/normal
@@ -312,3 +308,57 @@ normal lit = shadowspriteused
 billboard lit = octo
 
 decalMaterial : overlay
+
+combine decal material and shado
+apply z ordering to shadowspriteused
+
+big things looming:
+NPCs
+game system
+
+abstract bullet impact subscription
+allow bullet impacts to apply physics
+
+set layer
+make soda / snack bouncy
+impact sounds
+stop rolling
+
+
+1. disable ceiling hide unless player is obscured
+2. 
+
+hide whole ceilings at once?
+don't mess with transparent materials
+    what is happening? zmash gets written at 2500
+
+
+geometry    2000
+zmask       2010
+masked      2020
+alphatest   2450
+transparent 3000
+
+mask masks everything > 
+
+
+
+UI
+items
+explosives
+explosions
+destructible walls
+
+
+pool: problem: now tht we have abstracted the pools,
+how do we address them?
+
+1. use enums
+2. attach a component to pooled objects, to identify their pool
+    pooled object component can handle setup / teardown
+
+even abstract the pool management part: 
+Initialize the pool on Get if it doesn't exist. classes can either initialize a pool on start or let it wait for runtime.
+
+when the pool object is created / initialized, add to it 
+

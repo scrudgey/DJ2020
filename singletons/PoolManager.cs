@@ -2,92 +2,143 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class Pool {
-    private int maxConcurrentDecals = 100;
-    private Queue<GameObject> decalsInPool;
-    private Queue<GameObject> decalsActiveInWorld;
-    public virtual void InitializeAllDecals() {
-        decalsInPool = new Queue<GameObject>();
-        decalsActiveInWorld = new Queue<GameObject>();
-        for (int i = 0; i < maxConcurrentDecals; i++) {
-            NewDecal();
+public class PrefabPool {
+    protected GameObject prefab;
+    private int maxConcurrentObjects = 100;
+    private Queue<GameObject> objectsInPool;
+    private Queue<GameObject> objectsActiveInWorld;
+    public PrefabPool(string prefabPath) {
+        this.prefab = Resources.Load(prefabPath) as GameObject;
+    }
+    public PrefabPool(GameObject prefab) {
+        this.prefab = prefab;
+    }
+    protected GameObject InstantiatePrefab() {
+        GameObject obj = GameObject.Instantiate(prefab);
+        return obj;
+    }
+    protected virtual void EnableObject(GameObject obj) {
+        obj.SetActive(true);
+        // allow decals to define enable methods
+    }
+    protected virtual void DisableObject(GameObject obj) {
+        obj.SetActive(false);
+        // allow decals to define disable methods
+    }
+    public virtual void InitializePool() {
+        objectsInPool = new Queue<GameObject>();
+        objectsActiveInWorld = new Queue<GameObject>();
+        for (int i = 0; i < maxConcurrentObjects; i++) {
+            NewObject();
         }
     }
-    protected abstract GameObject InstantiateDecal();
-    protected virtual void EnableDecal(GameObject decal) {
-        decal.SetActive(true);
+    protected void NewObject() {
+        GameObject spawned = InstantiatePrefab();
+        objectsInPool.Enqueue(spawned);
+        DisableObject(spawned);
     }
-    protected virtual void DisableDecal(GameObject decal) {
-        decal.SetActive(false);
-    }
-    protected void NewDecal() {
-        GameObject spawned = InstantiateDecal();
-        decalsInPool.Enqueue(spawned);
-        DisableDecal(spawned);
-    }
-    public void RecallDecal(GameObject decal) {
-        if (decal == null) {
-            Debug.LogWarning("RecallDecal called with null value");
+    public void RecallObject(GameObject obj) {
+        if (obj == null) {
+            Debug.LogWarning("RecallObject called with null value");
         }
         // decal.SetActive(false);
-        DisableDecal(decal);
-        decalsInPool.Enqueue(decal);
+        DisableObject(obj);
+        objectsInPool.Enqueue(obj);
+        obj.transform.SetParent(null);
     }
-    public void RecallDecals(GameObject[] decals) {
-        foreach (GameObject decal in decals) {
-            RecallDecal(decal);
+    public void RecallObjects(GameObject[] objects) {
+        foreach (GameObject obj in objects) {
+            RecallObject(obj);
         }
     }
-    protected GameObject GetNextAvailableDecal() {
-        if (decalsInPool.Count > 0)
-            return decalsInPool.Dequeue();
-        var oldestActiveDecal = decalsActiveInWorld.Dequeue();
+    protected GameObject GetNextAvailableObject() {
+        if (objectsInPool.Count > 0)
+            return objectsInPool.Dequeue();
+        var oldestActiveDecal = objectsActiveInWorld.Dequeue();
         return oldestActiveDecal;
     }
-
-    public GameObject SpawnDecal(Vector3 position) {
-        GameObject decal = GetNextAvailableDecal();
-        if (decal != null) {
-            decal.transform.position = position;
-            EnableDecal(decal);
-            decalsActiveInWorld.Enqueue(decal);
+    public GameObject GetObject(Vector3 position) {
+        GameObject obj = GetNextAvailableObject();
+        if (obj != null) {
+            obj.transform.position = position;
+        } else {
+            obj = InstantiatePrefab();
         }
-        return decal;
+        EnableObject(obj);
+        objectsActiveInWorld.Enqueue(obj);
+        return obj;
     }
 }
-public class PrefabPool : Pool {
-    GameObject prefab;
-    public PrefabPool(string prefabPath) {
-        prefab = Resources.Load(prefabPath) as GameObject;
-    }
-    protected override GameObject InstantiateDecal() {
-        return GameObject.Instantiate(prefab);
-    }
 
-}
-public class DecalPool : Pool {
+
+public class PoolManager : Singleton<PoolManager> {
+    private Dictionary<GameObject, PrefabPool> prefabPools = new Dictionary<GameObject, PrefabPool>();
+
     public enum DecalType { normal, glass }
-    GameObject prefab;
-    public DecalPool() {
-        this.prefab = Resources.Load("prefabs/bullethole") as GameObject;
-    }
     public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
         {DecalType.normal, "sprites/particles/bulletholes_normal"},
         {DecalType.glass, "sprites/particles/bulletholes_glass"}
     };
     private static readonly Dictionary<DecalType, Sprite[]> decalSprites = new Dictionary<DecalType, Sprite[]>();
-
-    public override void InitializeAllDecals() {
+    void Awake() {
         foreach (KeyValuePair<DecalType, string> kvp in decalPaths) {
             decalSprites[kvp.Key] = Resources.LoadAll<Sprite>(kvp.Value) as Sprite[];
         }
-        base.InitializeAllDecals();
+        RegisterPool("prefabs/bullethole");
     }
-    protected override GameObject InstantiateDecal() {
-        return GameObject.Instantiate(prefab);
+    public PrefabPool RegisterPool(string prefabPath) {
+        GameObject prefab = Resources.Load(prefabPath) as GameObject;
+        return RegisterPool(prefab);
+    }
+    public PrefabPool RegisterPool(GameObject prefab) {
+        if (prefabPools.ContainsKey(prefab)) {
+            return prefabPools[prefab];
+        }
+        // Debug.Log($"initializing prefabpool for {prefab}");
+        PrefabPool pool = new PrefabPool(prefab);
+        prefabPools[prefab] = pool;
+        pool.InitializePool();
+        return pool;
+    }
+    public void RecallObject(GameObject obj) {
+        if (obj == null)
+            return;
+        // get key from component
+        PoolObject poolObject = obj.GetComponent<PoolObject>();
+        if (poolObject != null) {
+            GetPool(poolObject.prefabKey).RecallObject(obj);
+        } else {
+            Debug.LogWarning($"PoolObject not found on RecallObject {obj}");
+        }
+    }
+    public void RecallObjects(GameObject[] objects) {
+        PrefabPool pool = null;
+        foreach (GameObject obj in objects) {
+            if (obj == null) continue;
+            if (pool == null) {
+                PoolObject poolObject = obj.GetComponent<PoolObject>();
+                if (poolObject != null) {
+                    pool = GetPool(poolObject.prefabKey);
+                }
+            } else {
+                pool.RecallObject(obj);
+            }
+        }
+    }
+    public PrefabPool GetPool(string prefabPath) {
+        GameObject prefab = Resources.Load(prefabPath) as GameObject;
+        return GetPool(prefab);
+    }
+    public PrefabPool GetPool(GameObject prefab) {
+        if (prefabPools.ContainsKey(prefab)) {
+            return prefabPools[prefab];
+        } else {
+            return RegisterPool(prefab);
+        }
     }
     public GameObject CreateDecal(RaycastHit hit, DecalType type) {
-        GameObject decal = base.SpawnDecal(hit.point + (hit.normal * 0.025f));
+        PrefabPool pool = GetPool("prefabs/bullethole");
+        GameObject decal = pool.GetObject(hit.point + (hit.normal * 0.025f));
         if (decal != null) {
             RandomizeSprite decalRandomizer = decal.GetComponent<RandomizeSprite>();
             decal.transform.rotation = Quaternion.FromToRotation(-Vector3.forward, hit.normal);
@@ -95,21 +146,6 @@ public class DecalPool : Pool {
             decalRandomizer.Randomize();
         }
         return decal;
-    }
-}
-
-public class PoolManager : Singleton<PoolManager> {
-    public DecalPool decalPool;
-    public PrefabPool leafPool;
-    public PrefabPool damageDecalPool;
-    void Awake() {
-        decalPool = new DecalPool();
-        leafPool = new PrefabPool("prefabs/fx/leaf");
-        damageDecalPool = new PrefabPool("prefabs/damageDecal");
-
-        decalPool.InitializeAllDecals();
-        leafPool.InitializeAllDecals();
-        damageDecalPool.InitializeAllDecals();
     }
 
 }

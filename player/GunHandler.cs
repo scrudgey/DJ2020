@@ -43,12 +43,6 @@ public class GunHandler : MonoBehaviour, ISaveable {
         }
         return targetPoint;
     }
-    public void SpawnBulletRay(Vector3 startPoint, Vector3 endPoint) {
-        GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/bulletRay"), transform.position, Quaternion.identity) as GameObject;
-        BulletRay ray = obj.GetComponent<BulletRay>();
-        ray.Initialize(BulletRay.FadeStyle.streak, startPoint, endPoint);
-
-    }
     private Vector3 gunPosition() {
         // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
@@ -57,7 +51,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         Vector3 targetPoint = CursorToTargetPoint(input);
         return targetPoint - this.gunPosition();
     }
-    public void EmitRay(PlayerCharacterInputs.FireInputs input) {
+    public void EmitBullet(PlayerCharacterInputs.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
 
         // determine the direction to shoot in
@@ -72,37 +66,13 @@ public class GunHandler : MonoBehaviour, ISaveable {
         Vector3 direction = jitterPoint - gunPosition;
         Vector3 endPosition = gunPosition + (gunInstance.baseGun.range * direction);
 
-        Ray bulletRay = new Ray(gunPosition, direction);
+        Bullet bullet = new Bullet(new Ray(gunPosition, direction)) {
+            damage = gunInstance.baseGun.getBaseDamage(),
+            range = gunInstance.baseGun.range,
+            gunPosition = gunPosition
+        };
 
-        RaycastHit[] hits = Physics.RaycastAll(bulletRay, gunInstance.baseGun.range); // get all hits
-
-        // TODO: move this method to something else
-        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found
-            if (Toolbox.GetTagData(hit.collider.gameObject).bulletPassthrough) {
-                Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
-                if (glass != null) {
-                    BulletImpact impact = new BulletImpact() {
-                        hit = hit,
-                        ray = bulletRay,
-                        damage = gunInstance.baseGun.getBaseDamage()
-                    };
-                    glass.BulletHit(impact);
-                }
-            } else {
-                endPosition = hit.point;
-                GameObject decalObject = PoolManager.I.decalPool.CreateDecal(hit, DecalPool.DecalType.normal);
-                var sparks = Resources.Load("prefabs/impactSpark");
-                GameObject sparkObject = GameObject.Instantiate(sparks,
-                hit.point + (hit.normal * 0.025f),
-                Quaternion.LookRotation(hit.normal)) as GameObject;
-                DamageableMesh damageableMesh = hit.transform.GetComponent<DamageableMesh>();
-                damageableMesh?.OnImpact(hit);
-                break;
-            }
-        }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {
-            SpawnBulletRay(gunPosition, endPosition);
-        }
+        bullet.DoImpacts();
     }
 
     public void Shoot(PlayerCharacterInputs.FireInputs input) {
@@ -115,7 +85,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         gunInstance.Shoot();
 
         // shoot bullet
-        EmitRay(input);
+        EmitBullet(input);
 
         // play sound
         // TODO: change depending on silencer
@@ -148,18 +118,14 @@ public class GunHandler : MonoBehaviour, ISaveable {
         OnValueChanged?.Invoke(this);
     }
     public void EmitShell() {
-        GameObject shell = GameObject.Instantiate(
-            gunInstance.baseGun.shellCasing,
-            gunPosition() + 0.2f * transform.right + 0.2f * transform.forward,
-            Quaternion.identity
-        );
+        GameObject shell = PoolManager.I.GetPool(gunInstance.baseGun.shellCasing).GetObject(gunPosition() + 0.2f * transform.right + 0.2f * transform.forward);
         Rigidbody body = shell.GetComponent<Rigidbody>();
-        body.AddRelativeForce(
+        body?.AddRelativeForce(
             UnityEngine.Random.Range(0.5f, 1.5f) * transform.up +
             UnityEngine.Random.Range(0.1f, 1f) * transform.right +
             UnityEngine.Random.Range(-0.3f, 0.3f) * transform.forward,
             ForceMode.Impulse); // TODO: what does force mode mean?
-        body.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
+        body?.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
     }
     public void EmitMagazine() {
         GameObject mag = GameObject.Instantiate(
@@ -240,6 +206,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
         // TODO: don't call this! maybe?
         gunAnimation.EndShoot();
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.unholster);
+
+        PoolManager.I.RegisterPool(gunInstance.baseGun.shellCasing);
 
         OnValueChanged?.Invoke(this);
     }

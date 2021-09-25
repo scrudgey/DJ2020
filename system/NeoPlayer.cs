@@ -58,8 +58,8 @@ public class NeoPlayer : MonoBehaviour {
         // Crouch
         CrouchAction.action.performed += ctx => {
             crouchHeld = ctx.ReadValueAsButton();
-            // ctx.rea
-            // Debug.Log(crouchHeld);
+            // crouchHeld = ctx.ReadValue<bool>();
+            Debug.Log(crouchHeld);
         };
 
         // Run
@@ -122,6 +122,8 @@ public class NeoPlayer : MonoBehaviour {
             jumpHeld = false;
             jumpReleasedThisFrame = true;
         };
+
+        crouchHeld = false;
     }
     private void Start() {
         // Tell camera to follow transform
@@ -130,6 +132,8 @@ public class NeoPlayer : MonoBehaviour {
         // Ignore the character's collider(s) for camera obstruction checks
         OrbitCamera.IgnoredColliders.Clear();
         OrbitCamera.IgnoredColliders.AddRange(Character.GetComponentsInChildren<Collider>());
+
+
     }
 
     private void Update() {

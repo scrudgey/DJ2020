@@ -6,36 +6,48 @@ public class DamageableMesh : MonoBehaviour {
     Mesh mesh;
     Vector3[] vertices;
     int[] triangles;
+    bool[] hits;
+    PrefabPool damagePool;
     private void Start() {
         mesh = transform.GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
         triangles = mesh.triangles;
+        // hits = new bool[triangles.Length];
+        hits = new bool[100];
+        for (int i = 0; i < hits.Length; i++) {
+            hits[i] = false;
+        }
+        damagePool = PoolManager.I.RegisterPool("prefabs/damageDecal");
+
     }
 
-    public void OnImpact(RaycastHit hit) {
-        // Ray ray = Camera.main.ScreenPointToRay(coordinates);
+    public void OnImpact(BulletImpact impact) {
+        if (!enabled) return;
+        if (impact.hit.triangleIndex == -1)
+            return;
+        if (hits[impact.hit.triangleIndex]) {
+            return;
+        } else {
+            hits[impact.hit.triangleIndex] = true;
+        }
+        int vertIndex1 = triangles[impact.hit.triangleIndex * 3 + 0];
+        int vertIndex2 = triangles[impact.hit.triangleIndex * 3 + 1];
+        int vertIndex3 = triangles[impact.hit.triangleIndex * 3 + 2];
 
-        // if (Physics.Raycast(ray, out RaycastHit hit)) {
 
-        int vertIndex1 = triangles[hit.triangleIndex * 3 + 0];
-        int vertIndex2 = triangles[hit.triangleIndex * 3 + 1];
-        int vertIndex3 = triangles[hit.triangleIndex * 3 + 2];
+        Vector3 origin = Toolbox.GetVertexWorldPosition(vertices[vertIndex1], impact.hit.transform);
 
-
-        Vector3 origin = Toolbox.GetVertexWorldPosition(vertices[vertIndex1], hit.transform);
-
-        GameObject decal = PoolManager.I.damageDecalPool.SpawnDecal(origin);
+        GameObject decal = damagePool.GetObject(origin);
 
         MeshFilter meshFilter = decal.GetComponent<MeshFilter>();
 
         Mesh mesh = new Mesh();
 
-        Vector3[] vs = new Vector3[4]
-        {
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], hit.transform) - origin,
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex2], hit.transform) - origin,
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex3], hit.transform) - origin,
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], hit.transform) - origin,
+        Vector3[] vs = new Vector3[4]{
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], impact.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex2], impact.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex3], impact.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], impact.hit.transform) - origin,
         };
         mesh.vertices = vs;
 

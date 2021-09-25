@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Easings;
 
-public class BulletRay : MonoBehaviour {
+public class BulletFX : MonoBehaviour {
     public enum FadeStyle { none, timer, count, invisible, streak }
     public FadeStyle fadeStyle;
     public LineRenderer lineRenderer;
@@ -20,13 +20,13 @@ public class BulletRay : MonoBehaviour {
     public void Initialize(FadeStyle newStyle, Vector3 startPoint, Vector3 endPoint) {
         this.fadeStyle = newStyle;
         if (fadeStyle == FadeStyle.count) {
-            BulletRay[] rays = FindObjectsOfType<BulletRay>();
+            BulletFX[] rays = FindObjectsOfType<BulletFX>();
             while (rays.Length > countLimit) {
-                BulletRay ray = rays[Random.Range(0, rays.Length)];
+                BulletFX ray = rays[Random.Range(0, rays.Length)];
                 if (ray != this) {
                     DestroyImmediate(ray.gameObject);
                 }
-                rays = FindObjectsOfType<BulletRay>();
+                rays = FindObjectsOfType<BulletFX>();
             }
         } else if (fadeStyle == FadeStyle.invisible) {
             lineRenderer.startColor = Color.clear;

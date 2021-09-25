@@ -263,7 +263,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
         // Crouching input
         if (inputs.CrouchDown || inputs.jumpHeld) {
-            _shouldBeCrouching = true;
+            // Debug.Log("shouldbecrouching");
             if (!isCrouching) {
                 isCrouching = true;
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);

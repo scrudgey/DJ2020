@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Rendering;
 public class MaterialController {
-    public MeshRenderer renderer;
+    public Renderer renderer;
     public GameObject gameObject;
     public NeoCharacterCamera camera;
     public float timer;
@@ -13,9 +13,10 @@ public class MaterialController {
     public MaterialController(GameObject gameObject, NeoCharacterCamera camera) {
         this.camera = camera;
         this.gameObject = gameObject;
-        this.renderer = gameObject.GetComponent<MeshRenderer>();
+        this.renderer = gameObject.GetComponent<Renderer>();
     }
     public void InterloperStart() {
+        // Debug.Log($"{gameObject} {renderer} interloper start");
         timer = 1f;
     }
     public void CeilingCheck(Collider collider, Vector3 position) {
@@ -32,12 +33,15 @@ public class MaterialController {
         }
     }
     public void MakeTransparent() {
+        // handle transparent objects differently
         if (renderer.shadowCastingMode != ShadowCastingMode.ShadowsOnly)
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        // renderer.material.renderQueue = 2020;
     }
     public void MakeApparent() {
         if (renderer.shadowCastingMode != ShadowCastingMode.On)
             renderer.shadowCastingMode = ShadowCastingMode.On;
+        // renderer.material.renderQueue = 2000;
     }
     public void Update() {
         // interloper logic
@@ -56,7 +60,9 @@ public class MaterialController {
         }
     }
 
-    public bool active() { return disableBecauseInterloper || disableBecauseAbove; }
+    public bool active() {
+        return disableBecauseInterloper || disableBecauseAbove;
+    }
 }
 public class MaterialControllerCache {
     public NeoCharacterCamera camera;
@@ -69,6 +75,7 @@ public class MaterialControllerCache {
             return controllers[key];
         } else {
             MaterialController controller = new MaterialController(key, camera);
+            // Debug.Log($"materialcontroller initialize {key}:{controller.renderer}");
             if (controller.renderer == null) {
                 // Debug.Log($"{key} null controller");
                 controller = null;
@@ -104,9 +111,13 @@ public class ClearSighter : MonoBehaviour {
         Vector3 mypos = transform.position + new Vector3(0, 1f, 0);
         float distance = Vector3.Distance(myCamera.transform.position, mypos);
         Vector3 direction = (mypos - myCamera.transform.position).normalized;
-        foreach (RaycastHit hit in Physics.RaycastAll(myCamera.transform.position, direction, distance).OrderBy(x => x.distance)) {
+
+        Vector3 startPosition = myCamera.transform.position;
+        // Debug.DrawRay(startPosition, distance * direction, Color.red, 1f);
+        foreach (RaycastHit hit in Physics.RaycastAll(startPosition, direction, distance).OrderBy(x => x.distance)) {
+            // Debug.Log(hit.collider.gameObject);
             if (hit.collider.transform.IsChildOf(transform)) {
-                break;
+                continue;
             }
             if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInClearsight) {
                 continue;
