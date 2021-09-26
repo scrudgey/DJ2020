@@ -18,7 +18,7 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
     public Skin skin;
-    public PlayerCharacterInputs.FireInputs input;
+    public PlayerCharacterInput.FireInputs input;
     public bool holstered;
 
     private float trailTimer;

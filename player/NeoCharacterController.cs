@@ -5,7 +5,7 @@ using KinematicCharacterController;
 using System;
 using System.Linq;
 
-public struct PlayerCharacterInputs {
+public struct PlayerCharacterInput {
     public struct FireInputs {
         public bool FirePressed;
         public bool FireHeld;
@@ -24,6 +24,7 @@ public struct PlayerCharacterInputs {
     public bool reload;
     public int switchToGun;
     public bool climbLadder;
+    public int incrementItem;
 }
 public enum CharacterState {
     normal,
@@ -43,6 +44,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     public KinematicCharacterMotor Motor;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
+    public ItemHandler itemHandler;
     public Footsteps footsteps;
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
@@ -211,10 +213,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     /// <summary>
     /// This is called every frame by MyPlayer in order to tell the character what its inputs are
     /// </summary>
-    public void SetInputs(ref PlayerCharacterInputs inputs) {
+    public void SetInputs(ref PlayerCharacterInput input) {
         // Handle ladder transitions
-        _ladderUpDownInput = inputs.MoveAxisForward;
-        if (inputs.climbLadder) {
+        _ladderUpDownInput = input.MoveAxisForward;
+        if (input.climbLadder) {
             if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
                 // if (_probedColliders[0] != null) {
                 foreach (Collider collider in _probedColliders) {
@@ -241,28 +243,28 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         }
 
         // Clamp input
-        Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
+        Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
             moveInputVector = NeoCharacterCamera.rotationOffset * moveInputVector;
         }
 
         // Calculate camera direction and rotation on the character plane
-        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.forward, Vector3.up).normalized;
+        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.forward, Vector3.up).normalized;
         if (cameraPlanarDirection.sqrMagnitude == 0f) {
-            cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.up, Vector3.up).normalized;
+            cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.up, Vector3.up).normalized;
         }
         Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
 
         // Move and look inputs
         _moveInputVector = cameraPlanarRotation * moveInputVector;
-        if (inputs.MoveAxisRight != 0 && inputs.MoveAxisForward != 0) {
+        if (input.MoveAxisRight != 0 && input.MoveAxisForward != 0) {
             _moveInputVector = Quaternion.Inverse(NeoCharacterCamera.rotationOffset) * _moveInputVector;
         }
-        _moveAxis = new Vector2(inputs.MoveAxisRight, inputs.MoveAxisForward);
+        _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
 
 
         // Crouching input
-        if (inputs.CrouchDown || inputs.jumpHeld) {
+        if (input.CrouchDown || input.jumpHeld) {
             // Debug.Log("shouldbecrouching");
             if (!isCrouching) {
                 isCrouching = true;
@@ -272,7 +274,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
             _shouldBeCrouching = false;
         }
 
-        if (inputs.jumpHeld && Motor.GroundingStatus.IsStableOnGround) {
+        if (input.jumpHeld && Motor.GroundingStatus.IsStableOnGround) {
             jumpHeldTimer += Time.deltaTime;
             if (superJumpEnabled && jumpHeldTimer > jumpTimerThreshold && state != CharacterState.jumpPrep) {
                 TransitionToState(CharacterState.jumpPrep);
@@ -283,7 +285,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
         switch (state) {
             case CharacterState.jumpPrep:
-                if (inputs.jumpReleased) {
+                if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
                 }
@@ -293,19 +295,23 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 wallPressRatchet = false;
 
                 // Fire
-                Vector3 shootVector = gunHandler.ProcessInput(inputs);
+                Vector3 shootVector = gunHandler.ProcessInput(input);
+
+                // Items
+                itemHandler.ProcessInput(input);
+
                 if (shootVector != Vector3.zero) {
                     _shootLookDirection = shootVector;
                 }
                 _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
 
                 // Jumping input
-                if (inputs.jumpReleased) {
+                if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
                 }
 
-                if (inputs.runDown) {
+                if (input.runDown) {
                     _shouldBeRunning = true;
                     if (!isRunning) {
                         isRunning = true;
@@ -328,7 +334,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 }
                 break;
             case CharacterState.climbing:
-                if (inputs.jumpReleased) {
+                if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
                 }

@@ -20,10 +20,18 @@ public class PrefabPool {
     protected virtual void EnableObject(GameObject obj) {
         obj.SetActive(true);
         // allow decals to define enable methods
+        PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
+        if (poolObject != null) {
+            poolObject.OnPoolActivate();
+        }
     }
     protected virtual void DisableObject(GameObject obj) {
         obj.SetActive(false);
         // allow decals to define disable methods
+        PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
+        if (poolObject != null) {
+            poolObject.OnPoolDectivate();
+        }
     }
     public virtual void InitializePool() {
         objectsInPool = new Queue<GameObject>();
@@ -116,7 +124,7 @@ public class PoolManager : Singleton<PoolManager> {
         foreach (GameObject obj in objects) {
             if (obj == null) continue;
             if (pool == null) {
-                PoolObject poolObject = obj.GetComponent<PoolObject>();
+                PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
                 if (poolObject != null) {
                     pool = GetPool(poolObject.prefabKey);
                 }

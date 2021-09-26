@@ -12,13 +12,11 @@ public class DamageableMesh : MonoBehaviour {
         mesh = transform.GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
         triangles = mesh.triangles;
-        // hits = new bool[triangles.Length];
-        hits = new bool[100];
+        hits = new bool[triangles.Length * 3];
         for (int i = 0; i < hits.Length; i++) {
             hits[i] = false;
         }
         damagePool = PoolManager.I.RegisterPool("prefabs/damageDecal");
-
     }
 
     public void OnImpact(BulletImpact impact) {

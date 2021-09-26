@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UI;
-
 public class UIInput {
     public bool toggleConsole;
 }
@@ -13,8 +12,12 @@ public class UIInput {
 public class UIController : MonoBehaviour {
     public Canvas canvas;
     public TerminalController terminal;
-    public AmmoIndicator ammoIndicator;
-
+    public WeaponUIHandler weaponUIHandler;
+    public ItemUIHandler itemUIHandler;
+    public GameObject UICamera;
+    void Awake() {
+        DestroyImmediate(UICamera);
+    }
     void Start() {
         canvas.worldCamera = Camera.main;
         GameManager.OnTargetChanged += BindToNewTarget;
@@ -30,7 +33,8 @@ public class UIController : MonoBehaviour {
 
     void BindToNewTarget(GameObject target) {
         // Debug.Log($"bind: {target}");
-        ammoIndicator.Bind(target);
+        weaponUIHandler.Bind(target);
+        itemUIHandler.Bind(target);
     }
 
     void HandleMenuChange(MenuType type) {

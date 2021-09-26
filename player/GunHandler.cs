@@ -31,7 +31,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
             gunAnimation.StartRack();
         }
     }
-    public Vector3 CursorToTargetPoint(PlayerCharacterInputs.FireInputs input) {
+    public Vector3 CursorToTargetPoint(PlayerCharacterInput.FireInputs input) {
         Vector3 targetPoint = Vector3.zero;
         Plane plane = new Plane(Vector3.up, transform.position);
         Ray projection = Camera.main.ScreenPointToRay(input.cursorPosition);
@@ -47,11 +47,11 @@ public class GunHandler : MonoBehaviour, ISaveable {
         // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
-    private Vector3 gunDirection(PlayerCharacterInputs.FireInputs input) {
+    private Vector3 gunDirection(PlayerCharacterInput.FireInputs input) {
         Vector3 targetPoint = CursorToTargetPoint(input);
         return targetPoint - this.gunPosition();
     }
-    public void EmitBullet(PlayerCharacterInputs.FireInputs input) {
+    public void EmitBullet(PlayerCharacterInput.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
 
         // determine the direction to shoot in
@@ -75,7 +75,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         bullet.DoImpacts();
     }
 
-    public void Shoot(PlayerCharacterInputs.FireInputs input) {
+    public void Shoot(PlayerCharacterInput.FireInputs input) {
         if (!gunInstance.CanShoot()) {
             gunAnimation.EndShoot();
             return;
@@ -233,10 +233,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         }
     }
 
-    public Vector3 ProcessInput(PlayerCharacterInputs input) {
-        // if (gunInstance == null)
-        // return Vector3.zero;
-
+    public Vector3 ProcessInput(PlayerCharacterInput input) {
         gunAnimation.input = input.Fire;
 
         if (input.switchToGun != -1) {

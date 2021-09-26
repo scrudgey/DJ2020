@@ -8,7 +8,7 @@ public enum Direction { left, leftUp, up, rightUp, right, rightDown, down, leftD
 
 public struct AnimationInput {
     public Direction orientation;
-    public PlayerCharacterInputs playerInputs;
+    public PlayerCharacterInput playerInputs;
     public bool isMoving;
     public bool isCrouching;
     public bool isRunning;

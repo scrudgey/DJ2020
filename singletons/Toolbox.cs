@@ -52,6 +52,18 @@ public class Toolbox {
             GameObject.Destroy(t);
         }
     }
+    static public void DisableIfExists<T>(GameObject gameObject) where T : MonoBehaviour {
+        T t = gameObject.GetComponent<T>();
+        if (t != null) {
+            t.enabled = false;
+        }
+    }
+    static public void EnableIfExists<T>(GameObject gameObject) where T : MonoBehaviour {
+        T t = gameObject.GetComponent<T>();
+        if (t != null) {
+            t.enabled = true;
+        }
+    }
 
     static public Direction DirectionFromAngle(float angle) {
         if (angle < 22.5 && angle >= -22.5) {

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class PlayerData {
     // skin
     public string legSkin;
@@ -8,6 +10,8 @@ public class PlayerData {
     public GunInstance secondaryGun;
     public GunInstance tertiaryGun;
     public int activeGun;
+    // items
+    public List<string> items = new List<string>();
 
     // stats
     public int cyberlegsLevel;
@@ -25,7 +29,9 @@ public class PlayerData {
             // legSkin = "cyber",
             bodySkin = "generic",
 
-            cyberlegsLevel = 1
+            cyberlegsLevel = 1,
+
+            items = new List<string> { "deck", "explosive" }
         };
     }
 }

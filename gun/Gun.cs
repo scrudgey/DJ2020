@@ -6,6 +6,7 @@ public enum CycleType { manual, semiautomatic, automatic }
 
 [CreateAssetMenu(menuName = "ScriptableObjects/Gun")]
 public class Gun : ScriptableObject {
+    new public string name;
 
     // TODO: separate guntype as graphics from gun functionality. allow gun to specify manual cycling, e.g.
     public GunType type;
@@ -19,6 +20,7 @@ public class Gun : ScriptableObject {
     public float range;
     public float spread;
     public LoHi baseDamage;
+    public Sprite image;
 
     [Header("Resources")]
     public AudioClip[] shootSounds;

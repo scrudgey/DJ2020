@@ -29,6 +29,8 @@ public class NeoPlayer : MonoBehaviour {
     public InputActionReference gunPrimary;
     public InputActionReference gunThird;
     public InputActionReference actionButton;
+    public InputActionReference nextItem;
+    public InputActionReference previousItem;
 
     private Vector2 inputVector;
     private bool firePressedHeld;
@@ -43,7 +45,8 @@ public class NeoPlayer : MonoBehaviour {
     private bool reloadPressedThisFrame;
     private int switchToGunThisFrame;
     private bool actionButtonPressedThisFrame;
-    private PlayerCharacterInputs _lastInput;
+    private int incrementItemThisFrame;
+    private PlayerCharacterInput _lastInput;
 
     public void Awake() {
         // Move
@@ -110,6 +113,19 @@ public class NeoPlayer : MonoBehaviour {
         actionButton.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
                 actionButtonPressedThisFrame = ctx.ReadValueAsButton();
+            }
+        };
+
+        // Item
+        nextItem.action.performed += ctx => {
+            if (ctx.ReadValueAsButton()) {
+                incrementItemThisFrame = 1;
+            }
+        };
+
+        previousItem.action.performed += ctx => {
+            if (ctx.ReadValueAsButton()) {
+                incrementItemThisFrame = -1;
             }
         };
 
@@ -206,7 +222,7 @@ public class NeoPlayer : MonoBehaviour {
 
     private void HandleCharacterInput() {
 
-        PlayerCharacterInputs characterInputs = new PlayerCharacterInputs() {
+        PlayerCharacterInput characterInputs = new PlayerCharacterInput() {
             state = Character.state,
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
@@ -216,7 +232,7 @@ public class NeoPlayer : MonoBehaviour {
             jumpReleased = jumpReleasedThisFrame,
             CrouchDown = crouchHeld,
             runDown = runHeld,
-            Fire = new PlayerCharacterInputs.FireInputs() {
+            Fire = new PlayerCharacterInput.FireInputs() {
                 FirePressed = firePressedThisFrame,
                 FireHeld = firePressedHeld,
                 cursorPosition = Mouse.current.position.ReadValue()
@@ -224,6 +240,7 @@ public class NeoPlayer : MonoBehaviour {
             reload = reloadPressedThisFrame,
             switchToGun = switchToGunThisFrame,
             climbLadder = actionButtonPressedThisFrame,
+            incrementItem = incrementItemThisFrame
         };
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
@@ -237,6 +254,7 @@ public class NeoPlayer : MonoBehaviour {
         jumpReleasedThisFrame = false;
         switchToGunThisFrame = -1;
         actionButtonPressedThisFrame = false;
+        incrementItemThisFrame = 0;
 
         _lastInput = characterInputs;
     }

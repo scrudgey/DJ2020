@@ -20,6 +20,9 @@ public class GunInstance {
     public int TotalAmmo() {
         return clip + chamber;
     }
+    public int MaxAmmo() {
+        return baseGun.clipSize;
+    }
     public void Shoot() {
         if (!CanShoot()) {
             return;
