@@ -11,7 +11,6 @@ namespace UI {
         public TextMeshProUGUI itemTitle;
         public TextMeshProUGUI itemCaption;
         public void Bind(GameObject newTargetObject) {
-            // Debug.Log($"ammo bind: {newTargetObject}");
             if (target != null) {
                 target.OnValueChanged -= HandleValueChanged;
             }
@@ -28,9 +27,12 @@ namespace UI {
                 itemTitle.text = "N/A";
                 itemCaption.text = "";
             } else {
-                itemImage.sprite = itemHandler.activeItem.image;
-                itemTitle.text = itemHandler.activeItem.name;
-                itemCaption.text = itemHandler.activeItem.shortName;
+                // TODO: fix this up
+
+                itemImage.sprite = itemHandler.activeItem.data.image;
+                itemTitle.text = itemHandler.activeItem.data.name;
+                // itemCaption.text = itemHandler.activeItem.shortName;
+                itemCaption.text = "1/1";
             }
         }
     }

@@ -27,8 +27,11 @@ namespace UI {
 
         public void HandleValueChanged(GunHandler gun) {
             if (gun != null && gun.gunInstance != null) {
-                ammoIndicator.text = $"A: {gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
-                ammoImageCaption.text = gun.gunInstance.baseGun.name;
+                // ammoIndicator.text = $"A: {gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
+                // ammoImageCaption.text = gun.gunInstance.baseGun.name;
+                ammoIndicator.text = gun.gunInstance.baseGun.name;
+                ammoImageCaption.text = $"{gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
+
                 ammoImage.sprite = gun.gunInstance.baseGun.image;
             } else {
                 ammoIndicator.text = $"A: -/-";

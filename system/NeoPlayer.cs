@@ -31,6 +31,7 @@ public class NeoPlayer : MonoBehaviour {
     public InputActionReference actionButton;
     public InputActionReference nextItem;
     public InputActionReference previousItem;
+    public InputActionReference useItem;
 
     private Vector2 inputVector;
     private bool firePressedHeld;
@@ -43,9 +44,10 @@ public class NeoPlayer : MonoBehaviour {
     private bool jumpReleasedThisFrame;
     private bool jumpHeld;
     private bool reloadPressedThisFrame;
-    private int switchToGunThisFrame;
+    private int selectGunThisFrame;
     private bool actionButtonPressedThisFrame;
     private int incrementItemThisFrame;
+    private bool useItemThisFrame;
     private PlayerCharacterInput _lastInput;
 
     public void Awake() {
@@ -61,7 +63,6 @@ public class NeoPlayer : MonoBehaviour {
         // Crouch
         CrouchAction.action.performed += ctx => {
             crouchHeld = ctx.ReadValueAsButton();
-            // crouchHeld = ctx.ReadValue<bool>();
             Debug.Log(crouchHeld);
         };
 
@@ -92,22 +93,22 @@ public class NeoPlayer : MonoBehaviour {
         // Gun switch
         gunHolster.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
-                switchToGunThisFrame = 0;
+                selectGunThisFrame = 0;
             }
         };
         gunSecondary.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
-                switchToGunThisFrame = 2;
+                selectGunThisFrame = 2;
             }
         };
         gunPrimary.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
-                switchToGunThisFrame = 1;
+                selectGunThisFrame = 1;
             }
         };
         gunThird.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
-                switchToGunThisFrame = 3;
+                selectGunThisFrame = 3;
             }
         };
         actionButton.action.performed += ctx => {
@@ -129,9 +130,16 @@ public class NeoPlayer : MonoBehaviour {
             }
         };
 
+        useItem.action.performed += ctx => {
+            useItemThisFrame = ctx.ReadValueAsButton();
+        };
+
         // Button up
         FireAction.action.canceled += _ => firePressedHeld = false;
-        CrouchAction.action.canceled += _ => crouchHeld = false;
+        CrouchAction.action.canceled += _ => {
+            crouchHeld = false;
+            Debug.Log("uncrouch");
+        };
         RunAction.action.canceled += _ => runHeld = false;
         MoveAction.action.canceled += _ => inputVector = Vector2.zero;
         JumpAction.action.canceled += _ => {
@@ -238,9 +246,10 @@ public class NeoPlayer : MonoBehaviour {
                 cursorPosition = Mouse.current.position.ReadValue()
             },
             reload = reloadPressedThisFrame,
-            switchToGun = switchToGunThisFrame,
+            switchToGun = selectGunThisFrame,
             climbLadder = actionButtonPressedThisFrame,
-            incrementItem = incrementItemThisFrame
+            incrementItem = incrementItemThisFrame,
+            useItem = useItemThisFrame,
         };
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
@@ -252,9 +261,10 @@ public class NeoPlayer : MonoBehaviour {
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
         jumpReleasedThisFrame = false;
-        switchToGunThisFrame = -1;
+        selectGunThisFrame = -1;
         actionButtonPressedThisFrame = false;
         incrementItemThisFrame = 0;
+        useItemThisFrame = false;
 
         _lastInput = characterInputs;
     }

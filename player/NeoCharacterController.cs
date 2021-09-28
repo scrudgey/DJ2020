@@ -25,6 +25,7 @@ public struct PlayerCharacterInput {
     public int switchToGun;
     public bool climbLadder;
     public int incrementItem;
+    public bool useItem;
 }
 public enum CharacterState {
     normal,
@@ -294,12 +295,11 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
             case CharacterState.normal:
                 wallPressRatchet = false;
 
-                // Fire
-                Vector3 shootVector = gunHandler.ProcessInput(input);
-
                 // Items
                 itemHandler.ProcessInput(input);
 
+                // Fire
+                Vector3 shootVector = gunHandler.ProcessInput(input);
                 if (shootVector != Vector3.zero) {
                     _shootLookDirection = shootVector;
                 }

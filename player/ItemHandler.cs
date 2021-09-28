@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
+using Items;
+// TODO: enable buffs on/off
 public class ItemHandler : MonoBehaviour, ISaveable {
     public Action<ItemHandler> OnValueChanged;
-    public List<Item> items = new List<Item>();
+    public List<BaseItem> items = new List<BaseItem>();
     public int index;
-    public Item activeItem;
+    public BaseItem activeItem;
+    public AudioSource audioSource;
     public void ProcessInput(PlayerCharacterInput input) {
         if (input.incrementItem != 0) {
             index += input.incrementItem;
@@ -18,22 +20,34 @@ public class ItemHandler : MonoBehaviour, ISaveable {
             }
             SwitchToItem(items[index]);
         }
+        if (input.useItem) {
+            UseItem();
+        }
     }
 
-    void SwitchToItem(Item item) {
+    void SwitchToItem(BaseItem item) {
         this.activeItem = item;
         OnValueChanged?.Invoke(this);
     }
     public void LoadState(PlayerData data) {
-        items = new List<Item>();
+        items = new List<BaseItem>();
         foreach (string itemName in data.items) {
             // Debug.Log($"loadin {itemName}");
-            Item newItem = Item.LoadItem(itemName);
+            BaseItem newItem = ItemInstance.NewInstance(itemName);
             if (newItem != null) {
                 items.Add(newItem);
             } else {
                 Debug.LogError($"unable to load saved item {itemName}");
             }
         }
+        if (items.Count > 0) {
+            SwitchToItem(items[0]);    // TODO: save active item
+        }
+    }
+
+    void UseItem() {
+        if (activeItem == null)
+            return;
+        activeItem.Use(this);
     }
 }

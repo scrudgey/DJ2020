@@ -9,7 +9,6 @@ public class GunHandler : MonoBehaviour, ISaveable {
     static readonly float height = 0.5f;
     public Action<GunHandler> OnValueChanged;
     public GunAnimation gunAnimation;
-    // public LightmapPixelPicker pixelPicker;
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
@@ -274,9 +273,6 @@ public class GunHandler : MonoBehaviour, ISaveable {
 
             }
         }
-
-
-
         return Vector2.zero;
     }
 
