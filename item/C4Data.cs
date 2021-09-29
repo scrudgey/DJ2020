@@ -7,5 +7,8 @@ namespace Items {
     public class C4Data : ItemData {
         public GameObject prefab;
         public AudioClip deploySound;
+        public GameObject explosionFx;
+        public float explosionRadius = 2f;
+        public float explosionPower = 10f;
     }
 }

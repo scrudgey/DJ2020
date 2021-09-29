@@ -7,11 +7,13 @@ public class Destructible : MonoBehaviour {
     // public AudioSource audioSource;
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
-    public void TakeDamage(BulletImpact impact) {
+    public void TakeBulletDamage(BulletImpact impact) {
         health -= impact.bullet.damage;
         if (health <= 0) {
             Destruct();
         }
+    }
+    public void TakeExplosiveDamage(Explosion explosion) {
     }
 
     public void Destruct() {

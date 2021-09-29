@@ -8,6 +8,8 @@ using System;
 // maybe use loudspeaker object
 
 public class Toolbox {
+    public static GameObject explosiveRadiusPrefab;
+    public static readonly string ExplosiveRadiusPath = "prefabs/explosiveRadius";
     static public IEnumerator RunAfterTime(float delay, Action function) {
         float timer = 0;
         while (timer < delay) {
@@ -136,5 +138,31 @@ public class Toolbox {
     public static float RandomFromLoHi(LoHi input) {
         return UnityEngine.Random.Range(input.low, input.high);
     }
+    public static Explosion Explosion(Vector3 position) {
+        if (explosiveRadiusPrefab == null) {
+            explosiveRadiusPrefab = Resources.Load(ExplosiveRadiusPath) as GameObject;
+        }
+        return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
+    }
+    public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {
+        float dist = (target - source).magnitude;
+        if (dist > range)
+            return 0.0f;
+        return (1.0f - dist / range) * power;
+    }
+    public static Vector3 CalculateExplosionVector(Vector3 source, Vector3 target, float range, float power) {
+        Vector3 direction = (target - source).normalized;
+        float dist = (target - source).magnitude;
+        if (dist > range)
+            return Vector3.zero;
+        return (1.0f - dist / range) * power * direction;
+    }
+    public static float CalculateExplosionValue(Explosion explosion, Vector3 target) {
+        return CalculateExplosionValue(explosion.transform.position, target, explosion.radius, explosion.power);
+    }
+    public static Vector3 CalculateExplosionVector(Explosion explosion, Vector3 target) {
+        return CalculateExplosionVector(explosion.transform.position, target, explosion.radius, explosion.power);
+    }
 }
+
 

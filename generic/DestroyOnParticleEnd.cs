@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DestroyOnParticleEnd : MonoBehaviour {
-    ParticleSystem particles;
+    ParticleSystem[] particles;
     void Awake() {
-        particles = GetComponent<ParticleSystem>();
+        particles = GetComponentsInChildren<ParticleSystem>();
     }
 
-    // Update is called once per frame
     void Update() {
-        if (!particles.isPlaying) {
+        bool isPlaying = false;
+        foreach (ParticleSystem sys in particles) {
+            if (sys.isPlaying) {
+                isPlaying = true;
+                break;
+            }
+        }
+        if (!isPlaying) {
             Destroy(gameObject);
         }
     }

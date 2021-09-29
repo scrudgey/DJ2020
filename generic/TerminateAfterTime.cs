@@ -17,6 +17,10 @@ public class TerminateAfterTime : PoolObject {
             }
             Toolbox.DisableIfExists<PlaySound>(gameObject);
             Toolbox.DisableIfExists<FlipScintillator>(gameObject);
+            Rigidbody rigidbody = GetComponent<Rigidbody>();
+            if (rigidbody != null) {
+                rigidbody.isKinematic = true;
+            }
             this.enabled = false;
         }
     }
@@ -33,5 +37,10 @@ public class TerminateAfterTime : PoolObject {
         }
         Toolbox.EnableIfExists<PlaySound>(gameObject);
         Toolbox.EnableIfExists<FlipScintillator>(gameObject);
+
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        if (rigidbody != null) {
+            rigidbody.isKinematic = false;
+        }
     }
 }

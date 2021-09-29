@@ -38,7 +38,7 @@ public class Bullet {
         damageEmitter?.TakeDamage(impact);
 
         Destructible destructible = hit.transform.GetComponent<Destructible>();
-        destructible?.TakeDamage(impact);
+        destructible?.TakeBulletDamage(impact);
 
         Rigidbody body = hit.transform.GetComponent<Rigidbody>();
         if (body != null) {

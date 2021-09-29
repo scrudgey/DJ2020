@@ -30,6 +30,9 @@ public class Glass : MonoBehaviour {
         lastImpact = impact.hit;
         lastRay = impact.bullet.ray;
     }
+    public void TakeExplosionDamage(Explosion explosion) {
+
+    }
     public void FixedUpdate() {
         if (doDestruct) {
             doDestruct = false;
