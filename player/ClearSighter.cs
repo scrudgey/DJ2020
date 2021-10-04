@@ -7,6 +7,7 @@ public class MaterialController {
     public Renderer renderer;
     public GameObject gameObject;
     public NeoCharacterCamera camera;
+    public TagSystemData tagSystemData;
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableBecauseAbove;
@@ -14,12 +15,15 @@ public class MaterialController {
         this.camera = camera;
         this.gameObject = gameObject;
         this.renderer = gameObject.GetComponent<Renderer>();
+        this.tagSystemData = Toolbox.GetTagData(gameObject);
     }
     public void InterloperStart() {
         // Debug.Log($"{gameObject} {renderer} interloper start");
         timer = 1f;
     }
     public void CeilingCheck(Collider collider, Vector3 position) {
+        if (tagSystemData.dontHideInClearsight)
+            return;
         if (collider.bounds.center.y < position.y) {
             disableBecauseAbove = false;
             return;
@@ -44,6 +48,8 @@ public class MaterialController {
         // renderer.material.renderQueue = 2000;
     }
     public void Update() {
+        if (renderer == null)
+            return;
         // interloper logic
         if (timer > 0)
             timer -= Time.deltaTime;

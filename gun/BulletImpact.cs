@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class BulletImpact {
+public class BulletDamage : Damage {
     public RaycastHit hit;
     public Bullet bullet;
-    public BulletImpact(Bullet bullet, RaycastHit hit) {
+    public BulletDamage(Bullet bullet, RaycastHit hit) : base(DamageType.bullet, bullet.damage, bullet.ray.direction) {
         this.bullet = bullet;
         this.hit = hit;
     }

@@ -2,21 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Destructible : MonoBehaviour {
-    public float health;
-    // public AudioSource audioSource;
+public class Destructible : IDamageable {
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
-    public void TakeBulletDamage(BulletImpact impact) {
-        health -= impact.bullet.damage;
-        if (health <= 0) {
-            Destruct();
-        }
-    }
-    public void TakeExplosiveDamage(Explosion explosion) {
+    public DamageResult TakeBulletDamage(BulletDamage impact) {
+        return new DamageResult {
+            damageAmount = impact.bullet.damage
+        };
     }
 
-    public void Destruct() {
+    public DamageResult TakeExplosiveDamage(ExplosionDamage explosion) {
+        return new DamageResult { };
+    }
+    void Awake() {
+        RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
+        RegisterDamageCallback<ExplosionDamage>(TakeExplosiveDamage);
+    }
+
+    override protected void Destruct(Damage damage) {
         // TODO: destroy parent?
         Destroy(transform.parent.gameObject, 5f);
         foreach (GameObject fx in destructionFx) {

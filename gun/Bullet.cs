@@ -14,7 +14,6 @@ public class Bullet {
 
     public void DoImpacts() {
         RaycastHit[] hits = Physics.RaycastAll(ray, range); // get all hits
-        // TODO: move this method to something else
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (Impact(hit)) {
                 if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {
@@ -27,28 +26,21 @@ public class Bullet {
     }
 
     bool Impact(RaycastHit hit) {
-        BulletImpact impact = new BulletImpact(this, hit);
+        BulletDamage bulletDamage = new BulletDamage(this, hit);
 
         TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
 
-        DamageableMesh damageableMesh = hit.transform.GetComponent<DamageableMesh>();
-        damageableMesh?.OnImpact(impact);
-
-        DamageEmitter damageEmitter = hit.transform.GetComponent<DamageEmitter>();
-        damageEmitter?.TakeDamage(impact);
-
-        Destructible destructible = hit.transform.GetComponent<Destructible>();
-        destructible?.TakeBulletDamage(impact);
+        // TODO: unify with others
+        foreach (IDamageable damageable in hit.transform.GetComponentsInChildren<IDamageable>()) {
+            damageable.TakeDamage(bulletDamage);
+        }
 
         Rigidbody body = hit.transform.GetComponent<Rigidbody>();
         if (body != null) {
             body?.AddForceAtPosition(damage * -1f * hit.normal, hit.point, ForceMode.Impulse);
         }
 
-        if (tagData.bulletPassthrough) {
-            Glass glass = hit.collider.gameObject.GetComponentInParent<Glass>();
-            glass?.BulletHit(impact);
-        } else {
+        if (!tagData.bulletPassthrough) {
             // TODO: these effects should be data-driven
 
             // spawn decal

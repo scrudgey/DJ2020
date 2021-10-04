@@ -152,17 +152,9 @@ public class Toolbox {
     }
     public static Vector3 CalculateExplosionVector(Vector3 source, Vector3 target, float range, float power) {
         Vector3 direction = (target - source).normalized;
-        float dist = (target - source).magnitude;
-        if (dist > range)
-            return Vector3.zero;
-        return (1.0f - dist / range) * power * direction;
+        return CalculateExplosionValue(source, target, range, power) * direction;
     }
-    public static float CalculateExplosionValue(Explosion explosion, Vector3 target) {
-        return CalculateExplosionValue(explosion.transform.position, target, explosion.radius, explosion.power);
-    }
-    public static Vector3 CalculateExplosionVector(Explosion explosion, Vector3 target) {
-        return CalculateExplosionVector(explosion.transform.position, target, explosion.radius, explosion.power);
-    }
+
 }
 
 

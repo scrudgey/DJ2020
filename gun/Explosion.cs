@@ -6,7 +6,7 @@ public class Explosion : MonoBehaviour {
     public float radius = 2.0F;
     public float power = 10.0F;
 
-    void Start() {
+    void LateUpdate() {
         Vector3 explosionPos = transform.position;
         Collider[] colliders = Physics.OverlapSphere(explosionPos, radius);
         foreach (Collider hit in colliders) {
@@ -14,14 +14,10 @@ public class Explosion : MonoBehaviour {
             if (rb != null)
                 rb.AddExplosionForce(power, explosionPos, radius, 3.0F);
 
-            DestructibleWall wall = hit.GetComponent<DestructibleWall>();
-            if (wall != null) {
-                wall.TakeExplosionDamage(this);
+            // TODO: unify this with bullet method
+            foreach (IDamageable damageable in hit.GetComponentsInChildren<IDamageable>()) {
+                damageable.TakeDamage(new ExplosionDamage(this));
             }
-
-            // glass
-
-            // destructible object
         }
         Destroy(gameObject);
     }

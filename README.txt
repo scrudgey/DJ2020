@@ -366,3 +366,41 @@ unified damage and destructible model
 divide explodable from destrucible wall?
 
 destroy walls
+
+unify takedamage
+Damage class
+unify gibs and glass shards
+
+1. review how it is done in YC3.
+review what we like & don't like.
+
+
+1. interface with takedamage and implementation for destroy
+in this case, each component will track its health independently?
+
+Explosion gibs:
+    position random
+    force directed by explosion
+Glass gibs:
+    position partly determined
+    force directed by damage direction
+destructible object gibs:
+    ??
+    does this handle a particular type of damage?
+    what happens if glass and destructible on same object? they should not be.
+    then gibs will be generated more like explosion
+
+
+susceptible
+takedamage
+dotakedamage
+destruct
+    so maybe glass is just different from gibs?
+
+
+split IDamageable and IDestructable
+Susceptible vs. pattern matching?
+Susceptible can determine if we should react
+    but then, can we at least remove DamageType?
+is there a way to abstract this pattern?
+1. register Action<Damage> types? 

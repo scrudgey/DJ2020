@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageableMesh : MonoBehaviour {
+public class DamageableMesh : IDamageable {
     Mesh mesh;
     Vector3[] vertices;
     int[] triangles;
     bool[] hits;
     PrefabPool damagePool;
     private void Start() {
+        indestructable = true;
         mesh = transform.GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
         triangles = mesh.triangles;
@@ -17,23 +18,19 @@ public class DamageableMesh : MonoBehaviour {
             hits[i] = false;
         }
         damagePool = PoolManager.I.RegisterPool("prefabs/damageDecal");
+        RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
     }
-
-    public void OnImpact(BulletImpact impact) {
-        if (!enabled) return;
-        if (impact.hit.triangleIndex == -1)
-            return;
-        if (hits[impact.hit.triangleIndex]) {
-            return;
+    protected DamageResult TakeBulletDamage(BulletDamage damage) {
+        if (damage.hit.triangleIndex == -1 || hits[damage.hit.triangleIndex]) {
+            return new DamageResult();
         } else {
-            hits[impact.hit.triangleIndex] = true;
+            hits[damage.hit.triangleIndex] = true;
         }
-        int vertIndex1 = triangles[impact.hit.triangleIndex * 3 + 0];
-        int vertIndex2 = triangles[impact.hit.triangleIndex * 3 + 1];
-        int vertIndex3 = triangles[impact.hit.triangleIndex * 3 + 2];
+        int vertIndex1 = triangles[damage.hit.triangleIndex * 3 + 0];
+        int vertIndex2 = triangles[damage.hit.triangleIndex * 3 + 1];
+        int vertIndex3 = triangles[damage.hit.triangleIndex * 3 + 2];
 
-
-        Vector3 origin = Toolbox.GetVertexWorldPosition(vertices[vertIndex1], impact.hit.transform);
+        Vector3 origin = Toolbox.GetVertexWorldPosition(vertices[vertIndex1], damage.hit.transform);
 
         GameObject decal = damagePool.GetObject(origin);
 
@@ -42,10 +39,10 @@ public class DamageableMesh : MonoBehaviour {
         Mesh mesh = new Mesh();
 
         Vector3[] vs = new Vector3[4]{
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], impact.hit.transform) - origin,
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex2], impact.hit.transform) - origin,
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex3], impact.hit.transform) - origin,
-            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], impact.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], damage.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex2], damage.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex3], damage.hit.transform) - origin,
+            Toolbox.GetVertexWorldPosition(vertices[vertIndex1], damage.hit.transform) - origin,
         };
         mesh.vertices = vs;
 
@@ -75,28 +72,10 @@ public class DamageableMesh : MonoBehaviour {
             new Vector2(1, 1)
         };
 
-        // Vector2[] uv = new Vector2[3]
-        // {
-        //     new Vector2(0, 0),
-        //     new Vector2(1, 0),
-        //     new Vector2(0, 1),
-        //     // new Vector2(1, 1)
-        // };
-
-        //         Vector2[] uv = new Vector2[4]
-        // {
-        //             new Vector2(0, 0),
-        //             new Vector2(1, 0),
-        //             new Vector2(1, 1),
-        //             new Vector2(1, 1)
-        // };
         mesh.uv = uv;
         // mesh.SetUVs(1, uv);
 
         meshFilter.mesh = mesh;
-
-        // } else {
-        //     Debug.Log("no hit");
-        // }
+        return new DamageResult();
     }
 }
