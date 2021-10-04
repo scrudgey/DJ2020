@@ -5,11 +5,9 @@ using UnityEngine;
 public class DamageEmitter : IDamageable {
     public float probability = 0.5f;
     public LoHi velocity;
-    // use object pool
     public GameObject[] particles;
     private Dictionary<GameObject, PrefabPool> pools = new Dictionary<GameObject, PrefabPool>();
     void Awake() {
-        indestructable = true;
         foreach (GameObject particle in particles) {
             pools[particle] = PoolManager.I.RegisterPool(particle);
         }

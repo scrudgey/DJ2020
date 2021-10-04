@@ -9,7 +9,6 @@ public class DamageableMesh : IDamageable {
     bool[] hits;
     PrefabPool damagePool;
     private void Start() {
-        indestructable = true;
         mesh = transform.GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
         triangles = mesh.triangles;

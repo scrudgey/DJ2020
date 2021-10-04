@@ -5,20 +5,11 @@ public struct DamageResult {
     public float damageAmount;
 }
 public abstract class IDamageable : MonoBehaviour {
-
-    public delegate DamageResult HandleDamage(Damage damage);
-
-    protected HandleDamage handlers;
-
-    public float health;
     protected Damage lastDamage;
     protected DamageResult lastResult;
-    public Gibs gibs;
-    public bool indestructable;
 
     Dictionary<Type, Func<Damage, DamageResult>> damageHandlers = new Dictionary<Type, Func<Damage, DamageResult>>();
 
-    // register only once plz
     protected void RegisterDamageCallback<T>(Func<T, DamageResult> handler) where T : Damage {
         Type tType = typeof(T);
         Func<Damage, DamageResult> wrapper = (Damage damage) => {
@@ -36,29 +27,18 @@ public abstract class IDamageable : MonoBehaviour {
             damageHandlers[tType] = wrapper;
         }
     }
-    public void TakeDamage<T>(T damage) where T : Damage {
-        ApplyDamageResult(damage, damage.GetType());
-        ApplyDamageResult(damage, typeof(Damage));
-        if (health <= 0 && !indestructable) {
-            Destruct(damage);
-        }
+    public virtual void TakeDamage<T>(T damage) where T : Damage {
+        HandleDamage(damage, damage.GetType());
+        HandleDamage(damage, typeof(Damage));
     }
 
-    void ApplyDamageResult(Damage damage, Type type) {
+    void HandleDamage(Damage damage, Type type) {
         if (damageHandlers.ContainsKey(type) && damageHandlers[type] != null) {
             DamageResult result = damageHandlers[type](damage);
-            health -= result.damageAmount;
+            ApplyDamageResult(result);
             lastDamage = damage;
         }
     }
-    virtual protected void Destruct(Damage damage) {
-        Collider myCollider = GetComponentInChildren<Collider>();
-        if (gibs != null) {
-            foreach (Gib gib in gibs.gibs) {
-                gib.Emit(damage, myCollider);
-            }
-        }
-        Destroy(transform.parent.gameObject);
-    }
+    protected virtual void ApplyDamageResult(DamageResult result) { }
 }
 

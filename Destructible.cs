@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Destructible : IDamageable {
+public class Destructible : IDestructible {
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
     public DamageResult TakeBulletDamage(BulletDamage impact) {
@@ -20,7 +20,6 @@ public class Destructible : IDamageable {
     }
 
     override protected void Destruct(Damage damage) {
-        // TODO: destroy parent?
         Destroy(transform.parent.gameObject, 5f);
         foreach (GameObject fx in destructionFx) {
             GameObject.Instantiate(fx, transform.position, Quaternion.identity);
@@ -34,10 +33,8 @@ public class Destructible : IDamageable {
             Vector3 force = 50f * Random.onUnitSphere;
             force.y = Mathf.Abs(force.y);
             rigidbody.AddForce(force, ForceMode.Impulse);
-
         }
 
-        // TODO: destroy more things?
         Destroy(this);
     }
 }
