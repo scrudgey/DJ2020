@@ -75,15 +75,13 @@ public class HumanoidView : MonoBehaviour, ISaveable {
         // set direction
         direction = input.orientation;
         Vector3 scale = transform.localScale;
-        // if (spriteRenderer.flipX) {
-        //     scale.x = -1f * Mathf.Abs(scale.x);
-        // }
         transform.localScale = scale;
 
         // set mode and animation
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
         shadowCaster.localPosition = new Vector3(0f, 0.7f, 0f);
         spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+
         if (input.isMoving) { //
             if (input.isJumping) {
                 mode = Mode.jump;
@@ -111,7 +109,8 @@ public class HumanoidView : MonoBehaviour, ISaveable {
                 spriteRenderer.sprite = skin.climb[Direction.up][0];
             } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
-                shadowCaster.localPosition = new Vector3(0f, 0.3f, 0f);
+                // shadowCaster.localPosition = new Vector3(0f, 0.3f, 0f);
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
                 mode = Mode.crouch;
 
                 if (input.gunType == GunType.unarmed) {

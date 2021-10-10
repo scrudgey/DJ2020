@@ -10,7 +10,6 @@ public class Glass : IDestructible {
     public List<GameObject> decals = new List<GameObject>();
     public GameObject glassGibs;
     private PrefabPool glassGibsPool;
-    public bool doDestruct;
     Collider myCollider;
     public void Awake() {
         glassGibsPool = PoolManager.I.RegisterPool(glassGibs);
@@ -39,13 +38,6 @@ public class Glass : IDestructible {
         };
     }
 
-    // TODO: move to IDamageable
-    // public void FixedUpdate() {
-    //     if (doDestruct) {
-    //         doDestruct = false;
-    //         Destruct();
-    //     }
-    // }
     override protected void Destruct(Damage damage) {
         Toolbox.AudioSpeaker(transform.position, destroySounds);
         Destroy(gameObject);

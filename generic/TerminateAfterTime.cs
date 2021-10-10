@@ -19,7 +19,10 @@ public class TerminateAfterTime : PoolObject {
             Toolbox.DisableIfExists<FlipScintillator>(gameObject);
             Rigidbody rigidbody = GetComponent<Rigidbody>();
             if (rigidbody != null) {
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
                 rigidbody.isKinematic = true;
+                // rigidbody.velocity = Vector3.zero;
+                // rigidbody.inertiaTensorRotation = Quaternion.identity;
             }
             this.enabled = false;
         }

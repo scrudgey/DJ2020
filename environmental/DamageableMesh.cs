@@ -32,6 +32,7 @@ public class DamageableMesh : IDamageable {
         Vector3 origin = Toolbox.GetVertexWorldPosition(vertices[vertIndex1], damage.hit.transform);
 
         GameObject decal = damagePool.GetObject(origin);
+        decal.transform.SetParent(transform, true);
 
         MeshFilter meshFilter = decal.GetComponent<MeshFilter>();
 

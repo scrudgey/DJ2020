@@ -181,6 +181,7 @@ public class NeoPlayer : MonoBehaviour {
             orientation = Toolbox.DirectionFromAngle(angle),
             isMoving = Character.Motor.Velocity.magnitude > 0.1 && (Character.Motor.GroundingStatus.IsStableOnGround || Character.state == CharacterState.climbing),
             isCrouching = Character.isCrouching,
+            // isCrouching = true,
             isRunning = Character.isRunning,
             isJumping = Character.state == CharacterState.superJump,
             isClimbing = Character.state == CharacterState.climbing,

@@ -29,8 +29,6 @@ public class NeoCharacterCamera : MonoBehaviour {
     public Material isometricSkybox;
     public Material wallPressSkybox;
     public Transform maskCylinder;
-    // public PostProcessProfile normalProfile;
-    // public VolumeProfile wallPressProfile;
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
@@ -126,11 +124,11 @@ public class NeoCharacterCamera : MonoBehaviour {
             transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
 
             if (state == CameraState.normal) {
-                // maskCylinder.gameObject.SetActive(true);
                 ApplyTargetParameters(NormalUpdate(input));
+                volume.profile = isometricProfile;
             } else if (state == CameraState.wallPress) {
-                // maskCylinder.gameObject.SetActive(false);
                 ApplyTargetParameters(WallPressUpdate(input));
+                volume.profile = wallPressProfile;
             }
         }
     }

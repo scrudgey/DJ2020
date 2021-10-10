@@ -18,6 +18,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
     public GunInstance secondary;
     public GunInstance primary;
     public GunInstance third;
+    public bool emitShell;
 
     public void Update() {
         if (gunInstance == null) {
@@ -117,14 +118,30 @@ public class GunHandler : MonoBehaviour, ISaveable {
         OnValueChanged?.Invoke(this);
     }
     public void EmitShell() {
-        GameObject shell = PoolManager.I.GetPool(gunInstance.baseGun.shellCasing).GetObject(gunPosition() + 0.2f * transform.right + 0.2f * transform.forward);
+        emitShell = true;
+    }
+    public void DoEmitShell() {
+        Vector3 targetPosition = gunPosition() + 0.2f * transform.right + 0.2f * transform.forward;
+        GameObject shell = PoolManager.I.GetPool(gunInstance.baseGun.shellCasing).GetObject();
         Rigidbody body = shell.GetComponent<Rigidbody>();
-        body?.AddRelativeForce(
-            UnityEngine.Random.Range(0.5f, 1.5f) * transform.up +
-            UnityEngine.Random.Range(0.1f, 1f) * transform.right +
-            UnityEngine.Random.Range(-0.3f, 0.3f) * transform.forward,
-            ForceMode.Impulse); // TODO: what does force mode mean?
-        body?.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
+        if (body != null) {
+            body.MovePosition(targetPosition);
+            body.MoveRotation(Quaternion.identity);
+            body.velocity = Vector3.zero;
+            body.AddRelativeForce(
+                        UnityEngine.Random.Range(0.5f, 1.5f) * transform.up +
+                        UnityEngine.Random.Range(0.1f, 1f) * transform.right +
+                        UnityEngine.Random.Range(-0.3f, 0.3f) * transform.forward,
+                        ForceMode.Impulse); // TODO: what does force mode mean?
+            body.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
+        }
+
+    }
+    void FixedUpdate() {
+        if (emitShell) {
+            emitShell = false;
+            DoEmitShell();
+        }
     }
     public void EmitMagazine() {
         GameObject mag = GameObject.Instantiate(
@@ -158,6 +175,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
             return;
 
         reloading = true;
+        shooting = false;
 
         // gunInstance.Reload();
         gunInstance.ClipOut();
@@ -177,6 +195,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         if (reloading)
             return;
         reloading = true;
+        shooting = false;
 
         // start animation
         gunAnimation.StartReload();
@@ -244,13 +263,12 @@ public class GunHandler : MonoBehaviour, ISaveable {
                 } else if (gunInstance.baseGun.type != GunType.shotgun) {
                     Reload();
                 }
-            }
-            if (gunInstance.CanShoot()) {
-
+            } else if (gunInstance.CanShoot()) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && !shooting) {
                         gunAnimation.StartShooting();
                         shooting = true;
+                        reloading = false;
                     }
                     if (input.Fire.FireHeld) {
                         return CursorToTargetPoint(input.Fire);
@@ -264,6 +282,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
                     if (input.Fire.FirePressed) {//&& !shooting) {
                         gunAnimation.StartShooting();
                         shooting = true;
+                        reloading = false;
                         return CursorToTargetPoint(input.Fire);
                     }
                 }

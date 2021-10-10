@@ -69,7 +69,17 @@ public class PrefabPool {
         GameObject obj = GetNextAvailableObject();
         if (obj != null) {
             obj.transform.position = position;
+            // obj.GetComponent<Rigidbody>().Move
         } else {
+            obj = InstantiatePrefab();
+        }
+        EnableObject(obj);
+        objectsActiveInWorld.Enqueue(obj);
+        return obj;
+    }
+    public GameObject GetObject() {
+        GameObject obj = GetNextAvailableObject();
+        if (obj == null) {
             obj = InstantiatePrefab();
         }
         EnableObject(obj);

@@ -59,17 +59,16 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     }
 
     public void StartShooting() {
-        animator.clip = gunHandler.gunInstance.baseGun.shootAnimation;
-        animator.Play();
-        _isShooting = true;
-        _isRacking = false;
-        _isReloading = false;
-        UpdateFrame();
+        if (!_isShooting) {
+            // TODO: what is the point of _isShooting, _state, and why is animation set at this point? two ways of handling animations?
+            _isShooting = true;
+            _isRacking = false;
+            _isReloading = false;
+            UpdateFrame();
+        }
     }
     public void StartRack() {
         if (!_isRacking) {
-            animator.clip = gunHandler.gunInstance.baseGun.rackAnimation;
-            animator.Play();
             _isRacking = true;
             _isReloading = false;
             _isShooting = false;
@@ -78,8 +77,6 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     }
     public void StartReload() {
         if (!_isReloading) {
-            animator.clip = gunHandler.gunInstance.baseGun.reloadAnimation;
-            animator.Play();
             _isReloading = true;
             _isRacking = false;
             _isShooting = false;
@@ -142,26 +139,9 @@ public class GunAnimation : MonoBehaviour, ISaveable {
 
         _direction = input.orientation;
 
+        transform.localPosition = Vector3.zero;
         // order state settings by priority
         if (input.isCrouching) { // crouching
-                                 // TODO: change based on orientation (UR / DR) and flip
-            switch (input.orientation) {
-                case Direction.right:
-                case Direction.left:
-                    break;
-                case Direction.leftUp:
-                case Direction.up:
-                case Direction.rightUp:
-                    transform.localPosition = new Vector3(0.0f, -0.04f, -0.13f);
-                    break;
-                case Direction.rightDown:
-                case Direction.down:
-                case Direction.leftDown:
-                default:
-                    transform.localPosition = new Vector3(0.0f, -0.04f, -0.13f);
-                    break;
-            }
-
             _state = State.crouching;
             if (input.gunType == GunType.unarmed || input.isMoving || input.isJumping || input.isClimbing) {
                 spriteRenderer.enabled = false;
@@ -171,36 +151,44 @@ public class GunAnimation : MonoBehaviour, ISaveable {
         } else if (input.isClimbing || input.isJumping) {
             spriteRenderer.enabled = false;
         } else {
-            transform.localPosition = Vector3.zero;
             spriteRenderer.enabled = true;
         }
 
         if (_isShooting) { // shooting
             _state = State.shooting;
+            if (gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun) {
+                SetAnimation(gunHandler.gunInstance.baseGun.shootAnimation);
+            }
         } else if (_isReloading) {
             _state = State.reloading;
+            if (gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun) {
+                SetAnimation(gunHandler.gunInstance.baseGun.reloadAnimation);
+            }
         } else if (_isRacking) { // racking
             _state = State.racking;
+            if (gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun) {
+                SetAnimation(gunHandler.gunInstance.baseGun.rackAnimation);
+            }
         } else if (input.isMoving) { // walking
             if (input.isRunning) {
                 _state = State.running;
             } else {
                 _state = State.walking;
             }
-            if (animator.clip != walkAnimation) {
-                animator.clip = walkAnimation;
-                animator.Play();
-            }
+            SetAnimation(walkAnimation);
         } else { // idle
             _state = State.idle;
             _frame = 0;
-            if (animator.clip != idleAnimation) {
-                animator.clip = idleAnimation;
-                animator.Play();
-            }
+            SetAnimation(idleAnimation);
         }
 
         UpdateFrame();
+    }
+    private void SetAnimation(AnimationClip clip) {
+        if (animator.clip != clip) {
+            animator.clip = clip;
+            animator.Play();
+        }
     }
 
     private Octet<Sprite[]> GetCurrentOctet(GunType type) {

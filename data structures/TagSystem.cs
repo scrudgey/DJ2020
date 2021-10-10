@@ -14,7 +14,7 @@ public class TagSystemData {
     public bool isActor;
 
     // if true, I do not hide when between the player and camera
-    public bool dontHideInClearsight;
+    public bool dontHideInterloper;
 
     // determines the sound footsteps make when the player is walking on me
     public SurfaceType surfaceSoundType;
