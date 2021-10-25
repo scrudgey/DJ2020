@@ -49,6 +49,7 @@ public class NeoPlayer : MonoBehaviour {
     private int incrementItemThisFrame;
     private bool useItemThisFrame;
     private PlayerCharacterInput _lastInput;
+    private static List<SphereCollider> attractors;
 
     public void Awake() {
         // Move
@@ -63,7 +64,7 @@ public class NeoPlayer : MonoBehaviour {
         // Crouch
         CrouchAction.action.performed += ctx => {
             crouchHeld = ctx.ReadValueAsButton();
-            Debug.Log(crouchHeld);
+            // Debug.Log(crouchHeld);
         };
 
         // Run
@@ -138,7 +139,7 @@ public class NeoPlayer : MonoBehaviour {
         FireAction.action.canceled += _ => firePressedHeld = false;
         CrouchAction.action.canceled += _ => {
             crouchHeld = false;
-            Debug.Log("uncrouch");
+            // Debug.Log("uncrouch");
         };
         RunAction.action.canceled += _ => runHeld = false;
         MoveAction.action.canceled += _ => inputVector = Vector2.zero;
@@ -148,6 +149,14 @@ public class NeoPlayer : MonoBehaviour {
         };
 
         crouchHeld = false;
+
+        // TODO: move into on level load
+        attractors = new List<SphereCollider>();
+        foreach (GameObject attractor in GameObject.FindGameObjectsWithTag("cameraAttractor")) {
+            SphereCollider collider = attractor.GetComponent<SphereCollider>();
+            if (collider != null)
+                attractors.Add(collider);
+        }
     }
     private void Start() {
         // Tell camera to follow transform
@@ -168,9 +177,11 @@ public class NeoPlayer : MonoBehaviour {
         HandleCameraInput();
 
         // update view
-        Vector2 camDir = new Vector2(OrbitCamera.PlanarDirection.x, OrbitCamera.PlanarDirection.z);
+        Vector2 camDir = new Vector2(OrbitCamera.Transform.forward.x, OrbitCamera.Transform.forward.z);
         Vector2 playerDir = new Vector2(Character.direction.x, Character.direction.z);
         float angle = Vector2.SignedAngle(camDir, playerDir);
+        if (GameManager.I.showDebugRays)
+            Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
         GunType gunType = GunType.unarmed;
         if (torsoAnimator.gunHandler.gunInstance != null && torsoAnimator.gunHandler.gunInstance.baseGun != null) {
@@ -203,9 +214,20 @@ public class NeoPlayer : MonoBehaviour {
         } else if (rotateCameraLeftPressedThisFrame) {
             rotation = CameraInput.RotateInput.left;
         }
+
         CameraState state = CameraState.normal;
+        SphereCollider currentAttractor = null;
         if (Character.state == CharacterState.wallPress) {
             state = CameraState.wallPress;
+        } else {
+            // check / update Attractor
+            foreach (SphereCollider attractor in attractors) {
+                if (attractor.bounds.Contains(Character.transform.position)) {
+                    currentAttractor = attractor;
+                    state = CameraState.attractor;
+                    break;
+                }
+            }
         }
 
         Vector2 lastWallInput = Character.lastWallInput;
@@ -219,7 +241,8 @@ public class NeoPlayer : MonoBehaviour {
             state = state,
             wallNormal = Character.wallNormal,
             lastWallInput = lastWallInput,
-            crouchHeld = crouchHeld
+            crouchHeld = crouchHeld,
+            attractor = currentAttractor
         };
 
         // Apply inputs to the camera

@@ -46,6 +46,8 @@ public class HumanoidView : MonoBehaviour, ISaveable {
         billboard.skin = skin.GetCurrentOctet(mode);
     }
     public void UpdateView(AnimationInput input) {
+        // set direction
+        direction = input.orientation;
         switch (input.state) {
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
@@ -67,15 +69,11 @@ public class HumanoidView : MonoBehaviour, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }
                 break;
         }
 
-        // set direction
-        direction = input.orientation;
-        Vector3 scale = transform.localScale;
-        transform.localScale = scale;
 
         // set mode and animation
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);

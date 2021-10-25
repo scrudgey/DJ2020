@@ -103,7 +103,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     private bool _canWallJump = false;
     private Vector3 _wallJumpNormal;
     private Vector3 _internalVelocityAdd = Vector3.zero;
-    private bool _shouldBeCrouching = false;
+    // private bool _shouldBeCrouching = false;
     private bool _shouldBeRunning = false;
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
@@ -218,6 +218,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         // Handle ladder transitions
         _ladderUpDownInput = input.MoveAxisForward;
         if (input.climbLadder) {
+            _probedColliders = new Collider[8];
             if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
                 // if (_probedColliders[0] != null) {
                 foreach (Collider collider in _probedColliders) {
@@ -264,18 +265,26 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
 
 
-        // Crouching input
-        if (input.CrouchDown || input.jumpHeld) {
-            // Debug.Log("shouldbecrouching");
-            if (!isCrouching) {
-                isCrouching = true;
-                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+        // Run input
+        if (input.runDown) {
+            _shouldBeRunning = true;
+            if (!isRunning) {
+                isRunning = true;
             }
         } else {
-            _shouldBeCrouching = false;
+            isRunning = false;
+            _shouldBeRunning = false;
+
+            // Crouching input
+            if (input.CrouchDown || input.jumpHeld) {
+                if (!isCrouching) {
+                    isCrouching = true;
+                    Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                }
+            }
         }
 
-        if (input.jumpHeld && Motor.GroundingStatus.IsStableOnGround) {
+        if (moveInputVector == Vector3.zero && input.jumpHeld && Motor.GroundingStatus.IsStableOnGround) {
             jumpHeldTimer += Time.deltaTime;
             if (superJumpEnabled && jumpHeldTimer > jumpTimerThreshold && state != CharacterState.jumpPrep) {
                 TransitionToState(CharacterState.jumpPrep);
@@ -299,10 +308,12 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 itemHandler.ProcessInput(input);
 
                 // Fire
+                gunHandler.ProcessGunSwitch(input);
                 Vector3 shootVector = gunHandler.ProcessInput(input);
                 if (shootVector != Vector3.zero) {
                     _shootLookDirection = shootVector;
                 }
+
                 _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
 
                 // Jumping input
@@ -311,17 +322,12 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     _jumpRequested = true;
                 }
 
-                if (input.runDown) {
-                    _shouldBeRunning = true;
-                    if (!isRunning) {
-                        isRunning = true;
-                    }
-                } else {
-                    isRunning = false;
-                    _shouldBeRunning = false;
-                }
+
                 break;
             case CharacterState.wallPress:
+                // allow gun switch
+                gunHandler.ProcessGunSwitch(input);
+
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 if (_moveAxis != Vector2.zero) {
                     lastWallInput = _moveAxis;
@@ -432,6 +438,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     }
 
     Ladder GetOverlappingLadder() {
+        _probedColliders = new Collider[8];
         if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
             foreach (Collider collider in _probedColliders) {
                 if (collider == null || collider.gameObject == null)
@@ -704,6 +711,25 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
     }
 
+    void CheckUncrouch() {
+        if (isCrouching) {
+            // Do an overlap test with the character's standing height to see if there are any obstructions
+            // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+            // Motor.SetCapsuleDimensions(defaultRadius, 2f, 1f);
+            Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+            _probedColliders = new Collider[8];
+            if (Motor.CharacterCollisionsOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders) > 0) {
+                // If obstructions, just stick to crouching dimensions
+                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
+                // Debug.Log("cancel the uncrouch");
+            } else {
+                // If no obstructions, uncrouch
+                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                isCrouching = false;
+                // Debug.Log("uncrouching");
+            }
+        }
+    }
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
     /// This is called after the character has finished its movement update
@@ -733,27 +759,15 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 }
 
                 // Handle uncrouching
-                if (isCrouching && !_shouldBeCrouching) {
-                    // Do an overlap test with the character's standing height to see if there are any obstructions
-                    Motor.SetCapsuleDimensions(defaultRadius, 2f, 1f);
-
-                    if (Motor.CharacterCollisionsOverlap(
-                            Motor.TransientPosition,
-                            Motor.TransientRotation,
-                            _probedColliders) > 0) {
-                        // If obstructions, just stick to crouching dimensions
-                        Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
-
-                    } else {
-                        // If no obstructions, uncrouch
-                        Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
-
-                        isCrouching = false;
-
-
-                    }
-                }
+                CheckUncrouch();
                 direction = Motor.CharacterForward;
+                break;
+            case CharacterState.wallPress:
+                direction = wallNormal;
+                if (_moveAxis.x > 0.5f || _moveAxis.x < -0.5f) {
+                    direction = Quaternion.AngleAxis(90f, transform.up) * direction * Mathf.Sign(lastWallInput.x) * -1f;
+                }
+                CheckUncrouch();
                 break;
             case CharacterState.climbing:
                 switch (_climbingState) {
@@ -793,6 +807,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 break;
 
         }
+        if (GameManager.I.showDebugRays)
+            Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.green, 0.1f);
 
     }
 
@@ -817,6 +833,8 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         if (Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable && Vector3.Dot(_moveInputVector, hitNormal) < -0.9 && Vector3.Dot(_moveInputVector, hitNormal) > -1.1) {
             // wallPress = true;
             wallNormal = hitNormal;
+            if (GameManager.I.showDebugRays)
+                Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), wallNormal, Color.red, 2f);
         }
     }
 

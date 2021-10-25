@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using Easings;
+using System.Linq;
 
 // TODO: eliminate this enum
-public enum CameraState { normal, wallPress }
+public enum CameraState { normal, wallPress, attractor }
 
 // a single parameter lerps between states, and there is one transitional state.
 
 public struct CameraInput {
+    public SphereCollider attractor;
     public CameraState state;
     public enum RotateInput { none, left, right }
     public float deltaTime;
@@ -20,8 +22,11 @@ public struct CameraInput {
     public bool crouchHeld;
 }
 public class NeoCharacterCamera : MonoBehaviour {
-
-    public CameraState state;
+    private CameraState _state;
+    public CameraState state {
+        get { return _state; }
+    }
+    // public CameraState state;
     public static Quaternion rotationOffset;
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
@@ -32,15 +37,15 @@ public class NeoCharacterCamera : MonoBehaviour {
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
-    public float FollowingSharpness = 10000f;
+    public float followingSharpnessDefault = 10000f;
     public Quaternion isometricRotation;
 
     [Header("Distance")]
     public float DefaultDistance = 6f;
     public float MinDistance = 0f;
     public float MaxDistance = 3f;
-    public float DistanceMovementSpeed = 5f;
-    public float DistanceMovementSharpness = 10f;
+    public float distanceMovementSpeedDefault = 5f;
+    public float distanceMovementSharpnessDefault = 10f;
 
     [Header("Rotation")]
     public float RotationSpeed = 1f;
@@ -56,7 +61,6 @@ public class NeoCharacterCamera : MonoBehaviour {
 
     public Transform Transform { get; private set; }
     public Transform FollowTransform { get; private set; }
-
     public Vector3 PlanarDirection { get; set; }
     public float TargetDistance { get; set; }
 
@@ -68,9 +72,11 @@ public class NeoCharacterCamera : MonoBehaviour {
     private RaycastHit[] _obstructions = new RaycastHit[MaxObstructions];
     private float _obstructionTime;
     private Vector3 _currentFollowPosition;
-
     private const int MaxObstructions = 32;
     private float transitionTime;
+    private float currentDistanceMovementSharpness;
+    private float currentFollowingSharpness;
+    private float currentDistanceMovementSpeed;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
         // DefaultVerticalAngle = Mathf.Clamp(DefaultVerticalAngle, MinVerticalAngle, MaxVerticalAngle);
@@ -85,8 +91,51 @@ public class NeoCharacterCamera : MonoBehaviour {
         _targetVerticalAngle = 0f;
 
         PlanarDirection = Vector3.forward;
-    }
 
+        currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
+        currentFollowingSharpness = followingSharpnessDefault;
+        currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+    }
+    public void TransitionToState(CameraState toState) {
+        if (toState == _state)
+            return;
+        CameraState tmpInitialState = state;
+        OnStateExit(tmpInitialState, toState);
+        _state = toState;
+        OnStateEnter(toState, tmpInitialState);
+    }
+    private void OnStateEnter(CameraState state, CameraState fromState) {
+        // Debug.Log($"entering state {state} from {fromState}");
+        switch (state) {
+            case CameraState.wallPress:
+                currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
+                currentFollowingSharpness = followingSharpnessDefault;
+                currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+                break;
+            case CameraState.attractor:
+                if (fromState == CameraState.wallPress) {
+                    currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
+                    currentFollowingSharpness = followingSharpnessDefault;
+                    currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+                } else {
+                    currentDistanceMovementSharpness = 1;
+                    currentFollowingSharpness = 1;
+                    currentDistanceMovementSpeed = 0.1f;
+                }
+                break;
+            default:
+                currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
+                currentFollowingSharpness = followingSharpnessDefault;
+                currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+                break;
+        }
+    }
+    public void OnStateExit(CameraState state, CameraState toState) {
+        switch (state) {
+            default:
+                break;
+        }
+    }
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(Transform t) {
         FollowTransform = t;
@@ -104,32 +153,33 @@ public class NeoCharacterCamera : MonoBehaviour {
     }
 
     public void UpdateWithInput(CameraInput input) {
-        state = input.state;
-        if (FollowTransform) {
-            switch (input.state) {
-                default:
-                case CameraState.normal:
-                    RenderSettings.skybox = isometricSkybox;
-                    if (transitionTime > 0) {
-                        transitionTime -= Time.deltaTime;
-                    }
-                    break;
-                case CameraState.wallPress:
-                    RenderSettings.skybox = wallPressSkybox;
-                    if (transitionTime < 1) {
-                        transitionTime += Time.deltaTime;
-                    }
-                    break;
-            }
-            transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
+        TransitionToState(input.state);
 
-            if (state == CameraState.normal) {
-                ApplyTargetParameters(NormalUpdate(input));
-                volume.profile = isometricProfile;
-            } else if (state == CameraState.wallPress) {
-                ApplyTargetParameters(WallPressUpdate(input));
-                volume.profile = wallPressProfile;
-            }
+        switch (input.state) {
+            default:
+            case CameraState.normal:
+                RenderSettings.skybox = isometricSkybox;
+                if (transitionTime > 0) {
+                    transitionTime -= Time.deltaTime;
+                }
+                break;
+            case CameraState.wallPress:
+                RenderSettings.skybox = wallPressSkybox;
+                if (transitionTime < 1) {
+                    transitionTime += Time.deltaTime;
+                }
+                break;
+        }
+        transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
+
+        if (state == CameraState.attractor) {
+            ApplyTargetParameters(AttractorUpdate(input));
+        } else if (state == CameraState.normal) {
+            ApplyTargetParameters(NormalUpdate(input));
+            volume.profile = isometricProfile;
+        } else if (state == CameraState.wallPress) {
+            ApplyTargetParameters(WallPressUpdate(input));
+            volume.profile = wallPressProfile;
         }
     }
     public class CameraTargetParameters {
@@ -140,8 +190,12 @@ public class NeoCharacterCamera : MonoBehaviour {
         public float orthographicSize;
         public float targetDistance;
         public Vector3 targetPosition;
+        public float followingSharpness;
+        public float distanceMovementSpeed;
+        public float distanceMovementSharpness;
     }
     public CameraTargetParameters NormalUpdate(CameraInput input) {
+        Vector3 targetPosition = FollowTransform.position;
         // Process rotation input
         float rotationInput = 0f;
         switch (input.rotation) {
@@ -160,18 +214,25 @@ public class NeoCharacterCamera : MonoBehaviour {
         PlanarDirection = rotationFromInput * PlanarDirection;
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
-
         return new CameraTargetParameters() {
             fieldOfView = 70f,
             orthographic = true,
             rotation = planarRot * verticalRot,
             deltaTime = input.deltaTime,
             targetDistance = 20,
-            targetPosition = FollowTransform.position,
-            orthographicSize = 8
+            targetPosition = targetPosition,
+            orthographicSize = 8,
+            distanceMovementSharpness = currentDistanceMovementSharpness,
+            followingSharpness = currentFollowingSharpness,
+            distanceMovementSpeed = currentDistanceMovementSpeed
         };
     }
-
+    public CameraTargetParameters AttractorUpdate(CameraInput input) {
+        CameraTargetParameters parameters = NormalUpdate(input);
+        if (input.attractor != null)
+            parameters.targetPosition = input.attractor.bounds.center;
+        return parameters;
+    }
     public CameraTargetParameters WallPressUpdate(CameraInput input) {
         // Find the smoothed follow position
         Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
@@ -193,7 +254,10 @@ public class NeoCharacterCamera : MonoBehaviour {
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
             targetPosition = FollowTransform.position + distOffset + LROffset + heightOffset,
-            orthographicSize = 4f
+            orthographicSize = 4f,
+            distanceMovementSharpness = currentDistanceMovementSharpness,
+            followingSharpness = currentFollowingSharpness,
+            distanceMovementSpeed = currentDistanceMovementSpeed
         };
     }
 
@@ -219,10 +283,10 @@ public class NeoCharacterCamera : MonoBehaviour {
         Transform.rotation = targetRotation;
 
         // apply distance
-        _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-DistanceMovementSharpness * input.deltaTime));
+        _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
 
         // Find the smoothed follow position
-        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, input.targetPosition, 1f - Mathf.Exp(-FollowingSharpness * input.deltaTime));
+        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, input.targetPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
 
         // Find the smoothed camera orbit position
         Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);

@@ -251,45 +251,41 @@ public class GunHandler : MonoBehaviour, ISaveable {
         }
     }
 
-    public Vector3 ProcessInput(PlayerCharacterInput input) {
-        gunAnimation.input = input.Fire;
-
+    public void ProcessGunSwitch(PlayerCharacterInput input) {
         if (input.switchToGun != -1) {
             SwitchToGun(input.switchToGun);
-        } else if (gunInstance != null) {
-            if (input.reload) {
-                if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
-                    ReloadShell();
-                } else if (gunInstance.baseGun.type != GunType.shotgun) {
-                    Reload();
+        } else if (input.reload) {
+            if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
+                ReloadShell();
+            } else if (gunInstance.baseGun.type != GunType.shotgun) {
+                Reload();
+            }
+        }
+    }
+    public Vector3 ProcessInput(PlayerCharacterInput input) {
+        gunAnimation.input = input.Fire;
+        if (gunInstance != null && gunInstance.CanShoot()) {
+            if (gunInstance.baseGun.cycle == CycleType.automatic) {
+                if (input.Fire.FirePressed && !shooting) {
+                    gunAnimation.StartShooting();
+                    shooting = true;
+                    reloading = false;
                 }
-            } else if (gunInstance.CanShoot()) {
-                if (gunInstance.baseGun.cycle == CycleType.automatic) {
-                    if (input.Fire.FirePressed && !shooting) {
-                        gunAnimation.StartShooting();
-                        shooting = true;
-                        reloading = false;
-                    }
-                    if (input.Fire.FireHeld) {
-                        return CursorToTargetPoint(input.Fire);
-                    }
-                    if (shooting && !input.Fire.FireHeld) {
-                        gunAnimation.EndShoot();
-                        shooting = false;
-                        return CursorToTargetPoint(input.Fire);
-                    }
-                } else { // semiautomatic
-                    if (input.Fire.FirePressed) {//&& !shooting) {
-                        gunAnimation.StartShooting();
-                        shooting = true;
-                        reloading = false;
-                        return CursorToTargetPoint(input.Fire);
-                    }
+                if (input.Fire.FireHeld) {
+                    return CursorToTargetPoint(input.Fire);
                 }
-            } else {
-
-                // cancel out the shoot here for automatics
-
+                if (shooting && !input.Fire.FireHeld) {
+                    gunAnimation.EndShoot();
+                    shooting = false;
+                    return CursorToTargetPoint(input.Fire);
+                }
+            } else { // semiautomatic
+                if (input.Fire.FirePressed) {//&& !shooting) {
+                    gunAnimation.StartShooting();
+                    shooting = true;
+                    reloading = false;
+                    return CursorToTargetPoint(input.Fire);
+                }
             }
         }
         return Vector2.zero;

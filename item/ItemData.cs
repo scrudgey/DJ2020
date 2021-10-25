@@ -12,6 +12,7 @@ public class ItemData : ScriptableObject {
     public Sprite image;
 
     static public ItemData LoadItem(string name) {
+        // Debug.Log(name);
         return Resources.Load($"data/items/{name}") as ItemData;
     }
 

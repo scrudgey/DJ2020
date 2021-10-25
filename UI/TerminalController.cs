@@ -10,7 +10,6 @@ namespace UI {
 
     }
     public class TerminalController : MonoBehaviour {
-        public Transform consoleTransform;
         public TextMeshProUGUI consoleOutput;
         public TMP_InputField consoleInput;
         private Dictionary<string, Action<string[]>> commands = new Dictionary<string, Action<string[]>>();
@@ -58,6 +57,9 @@ namespace UI {
             switch (fieldName) {
                 case "cyberlegs":
                     GameManager.I.gameData.playerState.cyberlegsLevel = value;
+                    break;
+                case "debug-rays":
+                    GameManager.I.showDebugRays = value == 1;
                     break;
                 default:
                     Println($"unrecognized set parameter: {fieldName}");

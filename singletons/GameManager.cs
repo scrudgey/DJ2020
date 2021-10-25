@@ -17,17 +17,19 @@ public class GameManager : Singleton<GameManager> {
     public GameObject playerObject;
     public InputActionReference showConsole;
     private bool toggleConsoleThisFrame;
-
+    public bool showDebugRays;
     public void Start() {
+        // System
+        showConsole.action.performed += ctx => {
+            toggleConsoleThisFrame = ctx.ReadValueAsButton();
+        };
+
         // TODO: set level in gamedata
         gameData = GameData.TestInitialData();
 
         TransitionToState(GameState.levelPlay);
 
-        // System
-        showConsole.action.performed += ctx => {
-            toggleConsoleThisFrame = ctx.ReadValueAsButton();
-        };
+        showDebugRays = true;
     }
     public void TransitionToState(GameState newState) {
         GameState tmpInitialState = gameData.state;

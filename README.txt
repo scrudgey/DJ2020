@@ -404,3 +404,9 @@ Susceptible can determine if we should react
     but then, can we at least remove DamageType?
 is there a way to abstract this pattern?
 1. register Action<Damage> types? 
+
+
+cars driving by ambient noise interval random
+tree, bush, lanterns / things connected to random wind gusts
+crickets
+

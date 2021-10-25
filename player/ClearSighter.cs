@@ -66,7 +66,7 @@ public class MaterialController {
             disableBecauseInterloper = true;
         }
 
-        if (active() && camera.state == CameraState.normal) {
+        if (active() && (camera.state == CameraState.normal || camera.state == CameraState.attractor)) {
             MakeTransparent();
         } else {
             MakeApparent();
@@ -119,25 +119,28 @@ public class ClearSighter : MonoBehaviour {
 
 
         // collider between me and the camera
-        Vector3 mypos = transform.position + new Vector3(0, 1f, 0);
-        float distance = Vector3.Distance(myCamera.transform.position, mypos);
-        Vector3 direction = (mypos - myCamera.transform.position).normalized;
-
-        Vector3 startPosition = myCamera.transform.position;
-        // Debug.DrawRay(startPosition, distance * direction, Color.red, 1f);
-        foreach (RaycastHit hit in Physics.RaycastAll(startPosition, direction, distance).OrderBy(x => x.distance)) {
-            // Debug.Log(hit.collider.gameObject);
-            if (hit.collider.transform.IsChildOf(transform)) {
-                continue;
-            }
-            if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInterloper) {
-                continue;
-            }
-            MaterialController controller = controllers.get(hit.collider.gameObject);
-            if (controller != null) {
-                controller.InterloperStart();
+        foreach (Vector3 startPosition in new Vector3[] {
+            transform.position + new Vector3(0, 1f, 0) ,
+            transform.position + new Vector3(0, 0.1f, 0)
+            }) {
+            float distance = Vector3.Distance(myCamera.transform.position, startPosition);
+            Vector3 direction = -1f * myCamera.transform.forward;
+            Debug.DrawRay(startPosition, direction * distance, Color.magenta, 0.1f);
+            foreach (RaycastHit hit in Physics.RaycastAll(startPosition, direction, distance).OrderBy(x => x.distance)) {
+                if (hit.collider.transform.IsChildOf(transform)) {
+                    continue;
+                }
+                if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInterloper) {
+                    continue;
+                }
+                MaterialController controller = controllers.get(hit.collider.gameObject);
+                if (controller != null) {
+                    controller.InterloperStart();
+                }
             }
         }
+
+
 
         // garbage collect
         HashSet<MaterialController> removeControllers = new HashSet<MaterialController>();
