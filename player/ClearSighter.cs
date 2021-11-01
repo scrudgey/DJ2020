@@ -125,7 +125,9 @@ public class ClearSighter : MonoBehaviour {
             }) {
             float distance = Vector3.Distance(myCamera.transform.position, startPosition);
             Vector3 direction = -1f * myCamera.transform.forward;
-            Debug.DrawRay(startPosition, direction * distance, Color.magenta, 0.1f);
+            // Debug.Log(myCamera.transform.forward);
+            if (GameManager.I.showDebugRays)
+                Debug.DrawRay(startPosition, direction * distance, Color.magenta, 0.1f);
             foreach (RaycastHit hit in Physics.RaycastAll(startPosition, direction, distance).OrderBy(x => x.distance)) {
                 if (hit.collider.transform.IsChildOf(transform)) {
                     continue;

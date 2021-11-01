@@ -16,6 +16,8 @@ public class Bullet {
         RaycastHit[] hits = Physics.RaycastAll(ray, range); // get all hits
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (Impact(hit)) {
+                // TODO: reinstate the random effect
+
                 if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {
                     SpawnBulletRay(gunPosition, hit.point);
                 }
@@ -63,5 +65,6 @@ public class Bullet {
         GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/bulletRay"), gunPosition, Quaternion.identity) as GameObject;
         BulletFX ray = obj.GetComponent<BulletFX>();
         ray.Initialize(BulletFX.FadeStyle.streak, startPoint, endPoint);
+        // ray.Initialize(BulletFX.FadeStyle.count, startPoint, endPoint);
     }
 }

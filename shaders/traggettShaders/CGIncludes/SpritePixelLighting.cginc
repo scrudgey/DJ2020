@@ -167,6 +167,8 @@ VertexOutput vert(VertexInput v)
 	output.texcoord = float4(calculateTextureCoord(v.texcoord), 0, 0);
 	
 	output.posWorld = calculateWorldPos(v.vertex);
+	// output.posWorld = calculateLocalPos(v.vertex);
+    // output.posWorld.x = abs(output.posWorld.x);
 	
 	float backFaceSign = 1;
 #if defined(FIXED_NORMALS_BACKFACE_RENDERING)	

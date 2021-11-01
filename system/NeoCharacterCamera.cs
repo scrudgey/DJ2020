@@ -108,9 +108,9 @@ public class NeoCharacterCamera : MonoBehaviour {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case CameraState.wallPress:
-                currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
-                currentFollowingSharpness = followingSharpnessDefault;
-                currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+                currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
+                currentFollowingSharpness = followingSharpnessDefault * 3f;
+                currentDistanceMovementSpeed = distanceMovementSpeedDefault * 3f;
                 break;
             case CameraState.attractor:
                 if (fromState == CameraState.wallPress) {

@@ -9,7 +9,7 @@ public struct PlayerCharacterInput {
     public struct FireInputs {
         public bool FirePressed;
         public bool FireHeld;
-        public Vector2 cursorPosition;
+        public TargetData targetData;
     }
     public CharacterState state;
     public float MoveAxisForward;
@@ -309,9 +309,9 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
-                Vector3 shootVector = gunHandler.ProcessInput(input);
-                if (shootVector != Vector3.zero) {
-                    _shootLookDirection = shootVector;
+                gunHandler.ProcessInput(input);
+                if (input.Fire.targetData != TargetData.none) {
+                    _shootLookDirection = input.Fire.targetData.position;
                 }
 
                 _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);

@@ -349,7 +349,8 @@ VertexOutput vert(VertexInput input)
 	
 	float3 viewPos = UnityObjectToViewPos(input.vertex);
 #if defined(FIXED_NORMALS_BACKFACE_RENDERING) || defined(_RIM_LIGHTING)
-	float4 powWorld = calculateWorldPos(input.vertex);
+	// float4 powWorld = calculateWorldPos(input.vertex);
+	float4 powWorld = calculateLocalPos(input.vertex);
 #endif	
 
 	float backFaceSign = 1;

@@ -49,6 +49,7 @@ fixed4 fragDissolveBase(VertexOutput input) : SV_Target
 	texureColor.a *= 1.0 - dissolveEdge;
 	
 	//Get normal direction
+    // TODO: billboard this stuff
 	fixed3 normalWorld = calculateNormalWorld(input);
 
 	//Get Ambient diffuse

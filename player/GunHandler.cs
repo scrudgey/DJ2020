@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 
 public class GunHandler : MonoBehaviour, ISaveable {
-    static readonly float height = 0.5f;
+    static readonly public float height = 0.5f;
     public Action<GunHandler> OnValueChanged;
     public GunAnimation gunAnimation;
     public AudioSource audioSource;
@@ -31,31 +31,21 @@ public class GunHandler : MonoBehaviour, ISaveable {
             gunAnimation.StartRack();
         }
     }
-    public Vector3 CursorToTargetPoint(PlayerCharacterInput.FireInputs input) {
-        Vector3 targetPoint = Vector3.zero;
-        Plane plane = new Plane(Vector3.up, transform.position);
-        Ray projection = Camera.main.ScreenPointToRay(input.cursorPosition);
-        float distance = 0;
-        if (plane.Raycast(projection, out distance)) {
-            Vector3 hitPoint = projection.GetPoint(distance);
-            // targetPoint = new Vector3(hitPoint.x, hitPoint.y + height, hitPoint.z);
-            targetPoint = new Vector3(hitPoint.x, hitPoint.y + height, hitPoint.z);
-        }
-        return targetPoint;
-    }
-    private Vector3 gunPosition() {
+
+    public Vector3 gunPosition() {
         // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
-    private Vector3 gunDirection(PlayerCharacterInput.FireInputs input) {
-        Vector3 targetPoint = CursorToTargetPoint(input);
-        return targetPoint - this.gunPosition();
+    public Vector3 gunDirection(PlayerCharacterInput.FireInputs input) {
+        // TODO: shoot perpendicular to plane
+        return input.targetData.position - this.gunPosition();
     }
     public void EmitBullet(PlayerCharacterInput.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
 
         // determine the direction to shoot in
         Vector3 trueDirection = gunDirection(input);
+        // Debug.DrawRay(gunPosition, trueDirection * 2f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
         Vector3 aimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
@@ -82,6 +72,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         }
 
         // update state
+        // TODO: how to store the shoot input?
         gunInstance.Shoot();
 
         // shoot bullet
@@ -262,7 +253,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
             }
         }
     }
-    public Vector3 ProcessInput(PlayerCharacterInput input) {
+    public void ProcessInput(PlayerCharacterInput input) {
         gunAnimation.input = input.Fire;
         if (gunInstance != null && gunInstance.CanShoot()) {
             if (gunInstance.baseGun.cycle == CycleType.automatic) {
@@ -272,23 +263,19 @@ public class GunHandler : MonoBehaviour, ISaveable {
                     reloading = false;
                 }
                 if (input.Fire.FireHeld) {
-                    return CursorToTargetPoint(input.Fire);
                 }
                 if (shooting && !input.Fire.FireHeld) {
                     gunAnimation.EndShoot();
                     shooting = false;
-                    return CursorToTargetPoint(input.Fire);
                 }
             } else { // semiautomatic
                 if (input.Fire.FirePressed) {//&& !shooting) {
                     gunAnimation.StartShooting();
                     shooting = true;
                     reloading = false;
-                    return CursorToTargetPoint(input.Fire);
                 }
             }
         }
-        return Vector2.zero;
     }
 
     // TODO: save method

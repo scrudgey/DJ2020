@@ -7,6 +7,38 @@ Properties {
 	_Cutoff ("", Float) = 0.5
 	_Color ("", Color) = (1,1,1,1)
 }
+CGINCLUDE
+
+float4 billboardPos(float4 vertex){
+    
+    #ifdef _BILLBOARD
+
+        float4 view = mul(
+                        UNITY_MATRIX_MV, 
+                        float4(0, vertex.y * 1.0f, 0.0, 1.0)
+                    ) + float4(vertex.x * 5.0f, 0.0, 0.0, 0.0) ;
+
+        float4 pos = mul(
+            UNITY_MATRIX_P, 
+            view 
+        );
+
+        #ifdef UNITY_INSTANCING_ENABLED
+            pos.xy *= _Flip.xy;
+        #endif
+        return pos;
+    #else
+        float4 pos = UnityObjectToClipPos(vertex);
+        #ifdef UNITY_INSTANCING_ENABLED
+            pos.xy *= _Flip.xy;
+        #endif
+        return pos;
+    #endif
+
+    // o.pos = UnityObjectToClipPos(v.vertex); // TODO: billboard?
+
+}
+ENDCG
 
 SubShader {
 	Tags { "RenderType"="Sprite" }
@@ -29,7 +61,8 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex); // TODO: billboard? 
+    // o.pos = UnityObjectToClipPos(v.vertex); // TODO: billboard?
+    o.pos = billboardPos(v.vertex); 
 	o.uv = calculateTextureCoord(v.texcoord);
 	o.nz.xyz = COMPUTE_VIEW_NORMAL;
 	o.nz.w = COMPUTE_DEPTH_01;
@@ -67,7 +100,8 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex); 
+    // o.pos = UnityObjectToClipPos(v.vertex); 
+    o.pos = billboardPos(v.vertex);
 	o.uv = calculateTextureCoord(v.texcoord);
 	o.nz.xyz = getFixedNormal();
 	o.nz.w = COMPUTE_DEPTH_01;
@@ -105,7 +139,8 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex);
+    // o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = calculateTextureCoord(v.texcoord);
 	float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
 	float3 normal = getFixedNormal();
@@ -144,7 +179,8 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex);
+    // o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
     return o;
@@ -175,7 +211,8 @@ v2f vert( appdata_base v ) {
     v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    o.pos = UnityObjectToClipPos(v.vertex);
+    // o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
@@ -215,7 +252,8 @@ v2f vert( appdata_full v ) {
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
     TreeVertBark(v);
 	
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = v.texcoord.xy;
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
@@ -250,7 +288,8 @@ v2f vert( appdata_full v ) {
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
     TreeVertLeaf(v);
 	
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = v.texcoord.xy;
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
@@ -293,7 +332,8 @@ v2f vert( appdata v ) {
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 	TerrainAnimateTree(v.vertex, v.color.w);
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
 	return o;
@@ -334,7 +374,8 @@ v2f vert( appdata v ) {
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 	TerrainAnimateTree(v.vertex, v.color.w);
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = v.texcoord.xy;
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
@@ -377,7 +418,8 @@ v2f vert( appdata v ) {
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 	TerrainAnimateTree(v.vertex, v.color.w);
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = v.texcoord.xy;
     o.nz.xyz = -COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
@@ -416,7 +458,8 @@ v2f vert (appdata_tree_billboard v) {
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 	TerrainBillboardTree(v.vertex, v.texcoord1.xy, v.texcoord.y);
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv.x = v.texcoord.x;
 	o.uv.y = v.texcoord.y > 0;
     o.nz.xyz = float3(0,0,1);
@@ -458,7 +501,8 @@ v2f vert (appdata_full v) {
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 	WavingGrassBillboardVert (v);
 	o.color = v.color;
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = v.texcoord.xy;
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
@@ -500,7 +544,8 @@ v2f vert (appdata_full v) {
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 	WavingGrassVert (v);
 	o.color = v.color;
-	o.pos = UnityObjectToClipPos(v.vertex);
+	// o.pos = UnityObjectToClipPos(v.vertex);
+    o.pos = billboardPos(v.vertex);
 	o.uv = v.texcoord;
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;

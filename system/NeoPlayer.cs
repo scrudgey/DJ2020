@@ -4,12 +4,13 @@ using UnityEngine;
 using KinematicCharacterController;
 using UnityEngine.InputSystem;
 using System;
-
+using System.Linq;
 public class NeoPlayer : MonoBehaviour {
     public NeoCharacterCamera OrbitCamera;
     public ClearSighter sighter;
     public Transform CameraFollowPoint;
     public NeoCharacterController Character;
+    public GunHandler gunHandler;
     public JumpIndicatorController jumpIndicatorController;
     public JumpIndicatorView jumpIndicatorView;
     public HumanoidView legsAnimator;
@@ -252,7 +253,63 @@ public class NeoPlayer : MonoBehaviour {
         rotateCameraRightPressedThisFrame = false;
     }
 
+    public TargetData CursorToTarget(Vector2 cursorPosition) {
+        Vector3 gunPoint = gunHandler.gunPosition();
+        Plane plane = new Plane(Vector3.up, gunPoint);
+
+        Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, OrbitCamera.Camera.nearClipPlane);
+        Ray projection = OrbitCamera.Camera.ScreenPointToRay(cursorPoint);
+        Vector3 direction = OrbitCamera.transform.forward;
+        if (GameManager.I.showDebugRays)
+            Debug.DrawRay(projection.origin, direction * 100, Color.magenta, 0.1f);
+        Ray clickRay = new Ray(projection.origin, direction);
+
+        // 1. determine if the click ray is hovering over a targetable object
+        //      if so, determine the priority targetable and highlight it
+        //      this can aim up or down as necessary
+        // 2. if not, shoot in the direction indicated by the mouse
+        //      this will be in the player's gun's height plane.
+
+        // foreach(RaycastHit hit in Physics.Raycast(clickRay, 100, ))
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100); // get all hits
+        TagSystemData priorityData = null;
+        GameObject priorityObject = null;
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
+            if (data == null)
+                continue;
+            if (data.targetPriority == -1)
+                continue;
+            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
+                priorityData = data;
+                priorityObject = hit.collider.gameObject;
+            }
+        }
+        if (priorityObject != null) {
+            return new TargetData {
+                type = TargetData.TargetType.obj,
+                position = priorityObject.transform.position
+            };
+        }
+
+
+        // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
+        float distance = 0;
+        Vector3 targetPoint = Vector3.zero;
+        if (plane.Raycast(clickRay, out distance)) {
+            targetPoint = clickRay.GetPoint(distance);
+        }
+        return new TargetData {
+            type = TargetData.TargetType.direction,
+            position = targetPoint,
+        };
+    }
     private void HandleCharacterInput() {
+
+        TargetData targetData = TargetData.none;
+        if (firePressedThisFrame || firePressedHeld) {
+            targetData = CursorToTarget(Mouse.current.position.ReadValue());
+        }
 
         PlayerCharacterInput characterInputs = new PlayerCharacterInput() {
             state = Character.state,
@@ -267,7 +324,7 @@ public class NeoPlayer : MonoBehaviour {
             Fire = new PlayerCharacterInput.FireInputs() {
                 FirePressed = firePressedThisFrame,
                 FireHeld = firePressedHeld,
-                cursorPosition = Mouse.current.position.ReadValue()
+                targetData = targetData
             },
             reload = reloadPressedThisFrame,
             switchToGun = selectGunThisFrame,
@@ -292,4 +349,5 @@ public class NeoPlayer : MonoBehaviour {
 
         _lastInput = characterInputs;
     }
+
 }

@@ -16,6 +16,9 @@ public class TagSystemData {
     // if true, I do not hide when between the player and camera
     public bool dontHideInterloper;
 
+    // if greater than 0, the player will target this object when mouse over
+    public int targetPriority = -1;
+
     // determines the sound footsteps make when the player is walking on me
     public SurfaceType surfaceSoundType;
 }

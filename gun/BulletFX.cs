@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Easings;
 
+// TODO: pool line objects
 public class BulletFX : MonoBehaviour {
     public enum FadeStyle { none, timer, count, invisible, streak }
     public FadeStyle fadeStyle;
@@ -20,14 +21,9 @@ public class BulletFX : MonoBehaviour {
     public void Initialize(FadeStyle newStyle, Vector3 startPoint, Vector3 endPoint) {
         this.fadeStyle = newStyle;
         if (fadeStyle == FadeStyle.count) {
-            BulletFX[] rays = FindObjectsOfType<BulletFX>();
-            while (rays.Length > countLimit) {
-                BulletFX ray = rays[Random.Range(0, rays.Length)];
-                if (ray != this) {
-                    DestroyImmediate(ray.gameObject);
-                }
-                rays = FindObjectsOfType<BulletFX>();
-            }
+            lineRenderer.SetPositions(new Vector3[] { startPoint, endPoint });
+            lineRenderer.startColor = Color.yellow;
+            lineRenderer.endColor = Color.yellow;
         } else if (fadeStyle == FadeStyle.invisible) {
             lineRenderer.startColor = Color.clear;
             lineRenderer.endColor = Color.clear;
