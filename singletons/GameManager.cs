@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
+public enum CursorType { gun }
 public class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public static Action OnMenuClosed;
@@ -41,6 +42,7 @@ public class GameManager : Singleton<GameManager> {
         switch (state) {
             case GameState.levelPlay:
                 // TODO: data-driven level load
+                SetCursor(CursorType.gun);
                 break;
             case GameState.inMenu:
                 Time.timeScale = 0f;
@@ -60,6 +62,14 @@ public class GameManager : Singleton<GameManager> {
             default:
                 break;
         }
+    }
+    void SetCursor(CursorType cursorType) {
+        // TODO: support multiple cursor types
+        Texture2D mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 0") as Texture2D;
+
+        Vector2 hotSpot = new Vector2(8, 8);
+        CursorMode cursorMode = CursorMode.Auto;
+        Cursor.SetCursor(mouseCursor, hotSpot, cursorMode);
     }
     public void ShowMenu(MenuType menuType) {
         activeMenuType = menuType;

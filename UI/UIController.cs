@@ -38,16 +38,6 @@ public class UIController : MonoBehaviour {
         weaponUIHandler.Bind(target);
         itemUIHandler.Bind(target);
         aimIndicatorHandler.Bind(target);
-
-        SetCursor();
-    }
-
-    void SetCursor() {
-        Texture2D mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 0") as Texture2D;
-
-        Vector2 hotSpot = new Vector2(8, 8);
-        CursorMode cursorMode = CursorMode.Auto;
-        Cursor.SetCursor(mouseCursor, hotSpot, cursorMode);
     }
 
     void HandleMenuChange(MenuType type) {
