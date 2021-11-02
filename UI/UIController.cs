@@ -14,19 +14,21 @@ public class UIController : MonoBehaviour {
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
-    public GameObject UICamera;
+    public AimIndicatorHandler aimIndicatorHandler;
+    public GameObject UIEditorCamera;
     void Awake() {
-        DestroyImmediate(UICamera);
+        DestroyImmediate(UIEditorCamera);
     }
     void Start() {
         canvas.worldCamera = Camera.main;
-        GameManager.OnTargetChanged += BindToNewTarget;
+        aimIndicatorHandler.UICamera = Camera.main;
+        GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnMenuChange += HandleMenuChange;
         GameManager.OnMenuClosed += HandleMenuClosed;
         BindToNewTarget(GameManager.I.playerObject);
     }
     void OnDestroy() {
-        GameManager.OnTargetChanged -= BindToNewTarget;
+        GameManager.OnFocusChanged -= BindToNewTarget;
         GameManager.OnMenuChange -= HandleMenuChange;
         GameManager.OnMenuClosed -= HandleMenuClosed;
     }
@@ -35,6 +37,17 @@ public class UIController : MonoBehaviour {
         // Debug.Log($"bind: {target}");
         weaponUIHandler.Bind(target);
         itemUIHandler.Bind(target);
+        aimIndicatorHandler.Bind(target);
+
+        SetCursor();
+    }
+
+    void SetCursor() {
+        Texture2D mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 0") as Texture2D;
+
+        Vector2 hotSpot = new Vector2(8, 8);
+        CursorMode cursorMode = CursorMode.Auto;
+        Cursor.SetCursor(mouseCursor, hotSpot, cursorMode);
     }
 
     void HandleMenuChange(MenuType type) {

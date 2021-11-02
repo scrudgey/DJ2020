@@ -42,11 +42,15 @@ public class MaterialController {
         if (renderer.shadowCastingMode != ShadowCastingMode.ShadowsOnly) {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             foreach (Renderer renderer in childRenderers) {
+                if (renderer == null)
+                    continue;
                 renderer.enabled = false;
             }
         }
     }
     public void MakeApparent() {
+        if (renderer == null)
+            return;
         if (renderer.shadowCastingMode != ShadowCastingMode.On) {
             renderer.shadowCastingMode = ShadowCastingMode.On;
             foreach (Renderer renderer in childRenderers) {

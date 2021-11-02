@@ -310,7 +310,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.ProcessInput(input);
-                if (input.Fire.targetData != TargetData.none) {
+                if (input.Fire.targetData != TargetData.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
                     _shootLookDirection = input.Fire.targetData.position;
                 }
 

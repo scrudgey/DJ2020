@@ -7,8 +7,7 @@ using UnityEngine.InputSystem;
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
 public class GameManager : Singleton<GameManager> {
-    public static Action<GameObject> OnTargetChanged;
-
+    public static Action<GameObject> OnFocusChanged;
     public static Action OnMenuClosed;
     public static Action<MenuType> OnMenuChange;
 
@@ -74,7 +73,7 @@ public class GameManager : Singleton<GameManager> {
     }
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
-        OnTargetChanged?.Invoke(focus);
+        OnFocusChanged?.Invoke(focus);
     }
     private void InitializeLevel() { // TODO: level enum input
         SetFocus(GameObject.Find("playerCharacter"));

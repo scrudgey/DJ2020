@@ -16,8 +16,7 @@ public class Bullet {
         RaycastHit[] hits = Physics.RaycastAll(ray, range); // get all hits
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (Impact(hit)) {
-                // TODO: reinstate the random effect
-
+                Debug.DrawLine(gunPosition, hit.point, Color.green, 5f);
                 if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {
                     SpawnBulletRay(gunPosition, hit.point);
                 }

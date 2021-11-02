@@ -19,7 +19,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
     public GunInstance primary;
     public GunInstance third;
     public bool emitShell;
-
+    public TargetData lastTargetData;
+    public Action<GunHandler> OnTargetChanged;
     public void Update() {
         if (gunInstance == null) {
             return;
@@ -36,16 +37,23 @@ public class GunHandler : MonoBehaviour, ISaveable {
         // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
-    public Vector3 gunDirection(PlayerCharacterInput.FireInputs input) {
+    public Vector3 gunDirection() {
         // TODO: shoot perpendicular to plane
-        return input.targetData.position - this.gunPosition();
+        return lastTargetData.position - this.gunPosition();
+    }
+    public float inaccuracy() {
+        // returns the inaccuracy in world units at the point of the last target data
+        if (gunInstance == null || lastTargetData == null)
+            return 0f;
+        float distance = Vector3.Distance(lastTargetData.position, this.gunPosition());
+        return gunInstance.baseGun.spread * (distance / 10f);
     }
     public void EmitBullet(PlayerCharacterInput.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
 
         // determine the direction to shoot in
-        Vector3 trueDirection = gunDirection(input);
-        // Debug.DrawRay(gunPosition, trueDirection * 2f, Color.green, 10f);
+        Vector3 trueDirection = gunDirection();
+        // Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
         Vector3 aimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
@@ -95,7 +103,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         GameObject muzzleFlashObj = GameObject.Instantiate(
             gunInstance.baseGun.muzzleFlash,
             gunPosition() + 0.5f * motor.CharacterForward - new Vector3(0, 0.1f, 0),
-            Quaternion.LookRotation(transform.up, gunDirection(input))
+            Quaternion.LookRotation(transform.up, gunDirection())
             );
         muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one;
         GameObject.Destroy(muzzleFlashObj, 0.05f);
@@ -255,6 +263,8 @@ public class GunHandler : MonoBehaviour, ISaveable {
     }
     public void ProcessInput(PlayerCharacterInput input) {
         gunAnimation.input = input.Fire;
+        lastTargetData = input.Fire.targetData;
+        OnTargetChanged?.Invoke(this);
         if (gunInstance != null && gunInstance.CanShoot()) {
             if (gunInstance.baseGun.cycle == CycleType.automatic) {
                 if (input.Fire.FirePressed && !shooting) {

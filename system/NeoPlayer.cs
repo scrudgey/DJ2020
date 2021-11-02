@@ -5,6 +5,7 @@ using KinematicCharacterController;
 using UnityEngine.InputSystem;
 using System;
 using System.Linq;
+using UI;
 public class NeoPlayer : MonoBehaviour {
     public NeoCharacterCamera OrbitCamera;
     public ClearSighter sighter;
@@ -51,7 +52,7 @@ public class NeoPlayer : MonoBehaviour {
     private bool useItemThisFrame;
     private PlayerCharacterInput _lastInput;
     private static List<SphereCollider> attractors;
-
+    // public Action<AimIndicatorHandler> OnAimChanged;
     public void Awake() {
         // Move
         MoveAction.action.performed += ctx => inputVector = ctx.ReadValue<Vector2>();
@@ -273,7 +274,8 @@ public class NeoPlayer : MonoBehaviour {
         // foreach(RaycastHit hit in Physics.Raycast(clickRay, 100, ))
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 100); // get all hits
         TagSystemData priorityData = null;
-        GameObject priorityObject = null;
+        RaycastHit priorityHit = new RaycastHit();
+        bool prioritySet = false;
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data == null)
@@ -282,13 +284,15 @@ public class NeoPlayer : MonoBehaviour {
                 continue;
             if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
                 priorityData = data;
-                priorityObject = hit.collider.gameObject;
+                priorityHit = hit;
+                prioritySet = true;
             }
         }
-        if (priorityObject != null) {
+        if (prioritySet) {
             return new TargetData {
-                type = TargetData.TargetType.obj,
-                position = priorityObject.transform.position
+                type = TargetData.TargetType.objectLock,
+                position = priorityHit.collider.bounds.center,
+                screenPosition = OrbitCamera.Camera.WorldToScreenPoint(priorityHit.collider.bounds.center)
             };
         }
 
@@ -302,14 +306,12 @@ public class NeoPlayer : MonoBehaviour {
         return new TargetData {
             type = TargetData.TargetType.direction,
             position = targetPoint,
+            screenPosition = cursorPosition
         };
     }
     private void HandleCharacterInput() {
 
-        TargetData targetData = TargetData.none;
-        if (firePressedThisFrame || firePressedHeld) {
-            targetData = CursorToTarget(Mouse.current.position.ReadValue());
-        }
+        TargetData targetData = CursorToTarget(Mouse.current.position.ReadValue());
 
         PlayerCharacterInput characterInputs = new PlayerCharacterInput() {
             state = Character.state,
