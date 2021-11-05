@@ -22,14 +22,9 @@ public class IDestructible : IDamageable {
         }
     }
 
-
     virtual protected void Destruct(Damage damage) {
         Collider myCollider = GetComponentInChildren<Collider>();
-        if (gibs != null) {
-            foreach (Gib gib in gibs.gibs) {
-                gib.Emit(damage, myCollider);
-            }
-        }
+        gibs?.Emit(damage, myCollider);
         Destroy(transform.parent.gameObject);
     }
 }

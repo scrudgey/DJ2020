@@ -155,6 +155,19 @@ public class Toolbox {
         return CalculateExplosionValue(source, target, range, power) * direction;
     }
 
+    public static Vector3 RandomPointOnPlane(Vector3 position, Vector3 normal, float radius) {
+        Vector3 randomPoint;
+        do {
+            randomPoint = Vector3.Cross(UnityEngine.Random.insideUnitSphere, normal);
+        } while (randomPoint == Vector3.zero);
+
+        randomPoint.Normalize();
+        randomPoint *= radius;
+        randomPoint += position;
+
+        return randomPoint;
+    }
+
 }
 
 

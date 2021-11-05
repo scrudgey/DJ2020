@@ -16,6 +16,9 @@ public class TagSystemData {
     // if true, I do not hide when between the player and camera
     public bool dontHideInterloper;
 
+    // if true, I do not hide when above the player
+    public bool dontHideAbove;
+
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;
 

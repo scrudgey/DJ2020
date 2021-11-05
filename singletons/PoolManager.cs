@@ -19,6 +19,7 @@ public class PrefabPool {
     }
     protected virtual void EnableObject(GameObject obj) {
         obj.SetActive(true);
+        obj.transform.SetParent(null, true);
         // allow decals to define enable methods
         PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
         if (poolObject != null) {

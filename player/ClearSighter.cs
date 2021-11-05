@@ -19,6 +19,7 @@ public class MaterialController {
         this.tagSystemData = Toolbox.GetTagData(gameObject);
         this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>());
         childRenderers.Remove(renderer);
+        // gameObject.t
     }
     public void InterloperStart() {
         // Debug.Log($"{gameObject} {renderer} interloper start");
@@ -78,7 +79,7 @@ public class MaterialController {
     }
 
     public bool active() {
-        return disableBecauseInterloper || disableBecauseAbove;
+        return (disableBecauseInterloper && !tagSystemData.dontHideInterloper) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
     }
 }
 public class MaterialControllerCache {
@@ -136,9 +137,9 @@ public class ClearSighter : MonoBehaviour {
                 if (hit.collider.transform.IsChildOf(transform)) {
                     continue;
                 }
-                if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInterloper) {
-                    continue;
-                }
+                // if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInterloper) {
+                //     continue;
+                // }
                 MaterialController controller = controllers.get(hit.collider.gameObject);
                 if (controller != null) {
                     controller.InterloperStart();
