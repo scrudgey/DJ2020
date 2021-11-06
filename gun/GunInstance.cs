@@ -29,9 +29,12 @@ public class GunInstance {
         }
         cooldownTimer = baseGun.shootInterval;
         chamber = 0;
-        if (clip > 0 && baseGun.cycle == CycleType.semiautomatic || baseGun.cycle == CycleType.automatic) { // automatic chambering
+        if (CheckRack()) {
             Rack();
         }
+    }
+    public bool CheckRack() {
+        return clip > 0 && baseGun.cycle == CycleType.semiautomatic || baseGun.cycle == CycleType.automatic;
     }
     public void Update() {
         if (cooldownTimer > 0) {

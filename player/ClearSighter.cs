@@ -19,7 +19,6 @@ public class MaterialController {
         this.tagSystemData = Toolbox.GetTagData(gameObject);
         this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>());
         childRenderers.Remove(renderer);
-        // gameObject.t
     }
     public void InterloperStart() {
         // Debug.Log($"{gameObject} {renderer} interloper start");
@@ -122,7 +121,6 @@ public class ClearSighter : MonoBehaviour {
                 controller.CeilingCheck(collider, myTransform.position);
         }
 
-
         // collider between me and the camera
         foreach (Vector3 startPosition in new Vector3[] {
             transform.position + new Vector3(0, 1f, 0) ,
@@ -137,17 +135,12 @@ public class ClearSighter : MonoBehaviour {
                 if (hit.collider.transform.IsChildOf(transform)) {
                     continue;
                 }
-                // if (Toolbox.GetTagData(hit.collider.gameObject).dontHideInterloper) {
-                //     continue;
-                // }
                 MaterialController controller = controllers.get(hit.collider.gameObject);
                 if (controller != null) {
                     controller.InterloperStart();
                 }
             }
         }
-
-
 
         // garbage collect
         HashSet<MaterialController> removeControllers = new HashSet<MaterialController>();

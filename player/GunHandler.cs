@@ -254,11 +254,14 @@ public class GunHandler : MonoBehaviour, ISaveable {
         if (input.switchToGun != -1) {
             SwitchToGun(input.switchToGun);
         } else if (input.reload) {
-            if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
-                ReloadShell();
-            } else if (gunInstance.baseGun.type != GunType.shotgun) {
-                Reload();
-            }
+            DoReload();
+        }
+    }
+    void DoReload() {
+        if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
+            ReloadShell();
+        } else if (gunInstance.baseGun.type != GunType.shotgun) {
+            Reload();
         }
     }
     public void ProcessInput(PlayerCharacterInput input) {

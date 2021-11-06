@@ -22,7 +22,6 @@ public class Gib {
     public LoHi dispersion;
     public float directional = 1f;
     public void Emit(Damage damage, Collider bounds) {
-        // TODO: if glass, handle this differently?
         int num = (int)Toolbox.RandomFromLoHi(number);
         for (int i = 0; i < num; i++) {
             DoEmit(damage, bounds);

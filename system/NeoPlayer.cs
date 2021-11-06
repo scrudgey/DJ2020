@@ -151,6 +151,7 @@ public class NeoPlayer : MonoBehaviour {
         };
 
         crouchHeld = false;
+        selectGunThisFrame = -1;
 
         // TODO: move into on level load
         attractors = new List<SphereCollider>();

@@ -219,7 +219,6 @@ public class GunAnimation : MonoBehaviour, ISaveable {
         GunType type = GetCurrentGunType();
         Octet<Sprite[]> _sprites = GetCurrentOctet(type);
 
-
         if (_sprites == null)
             return;
         if (_sprites[_direction] == null)
