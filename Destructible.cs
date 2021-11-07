@@ -22,7 +22,7 @@ public class Destructible : IDestructible {
     override protected void Destruct(Damage damage) {
         // TODO: don't duplicate this code.
         Collider myCollider = GetComponentInChildren<Collider>();
-        gibs?.Emit(damage, myCollider);
+        gibs?.Emit(gameObject, damage, myCollider);
 
         Destroy(transform.parent.gameObject, 5f);
         foreach (GameObject fx in destructionFx) {

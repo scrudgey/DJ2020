@@ -49,7 +49,7 @@ public class Bullet {
 
             // spawn sparks
             GameObject.Instantiate(
-                Resources.Load("prefabs/impactSpark"),
+                Resources.Load("prefabs/fx/impactSpark"),
                 hit.point + (hit.normal * 0.025f),
                 Quaternion.LookRotation(hit.normal)
                 );

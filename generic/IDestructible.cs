@@ -24,7 +24,9 @@ public class IDestructible : IDamageable {
 
     virtual protected void Destruct(Damage damage) {
         Collider myCollider = GetComponentInChildren<Collider>();
-        gibs?.Emit(damage, myCollider);
+        gibs?.Emit(gameObject, damage, myCollider);
         Destroy(transform.parent.gameObject);
+        TagSystemData data = Toolbox.GetTagData(gameObject);
+        data.targetPriority = -1;
     }
 }

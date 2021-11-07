@@ -5,23 +5,34 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/Gibs")]
 public class Gibs : ScriptableObject {
     public List<Gib> gibs;
-    public void Emit(Damage damage, Collider bounds) {
+    public void Emit(GameObject host, Damage damage, Collider bounds) {
         foreach (Gib gib in gibs) {
-            // Debug.Log("emit gib")
-            gib.Emit(damage, bounds);
+            gib.Emit(host, damage, bounds);
         }
-        // Debug.Break();
     }
 }
+public enum GibType { normal, particleEffect }
 
 [System.Serializable]
 public class Gib {
+    public GibType type;
     public LoHi number;
     public GameObject prefab;
     public LoHi velocity;
     public LoHi dispersion;
     public float directional = 1f;
-    public void Emit(Damage damage, Collider bounds) {
+    public void Emit(GameObject host, Damage damage, Collider collider) {
+        if (type == GibType.normal) {
+            EmitParticle(damage, collider);
+        } else if (type == GibType.particleEffect) {
+            EmitParticleSystem(host, damage, collider);
+        }
+    }
+    void EmitParticleSystem(GameObject host, Damage damage, Collider collider) {
+        GameObject fx = GameObject.Instantiate(prefab, collider.bounds.center, Quaternion.identity);
+        fx.transform.SetParent(host.transform, true);
+    }
+    void EmitParticle(Damage damage, Collider bounds) {
         int num = (int)Toolbox.RandomFromLoHi(number);
         for (int i = 0; i < num; i++) {
             DoEmit(damage, bounds);

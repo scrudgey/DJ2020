@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaySound : MonoBehaviour {
-    public enum TriggerType { impact, start, enter }
+    public enum TriggerType { impact, start, enter, particleEmit }
     public enum RepeatType { repeatedly, once, cooldown }
     public TriggerType trigger;
     public RepeatType repeat;
     public AudioClip[] sounds;
     public AudioSource audioSource;
+    public ParticleSystem particles;
     public float probability = 1f;
     public float velocityThreshold = 0f;
     public float cooldownInterval = 1f;
     public float cooldownTimer = 0f;
     public float randomPitchWidth = 0.2f;
+    private int currentNumberOfParticles;
     private void Play() {
         if (cooldownTimer > 0)
             return;
@@ -57,6 +59,12 @@ public class PlaySound : MonoBehaviour {
     void Update() {
         if (cooldownTimer > 0) {
             cooldownTimer -= Time.deltaTime;
+        }
+        if (trigger == TriggerType.particleEmit) {
+            if (particles.particleCount > currentNumberOfParticles) {
+                Play();
+            }
+            currentNumberOfParticles = particles.particleCount;
         }
     }
 }
