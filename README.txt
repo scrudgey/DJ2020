@@ -410,3 +410,32 @@ cars driving by ambient noise interval random
 tree, bush, lanterns / things connected to random wind gusts
 crickets
 
+
+
+
+layers
+
+shell: collides with geometry, nothing else
+object: collides with geometry and object
+    player character
+    required to have a third thing that can collide with self and not geometry
+skybox: camera
+shadowprobe: camera
+
+proposal:
+    new layer:
+    bulletPassThrough: collides like default
+
+
+bullet raycast: 
+    layer mask: include object, default
+
+cursorToTarget raycast: 
+    layer mask: include object
+
+clearsighter overlap:
+clearsighter raycast:
+question: is there a better way to handle these things?
+
+problem:
+    we need bulletPassThrough tag because that's how we handle bullet holes

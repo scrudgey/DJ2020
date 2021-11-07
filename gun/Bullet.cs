@@ -13,7 +13,7 @@ public class Bullet {
     }
 
     public void DoImpacts() {
-        RaycastHit[] hits = Physics.RaycastAll(ray, range); // get all hits
+        RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetMask(Layer.def, Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (Impact(hit)) {
                 Debug.DrawLine(gunPosition, hit.point, Color.green, 5f);
@@ -31,7 +31,6 @@ public class Bullet {
 
         TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
 
-        // TODO: unify with others
         foreach (IDamageable damageable in hit.transform.GetComponentsInChildren<IDamageable>()) {
             damageable.TakeDamage(bulletDamage);
         }

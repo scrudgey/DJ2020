@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Rendering;
 public class MaterialController {
-    public Renderer renderer;
+    // public Renderer renderer;
     public List<Renderer> childRenderers;
     public GameObject gameObject;
     public NeoCharacterCamera camera;
@@ -15,10 +15,8 @@ public class MaterialController {
     public MaterialController(GameObject gameObject, NeoCharacterCamera camera) {
         this.camera = camera;
         this.gameObject = gameObject;
-        this.renderer = gameObject.GetComponent<Renderer>();
         this.tagSystemData = Toolbox.GetTagData(gameObject);
         this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>());
-        childRenderers.Remove(renderer);
     }
     public void InterloperStart() {
         // Debug.Log($"{gameObject} {renderer} interloper start");
@@ -39,27 +37,28 @@ public class MaterialController {
     }
     public void MakeTransparent() {
         // handle transparent objects differently
-        if (renderer.shadowCastingMode != ShadowCastingMode.ShadowsOnly) {
-            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-            foreach (Renderer renderer in childRenderers) {
-                if (renderer == null)
-                    continue;
-                renderer.enabled = false;
+        foreach (Renderer renderer in childRenderers) {
+            if (renderer == null)
+                continue;
+            if (renderer.shadowCastingMode != ShadowCastingMode.ShadowsOnly) {
+                renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+                // renderer.enabled = false;
             }
         }
     }
     public void MakeApparent() {
-        if (renderer == null)
-            return;
-        if (renderer.shadowCastingMode != ShadowCastingMode.On) {
-            renderer.shadowCastingMode = ShadowCastingMode.On;
-            foreach (Renderer renderer in childRenderers) {
-                renderer.enabled = true;
+        foreach (Renderer renderer in childRenderers) {
+
+            if (renderer == null)
+                return;
+            if (renderer.shadowCastingMode != ShadowCastingMode.On) {
+                renderer.shadowCastingMode = ShadowCastingMode.On;
+                // renderer.enabled = true;
             }
         }
     }
     public void Update() {
-        if (renderer == null)
+        if (childRenderers.Count == 0)
             return;
         // interloper logic
         if (timer > 0)
@@ -78,7 +77,7 @@ public class MaterialController {
     }
 
     public bool active() {
-        return (disableBecauseInterloper && !tagSystemData.dontHideInterloper) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
+        return (disableBecauseInterloper) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
     }
 }
 public class MaterialControllerCache {
@@ -92,8 +91,7 @@ public class MaterialControllerCache {
             return controllers[key];
         } else {
             MaterialController controller = new MaterialController(key, camera);
-            // Debug.Log($"materialcontroller initialize {key}:{controller.renderer}");
-            if (controller.renderer == null) {
+            if (controller.childRenderers.Count == 0) {
                 controller = null;
             }
             controllers[key] = controller;
@@ -112,7 +110,7 @@ public class ClearSighter : MonoBehaviour {
 
     void Update() {
         // colliders above me
-        Collider[] others = Physics.OverlapSphere(myTransform.position, 20f);
+        Collider[] others = Physics.OverlapSphere(myTransform.position, 20f, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.shell, Layer.bulletPassThrough));
         foreach (Collider collider in others) {
             if (collider.transform.IsChildOf(myTransform))
                 continue;
@@ -131,6 +129,8 @@ public class ClearSighter : MonoBehaviour {
             // Debug.Log(myCamera.transform.forward);
             if (GameManager.I.showDebugRays)
                 Debug.DrawRay(startPosition, direction * distance, Color.magenta, 0.1f);
+
+            // TODO: use layer mask
             foreach (RaycastHit hit in Physics.RaycastAll(startPosition, direction, distance).OrderBy(x => x.distance)) {
                 if (hit.collider.transform.IsChildOf(transform)) {
                     continue;

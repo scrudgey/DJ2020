@@ -14,10 +14,12 @@ public class TagSystemData {
     public bool isActor;
 
     // if true, I do not hide when between the player and camera
-    public bool dontHideInterloper;
+    // public bool dontHideInterloper; // TODO: use layers instead
+    // currently used by: transparent objects
 
     // if true, I do not hide when above the player
-    public bool dontHideAbove;
+    public bool dontHideAbove;  // TODO: use layers instead
+    // currently used by: gibs
 
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;

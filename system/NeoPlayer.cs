@@ -272,8 +272,8 @@ public class NeoPlayer : MonoBehaviour {
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
-        // foreach(RaycastHit hit in Physics.Raycast(clickRay, 100, ))
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100); // get all hits
+
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj));
         TagSystemData priorityData = null;
         RaycastHit priorityHit = new RaycastHit();
         bool prioritySet = false;
