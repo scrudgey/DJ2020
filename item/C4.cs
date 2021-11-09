@@ -4,11 +4,6 @@ using UnityEngine;
 namespace Items {
     public class C4 : BaseItem {
         public C4Data c4Data;
-        public override ItemData data {
-            get {
-                return c4Data;
-            }
-        }
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;
         }

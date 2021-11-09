@@ -19,6 +19,7 @@ public class Gun : ScriptableObject {
     public int clipSize;
     public float range;
     public float spread;
+    public float shootInaccuracy;
     public LoHi baseDamage;
     public Sprite image;
 

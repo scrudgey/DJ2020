@@ -21,6 +21,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
     public bool emitShell;
     public TargetData lastTargetData;
     public Action<GunHandler> OnTargetChanged;
+    private float movementInaccuracy;
+    private float crouchingInaccuracy;
+    private float shootingInaccuracy;
     public void Update() {
         if (gunInstance == null) {
             return;
@@ -31,6 +34,16 @@ public class GunHandler : MonoBehaviour, ISaveable {
         if (!shooting && !reloading && gunInstance.chamber == 0 && gunInstance.clip > 0) {
             gunAnimation.StartRack();
         }
+
+        if (movementInaccuracy > 0) {
+            // TODO: inaccuracy decrease based on weapon weight
+            movementInaccuracy -= Time.deltaTime;
+            movementInaccuracy = Math.Max(0, movementInaccuracy);
+        }
+        if (shootingInaccuracy > 0) {
+            shootingInaccuracy -= Time.deltaTime;
+            shootingInaccuracy = Math.Max(0, shootingInaccuracy);
+        }
     }
 
     public Vector3 gunPosition() {
@@ -38,15 +51,38 @@ public class GunHandler : MonoBehaviour, ISaveable {
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     public Vector3 gunDirection() {
-        // TODO: shoot perpendicular to plane
         return lastTargetData.position - this.gunPosition();
     }
     public float inaccuracy() {
+        float accuracy = 0;
+
         // returns the inaccuracy in world units at the point of the last target data
         if (gunInstance == null || lastTargetData == null)
             return 0f;
+
+        // range
         float distance = Vector3.Distance(lastTargetData.position, this.gunPosition());
-        return gunInstance.baseGun.spread * (distance / 10f);
+        accuracy += gunInstance.baseGun.spread * (distance / 10f);
+
+        // movement
+        accuracy += movementInaccuracy;
+
+        // crouching
+        accuracy += crouchingInaccuracy;
+
+        // shooting
+        accuracy += shootingInaccuracy;
+
+        // skills
+        int skillLevel = GameManager.I.gameData.playerState.gunSkillLevel[gunInstance.baseGun.type];
+        float skillBonus = (1 - skillLevel) * (0.1f);
+        accuracy -= skillBonus;
+
+        // weapon mods
+
+        accuracy = Math.Max(0, accuracy);
+
+        return accuracy;
     }
     public void EmitBullet(PlayerCharacterInput.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
@@ -80,7 +116,6 @@ public class GunHandler : MonoBehaviour, ISaveable {
         }
 
         // update state
-        // TODO: how to store the shoot input?
         gunInstance.Shoot();
 
         // shoot bullet
@@ -113,6 +148,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
             EmitShell();
         }
 
+        // accuracy effect
+        shootingInaccuracy = gunInstance.baseGun.shootInaccuracy;
+
         // state change callbacks
         OnValueChanged?.Invoke(this);
     }
@@ -131,7 +169,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
                         UnityEngine.Random.Range(0.5f, 1.5f) * transform.up +
                         UnityEngine.Random.Range(0.1f, 1f) * transform.right +
                         UnityEngine.Random.Range(-0.3f, 0.3f) * transform.forward,
-                        ForceMode.Impulse); // TODO: what does force mode mean?
+                        ForceMode.Impulse);
             body.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
         }
 
@@ -217,7 +255,6 @@ public class GunHandler : MonoBehaviour, ISaveable {
             return;
         gunInstance = instance;
 
-        // TODO:
         gunAnimation.Unholster();
 
         // TODO: don't call this! maybe?
@@ -288,6 +325,16 @@ public class GunHandler : MonoBehaviour, ISaveable {
                     reloading = false;
                 }
             }
+        }
+        if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {
+            // TODO: inaccuracy based on weapon weight
+            float movement = 1;
+            movementInaccuracy = Math.Max(movement, movementInaccuracy);
+        }
+        if (input.CrouchDown) {
+            crouchingInaccuracy = -0.5f;
+        } else {
+            crouchingInaccuracy = 0f;
         }
     }
 

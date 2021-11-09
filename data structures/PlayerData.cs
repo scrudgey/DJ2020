@@ -15,6 +15,13 @@ public class PlayerData {
 
     // stats
     public int cyberlegsLevel;
+    public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
+        {GunType.pistol, 1},
+        {GunType.smg, 1},
+        {GunType.rifle, 1},
+        {GunType.shotgun, 1},
+        {GunType.sword, 1},
+    };
 
     public static PlayerData TestInitialData() {
         return new PlayerData() {

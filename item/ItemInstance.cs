@@ -5,33 +5,29 @@ using UnityEngine;
 
 namespace Items {
     public abstract class ItemInstance {
-        abstract public ItemData data {
-            get;
-        }
+        // abstract public ItemData data {
+        //     get;
+        // }
 
         public static BaseItem NewInstance(string baseName) {
             ItemData baseItem = ItemData.LoadItem(baseName);
-            switch (baseItem.type) {
-                case ItemType.c4:
-                    C4Data item = (C4Data)baseItem;
-                    return new C4(item);
-                case ItemType.deck:
-                    return new CyberDeck(baseItem);
-                default:
-                    return new BaseItem(baseItem);
-            }
+            return baseItem switch {
+                C4Data c4Data => new C4(c4Data),
+                ItemData itemData => itemData.shortName switch {
+                    "deck" => new CyberDeck(itemData),
+                    _ => new BaseItem(baseItem)
+                },
+                _ => new BaseItem(baseItem)
+            };
         }
 
         public virtual void Use(ItemHandler handler) { }
     }
 
     public class BaseItem {
-        protected ItemData baseData;
+        public ItemData data;
         public BaseItem(ItemData baseData) {
-            this.baseData = baseData;
-        }
-        public virtual ItemData data {
-            get { return baseData; }
+            this.data = baseData;
         }
         public virtual void Use(ItemHandler handler) { }
     }

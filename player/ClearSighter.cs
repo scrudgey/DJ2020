@@ -77,7 +77,7 @@ public class MaterialController {
     }
 
     public bool active() {
-        return (disableBecauseInterloper) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
+        return (disableBecauseInterloper && !tagSystemData.bulletPassthrough) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
     }
 }
 public class MaterialControllerCache {

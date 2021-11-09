@@ -439,3 +439,5 @@ question: is there a better way to handle these things?
 
 problem:
     we need bulletPassThrough tag because that's how we handle bullet holes
+
+pistol, rifle, shotgun, smg skills

@@ -32,7 +32,6 @@ public class ItemHandler : MonoBehaviour, ISaveable {
     public void LoadState(PlayerData data) {
         items = new List<BaseItem>();
         foreach (string itemName in data.items) {
-            // Debug.Log($"loadin {itemName}");
             BaseItem newItem = ItemInstance.NewInstance(itemName);
             if (newItem != null) {
                 items.Add(newItem);
