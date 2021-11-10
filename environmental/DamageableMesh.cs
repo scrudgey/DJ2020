@@ -17,7 +17,7 @@ public class DamageableMesh : IDamageable {
         for (int i = 0; i < hits.Length; i++) {
             hits[i] = false;
         }
-        damagePool = PoolManager.I.RegisterPool("prefabs/damageDecal");
+        damagePool = PoolManager.I.RegisterPool("prefabs/fx/damageDecal");
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
     }
     protected DamageResult TakeBulletDamage(BulletDamage damage) {

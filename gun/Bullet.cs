@@ -60,7 +60,7 @@ public class Bullet {
     }
 
     public void SpawnBulletRay(Vector3 startPoint, Vector3 endPoint) {
-        GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/bulletRay"), gunPosition, Quaternion.identity) as GameObject;
+        GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/fx/bulletRay"), gunPosition, Quaternion.identity) as GameObject;
         BulletFX ray = obj.GetComponent<BulletFX>();
         ray.Initialize(BulletFX.FadeStyle.streak, startPoint, endPoint);
         // ray.Initialize(BulletFX.FadeStyle.count, startPoint, endPoint);

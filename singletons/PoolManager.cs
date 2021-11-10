@@ -103,7 +103,7 @@ public class PoolManager : Singleton<PoolManager> {
         foreach (KeyValuePair<DecalType, string> kvp in decalPaths) {
             decalSprites[kvp.Key] = Resources.LoadAll<Sprite>(kvp.Value) as Sprite[];
         }
-        RegisterPool("prefabs/bullethole");
+        RegisterPool("prefabs/fx/bullethole");
     }
     public PrefabPool RegisterPool(string prefabPath) {
         GameObject prefab = Resources.Load(prefabPath) as GameObject;
@@ -156,7 +156,7 @@ public class PoolManager : Singleton<PoolManager> {
         }
     }
     public GameObject CreateDecal(RaycastHit hit, DecalType type) {
-        PrefabPool pool = GetPool("prefabs/bullethole");
+        PrefabPool pool = GetPool("prefabs/fx/bullethole");
         GameObject decal = pool.GetObject(hit.point + (hit.normal * 0.025f));
         if (decal != null) {
             RandomizeSprite decalRandomizer = decal.GetComponent<RandomizeSprite>();

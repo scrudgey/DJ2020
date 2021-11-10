@@ -168,6 +168,15 @@ public class Toolbox {
         return randomPoint;
     }
 
+    public static Vector3 ColorToVector(Color color) {
+        return new Vector3(color.r, color.g, color.b);
+    }
+    public static Color VectorToColor(Vector3 vector) {
+        float x = Math.Abs(vector.x);
+        float y = Math.Abs(vector.y);
+        float z = Math.Abs(vector.z);
+        return new Color(x, y, z);
+    }
 }
 
 
