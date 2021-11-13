@@ -12,6 +12,7 @@ public class Glass : IDestructible {
     private PrefabPool glassGibsPool;
     Collider myCollider;
     public void Awake() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
         glassGibsPool = PoolManager.I.RegisterPool(glassGibs);
         myCollider = GetComponent<Collider>();
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);

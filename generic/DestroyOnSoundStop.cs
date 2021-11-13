@@ -6,7 +6,7 @@ public class DestroyOnSoundStop : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] clip;
     void Start() {
-        audioSource = GetComponent<AudioSource>();
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
         if (clip.Length > 0)
             Toolbox.RandomizeOneShot(audioSource, clip);
     }

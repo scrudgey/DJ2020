@@ -53,10 +53,14 @@ uniform fixed4 _LightColor0;
 
 inline fixed3 calculateLightDiffuse(VertexOutput input, float3 normalWorld, inout fixed4 albedo)
 {
+    // float4 pos = calculateLocalPos(input.posWorld);
+
 	//For directional lights _WorldSpaceLightPos0.w is set to zero
 	float3 lightWorldDirection = normalize(_WorldSpaceLightPos0.xyz - input.posWorld.xyz * _WorldSpaceLightPos0.w);
+	// float3 lightWorldDirection = normalize(_WorldSpaceLightPos0.xyz - pos.xyz * _WorldSpaceLightPos0.w);
 	
 	UNITY_LIGHT_ATTENUATION(attenuation, input, input.posWorld.xyz);
+	// UNITY_LIGHT_ATTENUATION(attenuation, input, pos.xyz);
 	
 	float angleDot = max(0, dot(normalWorld, lightWorldDirection));
 	
@@ -137,6 +141,9 @@ fixed4 calculateSpecularLight(SpecularCommonData s, float3 viewDir, float3 norma
 	SpecularLightData data = calculatePhysicsBasedSpecularLight (s.specColor, s.oneMinusReflectivity, s.smoothness, normal, viewDir, lightDir, lightColor, ambient, unity_IndirectSpecColor.rgb);
 	fixed4 pixel = calculateLitPixel(fixed4(s.diffColor, s.alpha), data.lighting);
 	pixel.rgb += data.specular * s.alpha;
+
+    // pixel = calculateLocalPos(pixel);
+
 	return pixel;
 }
 
@@ -145,6 +152,8 @@ fixed4 calculateSpecularLightAdditive(SpecularCommonData s, float3 viewDir, floa
 	SpecularLightData data = calculatePhysicsBasedSpecularLight (s.specColor, s.oneMinusReflectivity, s.smoothness, normal, viewDir, lightDir, lightColor, half3(0,0,0), half3(0,0,0));
 	fixed4 pixel = calculateAdditiveLitPixel(fixed4(s.diffColor, s.alpha), data.lighting);
 	pixel.rgb += data.specular * s.alpha;
+
+    // pixel = calculateLocalPos(pixel);
 	return pixel;
 }
 

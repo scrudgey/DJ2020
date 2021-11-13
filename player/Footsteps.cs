@@ -14,6 +14,9 @@ public class Footsteps : MonoBehaviour {
     private AudioClip rightFoot;
     private bool onRightFoot;
     private SurfaceType lastSurfaceType;
+    void Awake() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
     public void UpdateWithVelocity(Vector3 velocity) {
         if (velocity.magnitude <= 0.01) {
             leftFoot = null;

@@ -1,0 +1,68 @@
+normal shadowpass
+
+v2f vert(appdata_base v)
+            {
+                v2f o;
+                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+                return o;
+            }
+
+just do your custom vertices before that and it will work:
+
+v2f vert(appdata_base v)
+            {
+                float4 worldPos = mul(_Object2World, v.vertex);
+                // do stuff to worldPos.xyz
+                v.vertex = mul(_World2Object, worldPos);
+                v2f o;
+                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
+                return o;
+            }
+
+here, he is turning the vertices to world coordinates and then back to object coordinates.
+_Object2World is M matrix as I understand it.
+so we're taking model coordinates * M to get their position in world space.
+
+TRANSFER_SHADOW_CASTER_NORMALOFFSET
+
+#define TRANSFER_SHADOW_CASTER_NOPOS(o,opos) 
+o.vec = mul(unity_ObjectToWorld, v.vertex).xyz - _LightPositionRange.xyz; 
+opos = UnityObjectToClipPos(v.vertex);
+
+so transfer shadow caster is taking object to world coordinates for the light position calculation,
+then it sets position to UnityObjectToClipPos
+This is the equivalent of mul(UNITY_MATRIX_MVP, float4(pos, 1.0)), and should be used in its place.
+
+so clearly, TRANSFER_SHADOW_CASTER is assuming model vertices coordinates.
+
+very similar to our billboard code, but the major difference is that in the sprite renderer,
+we start from model vertices and want to end on clip coordinates, so we basically do
+MVP * vertices
+with some modification for billboarding
+
+in the shadow caster example it's not as simple. we instead must start from model coordinates,
+modify them to billboard, then return to model coordinates.
+
+
+       M       V          P
+model -> world -> camera -> clip space
+
+
+possibility 1: do TRANSFER_SHADOW_CASTER_NORMALOFFSET manually with billboarding enabled.
+possibility 2: perform some sort of billboarding in world space or whatever, then transform back.
+
+billboard:
+
+float xscale = length(unity_ObjectToWorld._m00_m10_m20);
+
+float4 view = mul(
+                UNITY_MATRIX_MV, 
+                float4(0, vertex.y, 0.0, 1.0)
+            ) + float4(vertex.x * xscale, 0.0, 0.0, 0.0);
+
+pos = mul(
+    UNITY_MATRIX_P, 
+    view 
+);
+
+why does this work at all? we are basically multiplying the x coordinate straight from model to clip

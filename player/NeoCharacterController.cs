@@ -207,6 +207,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     }
 
     private void Start() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
         // Assign to motor
         Motor.CharacterController = this;
     }

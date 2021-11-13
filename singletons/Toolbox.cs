@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Audio;
 
 // random from list
 // play a sound with random pitch from randomized list
@@ -10,6 +11,7 @@ using System;
 public class Toolbox {
     public static GameObject explosiveRadiusPrefab;
     public static readonly string ExplosiveRadiusPath = "prefabs/explosiveRadius";
+    public static AudioMixer sfxMixer;
     static public IEnumerator RunAfterTime(float delay, Action function) {
         float timer = 0;
         while (timer < delay) {
@@ -176,6 +178,23 @@ public class Toolbox {
         float y = Math.Abs(vector.y);
         float z = Math.Abs(vector.z);
         return new Color(x, y, z);
+    }
+
+    public static AudioSource SetUpAudioSource(GameObject g) {
+        AudioSource source = GetOrCreateComponent<AudioSource>(g);
+
+        if (sfxMixer == null) {
+            sfxMixer = Resources.Load("mixers/SoundEffectMixer") as AudioMixer;
+        }
+        source.outputAudioMixerGroup = sfxMixer.FindMatchingGroups("Master")[0];
+
+        source.rolloffMode = AudioRolloffMode.Logarithmic;
+        source.minDistance = 1f;
+        source.maxDistance = 5.42f;
+        source.spatialBlend = 1;
+        source.spread = 0.2f;
+
+        return source;
     }
 }
 

@@ -11,7 +11,9 @@ public class DoorSound : MonoBehaviour {
     public AudioClip[] openSounds;
     public AudioClip[] closeSounds;
     public AudioSource audioSource;
-
+    void Awake() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
     void Update() {
         if (Mathf.Abs(hinge.angle) > openAngleThreshold && state == State.shut) {
             state = State.open;

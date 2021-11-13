@@ -44,6 +44,7 @@ public class PlaySound : MonoBehaviour {
     }
 
     void Start() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
         if (trigger == TriggerType.start) {
             Play();
         }

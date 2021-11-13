@@ -10,6 +10,9 @@ public class ItemHandler : MonoBehaviour, ISaveable {
     public int index;
     public BaseItem activeItem;
     public AudioSource audioSource;
+    void Awake() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
     public void ProcessInput(PlayerCharacterInput input) {
         if (input.incrementItem != 0) {
             index += input.incrementItem;

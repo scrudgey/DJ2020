@@ -17,6 +17,7 @@ public class Bush : MonoBehaviour {
     public float leafProbability = 0.5f;
     new private Collider collider;
     void Awake() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
         collider = GetComponent<Collider>();
         leafPool = PoolManager.I.RegisterPool(leafPrefab);
     }

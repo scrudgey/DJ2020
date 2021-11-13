@@ -141,6 +141,8 @@ Shader "Sprite (Pixel Lit)"
 			
 			CGPROGRAM
 				#pragma target 3.0
+                
+                #pragma shader_feature _BILLBOARD
 				
 				#pragma multi_compile_shadowcaster
 				#pragma multi_compile_instancing

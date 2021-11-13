@@ -11,6 +11,7 @@ public class AnimateFrames : MonoBehaviour {
     public AudioClip flipSound;
     public bool destroyOnFinished;
     void Start() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) {
             Destroy(this);

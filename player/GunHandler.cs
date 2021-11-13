@@ -24,6 +24,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
+    void Awake() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
     public void Update() {
         if (gunInstance == null) {
             return;
@@ -57,7 +60,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         float accuracy = 0;
 
         // returns the inaccuracy in world units at the point of the last target data
-        if (gunInstance == null || lastTargetData == null)
+        if (gunInstance == null || gunInstance.baseGun == null || lastTargetData == null)
             return 0f;
 
         // range
