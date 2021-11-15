@@ -12,14 +12,25 @@ public class Explosion : MonoBehaviour {
         foreach (Collider hit in colliders) {
             Rigidbody rb = hit.GetComponent<Rigidbody>();
             if (rb != null)
-                rb.AddExplosionForce(power, explosionPos, radius, 3.0F);
+                rb.AddExplosionForce(power * 20f, explosionPos, radius, 3.0F);
 
             // TODO: unify this with bullet method
             foreach (IDamageable damageable in hit.GetComponentsInChildren<IDamageable>()) {
-                damageable.TakeDamage(new ExplosionDamage(this));
+                // TODO: calculate damage at point.
+                damageable.TakeDamage(GetDamageAtPoint(hit.bounds.center));
             }
         }
         Destroy(gameObject);
+    }
+
+    public ExplosionDamage GetDamageAtPoint(Vector3 point) {
+        Vector3 direction = (point - transform.position).normalized;
+        float dist = (point - transform.position).magnitude;
+        if (dist > radius) {
+            return new ExplosionDamage(0, direction, point);
+        } else {
+            return new ExplosionDamage((1.0f - dist / radius) * power, direction, point);
+        }
     }
 
 }

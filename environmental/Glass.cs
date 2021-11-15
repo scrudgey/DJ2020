@@ -29,13 +29,8 @@ public class Glass : IDestructible {
         };
     }
     public DamageResult TakeExplosionDamage(ExplosionDamage explosion) {
-        Vector3 myPosition = transform.position;
-        if (myCollider != null) {
-            myPosition = myCollider.bounds.center;
-        }
-        Vector3 force = explosion.GetDamageAtPoint(myPosition);
         return new DamageResult {
-            damageAmount = force.magnitude * 100
+            damageAmount = explosion.amount
         };
     }
 

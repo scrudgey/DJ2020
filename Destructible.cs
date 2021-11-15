@@ -12,7 +12,9 @@ public class Destructible : IDestructible {
     }
 
     public DamageResult TakeExplosiveDamage(ExplosionDamage explosion) {
-        return new DamageResult { };
+        return new DamageResult {
+            damageAmount = explosion.amount
+        };
     }
     void Awake() {
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
@@ -38,6 +40,9 @@ public class Destructible : IDestructible {
             force.y = Mathf.Abs(force.y);
             rigidbody.AddForce(force, ForceMode.Impulse);
         }
+
+        TagSystemData data = Toolbox.GetTagData(gameObject);
+        data.dontHideAbove = true;
 
         Destroy(this);
         // Debug.Break();

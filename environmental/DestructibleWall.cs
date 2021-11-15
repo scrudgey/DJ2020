@@ -14,13 +14,13 @@ public class DestructibleWall : IDestructible {
     }
 
     public DamageResult DoTakeDamage(ExplosionDamage damage) {
-        Vector3 myPosition = transform.position;
-        if (myCollider != null) {
-            myPosition = myCollider.bounds.center;
-        }
-        Vector3 force = damage.GetDamageAtPoint(myPosition);
+        // Vector3 myPosition = transform.position;
+        // if (myCollider != null) {
+        //     myPosition = myCollider.bounds.center;
+        // }
+        // Vector3 force = damage.force;
         return new DamageResult {
-            damageAmount = force.magnitude
+            damageAmount = damage.amount
         };
     }
 }

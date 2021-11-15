@@ -26,7 +26,6 @@ public class LightFlicker : MonoBehaviour {
         light.color = Toolbox.VectorToColor(total);
 
         Vector3 currentIntensity = intensityFlow.Update(Time.deltaTime) * intensityFluctuationIntensity;
-        Debug.Log(currentIntensity);
         light.intensity = initialIntensity + Mathf.Abs(currentIntensity.z);
     }
 
