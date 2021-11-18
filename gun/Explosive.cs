@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Items;
+using UnityEngine;
 public enum ExplosiveType { timer }
 public class Explosive : MonoBehaviour {
     public ExplosiveType type;
@@ -20,7 +20,10 @@ public class Explosive : MonoBehaviour {
         }
     }
     void Explode() {
-        Toolbox.AudioSpeaker(transform.position, explodeSounds);
+        AudioSource source = Toolbox.AudioSpeaker(transform.position, explodeSounds, volume: 5f);
+        source.minDistance = 5f;
+        source.maxDistance = 10f;
+
         GameObject.Instantiate(data.explosionFx, transform.position, Quaternion.identity);
         Explosion explosion = Toolbox.Explosion(transform.position);
         explosion.radius = data.explosionRadius;

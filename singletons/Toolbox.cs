@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 using UnityEngine.Audio;
 
 // random from list
@@ -43,12 +43,14 @@ public class Toolbox {
         }
         RandomizeOneShot(audioSource, RandomFromList(audioClips), randomPitchWidth: randomPitchWidth);
     }
-    public static void AudioSpeaker(Vector3 position, AudioClip[] clips) {
-        GameObject audioSpeaker = GameObject.Instantiate(Resources.Load("prefabs/audioSpeaker")) as GameObject;
+    public static AudioSource AudioSpeaker(Vector3 position, AudioClip[] clips, float volume = 1f) {
+        GameObject audioSpeaker = GameObject.Instantiate(Resources.Load("prefabs/audioSpeaker"), position, Quaternion.identity) as GameObject;
         DestroyOnSoundStop ds = audioSpeaker.GetComponent<DestroyOnSoundStop>();
         if (ds != null) {
             ds.clip = clips;
+            ds.audioSource.volume = volume;
         }
+        return ds.audioSource;
     }
     static public void DestroyIfExists<T>(GameObject gameObject) where T : Component {
         T t = gameObject.GetComponent<T>();
@@ -193,7 +195,6 @@ public class Toolbox {
         source.maxDistance = 5.42f;
         source.spatialBlend = 1;
         source.spread = 0.2f;
-
         return source;
     }
 }

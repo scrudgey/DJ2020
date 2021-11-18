@@ -5,8 +5,10 @@ using UnityEngine;
 public class DestroyOnSoundStop : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] clip;
-    void Start() {
+    void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
+    void Start() {
         if (clip.Length > 0)
             Toolbox.RandomizeOneShot(audioSource, clip);
     }

@@ -31,7 +31,7 @@ public class Destructible : IDestructible {
             GameObject.Instantiate(fx, transform.position, Quaternion.identity);
         }
         if (destructSounds.Length > 0) {
-            Toolbox.AudioSpeaker(transform.position, destructSounds);
+            Toolbox.AudioSpeaker(transform.position, destructSounds, volume: 2f);
         }
 
         Rigidbody rigidbody = GetComponent<Rigidbody>();

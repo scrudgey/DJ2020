@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using KinematicCharacterController;
-using System;
 using System.Linq;
+using KinematicCharacterController;
+using UnityEngine;
 
 public struct PlayerCharacterInput {
     public struct FireInputs {
@@ -50,6 +50,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
 
+    public Action<NeoCharacterController> OnValueChanged;
 
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;
@@ -155,6 +156,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         OnStateExit(tmpInitialState, newState);
         _state = newState;
         OnStateEnter(newState, tmpInitialState);
+        OnValueChanged?.Invoke(this);
     }
     private void OnStateEnter(CharacterState state, CharacterState fromState) {
         // Debug.Log($"entering state {state} from {fromState}");

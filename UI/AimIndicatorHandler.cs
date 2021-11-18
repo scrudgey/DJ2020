@@ -5,7 +5,8 @@ using UnityEngine.UI;
 namespace UI {
     public class AimIndicatorHandler : MonoBehaviour {
         public Camera UICamera;
-        private GunHandler target;
+        private GunHandler targetGunHandler;
+        private NeoCharacterController targetCharacterController;
         public RectTransform cursor;
         public Image cursorImage;
         public Sprite directionAimSprite;
@@ -17,13 +18,18 @@ namespace UI {
         public TargetData.TargetType state;
         public int pulseSize;
         public void Bind(GameObject newTargetObject) {
-            if (target != null) {
-                target.OnTargetChanged -= HandleValueChanged;
+            if (targetGunHandler != null) {
+                targetGunHandler.OnTargetChanged -= HandleGunValueChanged;
             }
-            target = newTargetObject.GetComponentInChildren<GunHandler>();
-            if (target != null) {
-                target.OnTargetChanged += HandleValueChanged;
-                HandleValueChanged(target);
+            targetGunHandler = newTargetObject.GetComponentInChildren<GunHandler>();
+            if (targetGunHandler != null) {
+                targetGunHandler.OnTargetChanged += HandleGunValueChanged;
+                HandleGunValueChanged(targetGunHandler);
+            }
+            targetCharacterController = newTargetObject.GetComponentInChildren<NeoCharacterController>();
+            if (targetCharacterController != null) {
+                targetCharacterController.OnValueChanged += HandleCharacterValueChanged;
+                HandleCharacterValueChanged(targetCharacterController);
             }
         }
         public void Update() {
@@ -41,7 +47,7 @@ namespace UI {
                 pulseSize = 0;
             }
         }
-        public void HandleValueChanged(GunHandler gunHandler) {
+        public void HandleGunValueChanged(GunHandler gunHandler) {
             TargetData data = gunHandler.lastTargetData;
             if (data == null)
                 return;
@@ -61,11 +67,18 @@ namespace UI {
             state = data.type;
             SetScale();
         }
+        public void HandleCharacterValueChanged(NeoCharacterController controller) {
+            if (controller.state == CharacterState.wallPress) {
+                cursorImage.enabled = false;
+            } else {
+                cursorImage.enabled = true;
+            }
+        }
         public void SetScale() {
-            float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
+            float distance = Vector3.Distance(UICamera.transform.position, targetGunHandler.transform.position);
             float frustumHeight = 2.0f * distance * Mathf.Tan(UICamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-            float inaccuracyLength = target.inaccuracy();
+            float inaccuracyLength = targetGunHandler.inaccuracy();
             float pixelsPerLength = UICamera.scaledPixelHeight / frustumHeight;
             float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
             pixelScale = Mathf.Max(10, pixelScale) + pulseSize;

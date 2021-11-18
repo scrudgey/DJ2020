@@ -37,7 +37,10 @@ public class Glass : IDestructible {
     override protected void Destruct(Damage damage) {
         base.Destruct(damage);
 
-        Toolbox.AudioSpeaker(transform.position, destroySounds);
+        AudioSource source = Toolbox.AudioSpeaker(transform.position, destroySounds, volume: 2f);
+        source.minDistance = 5f;
+        source.maxDistance = 10f;
+
         Destroy(gameObject);
         PoolManager.I.RecallObjects(decals.ToArray());
         // TODO: amortize this expensive operation

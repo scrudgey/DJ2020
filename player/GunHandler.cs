@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using KinematicCharacterController;
 using System.Linq;
-using System;
+using KinematicCharacterController;
+using UnityEngine;
 
 public class GunHandler : MonoBehaviour, ISaveable {
     static readonly public float height = 0.5f;
