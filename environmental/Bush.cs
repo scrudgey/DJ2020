@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Easings;
+using UnityEngine;
 
 public class Bush : MonoBehaviour {
     public GameObject leafPrefab;

@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 using UnityEngine.InputSystem;
 
 public enum GameState { none, levelPlay, inMenu }
@@ -88,7 +88,7 @@ public class GameManager : Singleton<GameManager> {
     private void InitializeLevel() { // TODO: level enum input
         SetFocus(GameObject.Find("playerCharacter"));
 
-        LoadPlayerState(gameData.playerState);
+        LoadPlayerState(gameData.playerData);
     }
     public void LoadPlayerState(PlayerData data) {
         foreach (ISaveable saveable in playerObject.GetComponentsInChildren<ISaveable>()) {

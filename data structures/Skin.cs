@@ -8,12 +8,19 @@ public class Skin {
     public Octet<Sprite[]> legsCrouch = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsCrawl = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsRun = new Octet<Sprite[]>();
+    public Octet<Sprite[]> legsClimb = new Octet<Sprite[]>();
+    public Octet<Sprite[]> legsJump = new Octet<Sprite[]>();
+
 
     // unarmed
-    public Octet<Sprite[]> unarmedCrouch = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedWalk = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedCrouch = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedCrawl = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedRun = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedClimb = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedJump = new Octet<Sprite[]>();
+
 
     // pistol
     public Octet<Sprite[]> pistolIdle = new Octet<Sprite[]>();
@@ -41,13 +48,8 @@ public class Skin {
     public Octet<Sprite[]> rifleRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
 
-    // climb
-    public Octet<Sprite[]> climb = new Octet<Sprite[]>();
 
-    // jump
-    public Octet<Sprite[]> jump = new Octet<Sprite[]>();
-
-    public Octet<Sprite[]> idleSprites(GunType type) {
+    public Octet<Sprite[]> gunIdleSprites(GunType type) {
         switch (type) {
             case GunType.smg:
                 return smgIdle;
@@ -62,7 +64,7 @@ public class Skin {
                 return unarmedIdle;
         }
     }
-    public Octet<Sprite[]> walkSprites(GunType type) {
+    public Octet<Sprite[]> gunWalkSprites(GunType type) {
         switch (type) {
             case GunType.smg:
                 return smgIdle;
@@ -90,7 +92,7 @@ public class Skin {
                 return pistolShoot;
         }
     }
-    public Octet<Sprite[]> runSprites(GunType type) {
+    public Octet<Sprite[]> gunRunSprites(GunType type) {
         switch (type) {
             default:
             case GunType.unarmed:
@@ -103,7 +105,15 @@ public class Skin {
                 return smgRun;
         }
     }
-    public Octet<Sprite[]> rackSprites(GunType type) {
+    public Octet<Sprite[]> gunCrouchSprites(GunType type) {
+        switch (type) {
+            case GunType.unarmed:
+                return unarmedCrouch;
+            default:
+                return gunIdleSprites(type);
+        }
+    }
+    public Octet<Sprite[]> gunRackSprites(GunType type) {
         switch (type) {
             case GunType.smg:
                 return smgRack;
@@ -160,7 +170,6 @@ public class Skin {
 
 
         // legs
-
         skin.legsIdle[Direction.down] = new Sprite[] { legSprites[0] };
         skin.legsIdle[Direction.rightDown] = new Sprite[] { legSprites[1] };
         skin.legsIdle[Direction.right] = new Sprite[] { legSprites[2] };
@@ -173,8 +182,8 @@ public class Skin {
         skin.legsWalk[Direction.rightUp] = new Sprite[] { legSprites[17], legSprites[18], legSprites[19], legSprites[20] };
         skin.legsWalk[Direction.up] = new Sprite[] { legSprites[21], legSprites[22], legSprites[23], legSprites[24] };
 
-        skin.legsCrouch[Direction.rightDown] = new Sprite[] { legSprites[67] };
-        skin.legsCrouch[Direction.rightUp] = new Sprite[] { legSprites[68] };
+        skin.legsCrouch[Direction.rightDown] = new Sprite[] { legSprites[67] }; // 25
+        skin.legsCrouch[Direction.rightUp] = new Sprite[] { legSprites[68] }; // 26
 
         skin.legsCrawl[Direction.down] = new Sprite[] { legSprites[27], legSprites[28], legSprites[29], legSprites[30] };
         skin.legsCrawl[Direction.rightDown] = new Sprite[] { legSprites[31], legSprites[32], legSprites[33], legSprites[34] };
@@ -188,12 +197,19 @@ public class Skin {
         skin.legsRun[Direction.rightUp] = new Sprite[] { legSprites[59], legSprites[60], legSprites[61], legSprites[62] };
         skin.legsRun[Direction.up] = new Sprite[] { legSprites[63], legSprites[64], legSprites[65], legSprites[66] };
 
+        skin.legsClimb[Direction.up] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.legsClimb[Direction.rightUp] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.legsClimb[Direction.right] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.legsClimb[Direction.rightDown] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+        skin.legsClimb[Direction.down] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
+
+        skin.legsJump[Direction.down] = new Sprite[] { legSprites[73] };
+        skin.legsJump[Direction.rightDown] = new Sprite[] { legSprites[74] };
+        skin.legsJump[Direction.right] = new Sprite[] { legSprites[75] };
+        skin.legsJump[Direction.rightUp] = new Sprite[] { legSprites[76] };
+        skin.legsJump[Direction.up] = new Sprite[] { legSprites[77] };
 
         // unarmed
-
-        skin.unarmedCrouch[Direction.rightDown] = new Sprite[] { legSprites[25] };
-        skin.unarmedCrouch[Direction.rightUp] = new Sprite[] { legSprites[26] };
-
         skin.unarmedIdle[Direction.down] = new Sprite[] { torsoSprites[0] };
         skin.unarmedIdle[Direction.rightDown] = new Sprite[] { torsoSprites[1] };
         skin.unarmedIdle[Direction.right] = new Sprite[] { torsoSprites[2] };
@@ -206,12 +222,32 @@ public class Skin {
         skin.unarmedWalk[Direction.rightUp] = new Sprite[] { torsoSprites[17], torsoSprites[18], torsoSprites[19], torsoSprites[20] };
         skin.unarmedWalk[Direction.up] = new Sprite[] { torsoSprites[21], torsoSprites[22], torsoSprites[23], torsoSprites[24] };
 
-        skin.unarmedRun[Direction.down] = new Sprite[] { torsoSprites[25], torsoSprites[26], torsoSprites[27], torsoSprites[28] };
-        skin.unarmedRun[Direction.rightDown] = new Sprite[] { torsoSprites[29], torsoSprites[30], torsoSprites[31], torsoSprites[32] };
-        skin.unarmedRun[Direction.right] = new Sprite[] { torsoSprites[33], torsoSprites[34], torsoSprites[35], torsoSprites[36] };
-        skin.unarmedRun[Direction.rightUp] = new Sprite[] { torsoSprites[37], torsoSprites[38], torsoSprites[39], torsoSprites[40] };
-        skin.unarmedRun[Direction.up] = new Sprite[] { torsoSprites[41], torsoSprites[42], torsoSprites[43], torsoSprites[44] };
+        skin.unarmedCrouch[Direction.rightDown] = new Sprite[] { torsoSprites[67] }; // 25
+        skin.unarmedCrouch[Direction.rightUp] = new Sprite[] { torsoSprites[68] }; // 26
 
+        skin.unarmedCrawl[Direction.down] = new Sprite[] { torsoSprites[27], torsoSprites[28], torsoSprites[29], torsoSprites[30] };
+        skin.unarmedCrawl[Direction.rightDown] = new Sprite[] { torsoSprites[31], torsoSprites[32], torsoSprites[33], torsoSprites[34] };
+        skin.unarmedCrawl[Direction.right] = new Sprite[] { torsoSprites[35], torsoSprites[36], torsoSprites[37], torsoSprites[38] };
+        skin.unarmedCrawl[Direction.rightUp] = new Sprite[] { torsoSprites[39], torsoSprites[40], torsoSprites[41], torsoSprites[42] };
+        skin.unarmedCrawl[Direction.up] = new Sprite[] { torsoSprites[43], torsoSprites[44], torsoSprites[45], torsoSprites[46] };
+
+        skin.unarmedRun[Direction.down] = new Sprite[] { torsoSprites[47], torsoSprites[48], torsoSprites[49], torsoSprites[50] };
+        skin.unarmedRun[Direction.rightDown] = new Sprite[] { torsoSprites[51], torsoSprites[52], torsoSprites[53], torsoSprites[54] };
+        skin.unarmedRun[Direction.right] = new Sprite[] { torsoSprites[55], torsoSprites[56], torsoSprites[57], torsoSprites[58] };
+        skin.unarmedRun[Direction.rightUp] = new Sprite[] { torsoSprites[59], torsoSprites[60], torsoSprites[61], torsoSprites[62] };
+        skin.unarmedRun[Direction.up] = new Sprite[] { torsoSprites[63], torsoSprites[64], torsoSprites[65], torsoSprites[66] };
+
+        skin.unarmedClimb[Direction.up] = new Sprite[] { torsoSprites[69], torsoSprites[70], torsoSprites[71], torsoSprites[72] };
+        skin.unarmedClimb[Direction.rightUp] = new Sprite[] { torsoSprites[69], torsoSprites[70], torsoSprites[71], torsoSprites[72] };
+        skin.unarmedClimb[Direction.right] = new Sprite[] { torsoSprites[69], torsoSprites[70], torsoSprites[71], torsoSprites[72] };
+        skin.unarmedClimb[Direction.rightDown] = new Sprite[] { torsoSprites[69], torsoSprites[70], torsoSprites[71], torsoSprites[72] };
+        skin.unarmedClimb[Direction.down] = new Sprite[] { torsoSprites[69], torsoSprites[70], torsoSprites[71], torsoSprites[72] };
+
+        skin.unarmedJump[Direction.down] = new Sprite[] { torsoSprites[73] };
+        skin.unarmedJump[Direction.rightDown] = new Sprite[] { torsoSprites[74] };
+        skin.unarmedJump[Direction.right] = new Sprite[] { torsoSprites[75] };
+        skin.unarmedJump[Direction.rightUp] = new Sprite[] { torsoSprites[76] };
+        skin.unarmedJump[Direction.up] = new Sprite[] { torsoSprites[77] };
 
         // pistol
 
@@ -239,11 +275,11 @@ public class Skin {
         skin.pistolRack[Direction.rightUp] = new Sprite[] { pistolSprites[48], pistolSprites[49], pistolSprites[50], pistolSprites[49] };
         skin.pistolRack[Direction.up] = new Sprite[] { pistolSprites[53] };
 
-        skin.pistolRun[Direction.down] = new Sprite[] { pistolSprites[55], pistolSprites[56], pistolSprites[57], pistolSprites[58] };
-        skin.pistolRun[Direction.rightDown] = new Sprite[] { pistolSprites[59], pistolSprites[60], pistolSprites[61], pistolSprites[62] };
-        skin.pistolRun[Direction.right] = new Sprite[] { pistolSprites[63], pistolSprites[64], pistolSprites[65], pistolSprites[66] };
-        skin.pistolRun[Direction.rightUp] = new Sprite[] { pistolSprites[67], pistolSprites[68], pistolSprites[69], pistolSprites[70] };
-        skin.pistolRun[Direction.up] = new Sprite[] { pistolSprites[71], pistolSprites[72], pistolSprites[73], pistolSprites[74] };
+        skin.pistolRun[Direction.down] = new Sprite[] { pistolSprites[54], pistolSprites[55], pistolSprites[56], pistolSprites[57] };
+        skin.pistolRun[Direction.rightDown] = new Sprite[] { pistolSprites[58], pistolSprites[59], pistolSprites[60], pistolSprites[61] };
+        skin.pistolRun[Direction.right] = new Sprite[] { pistolSprites[62], pistolSprites[63], pistolSprites[64], pistolSprites[65] };
+        skin.pistolRun[Direction.rightUp] = new Sprite[] { pistolSprites[66], pistolSprites[67], pistolSprites[68], pistolSprites[69] };
+        skin.pistolRun[Direction.up] = new Sprite[] { pistolSprites[70], pistolSprites[71], pistolSprites[72], pistolSprites[73] };
 
 
         // smg
@@ -329,43 +365,55 @@ public class Skin {
         skin.rifleRack[Direction.right] = new Sprite[] { rifleSprites[35], rifleSprites[36], rifleSprites[37], rifleSprites[36] };
         skin.rifleRack[Direction.rightUp] = new Sprite[] { rifleSprites[43], rifleSprites[44], rifleSprites[45], rifleSprites[44] };
         skin.rifleRack[Direction.up] = new Sprite[] { rifleSprites[49] };
-
-        // climb
-        skin.climb[Direction.up] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
-        skin.climb[Direction.rightUp] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
-        skin.climb[Direction.right] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
-        skin.climb[Direction.rightDown] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
-        skin.climb[Direction.down] = new Sprite[] { legSprites[69], legSprites[70], legSprites[71], legSprites[72] };
-
-        // jump
-        skin.jump[Direction.down] = new Sprite[] { legSprites[73] };
-        skin.jump[Direction.rightDown] = new Sprite[] { legSprites[74] };
-        skin.jump[Direction.right] = new Sprite[] { legSprites[75] };
-        skin.jump[Direction.rightUp] = new Sprite[] { legSprites[76] };
-        skin.jump[Direction.up] = new Sprite[] { legSprites[77] };
-
-
-
         return skin;
     }
 
-    public Octet<Sprite[]> GetCurrentOctet(HumanoidView.Mode mode) {
-        switch (mode) {
-            case HumanoidView.Mode.walk:
+    public Octet<Sprite[]> GetCurrentLegsOctet(LegsAnimation.State state) {
+        switch (state) {
+            case LegsAnimation.State.walk:
                 return legsWalk;
-            case HumanoidView.Mode.crawl:
+            case LegsAnimation.State.crawl:
                 return legsCrawl;
-            case HumanoidView.Mode.crouch:
+            case LegsAnimation.State.crouch:
                 return legsCrouch;
-            case HumanoidView.Mode.run:
+            case LegsAnimation.State.run:
                 return legsRun;
-            case HumanoidView.Mode.jump:
-                return jump;
-            case HumanoidView.Mode.climb:
-                return climb;
+            case LegsAnimation.State.jump:
+                return legsJump;
+            case LegsAnimation.State.climb:
+                return legsClimb;
             default:
-            case HumanoidView.Mode.idle:
+            case LegsAnimation.State.idle:
                 return legsIdle;
+        }
+    }
+
+    public Octet<Sprite[]> GetCurrentTorsoOctet(GunAnimation.State state, GunType type) {
+        switch (state) {
+
+            // base states
+            case GunAnimation.State.walking:
+                return gunWalkSprites(type);
+            case GunAnimation.State.crawling:
+                return unarmedCrawl;
+            case GunAnimation.State.crouching:
+                return gunCrouchSprites(type);
+            case GunAnimation.State.running:
+                return gunRunSprites(type);
+            case GunAnimation.State.climbing:
+                return unarmedClimb;
+
+            // gun states
+            case GunAnimation.State.reloading:
+                return reloadSprites(type);
+            case GunAnimation.State.racking:
+                return gunRackSprites(type);
+            case GunAnimation.State.shooting:
+                return shootSprites(type);
+
+            default:
+            case GunAnimation.State.idle:
+                return gunIdleSprites(type);
         }
     }
 }

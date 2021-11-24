@@ -19,7 +19,6 @@ public class TagSystemData {
 
     // if true, I do not hide when above the player
     public bool dontHideAbove;  // TODO: use layers instead
-    // currently used by: gibs
 
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;

@@ -1,26 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 using UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 public class UIInput {
     public bool toggleConsole;
 }
 
-// public partial class UI : Singleton<UI> {
 public class UIController : MonoBehaviour {
     public Canvas canvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
+    public InteractionIndicatorHandler interactionIndicatorHandler;
     public GameObject UIEditorCamera;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
     void Start() {
+        // cameras
         canvas.worldCamera = Camera.main;
+        interactionIndicatorHandler.cam = Camera.main;
+
         aimIndicatorHandler.UICamera = Camera.main;
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnMenuChange += HandleMenuChange;
@@ -38,6 +41,7 @@ public class UIController : MonoBehaviour {
         weaponUIHandler.Bind(target);
         itemUIHandler.Bind(target);
         aimIndicatorHandler.Bind(target);
+        interactionIndicatorHandler.Bind(target);
     }
 
     void HandleMenuChange(MenuType type) {

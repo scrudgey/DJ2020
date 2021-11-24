@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
-using System;
 using System.Linq;
+using TMPro;
+using UnityEngine;
 
 namespace UI {
     public class TerminalCommand {
@@ -56,10 +56,22 @@ namespace UI {
             int value = int.Parse(args[1]);
             switch (fieldName) {
                 case "cyberlegs":
-                    GameManager.I.gameData.playerState.cyberlegsLevel = value;
+                    GameManager.I.gameData.playerData.cyberlegsLevel = value;
                     break;
                 case "debug-rays":
                     GameManager.I.showDebugRays = value == 1;
+                    break;
+                case "pistol-skill":
+                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.pistol] = value;
+                    break;
+                case "smg-skill":
+                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.smg] = value;
+                    break;
+                case "rifle-skill":
+                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.rifle] = value;
+                    break;
+                case "shotgun-skill":
+                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.shotgun] = value;
                     break;
                 default:
                     Println($"unrecognized set parameter: {fieldName}");

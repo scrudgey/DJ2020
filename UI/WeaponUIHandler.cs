@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using TMPro;
 
 namespace UI {
 
@@ -26,7 +26,7 @@ namespace UI {
         }
 
         public void HandleValueChanged(GunHandler gun) {
-            if (gun != null && gun.gunInstance != null) {
+            if (target.HasGun()) {
                 // ammoIndicator.text = $"A: {gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
                 // ammoImageCaption.text = gun.gunInstance.baseGun.name;
                 ammoIndicator.text = gun.gunInstance.baseGun.name;

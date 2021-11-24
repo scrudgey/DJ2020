@@ -23,7 +23,7 @@ public class PlayerData {
         {GunType.sword, 1},
     };
 
-    public static PlayerData TestInitialData() {
+    public static PlayerData DefaultGameData() {
         return new PlayerData() {
 
             primaryGun = new GunInstance(Gun.Load("rifle")),
@@ -32,9 +32,9 @@ public class PlayerData {
             tertiaryGun = new GunInstance(Gun.Load("shotgun")),
             activeGun = 2,
 
-            legSkin = "generic",
+            legSkin = "generic64",
             // legSkin = "cyber",
-            bodySkin = "generic",
+            bodySkin = "generic64",
 
             cyberlegsLevel = 1,
 

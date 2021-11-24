@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Easings;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
-using Easings;
-using System.Linq;
 
 // TODO: eliminate this enum
 public enum CameraState { normal, wallPress, attractor }
@@ -221,7 +221,7 @@ public class NeoCharacterCamera : MonoBehaviour {
             deltaTime = input.deltaTime,
             targetDistance = 20,
             targetPosition = targetPosition,
-            orthographicSize = 8,
+            orthographicSize = 6, // 8 TODO: set by attractor and/or level
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
             distanceMovementSpeed = currentDistanceMovementSpeed

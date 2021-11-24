@@ -1,12 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
 using KinematicCharacterController;
+using UnityEngine;
 
 public class GunAnimation : MonoBehaviour, ISaveable {
-    public enum State { idle, walking, shooting, crouching, racking, reloading, running }
-    private State _state;
+    public enum State { idle, walking, shooting, crouching, racking, reloading, running, climbing, crawling }
+    private State state;
     private int _frame;
     private bool _isShooting;
     private bool _isRacking;
@@ -23,9 +23,16 @@ public class GunAnimation : MonoBehaviour, ISaveable {
 
     private float trailTimer;
     public float trailInterval = 0.05f;
-
-
-
+    private bool bob;
+    public bool HasGun() {
+        return gunHandler != null && gunHandler.HasGun();
+    }
+    void SetState(State newState) {
+        if (newState != state) {
+            bob = false;
+        }
+        state = newState;
+    }
     void OnEnable() {
         animator.Play();
     }
@@ -41,6 +48,9 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     // used by animator
     public void SetFrame(int frame) {
         _frame = frame;
+    }
+    public void SetBob(int bob) {
+        this.bob = bob == 1;
     }
     // used by animator
     public void EndShoot() {
@@ -104,7 +114,9 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
-        billboard.skin = GetCurrentOctet(GetCurrentGunType());
+        billboard.skin = skin.GetCurrentTorsoOctet(state, GetCurrentGunType());
+        // TODO: set direction
+        // billboard.direction = _direction;
     }
 
     // TODO: why is there separate private state variables and input
@@ -125,7 +137,6 @@ public class GunAnimation : MonoBehaviour, ISaveable {
                     spriteRenderer.material.EnableKeyword("_BILLBOARD");
                 }
                 spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
-
                 break;
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
@@ -140,49 +151,86 @@ public class GunAnimation : MonoBehaviour, ISaveable {
         _direction = input.orientation;
 
         transform.localPosition = Vector3.zero;
-        // order state settings by priority
-        if (input.isCrouching) { // crouching
-            _state = State.crouching;
-            if (input.gunType == GunType.unarmed || input.isMoving || input.isJumping || input.isClimbing) {
-                spriteRenderer.enabled = false;
-            } else {
-                spriteRenderer.enabled = true;
-            }
-        } else if (input.isClimbing || input.isJumping) {
-            spriteRenderer.enabled = false;
-        } else {
-            spriteRenderer.enabled = true;
+        if (bob) {
+            transform.localPosition -= new Vector3(0f, 0.01f, 0f);
         }
 
         if (_isShooting) { // shooting
-            _state = State.shooting;
-            if (gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun) {
+            SetState(State.shooting);
+            if (gunHandler.HasGun()) {
                 SetAnimation(gunHandler.gunInstance.baseGun.shootAnimation);
             }
         } else if (_isReloading) {
-            _state = State.reloading;
-            if (gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun) {
+            SetState(State.reloading);
+            if (gunHandler.HasGun()) {
                 SetAnimation(gunHandler.gunInstance.baseGun.reloadAnimation);
             }
         } else if (_isRacking) { // racking
-            _state = State.racking;
-            if (gunHandler.gunInstance != null && gunHandler.gunInstance.baseGun) {
+            SetState(State.racking);
+            if (gunHandler.HasGun()) {
                 SetAnimation(gunHandler.gunInstance.baseGun.rackAnimation);
             }
-        } else if (input.isMoving) { // walking
-            if (input.isRunning) {
-                _state = State.running;
+        } else { // walking
+            if (input.isMoving) {
+                if (input.isRunning) {
+                    SetState(State.running);
+                } else {
+                    SetState(State.walking);
+                }
+                if (input.isCrouching) {
+                    SetState(State.crawling);
+                }
+                if (input.isClimbing) {
+                    SetState(State.climbing);
+                }
+                SetAnimation(walkAnimation);
             } else {
-                _state = State.walking;
+                SetState(State.idle);
+                _frame = 0;
+                if (input.isCrouching) {
+                    SetState(State.crouching);
+                    FixCrouchOffset();
+                }
+                if (input.isClimbing) {
+                    SetState(State.climbing);
+                }
+                SetAnimation(idleAnimation);
             }
-            SetAnimation(walkAnimation);
-        } else { // idle
-            _state = State.idle;
-            _frame = 0;
-            SetAnimation(idleAnimation);
+
         }
 
         UpdateFrame();
+    }
+
+    private void FixCrouchOffset() {
+        Vector3 offset = Vector3.zero;
+        switch (_direction) {
+            case Direction.right:
+                offset = new Vector3(0f, 0.07f, 0.06f);
+                break;
+            case Direction.rightUp:
+                offset = new Vector3(0.07f, 0.07f, 0f);
+                break;
+            case Direction.up:
+                offset = new Vector3(0.06f, 0.07f, 0f);
+                break;
+            case Direction.leftUp:
+                offset = new Vector3(0f, 0.07f, 0.07f);
+                break;
+            case Direction.left:
+                offset = new Vector3(0f, 0.07f, 0.07f);
+                break;
+            case Direction.leftDown:
+                offset = new Vector3(0.06f, 0.04f, 0f);
+                break;
+            case Direction.down:
+                offset = new Vector3(-0.05f, 0.04f, 0f);
+                break;
+            case Direction.rightDown:
+                offset = new Vector3(0f, 0.05f, 0.06f);
+                break;
+        }
+        transform.localPosition -= offset;
     }
     private void SetAnimation(AnimationClip clip) {
         if (animator.clip != clip) {
@@ -191,33 +239,17 @@ public class GunAnimation : MonoBehaviour, ISaveable {
         }
     }
 
-    private Octet<Sprite[]> GetCurrentOctet(GunType type) {
-        switch (_state) {
-            case State.reloading:
-                return skin.reloadSprites(type);
-            case State.racking:
-                return skin.rackSprites(type);
-            case State.shooting:
-                return skin.shootSprites(type);
-            case State.running:
-                return skin.runSprites(type);
-            case State.walking:
-                return skin.walkSprites(type);
-            default:
-            case State.idle:
-                return skin.idleSprites(type);
-        }
-    }
+
     private GunType GetCurrentGunType() {
         GunType type = GunType.unarmed;
-        if (gunHandler != null && gunHandler.gunInstance != null && !holstered) { //
+        if (HasGun() && !holstered) { //
             type = gunHandler.gunInstance.baseGun.type;
         }
         return type;
     }
     public void UpdateFrame() {
         GunType type = GetCurrentGunType();
-        Octet<Sprite[]> _sprites = GetCurrentOctet(type);
+        Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(state, GetCurrentGunType());
 
         if (_sprites == null)
             return;

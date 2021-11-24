@@ -27,6 +27,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
+    public bool HasGun() {
+        return gunInstance != null && gunInstance.baseGun != null;
+    }
     public void Update() {
         if (gunInstance == null) {
             return;
@@ -77,9 +80,9 @@ public class GunHandler : MonoBehaviour, ISaveable {
         accuracy += shootingInaccuracy;
 
         // skills
-        int skillLevel = GameManager.I.gameData.playerState.gunSkillLevel[gunInstance.baseGun.type];
+        int skillLevel = GameManager.I.gameData.playerData.gunSkillLevel[gunInstance.baseGun.type];
         float skillBonus = (1 - skillLevel) * (0.1f);
-        accuracy -= skillBonus;
+        accuracy += skillBonus;
 
         // weapon mods
 
@@ -308,7 +311,7 @@ public class GunHandler : MonoBehaviour, ISaveable {
         gunAnimation.input = input.Fire;
         lastTargetData = input.Fire.targetData;
         OnTargetChanged?.Invoke(this);
-        if (gunInstance != null && gunInstance.CanShoot()) {
+        if (HasGun() && gunInstance.CanShoot()) {
             if (gunInstance.baseGun.cycle == CycleType.automatic) {
                 if (input.Fire.FirePressed && !shooting) {
                     gunAnimation.StartShooting();

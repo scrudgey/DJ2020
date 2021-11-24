@@ -1,11 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using KinematicCharacterController;
-using UnityEngine.InputSystem;
-using System;
 using System.Linq;
+using KinematicCharacterController;
 using UI;
+using UnityEngine;
+using UnityEngine.InputSystem;
 public class NeoPlayer : MonoBehaviour {
     public NeoCharacterCamera OrbitCamera;
     public ClearSighter sighter;
@@ -14,7 +14,7 @@ public class NeoPlayer : MonoBehaviour {
     public GunHandler gunHandler;
     public JumpIndicatorController jumpIndicatorController;
     public JumpIndicatorView jumpIndicatorView;
-    public HumanoidView legsAnimator;
+    public LegsAnimation legsAnimator;
     public GunAnimation torsoAnimator;
 
     [Header("Inputs")]
@@ -187,7 +187,7 @@ public class NeoPlayer : MonoBehaviour {
             Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
         GunType gunType = GunType.unarmed;
-        if (torsoAnimator.gunHandler.gunInstance != null && torsoAnimator.gunHandler.gunInstance.baseGun != null) {
+        if (torsoAnimator.gunHandler.HasGun()) {
             gunType = torsoAnimator.gunHandler.gunInstance.baseGun.type;
         }
 

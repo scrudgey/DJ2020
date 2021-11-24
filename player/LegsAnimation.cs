@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
-using System;
+using UnityEngine;
 
 public enum Direction { left, leftUp, up, rightUp, right, rightDown, down, leftDown }
 
@@ -19,9 +19,9 @@ public struct AnimationInput {
     public GunType gunType;
 }
 
-public class HumanoidView : MonoBehaviour, ISaveable {
-    public enum Mode { idle, walk, crawl, crouch, run, jump, climb }
-    Mode mode;
+public class LegsAnimation : MonoBehaviour, ISaveable {
+    public enum State { idle, walk, crawl, crouch, run, jump, climb }
+    State state;
     public SpriteRenderer spriteRenderer;
     public Transform shadowCaster;
     public GameObject torso;
@@ -35,7 +35,7 @@ public class HumanoidView : MonoBehaviour, ISaveable {
 
     // used by animation
     public void SetFrame(int frame) {
-        Octet<Sprite[]> octet = skin.GetCurrentOctet(mode);
+        Octet<Sprite[]> octet = skin.GetCurrentLegsOctet(state);
         Sprite[] sprites = octet[direction];
         frame = Math.Min(frame, sprites.Length - 1);
         spriteRenderer.sprite = sprites[frame];
@@ -43,8 +43,9 @@ public class HumanoidView : MonoBehaviour, ISaveable {
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
-        billboard.skin = skin.GetCurrentOctet(mode);
+        billboard.skin = skin.GetCurrentLegsOctet(state);
     }
+    public void SetBob(int bob) { }
     public void UpdateView(AnimationInput input) {
         // set direction
         direction = input.orientation;
@@ -82,17 +83,17 @@ public class HumanoidView : MonoBehaviour, ISaveable {
 
         if (input.isMoving) { //
             if (input.isJumping) {
-                mode = Mode.jump;
+                state = State.jump;
             } else if (input.isClimbing) {
-                mode = Mode.climb;
+                state = State.climb;
             } else if (input.isRunning) {
-                mode = Mode.run;
+                state = State.run;
             } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.5f, 0.1f, 0.5f);
                 shadowCaster.localPosition = new Vector3(0f, 0.1f, 0f);
-                mode = Mode.crawl;
+                state = State.crawl;
             } else {
-                mode = Mode.walk;
+                state = State.walk;
             }
             if (animator.clip != walkAnimation) {
                 animator.clip = walkAnimation;
@@ -100,24 +101,24 @@ public class HumanoidView : MonoBehaviour, ISaveable {
             }
         } else { // stopped
             if (input.isJumping) {
-                mode = Mode.jump;
-                spriteRenderer.sprite = skin.jump[direction][0];
+                state = State.jump;
+                spriteRenderer.sprite = skin.legsJump[direction][0];
             } else if (input.isClimbing) {
-                mode = Mode.climb;
-                spriteRenderer.sprite = skin.climb[Direction.up][0];
+                state = State.climb;
+                spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
             } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
                 // shadowCaster.localPosition = new Vector3(0f, 0.3f, 0f);
                 spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
-                mode = Mode.crouch;
+                state = State.crouch;
 
-                if (input.gunType == GunType.unarmed) {
-                    spriteRenderer.sprite = skin.unarmedCrouch[direction][0];
-                } else {
-                    spriteRenderer.sprite = skin.legsCrouch[direction][0];
-                }
+                // if (input.gunType == GunType.unarmed) {
+                //     spriteRenderer.sprite = skin.unarmedCrouch[direction][0];
+                // } else {
+                spriteRenderer.sprite = skin.legsCrouch[direction][0];
+                // }
             } else {
-                mode = Mode.idle;
+                state = State.idle;
                 spriteRenderer.sprite = skin.legsIdle[direction][0];
             }
             if (animator.clip != idleAnimation) {
