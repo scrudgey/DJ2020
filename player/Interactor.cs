@@ -15,26 +15,36 @@ public class Interactor : MonoBehaviour {
     public HashSet<InteractorTargetData> interactives = new HashSet<InteractorTargetData>();
 
     public Action<Interactor> OnValueChanged;
+    public Action<InteractorTargetData> OnActionDone;
     public void AddInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
         if (interactive) {
             interactives.Add(new InteractorTargetData(interactive, other));
         }
-        OnValueChanged(this);
+        OnValueChanged?.Invoke(this);
     }
     public void RemoveInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
         if (interactive) {
             interactives.RemoveWhere(data => data.collider == other);
         }
-        OnValueChanged(this);
+        OnValueChanged?.Invoke(this);
+    }
+    public void RemoveInteractive(Interactive other) {
+        if (other) {
+            interactives.RemoveWhere(data => data.target == other);
+        }
+        OnValueChanged?.Invoke(this);
     }
 
     public InteractorTargetData ActiveTarget() {
         if (interactives.Count == 0) {
             return null;
         }
-        return interactives.OrderBy(interactive => interactive.target.priority).First();
+        return interactives
+        .Where(interactive => interactive.target.priority > 0)
+        .OrderBy(interactive => interactive.target.priority)
+        .FirstOrDefault();
     }
 
     void OnTriggerEnter(Collider other) {
@@ -42,5 +52,15 @@ public class Interactor : MonoBehaviour {
     }
     void OnTriggerExit(Collider other) {
         RemoveInteractive(other);
+    }
+
+    public void SetInputs(ref PlayerCharacterInput inputs) {
+        // TODO: handle the case when there's a ladder separate from interactives
+        if (inputs.actionButtonPressed) {
+            InteractorTargetData data = ActiveTarget();
+            if (data == null) return;
+            data.target.DoAction(this);
+            OnActionDone?.Invoke(data);
+        }
     }
 }

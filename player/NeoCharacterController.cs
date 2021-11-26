@@ -23,7 +23,7 @@ public struct PlayerCharacterInput {
     public FireInputs Fire;
     public bool reload;
     public int switchToGun;
-    public bool climbLadder;
+    public bool actionButtonPressed;
     public int incrementItem;
     public bool useItem;
 }
@@ -220,7 +220,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     public void SetInputs(ref PlayerCharacterInput input) {
         // Handle ladder transitions
         _ladderUpDownInput = input.MoveAxisForward;
-        if (input.climbLadder) {
+        if (input.actionButtonPressed) {
             _probedColliders = new Collider[8];
             if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
                 // if (_probedColliders[0] != null) {

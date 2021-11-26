@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
-public enum Layer { def, shell, obj, skybox, shadowprobe, bulletPassThrough }
+public enum Layer { def, shell, obj, skybox, shadowprobe, bulletPassThrough, interactive, interactor }
 public class LayerUtil {
     private static Dictionary<Layer, string> layerNames = new Dictionary<Layer, string>{
         {Layer.def, "Default"},
@@ -11,7 +11,9 @@ public class LayerUtil {
         {Layer.obj, "Object"},
         {Layer.skybox, "skybox"},
         {Layer.shadowprobe, "shadowprobe"},
-        {Layer.bulletPassThrough, "bulletPassThrough"}
+        {Layer.bulletPassThrough, "bulletPassThrough"},
+        {Layer.interactive, "interactive"},
+        {Layer.interactor, "interactor"}
     };
 
     public static LayerMask GetMask(params Layer[] layers) {

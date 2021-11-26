@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 public class PlayerData {
+    public int credits;
     // skin
     public string legSkin;
     public string bodySkin;

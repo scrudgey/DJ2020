@@ -4,4 +4,13 @@ using UnityEngine;
 
 public class Credstick : Interactive {
     public int amount;
+    public AudioClip[] pickupSounds;
+    public override void DoAction(Interactor interactor) {
+        Destroy(gameObject);
+        GameManager.I.gameData.playerData.credits += amount;
+        interactor.RemoveInteractive(this);
+    }
+    public override string ResponseString() {
+        return $"picked up {amount} credits";
+    }
 }

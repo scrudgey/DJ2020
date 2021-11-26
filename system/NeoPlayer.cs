@@ -13,6 +13,7 @@ public class NeoPlayer : MonoBehaviour {
     public NeoCharacterController Character;
     public GunHandler gunHandler;
     public JumpIndicatorController jumpIndicatorController;
+    public Interactor interactor;
     public JumpIndicatorView jumpIndicatorView;
     public LegsAnimation legsAnimator;
     public GunAnimation torsoAnimator;
@@ -273,7 +274,7 @@ public class NeoPlayer : MonoBehaviour {
         //      this will be in the player's gun's height plane.
 
 
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
         TagSystemData priorityData = null;
         RaycastHit priorityHit = new RaycastHit();
         bool prioritySet = false;
@@ -331,7 +332,7 @@ public class NeoPlayer : MonoBehaviour {
             },
             reload = reloadPressedThisFrame,
             switchToGun = selectGunThisFrame,
-            climbLadder = actionButtonPressedThisFrame,
+            actionButtonPressed = actionButtonPressedThisFrame,
             incrementItem = incrementItemThisFrame,
             useItem = useItemThisFrame,
         };
@@ -340,6 +341,9 @@ public class NeoPlayer : MonoBehaviour {
 
         // apply inputs to jump indicator
         jumpIndicatorController.SetInputs(ref characterInputs, Character);
+
+        // apply inputs to interactor
+        interactor.SetInputs(ref characterInputs);
 
         firePressedThisFrame = false;
         jumpPressedThisFrame = false;

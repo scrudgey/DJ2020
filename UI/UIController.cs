@@ -8,6 +8,7 @@ public class UIInput {
     public bool toggleConsole;
 }
 
+
 public class UIController : MonoBehaviour {
     public Canvas canvas;
     public TerminalController terminal;
@@ -15,6 +16,7 @@ public class UIController : MonoBehaviour {
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
     public InteractionIndicatorHandler interactionIndicatorHandler;
+    public ActionLogHandler actionLogHandler;
     public GameObject UIEditorCamera;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -42,6 +44,7 @@ public class UIController : MonoBehaviour {
         itemUIHandler.Bind(target);
         aimIndicatorHandler.Bind(target);
         interactionIndicatorHandler.Bind(target);
+        actionLogHandler.Bind(target);
     }
 
     void HandleMenuChange(MenuType type) {
