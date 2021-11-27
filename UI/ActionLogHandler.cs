@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-public class ActionLogHandler : MonoBehaviour {
+public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
+    public Interactor target { get; set; }
+
     public TextMeshProUGUI logText;
     public TextMeshProUGUI promptText;
-    public Interactor target;
     public InteractorTargetData data;
     Coroutine blitTextCoroutine;
 
@@ -16,8 +17,10 @@ public class ActionLogHandler : MonoBehaviour {
     void Start() {
         logText.text = "";
     }
+
+    // TODO: figure out a better pattern for this sort of thing
     public void Bind(GameObject newTargetObject) {
-        if (target != null) {
+        if (this.target != null) {
             target.OnValueChanged -= HandleValueChanged;
             target.OnActionDone -= HandleActionDone;
         }
@@ -28,7 +31,7 @@ public class ActionLogHandler : MonoBehaviour {
             HandleValueChanged(target);
         }
     }
-    void HandleValueChanged(Interactor interactor) {
+    public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
         if (newData != data) {
             data = newData;

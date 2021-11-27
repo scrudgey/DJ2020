@@ -5,9 +5,10 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, ISaveable {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
+    public Action<GunHandler> OnValueChanged { get; set; }
+
     static readonly public float height = 0.5f;
-    public Action<GunHandler> OnValueChanged;
     public GunAnimation gunAnimation;
     public AudioSource audioSource;
     public Light muzzleFlashLight;

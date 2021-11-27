@@ -1,11 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
 using Items;
+using UnityEngine;
 // TODO: enable buffs on/off
-public class ItemHandler : MonoBehaviour, ISaveable {
-    public Action<ItemHandler> OnValueChanged;
+public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
+    public Action<ItemHandler> OnValueChanged { get; set; }
+
     public List<BaseItem> items = new List<BaseItem>();
     public int index;
     public BaseItem activeItem;

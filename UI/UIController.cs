@@ -40,10 +40,21 @@ public class UIController : MonoBehaviour {
 
     void BindToNewTarget(GameObject target) {
         // Debug.Log($"bind: {target}");
-        weaponUIHandler.Bind(target);
-        itemUIHandler.Bind(target);
-        aimIndicatorHandler.Bind(target);
-        interactionIndicatorHandler.Bind(target);
+        IBinder<GunHandler> x = weaponUIHandler;
+        x.Bind(target);
+
+        IBinder<ItemHandler> y = itemUIHandler;
+        y.Bind(target);
+
+        IBinder<GunHandler> z = aimIndicatorHandler;
+        z.Bind(target);
+
+        IBinder<NeoCharacterController> zz = aimIndicatorHandler;
+        zz.Bind(target);
+
+        IBinder<Interactor> w = interactionIndicatorHandler;
+        w.Bind(target);
+
         actionLogHandler.Bind(target);
     }
 

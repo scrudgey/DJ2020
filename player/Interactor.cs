@@ -11,10 +11,11 @@ public class InteractorTargetData {
         this.collider = collider;
     }
 }
-public class Interactor : MonoBehaviour {
+public class Interactor : MonoBehaviour, IBindable<Interactor> {
+    public Action<Interactor> OnValueChanged { get; set; }
+
     public HashSet<InteractorTargetData> interactives = new HashSet<InteractorTargetData>();
 
-    public Action<Interactor> OnValueChanged;
     public Action<InteractorTargetData> OnActionDone;
     public void AddInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
