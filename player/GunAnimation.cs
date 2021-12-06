@@ -8,27 +8,17 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
-    // private bool _isShooting;
-    // private bool _isRacking;
-    // private bool _isReloading;
     private Direction _direction;
-    // public GunHandler gunHandler;
     public SpriteRenderer spriteRenderer;
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
     public Skin skin;
-    // public PlayerCharacterInput.FireInputs input;
-    // public bool holstered;
-
     private float trailTimer;
     public float trailInterval = 0.05f;
     private bool bob;
-    // private GunType currentGunType;
     private AnimationInput lastInput;
-    // public bool HasGun() {
-    //     return gunHandler != null && gunHandler.HasGun();
-    // }
+
     void SetState(GunHandler.GunState newState) {
         if (newState != state) {
             bob = false;
@@ -38,88 +28,15 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     void OnEnable() {
         animator.Play();
     }
-
-    // used by animator
-    // public void ShootCallback() {
-    // gunHandler.Shoot(input);
-    // }
-    // // used by animator
-    // public void AimCallback() {
-    //     gunHandler.Aim();
-    // }
-    // // used by animator
-    // public void RackCallback() {
-    //     gunHandler.Rack();
-    // }
-    // // used by animator
-    // public void EndShoot() {
-    //     if (gunHandler.gunInstance == null)
-    //         return;
-    //     gunHandler.shooting = false;
-    //     _isShooting = false;
-    // }
-
-
     // used by animator
     public void SetFrame(int frame) {
         _frame = frame;
     }
+    // used by animator
     public void SetBob(int bob) {
         this.bob = bob == 1;
     }
-
-    // // used by animator
-    // public void EndRack() {
-    //     _isRacking = false;
-    // }
-
-    // public void StartShooting() {
-    //     if (!_isShooting) {
-    //         // TODO: what is the point of _isShooting, _state, and why is animation set at this point? two ways of handling animations?
-    //         _isShooting = true;
-    //         _isRacking = false;
-    //         _isReloading = false;
-    //         UpdateFrame();
-    //     }
-    // }
-    // public void StartRack() {
-    //     if (!_isRacking) {
-    //         _isRacking = true;
-    //         _isReloading = false;
-    //         _isShooting = false;
-    //         UpdateFrame();
-    //     }
-    // }
-    // public void StartReload() {
-    //     if (!_isReloading) {
-    //         _isReloading = true;
-    //         _isRacking = false;
-    //         _isShooting = false;
-    //         UpdateFrame();
-    //     }
-    // }
-    // public void StopReload() {
-    //     _isReloading = false; // TODO: delete this?s
-    // }
-    // public void ClipIn() {
-    //     gunHandler.ClipIn();
-    // }
-
-    // public void Holster() {
-    //     holstered = true;
-    //     // EndShoot();
-    // }
-    // public void Unholster() {
-    //     holstered = false;
-    //     _isShooting = false;
-    //     _isRacking = false;
-    // }
-
-
-
-    // TODO: why is there separate private state variables and input
     public void UpdateView(AnimationInput input) {
-        // currentGunType = input.gunInput.gunType;
         lastInput = input;
 
         switch (input.state) {
@@ -188,79 +105,15 @@ public class GunAnimation : MonoBehaviour, ISaveable {
             }
         }
 
-        // if (state == GunHandler.State.shooting) { // shooting
-        //                                           // SetState(State.shooting);
-        //     if (gunHandler.HasGun()) { // should be input
-        //         SetAnimation(gunHandler.gunInstance.baseGun.shootAnimation);
-        //     }
-        // } else if (_isReloading) {
-        //     // SetState(State.reloading);
-        //     if (gunHandler.HasGun()) {
-        //         SetAnimation(gunHandler.gunInstance.baseGun.reloadAnimation);
-        //     }
-        // } else 
-        // if (_isRacking) { // racking
-        //                   // SetState(State.racking);
-        //     if (gunHandler.HasGun()) {
-        //         SetAnimation(gunHandler.gunInstance.baseGun.rackAnimation);
-        //     }
-        // } else { // walking
-
-
-        // }
-
         UpdateFrame();
     }
-
-    // private void FixCrouchOffset() {
-    //     if (gunHandler.gunInstance == null)
-    //         return;
-    //     Vector3 offset = Vector3.zero;
-    //     // switch (_direction) {
-    //     //     case Direction.right:
-    //     //         offset = new Vector3(0f, 0.07f, 0.06f);
-    //     //         break;
-    //     //     case Direction.rightUp:
-    //     //         offset = new Vector3(0.07f, 0.07f, 0f);
-    //     //         break;
-    //     //     case Direction.up:
-    //     //         offset = new Vector3(0.06f, 0.07f, 0f);
-    //     //         break;
-    //     //     case Direction.leftUp:
-    //     //         offset = new Vector3(0f, 0.07f, 0.07f);
-    //     //         break;
-    //     //     case Direction.left:
-    //     //         offset = new Vector3(0f, 0.07f, 0.07f);
-    //     //         break;
-    //     //     case Direction.leftDown:
-    //     //         offset = new Vector3(0.06f, 0.04f, 0f);
-    //     //         break;
-    //     //     case Direction.down:
-    //     //         offset = new Vector3(-0.05f, 0.04f, 0f);
-    //     //         break;
-    //     //     case Direction.rightDown:
-    //     //         offset = new Vector3(0f, 0.05f, 0.06f);
-    //     //         break;
-    //     // }
-    //     transform.localPosition -= offset;
-    // }
     private void SetAnimation(AnimationClip clip) {
         if (animator.clip != clip) {
             animator.clip = clip;
             animator.Play();
         }
     }
-
-
-    // private GunType GetCurrentGunType() {
-    //     GunType type = GunType.unarmed;
-    //     if (HasGun() && !holstered) { //
-    //         type = gunHandler.gunInstance.baseGun.type; // this should be part of input!!! 
-    //     }
-    //     return type;
-    // }
     public void UpdateFrame() {
-        // GunType type = GetCurrentGunType();
         Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(lastInput);
 
         if (_sprites == null)

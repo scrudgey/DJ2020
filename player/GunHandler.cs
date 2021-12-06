@@ -8,32 +8,22 @@ using UnityEngine;
 public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     public enum GunState {
         idle,
-        // walking,
         shooting,
-        // crouching,
         racking,
         reloading,
-        // running,
-        // climbing,
-        // crawling
     }
     public GunState state;
     public Action<GunHandler> OnValueChanged { get; set; }
-
     static readonly public float height = 0.5f;
-    // public GunAnimation gunAnimation;
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
     public GunInstance gunInstance;
-    // public bool shooting;
-    // public bool reloading;
     public GunInstance secondary;
     public GunInstance primary;
     public GunInstance third;
     public bool emitShell;
     public TargetData lastTargetData;
-    // public Action<GunHandler> OnTargetChanged;
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
@@ -59,7 +49,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
     // used by animator
     public void EndShoot() {
-        // shooting = false;
         state = GunState.idle;
     }
     // used by animator
@@ -76,7 +65,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
     // used by animator
     public void StopReload() {
-        // reloading = false;
         state = GunState.idle;
     }
 
@@ -92,7 +80,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
 
         if (state != GunState.shooting && state != GunState.reloading && gunInstance.chamber == 0 && gunInstance.clip > 0) {
-            // gunAnimation.StartRack();
             Rack();
         }
 
@@ -108,7 +95,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
 
     public Vector3 gunPosition() {
-        // return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     public Vector3 gunDirection() {
@@ -139,7 +125,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         float skillBonus = (1 - skillLevel) * (0.1f);
         accuracy += skillBonus;
 
-        // weapon mods
+        // TODO: weapon mods
 
         accuracy = Math.Max(0, accuracy);
 
@@ -276,11 +262,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         if (state == GunState.reloading)
             return;
 
-        // reloading = true;
-        // shooting = false;
         state = GunState.reloading;
 
-        // gunInstance.Reload();
         gunInstance.ClipOut();
 
         // drop clip
@@ -289,20 +272,12 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         // play sound
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipOut);
 
-        // start animation
-        // gunAnimation.StartReload();
-
         OnValueChanged?.Invoke(this);
     }
     public void ReloadShell() {
         if (state == GunState.reloading)
             return;
-        // reloading = true;
-        // shooting = false;
         state = GunState.reloading;
-
-        // start animation
-        // gunAnimation.StartReload();
     }
 
     private void SwitchGun(GunInstance instance) {
@@ -310,11 +285,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             return;
         gunInstance = instance;
 
-        // gunAnimation.Unholster();
-
-
-        // TODO: don't call this! maybe?
-        // gunAnimation.EndShoot();
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.unholster);
 
         PoolManager.I.RegisterPool(gunInstance.baseGun.shellCasing);
@@ -323,7 +293,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
     public void Holster() {
         gunInstance = null;
-        // gunAnimation.Holster();
         OnValueChanged?.Invoke(this);
     }
     public void SwitchToGun(int idn) {
@@ -361,28 +330,23 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
     }
     public void ProcessInput(PlayerCharacterInput input) {
-        // gunAnimation.input = input.Fire;
         lastTargetData = input.Fire.targetData;
         OnValueChanged?.Invoke(this);
         if (HasGun() && gunInstance.CanShoot()) {
             if (gunInstance.baseGun.cycle == CycleType.automatic) {
                 if (input.Fire.FirePressed && state != GunState.shooting) {
-                    // gunAnimation.StartShooting();
-                    // shooting = true;
-                    // reloading = false;
                     state = GunState.shooting;
                 } else if (state == GunState.shooting && !input.Fire.FireHeld) {
                     EndShoot();
-                    // shooting = false;
-
                 }
             } else { // semiautomatic
                 if (input.Fire.FirePressed) {//&& !shooting) {
-                    // gunAnimation.StartShooting();
-                    // shooting = true;
-                    // reloading = false;
                     state = GunState.shooting;
                 }
+            }
+        } else {
+            if (state == GunState.shooting) {
+                state = GunState.idle;
             }
         }
         if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {

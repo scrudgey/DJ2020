@@ -409,8 +409,8 @@ public class Skin {
             }
         } else { // not moving
 
+            // gun states
             switch (input.gunInput.gunState) {
-                // gun states
                 case GunHandler.GunState.reloading:
                     return reloadSprites(input.gunInput.gunType);
                 case GunHandler.GunState.racking:
