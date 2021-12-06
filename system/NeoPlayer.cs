@@ -17,6 +17,7 @@ public class NeoPlayer : MonoBehaviour {
     public JumpIndicatorView jumpIndicatorView;
     public LegsAnimation legsAnimator;
     public GunAnimation torsoAnimator;
+    public HeadAnimation headAnimation;
 
     [Header("Inputs")]
     public InputActionReference MoveAction;
@@ -183,31 +184,50 @@ public class NeoPlayer : MonoBehaviour {
         // update view
         Vector2 camDir = new Vector2(OrbitCamera.Transform.forward.x, OrbitCamera.Transform.forward.z);
         Vector2 playerDir = new Vector2(Character.direction.x, Character.direction.z);
+
+        // head direction
+        TargetData targetData = CursorToTarget(Mouse.current.position.ReadValue());
+        Vector3 headDirection = (targetData.position - headAnimation.transform.position).normalized;
+        // Debug.DrawRay(headAnimation.transform.position, headDirection, Color.red, 1f);
+        Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
+
+        // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);
+        float headAngle = Vector2.SignedAngle(camDir, headDir);
+
         if (GameManager.I.showDebugRays)
             Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
         GunType gunType = GunType.unarmed;
-        if (torsoAnimator.gunHandler.HasGun()) {
-            gunType = torsoAnimator.gunHandler.gunInstance.baseGun.type;
+        Gun baseGun = null;
+        if (gunHandler.HasGun()) {
+            gunType = gunHandler.gunInstance.baseGun.type;
+            baseGun = gunHandler.gunInstance.baseGun;
         }
 
         AnimationInput animationInput = new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
+            headOrientation = Toolbox.DirectionFromAngle(headAngle),
             isMoving = Character.Motor.Velocity.magnitude > 0.1 && (Character.Motor.GroundingStatus.IsStableOnGround || Character.state == CharacterState.climbing),
             isCrouching = Character.isCrouching,
-            // isCrouching = true,
             isRunning = Character.isRunning,
             isJumping = Character.state == CharacterState.superJump,
             isClimbing = Character.state == CharacterState.climbing,
             wallPressTimer = Character.wallPressTimer,
             state = Character.state,
             playerInputs = _lastInput,
-            gunType = gunType
+            gunInput = new AnimationInput.GunAnimationInput {
+                gunType = gunType,
+                gunState = gunHandler.state,
+                hasGun = gunHandler.gunInstance != null && gunHandler.HasGun(),
+                holstered = gunHandler.gunInstance == null,
+                baseGun = baseGun
+            }
         };
 
         legsAnimator.UpdateView(animationInput);
         torsoAnimator.UpdateView(animationInput);
+        headAnimation.UpdateView(animationInput);
         jumpIndicatorView.UpdateView(animationInput);
     }
 

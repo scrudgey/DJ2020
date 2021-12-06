@@ -174,6 +174,7 @@ public class NeoCharacterCamera : MonoBehaviour {
 
         if (state == CameraState.attractor) {
             ApplyTargetParameters(AttractorUpdate(input));
+            volume.profile = isometricProfile;
         } else if (state == CameraState.normal) {
             ApplyTargetParameters(NormalUpdate(input));
             volume.profile = isometricProfile;

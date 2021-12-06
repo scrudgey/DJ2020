@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Skin {
+    // head
+    public Octet<Sprite[]> headIdle = new Octet<Sprite[]>();
+
+    // legs
     public Octet<Sprite[]> legsIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsWalk = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsCrouch = new Octet<Sprite[]>();
@@ -146,28 +150,28 @@ public class Skin {
         } else return output;
     }
     public static Skin LoadSkin(string name) {
-        // Sprite[] legSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/legs") as Sprite[];
         Sprite[] legSprites = loadSprites(name, "legs");
 
-        // Sprite[] torsoSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/torso") as Sprite[];
         Sprite[] torsoSprites = loadSprites(name, "torso");
 
-        // Sprite[] pistolSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/pistol") as Sprite[];
         Sprite[] pistolSprites = loadSprites(name, "pistol");
 
-        // Sprite[] smgSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/smg") as Sprite[];
         Sprite[] smgSprites = loadSprites(name, "smg");
 
-        // Sprite[] shotgunSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/shotgun") as Sprite[];
         Sprite[] shotgunSprites = loadSprites(name, "shotgun");
 
-        // Sprite[] rifleSprites = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/rifle") as Sprite[];
         Sprite[] rifleSprites = loadSprites(name, "rifle");
+
+        Sprite[] headSprites = loadSprites(name, "head");
 
         Skin skin = new Skin();
 
-        // TODO: clean this up a bit
-
+        // head
+        skin.headIdle[Direction.down] = new Sprite[] { headSprites[0] };
+        skin.headIdle[Direction.rightDown] = new Sprite[] { headSprites[1] };
+        skin.headIdle[Direction.right] = new Sprite[] { headSprites[2] };
+        skin.headIdle[Direction.rightUp] = new Sprite[] { headSprites[3] };
+        skin.headIdle[Direction.up] = new Sprite[] { headSprites[4] };
 
         // legs
         skin.legsIdle[Direction.down] = new Sprite[] { legSprites[0] };
@@ -388,32 +392,38 @@ public class Skin {
         }
     }
 
-    public Octet<Sprite[]> GetCurrentTorsoOctet(GunAnimation.State state, GunType type) {
-        switch (state) {
-
-            // base states
-            case GunAnimation.State.walking:
-                return gunWalkSprites(type);
-            case GunAnimation.State.crawling:
-                return unarmedCrawl;
-            case GunAnimation.State.crouching:
-                return gunCrouchSprites(type);
-            case GunAnimation.State.running:
-                return gunRunSprites(type);
-            case GunAnimation.State.climbing:
-                return unarmedClimb;
-
-            // gun states
-            case GunAnimation.State.reloading:
-                return reloadSprites(type);
-            case GunAnimation.State.racking:
-                return gunRackSprites(type);
-            case GunAnimation.State.shooting:
-                return shootSprites(type);
-
-            default:
-            case GunAnimation.State.idle:
-                return gunIdleSprites(type);
+    public Octet<Sprite[]> GetCurrentTorsoOctet(AnimationInput input) {
+        if (input.isClimbing) {
+            return unarmedClimb;
         }
+        if (input.isMoving) {
+            if (input.isCrouching) {
+                // crawl
+                return unarmedCrawl;
+            } else if (input.isRunning) {
+                // running
+                return gunRunSprites(input.gunInput.gunType);
+            } else {
+                // walk
+                return gunWalkSprites(input.gunInput.gunType);
+            }
+        } else { // not moving
+
+            switch (input.gunInput.gunState) {
+                // gun states
+                case GunHandler.GunState.reloading:
+                    return reloadSprites(input.gunInput.gunType);
+                case GunHandler.GunState.racking:
+                    return gunRackSprites(input.gunInput.gunType);
+                case GunHandler.GunState.shooting:
+                    return shootSprites(input.gunInput.gunType);
+                default:
+                case GunHandler.GunState.idle:
+                    if (input.isCrouching) {
+                        return gunCrouchSprites(input.gunInput.gunType);
+                    } else return gunIdleSprites(input.gunInput.gunType);
+            }
+        }
+
     }
 }

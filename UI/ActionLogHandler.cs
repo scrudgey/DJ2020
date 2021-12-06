@@ -5,17 +5,23 @@ using UnityEngine;
 public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
     public Interactor target { get; set; }
 
-    public TextMeshProUGUI logText;
+    // public TextMeshProUGUI logText;
+    public Transform logTextHolder;
+    public GameObject logTextEntryPrefab;
     public TextMeshProUGUI promptText;
     public InteractorTargetData data;
     Coroutine blitTextCoroutine;
+    public AudioSource audioSource;
 
     static readonly string prefix = ">";
-    static readonly string dot = "|";
+    static readonly string dot = "<sprite index=1 tint>";
 
 
     void Start() {
-        logText.text = "";
+        foreach (Transform child in logTextHolder) {
+            Destroy(child.gameObject);
+        }
+        promptText.text = prefix;
     }
 
     // TODO: figure out a better pattern for this sort of thing
@@ -39,13 +45,22 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
         }
     }
     void HandleActionDone(InteractorTargetData data) {
-        logText.text += $"\n>{data.target.actionPrompt}\n{data.target.ResponseString()}";
-        // TODO: trim old lines
+        CreateLogEntry($"{prefix}{data.target.actionPrompt}\n{data.target.ResponseString()}");
+    }
+    void CreateLogEntry(string entry) {
+        GameObject logEntry = GameObject.Instantiate(logTextEntryPrefab);
+        TextMeshProUGUI logText = logEntry.GetComponent<TextMeshProUGUI>();
+        logText.text = entry;
+        logEntry.transform.SetParent(logTextHolder, false);
+
+        // TODO: configurable log cull time
+        Destroy(logEntry, 10);
     }
     void DataChanged() {
-        promptText.text = ">";
+        promptText.text = prefix;
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
+            audioSource.Stop();
         }
         if (data == null) {
             return;
@@ -57,6 +72,7 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
         float timer = 0f;
         int index = 1;
         string targetText = $"{prefix}{actionText}{dot}";
+        audioSource.Play();
         while (promptText.text != targetText) {
             while (timer < blitInterval) {
                 timer += Time.deltaTime;
@@ -64,8 +80,12 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
             }
             timer -= blitInterval;
             index += 1;
+            if (index > prefix.Length + actionText.Length) {
+                index = targetText.Length;
+            }
             promptText.text = targetText.Substring(0, index);
         }
+        audioSource.Stop();
         timer = 0f;
         blitInterval = 0.1f;
         while (true) {

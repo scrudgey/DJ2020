@@ -7,7 +7,18 @@ using UnityEngine;
 public enum Direction { left, leftUp, up, rightUp, right, rightDown, down, leftDown }
 
 public struct AnimationInput {
+    public struct GunAnimationInput {
+        public GunType gunType;
+        public GunHandler.GunState gunState;
+        // public bool shooting;
+        // public bool reloading;
+        public bool hasGun;
+        public bool holstered;
+        public Gun baseGun;
+    }
+    public GunAnimationInput gunInput;
     public Direction orientation;
+    public Direction headOrientation;
     public PlayerCharacterInput playerInputs;
     public bool isMoving;
     public bool isCrouching;
@@ -16,12 +27,19 @@ public struct AnimationInput {
     public bool isClimbing;
     public float wallPressTimer;
     public CharacterState state;
-    public GunType gunType;
 }
 
 public class LegsAnimation : MonoBehaviour, ISaveable {
-    public enum State { idle, walk, crawl, crouch, run, jump, climb }
+    public enum State {
+        idle,
+        walk,
+        crawl,
+        crouch,
+        run,
+        jump, climb
+    }
     State state;
+    private int frame;
     public SpriteRenderer spriteRenderer;
     public Transform shadowCaster;
     public GameObject torso;
@@ -35,10 +53,7 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
 
     // used by animation
     public void SetFrame(int frame) {
-        Octet<Sprite[]> octet = skin.GetCurrentLegsOctet(state);
-        Sprite[] sprites = octet[direction];
-        frame = Math.Min(frame, sprites.Length - 1);
-        spriteRenderer.sprite = sprites[frame];
+        this.frame = frame;
     }
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
@@ -126,9 +141,18 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
                 animator.Play();
             }
         }
+
+        UpdateFrame();
     }
 
     public void LoadState(PlayerData data) {
         skin = Skin.LoadSkin(data.legSkin);
+    }
+
+    public void UpdateFrame() {
+        Octet<Sprite[]> octet = skin.GetCurrentLegsOctet(state);
+        Sprite[] sprites = octet[direction];
+        frame = Math.Min(frame, sprites.Length - 1);
+        spriteRenderer.sprite = sprites[frame];
     }
 }

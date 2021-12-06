@@ -15,10 +15,12 @@ namespace UI {
 
         public void HandleValueChanged(GunHandler gun) {
             if (target.HasGun()) {
+                ammoImage.enabled = true;
                 ammoIndicator.text = gun.gunInstance.baseGun.name;
                 ammoImageCaption.text = $"{gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
                 ammoImage.sprite = gun.gunInstance.baseGun.image;
             } else {
+                ammoImage.enabled = false;
                 ammoIndicator.text = $"A: -/-";
                 ammoImageCaption.text = "";
                 ammoImage.sprite = null;

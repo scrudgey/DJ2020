@@ -9,6 +9,7 @@ public class Credstick : Interactive {
         Destroy(gameObject);
         GameManager.I.gameData.playerData.credits += amount;
         interactor.RemoveInteractive(this);
+        Toolbox.AudioSpeaker(transform.position, pickupSounds);
     }
     public override string ResponseString() {
         return $"picked up {amount} credits";
