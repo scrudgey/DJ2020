@@ -197,6 +197,76 @@ public class Toolbox {
         source.spread = 0.2f;
         return source;
     }
+    public static int Moddo(int x, int m) {
+        // // if (x < 0) {
+        // //     return (x + m + 1) % m;
+        // // } else return (x + m) % m;
+        // return ((x % m) + m) % m;
+        if (x < 0) {
+            return m + x + 1; // -1 -> 7 = 7 - 1 + 1
+        } else if (x <= m) {
+            return x;
+        } else {
+            return x % m - 1;
+        }
+    }
+
+
+    public static Direction ClampDirection(Direction direction, Direction clamp, int width = 2, bool suppressOutput = true) {
+        int clampInt = (int)clamp;
+        int dirInt = (int)direction;
+        int lower = Moddo((clampInt - width), 7);
+        int upper = Moddo((clampInt + width), 7);
+
+        if (lower < clampInt && upper > clampInt) { // |---------lower----clamp------upper------|
+            if (!suppressOutput)
+                Debug.Log($"I");
+            if (dirInt <= lower) {
+                if (lower - dirInt > width) {
+                    dirInt = upper;
+                } else {
+                    dirInt = lower;
+                }
+            } else if (dirInt >= upper) {
+                if (dirInt - upper > width) {
+                    dirInt = lower;
+                } else {
+                    dirInt = upper;
+
+                }
+            }
+        } else if (lower > clampInt) { // |-----clamp--upper----------lower---|
+            if (!suppressOutput)
+                Debug.Log($"II");
+            if (dirInt < lower && dirInt > upper) {
+                if (Math.Abs(dirInt - lower) < Math.Abs(dirInt - upper)) {
+                    dirInt = lower;
+                } else {
+                    dirInt = upper;
+                }
+            }
+        } else if (upper < clampInt) { // |-upper----------------lower---clamp---|
+            if (!suppressOutput)
+                Debug.Log($"III");
+
+            if (dirInt < lower && dirInt > upper) {
+                if (Math.Abs(dirInt - lower) < Math.Abs(dirInt - upper)) {
+                    dirInt = lower;
+                } else {
+                    dirInt = upper;
+                    if (!suppressOutput)
+                        Debug.Log($"({direction}, {clamp}) -> {(Direction)dirInt} III");
+                }
+            }
+        }
+        if (!suppressOutput) {
+            Debug.Log($"direction: {direction}:{dirInt}");
+            Debug.Log($"clamp: {clamp}:{clampInt}");
+            Debug.Log($"bounds: [{(Direction)lower}:{lower}, {(Direction)upper}:{upper}])");
+            Debug.Log($"output: {(Direction)dirInt}");
+        }
+        return (Direction)dirInt;
+    }
 }
 
 

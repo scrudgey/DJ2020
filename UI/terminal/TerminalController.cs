@@ -17,6 +17,7 @@ namespace UI {
             consoleInput.onEndEdit.AddListener(OnConsoleEditEnd);
 
             commands["set"] = SetValue;
+            commands["test"] = RunTests;
         }
         public void OnEnable() {
             TakeFocus();
@@ -50,7 +51,10 @@ namespace UI {
         }
 
         // commands
-
+        public void RunTests(string[] args) {
+            Println($"running test suite...");
+            TestSuite.RunToolboxTests();
+        }
         public void SetValue(string[] args) {
             string fieldName = args[0];
             int value = int.Parse(args[1]);
@@ -73,6 +77,9 @@ namespace UI {
                 case "shotgun-skill":
                     GameManager.I.gameData.playerData.gunSkillLevel[GunType.shotgun] = value;
                     break;
+                // case "test":
+                //     TestSuite.RunToolboxTests();
+                //     break;
                 default:
                     Println($"unrecognized set parameter: {fieldName}");
                     break;

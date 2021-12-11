@@ -150,7 +150,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
     private float landStunTimer;
 
-
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
         OnStateExit(tmpInitialState, newState);

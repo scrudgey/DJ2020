@@ -222,7 +222,8 @@ public class NeoPlayer : MonoBehaviour {
                 hasGun = gunHandler.gunInstance != null && gunHandler.HasGun(),
                 holstered = gunHandler.gunInstance == null,
                 baseGun = baseGun
-            }
+            },
+            cameraRotation = OrbitCamera.isometricRotation
         };
 
         legsAnimator.UpdateView(animationInput);
@@ -317,7 +318,6 @@ public class NeoPlayer : MonoBehaviour {
                 screenPosition = OrbitCamera.Camera.WorldToScreenPoint(priorityHit.collider.bounds.center)
             };
         }
-
 
         // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
         float distance = 0;

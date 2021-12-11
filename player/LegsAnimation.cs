@@ -4,7 +4,16 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public enum Direction { left, leftUp, up, rightUp, right, rightDown, down, leftDown }
+public enum Direction {
+    right,      // 0
+    rightUp,    // 1
+    up,         // 2
+    leftUp,     // 3
+    left,       // 4
+    leftDown,   // 5
+    down,       // 6
+    rightDown,  // 7
+}
 
 public struct AnimationInput {
     public struct GunAnimationInput {
@@ -27,6 +36,7 @@ public struct AnimationInput {
     public bool isClimbing;
     public float wallPressTimer;
     public CharacterState state;
+    public Quaternion cameraRotation;
 }
 
 public class LegsAnimation : MonoBehaviour, ISaveable {
@@ -123,15 +133,9 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
                 spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
             } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
-                // shadowCaster.localPosition = new Vector3(0f, 0.3f, 0f);
                 spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
                 state = State.crouch;
-
-                // if (input.gunType == GunType.unarmed) {
-                //     spriteRenderer.sprite = skin.unarmedCrouch[direction][0];
-                // } else {
                 spriteRenderer.sprite = skin.legsCrouch[direction][0];
-                // }
             } else {
                 state = State.idle;
                 spriteRenderer.sprite = skin.legsIdle[direction][0];
@@ -141,6 +145,15 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
                 animator.Play();
             }
         }
+
+        // orientation
+        // Calculate camera direction and rotation on the character plane
+        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
+        if (cameraPlanarDirection.sqrMagnitude == 0f) {
+            cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;
+        }
+        Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
+        transform.rotation = cameraPlanarRotation;
 
         UpdateFrame();
     }
