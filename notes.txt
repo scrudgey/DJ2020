@@ -265,4 +265,50 @@ ENUM            clamp       result
 7 - leftdown                7
 
 
-nest 
+next major branches to work on:
+
+NPCs
+    sphere robot
+    basic civilians
+        hands up pose
+        hand interact pose
+interactives
+    PIP camera for panel interactions system
+        take control mode
+        layer visible only to cinematic camera
+        camera lerp in / out on enter/exit
+        UI contains PIP camera while active
+        modular interactive panel system
+            tool kit
+                screwdriver, lockpicks, wire cutters, cyberdeck
+            open up panel
+            wires to cut
+            data port to tap
+            physical locks
+            variable effects
+                overload, bypass, reroute, etc.
+                terminator-style hack card for ATM
+environmental systems
+    power
+        lights, various gadgets receive power / no power
+        dynamic lights / instanced material emission
+        backup generator
+        mains connection / transformer
+        underground cables / steam tunnels
+    network
+        hacking system
+            WAN / cloud connection on map
+        allow hacking over networks
+        routers / portals
+        firewalls
+        ICE
+    alarms / video feed ?
+    water / fire suppression ?
+
+    represent the connections physically in-game
+        automatically represent the connectors as meshes in-game?
+        different vision modes can reveal infrastructure connections
+        connections are severed when wall explodes
+            water pipes spill water
+            network connections severed
+        

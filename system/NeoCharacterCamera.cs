@@ -88,8 +88,6 @@ public class NeoCharacterCamera : MonoBehaviour {
         _currentDistance = DefaultDistance;
         TargetDistance = _currentDistance;
 
-        // _targetVerticalAngle = 0f;
-
         PlanarDirection = Vector3.forward;
 
         currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
