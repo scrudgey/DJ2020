@@ -39,6 +39,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     }
 
     public InteractorTargetData ActiveTarget() {
+        interactives.RemoveWhere(interactive => interactive == null);
         if (interactives.Count == 0) {
             return null;
         }

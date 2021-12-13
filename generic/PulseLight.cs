@@ -16,10 +16,6 @@ public class PulseLight : MonoBehaviour {
     }
     void Update() {
         timer += Time.deltaTime;
-        // if (timer >= period) {
-        //     timer = 0;
-
-        // }
         float intensity = Mathf.Sin(timer * (2 * Mathf.PI / period));
         Color color = new Color(startColor.r, startColor.g, startColor.b, startAlpha * intensity);
         transform.localScale = intensity * startScale;

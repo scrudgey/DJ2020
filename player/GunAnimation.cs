@@ -20,9 +20,6 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     private AnimationInput lastInput;
 
     void SetState(GunHandler.GunState newState) {
-        if (newState != state) {
-            bob = false;
-        }
         state = newState;
     }
     void OnEnable() {
@@ -59,7 +56,7 @@ public class GunAnimation : MonoBehaviour, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
                 }
                 break;
         }
@@ -109,6 +106,7 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     }
     private void SetAnimation(AnimationClip clip) {
         if (animator.clip != clip) {
+            bob = false;
             animator.clip = clip;
             animator.Play();
         }

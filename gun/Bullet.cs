@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 public class Bullet {
     public float damage;
@@ -13,7 +13,7 @@ public class Bullet {
     }
 
     public void DoImpacts() {
-        RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetMask(Layer.def, Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (Impact(hit)) {
                 Debug.DrawLine(gunPosition, hit.point, Color.green, 5f);

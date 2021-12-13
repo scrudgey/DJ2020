@@ -79,8 +79,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             gunInstance.Update();
         }
 
-        if (state != GunState.shooting && state != GunState.reloading && gunInstance.chamber == 0 && gunInstance.clip > 0) {
-            Rack();
+        if (state == GunState.idle && gunInstance.chamber == 0 && gunInstance.clip > 0) {
+            // Rack();
+            state = GunState.racking;
         }
 
         if (movementInaccuracy > 0) {
@@ -246,12 +247,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.aimSounds);
     }
     public void Rack() {
-        if (state == GunState.racking)
-            return;
         if (gunInstance == null || gunInstance.baseGun == null) {
             return;
         }
-        state = GunState.racking;
         if (gunInstance.baseGun.cycle == CycleType.manual) {
             EmitShell();
         }
@@ -279,7 +277,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             return;
         state = GunState.reloading;
     }
-
     private void SwitchGun(GunInstance instance) {
         if (instance == null || instance == gunInstance)
             return;
@@ -332,23 +329,28 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     public void ProcessInput(PlayerCharacterInput input) {
         lastTargetData = input.Fire.targetData;
         OnValueChanged?.Invoke(this);
-        if (HasGun() && gunInstance.CanShoot()) {
-            if (gunInstance.baseGun.cycle == CycleType.automatic) {
-                if (input.Fire.FirePressed && state != GunState.shooting) {
-                    state = GunState.shooting;
-                } else if (state == GunState.shooting && !input.Fire.FireHeld) {
-                    EndShoot();
+        if (HasGun()) {
+            if (gunInstance.CanShoot()) {
+                if (gunInstance.baseGun.cycle == CycleType.automatic) {
+                    if (input.Fire.FirePressed && state != GunState.shooting) {
+                        state = GunState.shooting;
+                    } else if (state == GunState.shooting && !input.Fire.FireHeld) {
+                        EndShoot();
+                    }
+                } else { // semiautomatic
+                    if (input.Fire.FirePressed) {//&& !shooting) {
+                        state = GunState.shooting;
+                    }
                 }
-            } else { // semiautomatic
-                if (input.Fire.FirePressed) {//&& !shooting) {
-                    state = GunState.shooting;
+            } else {
+                if (gunInstance.baseGun.cycle == CycleType.automatic) {
+                    if (state == GunState.shooting) {
+                        state = GunState.idle;
+                    }
                 }
-            }
-        } else {
-            if (state == GunState.shooting) {
-                state = GunState.idle;
             }
         }
+
         if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {
             // TODO: inaccuracy based on weapon weight
             float movement = 1;

@@ -86,8 +86,8 @@ public class TestSuite {
         // down ↓
         // limits: ←, →
         AssertEquals(Toolbox.ClampDirection(Direction.right, Direction.down), Direction.right);         //  →, ↓ = → <- upper
-        AssertEquals(Toolbox.ClampDirection(Direction.rightUp, Direction.down), Direction.right);       //  ↗, ↓ = → // bad ↗
-        AssertEquals(Toolbox.ClampDirection(Direction.up, Direction.down), Direction.right);            //  ↑, ↓ = → // bad: ↗
+        AssertEquals(Toolbox.ClampDirection(Direction.rightUp, Direction.down), Direction.right);       //  ↗, ↓ = → 
+        AssertEquals(Toolbox.ClampDirection(Direction.up, Direction.down), Direction.right);            //  ↑, ↓ = → 
         AssertEquals(Toolbox.ClampDirection(Direction.leftUp, Direction.down), Direction.left);         //  ↖, ↓ = ← 
         AssertEquals(Toolbox.ClampDirection(Direction.left, Direction.down), Direction.left);           //  ←, ↓ = ← <- lower
         AssertEquals(Toolbox.ClampDirection(Direction.leftDown, Direction.down), Direction.leftDown);   //  ↙, ↓ = ↙ 
@@ -99,8 +99,8 @@ public class TestSuite {
         AssertEquals(Toolbox.ClampDirection(Direction.right, Direction.rightDown), Direction.right);             //  →, ↘ = → 
         AssertEquals(Toolbox.ClampDirection(Direction.rightUp, Direction.rightDown), Direction.rightUp);         //  ↗, ↘ = ↗ <- upper
         AssertEquals(Toolbox.ClampDirection(Direction.up, Direction.rightDown), Direction.rightUp);              //  ↑, ↘ = ↗ 
-        AssertEquals(Toolbox.ClampDirection(Direction.leftUp, Direction.rightDown), Direction.rightUp);          //  ↖, ↘ = ↗ // bad: ←
-        AssertEquals(Toolbox.ClampDirection(Direction.left, Direction.rightDown), Direction.leftDown);           //  ←, ↘ = ↙ // bad: ←
+        AssertEquals(Toolbox.ClampDirection(Direction.leftUp, Direction.rightDown), Direction.rightUp);          //  ↖, ↘ = ↗ 
+        AssertEquals(Toolbox.ClampDirection(Direction.left, Direction.rightDown), Direction.leftDown);           //  ←, ↘ = ↙ 
         AssertEquals(Toolbox.ClampDirection(Direction.leftDown, Direction.rightDown), Direction.leftDown);       //  ↙, ↘ = ↙ <- lower
         AssertEquals(Toolbox.ClampDirection(Direction.down, Direction.rightDown), Direction.down);               //  ↓, ↘ = ↓ 
         AssertEquals(Toolbox.ClampDirection(Direction.rightDown, Direction.rightDown), Direction.rightDown);     //  ↘, ↘ = ↘ <- clamp

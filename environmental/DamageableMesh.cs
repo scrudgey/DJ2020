@@ -13,7 +13,8 @@ public class DamageableMesh : IDamageable {
         mesh = transform.GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
         triangles = mesh.triangles;
-        hits = new bool[triangles.Length * 3];
+        // hits = new bool[triangles.Length * 3];
+        hits = new bool[vertices.Length];
         for (int i = 0; i < hits.Length; i++) {
             hits[i] = false;
         }

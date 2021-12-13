@@ -95,7 +95,7 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
                 }
                 break;
         }
@@ -148,12 +148,16 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
 
         // orientation
         // Calculate camera direction and rotation on the character plane
-        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
-        if (cameraPlanarDirection.sqrMagnitude == 0f) {
-            cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;
+        if (input.wallPressTimer <= 0) {
+            Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
+            if (cameraPlanarDirection.sqrMagnitude == 0f) {
+                cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;
+            }
+            Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
+            transform.rotation = cameraPlanarRotation;
+        } else {
+            transform.localRotation = Quaternion.identity;
         }
-        Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
-        transform.rotation = cameraPlanarRotation;
 
         UpdateFrame();
     }

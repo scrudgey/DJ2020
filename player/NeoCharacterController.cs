@@ -347,10 +347,14 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     _jumpRequested = true;
                 }
                 break;
-
+            case CharacterState.superJump:
+                if (Motor.Velocity.y < 0) {
+                    Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                } else {
+                    Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.75f);
+                }
+                break;
         }
-
-
     }
 
     /// <summary>
@@ -716,8 +720,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     void CheckUncrouch() {
         if (isCrouching) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
-            // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
-            // Motor.SetCapsuleDimensions(defaultRadius, 2f, 1f);
             Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
             _probedColliders = new Collider[8];
             if (Motor.CharacterCollisionsOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders) > 0) {

@@ -184,12 +184,10 @@ public class Toolbox {
 
     public static AudioSource SetUpAudioSource(GameObject g) {
         AudioSource source = GetOrCreateComponent<AudioSource>(g);
-
         if (sfxMixer == null) {
             sfxMixer = Resources.Load("mixers/SoundEffectMixer") as AudioMixer;
         }
         source.outputAudioMixerGroup = sfxMixer.FindMatchingGroups("Master")[0];
-
         source.rolloffMode = AudioRolloffMode.Logarithmic;
         source.minDistance = 1f;
         source.maxDistance = 5.42f;
@@ -198,12 +196,8 @@ public class Toolbox {
         return source;
     }
     public static int Moddo(int x, int m) {
-        // // if (x < 0) {
-        // //     return (x + m + 1) % m;
-        // // } else return (x + m) % m;
-        // return ((x % m) + m) % m;
         if (x < 0) {
-            return m + x + 1; // -1 -> 7 = 7 - 1 + 1
+            return m + x + 1;
         } else if (x <= m) {
             return x;
         } else {
@@ -219,8 +213,6 @@ public class Toolbox {
         int upper = Moddo((clampInt + width), 7);
 
         if (lower < clampInt && upper > clampInt) { // |---------lower----clamp------upper------|
-            if (!suppressOutput)
-                Debug.Log($"I");
             if (dirInt <= lower) {
                 if (lower - dirInt > width) {
                     dirInt = upper;
@@ -232,12 +224,9 @@ public class Toolbox {
                     dirInt = lower;
                 } else {
                     dirInt = upper;
-
                 }
             }
         } else if (lower > clampInt) { // |-----clamp--upper----------lower---|
-            if (!suppressOutput)
-                Debug.Log($"II");
             if (dirInt < lower && dirInt > upper) {
                 if (Math.Abs(dirInt - lower) < Math.Abs(dirInt - upper)) {
                     dirInt = lower;
@@ -246,16 +235,11 @@ public class Toolbox {
                 }
             }
         } else if (upper < clampInt) { // |-upper----------------lower---clamp---|
-            if (!suppressOutput)
-                Debug.Log($"III");
-
             if (dirInt < lower && dirInt > upper) {
                 if (Math.Abs(dirInt - lower) < Math.Abs(dirInt - upper)) {
                     dirInt = lower;
                 } else {
                     dirInt = upper;
-                    if (!suppressOutput)
-                        Debug.Log($"({direction}, {clamp}) -> {(Direction)dirInt} III");
                 }
             }
         }
