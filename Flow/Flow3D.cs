@@ -38,8 +38,8 @@ public class Flow3D : MonoBehaviour {
         if (system == null) {
             system = GetComponent<ParticleSystem>();
         }
-        if (particles == null || particles.Length < system.maxParticles) {
-            particles = new ParticleSystem.Particle[system.maxParticles];
+        if (particles == null || particles.Length < system.main.maxParticles) {
+            particles = new ParticleSystem.Particle[system.main.maxParticles];
         }
         int particleCount = system.GetParticles(particles);
         PositionParticles();

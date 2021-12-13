@@ -66,7 +66,7 @@ public class NeoCharacterCamera : MonoBehaviour {
 
     private bool _distanceIsObstructed;
     private float _currentDistance;
-    private float _targetVerticalAngle;
+    // private float _targetVerticalAngle;
     private RaycastHit _obstructionHit;
     private int _obstructionCount;
     private RaycastHit[] _obstructions = new RaycastHit[MaxObstructions];
@@ -88,7 +88,7 @@ public class NeoCharacterCamera : MonoBehaviour {
         _currentDistance = DefaultDistance;
         TargetDistance = _currentDistance;
 
-        _targetVerticalAngle = 0f;
+        // _targetVerticalAngle = 0f;
 
         PlanarDirection = Vector3.forward;
 

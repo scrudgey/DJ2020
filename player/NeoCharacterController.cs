@@ -105,7 +105,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     private Vector3 _wallJumpNormal;
     private Vector3 _internalVelocityAdd = Vector3.zero;
     // private bool _shouldBeCrouching = false;
-    private bool _shouldBeRunning = false;
+    // private bool _shouldBeRunning = false;
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
     public bool isRunning = false;
@@ -269,13 +269,13 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
         // Run input
         if (input.runDown) {
-            _shouldBeRunning = true;
+            // _shouldBeRunning = true;
             if (!isRunning) {
                 isRunning = true;
             }
         } else {
             isRunning = false;
-            _shouldBeRunning = false;
+            // _shouldBeRunning = false;
 
             // Crouching input
             if (input.CrouchDown || input.jumpHeld) {

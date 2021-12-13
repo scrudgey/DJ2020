@@ -66,3 +66,203 @@ pos = mul(
 );
 
 why does this work at all? we are basically multiplying the x coordinate straight from model to clip
+
+✓ reformulate in 64x64
+    ✓ new sprites
+        ✓ base
+        ✓ pistol
+        ✓ smg
+        ✓ shotgun
+        ✓ rifle
+    ✓ new models: not necessary
+    ✓ new textures
+        ✓ windows
+        ✓ street parking sign
+        ✓ gibs 
+        ✓ shells
+        ✓ decals
+        ✓ newspaper stand
+        ✓ sidewalk
+        ✓ pc tower / monitor
+        ✓ fence
+        ✓ meter wires
+        ✓ emission map
+
+UI initiative
+    probably i want pixelated / animated lines and callouts
+
+interactible
+    press F to interact with nearest 
+    UI call-out of F action
+
+how can we highlight when an object is near?
+    needs to detect objects in range and sort by priority
+        is this a case for a tag?
+        a trigger collider, masked to collide with only certain layer objects
+        what about don't hide interlopers?
+    UI needs to bind to interactor
+
+broadly:
+interactive interface is in place.
+we next need to think about how hacking interacts with this system.
+
+* graphics
+    pass 2 of base template
+    security guard
+    face
+* UI   
+    better gun / item graphics
+* hacking
+    networks / gateways / endpoints
+    UI overlay
+    clarity 
+* level parameters
+    sound effects, camera defaults, etc.
+    scenes
+    objectives
+* system
+    main menu
+    game start
+    game load
+    settings
+* entities
+    baddies
+    civilians
+    robots
+    AI
+* more environment
+
+
+
+time to speculate on some new gameplay beats. try to narrow in on what drew me to this idea.
+overall theme possibilities:
+    1. realistic B&E simulator. buildings have realistic utilities, firefighter access, security grids, physical security. you need specialized tools and tactics to get around.
+    2. modern setting / cyberpunk setting / sci-fi setting
+        shadowrun SNES: alleyways, brick buildings
+    3. stealth ninja
+        stealth kills with sword, knife, etc.
+    4. whatever DJ1 was
+            DJ1 was: flat concrete plains with small buildings dotting it. like military compounds.
+            instead we want:
+                self contained small office tower (say 3 story building) with interior, exterior, multiple insertion / extraction points.
+
+inspo:
+    ghost in the shell
+
+the basic loop: do missions, earn credits, buy upgrades, do harder missions
+    some very hard missions might be available early on, technically doable with pure stealth?
+
+an alarm is triggered and the street fills up with private securiy swat response team (configurable offsite secutiy detail per level)
+    the team lines up outside and then breaches through main entrance
+an alarm is triggered and shutter doors descend, corridor fills with gas, turrets pop out of walls
+
+you sneak through a ventilation airduct until you're above the conference room containing your target, bypassing the security detail and locked door outside.
+you drop down through the vent and quickly dispatch everyone inside with throwing stars and nanoblade katana. the guards outside the door hear nothing and you commence extraction.
+outside the window, the city night twinkles like fireflies in the darkness. your home is down there: safely in the shadows.
+
+breaching a conference room, shooting the target with delayed-explosive tip flechettes
+
+shellfish toxin flechettes / needlegun
+
+you plant remote detonation explosives outside a wall in the alley way first thing, so that you'll have a quick escape route later. after you have completed the mission objectives, security is closing in:
+so you hit the detonator and make for the hole in the wall.
+
+planting explosives or a simulator / distractor outside, to draw the security team away from your target.
+
+a team of two men in hazmat suits carry a radioactive thing through a cleanroom hallway
+
+MI CIA NOC list sequence (disguise, trigger alarms, distract, track, etc.)
+
+at the first sign of trouble, a team of bodyguards shove the VIP into a bulletproof limo and then take defensive positions
+
+you approach a smart gas meter. interact brings up a live close-up cam with greater detail. you use a toolbox of tools to unscrew faceplates,
+snip wires, attach hacking gizmos, enter the network, etc.
+
+randomized missions
+
+hack or tap security system to get a UI feed of their info & actions
+
+shooting out a fine wire zipline into the neck of a distracted robot to upload a stun program that disables it temporarily
+
+remote hacker handles hacking things for you
+a fence for handling stolen goods & data
+
+ransacking storage for valuable equipment?
+
+overall, a sense of *precision and detail*
+
+something like: hitman, but *not* scripted predetermined bullshit! instead, planning ahead, using an array of tools, realistic tactics, planning entrance and escape routes,
+using what you've unlocked to access better ingress points (grapple gun, dropship), in a sort of immersive sim that takes care of realistic response to your actions.
+each time it unfolds differently.
+realistic security response.
+    * something is amiss on the secutity cam (body, missing guard)
+    * a guard has been out of communication for some time
+    * perimiter alarm has been triggered
+
+ironman mode?
+abort mission?
+
+
+
+incongruities with vision:
+1. control 
+    feels too loose?
+    sticky controls: actual unity bug, submit bug report
+2. shadows
+    shadows should be more congruent with expected feel
+    shadows on sprite should be darker
+    easy to hide in, like thief
+        use shadowprobe to create a transparent overlay?
+        prevents nice dynamic shadows / light effects?
+    i want deep shadows near planters and structures
+        dark, gritty
+        shadows don't apply correctly
+        shadow probe doesnt change much in dark regions
+    post-processing: increase contrast? dynamic?
+
+head:
+1. clamp head angle
+2. don't apply head angle when moving
+3. hide during forbidden animations
+4. adjust gun spritesheets
+
+
+
+ENUM            clamp       result
+0 - left                    0
+1 - leftup      X           1 <- clamp
+2 - up                      2
+3 - rightup                 3 <- upper
+4 - right                   3
+5 - rightdown               3/7
+6 - down                    7
+7 - leftdown                7 <- lower (-1)
+
+7 - 4 = 3
+3 / 2 = 1.5
+
+
+ENUM            clamp       result
+0 - left                    2/6
+1 - leftup                  2
+2 - up                      2 <- lower
+3 - rightup                 3
+4 - right       X           4 <- clamp
+5 - rightdown               5
+6 - down                    6 <- upper
+7 - leftdown                6
+
+
+
+ENUM            clamp       result
+0 - left         X          0 <- clamp
+1 - leftup                  1
+2 - up                      2 <- upper
+3 - rightup                 3
+4 - right                   3/6
+5 - rightdown               6
+6 - down                    6 <- lower
+7 - leftdown                7
+
+
+nest 
