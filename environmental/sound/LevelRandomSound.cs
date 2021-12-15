@@ -8,9 +8,10 @@ public class LevelRandomSound : MonoBehaviour {
     private float timer;
     public LoHi intervalRange;
     private float interval;
+
     void Awake() {
         audioSource = Toolbox.GetOrCreateComponent<AudioSource>(gameObject);
-        audioSource.spatialBlend = 0;
+        // audioSource.spatialBlend = 0;
         interval = Toolbox.RandomFromLoHi(intervalRange);
     }
     void Update() {

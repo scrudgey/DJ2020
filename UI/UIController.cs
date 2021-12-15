@@ -16,6 +16,7 @@ public class UIController : MonoBehaviour {
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
     public InteractionIndicatorHandler interactionIndicatorHandler;
+    public InteractiveHighlightHandler interactiveHighlightHandler;
     public ActionLogHandler actionLogHandler;
     public GameObject UIEditorCamera;
     void Awake() {
@@ -25,6 +26,7 @@ public class UIController : MonoBehaviour {
         // cameras
         canvas.worldCamera = Camera.main;
         interactionIndicatorHandler.cam = Camera.main;
+        interactiveHighlightHandler.cam = Camera.main;
 
         aimIndicatorHandler.UICamera = Camera.main;
         GameManager.OnFocusChanged += BindToNewTarget;
@@ -47,6 +49,7 @@ public class UIController : MonoBehaviour {
         ((IBinder<NeoCharacterController>)aimIndicatorHandler).Bind(target);
 
         ((IBinder<Interactor>)interactionIndicatorHandler).Bind(target);
+        ((IBinder<Interactor>)interactiveHighlightHandler).Bind(target);
 
         actionLogHandler.Bind(target);
     }

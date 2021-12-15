@@ -10,12 +10,22 @@ public class InteractorTargetData {
         this.target = target;
         this.collider = collider;
     }
+
+    static public bool Equality(InteractorTargetData a, InteractorTargetData b) {
+        if (a == null && b == null) {
+            return true;
+        } else if (a == null || b == null) {
+            return false;
+        } else {
+            return a.target == b.target && a.collider == b.collider;
+        }
+    }
 }
 public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
 
     public HashSet<InteractorTargetData> interactives = new HashSet<InteractorTargetData>();
-
+    public InteractorTargetData highlighted = null;
     public Action<InteractorTargetData> OnActionDone;
     public void AddInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
@@ -27,6 +37,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public void RemoveInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
         if (interactive) {
+            interactive.DisableOutline();
             interactives.RemoveWhere(data => data.collider == other);
         }
         OnValueChanged?.Invoke(this);
@@ -43,10 +54,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         if (interactives.Count == 0) {
             return null;
         }
-        return interactives
-        .Where(interactive => interactive.target.priority > 0)
-        .OrderBy(interactive => interactive.target.priority)
-        .FirstOrDefault();
+        return Interactive.TopTarget(interactives);
     }
 
     void OnTriggerEnter(Collider other) {
@@ -57,6 +65,11 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     }
 
     public void SetInputs(ref PlayerCharacterInput inputs) {
+        if (inputs.Fire.targetData.interactorData != highlighted) {
+            highlighted = inputs.Fire.targetData.interactorData;
+            OnValueChanged?.Invoke(this);
+        }
+
         // TODO: handle the case when there's a ladder separate from interactives
         if (inputs.actionButtonPressed) {
             InteractorTargetData data = ActiveTarget();
@@ -64,5 +77,6 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
             data.target.DoAction(this);
             OnActionDone?.Invoke(data);
         }
+
     }
 }

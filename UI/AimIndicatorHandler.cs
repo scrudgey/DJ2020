@@ -47,24 +47,32 @@ namespace UI {
             }
         }
         void IBinder<GunHandler>.HandleValueChanged(GunHandler gunHandler) {
-            TargetData data = gunHandler.lastTargetData;
-            if (data == null)
-                return;
-            cursor.position = data.screenPosition;
-            switch (data.type) {
-                case TargetData.TargetType.none:
-                    break;
-                case TargetData.TargetType.direction:
-                    cursorImage.sprite = directionAimSprite;
-                    cursorImage.color = directionAimColor;
-                    break;
-                case TargetData.TargetType.objectLock:
-                    cursorImage.sprite = objectLockSprite;
-                    cursorImage.color = objectLockColor;
-                    break;
+            if (gunHandler.HasGun()) {
+                cursorImage.enabled = true;
+
+                TargetData data = gunHandler.lastTargetData;
+                if (data == null)
+                    return;
+                cursor.position = data.screenPosition;
+                switch (data.type) {
+                    case TargetData.TargetType.none:
+                        break;
+                    default:
+                    case TargetData.TargetType.direction:
+                        cursorImage.sprite = directionAimSprite;
+                        cursorImage.color = directionAimColor;
+                        break;
+                    case TargetData.TargetType.objectLock:
+                        cursorImage.sprite = objectLockSprite;
+                        cursorImage.color = objectLockColor;
+                        break;
+                }
+                state = data.type;
+                SetScale();
+            } else {
+                cursorImage.enabled = false;
             }
-            state = data.type;
-            SetScale();
+
         }
         void IBinder<NeoCharacterController>.HandleValueChanged(NeoCharacterController t) {
             if (neoCharacterControllerTarget.state == CharacterState.wallPress) {
