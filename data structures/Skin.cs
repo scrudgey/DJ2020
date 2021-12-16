@@ -396,34 +396,32 @@ public class Skin {
         if (input.isClimbing) {
             return unarmedClimb;
         }
-        if (input.isMoving) {
-            if (input.isCrouching) {
-                // crawl
-                return unarmedCrawl;
-            } else if (input.isRunning) {
-                // running
-                return gunRunSprites(input.gunInput.gunType);
-            } else {
-                // walk
-                return gunWalkSprites(input.gunInput.gunType);
-            }
-        } else { // not moving
-
-            // gun states
-            switch (input.gunInput.gunState) {
-                case GunHandler.GunState.reloading:
-                    return reloadSprites(input.gunInput.gunType);
-                case GunHandler.GunState.racking:
-                    return gunRackSprites(input.gunInput.gunType);
-                case GunHandler.GunState.shooting:
-                    return shootSprites(input.gunInput.gunType);
-                default:
-                case GunHandler.GunState.idle:
+        // gun states
+        switch (input.gunInput.gunState) {
+            case GunHandler.GunState.reloading:
+                return reloadSprites(input.gunInput.gunType);
+            case GunHandler.GunState.racking:
+                return gunRackSprites(input.gunInput.gunType);
+            case GunHandler.GunState.shooting:
+                return shootSprites(input.gunInput.gunType);
+            default:
+                if (input.isMoving) {
+                    if (input.isCrouching) {
+                        // crawl
+                        return unarmedCrawl;
+                    } else if (input.isRunning) {
+                        // running
+                        return gunRunSprites(input.gunInput.gunType);
+                    } else {
+                        // walk
+                        return gunWalkSprites(input.gunInput.gunType);
+                    }
+                } else { // not moving
                     if (input.isCrouching) {
                         return gunCrouchSprites(input.gunInput.gunType);
                     } else return gunIdleSprites(input.gunInput.gunType);
-            }
-        }
 
+                }
+        }
     }
 }

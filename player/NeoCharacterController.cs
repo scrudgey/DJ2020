@@ -397,6 +397,11 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                 currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);
                 break;
             case CharacterState.jumpPrep:
+                Vector3 indicatorDirection = jumpIndicatorController.indicator.transform.position - transform.position;
+                indicatorDirection.y = 0;
+                indicatorDirection = indicatorDirection.normalized;
+                Vector3 smoothedLookDirection = Vector3.Slerp(Motor.CharacterForward, indicatorDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+                currentRotation = Quaternion.LookRotation(smoothedLookDirection, Vector3.up);
                 break;
             case CharacterState.climbing:
                 switch (_climbingState) {
@@ -772,6 +777,10 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     direction = Quaternion.AngleAxis(90f, transform.up) * direction * Mathf.Sign(lastWallInput.x) * -1f;
                 }
                 CheckUncrouch();
+                break;
+            case CharacterState.jumpPrep:
+                jumpIndicatorController.transform.rotation = Quaternion.identity;
+                direction = Motor.CharacterForward;
                 break;
             case CharacterState.climbing:
                 switch (_climbingState) {

@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using KinematicCharacterController;
-using System;
+using UnityEngine;
 
 public class JumpIndicatorController : MonoBehaviour {
     public Transform indicator;

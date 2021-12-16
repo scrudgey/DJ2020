@@ -52,6 +52,7 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
             cursorImage.color = Color.green;
             cursorText.color = Color.green;
             dotText.color = Color.green;
+            SetScale();
         }
 
     }
@@ -97,12 +98,17 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
             }
             timer -= blitInterval;
             dotText.enabled = !dotText.enabled;
-            // if (cursorText.text == $"{dot}{actionText}") {
-            //     cursorText.text = $" {actionText}";
-            // } else {
-            //     cursorText.text = $"{dot}{actionText}";
-            // }
             yield return null;
         }
+    }
+    public void SetScale() {
+        float distance = Vector3.Distance(cam.transform.position, data.target.transform.position);
+        float frustumHeight = 2.0f * distance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+
+        float inaccuracyLength = data.collider.bounds.size.magnitude / 2f;
+        float pixelsPerLength = cam.scaledPixelHeight / frustumHeight;
+        float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
+
+        cursor.sizeDelta = pixelScale * Vector2.one;
     }
 }

@@ -17,11 +17,9 @@ public abstract class Interactive : MonoBehaviour {
         DisableOutline();
     }
     public void EnableOutline() {
-        Debug.Log("enabling outline");
         outline.enabled = true;
     }
     public void DisableOutline() {
-        Debug.Log("disabling outline");
         outline.enabled = false;
     }
 

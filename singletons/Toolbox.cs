@@ -251,6 +251,12 @@ public class Toolbox {
         }
         return (Direction)dirInt;
     }
+    public static Quaternion QuaternionDelta(Quaternion origin, Quaternion target) {
+        Quaternion identityOrigin = Quaternion.identity * Quaternion.Inverse(origin);
+        Quaternion identityTarget = Quaternion.identity * Quaternion.Inverse(target);
+
+        return identityOrigin * Quaternion.Inverse(identityTarget);
+    }
 }
 
 

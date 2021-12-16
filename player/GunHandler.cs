@@ -74,6 +74,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
     public void Update() {
         if (gunInstance == null) {
+            state = GunState.idle;
             return;
         } else {
             gunInstance.Update();
@@ -158,6 +159,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
 
     public void Shoot(PlayerCharacterInput.FireInputs input) {
+        if (!HasGun()) {
+            return;
+        }
         if (!gunInstance.CanShoot()) {
             // EndShoot(); maybe?
             return;

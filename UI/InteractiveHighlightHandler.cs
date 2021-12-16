@@ -13,6 +13,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
     public TextMeshProUGUI cursorText;
     public TextMeshProUGUI dotText;
     Coroutine blitTextCoroutine;
+    public AudioSource audioSource;
 
     void Awake() {
         blitTextCoroutine = null;
@@ -64,6 +65,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
             data.target.DisableOutline();
         }
         dotText.enabled = false;
+        audioSource.Stop();
     }
     void Enable(string actionText) {
         cursorText.text = "";
@@ -79,6 +81,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
         int index = 1;
         dotText.enabled = true;
         string targetText = $"{actionText}";
+        audioSource.Play();
         while (cursorText.text != targetText) {
             while (timer < blitInterval) {
                 timer += Time.deltaTime;
@@ -88,6 +91,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
             index += 1;
             cursorText.text = targetText.Substring(0, index);
         }
+        audioSource.Stop();
         timer = 0f;
         blitInterval = 0.5f;
         while (true) {
