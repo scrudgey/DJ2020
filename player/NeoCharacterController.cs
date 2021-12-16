@@ -316,7 +316,20 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     _shootLookDirection = input.Fire.targetData.position;
                 }
 
-                _lookInputVector = Vector3.Lerp(_lookInputVector, moveInputVector, 0.1f);
+
+                // TODO: turn to face aim position?
+                Vector3 directionToCursor = input.Fire.targetData.position - transform.position;
+                directionToCursor.y = 0;
+                directionToCursor = directionToCursor.normalized;
+                float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
+
+                if (dotproduct < 0 && moveInputVector == Vector3.zero) {
+                    _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
+                } else {
+                    _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
+                    // _lookInputVector = _moveInputVector;
+                }
+                // Debug.Log(_lookInputVector);
 
                 // Jumping input
                 if (input.jumpReleased) {
@@ -387,7 +400,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 } else if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
                     // Smoothly interpolate from current to target look direction
-                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _lookInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
