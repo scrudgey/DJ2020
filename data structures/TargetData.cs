@@ -4,6 +4,6 @@ public class TargetData {
     public TargetType type;
     public Vector3 position;
     public Vector2 screenPosition;
-    public InteractorTargetData interactorData;
+    public HighlightableTargetData highlightableTargetData;
     public static TargetData none = new TargetData();
 }

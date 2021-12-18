@@ -79,7 +79,6 @@ public class NeoCharacterCamera : MonoBehaviour {
     private float currentDistanceMovementSpeed;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
-        // DefaultVerticalAngle = Mathf.Clamp(DefaultVerticalAngle, MinVerticalAngle, MaxVerticalAngle);
     }
 
     void Awake() {

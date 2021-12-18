@@ -3,15 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public class InteractorTargetData {
-    public Interactive target;
+public class HighlightableTargetData {
+    public Highlightable target;
     public Collider collider;
-    public InteractorTargetData(Interactive target, Collider collider) {
+    public HighlightableTargetData(Highlightable target, Collider collider) {
         this.target = target;
         this.collider = collider;
     }
-
-    static public bool Equality(InteractorTargetData a, InteractorTargetData b) {
+    static public bool Equality(HighlightableTargetData a, HighlightableTargetData b) {
         if (a == null && b == null) {
             return true;
         } else if (a == null || b == null) {
@@ -21,11 +20,17 @@ public class InteractorTargetData {
         }
     }
 }
+public class InteractorTargetData : HighlightableTargetData {
+    new public Interactive target;
+    public InteractorTargetData(Interactive target, Collider collider) : base(target, collider) {
+        this.target = target;
+    }
+}
 public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
 
     public HashSet<InteractorTargetData> interactives = new HashSet<InteractorTargetData>();
-    public InteractorTargetData highlighted = null;
+    public HighlightableTargetData highlighted = null;
     public Action<InteractorTargetData> OnActionDone;
     public void AddInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
@@ -65,8 +70,8 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     }
 
     public void SetInputs(ref PlayerCharacterInput inputs) {
-        if (inputs.Fire.targetData.interactorData != highlighted) {
-            highlighted = inputs.Fire.targetData.interactorData;
+        if (inputs.Fire.targetData.highlightableTargetData != highlighted) {
+            highlighted = inputs.Fire.targetData.highlightableTargetData;
             OnValueChanged?.Invoke(this);
         }
 

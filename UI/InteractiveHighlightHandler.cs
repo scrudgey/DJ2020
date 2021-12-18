@@ -9,7 +9,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
 
     public Camera cam;
     public RectTransform cursor;
-    public InteractorTargetData data;
+    public HighlightableTargetData data;
     public TextMeshProUGUI cursorText;
     public TextMeshProUGUI dotText;
     Coroutine blitTextCoroutine;
@@ -19,7 +19,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
         blitTextCoroutine = null;
     }
     public void HandleValueChanged(Interactor interactor) {
-        InteractorTargetData newData = interactor.highlighted;
+        HighlightableTargetData newData = interactor.highlighted;
         if (!InteractorTargetData.Equality(data, newData)) {
             if (data != null && data.target != null)
                 data.target.DisableOutline();

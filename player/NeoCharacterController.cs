@@ -222,7 +222,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         if (input.actionButtonPressed) {
             _probedColliders = new Collider[8];
             if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
-                // if (_probedColliders[0] != null) {
                 foreach (Collider collider in _probedColliders) {
                     // Handle ladders
                     if (collider == null || collider.gameObject == null)
@@ -269,13 +268,11 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
         // Run input
         if (input.runDown) {
-            // _shouldBeRunning = true;
             if (!isRunning) {
                 isRunning = true;
             }
         } else {
             isRunning = false;
-            // _shouldBeRunning = false;
 
             // Crouching input
             if (input.CrouchDown || input.jumpHeld) {
@@ -316,7 +313,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     _shootLookDirection = input.Fire.targetData.position;
                 }
 
-
                 // TODO: turn to face aim position?
                 Vector3 directionToCursor = input.Fire.targetData.position - transform.position;
                 directionToCursor.y = 0;
@@ -327,16 +323,13 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
                     _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
                 } else {
                     _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
-                    // _lookInputVector = _moveInputVector;
                 }
-                // Debug.Log(_lookInputVector);
 
                 // Jumping input
                 if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
                 }
-
 
                 break;
             case CharacterState.wallPress:
@@ -876,7 +869,6 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
 
     public void OnDiscreteCollisionDetected(Collider hitCollider) {
     }
-
 
     public void LoadState(PlayerData data) {
         superJumpEnabled = data.cyberlegsLevel > 0;

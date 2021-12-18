@@ -299,11 +299,12 @@ public class NeoPlayer : MonoBehaviour {
         TagSystemData priorityData = null;
         RaycastHit priorityHit = new RaycastHit();
         bool prioritySet = false;
-        HashSet<InteractorTargetData> targetDatas = new HashSet<InteractorTargetData>();
+        HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
+
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            Interactive interactive = hit.collider.GetComponent<Interactive>();
+            Highlightable interactive = hit.collider.GetComponent<Highlightable>();
             if (interactive != null) {
-                targetDatas.Add(new InteractorTargetData(interactive, hit.collider));
+                targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
             }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data == null)
@@ -316,13 +317,14 @@ public class NeoPlayer : MonoBehaviour {
                 prioritySet = true;
             }
         }
-        InteractorTargetData interactorData = Interactive.TopTarget(targetDatas);
+
+        HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
         if (prioritySet) {
             return new TargetData {
                 type = TargetData.TargetType.objectLock,
                 position = priorityHit.collider.bounds.center,
                 screenPosition = OrbitCamera.Camera.WorldToScreenPoint(priorityHit.collider.bounds.center),
-                interactorData = interactorData
+                highlightableTargetData = interactorData
             };
         }
 
@@ -336,7 +338,7 @@ public class NeoPlayer : MonoBehaviour {
             type = TargetData.TargetType.direction,
             position = targetPoint,
             screenPosition = cursorPosition,
-            interactorData = interactorData
+            highlightableTargetData = interactorData
         };
     }
     private void HandleCharacterInput() {
