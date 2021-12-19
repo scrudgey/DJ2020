@@ -5,7 +5,6 @@ using UnityEngine;
 public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
     public Interactor target { get; set; }
 
-    // public TextMeshProUGUI logText;
     public Transform logTextHolder;
     public GameObject logTextEntryPrefab;
     public TextMeshProUGUI promptText;

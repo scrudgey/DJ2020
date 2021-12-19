@@ -70,10 +70,18 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     }
 
     public void SetInputs(ref PlayerCharacterInput inputs) {
-        if (inputs.Fire.targetData.highlightableTargetData != highlighted) {
-            highlighted = inputs.Fire.targetData.highlightableTargetData;
-            OnValueChanged?.Invoke(this);
+        if (inputs.state != CharacterState.wallPress) {
+            if (inputs.Fire.targetData.highlightableTargetData != highlighted) {
+                highlighted = inputs.Fire.targetData.highlightableTargetData;
+                OnValueChanged?.Invoke(this);
+            }
+        } else {
+            if (highlighted != null) {
+                highlighted = null;
+                OnValueChanged?.Invoke(this);
+            }
         }
+
 
         // TODO: handle the case when there's a ladder separate from interactives
         if (inputs.actionButtonPressed) {

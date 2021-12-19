@@ -45,6 +45,17 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
             case CharacterState.climbing:
                 spriteRenderer.enabled = false;
                 break;
+            case CharacterState.superJump:
+                spriteRenderer.enabled = true;
+                break;
+            case CharacterState.landStun:
+            case CharacterState.jumpPrep:
+                if (input.gunInput.hasGun) {
+                    spriteRenderer.enabled = true;
+                } else {
+                    spriteRenderer.enabled = false;
+                }
+                break;
             case CharacterState.normal:
                 direction = Toolbox.ClampDirection(input.headOrientation, input.orientation);
                 if (input.isMoving) {
@@ -93,6 +104,11 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
 
         spriteRenderer.flipX = direction == Direction.left || direction == Direction.leftUp || direction == Direction.leftDown;
         UpdateFrame();
+    }
+    public void SpawnTrail() {
+        GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
+        DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
+        billboard.skin = skin.headIdle;
     }
 
     public void UpdateFrame() {

@@ -19,8 +19,6 @@ public struct AnimationInput {
     public struct GunAnimationInput {
         public GunType gunType;
         public GunHandler.GunState gunState;
-        // public bool shooting;
-        // public bool reloading;
         public bool hasGun;
         public bool holstered;
         public Gun baseGun;
@@ -46,7 +44,8 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
         crawl,
         crouch,
         run,
-        jump, climb
+        jump,
+        climb
     }
     State state;
     private int frame;
@@ -60,6 +59,8 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
     public Direction direction;
     private float trailTimer;
     public float trailInterval = 0.05f;
+    public GunAnimation gunAnimation;
+    public HeadAnimation headAnimation;
 
     // used by animation
     public void SetFrame(int frame) {
@@ -69,6 +70,8 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
         billboard.skin = skin.GetCurrentLegsOctet(state);
+        gunAnimation?.SpawnTrail();
+        headAnimation?.SpawnTrail();
     }
     public void SetBob(int bob) { }
     public void UpdateView(AnimationInput input) {
@@ -148,7 +151,7 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
 
         // orientation
         // Calculate camera direction and rotation on the character plane
-        if (input.wallPressTimer <= 0) {
+        if (input.wallPressTimer <= 0 || input.state == CharacterState.wallPress) {
             Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
             if (cameraPlanarDirection.sqrMagnitude == 0f) {
                 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;

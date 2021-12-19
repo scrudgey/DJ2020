@@ -14,7 +14,7 @@ public class GunAnimation : MonoBehaviour, ISaveable {
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
     public Skin skin;
-    private float trailTimer;
+    // private float trailTimer;
     public float trailInterval = 0.05f;
     private bool bob;
     private AnimationInput lastInput;
@@ -37,13 +37,13 @@ public class GunAnimation : MonoBehaviour, ISaveable {
         lastInput = input;
 
         switch (input.state) {
-            case CharacterState.superJump:
-                trailTimer += Time.deltaTime;
-                if (trailTimer > trailInterval) {
-                    trailTimer = 0f;
-                    SpawnTrail();
-                }
-                break;
+            // case CharacterState.superJump:
+            //     trailTimer += Time.deltaTime;
+            //     if (trailTimer > trailInterval) {
+            //         trailTimer = 0f;
+            //         SpawnTrail();
+            //     }
+            //     break;
             default:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {
@@ -124,7 +124,7 @@ public class GunAnimation : MonoBehaviour, ISaveable {
             return;
         spriteRenderer.sprite = _sprites[_direction][frame];
     }
-    private void SpawnTrail() {
+    public void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
         billboard.skin = skin.GetCurrentTorsoOctet(lastInput);
