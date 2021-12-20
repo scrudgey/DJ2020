@@ -23,7 +23,6 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
         promptText.text = prefix;
     }
 
-    // TODO: figure out a better pattern for this sort of thing
     public void Bind(GameObject newTargetObject) {
         if (this.target != null) {
             target.OnValueChanged -= HandleValueChanged;
@@ -38,7 +37,10 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
     }
     public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
-        if (newData != data) {
+        if (!InteractorTargetData.Equality(data, newData)) {
+            // if (data != null) {
+            Disable();
+            // }
             data = newData;
             DataChanged();
         }
@@ -55,16 +57,18 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
         // TODO: configurable log cull time
         Destroy(logEntry, 10);
     }
-    void DataChanged() {
+    void Disable() {
         promptText.text = prefix;
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
             audioSource.Stop();
         }
-        if (data == null) {
-            return;
+    }
+    void DataChanged() {
+        Disable();
+        if (data != null) {
+            blitTextCoroutine = StartCoroutine(BlitCalloutText(data.target.actionPrompt));
         }
-        blitTextCoroutine = StartCoroutine(BlitCalloutText(data.target.actionPrompt));
     }
     public IEnumerator BlitCalloutText(string actionText) {
         float blitInterval = 0.01f;

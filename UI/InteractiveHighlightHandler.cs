@@ -22,16 +22,10 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
         HighlightableTargetData newData = interactor.highlighted;
         if (!InteractorTargetData.Equality(data, newData)) {
             if (data != null && data.target != null)
-                data.target.DisableOutline();
+                Disable();
+            // data.target.DisableOutline();
             data = newData;
             DataChanged();
-        }
-        if (data == null) {
-            cursorText.enabled = false;
-        } else {
-            if (data.target != null)
-                data.target.EnableOutline();
-            cursorText.enabled = true;
         }
     }
     void DataChanged() {
@@ -57,22 +51,25 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
         }
     }
     void Disable() {
+        dotText.enabled = false;
+        cursorText.enabled = false;
         cursorText.text = "";
+        audioSource.Stop();
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
         if (data != null) {
             data.target.DisableOutline();
         }
-        dotText.enabled = false;
-        audioSource.Stop();
     }
     void Enable(string actionText) {
-        cursorText.text = "";
-        dotText.enabled = true;
-        blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
         if (data != null) {
             data.target.EnableOutline();
+            cursorText.enabled = true;
+
+            cursorText.text = "";
+            dotText.enabled = true;
+            blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
         }
     }
     public IEnumerator BlitCalloutText(string actionText) {

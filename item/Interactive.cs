@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public abstract class Interactive : Highlightable {
     public string actionPrompt;
+    public Interactor interactor;
     public virtual string ResponseString() {
         return $"did {actionPrompt}";
     }
@@ -17,5 +18,10 @@ public abstract class Interactive : Highlightable {
             }
         }
         return topInteractive;
+    }
+    void OnDestroy() {
+        if (interactor != null) {
+            interactor.RemoveInteractive(this);
+        }
     }
 }

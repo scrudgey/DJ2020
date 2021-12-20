@@ -19,16 +19,12 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
 
     public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
-        if (newData != data) {
+        if (!InteractorTargetData.Equality(data, newData)) {
+            if (data != null && data.target != null)
+                Disable();
+            // data.target.DisableOutline();
             data = newData;
             DataChanged();
-        }
-        if (data == null) {
-            cursorImage.enabled = false;
-            cursorText.enabled = false;
-        } else {
-            cursorImage.enabled = true;
-            cursorText.enabled = true;
         }
     }
     void DataChanged() {
@@ -57,22 +53,27 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
 
     }
     void Disable() {
+        dotText.enabled = false;
+        cursorImage.enabled = false;
+        cursorText.enabled = false;
         cursorText.text = "";
-        if (data != null) {
-            data.target.DisableOutline();
-        }
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
-        dotText.enabled = false;
+        if (data != null) {
+            data.target.DisableOutline();
+        }
     }
     void Enable(string actionText) {
         if (data != null) {
+            cursorImage.enabled = true;
+            cursorText.enabled = true;
             data.target.EnableOutline();
+
+            cursorText.text = "";
+            dotText.enabled = true;
+            blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
         }
-        cursorText.text = "";
-        dotText.enabled = true;
-        blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
     }
     public IEnumerator BlitCalloutText(string actionText) {
         float blitInterval = 0.02f;

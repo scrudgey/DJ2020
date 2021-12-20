@@ -28,46 +28,55 @@ public class InteractorTargetData : HighlightableTargetData {
 }
 public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
-
-    public HashSet<InteractorTargetData> interactives = new HashSet<InteractorTargetData>();
-    public HighlightableTargetData highlighted = null;
     public Action<InteractorTargetData> OnActionDone;
+
+    public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
+    public HighlightableTargetData highlighted = null;
     public void AddInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
         if (interactive) {
-            interactives.Add(new InteractorTargetData(interactive, other));
+            interactives[other] = interactive;
+            interactive.interactor = this;
         }
+        RemoveNullInteractives();
         OnValueChanged?.Invoke(this);
     }
     public void RemoveInteractive(Collider other) {
-        Interactive interactive = other.GetComponent<Interactive>();
-        if (interactive) {
-            interactive.DisableOutline();
-            interactives.RemoveWhere(data => data.collider == other);
+        if (interactives.ContainsKey(other)) {
+            interactives[other].interactor = null;
+            interactives.Remove(other);
         }
+        RemoveNullInteractives();
         OnValueChanged?.Invoke(this);
     }
     public void RemoveInteractive(Interactive other) {
-        if (other) {
-            interactives.RemoveWhere(data => data.target == other);
+        foreach (var item in interactives.Where(kvp => kvp.Value == other).ToList()) {
+            item.Value.interactor = null;
+            interactives.Remove(item.Key);
         }
         OnValueChanged?.Invoke(this);
     }
 
     public InteractorTargetData ActiveTarget() {
-        interactives.RemoveWhere(interactive => interactive == null);
+        RemoveNullInteractives();
         if (interactives.Count == 0) {
             return null;
         }
-        return Interactive.TopTarget(interactives);
+        List<InteractorTargetData> data = new List<InteractorTargetData>();
+        foreach (KeyValuePair<Collider, Interactive> kvp in interactives) {
+            data.Add(new InteractorTargetData(kvp.Value, kvp.Key));
+        }
+        return Interactive.TopTarget(data);
     }
+    void RemoveNullInteractives() => interactives = interactives
+            .Where(f => f.Value != null && f.Key != null)
+            .ToDictionary(x => x.Key, x => x.Value);
 
-    void OnTriggerEnter(Collider other) {
-        AddInteractive(other);
-    }
-    void OnTriggerExit(Collider other) {
-        RemoveInteractive(other);
-    }
+    void OnTriggerEnter(Collider other)
+        => AddInteractive(other);
+
+    void OnTriggerExit(Collider other)
+        => RemoveInteractive(other);
 
     public void SetInputs(ref PlayerCharacterInput inputs) {
         if (inputs.state != CharacterState.wallPress) {
@@ -82,7 +91,6 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
             }
         }
 
-
         // TODO: handle the case when there's a ladder separate from interactives
         if (inputs.actionButtonPressed) {
             InteractorTargetData data = ActiveTarget();
@@ -90,6 +98,5 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
             data.target.DoAction(this);
             OnActionDone?.Invoke(data);
         }
-
     }
 }
