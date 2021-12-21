@@ -46,7 +46,7 @@ public class UIController : MonoBehaviour {
         ((IBinder<ItemHandler>)itemUIHandler).Bind(target);
 
         ((IBinder<GunHandler>)aimIndicatorHandler).Bind(target);
-        ((IBinder<NeoCharacterController>)aimIndicatorHandler).Bind(target);
+        ((IBinder<CharacterController>)aimIndicatorHandler).Bind(target);
 
         ((IBinder<Interactor>)interactionIndicatorHandler).Bind(target);
         ((IBinder<Interactor>)interactiveHighlightHandler).Bind(target);

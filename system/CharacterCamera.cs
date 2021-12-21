@@ -26,7 +26,6 @@ public class CharacterCamera : MonoBehaviour {
     public CameraState state {
         get { return _state; }
     }
-    // public CameraState state;
     public static Quaternion rotationOffset;
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
@@ -66,7 +65,6 @@ public class CharacterCamera : MonoBehaviour {
 
     private bool _distanceIsObstructed;
     private float _currentDistance;
-    // private float _targetVerticalAngle;
     private RaycastHit _obstructionHit;
     private int _obstructionCount;
     private RaycastHit[] _obstructions = new RaycastHit[MaxObstructions];
@@ -96,6 +94,7 @@ public class CharacterCamera : MonoBehaviour {
     public void TransitionToState(CameraState toState) {
         if (toState == _state)
             return;
+        transitionTime = 0f;
         CameraState tmpInitialState = state;
         OnStateExit(tmpInitialState, toState);
         _state = toState;
@@ -151,20 +150,16 @@ public class CharacterCamera : MonoBehaviour {
 
     public void UpdateWithInput(CameraInput input) {
         TransitionToState(input.state);
-
+        if (transitionTime < 1) {
+            transitionTime += Time.deltaTime;
+        }
         switch (input.state) {
             default:
             case CameraState.normal:
                 RenderSettings.skybox = isometricSkybox;
-                if (transitionTime > 0) {
-                    transitionTime -= Time.deltaTime;
-                }
                 break;
             case CameraState.wallPress:
                 RenderSettings.skybox = wallPressSkybox;
-                if (transitionTime < 1) {
-                    transitionTime += Time.deltaTime;
-                }
                 break;
         }
         transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
@@ -229,6 +224,11 @@ public class CharacterCamera : MonoBehaviour {
         CameraTargetParameters parameters = NormalUpdate(input);
         if (input.attractor != null)
             parameters.targetPosition = input.attractor.bounds.center;
+
+
+        // Debueg.Log(screenPoint);
+        // bool onScreen = screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
+
         return parameters;
     }
     public CameraTargetParameters WallPressUpdate(CameraInput input) {
@@ -253,8 +253,8 @@ public class CharacterCamera : MonoBehaviour {
             targetDistance = 1.5f,
             targetPosition = FollowTransform.position + distOffset + LROffset + heightOffset,
             orthographicSize = 4f,
-            distanceMovementSharpness = currentDistanceMovementSharpness,
-            followingSharpness = currentFollowingSharpness,
+            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed
         };
     }
@@ -273,8 +273,17 @@ public class CharacterCamera : MonoBehaviour {
 
         // apply orthographic
         Camera.orthographic = input.orthographic;
+
         // TODO: lerp it
         Camera.orthographicSize = input.orthographicSize;
+        // ensure visibility
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        int i = 0;
+        while ((screenPoint.x < 0.1 || screenPoint.y < 0.1 || screenPoint.x > 0.9 || screenPoint.y > 0.9) && i < 20) {
+            i++;
+            Camera.orthographicSize *= 1.01f;
+            screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        }
 
         // apply rotation
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));

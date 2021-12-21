@@ -13,7 +13,7 @@ public class Bush : MonoBehaviour {
 
     public List<Coroutine> shakeRoutines = new List<Coroutine>();
 
-    private static Dictionary<Collider, NeoCharacterController> bodies = new Dictionary<Collider, NeoCharacterController>();
+    private static Dictionary<Collider, CharacterController> bodies = new Dictionary<Collider, CharacterController>();
     public float leafProbability = 0.5f;
     new private Collider collider;
     void Awake() {
@@ -21,19 +21,19 @@ public class Bush : MonoBehaviour {
         collider = GetComponent<Collider>();
         leafPool = PoolManager.I.RegisterPool(leafPrefab);
     }
-    public NeoCharacterController GetRigidbody(Collider key) {
-        NeoCharacterController outBody;
+    public CharacterController GetRigidbody(Collider key) {
+        CharacterController outBody;
         if (bodies.TryGetValue(key, out outBody)) {
             return outBody;
         } else {
-            outBody = key.transform.root.GetComponentInChildren<NeoCharacterController>();
+            outBody = key.transform.root.GetComponentInChildren<CharacterController>();
             bodies[key] = outBody;
             return outBody;
         }
 
     }
     void OnTriggerStay(Collider other) {
-        NeoCharacterController body = GetRigidbody(other);
+        CharacterController body = GetRigidbody(other);
         if (body != null) {
             shakeAmount += body.Motor.Velocity.magnitude;
             // Debug.Log(shakeAmount);

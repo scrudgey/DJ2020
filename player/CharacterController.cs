@@ -41,7 +41,7 @@ public enum ClimbingState {
     DeAnchoring
 }
 
-public class NeoCharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<NeoCharacterController> {
+public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController> {
     public KinematicCharacterMotor Motor;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
@@ -50,7 +50,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
 
-    public Action<NeoCharacterController> OnValueChanged { get; set; }
+    public Action<CharacterController> OnValueChanged { get; set; }
 
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;

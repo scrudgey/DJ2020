@@ -6,7 +6,7 @@ public class JumpIndicatorView : MonoBehaviour {
     public LineRenderer lineRenderer;
     public SpriteRenderer indicatorSprite;
     public Transform indicator;
-    public NeoCharacterController characterController;
+    public CharacterController characterController;
 
     public void UpdateView(AnimationInput input) {
         if (input.state == CharacterState.jumpPrep) {

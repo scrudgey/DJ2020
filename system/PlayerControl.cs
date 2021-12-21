@@ -10,7 +10,7 @@ public class PlayerControl : MonoBehaviour {
     public CharacterCamera OrbitCamera;
     public ClearSighter sighter;
     public Transform CameraFollowPoint;
-    public NeoCharacterController Character;
+    public CharacterController Character;
     public GunHandler gunHandler;
     public JumpIndicatorController jumpIndicatorController;
     public Interactor interactor;

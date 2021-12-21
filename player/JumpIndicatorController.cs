@@ -8,7 +8,7 @@ public class JumpIndicatorController : MonoBehaviour {
     public Transform indicator;
     public float moveRatio = 0.01f;
 
-    public void SetInputs(ref PlayerCharacterInput inputs, NeoCharacterController characterController) {
+    public void SetInputs(ref PlayerCharacterInput inputs, CharacterController characterController) {
         if (inputs.state != CharacterState.jumpPrep)
             return;
 

@@ -313,3 +313,6 @@ environmental systems
             network connections severed
         
 
+
+camera
+broadly, inputs are created depending on state, then camera applies input by lerping

@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 namespace UI {
-    public class AimIndicatorHandler : MonoBehaviour, IBinder<GunHandler>, IBinder<NeoCharacterController> {
+    public class AimIndicatorHandler : MonoBehaviour, IBinder<GunHandler>, IBinder<CharacterController> {
 
         private GunHandler gunHandlerTarget;
-        private NeoCharacterController neoCharacterControllerTarget;
+        private CharacterController neoCharacterControllerTarget;
         GunHandler IBinder<GunHandler>.target {
             get { return gunHandlerTarget; }
             set { gunHandlerTarget = value; }
         }
 
-        NeoCharacterController IBinder<NeoCharacterController>.target {
+        CharacterController IBinder<CharacterController>.target {
             get { return neoCharacterControllerTarget; }
             set { neoCharacterControllerTarget = value; }
         }
 
 
         public Camera UICamera;
-        private NeoCharacterController targetCharacterController;
+        private CharacterController targetCharacterController;
         public RectTransform cursor;
         public Image cursorImage;
         public Sprite directionAimSprite;
@@ -74,7 +74,7 @@ namespace UI {
             }
 
         }
-        void IBinder<NeoCharacterController>.HandleValueChanged(NeoCharacterController t) {
+        void IBinder<CharacterController>.HandleValueChanged(CharacterController t) {
             if (neoCharacterControllerTarget.state == CharacterState.wallPress) {
                 cursorImage.enabled = false;
             } else {
