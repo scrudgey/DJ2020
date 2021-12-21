@@ -7,12 +7,12 @@ public class MaterialController {
     // public Renderer renderer;
     public List<Renderer> childRenderers;
     public GameObject gameObject;
-    public NeoCharacterCamera camera;
+    public CharacterCamera camera;
     public TagSystemData tagSystemData;
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableBecauseAbove;
-    public MaterialController(GameObject gameObject, NeoCharacterCamera camera) {
+    public MaterialController(GameObject gameObject, CharacterCamera camera) {
         this.camera = camera;
         this.gameObject = gameObject;
         this.tagSystemData = Toolbox.GetTagData(gameObject);
@@ -81,9 +81,9 @@ public class MaterialController {
     }
 }
 public class MaterialControllerCache {
-    public NeoCharacterCamera camera;
+    public CharacterCamera camera;
     public Dictionary<GameObject, MaterialController> controllers = new Dictionary<GameObject, MaterialController>();
-    public MaterialControllerCache(NeoCharacterCamera camera) {
+    public MaterialControllerCache(CharacterCamera camera) {
         this.camera = camera;
     }
     public MaterialController get(GameObject key) {
@@ -101,10 +101,10 @@ public class MaterialControllerCache {
 }
 public class ClearSighter : MonoBehaviour {
     public MaterialControllerCache controllers;
-    public NeoCharacterCamera myCamera;
+    public CharacterCamera myCamera;
     Transform myTransform;
     void Start() {
-        controllers = new MaterialControllerCache(GameObject.FindObjectOfType<NeoCharacterCamera>());
+        controllers = new MaterialControllerCache(GameObject.FindObjectOfType<CharacterCamera>());
         myTransform = transform;
     }
 

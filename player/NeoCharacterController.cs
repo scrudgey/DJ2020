@@ -248,7 +248,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
-            moveInputVector = NeoCharacterCamera.rotationOffset * moveInputVector;
+            moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
         }
 
         // Calculate camera direction and rotation on the character plane
@@ -261,7 +261,7 @@ public class NeoCharacterController : MonoBehaviour, ICharacterController, ISave
         // Move and look inputs
         _moveInputVector = cameraPlanarRotation * moveInputVector;
         if (input.MoveAxisRight != 0 && input.MoveAxisForward != 0) {
-            _moveInputVector = Quaternion.Inverse(NeoCharacterCamera.rotationOffset) * _moveInputVector;
+            _moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * _moveInputVector;
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
 

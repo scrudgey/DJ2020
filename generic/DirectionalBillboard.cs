@@ -6,11 +6,11 @@ public class DirectionalBillboard : MonoBehaviour {
     public Vector3 direction;
     public SpriteRenderer spriteRenderer;
     public Octet<Sprite[]> skin;
-    private NeoCharacterCamera _cam;
-    public NeoCharacterCamera cam {
+    private CharacterCamera _cam;
+    public CharacterCamera cam {
         get {
             if (_cam == null) {
-                _cam = Camera.main.GetComponent<NeoCharacterCamera>();
+                _cam = Camera.main.GetComponent<CharacterCamera>();
             }
             return _cam;
         }

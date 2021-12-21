@@ -21,7 +21,7 @@ public struct CameraInput {
     public Vector2 lastWallInput;
     public bool crouchHeld;
 }
-public class NeoCharacterCamera : MonoBehaviour {
+public class CharacterCamera : MonoBehaviour {
     private CameraState _state;
     public CameraState state {
         get { return _state; }

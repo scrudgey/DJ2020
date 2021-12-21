@@ -6,8 +6,8 @@ using KinematicCharacterController;
 using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class NeoPlayer : MonoBehaviour {
-    public NeoCharacterCamera OrbitCamera;
+public class PlayerControl : MonoBehaviour {
+    public CharacterCamera OrbitCamera;
     public ClearSighter sighter;
     public Transform CameraFollowPoint;
     public NeoCharacterController Character;
@@ -16,7 +16,7 @@ public class NeoPlayer : MonoBehaviour {
     public Interactor interactor;
     public JumpIndicatorView jumpIndicatorView;
     public LegsAnimation legsAnimator;
-    public GunAnimation torsoAnimator;
+    public TorsoAnimation torsoAnimator;
     public HeadAnimation headAnimation;
 
     [Header("Inputs")]

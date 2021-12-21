@@ -59,7 +59,7 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
     public Direction direction;
     private float trailTimer;
     public float trailInterval = 0.05f;
-    public GunAnimation gunAnimation;
+    public TorsoAnimation gunAnimation;
     public HeadAnimation headAnimation;
 
     // used by animation

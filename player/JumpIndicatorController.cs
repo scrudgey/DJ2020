@@ -15,7 +15,7 @@ public class JumpIndicatorController : MonoBehaviour {
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
-            moveInputVector = NeoCharacterCamera.rotationOffset * moveInputVector;
+            moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
         }
 
         // Calculate camera direction and rotation on the character plane
@@ -28,7 +28,7 @@ public class JumpIndicatorController : MonoBehaviour {
         // Move and look inputs
         moveInputVector = cameraPlanarRotation * moveInputVector;
         if (inputs.MoveAxisRight != 0 && inputs.MoveAxisForward != 0) {
-            moveInputVector = Quaternion.Inverse(NeoCharacterCamera.rotationOffset) * moveInputVector;
+            moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * moveInputVector;
         }
 
         // Move and look inputs

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunAnimation : MonoBehaviour, ISaveable {
+public class TorsoAnimation : MonoBehaviour, ISaveable {
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
