@@ -12,7 +12,7 @@ public enum CameraState { normal, wallPress, attractor }
 // a single parameter lerps between states, and there is one transitional state.
 
 public struct CameraInput {
-    public SphereCollider attractor;
+    public CameraAttractorZone attractor;
     public CameraState state;
     public enum RotateInput { none, left, right }
     public float deltaTime;
@@ -75,6 +75,7 @@ public class CharacterCamera : MonoBehaviour {
     private float currentDistanceMovementSharpness;
     private float currentFollowingSharpness;
     private float currentDistanceMovementSpeed;
+    private bool clampOrthographicSize;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
@@ -115,7 +116,6 @@ public class CharacterCamera : MonoBehaviour {
                     currentDistanceMovementSpeed = distanceMovementSpeedDefault;
                 } else {
                     currentDistanceMovementSharpness = 1;
-                    currentFollowingSharpness = 1;
                     currentDistanceMovementSpeed = 0.1f;
                 }
                 break;
@@ -222,13 +222,15 @@ public class CharacterCamera : MonoBehaviour {
     }
     public CameraTargetParameters AttractorUpdate(CameraInput input) {
         CameraTargetParameters parameters = NormalUpdate(input);
-        if (input.attractor != null)
-            parameters.targetPosition = input.attractor.bounds.center;
-
-
-        // Debueg.Log(screenPoint);
-        // bool onScreen = screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
-
+        if (input.attractor != null) {
+            parameters.followingSharpness = input.attractor.movementSharpness;
+            Vector3 delta = FollowTransform.position - input.attractor.sphereCollider.bounds.center;
+            if (input.attractor.useInnerFocus && delta.magnitude < input.attractor.innerFocusRadius) {
+                parameters.orthographicSize = input.attractor.innerFocusOrthographicSize;
+            } else {
+                parameters.targetPosition = input.attractor.sphereCollider.bounds.center;
+            }
+        }
         return parameters;
     }
     public CameraTargetParameters WallPressUpdate(CameraInput input) {
@@ -259,6 +261,9 @@ public class CharacterCamera : MonoBehaviour {
         };
     }
 
+    bool PlayerInsideBounds(Vector3 screenPoint) {
+        return screenPoint.x > 0.1 && screenPoint.y > 0.1 && screenPoint.x < 0.9 && screenPoint.y < 0.9;
+    }
     public void ApplyTargetParameters(CameraTargetParameters input) {
         // Process distance input
         TargetDistance = input.targetDistance;
@@ -275,14 +280,38 @@ public class CharacterCamera : MonoBehaviour {
         Camera.orthographic = input.orthographic;
 
         // TODO: lerp it
-        Camera.orthographicSize = input.orthographicSize;
-        // ensure visibility
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        float desiredOrthographicSize = input.orthographicSize;
+        float previousOrthographicSize = Camera.orthographicSize;
+
         int i = 0;
-        while ((screenPoint.x < 0.1 || screenPoint.y < 0.1 || screenPoint.x > 0.9 || screenPoint.y > 0.9) && i < 20) {
-            i++;
-            Camera.orthographicSize *= 1.01f;
-            screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        if (PlayerInsideBounds(screenPoint)) {
+            if (Camera.orthographicSize < desiredOrthographicSize) {
+                while (i < 10 && Camera.orthographicSize < desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+                    i++;
+                    Camera.orthographicSize += 0.01f;
+                    screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+                }
+                Camera.orthographicSize = Math.Min(desiredOrthographicSize, Camera.orthographicSize);
+            } else if (Camera.orthographicSize > desiredOrthographicSize) {
+                while (i < 10 && Camera.orthographicSize > desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+                    i++;
+                    Camera.orthographicSize -= 0.01f;
+                    screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+                }
+                if (i == 1) {
+                    Camera.orthographicSize = previousOrthographicSize;
+                } else {
+                    Camera.orthographicSize = Math.Max(desiredOrthographicSize, Camera.orthographicSize);
+                }
+            }
+
+        } else {
+            while (i < 10 && !PlayerInsideBounds(screenPoint)) {
+                i++;
+                Camera.orthographicSize += 0.01f;
+                screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+            }
         }
 
         // apply rotation

@@ -53,7 +53,7 @@ public class PlayerControl : MonoBehaviour {
     private int incrementItemThisFrame;
     private bool useItemThisFrame;
     private PlayerCharacterInput _lastInput;
-    private static List<SphereCollider> attractors;
+    private static List<CameraAttractorZone> attractors;
     // public Action<AimIndicatorHandler> OnAimChanged;
     public void Awake() {
         // Move
@@ -156,9 +156,9 @@ public class PlayerControl : MonoBehaviour {
         selectGunThisFrame = -1;
 
         // TODO: move into on level load
-        attractors = new List<SphereCollider>();
+        attractors = new List<CameraAttractorZone>();
         foreach (GameObject attractor in GameObject.FindGameObjectsWithTag("cameraAttractor")) {
-            SphereCollider collider = attractor.GetComponent<SphereCollider>();
+            CameraAttractorZone collider = attractor.GetComponent<CameraAttractorZone>();
             if (collider != null)
                 attractors.Add(collider);
         }
@@ -241,13 +241,13 @@ public class PlayerControl : MonoBehaviour {
         }
 
         CameraState state = CameraState.normal;
-        SphereCollider currentAttractor = null;
+        CameraAttractorZone currentAttractor = null;
         if (Character.state == CharacterState.wallPress) {
             state = CameraState.wallPress;
         } else {
             // check / update Attractor
-            foreach (SphereCollider attractor in attractors) {
-                if (attractor.bounds.Contains(Character.transform.position)) {
+            foreach (CameraAttractorZone attractor in attractors) {
+                if (attractor.sphereCollider.bounds.Contains(Character.transform.position)) {
                     currentAttractor = attractor;
                     state = CameraState.attractor;
                     break;
