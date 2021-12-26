@@ -271,7 +271,10 @@ NPCs
     sphere robot
     basic civilians
         hands up pose
-        hand interact pose
+        animation temp frame
+            hand interact pose
+        damage
+        gibbing
 interactives
     PIP camera for panel interactions system
         take control mode
@@ -295,6 +298,8 @@ environmental systems
         backup generator
         mains connection / transformer
         underground cables / steam tunnels
+        UI representation of power network?
+
     network
         hacking system
             WAN / cloud connection on map
@@ -311,8 +316,19 @@ environmental systems
         connections are severed when wall explodes
             water pipes spill water
             network connections severed
-        
+police / security response
 
 
 camera
 broadly, inputs are created depending on state, then camera applies input by lerping
+
+
+power: we want a single interface for consuming power
+there might be a gun turret, light, sound effect components separately hooked into power
+
+PoweredDevice
+    this is what will expose api for turning on / off power
+    it will be part of a network, and involves logic for determining if i am powered.... etc.
+Subscribers
+    components for various effects.
+    machinery, light, sound effects
