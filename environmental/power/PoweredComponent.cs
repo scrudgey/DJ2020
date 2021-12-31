@@ -2,21 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PoweredDevice))]
-public abstract class PoweredComponent : MonoBehaviour {
-    public PoweredDevice power;
-    void Awake() {
-        power = GetComponent<PoweredDevice>();
-    }
-    void OnEnable() {
-        power.PowerOn += OnPowerOn;
-        power.PowerOff += OnPowerOff;
-    }
-    void OnDisable() {
-        power.PowerOn -= OnPowerOn;
-        power.PowerOff -= OnPowerOff;
-    }
+public class PoweredComponent : MonoBehaviour {
+    // public PowerNode node;
+    public string idn;
+    public bool power;
+    public PoweredComponent[] edges;
+    // public PoweredComponentNode node;
+    // public string idn;
 
-    abstract protected void OnPowerOn();
-    abstract protected void OnPowerOff();
+    // void OnEnable() {
+    //     // power.PowerOn += OnPowerOn;
+    //     // power.PowerOff += OnPowerOff;
+    // }
+    // void OnDisable() {
+    //     // power.PowerOn -= OnPowerOn;
+    //     // power.PowerOff -= OnPowerOff;
+    // }
+
+    virtual protected void OnPowerOn() { }
+    virtual protected void OnPowerOff() { }
 }

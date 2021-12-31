@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
 public enum CursorType { gun }
-public class GameManager : Singleton<GameManager> {
+public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public static Action OnMenuClosed;
     public static Action<MenuType> OnMenuChange;
@@ -54,7 +54,8 @@ public class GameManager : Singleton<GameManager> {
     public void OnStateExit(GameState state, GameState toState) {
         switch (state) {
             case GameState.none:
-                InitializeLevel();
+                // TODO: move this somewhere else or check that we are going to levelPlay
+                InitializeLevel("test");
                 break;
             case GameState.inMenu:
                 Time.timeScale = 1f;
@@ -81,21 +82,7 @@ public class GameManager : Singleton<GameManager> {
         TransitionToState(GameState.levelPlay); // this isn't right either?
         activeMenuType = MenuType.none;
     }
-    public void SetFocus(GameObject focus) {
-        this.playerObject = focus;
-        OnFocusChanged?.Invoke(focus);
-    }
-    private void InitializeLevel() { // TODO: level enum input
-        SetFocus(GameObject.Find("playerCharacter"));
 
-        LoadPlayerState(gameData.playerData);
-    }
-    public void LoadPlayerState(PlayerData data) {
-        foreach (ISaveable saveable in playerObject.GetComponentsInChildren<ISaveable>()) {
-            // Debug.Log("triggering load on " + saveable);
-            saveable.LoadState(data);
-        }
-    }
     public void Update() {
         if (toggleConsoleThisFrame) {
             if (activeMenuType != MenuType.console) {

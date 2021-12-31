@@ -8,4 +8,5 @@ public class GameData {
             playerData = PlayerData.DefaultGameData()
         };
     }
+    public LevelData levelData;
 }

@@ -323,12 +323,3 @@ camera
 broadly, inputs are created depending on state, then camera applies input by lerping
 
 
-power: we want a single interface for consuming power
-there might be a gun turret, light, sound effect components separately hooked into power
-
-PoweredDevice
-    this is what will expose api for turning on / off power
-    it will be part of a network, and involves logic for determining if i am powered.... etc.
-Subscribers
-    components for various effects.
-    machinery, light, sound effects
