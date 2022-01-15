@@ -30,6 +30,7 @@ public class UIController : MonoBehaviour {
         interactiveHighlightHandler.cam = Camera.main;
         powerOverlay.cam = Camera.main;
 
+        // TODO: this is weird.
         GameManager.OnPowerGraphChange += powerOverlay.Refresh;
         powerOverlay.Refresh(GameManager.I.gameData.levelData.powerGraph);
 

@@ -334,3 +334,41 @@ These depictions were inspired by the “strange figures” engraved in the myst
 
 
 onpowergraphchange is not registered when level starts.
+
+
+
+
+    void Update() {
+
+        HashSet<RectTransform> activeIndicators = new HashSet<RectTransform>();
+        List<Vector3> positions = new List<Vector3>();
+
+        // incorrect. use level data power graph as reference instead.
+        foreach (PowerNode node in GameManager.I.gameData.levelData.powerGraph. ) {
+
+            if (!indicatorPool.ContainsKey(component.idn)) {
+                GameObject newIndicator = GameObject.Instantiate(powerNodeIndicatorPrefab);
+                RectTransform rt = newIndicator.GetComponent<RectTransform>();
+                indicatorPool[component.idn] = rt;
+                rt.SetParent(transform, true);
+
+                LineRenderer lr = newIndicator.GetComponent<LineRenderer>();
+            }
+
+            RectTransform indicator = indicatorPool[component.idn];
+            indicator.gameObject.SetActive(true);
+            Vector3 screenPoint = cam.WorldToScreenPoint(component.transform.position);
+            indicator.position = screenPoint;
+            activeIndicators.Add(indicator);
+
+            foreach (PoweredComponent neighbor in component.edges) {
+                positions.Add(component.transform.position);
+                positions.Add(neighbor.transform.position);
+            }
+        }
+        lineRenderer.positionCount = positions.Count;
+        lineRenderer.SetPositions(positions.ToArray());
+        foreach (RectTransform unused in indicatorPool.Values.ToHashSet().Except(activeIndicators)) {
+            unused.gameObject.SetActive(false);
+        }
+    }
