@@ -323,3 +323,14 @@ camera
 broadly, inputs are created depending on state, then camera applies input by lerping
 
 
+1. on power change
+2. power source on / off
+3. easier way to hook up power grids
+4. power grid UI layer
+    iconography
+
+Under the name ‘Livre des figures hiéroglyphiques’ The depictions were meant to be painted on an arch in Cimetière des Innocents. 
+These depictions were inspired by the “strange figures” engraved in the mysterious manuscript that helped Flamel on the quest for the Philosopher’s Stone.
+
+
+onpowergraphchange is not registered when level starts.

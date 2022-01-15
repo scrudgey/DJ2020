@@ -1,12 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,9 +33,12 @@ public class PowerNetworkUtilEditor : Editor {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
 
+            Vector3 position = group.First().gameObject.transform.position;
+
             // new node with idn
             PowerNode node = new PowerNode {
-                idn = idn
+                idn = idn,
+                position = position
             };
             graph.nodes[idn] = node;
 
@@ -46,6 +46,7 @@ public class PowerNetworkUtilEditor : Editor {
                 Debug.Log($"{idn}: {component}");
                 // set the component's id
                 component.idn = idn;
+                EditorUtility.SetDirty(component);
                 switch (component) {
                     case PowerSource source:
                         node.powerSource = true;

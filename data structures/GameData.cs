@@ -1,12 +1,15 @@
+[System.Serializable]
 public class GameData {
     // TODO static save, load method
     public GameState state;
     public PlayerData playerData;
+    public LevelData levelData;
+
     public static GameData TestInitialData() {
         return new GameData() {
             state = GameState.none,
-            playerData = PlayerData.DefaultGameData()
+            playerData = PlayerData.DefaultGameData(),
+            levelData = LevelData.LoadLevelData("test")
         };
     }
-    public LevelData levelData;
 }

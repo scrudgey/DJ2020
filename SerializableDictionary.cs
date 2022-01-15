@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
+[System.Serializable]
 [XmlRoot("dictionary")]
 public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable {
     #region IXmlSerializable Members

@@ -11,6 +11,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public static Action OnMenuClosed;
     public static Action<MenuType> OnMenuChange;
+    public static Action<PowerGraph> OnPowerGraphChange;
 
     public MenuType activeMenuType;
     public GameData gameData;
@@ -27,6 +28,7 @@ public partial class GameManager : Singleton<GameManager> {
         // TODO: set level in gamedata
         gameData = GameData.TestInitialData();
 
+        // TODO: a better start of level method?
         TransitionToState(GameState.levelPlay);
 
         showDebugRays = true;

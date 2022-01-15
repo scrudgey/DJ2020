@@ -18,6 +18,7 @@ public class UIController : MonoBehaviour {
     public InteractionIndicatorHandler interactionIndicatorHandler;
     public InteractiveHighlightHandler interactiveHighlightHandler;
     public ActionLogHandler actionLogHandler;
+    public PowerOverlay powerOverlay;
     public GameObject UIEditorCamera;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -27,6 +28,10 @@ public class UIController : MonoBehaviour {
         canvas.worldCamera = Camera.main;
         interactionIndicatorHandler.cam = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
+        powerOverlay.cam = Camera.main;
+
+        GameManager.OnPowerGraphChange += powerOverlay.Refresh;
+        powerOverlay.Refresh(GameManager.I.gameData.levelData.powerGraph);
 
         aimIndicatorHandler.UICamera = Camera.main;
         GameManager.OnFocusChanged += BindToNewTarget;
@@ -38,6 +43,7 @@ public class UIController : MonoBehaviour {
         GameManager.OnFocusChanged -= BindToNewTarget;
         GameManager.OnMenuChange -= HandleMenuChange;
         GameManager.OnMenuClosed -= HandleMenuClosed;
+        GameManager.OnPowerGraphChange -= powerOverlay.Refresh;
     }
 
     void BindToNewTarget(GameObject target) {
