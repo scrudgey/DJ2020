@@ -7,18 +7,19 @@ public class PowerOverlay : MonoBehaviour {
     public GameObject powerNodeIndicatorPrefab;
     public LineRenderer lineRenderer;
 
-    Dictionary<PowerNode, RectTransform> indicators = new Dictionary<PowerNode, RectTransform>();
+    Dictionary<PowerNode, PowerNodeIndicator> indicators = new Dictionary<PowerNode, PowerNodeIndicator>();
 
     public void DisableOverlay() {
         lineRenderer.enabled = false;
+        indicators = new Dictionary<PowerNode, PowerNodeIndicator>();
     }
 
     void Update() {
-        foreach (KeyValuePair<PowerNode, RectTransform> kvp in indicators) {
+        foreach (KeyValuePair<PowerNode, PowerNodeIndicator> kvp in indicators) {
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            Debug.Log(screenPoint);
-            kvp.Value.position = screenPoint;
-            Debug.Log($"{kvp.Key} {screenPoint} {kvp.Value.anchoredPosition}");
+            // kvp.Value.position = screenPoint;
+            kvp.Value.Configure(kvp.Key);
+            kvp.Value.SetScreenPosition(screenPoint);
         }
     }
     public void Refresh(PowerGraph graph) {
@@ -31,9 +32,11 @@ public class PowerOverlay : MonoBehaviour {
         List<Vector3> positions = new List<Vector3>();
         foreach (PowerNode node in graph.nodes.Values) {
 
-            Vector3 screenPoint = Camera.main.WorldToScreenPoint(node.position);
-            RectTransform indicator = GetIndicator(node);
-            indicator.position = screenPoint;
+            Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
+            PowerNodeIndicator indicator = GetIndicator(node);
+            indicator.Configure(node);
+            indicator.SetScreenPosition(screenPoint);
+            // indicator.position = screenPoint;
 
             foreach (PowerNode neighbor in graph.Neighbors(node)) {
                 positions.Add(node.position);
@@ -44,15 +47,16 @@ public class PowerOverlay : MonoBehaviour {
         lineRenderer.SetPositions(positions.ToArray());
     }
 
-    RectTransform GetIndicator(PowerNode node) {
+    PowerNodeIndicator GetIndicator(PowerNode node) {
         if (indicators.ContainsKey(node)) {
             return indicators[node];
         } else {
             GameObject newIndicator = GameObject.Instantiate(powerNodeIndicatorPrefab);
-            RectTransform rt = newIndicator.GetComponent<RectTransform>();
-            rt.SetParent(transform, false);
-            indicators[node] = rt;
-            return rt;
+            PowerNodeIndicator indicator = newIndicator.GetComponent<PowerNodeIndicator>();
+            indicator.Configure(node);
+            indicator.rectTransform.SetParent(transform, false);
+            indicators[node] = indicator;
+            return indicator;
         }
     }
 }

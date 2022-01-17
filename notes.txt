@@ -336,39 +336,33 @@ These depictions were inspired by the “strange figures” engraved in the myst
 onpowergraphchange is not registered when level starts.
 
 
+does everything connect back everywhere back to a single mains connection?
+or do we implement several smaller connected graphs within each scene
+    this is more game-like
 
+how did i envision the transformer connecting to the mains connection?
+normal nodes in the network do not block transmission when they are destroyed, otherwise blowing up a gun turret might take out lights.
+but, i do want blowing up the transformer to take out the lights.
+so there is a distinction:
+    * regular node
+    * distribution node 
+    * switch
+    * mains
 
-    void Update() {
-
-        HashSet<RectTransform> activeIndicators = new HashSet<RectTransform>();
-        List<Vector3> positions = new List<Vector3>();
-
-        // incorrect. use level data power graph as reference instead.
-        foreach (PowerNode node in GameManager.I.gameData.levelData.powerGraph. ) {
-
-            if (!indicatorPool.ContainsKey(component.idn)) {
-                GameObject newIndicator = GameObject.Instantiate(powerNodeIndicatorPrefab);
-                RectTransform rt = newIndicator.GetComponent<RectTransform>();
-                indicatorPool[component.idn] = rt;
-                rt.SetParent(transform, true);
-
-                LineRenderer lr = newIndicator.GetComponent<LineRenderer>();
-            }
-
-            RectTransform indicator = indicatorPool[component.idn];
-            indicator.gameObject.SetActive(true);
-            Vector3 screenPoint = cam.WorldToScreenPoint(component.transform.position);
-            indicator.position = screenPoint;
-            activeIndicators.Add(indicator);
-
-            foreach (PoweredComponent neighbor in component.edges) {
-                positions.Add(component.transform.position);
-                positions.Add(neighbor.transform.position);
-            }
-        }
-        lineRenderer.positionCount = positions.Count;
-        lineRenderer.SetPositions(positions.ToArray());
-        foreach (RectTransform unused in indicatorPool.Values.ToHashSet().Except(activeIndicators)) {
-            unused.gameObject.SetActive(false);
-        }
-    }
+how do i envision "power map view"?
+    a separate view superimposed over the scene
+    in analogy with similar views: network, water, sensor nets
+    when the view is active, mouse over components to view their information
+        * power: on / off
+        * enabled: yes / no
+        * information: when this node is disabled, it will no longer distribute power to connected components
+    mouse becomes a cursor
+        this is important for network / hacking view, too
+    is there a better / more visual / more intuitive way to represent the flow of power then?
+        simple connections in the network are not sufficient?
+        or else: all connections *are* power connections. no serial between disconnected nodes.
+            in other words, go back to the original design of nodes interrupting power flow
+            this design will be very spoke & wheel
+            we can always move the lines around
+    when does the view activate?
+        

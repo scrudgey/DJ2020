@@ -53,8 +53,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
-    public void SetPowerSourceState(string idn, bool state) {
-        gameData.levelData.powerGraph.nodes[idn].powerSource = state;
+    public void SetNodeEnabled(string idn, bool state) {
+        gameData.levelData.powerGraph.nodes[idn].enabled = state;
         RefreshPowerGraph();
     }
     public void RefreshPowerGraph() {
@@ -71,7 +71,7 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelData.powerGraph.nodes) {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 foreach (PoweredComponent component in poweredComponents[kvp.Key]) {
-                    component.power = kvp.Value.power;
+                    component.power = kvp.Value.powered;
                     // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
                 }
             }

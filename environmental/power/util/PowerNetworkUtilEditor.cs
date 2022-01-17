@@ -33,12 +33,13 @@ public class PowerNetworkUtilEditor : Editor {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
 
-            Vector3 position = group.First().gameObject.transform.position;
+            Vector3 position = group.First().NodePosition();
 
             // new node with idn
             PowerNode node = new PowerNode {
                 idn = idn,
-                position = position
+                position = position,
+                enabled = true
             };
             graph.nodes[idn] = node;
 
@@ -49,9 +50,10 @@ public class PowerNetworkUtilEditor : Editor {
                 EditorUtility.SetDirty(component);
                 switch (component) {
                     case PowerSource source:
-                        node.powerSource = true;
+                        node.type = PowerNodeType.powerSource;
                         break;
                     default:
+                        node.type = PowerNodeType.normal;
                         break;
                 }
             }

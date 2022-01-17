@@ -5,10 +5,10 @@ using UnityEngine;
 public class PowerSource : PoweredComponent {
     // bool sourceEnabled = true;
     public void DisableSource() {
-        GameManager.I.SetPowerSourceState(idn, false);
+        GameManager.I.SetNodeEnabled(idn, false);
     }
     public void EnableSource() {
-        GameManager.I.SetPowerSourceState(idn, true);
+        GameManager.I.SetNodeEnabled(idn, true);
     }
 
     void OnDisable() {

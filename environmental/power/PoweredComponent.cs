@@ -16,6 +16,14 @@ public class PoweredComponent : MonoBehaviour {
     }
     public PoweredComponent[] edges;
 
+    public Vector3 NodePosition() {
+        Transform nodePositioner = transform.Find("node");
+        // nodePositioner? nodePositioner.p
+        if (nodePositioner) {
+            return nodePositioner.position;
+        } else return transform.position;
+    }
+
     virtual protected void OnPowerOn() { }
     virtual protected void OnPowerOff() { }
 
@@ -25,7 +33,7 @@ public class PoweredComponent : MonoBehaviour {
         // string customName = "Relic\\" + relicType.ToString() + ".png";
         // Gizmos.DrawIcon(transform.position, customName, true);
         foreach (PoweredComponent other in edges) {
-            Gizmos.DrawLine(transform.position, other.transform.position);
+            Gizmos.DrawLine(NodePosition(), other.NodePosition());
         }
     }
 #endif

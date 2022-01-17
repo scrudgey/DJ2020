@@ -35,19 +35,21 @@ public class PowerGraph {
     }
 
     public void Refresh() {
-        nodes.Values.ToList().ForEach(node => node.power = false);
+        nodes.Values.ToList().ForEach(node => node.powered = false);
+
         // run the algorithm
-        PowerNode[] sources = nodes.Values.Where(node => node.powerSource).ToArray();
+        PowerNode[] sources = nodes.Values.Where(node => node.type == PowerNodeType.powerSource && node.enabled).ToArray();
+
         foreach (PowerNode source in sources) {
             // Debug.Log($"power source: {source.idn}");
             DFS(source);
         }
     }
     void DFS(PowerNode node) {
-        node.power = true;
+        node.powered = true;
         if (edges.ContainsKey(node.idn))
             foreach (string neighborID in edges[node.idn]) {
-                if (!nodes[neighborID].power) {
+                if (!nodes[neighborID].powered) {
                     // Debug.Log($"propagating from {node.idn} to {neighborID}");
                     DFS(nodes[neighborID]);
                 }
