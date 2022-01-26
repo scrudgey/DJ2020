@@ -6,18 +6,30 @@ using UnityEngine.InputSystem;
 
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
+public enum OverlayType { none, power, cyber }
 public enum CursorType { gun }
 public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
+    public GameData gameData;
+    public GameObject playerObject;
+
+
+    // UI input
+    public InputActionReference showConsole;
+
+    // UI callbacks
     public static Action OnMenuClosed;
     public static Action<MenuType> OnMenuChange;
     public static Action<PowerGraph> OnPowerGraphChange;
+    public static Action<OverlayType> OnOverlayChange;
 
-    public MenuType activeMenuType;
-    public GameData gameData;
-    public GameObject playerObject;
-    public InputActionReference showConsole;
+    // UI state
     private bool toggleConsoleThisFrame;
+    private bool nextOverlayThisFrame;
+    private bool previousOverlayThisFrame;
+    public MenuType activeMenuType;
+    public OverlayType activeOverlayType;
+
     public bool showDebugRays;
     public void Start() {
         // System
@@ -83,6 +95,23 @@ public partial class GameManager : Singleton<GameManager> {
         OnMenuClosed();
         TransitionToState(GameState.levelPlay); // this isn't right either?
         activeMenuType = MenuType.none;
+    }
+
+    // should there be a UI state holder?
+    public void IncrementOverlay(int increment) {
+        int current = (int)gameData.overlayIndex;
+        int length = Enum.GetNames(typeof(OverlayType)).Length;
+        int nextInt = (current + increment);
+
+        if (nextInt < 0) {
+            nextInt = length - 1;
+        } else if (nextInt >= length) {
+            nextInt = 0;
+        }
+
+        gameData.overlayIndex = nextInt;
+        OverlayType newType = (OverlayType)nextInt;
+        OnOverlayChange(newType);
     }
 
     public void Update() {

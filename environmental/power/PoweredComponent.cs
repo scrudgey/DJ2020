@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+public enum PowerNodeIcon { normal, power, mains }
 public class PoweredComponent : MonoBehaviour {
     public string idn;
+    public string nodeTitle;
+    public PowerNodeIcon icon;
     private bool _power;
     public bool power {
         get { return _power; }

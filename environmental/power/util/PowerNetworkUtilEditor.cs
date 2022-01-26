@@ -39,11 +39,17 @@ public class PowerNetworkUtilEditor : Editor {
             PowerNode node = new PowerNode {
                 idn = idn,
                 position = position,
-                enabled = true
+                enabled = true,
+                icon = PowerNodeIcon.normal
             };
             graph.nodes[idn] = node;
 
             foreach (PoweredComponent component in group) {
+                if (component.nodeTitle != "") {
+                    node.nodeTitle = component.nodeTitle;
+                }
+                if (component.icon != PowerNodeIcon.normal)
+                    node.icon = component.icon;
                 Debug.Log($"{idn}: {component}");
                 // set the component's id
                 component.idn = idn;

@@ -5,46 +5,39 @@ using UnityEngine;
 public class PowerOverlay : MonoBehaviour {
     public Camera cam;
     public GameObject powerNodeIndicatorPrefab;
-    public LineRenderer lineRenderer;
+    PowerGraph graph;
 
     Dictionary<PowerNode, PowerNodeIndicator> indicators = new Dictionary<PowerNode, PowerNodeIndicator>();
-
+    void Awake() {
+        foreach (Transform child in transform) {
+            Destroy(child.gameObject);
+        }
+    }
     public void DisableOverlay() {
-        lineRenderer.enabled = false;
         indicators = new Dictionary<PowerNode, PowerNodeIndicator>();
     }
 
     void Update() {
         foreach (KeyValuePair<PowerNode, PowerNodeIndicator> kvp in indicators) {
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            // kvp.Value.position = screenPoint;
-            kvp.Value.Configure(kvp.Key);
+            kvp.Value.Configure(kvp.Key, graph);
             kvp.Value.SetScreenPosition(screenPoint);
         }
     }
     public void Refresh(PowerGraph graph) {
-
-        if (graph == null) {
+        this.graph = graph;
+        // Debug.Log($"refreshing graph {graph}");
+        if (graph == null || cam == null) {
             DisableOverlay();
             return;
         }
 
-        List<Vector3> positions = new List<Vector3>();
         foreach (PowerNode node in graph.nodes.Values) {
-
             Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             PowerNodeIndicator indicator = GetIndicator(node);
-            indicator.Configure(node);
+            indicator.Configure(node, graph);
             indicator.SetScreenPosition(screenPoint);
-            // indicator.position = screenPoint;
-
-            foreach (PowerNode neighbor in graph.Neighbors(node)) {
-                positions.Add(node.position);
-                positions.Add(neighbor.position);
-            }
         }
-        lineRenderer.positionCount = positions.Count;
-        lineRenderer.SetPositions(positions.ToArray());
     }
 
     PowerNodeIndicator GetIndicator(PowerNode node) {
@@ -53,7 +46,7 @@ public class PowerOverlay : MonoBehaviour {
         } else {
             GameObject newIndicator = GameObject.Instantiate(powerNodeIndicatorPrefab);
             PowerNodeIndicator indicator = newIndicator.GetComponent<PowerNodeIndicator>();
-            indicator.Configure(node);
+            indicator.Configure(node, graph);
             indicator.rectTransform.SetParent(transform, false);
             indicators[node] = indicator;
             return indicator;

@@ -26,6 +26,7 @@ public struct PlayerCharacterInput {
     public bool actionButtonPressed;
     public int incrementItem;
     public bool useItem;
+    public int incrementOverlay;
 }
 public enum CharacterState {
     normal,
@@ -360,6 +361,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.75f);
                 }
                 break;
+        }
+
+        if (input.incrementOverlay != 0) {
+            GameManager.I.IncrementOverlay(input.incrementOverlay);
         }
     }
 

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using TMPro;
 using UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 public class UIInput {
     public bool toggleConsole;
 }
 
-
+public class MouseInputData {
+    public Vector3 mousePosition;
+}
 public class UIController : MonoBehaviour {
     public Canvas canvas;
     public TerminalController terminal;
@@ -18,7 +21,7 @@ public class UIController : MonoBehaviour {
     public InteractionIndicatorHandler interactionIndicatorHandler;
     public InteractiveHighlightHandler interactiveHighlightHandler;
     public ActionLogHandler actionLogHandler;
-    public PowerOverlay powerOverlay;
+    public OverlayHandler overlayHandler;
     public GameObject UIEditorCamera;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -28,13 +31,9 @@ public class UIController : MonoBehaviour {
         canvas.worldCamera = Camera.main;
         interactionIndicatorHandler.cam = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
-        powerOverlay.cam = Camera.main;
-
-        // TODO: this is weird.
-        GameManager.OnPowerGraphChange += powerOverlay.Refresh;
-        powerOverlay.Refresh(GameManager.I.gameData.levelData.powerGraph);
-
+        overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
+
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnMenuChange += HandleMenuChange;
         GameManager.OnMenuClosed += HandleMenuClosed;
@@ -44,7 +43,8 @@ public class UIController : MonoBehaviour {
         GameManager.OnFocusChanged -= BindToNewTarget;
         GameManager.OnMenuChange -= HandleMenuChange;
         GameManager.OnMenuClosed -= HandleMenuClosed;
-        GameManager.OnPowerGraphChange -= powerOverlay.Refresh;
+        GameManager.OnPowerGraphChange -= overlayHandler.RefreshPowerGraph;
+        GameManager.OnOverlayChange -= overlayHandler.HandleOverlayChange;
     }
 
     void BindToNewTarget(GameObject target) {
@@ -58,6 +58,7 @@ public class UIController : MonoBehaviour {
         ((IBinder<Interactor>)interactionIndicatorHandler).Bind(target);
         ((IBinder<Interactor>)interactiveHighlightHandler).Bind(target);
 
+        overlayHandler.Bind();
         actionLogHandler.Bind(target);
     }
 
@@ -69,4 +70,20 @@ public class UIController : MonoBehaviour {
     void HandleMenuClosed() {
         terminal.gameObject.SetActive(false);
     }
+
+    // void Update() {
+    //     HandleMouseInput();
+    // }
+    // void HandleMouseInput() {
+    //     // TargetData targetData = CursorToTarget(Mouse.current.position.ReadValue());
+    //     MouseInputData mouseData = CursorToTarget();
+    // }
+
+    // MouseInputData CursorToTarget() {
+    //     Vector2 mousePosition = Mouse.current.position.ReadValue();
+    //     return new MouseInputData {
+    //         mousePosition = mousePosition
+    //     };
+    // }
+
 }

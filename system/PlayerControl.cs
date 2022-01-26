@@ -36,6 +36,8 @@ public class PlayerControl : MonoBehaviour {
     public InputActionReference nextItem;
     public InputActionReference previousItem;
     public InputActionReference useItem;
+    public InputActionReference nextOverlay;
+    public InputActionReference previousOverlay;
 
     private Vector2 inputVector;
     private bool firePressedHeld;
@@ -51,6 +53,7 @@ public class PlayerControl : MonoBehaviour {
     private int selectGunThisFrame;
     private bool actionButtonPressedThisFrame;
     private int incrementItemThisFrame;
+    private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
     private PlayerCharacterInput _lastInput;
     private static List<CameraAttractorZone> attractors;
@@ -135,6 +138,19 @@ public class PlayerControl : MonoBehaviour {
             }
         };
 
+        // Overlay
+        nextOverlay.action.performed += ctx => {
+            if (ctx.ReadValueAsButton()) {
+                incrementOverlayThisFrame = 1;
+            }
+        };
+
+        previousOverlay.action.performed += ctx => {
+            if (ctx.ReadValueAsButton()) {
+                incrementOverlayThisFrame = -1;
+            }
+        };
+
         useItem.action.performed += ctx => {
             useItemThisFrame = ctx.ReadValueAsButton();
         };
@@ -186,7 +202,7 @@ public class PlayerControl : MonoBehaviour {
         Vector2 playerDir = new Vector2(Character.direction.x, Character.direction.z);
 
         // head direction
-        TargetData targetData = CursorToTarget(Mouse.current.position.ReadValue());
+        TargetData targetData = CursorToTarget();
         Vector3 headDirection = (targetData.position - headAnimation.transform.position).normalized;
         // Debug.DrawRay(headAnimation.transform.position, headDirection, Color.red, 1f);
         Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
@@ -277,7 +293,8 @@ public class PlayerControl : MonoBehaviour {
         rotateCameraRightPressedThisFrame = false;
     }
 
-    public TargetData CursorToTarget(Vector2 cursorPosition) {
+    public TargetData CursorToTarget() {
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector3 gunPoint = gunHandler.gunPosition();
         Plane plane = new Plane(Vector3.up, gunPoint);
 
@@ -343,7 +360,7 @@ public class PlayerControl : MonoBehaviour {
     }
     private void HandleCharacterInput() {
 
-        TargetData targetData = CursorToTarget(Mouse.current.position.ReadValue());
+        TargetData targetData = CursorToTarget();
 
         PlayerCharacterInput characterInputs = new PlayerCharacterInput() {
             state = Character.state,
@@ -365,6 +382,7 @@ public class PlayerControl : MonoBehaviour {
             actionButtonPressed = actionButtonPressedThisFrame,
             incrementItem = incrementItemThisFrame,
             useItem = useItemThisFrame,
+            incrementOverlay = incrementOverlayThisFrame
         };
         // Apply inputs to character
         Character.SetInputs(ref characterInputs);
@@ -382,6 +400,7 @@ public class PlayerControl : MonoBehaviour {
         selectGunThisFrame = -1;
         actionButtonPressedThisFrame = false;
         incrementItemThisFrame = 0;
+        incrementOverlayThisFrame = 0;
         useItemThisFrame = false;
 
         _lastInput = characterInputs;

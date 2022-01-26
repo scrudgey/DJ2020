@@ -47,7 +47,7 @@ public class PowerGraph {
     }
     void DFS(PowerNode node) {
         node.powered = true;
-        if (edges.ContainsKey(node.idn))
+        if (node.enabled && edges.ContainsKey(node.idn))
             foreach (string neighborID in edges[node.idn]) {
                 if (!nodes[neighborID].powered) {
                     // Debug.Log($"propagating from {node.idn} to {neighborID}");

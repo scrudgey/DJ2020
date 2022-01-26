@@ -38,9 +38,7 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
     public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
         if (!InteractorTargetData.Equality(data, newData)) {
-            // if (data != null) {
             Disable();
-            // }
             data = newData;
             DataChanged();
         }

@@ -5,6 +5,10 @@ public class GameData {
     public PlayerData playerData;
     public LevelData levelData;
 
+
+    // UI state:
+    public int overlayIndex;
+
     public static GameData TestInitialData() {
         return new GameData() {
             state = GameState.none,
