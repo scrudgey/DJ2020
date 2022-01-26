@@ -109,9 +109,12 @@ public partial class GameManager : Singleton<GameManager> {
             nextInt = 0;
         }
 
-        gameData.overlayIndex = nextInt;
         OverlayType newType = (OverlayType)nextInt;
-        OnOverlayChange(newType);
+        SetOverlay(newType);
+    }
+    public void SetOverlay(OverlayType newType) {
+        gameData.overlayIndex = (int)newType;
+        OnOverlayChange?.Invoke(newType);
     }
 
     public void Update() {

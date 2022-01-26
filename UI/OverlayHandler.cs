@@ -2,11 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+
+[System.Serializable]
+public class UIColorSet {
+    public Color enabledColor;
+    public Color disabledColor;
+    public Color deadColor;
+}
 public class OverlayHandler : MonoBehaviour {
     public GameObject outline;
+    public Image outlineImage;
+    public Image titleBoxImage;
     public TextMeshProUGUI titleText;
     public PowerOverlay powerOverlay;
     private Camera _cam;
+    public UIColorSet powerOverlayColors;
+    public UIColorSet cyberOverlayColors;
     public Camera cam {
         get { return _cam; }
         set {
@@ -14,7 +26,9 @@ public class OverlayHandler : MonoBehaviour {
             powerOverlay.cam = value;
         }
     }
-
+    void Awake() {
+        powerOverlay.colorSet = powerOverlayColors;
+    }
     public void Bind() {
         // TODO: this is weird.
         GameManager.OnPowerGraphChange += RefreshPowerGraph;
@@ -40,10 +54,16 @@ public class OverlayHandler : MonoBehaviour {
                 titleText.text = "None";
                 break;
             case OverlayType.power:
+                outlineImage.color = powerOverlayColors.enabledColor;
+                titleBoxImage.color = powerOverlayColors.enabledColor;
+                titleText.color = powerOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(true);
                 titleText.text = "Power";
                 break;
             case OverlayType.cyber:
+                outlineImage.color = cyberOverlayColors.enabledColor;
+                titleBoxImage.color = cyberOverlayColors.enabledColor;
+                titleText.color = cyberOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(false);
                 titleText.text = "Network";
                 break;

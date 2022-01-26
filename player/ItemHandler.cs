@@ -30,7 +30,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
     }
 
     void SwitchToItem(BaseItem item) {
+        OnItemExit(this.activeItem);
         this.activeItem = item;
+        OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
     public void LoadState(PlayerData data) {
@@ -52,5 +54,24 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
         if (activeItem == null)
             return;
         activeItem.Use(this);
+    }
+
+    void OnItemEnter(BaseItem item) {
+        switch (item) {
+            case CyberDeck cyberDeck:
+                GameManager.I.SetOverlay(OverlayType.cyber);
+                break;
+            default:
+                break;
+        }
+    }
+    void OnItemExit(BaseItem item) {
+        switch (item) {
+            case CyberDeck cyberDeck:
+                GameManager.I.SetOverlay(OverlayType.none);
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 public class PowerOverlay : MonoBehaviour {
+    public UIColorSet colorSet;
     public Camera cam;
     public GameObject powerNodeIndicatorPrefab;
     PowerGraph graph;
