@@ -10,7 +10,7 @@ public class LevelData {
 
     public static LevelData LoadLevelData(string levelName) {
 
-        PowerGraph graph = PowerGraph.LoadAll(levelName);
+        PowerGraph graph = PowerGraph.LoadAll<PowerNode, PowerGraph>(levelName);
 
         return new LevelData {
             powerGraph = graph

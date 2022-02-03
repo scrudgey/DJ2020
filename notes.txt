@@ -365,4 +365,13 @@ how do i envision "power map view"?
             this design will be very spoke & wheel
             we can always move the lines around
     when does the view activate?
-        
+
+
+is there an exclusive cursor mode when the item is deployed?
+    cyberdeck yes, AR goggles no?
+    how to communicate to player that they can't shoot now?
+
+design for cyber networks
+    does hack originate from offscreen, as original idea?
+        that was so that you could hack the building before going in.
+        could offer a chanc

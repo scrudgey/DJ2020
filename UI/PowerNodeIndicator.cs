@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class PowerNodeIndicator : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     public Image image;
+    public Image selectionIndicatorImage;
     public RectTransform rectTransform;
     public Sprite normalNode;
     public Sprite powerNode;
@@ -15,6 +16,9 @@ public class PowerNodeIndicator : MonoBehaviour, IPointerEnterHandler, IPointerE
     public Color deadColor;
     public PowerNodePopupBox popupBox;
     public LineRenderer lineRenderer;
+    private bool showSelectionIndicator;
+    private float selectionIndicatorTimer;
+    readonly float SELECTION_TIMEOUT = 0.05f;
     public void Configure(PowerNode node, PowerGraph graph) {
 
         // set icon
@@ -64,8 +68,23 @@ public class PowerNodeIndicator : MonoBehaviour, IPointerEnterHandler, IPointerE
     }
     public void OnPointerEnter(PointerEventData eventData) {
         popupBox.Show();
+        showSelectionIndicator = true;
     }
     public void OnPointerExit(PointerEventData eventData) {
         popupBox.Hide();
+        showSelectionIndicator = false;
+        selectionIndicatorImage.enabled = false;
+    }
+
+    void Update() {
+        if (showSelectionIndicator) {
+            selectionIndicatorTimer += Time.deltaTime;
+            if (selectionIndicatorTimer > SELECTION_TIMEOUT) {
+                selectionIndicatorTimer -= SELECTION_TIMEOUT;
+                selectionIndicatorImage.enabled = !selectionIndicatorImage.enabled;
+            }
+        } else {
+            selectionIndicatorImage.enabled = false;
+        }
     }
 }
