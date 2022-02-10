@@ -16,6 +16,7 @@ public class OverlayHandler : MonoBehaviour {
     public Image titleBoxImage;
     public TextMeshProUGUI titleText;
     public PowerOverlay powerOverlay;
+    public CyberOverlay cyberOverlay;
     private Camera _cam;
     public UIColorSet powerOverlayColors;
     public UIColorSet cyberOverlayColors;
@@ -31,10 +32,16 @@ public class OverlayHandler : MonoBehaviour {
     }
     public void Bind() {
         // TODO: this is weird.
-        GameManager.OnPowerGraphChange += RefreshPowerGraph;
         GameManager.OnOverlayChange += HandleOverlayChange;
+
+        GameManager.OnPowerGraphChange += RefreshPowerGraph;
+        GameManager.OnCyberGraphChange += RefreshCyberGraph;
+
+        // TODO: cyber
         RefreshPowerGraph(GameManager.I.gameData.levelData.powerGraph);
-        HandleOverlayChange(OverlayType.none);
+        RefreshCyberGraph(GameManager.I.gameData.levelData.cyberGraph);
+
+        HandleOverlayChange(GameManager.I.activeOverlayType);
     }
     void OnDestroy() {
         GameManager.OnPowerGraphChange -= RefreshPowerGraph;
@@ -42,15 +49,19 @@ public class OverlayHandler : MonoBehaviour {
     }
 
     public void RefreshPowerGraph(PowerGraph graph) {
-        powerOverlay.Refresh(graph);
         powerOverlay.cam = cam;
+        powerOverlay.Refresh(graph);
     }
-
+    public void RefreshCyberGraph(CyberGraph graph) {
+        cyberOverlay.cam = cam;
+        cyberOverlay.Refresh(graph);
+    }
     public void HandleOverlayChange(OverlayType type) {
         switch (type) {
             case OverlayType.none:
             default:
                 powerOverlay.gameObject.SetActive(false);
+                cyberOverlay.gameObject.SetActive(false);
                 titleText.text = "None";
                 break;
             case OverlayType.power:
@@ -58,6 +69,7 @@ public class OverlayHandler : MonoBehaviour {
                 titleBoxImage.color = powerOverlayColors.enabledColor;
                 titleText.color = powerOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(true);
+                cyberOverlay.gameObject.SetActive(false);
                 titleText.text = "Power";
                 break;
             case OverlayType.cyber:
@@ -65,6 +77,7 @@ public class OverlayHandler : MonoBehaviour {
                 titleBoxImage.color = cyberOverlayColors.enabledColor;
                 titleText.color = cyberOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(false);
+                cyberOverlay.gameObject.SetActive(true);
                 titleText.text = "Network";
                 break;
         }

@@ -9,25 +9,27 @@ using UnityEngine.SceneManagement;
 
 [CustomEditor(typeof(PowerNetworkUtil))]
 public class PowerNetworkUtilEditor : Editor {
+    public string levelName = "test";
     public override void OnInspectorGUI() {
         // PowerNetworkUtil networkUtil = (PowerNetworkUtil)target;
 
         if (GUILayout.Button("Build Power Network")) {
-            PowerGraph graph = BuildPowerNetwork();
-
-            string levelName = "test";
             string sceneName = SceneManager.GetActiveScene().name;
 
-            graph.Write(levelName, sceneName);
+            PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
+            CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
+
+            powerGraph.Write(levelName, sceneName);
+            cyberGraph.Write(levelName, sceneName);
             AssetDatabase.Refresh();
         }
 
     }
 
-    public PowerGraph BuildPowerNetwork() {
-        PowerGraph graph = new PowerGraph();
+    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node, new() where V : GraphNodeComponent<V> {
+        T graph = new T();
 
-        PoweredComponent[] components = GameObject.FindObjectsOfType<PoweredComponent>();
+        V[] components = GameObject.FindObjectsOfType<V>();
 
         foreach (var group in components.GroupBy(component => component.gameObject)) {
             Guid guid = Guid.NewGuid();
@@ -36,7 +38,7 @@ public class PowerNetworkUtilEditor : Editor {
             Vector3 position = group.First().NodePosition();
 
             // new node with idn
-            PowerNode node = new PowerNode {
+            U node = new U {
                 idn = idn,
                 position = position,
                 enabled = true,
@@ -44,7 +46,7 @@ public class PowerNetworkUtilEditor : Editor {
             };
             graph.nodes[idn] = node;
 
-            foreach (PoweredComponent component in group) {
+            foreach (V component in group) {
                 if (component.nodeTitle != "") {
                     node.nodeTitle = component.nodeTitle;
                 }
@@ -54,20 +56,21 @@ public class PowerNetworkUtilEditor : Editor {
                 // set the component's id
                 component.idn = idn;
                 EditorUtility.SetDirty(component);
-                switch (component) {
-                    case PowerSource source:
-                        node.type = PowerNodeType.powerSource;
-                        break;
-                    default:
-                        node.type = PowerNodeType.normal;
-                        break;
-                }
+
+                node.type = component switch {
+                    PowerSource => PowerNodeType.powerSource,
+                    _ => PowerNodeType.normal
+                };
             }
         }
-        foreach (PoweredComponent component in components) {
-            foreach (PoweredComponent link in component.edges) {
-                PowerNode source = graph.nodes[component.idn];
-                PowerNode neighbor = graph.nodes[link.idn];
+        foreach (V component in components) {
+            if (component == null)
+                continue;
+            foreach (V link in component.edges) {
+                if (link == null)
+                    continue;
+                U source = graph.nodes[component.idn];
+                U neighbor = graph.nodes[link.idn];
                 graph.AddEdge(source, neighbor);
             }
         }

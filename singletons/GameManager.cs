@@ -21,6 +21,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action OnMenuClosed;
     public static Action<MenuType> OnMenuChange;
     public static Action<PowerGraph> OnPowerGraphChange;
+    public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<OverlayType> OnOverlayChange;
 
     // UI state

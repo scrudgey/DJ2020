@@ -35,21 +35,17 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     }
 
 
-    public static U Load<V, U>(string path) where U : Graph<V, U> where V : Node {
-        XmlSerializer serializer = new XmlSerializer(typeof(U));
+    public static W Load(string path) {
+        XmlSerializer serializer = new XmlSerializer(typeof(W));
         if (File.Exists(path)) {
             using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-                return serializer.Deserialize(sceneStream) as U;
+                return (W)serializer.Deserialize(sceneStream);
             }
         } else {
             Debug.LogError($"power graph file not found: {path}");
             return null;
         }
     }
-
-
-
-
 
     public void Write(string levelName, string sceneName) {
         XmlSerializer serializer = new XmlSerializer(typeof(W));
@@ -58,37 +54,40 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
             serializer.Serialize(sceneStream, this);
         }
     }
+
     private string FilePath(string levelName, string sceneName) {
         string scenePath = GameManager.Level.LevelDataPath(levelName);
-        string prefix = PowerGraphPrefix<T, W>(typeof(W));
+        string prefix = PowerGraphPrefix();
         return Path.Combine(scenePath, $"graph_{prefix}_{sceneName}.xml");
     }
-    public static U LoadAll<V, U>(string levelName) where U : Graph<V, U> where V : Node {
+
+    public static W LoadAll(string levelName) {
+        // public static PowerGraph LoadAll(string levelName) {
         string levelPath = GameManager.Level.LevelDataPath(levelName);
-        Debug.Log($"loading power graphs at {levelPath}...");
-        string prefix = PowerGraphPrefix<V, U>(typeof(U));
-        string[] graphPaths = Directory.GetFiles(levelPath, $"*power*xml"); // TODO: fix this
+        Debug.Log($"loading all graphs at {levelPath}...");
+        string prefix = PowerGraphPrefix();
+        string[] graphPaths = Directory.GetFiles(levelPath, $"*{prefix}*xml"); // TODO: fix this
         if (graphPaths.Length == 0) {
-            Debug.LogError($"no power graphs found for level {levelName} at {levelPath}...");
+            Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");
             return null;
         } else {
-            U graph = null;
+            W graph = null;
             foreach (string path in graphPaths) {
                 Debug.Log($"loading {path}...");
-                graph = Load<V, U>(path);
+                graph = Load(path);
             }
             // TODO: combine graphs
             return graph;
         }
     }
 
-    public static string PowerGraphPrefix<U, V>(Type g) where U : Node where V : Graph<U, V> {
-        if (g == typeof(PowerGraph)) {
+    public static string PowerGraphPrefix() {
+        if (typeof(W) == typeof(PowerGraph)) {
             return "power";
-        } else if (g == typeof(Graph<U, V>)) {
-            return "graph";
+        } else if (typeof(W) == typeof(CyberGraph)) {
+            return "cyber";
         } else {
-            return "NULL";
+            return "generic";
         }
     }
 

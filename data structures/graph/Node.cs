@@ -9,5 +9,8 @@ public class Node {
     public string nodeTitle;
     public bool enabled;
     public Vector3 position;
+    public PowerNodeIcon icon;
+    public PowerNodeType type;
+
     public Node() { }
 }

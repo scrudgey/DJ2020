@@ -1,29 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
-using Easings;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-public class PowerNodePopupBox : NodePopupBox<PowerNode> {
 
-    public TextMeshProUGUI poweredText;
-    public Color unpoweredColor;
-    protected override void SetGraphicalState(PowerNode node) {
+public class CyberNodePopupBox : NodePopupBox<CyberNode> {
+
+    public TextMeshProUGUI compromisedText;
+    public Color compromisedColor;
+    protected override void SetGraphicalState(CyberNode node) {
         idText.text = node.idn.Substring(0, node.idn.Length / 2);
         nameText.text = node.nodeTitle;
 
-        if (node.powered) {
-            poweredText.text = $"Power: Y";
+        if (node.compromised) {
+            compromisedText.text = $"COMPROMISED";
         } else {
-            poweredText.text = $"Power: N";
+            compromisedText.text = $"uncompromised";
         }
         Color activeColor = enabledColor;
         if (node.enabled) {
             enabledText.text = $"Enabled: Y";
-            if (node.powered) {
-                activeColor = enabledColor;
-            } else {
-                activeColor = unpoweredColor;
+            if (node.compromised) {
+                activeColor = compromisedColor;
             }
         } else {
             enabledText.text = $"Enabled: N";

@@ -3,7 +3,8 @@ using System.IO;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
 
-    Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
+    static Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
+    static Dictionary<string, HashSet<CyberComponent>> cyberComponents;
 
     public static class Level {
         public static string LevelDataPath(string levelName) {
@@ -21,6 +22,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void ClearSceneData() {
         poweredComponents = new Dictionary<string, HashSet<PoweredComponent>>();
+        cyberComponents = new Dictionary<string, HashSet<CyberComponent>>();
     }
     private void InitializeLevel(string levelName) {
         // TODO: level enum input
@@ -49,13 +51,33 @@ public partial class GameManager : Singleton<GameManager> {
                 poweredComponents[component.idn] = new HashSet<PoweredComponent> { component };
             }
         }
+
+        // TODO: abstract this
+        // connect up cyber grids
+        Debug.Log("connecting cyber grid...");
+        foreach (CyberComponent component in GameObject.FindObjectsOfType<CyberComponent>()) {
+            if (cyberComponents.ContainsKey(component.idn)) {
+                cyberComponents[component.idn].Add(component);
+            } else {
+                cyberComponents[component.idn] = new HashSet<CyberComponent> { component };
+            }
+        }
+
+        // TODO: abstract this?
         RefreshPowerGraph();
+        RefreshCyberGraph();
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
     public void SetNodeEnabled(string idn, bool state) {
-        gameData.levelData.powerGraph.nodes[idn].enabled = state;
-        RefreshPowerGraph();
+        if (gameData.levelData != null && gameData.levelData.powerGraph != null && gameData.levelData.powerGraph.nodes.ContainsKey(idn)) {
+            gameData.levelData.powerGraph.nodes[idn].enabled = state;
+            RefreshPowerGraph();
+        }
+    }
+    public void RefreshCyberGraph() {
+        // TODO: abstract this
+        // gameData.levelData.cyberGraph.Refresh();
     }
     public void RefreshPowerGraph() {
         // power distribution algorithm
@@ -63,6 +85,9 @@ public partial class GameManager : Singleton<GameManager> {
 
         // propagate the changes to local state
         TransferPowerState();
+
+        // TODO: abstract this
+        TransferCyberState();
 
         // propagate changes to UI
         OnPowerGraphChange?.Invoke(gameData.levelData.powerGraph);
@@ -72,6 +97,16 @@ public partial class GameManager : Singleton<GameManager> {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 foreach (PoweredComponent component in poweredComponents[kvp.Key]) {
                     component.power = kvp.Value.powered;
+                    // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
+                }
+            }
+        }
+    }
+    void TransferCyberState() {
+        foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelData.cyberGraph.nodes) {
+            if (cyberComponents.ContainsKey(kvp.Key)) {
+                foreach (CyberComponent component in cyberComponents[kvp.Key]) {
+                    component.compromised = kvp.Value.compromised;
                     // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
                 }
             }
