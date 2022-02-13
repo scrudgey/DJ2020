@@ -42,6 +42,7 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"loading player state...");
         LoadPlayerState(gameData.playerData);
 
+        // TODO: abstract this
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
@@ -52,7 +53,6 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        // TODO: abstract this
         // connect up cyber grids
         Debug.Log("connecting cyber grid...");
         foreach (CyberComponent component in GameObject.FindObjectsOfType<CyberComponent>()) {
@@ -101,12 +101,18 @@ public partial class GameManager : Singleton<GameManager> {
             RefreshCyberGraph();
         }
     }
+    public bool IsCyberNodeVulnerable(CyberNode node) {
+        if (node.compromised)
+            return false;
+        if (gameData.levelData != null && gameData.levelData.cyberGraph != null && gameData.levelData.cyberGraph.nodes.ContainsKey(node.idn)) {
+            foreach (CyberNode neighbor in gameData.levelData.cyberGraph.Neighbors(node)) {
+                if (neighbor.compromised) return true;
+            }
+            return false;
+        } else return false;
+    }
 
     public void RefreshCyberGraph() {
-        // TODO: abstract this
-        // gameData.levelData.cyberGraph.Refresh();
-
-        // TODO: abstract this
         TransferCyberState();
 
         // propagate changes to UI

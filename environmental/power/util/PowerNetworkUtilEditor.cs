@@ -63,6 +63,7 @@ public class PowerNetworkUtilEditor : Editor {
                     _ => NodeType.normal
                 };
 
+                // allow the subclass to add class-specific configuration
                 component.ConfigureNode(node);
             }
         }

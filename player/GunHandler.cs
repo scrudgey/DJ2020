@@ -13,6 +13,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         reloading,
     }
     public GunState state;
+    public InputMode inputMode;
     public Action<GunHandler> OnValueChanged { get; set; }
     static readonly public float height = 0.5f;
     public AudioSource audioSource;
@@ -315,8 +316,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
 
     public void ProcessGunSwitch(PlayerCharacterInput input) {
-        if (input.switchToGun != -1) {
-            SwitchToGun(input.switchToGun);
+        if (input.selectgun != -1) {
+            SwitchToGun(input.selectgun);
         } else if (input.reload) {
             DoReload();
         }
@@ -331,10 +332,11 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
     }
     public void ProcessInput(PlayerCharacterInput input) {
+        inputMode = input.inputMode;
         lastTargetData = input.Fire.targetData;
         OnValueChanged?.Invoke(this);
         if (HasGun()) {
-            if (gunInstance.CanShoot()) {
+            if (gunInstance.CanShoot() && inputMode == InputMode.gun) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
                         state = GunState.shooting;

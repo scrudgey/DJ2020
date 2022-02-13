@@ -11,6 +11,7 @@ public struct PlayerCharacterInput {
         public bool FireHeld;
         public TargetData targetData;
     }
+    public InputMode inputMode;
     public CharacterState state;
     public float MoveAxisForward;
     public float MoveAxisRight;
@@ -22,7 +23,7 @@ public struct PlayerCharacterInput {
     public bool runDown;
     public FireInputs Fire;
     public bool reload;
-    public int switchToGun;
+    public int selectgun;
     public bool actionButtonPressed;
     public int incrementItem;
     public bool useItem;

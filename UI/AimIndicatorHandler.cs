@@ -47,7 +47,7 @@ namespace UI {
             }
         }
         void IBinder<GunHandler>.HandleValueChanged(GunHandler gunHandler) {
-            if (gunHandler.HasGun()) {
+            if (gunHandler.HasGun() && gunHandler.inputMode == InputMode.gun) {
                 cursorImage.enabled = true;
 
                 TargetData data = gunHandler.lastTargetData;

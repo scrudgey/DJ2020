@@ -1,22 +1,25 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
 public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler where T : Node where U : Graph<T, U> {
     public Image image;
     public Image selectionIndicatorImage;
     public RectTransform rectTransform;
     public Color enabledColor;
     public Color disabledColor;
-    // public Color deadColor;
     public NodePopupBox<T> popupBox;
     public LineRenderer lineRenderer;
-    private bool showSelectionIndicator;
+    protected bool showSelectionIndicator;
     private float selectionIndicatorTimer;
     readonly float SELECTION_TIMEOUT = 0.05f;
+    protected T node;
+    public static Action<NodeIndicator<T, U>> onMouseOver;
+    public static Action<NodeIndicator<T, U>> onMouseExit;
     public void Configure(T node, Graph<T, U> graph) {
+        this.node = node;
 
         // set icon
         Sprite[] icons = Resources.LoadAll<Sprite>("sprites/UI/Powericons") as Sprite[];

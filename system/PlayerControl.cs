@@ -57,7 +57,6 @@ public class PlayerControl : MonoBehaviour {
     private bool useItemThisFrame;
     private PlayerCharacterInput _lastInput;
     private static List<CameraAttractorZone> attractors;
-    // public Action<AimIndicatorHandler> OnAimChanged;
     public void Awake() {
         // Move
         MoveAction.action.performed += ctx => inputVector = ctx.ReadValue<Vector2>();
@@ -186,8 +185,6 @@ public class PlayerControl : MonoBehaviour {
         // Ignore the character's collider(s) for camera obstruction checks
         OrbitCamera.IgnoredColliders.Clear();
         OrbitCamera.IgnoredColliders.AddRange(Character.GetComponentsInChildren<Collider>());
-
-
     }
 
     private void Update() {
@@ -363,6 +360,7 @@ public class PlayerControl : MonoBehaviour {
         TargetData targetData = CursorToTarget();
 
         PlayerCharacterInput characterInputs = new PlayerCharacterInput() {
+            inputMode = GameManager.I.inputMode,
             state = Character.state,
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
@@ -378,7 +376,7 @@ public class PlayerControl : MonoBehaviour {
                 targetData = targetData
             },
             reload = reloadPressedThisFrame,
-            switchToGun = selectGunThisFrame,
+            selectgun = selectGunThisFrame,
             actionButtonPressed = actionButtonPressedThisFrame,
             incrementItem = incrementItemThisFrame,
             useItem = useItemThisFrame,

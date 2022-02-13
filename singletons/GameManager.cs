@@ -7,7 +7,13 @@ using UnityEngine.InputSystem;
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
 public enum OverlayType { none, power, cyber }
-public enum CursorType { gun }
+public enum CursorType { gun, pointer }
+public enum InputMode { none, gun, cyber }
+public struct CursorData {
+    public Texture2D mouseCursor;
+    public Vector2 hotSpot;
+    public CursorMode cursorMode;
+}
 public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public GameData gameData;
@@ -23,6 +29,8 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<OverlayType> OnOverlayChange;
+    public static Action<InputMode> OnInputModeChange;
+    public static Action<CursorType> OnCursorTypeChange;
 
     // UI state
     private bool toggleConsoleThisFrame;
@@ -30,6 +38,15 @@ public partial class GameManager : Singleton<GameManager> {
     private bool previousOverlayThisFrame;
     public MenuType activeMenuType;
     public OverlayType activeOverlayType;
+    private CursorType _cursorType;
+    public CursorType cursorType {
+        get { return _cursorType; }
+        set {
+            _cursorType = value;
+            SetCursor(value);
+        }
+    }
+    public InputMode inputMode;
 
     public bool showDebugRays;
     public void Start() {
@@ -45,6 +62,14 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToState(GameState.levelPlay);
 
         showDebugRays = true;
+
+        CyberNodeIndicator.onMouseOver += HandleCyberNodeMouseOver;
+        CyberNodeIndicator.onMouseExit += HandleCyberNodeMouseExit;
+    }
+    public override void OnDestroy() {
+        base.OnDestroy();
+        CyberNodeIndicator.onMouseOver -= HandleCyberNodeMouseOver;
+        CyberNodeIndicator.onMouseExit -= HandleCyberNodeMouseExit;
     }
     public void TransitionToState(GameState newState) {
         GameState tmpInitialState = gameData.state;
@@ -56,8 +81,9 @@ public partial class GameManager : Singleton<GameManager> {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
-                // TODO: data-driven level load
-                SetCursor(CursorType.gun);
+                // TODO: data-driven level load 
+                cursorType = CursorType.gun;
+                inputMode = InputMode.gun;
                 break;
             case GameState.inMenu:
                 Time.timeScale = 0f;
@@ -79,13 +105,22 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
     }
-    void SetCursor(CursorType cursorType) {
-        // TODO: support multiple cursor types
-        Texture2D mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 0") as Texture2D;
 
-        Vector2 hotSpot = new Vector2(8, 8);
-        CursorMode cursorMode = CursorMode.Auto;
-        Cursor.SetCursor(mouseCursor, hotSpot, cursorMode);
+    void SetCursor(CursorType cursorType) {
+        CursorData data = cursorType switch {
+            CursorType.pointer => new CursorData() {
+                mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
+                hotSpot = new Vector2(8, 8),
+                cursorMode = CursorMode.Auto
+            },
+            CursorType.gun => new CursorData {
+                mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 0") as Texture2D,
+                hotSpot = new Vector2(8, 8),
+                cursorMode = CursorMode.Auto
+            },
+            _ => new CursorData()
+        };
+        Cursor.SetCursor(data.mouseCursor, data.hotSpot, data.cursorMode);
     }
     public void ShowMenu(MenuType menuType) {
         activeMenuType = menuType;
@@ -127,5 +162,14 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         toggleConsoleThisFrame = false;
+    }
+
+    public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
+        cursorType = CursorType.pointer;
+        inputMode = InputMode.cyber;
+    }
+    public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
+        cursorType = CursorType.gun;
+        inputMode = InputMode.gun;
     }
 }

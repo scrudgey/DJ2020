@@ -70,20 +70,4 @@ public class UIController : MonoBehaviour {
     void HandleMenuClosed() {
         terminal.gameObject.SetActive(false);
     }
-
-    // void Update() {
-    //     HandleMouseInput();
-    // }
-    // void HandleMouseInput() {
-    //     // TargetData targetData = CursorToTarget(Mouse.current.position.ReadValue());
-    //     MouseInputData mouseData = CursorToTarget();
-    // }
-
-    // MouseInputData CursorToTarget() {
-    //     Vector2 mousePosition = Mouse.current.position.ReadValue();
-    //     return new MouseInputData {
-    //         mousePosition = mousePosition
-    //     };
-    // }
-
 }
