@@ -69,15 +69,48 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
-    public void SetNodeEnabled(string idn, bool state) {
+    public void SetNodeEnabled<T, U>(T graphNodeComponent, bool state) where T : GraphNodeComponent<T, U> where U : Node {
+        string idn = graphNodeComponent.idn;
+        switch (graphNodeComponent) {
+            case PoweredComponent:
+                if (gameData.levelData != null && gameData.levelData.powerGraph != null && gameData.levelData.powerGraph.nodes.ContainsKey(idn)) {
+                    gameData.levelData.powerGraph.nodes[idn].enabled = state;
+                    RefreshPowerGraph();
+                }
+                break;
+            case CyberComponent:
+                if (gameData.levelData != null && gameData.levelData.cyberGraph != null && gameData.levelData.cyberGraph.nodes.ContainsKey(idn)) {
+                    gameData.levelData.cyberGraph.nodes[idn].enabled = state;
+                    RefreshCyberGraph();
+                }
+                break;
+        };
+    }
+    public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
+        string idn = poweredComponent.idn;
         if (gameData.levelData != null && gameData.levelData.powerGraph != null && gameData.levelData.powerGraph.nodes.ContainsKey(idn)) {
-            gameData.levelData.powerGraph.nodes[idn].enabled = state;
+            gameData.levelData.powerGraph.nodes[idn].powered = state;
             RefreshPowerGraph();
         }
     }
+    public void SetCyberNodeState(CyberComponent cyberComponent, bool state) {
+        Debug.Log("set cybernode state");
+        string idn = cyberComponent.idn;
+        if (gameData.levelData != null && gameData.levelData.cyberGraph != null && gameData.levelData.cyberGraph.nodes.ContainsKey(idn)) {
+            gameData.levelData.cyberGraph.nodes[idn].compromised = state;
+            RefreshCyberGraph();
+        }
+    }
+
     public void RefreshCyberGraph() {
         // TODO: abstract this
         // gameData.levelData.cyberGraph.Refresh();
+
+        // TODO: abstract this
+        TransferCyberState();
+
+        // propagate changes to UI
+        OnCyberGraphChange?.Invoke(gameData.levelData.cyberGraph);
     }
     public void RefreshPowerGraph() {
         // power distribution algorithm
@@ -85,9 +118,6 @@ public partial class GameManager : Singleton<GameManager> {
 
         // propagate the changes to local state
         TransferPowerState();
-
-        // TODO: abstract this
-        TransferCyberState();
 
         // propagate changes to UI
         OnPowerGraphChange?.Invoke(gameData.levelData.powerGraph);

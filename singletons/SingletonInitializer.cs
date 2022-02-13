@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SingletonInitializer : MonoBehaviour {
-    void Start() {
+    void Awake() {
         GameManager.InitializeInstance();
         PoolManager.InitializeInstance();
         if (!SceneManager.GetSceneByName("UI").isLoaded) {

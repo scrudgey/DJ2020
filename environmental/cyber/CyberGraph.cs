@@ -7,5 +7,4 @@ using UnityEngine;
 
 [System.Serializable]
 public class CyberGraph : Graph<CyberNode, CyberGraph> {
-
 }

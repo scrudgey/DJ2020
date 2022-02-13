@@ -9,8 +9,11 @@ public class Node {
     public string nodeTitle;
     public bool enabled;
     public Vector3 position;
-    public PowerNodeIcon icon;
-    public PowerNodeType type;
-
+    public NodeIcon icon;
+    public NodeType type;
     public Node() { }
 }
+
+
+public enum NodeType { none, normal, powerSource, WAN }
+public enum NodeIcon { normal, power, mains }

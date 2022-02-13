@@ -21,13 +21,13 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         // set icon
         Sprite[] icons = Resources.LoadAll<Sprite>("sprites/UI/Powericons") as Sprite[];
         switch (node.icon) {
-            case PowerNodeIcon.normal:
+            case NodeIcon.normal:
                 image.sprite = icons[0];
                 break;
-            case PowerNodeIcon.power:
+            case NodeIcon.power:
                 image.sprite = icons[3];
                 break;
-            case PowerNodeIcon.mains:
+            case NodeIcon.mains:
                 image.sprite = icons[7];
                 break;
         }
@@ -62,11 +62,11 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public void SetScreenPosition(Vector3 position) {
         rectTransform.position = position;
     }
-    public void OnPointerEnter(PointerEventData eventData) {
+    public virtual void OnPointerEnter(PointerEventData eventData) {
         popupBox.Show();
         showSelectionIndicator = true;
     }
-    public void OnPointerExit(PointerEventData eventData) {
+    public virtual void OnPointerExit(PointerEventData eventData) {
         popupBox.Hide();
         showSelectionIndicator = false;
         selectionIndicatorImage.enabled = false;

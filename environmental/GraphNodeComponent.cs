@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GraphNodeComponent<T> : MonoBehaviour where T : GraphNodeComponent<T> {
+public class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node {
     public string idn;
     public string nodeTitle;
-    public PowerNodeIcon icon;
+    public NodeIcon icon;
 
     public T[] edges = new T[0];
 
@@ -18,6 +18,33 @@ public class GraphNodeComponent<T> : MonoBehaviour where T : GraphNodeComponent<
     }
 
     public Action<T> OnStateChange;
+
+    public virtual void DisableSource() {
+        GameManager.I?.SetNodeEnabled<T, U>((T)this, false);
+    }
+    public virtual void EnableSource() {
+        GameManager.I?.SetNodeEnabled<T, U>((T)this, true);
+    }
+
+    void OnDisable() {
+        DisableSource();
+    }
+    void OnEnable() {
+        EnableSource();
+    }
+    void OnDestroy() {
+        DisableSource();
+    }
+    void Start() {
+        if (enabled) {
+            EnableSource();
+        } else {
+            DisableSource();
+        }
+    }
+    public virtual void ConfigureNode(U node) {
+
+    }
 
 
 #if UNITY_EDITOR

@@ -36,7 +36,6 @@ public class CyberOverlay : MonoBehaviour {
         }
 
         foreach (CyberNode node in graph.nodes.Values) {
-            Debug.Log($"node: {node}");
             Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             CyberNodeIndicator indicator = GetIndicator(node);
             indicator.Configure(node, graph);

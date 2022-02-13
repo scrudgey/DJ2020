@@ -26,7 +26,7 @@ public class PowerNetworkUtilEditor : Editor {
 
     }
 
-    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node, new() where V : GraphNodeComponent<V> {
+    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node, new() where V : GraphNodeComponent<V, U> {
         T graph = new T();
 
         V[] components = GameObject.FindObjectsOfType<V>();
@@ -42,7 +42,7 @@ public class PowerNetworkUtilEditor : Editor {
                 idn = idn,
                 position = position,
                 enabled = true,
-                icon = PowerNodeIcon.normal
+                icon = NodeIcon.normal
             };
             graph.nodes[idn] = node;
 
@@ -50,7 +50,7 @@ public class PowerNetworkUtilEditor : Editor {
                 if (component.nodeTitle != "") {
                     node.nodeTitle = component.nodeTitle;
                 }
-                if (component.icon != PowerNodeIcon.normal)
+                if (component.icon != NodeIcon.normal)
                     node.icon = component.icon;
                 Debug.Log($"{idn}: {component}");
                 // set the component's id
@@ -58,9 +58,12 @@ public class PowerNetworkUtilEditor : Editor {
                 EditorUtility.SetDirty(component);
 
                 node.type = component switch {
-                    PowerSource => PowerNodeType.powerSource,
-                    _ => PowerNodeType.normal
+                    PowerSource => NodeType.powerSource,
+                    InternetSource => NodeType.WAN,
+                    _ => NodeType.normal
                 };
+
+                component.ConfigureNode(node);
             }
         }
         foreach (V component in components) {

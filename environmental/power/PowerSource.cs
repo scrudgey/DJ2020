@@ -3,21 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PowerSource : PoweredComponent {
-    // bool sourceEnabled = true;
-    public void DisableSource() {
-        GameManager.I?.SetNodeEnabled(idn, false);
+    public override void EnableSource() {
+        base.EnableSource();
+        GameManager.I.SetPowerNodeState(this, true);
     }
-    public void EnableSource() {
-        GameManager.I?.SetNodeEnabled(idn, true);
-    }
-
-    void OnDisable() {
-        DisableSource();
-    }
-    void OnEnable() {
-        EnableSource();
-    }
-    void OnDestroy() {
-        DisableSource();
+    public override void ConfigureNode(PowerNode node) {
+        node.powered = true;
     }
 }
