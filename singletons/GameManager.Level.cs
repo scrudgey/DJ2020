@@ -94,12 +94,14 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void SetCyberNodeState(CyberComponent cyberComponent, bool state) {
-        Debug.Log("set cybernode state");
         string idn = cyberComponent.idn;
         if (gameData.levelData != null && gameData.levelData.cyberGraph != null && gameData.levelData.cyberGraph.nodes.ContainsKey(idn)) {
-            gameData.levelData.cyberGraph.nodes[idn].compromised = state;
-            RefreshCyberGraph();
+            SetCyberNodeState(gameData.levelData.cyberGraph.nodes[idn], state);
         }
+    }
+    public void SetCyberNodeState(CyberNode node, bool state) {
+        node.compromised = state;
+        RefreshCyberGraph();
     }
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)

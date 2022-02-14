@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler where T : Node where U : Graph<T, U> {
+public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler where T : Node where U : Graph<T, U> {
     public Image image;
     public Image selectionIndicatorImage;
     public RectTransform rectTransform;
@@ -18,8 +18,11 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     protected T node;
     public static Action<NodeIndicator<T, U>> onMouseOver;
     public static Action<NodeIndicator<T, U>> onMouseExit;
+
     public void Configure(T node, Graph<T, U> graph) {
         this.node = node;
+
+        // TODO: dynamically enlarge line renderer cache
 
         // set icon
         Sprite[] icons = Resources.LoadAll<Sprite>("sprites/UI/Powericons") as Sprite[];
@@ -73,6 +76,9 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         popupBox.Hide();
         showSelectionIndicator = false;
         selectionIndicatorImage.enabled = false;
+    }
+    public virtual void OnPointerClick(PointerEventData pointerEventData) {
+
     }
 
     void Update() {

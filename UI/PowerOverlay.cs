@@ -34,10 +34,11 @@ public class PowerOverlay : MonoBehaviour {
         }
 
         foreach (PowerNode node in graph.nodes.Values) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             PowerNodeIndicator indicator = GetIndicator(node);
-            indicator.Configure(node, graph);
+
+            Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             indicator.SetScreenPosition(screenPoint);
+            indicator.Configure(node, graph);
         }
     }
 
@@ -45,8 +46,10 @@ public class PowerOverlay : MonoBehaviour {
         if (indicators.ContainsKey(node)) {
             return indicators[node];
         } else {
+            Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             GameObject newIndicator = GameObject.Instantiate(powerNodeIndicatorPrefab);
             PowerNodeIndicator indicator = newIndicator.GetComponent<PowerNodeIndicator>();
+            indicator.SetScreenPosition(screenPoint);
             indicator.Configure(node, graph);
             indicator.rectTransform.SetParent(transform, false);
             indicators[node] = indicator;

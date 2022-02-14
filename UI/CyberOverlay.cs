@@ -29,7 +29,6 @@ public class CyberOverlay : MonoBehaviour {
     }
     public void Refresh(CyberGraph graph) {
         this.graph = graph;
-        Debug.Log($"refreshing cyber graph {graph} {cam}");
         if (graph == null || cam == null) {
             DisableOverlay();
             return;

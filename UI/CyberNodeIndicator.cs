@@ -45,4 +45,14 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         CyberNodeIndicator.onMouseExit?.Invoke(this);
     }
 
+    public override void OnPointerClick(PointerEventData pointerEventData) {
+        base.OnPointerClick(pointerEventData);
+        if (GameManager.I.IsCyberNodeVulnerable(node)) {
+            HackInput input = new HackInput {
+                targetNode = node
+            };
+            HackController.I.HandleHackInput(input);
+        }
+    }
+
 }
