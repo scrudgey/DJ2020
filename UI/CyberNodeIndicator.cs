@@ -8,6 +8,10 @@ using UnityEngine.UI;
 public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Color compromisedColor;
     public VulnerabilityIndicator vulnerabilityIndicator;
+    public AudioSource audioSource;
+    public AudioClip mouseOver;
+    public AudioClip mouseOverVulnerable;
+
     protected override void SetGraphicalState(CyberNode node) {
         // Debug.Log("set cyber graphical state");
         if (node.enabled) {
@@ -20,15 +24,15 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             image.color = disabledColor;
         }
 
-        if (node.enabled) {
-            if (vulnerabilityIndicator.IsVisible()) {
-                lineRenderer.material.color = compromisedColor;
-            } else {
-                lineRenderer.material.color = enabledColor;
-            }
-        } else {
-            lineRenderer.material.color = disabledColor;
-        }
+        // if (node.enabled) {
+        //     if (vulnerabilityIndicator.IsVisible()) {
+        //         lineRenderer.material.color = compromisedColor;
+        //     } else {
+        //         lineRenderer.material.color = enabledColor;
+        //     }
+        // } else {
+        //     lineRenderer.material.color = disabledColor;
+        // }
     }
 
     public override void OnPointerEnter(PointerEventData eventData) {
@@ -36,8 +40,12 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         if (GameManager.I.IsCyberNodeVulnerable(node)) {
             vulnerabilityIndicator.StartIndicator();
             showSelectionIndicator = false;
+            audioSource.PlayOneShot(mouseOverVulnerable);
+        } else {
+            audioSource.PlayOneShot(mouseOver);
         }
         CyberNodeIndicator.onMouseOver?.Invoke(this);
+
     }
     public override void OnPointerExit(PointerEventData eventData) {
         base.OnPointerExit(eventData);

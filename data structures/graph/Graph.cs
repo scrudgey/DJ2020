@@ -10,13 +10,16 @@ using UnityEngine;
 public class Graph<T, W> where T : Node where W : Graph<T, W> {
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
+    public HashSet<HashSet<string>> edgePairs;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
+        edgePairs = new HashSet<HashSet<string>>();
         edges = new SerializableDictionary<string, HashSet<string>>();
     }
     public void AddEdge(Node from, Node to) {
         AddLink(from, to);
         AddLink(to, from);
+        edgePairs.Add(new HashSet<string> { from.idn, to.idn });
     }
 
     void AddLink(Node from, Node to) {

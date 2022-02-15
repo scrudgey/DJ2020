@@ -12,10 +12,13 @@ public class HackController : Singleton<HackController> {
         public float timer;
         public float lifetime;
     }
-    public Action OnValueChanged { get; set; }
 
-    // public CyberNode currentHackTarget;
-    public float currentHackTimer;
+    public AudioSource audioSource;
+    public AudioClip hackStarted;
+    public AudioClip hackFinished;
+    public AudioClip hackInProgress;
+    public Action OnValueChanged { get; set; }
+    public float hackInProgressTimer;
     public List<HackData> targets = new List<HackData>();
     public void HandleHackInput(HackInput input) {
         if (!targets.Any(t => t.node == input.targetNode)) {
@@ -23,10 +26,11 @@ public class HackController : Singleton<HackController> {
             HackData data = new HackData {
                 node = input.targetNode,
                 timer = 0f,
-                lifetime = 2f
+                lifetime = 5f
             };
             targets.Add(data);
             OnValueChanged?.Invoke();
+            audioSource.PlayOneShot(hackStarted);
         }
     }
 
@@ -37,11 +41,19 @@ public class HackController : Singleton<HackController> {
             if (data.timer > data.lifetime) {
                 GameManager.I.SetCyberNodeState(data.node, true);
                 done.Add(data);
+                audioSource.PlayOneShot(hackFinished);
             }
         }
         if (targets.Count > 0) {
             targets = targets.Except(done).ToList();
             OnValueChanged?.Invoke();
+            hackInProgressTimer += Time.deltaTime;
+            if (hackInProgressTimer > 1f) {
+                audioSource.PlayOneShot(hackInProgress);
+                hackInProgressTimer = 0f;
+            }
+        } else {
+            hackInProgressTimer = 0f;
         }
     }
 }

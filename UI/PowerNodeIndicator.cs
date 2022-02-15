@@ -10,14 +10,11 @@ public class PowerNodeIndicator : NodeIndicator<PowerNode, PowerGraph> {
         if (node.enabled) {
             if (node.powered) {
                 image.color = enabledColor;
-                lineRenderer.material.color = enabledColor;
             } else {
                 image.color = unpoweredColor;
-                lineRenderer.material.color = unpoweredColor;
             }
         } else {
             image.color = disabledColor;
-            lineRenderer.material.color = disabledColor;
         }
     }
 

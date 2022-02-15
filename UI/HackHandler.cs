@@ -7,7 +7,6 @@ public class HackHandler : MonoBehaviour {
     HackController hackTarget;
     public GameObject hackPanelEntryPrefab;
     List<HackPanelEntry> entries = new List<HackPanelEntry>();
-
     public void Bind() {
         HackController.I.OnValueChanged += HandleValueChanged;
         HandleValueChanged();

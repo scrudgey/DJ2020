@@ -4,54 +4,20 @@ using System.Linq;
 using UnityEngine;
 
 // TODO: abstract this out
-public class CyberOverlay : MonoBehaviour {
-    public UIColorSet colorSet;
-    public Camera cam;
-    public GameObject nodeIndicatorPrefab;
-    CyberGraph graph;
+public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, CyberNodeIndicator> {
+    public override void SetEdgeGraphicState() {
+        base.SetEdgeGraphicState();
+        foreach (HashSet<string> edge in graph.edgePairs) {
+            LineRenderer renderer = GetLineRenderer(edge);
+            string[] nodes = edge.ToArray();
+            CyberNode node1 = graph.nodes[nodes[0]];
+            CyberNode node2 = graph.nodes[nodes[1]];
 
-    Dictionary<CyberNode, CyberNodeIndicator> indicators = new Dictionary<CyberNode, CyberNodeIndicator>();
-    void Awake() {
-        foreach (Transform child in transform) {
-            Destroy(child.gameObject);
-        }
-    }
-    public void DisableOverlay() {
-        indicators = new Dictionary<CyberNode, CyberNodeIndicator>();
-    }
-
-    void Update() {
-        foreach (KeyValuePair<CyberNode, CyberNodeIndicator> kvp in indicators) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            kvp.Value.Configure(kvp.Key, graph);
-            kvp.Value.SetScreenPosition(screenPoint);
-        }
-    }
-    public void Refresh(CyberGraph graph) {
-        this.graph = graph;
-        if (graph == null || cam == null) {
-            DisableOverlay();
-            return;
-        }
-
-        foreach (CyberNode node in graph.nodes.Values) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
-            CyberNodeIndicator indicator = GetIndicator(node);
-            indicator.Configure(node, graph);
-            indicator.SetScreenPosition(screenPoint);
-        }
-    }
-
-    CyberNodeIndicator GetIndicator(CyberNode node) {
-        if (indicators.ContainsKey(node)) {
-            return indicators[node];
-        } else {
-            GameObject newIndicator = GameObject.Instantiate(nodeIndicatorPrefab);
-            CyberNodeIndicator indicator = newIndicator.GetComponent<CyberNodeIndicator>();
-            indicator.Configure(node, graph);
-            indicator.rectTransform.SetParent(transform, false);
-            indicators[node] = indicator;
-            return indicator;
+            if (node1.compromised && node2.compromised) {
+                renderer.material.color = colorSet.deadColor;
+            } else {
+                renderer.material.color = colorSet.enabledColor;
+            }
         }
     }
 }

@@ -46,8 +46,8 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             positions.Add(node.position);
             positions.Add(neighbor.position);
         }
-        lineRenderer.positionCount = positions.Count;
-        lineRenderer.SetPositions(positions.ToArray());
+        // lineRenderer.positionCount = positions.Count;
+        // lineRenderer.SetPositions(positions.ToArray());
 
         // set popup box
         popupBox.Configure(node);
@@ -59,11 +59,11 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             image.color = disabledColor;
         }
 
-        if (node.enabled) {
-            lineRenderer.material.color = enabledColor;
-        } else {
-            lineRenderer.material.color = disabledColor;
-        }
+        // if (node.enabled) {
+        //     lineRenderer.material.color = enabledColor;
+        // } else {
+        //     lineRenderer.material.color = disabledColor;
+        // }
     }
     public void SetScreenPosition(Vector3 position) {
         rectTransform.position = position;
