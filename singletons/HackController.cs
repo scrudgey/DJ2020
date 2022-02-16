@@ -22,7 +22,7 @@ public class HackController : Singleton<HackController> {
     public List<HackData> targets = new List<HackData>();
     public void HandleHackInput(HackInput input) {
         if (!targets.Any(t => t.node == input.targetNode)) {
-            Debug.Log("handling hack input");
+            // Debug.Log("handling hack input");
             HackData data = new HackData {
                 node = input.targetNode,
                 timer = 0f,

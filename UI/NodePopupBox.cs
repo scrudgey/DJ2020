@@ -4,7 +4,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class NodePopupBox<T> : MonoBehaviour where T : Node {
+public class NodePopupBox<T, U> : MonoBehaviour where T : Node where U : Graph<T, U> {
     enum State { hidden, easeIn, show, easeOut }
     State state;
     float stateTime;
@@ -12,6 +12,7 @@ public class NodePopupBox<T> : MonoBehaviour where T : Node {
     float targetHeight;
     float startWidth;
     float startHeight;
+    public NodeIndicator<T, U> indicator;
     public AudioSource audioSource;
     public RectTransform rectTransform;
     public GameObject[] dataObjects;
@@ -28,9 +29,22 @@ public class NodePopupBox<T> : MonoBehaviour where T : Node {
     public Color disabledColor;
     void Start() {
         EnterState(state);
+        Configure(indicator.node);
+        indicator.onMouseOver += HandleNodeMouseOver;
+        indicator.onMouseExit += HandleNodeMouseExit;
+    }
+    void OnDestroy() {
+        indicator.onMouseOver -= HandleNodeMouseOver;
+        indicator.onMouseExit -= HandleNodeMouseExit;
     }
     public void Configure(T node) {
         SetGraphicalState(node);
+    }
+    public void HandleNodeMouseOver(NodeIndicator<T, U> indicator) {
+        Show();
+    }
+    public void HandleNodeMouseExit(NodeIndicator<T, U> indicator) {
+        Hide();
     }
 
     protected virtual void SetGraphicalState(T node) {

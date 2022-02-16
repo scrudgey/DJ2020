@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class CyberNodePopupBox : NodePopupBox<CyberNode> {
+public class CyberNodePopupBox : NodePopupBox<CyberNode, CyberGraph> {
 
     public TextMeshProUGUI compromisedText;
     public Color compromisedColor;

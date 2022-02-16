@@ -63,13 +63,13 @@ public partial class GameManager : Singleton<GameManager> {
 
         showDebugRays = true;
 
-        CyberNodeIndicator.onMouseOver += HandleCyberNodeMouseOver;
-        CyberNodeIndicator.onMouseExit += HandleCyberNodeMouseExit;
+        CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
+        CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
     public override void OnDestroy() {
         base.OnDestroy();
-        CyberNodeIndicator.onMouseOver -= HandleCyberNodeMouseOver;
-        CyberNodeIndicator.onMouseExit -= HandleCyberNodeMouseExit;
+        CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
+        CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
     }
     public void TransitionToState(GameState newState) {
         GameState tmpInitialState = gameData.state;

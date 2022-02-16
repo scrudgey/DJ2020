@@ -23,16 +23,6 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         } else {
             image.color = disabledColor;
         }
-
-        // if (node.enabled) {
-        //     if (vulnerabilityIndicator.IsVisible()) {
-        //         lineRenderer.material.color = compromisedColor;
-        //     } else {
-        //         lineRenderer.material.color = enabledColor;
-        //     }
-        // } else {
-        //     lineRenderer.material.color = disabledColor;
-        // }
     }
 
     public override void OnPointerEnter(PointerEventData eventData) {
@@ -44,13 +34,16 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         } else {
             audioSource.PlayOneShot(mouseOver);
         }
-        CyberNodeIndicator.onMouseOver?.Invoke(this);
 
+        CyberOverlay cb = (CyberOverlay)overlay;
+        cb.NodeMouseOverCallback(this);
     }
     public override void OnPointerExit(PointerEventData eventData) {
         base.OnPointerExit(eventData);
         vulnerabilityIndicator.StopIndicator();
-        CyberNodeIndicator.onMouseExit?.Invoke(this);
+
+        CyberOverlay cb = (CyberOverlay)overlay;
+        cb.NodeMouseExitCallback(this);
     }
 
     public override void OnPointerClick(PointerEventData pointerEventData) {

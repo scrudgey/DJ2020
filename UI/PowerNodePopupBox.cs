@@ -4,7 +4,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class PowerNodePopupBox : NodePopupBox<PowerNode> {
+public class PowerNodePopupBox : NodePopupBox<PowerNode, PowerGraph> {
 
     public TextMeshProUGUI poweredText;
     public Color unpoweredColor;

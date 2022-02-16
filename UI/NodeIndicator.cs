@@ -10,17 +10,19 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public RectTransform rectTransform;
     public Color enabledColor;
     public Color disabledColor;
-    public NodePopupBox<T> popupBox;
     public LineRenderer lineRenderer;
     protected bool showSelectionIndicator;
     private float selectionIndicatorTimer;
     readonly float SELECTION_TIMEOUT = 0.05f;
-    protected T node;
-    public static Action<NodeIndicator<T, U>> onMouseOver;
-    public static Action<NodeIndicator<T, U>> onMouseExit;
-
-    public void Configure(T node, Graph<T, U> graph) {
+    public T node;
+    public Action<NodeIndicator<T, U>> onMouseOver;
+    public Action<NodeIndicator<T, U>> onMouseExit;
+    public static Action<NodeIndicator<T, U>> staticOnMouseOver;
+    public static Action<NodeIndicator<T, U>> staticOnMouseExit;
+    public IGraphOverlay<U, T, NodeIndicator<T, U>> overlay;
+    public void Configure(T node, Graph<T, U> graph, IGraphOverlay<U, T, NodeIndicator<T, U>> overlay) {
         this.node = node;
+        this.overlay = overlay;
 
         // TODO: dynamically enlarge line renderer cache
 
@@ -46,11 +48,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             positions.Add(node.position);
             positions.Add(neighbor.position);
         }
-        // lineRenderer.positionCount = positions.Count;
-        // lineRenderer.SetPositions(positions.ToArray());
 
-        // set popup box
-        popupBox.Configure(node);
     }
     protected virtual void SetGraphicalState(T node) {
         if (node.enabled) {
@@ -58,24 +56,21 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         } else {
             image.color = disabledColor;
         }
-
-        // if (node.enabled) {
-        //     lineRenderer.material.color = enabledColor;
-        // } else {
-        //     lineRenderer.material.color = disabledColor;
-        // }
     }
     public void SetScreenPosition(Vector3 position) {
         rectTransform.position = position;
     }
     public virtual void OnPointerEnter(PointerEventData eventData) {
-        popupBox.Show();
+        // move this to use callbacks
         showSelectionIndicator = true;
+        staticOnMouseOver?.Invoke(this);
+        onMouseOver?.Invoke(this);
     }
     public virtual void OnPointerExit(PointerEventData eventData) {
-        popupBox.Hide();
         showSelectionIndicator = false;
         selectionIndicatorImage.enabled = false;
+        staticOnMouseExit?.Invoke(this);
+        onMouseExit?.Invoke(this);
     }
     public virtual void OnPointerClick(PointerEventData pointerEventData) {
 

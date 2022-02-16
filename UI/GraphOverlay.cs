@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U : Node where V : NodeIndicator<U, T> {
+
+public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node where V : NodeIndicator<U, T> {
     public UIColorSet colorSet;
     public Camera cam;
     public GameObject nodeIndicatorPrefab;
@@ -23,7 +24,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U
     void Update() {
         foreach (KeyValuePair<U, V> kvp in indicators) {
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            kvp.Value.Configure(kvp.Key, graph);
+            kvp.Value.Configure(kvp.Key, graph, this);
             kvp.Value.SetScreenPosition(screenPoint);
         }
     }
@@ -40,7 +41,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U
             V indicator = GetIndicator(node);
             Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             indicator.SetScreenPosition(screenPoint);
-            indicator.Configure(node, graph);
+            indicator.Configure(node, graph, this);
         }
 
         SetEdgeGraphicState();
@@ -65,14 +66,12 @@ public class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U
             GameObject newIndicator = GameObject.Instantiate(nodeIndicatorPrefab);
             V indicator = newIndicator.GetComponent<V>();
             indicator.SetScreenPosition(screenPoint);
-            indicator.Configure(node, graph);
+            indicator.Configure(node, graph, this);
             indicator.rectTransform.SetParent(transform, false);
             indicators[node] = indicator;
             return indicator;
         }
     }
-
-
 
     protected LineRenderer GetLineRenderer(HashSet<string> edge) {
         if (lineRenderers.ContainsKey(edge)) {
