@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Color compromisedColor;
-    public VulnerabilityIndicator vulnerabilityIndicator;
     public AudioSource audioSource;
     public AudioClip mouseOver;
     public AudioClip mouseOverVulnerable;
@@ -28,7 +27,6 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public override void OnPointerEnter(PointerEventData eventData) {
         base.OnPointerEnter(eventData);
         if (GameManager.I.IsCyberNodeVulnerable(node)) {
-            vulnerabilityIndicator.StartIndicator();
             showSelectionIndicator = false;
             audioSource.PlayOneShot(mouseOverVulnerable);
         } else {
@@ -40,7 +38,6 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     }
     public override void OnPointerExit(PointerEventData eventData) {
         base.OnPointerExit(eventData);
-        vulnerabilityIndicator.StopIndicator();
 
         CyberOverlay cb = (CyberOverlay)overlay;
         cb.NodeMouseExitCallback(this);

@@ -2,15 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public class HackHandler : MonoBehaviour {
+
+// TODO: rename to HackPanelHandler
+public class HackHandler : MonoBehaviour, IBinder<HackController> {
+
+    public HackController target { get; set; }
     public Transform entriesHolder;
     HackController hackTarget;
     public GameObject hackPanelEntryPrefab;
     List<HackPanelEntry> entries = new List<HackPanelEntry>();
-    public void Bind() {
-        HackController.I.OnValueChanged += HandleValueChanged;
-        HandleValueChanged();
-    }
+
     void Start() {
         foreach (Transform child in entriesHolder) {
             Destroy(child.gameObject);
@@ -24,15 +25,20 @@ public class HackHandler : MonoBehaviour {
             newEntry.SetActive(false);
             entries.Add(hackPanelEntry);
         }
-        Bind();
+        ((IBinder<HackController>)this).Bind(HackController.I.gameObject);
     }
-    void HandleValueChanged() {
-        for (int i = 0; i < HackController.I.targets.Count; i++) {
+    public void HandleValueChanged(HackController hackController) {
+        if (hackController.targets.Count == 0) {
+            gameObject.SetActive(false);
+        } else {
+            gameObject.SetActive(true);
+        }
+        for (int i = 0; i < hackController.targets.Count; i++) {
             HackPanelEntry entry = entries[i];
             entry.gameObject.SetActive(true);
-            entry.Configure(HackController.I.targets[i]);
+            entry.Configure(hackController.targets[i]);
         }
-        for (int i = HackController.I.targets.Count; i < 5; i++) {
+        for (int i = hackController.targets.Count; i < 5; i++) {
             HackPanelEntry entry = entries[i];
             entry.Clear();
             entry.gameObject.SetActive(false);

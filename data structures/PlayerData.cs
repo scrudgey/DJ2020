@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 public class PlayerData {
     public int credits;
+
     // skin
     public string legSkin;
     public string bodySkin;
@@ -11,6 +12,7 @@ public class PlayerData {
     public GunInstance secondaryGun;
     public GunInstance tertiaryGun;
     public int activeGun;
+
     // items
     public List<string> items = new List<string>();
 
@@ -23,6 +25,9 @@ public class PlayerData {
         {GunType.shotgun, 1},
         {GunType.sword, 1},
     };
+
+    public int maxConcurrentNetworkHacks;
+    public float hackSpeedCoefficient;
 
     public static PlayerData DefaultGameData() {
         return new PlayerData() {
@@ -39,7 +44,10 @@ public class PlayerData {
 
             cyberlegsLevel = 1,
 
-            items = new List<string> { "deck", "explosive" }
+            items = new List<string> { "deck", "explosive" },
+
+            maxConcurrentNetworkHacks = 1,
+            hackSpeedCoefficient = 1f
         };
     }
 }
