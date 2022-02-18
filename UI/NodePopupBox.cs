@@ -41,6 +41,7 @@ public class NodePopupBox<T, U> : MonoBehaviour where T : Node where U : Graph<T
         SetGraphicalState(node);
     }
     public void HandleNodeMouseOver(NodeIndicator<T, U> indicator) {
+        Configure(indicator.node);
         Show();
     }
     public void HandleNodeMouseExit(NodeIndicator<T, U> indicator) {

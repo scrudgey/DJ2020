@@ -10,4 +10,8 @@ public class PowerSource : PoweredComponent {
     public override void ConfigureNode(PowerNode node) {
         node.powered = true;
     }
+    void OnDestroy() {
+        base.DisableSource();
+        GameManager.I.SetPowerNodeState(this, false);
+    }
 }

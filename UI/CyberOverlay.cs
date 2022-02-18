@@ -5,7 +5,6 @@ using UnityEngine;
 
 // TODO: abstract this out
 public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, CyberNodeIndicator> {
-    // HashSet<HashSet<string>> overrideEdgesRed;
     public override void SetEdgeGraphicState() {
         base.SetEdgeGraphicState();
         foreach (HashSet<string> edge in graph.edgePairs) {

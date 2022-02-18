@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class PoweredLightSource : MonoBehaviour {
     public MeshRenderer meshRenderer;
+    public PoweredComponent poweredComponent;
     public Light[] lights;
     float timer;
     void Start() {
-        PoweredComponent poweredComponent = GetComponent<PoweredComponent>();
-        // poweredComponent.OnStateChange += OnPowerChange;
+        // PoweredComponent poweredComponent = GetComponent<PoweredComponent>();
+        poweredComponent.OnStateChange += OnPowerChange;
+    }
+    void OnDestroy() {
+        poweredComponent.OnStateChange -= OnPowerChange;
     }
     public void OnPowerChange(PoweredComponent node) {
         if (node.power) {

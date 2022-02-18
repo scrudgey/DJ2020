@@ -89,6 +89,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         string idn = poweredComponent.idn;
         if (gameData.levelData != null && gameData.levelData.powerGraph != null && gameData.levelData.powerGraph.nodes.ContainsKey(idn)) {
+            // Debug.Log($"setting power node power {idn} {state}");
             gameData.levelData.powerGraph.nodes[idn].powered = state;
             RefreshPowerGraph();
         }
@@ -135,7 +136,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 foreach (PoweredComponent component in poweredComponents[kvp.Key]) {
                     component.power = kvp.Value.powered;
-                    // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
+                    // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
                 }
             }
         }
