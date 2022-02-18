@@ -7,6 +7,7 @@ namespace Items {
         public override void Use(ItemHandler handler) {
             base.Use(handler);
         }
+        public override bool EnablesManualHack() => true;
     }
 }
 

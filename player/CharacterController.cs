@@ -48,6 +48,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
     public ItemHandler itemHandler;
+    public ManualHacker manualHacker;
     public Footsteps footsteps;
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
@@ -307,6 +308,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
                 // Items
                 itemHandler.ProcessInput(input);
+
+                // Cyberdeck
+                if (itemHandler.activeItem.EnablesManualHack()) {
+                    manualHacker.SetInputs(input);
+                }
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);

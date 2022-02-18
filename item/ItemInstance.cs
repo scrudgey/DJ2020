@@ -5,10 +5,6 @@ using UnityEngine;
 
 namespace Items {
     public abstract class ItemInstance {
-        // abstract public ItemData data {
-        //     get;
-        // }
-
         public static BaseItem NewInstance(string baseName) {
             ItemData baseItem = ItemData.LoadItem(baseName);
             return baseItem switch {
@@ -30,6 +26,7 @@ namespace Items {
             this.data = baseData;
         }
         public virtual void Use(ItemHandler handler) { }
+        public virtual bool EnablesManualHack() => false;
     }
 }
 

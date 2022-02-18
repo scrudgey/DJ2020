@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
 
@@ -73,18 +74,22 @@ public partial class GameManager : Singleton<GameManager> {
         string idn = graphNodeComponent.idn;
         switch (graphNodeComponent) {
             case PoweredComponent:
-                if (gameData.levelData != null && gameData.levelData.powerGraph != null && gameData.levelData.powerGraph.nodes.ContainsKey(idn)) {
+                if (gameData?.levelData?.powerGraph?.nodes.ContainsKey(idn) ?? false) {
                     gameData.levelData.powerGraph.nodes[idn].enabled = state;
                     RefreshPowerGraph();
                 }
                 break;
             case CyberComponent:
-                if (gameData.levelData != null && gameData.levelData.cyberGraph != null && gameData.levelData.cyberGraph.nodes.ContainsKey(idn)) {
-                    gameData.levelData.cyberGraph.nodes[idn].enabled = state;
+                CyberNode node = GetCyberNode(idn);
+                if (node != null) {
+                    node.enabled = state;
                     RefreshCyberGraph();
                 }
                 break;
         };
+    }
+    public CyberNode GetCyberNode(string idn) {
+        return gameData?.levelData?.cyberGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.cyberGraph.nodes[idn] : null;
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         string idn = poweredComponent.idn;
