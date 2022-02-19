@@ -6,7 +6,6 @@ public class PowerOverlay : GraphOverlay<PowerGraph, PowerNode, PowerNodeIndicat
 
     public override void SetEdgeGraphicState() {
         base.SetEdgeGraphicState();
-        Debug.Log("powegraph set edge graphics");
         foreach (HashSet<string> edge in graph.edgePairs) {
             LineRenderer renderer = GetLineRenderer(edge);
             string[] nodes = edge.ToArray();

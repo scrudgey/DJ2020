@@ -14,32 +14,44 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
     public TextMeshProUGUI dotText;
     Coroutine blitTextCoroutine;
     public AudioSource audioSource;
-
+    public Image cursorImage;
+    private float timer;
     void Awake() {
         blitTextCoroutine = null;
     }
     public void HandleValueChanged(Interactor interactor) {
         HighlightableTargetData newData = interactor.highlighted;
-        if (!InteractorTargetData.Equality(data, newData)) {
-            if (data != null && data.target != null)
-                Disable();
-            // data.target.DisableOutline();
-            data = newData;
-            DataChanged();
+        InteractorTargetData activeTarget = interactor.ActiveTarget();
+        if (newData == null && activeTarget == null) {
+            Disable();
+            data = null;
+        } else if (activeTarget != null) {
+            if (!InteractorTargetData.Equality(data, activeTarget)) {
+                data?.target?.DisableOutline();
+                data = activeTarget;
+                DataChanged();
+            }
+        } else if (newData != null) {
+            if (!InteractorTargetData.Equality(data, newData)) {
+                data?.target?.DisableOutline();
+                data = newData;
+                DataChanged();
+            }
         }
     }
     void DataChanged() {
         if (data == null) {
             Disable();
-        } else {
+        } else if (data.target != null) {
             Enable(data.target.calloutText);
         }
     }
 
     void Update() {
+        timer += Time.deltaTime;
         if (data == null) {
             Disable();
-        } else if (data.target == null) {
+        } else if (data?.target == null) {
             data = null;
             DataChanged();
             return;
@@ -48,11 +60,14 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
             cursor.position = screenPoint;
             cursorText.color = Color.green;
             dotText.color = Color.green;
+            cursorImage.color = Color.green;
+            SetScale();
         }
     }
     void Disable() {
         dotText.enabled = false;
         cursorText.enabled = false;
+        cursorImage.enabled = false;
         cursorText.text = "";
         audioSource.Stop();
         if (blitTextCoroutine != null) {
@@ -63,14 +78,18 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
         }
     }
     void Enable(string actionText) {
-        if (data != null) {
-            data.target.EnableOutline();
-            cursorText.enabled = true;
-
-            cursorText.text = "";
-            dotText.enabled = true;
-            blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
+        if (blitTextCoroutine != null) {
+            StopCoroutine(blitTextCoroutine);
         }
+        // if (data != null) {
+        data.target.EnableOutline();
+        cursorText.enabled = true;
+
+        cursorImage.enabled = true;
+        cursorText.text = "";
+        dotText.enabled = true;
+        blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
+        // }
     }
     public IEnumerator BlitCalloutText(string actionText) {
         float blitInterval = 0.02f;
@@ -100,5 +119,19 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
             dotText.enabled = !dotText.enabled;
             yield return null;
         }
+    }
+    public void SetScale() {
+        float distance = Vector3.Distance(cam.transform.position, data.target.transform.position);
+        float frustumHeight = 2.0f * distance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+
+        float inaccuracyLength = data.collider.bounds.size.magnitude / 2f;
+        float pixelsPerLength = cam.scaledPixelHeight / frustumHeight;
+        float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
+
+        // float dynamicCoefficient = 1.0f + 0.05f * Mathf.Sin(timer);
+        // float dynamicCoefficient = Toolbox.Triangle(0.95f, 1.05f, 5f, 0f, timer);
+        float dynamicCoefficient = 1f;
+
+        cursor.sizeDelta = dynamicCoefficient * pixelScale * Vector2.one;
     }
 }

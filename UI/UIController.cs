@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour {
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
-    public InteractionIndicatorHandler interactionIndicatorHandler;
+    // public InteractionIndicatorHandler interactionIndicatorHandler;
     public InteractiveHighlightHandler interactiveHighlightHandler;
     public ActionLogHandler actionLogHandler;
     public OverlayHandler overlayHandler;
@@ -30,7 +30,7 @@ public class UIController : MonoBehaviour {
     void Start() {
         // cameras
         canvas.worldCamera = Camera.main;
-        interactionIndicatorHandler.cam = Camera.main;
+        // interactionIndicatorHandler.cam = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
         overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
@@ -57,7 +57,7 @@ public class UIController : MonoBehaviour {
         ((IBinder<GunHandler>)aimIndicatorHandler).Bind(target);
         ((IBinder<CharacterController>)aimIndicatorHandler).Bind(target);
 
-        ((IBinder<Interactor>)interactionIndicatorHandler).Bind(target);
+        // ((IBinder<Interactor>)interactionIndicatorHandler).Bind(target);
         ((IBinder<Interactor>)interactiveHighlightHandler).Bind(target);
 
         overlayHandler.Bind();

@@ -29,7 +29,6 @@ public class InteractorTargetData : HighlightableTargetData {
 public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
     public Action<InteractorTargetData> OnActionDone;
-
     public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
     public HighlightableTargetData highlighted = null;
     public void AddInteractive(Collider other) {

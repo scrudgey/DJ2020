@@ -15,14 +15,12 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
     public TextMeshProUGUI dotText;
     Coroutine blitTextCoroutine;
 
-    // readonly static string dot = "<sprite index=0 tint>";
 
     public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
         if (!InteractorTargetData.Equality(data, newData)) {
-            if (data != null && data.target != null)
+            if (data?.target ?? false)
                 Disable();
-            // data.target.DisableOutline();
             data = newData;
             DataChanged();
         }
@@ -34,7 +32,6 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
             Enable(data.target.calloutText);
         }
     }
-
     void Update() {
         if (data == null) {
             Disable();
@@ -50,7 +47,6 @@ public class InteractionIndicatorHandler : MonoBehaviour, IBinder<Interactor> {
             dotText.color = Color.green;
             SetScale();
         }
-
     }
     void Disable() {
         dotText.enabled = false;
