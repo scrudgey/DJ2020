@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+public class ManualHackInput {
+    public PlayerCharacterInput playerInput;
+    public Items.BaseItem activeItem;
+}
 public class HackTargetData {
     public CyberComponent target;
     public HackTargetData(CyberComponent target, Collider collider) {
@@ -26,13 +29,13 @@ public class HackTargetData {
 public class ManualHacker : MonoBehaviour {
     public Action<HackTargetData> OnActionDone;
     public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
+    bool hackToolDeployed;
     public void AddInteractive(Collider other) {
         CyberComponent component = other.GetComponent<CyberComponent>();
         if (component) {
             cyberComponents[other] = component;
         }
         RemoveNullCyberComponents();
-
         HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
     public void RemoveInteractive(Collider other) {
@@ -40,12 +43,14 @@ public class ManualHacker : MonoBehaviour {
             cyberComponents.Remove(other);
         }
         RemoveNullCyberComponents();
-
         HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
 
     public HackTargetData ActiveTarget() {
         RemoveNullCyberComponents();
+        if (!hackToolDeployed) {
+            return null;
+        }
         if (cyberComponents.Count == 0) {
             return null;
         } else return cyberComponents
@@ -58,7 +63,7 @@ public class ManualHacker : MonoBehaviour {
 
     bool IsNodeVulnerable(CyberNode node) {
         // TODO: compute various checks to see if node is indeed vulnerable
-        return !node.compromised;
+        return hackToolDeployed && !node.compromised;
     }
     void RemoveNullCyberComponents() => cyberComponents =
         cyberComponents
@@ -69,8 +74,16 @@ public class ManualHacker : MonoBehaviour {
 
     void OnTriggerExit(Collider other) => RemoveInteractive(other);
 
-    public void SetInputs(PlayerCharacterInput inputs) {
-        if (inputs.useItem) {
+    public void SetInputs(ManualHackInput inputs) {
+        bool refresh = false;
+        if (hackToolDeployed != inputs.activeItem.EnablesManualHack()) {
+            hackToolDeployed = inputs.activeItem.EnablesManualHack();
+            refresh = true;
+        }
+        if (refresh) {
+            HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
+        }
+        if (inputs.playerInput.useItem) {
             HackTargetData data = ActiveTarget();
             if (data == null) return;
 

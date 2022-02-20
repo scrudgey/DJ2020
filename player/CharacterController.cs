@@ -310,9 +310,17 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 itemHandler.ProcessInput(input);
 
                 // Cyberdeck
-                if (itemHandler.activeItem.EnablesManualHack()) {
-                    manualHacker.SetInputs(input);
-                }
+                // if (itemHandler.activeItem.EnablesManualHack()) {
+                // ItemHandlerInput itemInput = new ItemHandlerInput{
+                //     playerInput = input,
+                //     activeItem = item
+                // }
+                ManualHackInput manualHackInput = new ManualHackInput {
+                    playerInput = input,
+                    activeItem = itemHandler.activeItem
+                };
+                manualHacker.SetInputs(manualHackInput);
+                // }
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);

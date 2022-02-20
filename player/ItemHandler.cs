@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Items;
 using UnityEngine;
 // TODO: enable buffs on/off
+
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
     public Action<ItemHandler> OnValueChanged { get; set; }
 
@@ -13,6 +14,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
     public AudioSource audioSource;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
+    void Start() {
+        OnItemEnter(activeItem);
     }
     public void ProcessInput(PlayerCharacterInput input) {
         if (input.incrementItem != 0) {
