@@ -51,8 +51,10 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
         timer += Time.deltaTime;
         if (data == null) {
             Disable();
+            timer = 0f;
         } else if (data?.target == null) {
             data = null;
+            timer = 0f;
             DataChanged();
             return;
         } else if (data != null) {
@@ -62,6 +64,12 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
             dotText.color = Color.green;
             cursorImage.color = Color.green;
             SetScale();
+            // if (timer < 1f) {
+            //     cursorImage.enabled = true;
+            // } else {
+            //     cursorImage.enabled = false;
+            // }
+            cursorImage.enabled = false;
         }
     }
     void Disable() {

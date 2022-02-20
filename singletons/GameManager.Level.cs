@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -72,24 +73,37 @@ public partial class GameManager : Singleton<GameManager> {
     // TODO: this belongs to level logic, but it's fine to put it here for now
     public void SetNodeEnabled<T, U>(T graphNodeComponent, bool state) where T : GraphNodeComponent<T, U> where U : Node {
         string idn = graphNodeComponent.idn;
-        switch (graphNodeComponent) {
-            case PoweredComponent:
-                if (gameData?.levelData?.powerGraph?.nodes.ContainsKey(idn) ?? false) {
-                    gameData.levelData.powerGraph.nodes[idn].enabled = state;
-                    RefreshPowerGraph();
-                }
-                break;
-            case CyberComponent:
-                CyberNode node = GetCyberNode(idn);
-                if (node != null) {
-                    node.enabled = state;
-                    RefreshCyberGraph();
-                }
-                break;
+
+        Node node = graphNodeComponent switch {
+            PoweredComponent => GetPowerNode(idn),
+            CyberComponent => GetCyberNode(idn),
+            GraphNodeComponent<PoweredComponent, PowerNode> => GetPowerNode(idn),
+            GraphNodeComponent<CyberComponent, CyberNode> => GetCyberNode(idn),
+            _ => null
         };
+
+        if (node != null) {
+            node.enabled = state;
+
+            switch (graphNodeComponent) {
+                case PoweredComponent:
+                    RefreshPowerGraph();
+                    break;
+                case CyberComponent:
+                    RefreshCyberGraph();
+                    break;
+            };
+        } else {
+            Debug.Log("called set node enabled with null node");
+        }
+
+
     }
     public CyberNode GetCyberNode(string idn) {
         return gameData?.levelData?.cyberGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.cyberGraph.nodes[idn] : null;
+    }
+    public PowerNode GetPowerNode(string idn) {
+        return gameData?.levelData?.powerGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.powerGraph.nodes[idn] : null;
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         string idn = poweredComponent.idn;

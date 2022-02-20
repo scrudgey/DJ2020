@@ -18,12 +18,12 @@ public class HackTargetData {
             return a.target == b.target && a.collider == b.collider;
         }
     }
-    public HackInput ToHackInput() => new HackInput {
-        targetNode = GameManager.I.GetCyberNode(target.idn)
+    public HackInput ToManualHackInput() => new HackInput {
+        targetNode = GameManager.I.GetCyberNode(target.idn),
+        type = HackType.manual
     };
 }
-public class ManualHacker : MonoBehaviour, IBindable<ManualHacker> {
-    public Action<ManualHacker> OnValueChanged { get; set; }
+public class ManualHacker : MonoBehaviour {
     public Action<HackTargetData> OnActionDone;
     public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
     public void AddInteractive(Collider other) {
@@ -32,53 +32,57 @@ public class ManualHacker : MonoBehaviour, IBindable<ManualHacker> {
             cyberComponents[other] = component;
         }
         RemoveNullCyberComponents();
-        OnValueChanged?.Invoke(this);
+
+        HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
     public void RemoveInteractive(Collider other) {
         if (cyberComponents.ContainsKey(other)) {
             cyberComponents.Remove(other);
         }
         RemoveNullCyberComponents();
-        OnValueChanged?.Invoke(this);
-    }
-    public void RemoveInteractive(CyberComponent other) {
-        foreach (var item in cyberComponents.Where(kvp => kvp.Value == other).ToList()) {
-            cyberComponents.Remove(item.Key);
-        }
-        OnValueChanged?.Invoke(this);
+
+        HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
 
     public HackTargetData ActiveTarget() {
-        // TODO: weigh the targets in some way, return deterministic
         RemoveNullCyberComponents();
         if (cyberComponents.Count == 0) {
             return null;
         } else return cyberComponents
             .ToList()
+            .Where((KeyValuePair<Collider, CyberComponent> kvp) => IsNodeVulnerable(kvp.Value.GetNode()))
             .Select((KeyValuePair<Collider, CyberComponent> kvp) => new HackTargetData(kvp.Value, kvp.Key))
-            .First();
+            .DefaultIfEmpty(null)
+            .First(); // TODO: weigh the targets in some way, return deterministic
+    }
+
+    bool IsNodeVulnerable(CyberNode node) {
+        // TODO: compute various checks to see if node is indeed vulnerable
+        return !node.compromised;
     }
     void RemoveNullCyberComponents() => cyberComponents =
         cyberComponents
             .Where(f => f.Value != null && f.Key != null)
             .ToDictionary(x => x.Key, x => x.Value);
 
-    void OnTriggerEnter(Collider other)
-        => AddInteractive(other);
+    void OnTriggerEnter(Collider other) => AddInteractive(other);
 
-    void OnTriggerExit(Collider other)
-        => RemoveInteractive(other);
+    void OnTriggerExit(Collider other) => RemoveInteractive(other);
 
     public void SetInputs(PlayerCharacterInput inputs) {
         if (inputs.useItem) {
             HackTargetData data = ActiveTarget();
             if (data == null) return;
 
-            Debug.Log("doing manual hack");
-
-            HackController.I.HandleHackInput(data.ToHackInput());
-
+            HackController.I.HandleHackInput(data.ToManualHackInput());
             OnActionDone?.Invoke(data);
         }
     }
+
+    public List<CyberNode> GetVulnerableNodes() => cyberComponents
+        .ToList()
+        .Select((KeyValuePair<Collider, CyberComponent> kvp) => kvp.Value.GetNode())
+        .Where(IsNodeVulnerable)
+        .ToList();
+
 }

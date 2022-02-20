@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node {
+public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node {
     public string idn;
     public string nodeTitle;
     public NodeIcon icon;
@@ -46,6 +46,7 @@ public class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeCompone
 
     }
 
+    public abstract U GetNode();
 
 #if UNITY_EDITOR
     private void OnDrawGizmos() {

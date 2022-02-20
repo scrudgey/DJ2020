@@ -11,4 +11,6 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
             OnStateChange?.Invoke(this);
         }
     }
+
+    public override CyberNode GetNode() => GameManager.I.GetCyberNode(idn);
 }

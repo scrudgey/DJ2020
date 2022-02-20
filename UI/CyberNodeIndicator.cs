@@ -29,6 +29,9 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         if (GameManager.I.IsCyberNodeVulnerable(node)) {
             showSelectionIndicator = false;
             audioSource.PlayOneShot(mouseOverVulnerable);
+
+            // notify hack controller that vulnerability changed
+            HackController.I.HandleVulnerableNetworkNode(node);
         } else {
             audioSource.PlayOneShot(mouseOver);
         }
@@ -41,16 +44,25 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
 
         CyberOverlay cb = (CyberOverlay)overlay;
         cb.NodeMouseExitCallback(this);
+
+        // notify hack controller that vulnerability changed
+        HackController.I.HandleVulnerableNetworkNode(null);
     }
 
     public override void OnPointerClick(PointerEventData pointerEventData) {
         base.OnPointerClick(pointerEventData);
         if (GameManager.I.IsCyberNodeVulnerable(node)) {
             HackInput input = new HackInput {
-                targetNode = node
+                targetNode = node,
+                type = HackType.network
             };
             HackController.I.HandleHackInput(input);
         }
     }
 
+    public List<CyberNode> GetVulnerableNodes() {
+        if (GameManager.I.IsCyberNodeVulnerable(node)) {
+            return new List<CyberNode> { node };
+        } else return new List<CyberNode>();
+    }
 }

@@ -10,4 +10,6 @@ public class PoweredComponent : GraphNodeComponent<PoweredComponent, PowerNode> 
             OnStateChange?.Invoke(this);
         }
     }
+    public override PowerNode GetNode() => GameManager.I.GetPowerNode(idn);
+
 }
