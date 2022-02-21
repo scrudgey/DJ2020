@@ -109,8 +109,10 @@ public partial class GameManager : Singleton<GameManager> {
     void SetCursor(CursorType cursorType) {
         CursorData data = cursorType switch {
             CursorType.pointer => new CursorData() {
-                mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
-                hotSpot = new Vector2(8, 8),
+                // mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
+                // hotSpot = new Vector2(8, 8),
+                mouseCursor = Resources.Load("sprites/UI/elements/Cursor") as Texture2D,
+                hotSpot = new Vector2(0, 0),
                 cursorMode = CursorMode.Auto
             },
             CursorType.gun => new CursorData {

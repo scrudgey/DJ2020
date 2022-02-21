@@ -27,6 +27,7 @@ public class HackTargetData {
     };
 }
 public class ManualHacker : MonoBehaviour {
+    public SphereCollider sphereCollider;
     public Action<HackTargetData> OnActionDone;
     public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
     bool hackToolDeployed;
@@ -123,6 +124,8 @@ public class ManualHacker : MonoBehaviour {
             attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
+        float radius = GameManager.I?.gameData?.playerData.hackRadius ?? 1.5f;
+        sphereCollider.radius = radius;
     }
     void UpdateWire(CyberNode node) {
         Vector3 playerPos = transform.position;
@@ -130,9 +133,10 @@ public class ManualHacker : MonoBehaviour {
         Vector3[] points = new Vector3[2];
         if (timer < 0.25) {
             Vector3 direction = node.position - playerPos;
+            float length = 0.65f * (timer / 0.25f);
             points = new Vector3[]{
                     playerPos,
-                    playerPos + 0.65f * direction.normalized
+                    playerPos + length * direction.normalized
                 };
             lineRenderer.material = wireUnfurlMaterial;
             lineRenderer.widthCurve = fatWidth;
@@ -141,7 +145,6 @@ public class ManualHacker : MonoBehaviour {
 
             if (!deploySoundPlayed) {
                 deploySoundPlayed = true;
-                // audioSource.PlayOneShot(wireDeploy);
                 Toolbox.RandomizeOneShot(audioSource, wireDeploy);
             }
         } else {
@@ -156,7 +159,6 @@ public class ManualHacker : MonoBehaviour {
 
             if (!attachSoundPlayed) {
                 attachSoundPlayed = true;
-                // audioSource.PlayOneShot(wireAttach);
                 Toolbox.RandomizeOneShot(audioSource, wireAttach);
             }
         }

@@ -95,7 +95,10 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
                     data.node.position,
                     playerPos
                 };
-        if (Vector3.Distance(points[0], points[1]) > 1.5f) {
+
+        // this is weird, and indicates that state should be handled by manual hacker?
+        float radius = GameManager.I?.gameData?.playerData.hackRadius ?? 1.5f;
+        if (Vector3.Distance(points[0], points[1]) > radius) {
             data.done = true;
         }
     }
