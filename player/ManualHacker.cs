@@ -30,6 +30,21 @@ public class ManualHacker : MonoBehaviour {
     public Action<HackTargetData> OnActionDone;
     public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
     bool hackToolDeployed;
+    public LineRenderer lineRenderer;
+    public Material wireUnfurlMaterial;
+    public Material wireAttachedMaterial;
+    private readonly AnimationCurve fatWidth = AnimationCurve.Constant(0f, 1f, 1f);
+    private readonly AnimationCurve thinWidth = AnimationCurve.Constant(0f, 1f, 0.05f);
+    float timer;
+    public Color wireColor;
+    public AudioSource audioSource;
+    public AudioClip wireDeploy;
+    public AudioClip wireAttach;
+    bool deploySoundPlayed;
+    bool attachSoundPlayed;
+    void Start() {
+        audioSource = Toolbox.SetUpAudioSource(gameObject);
+    }
     public void AddInteractive(Collider other) {
         CyberComponent component = other.GetComponent<CyberComponent>();
         if (component) {
@@ -86,7 +101,6 @@ public class ManualHacker : MonoBehaviour {
         if (inputs.playerInput.useItem) {
             HackTargetData data = ActiveTarget();
             if (data == null) return;
-
             HackController.I.HandleHackInput(data.ToManualHackInput());
             OnActionDone?.Invoke(data);
         }
@@ -98,4 +112,55 @@ public class ManualHacker : MonoBehaviour {
         .Where(IsNodeVulnerable)
         .ToList();
 
+    void Update() {
+        CyberNode node = GetVulnerableNodes().DefaultIfEmpty(null).FirstOrDefault();
+        if (node != null) {
+            timer += Time.deltaTime;
+            UpdateWire(node);
+        } else {
+            timer = 0f;
+            deploySoundPlayed = false;
+            attachSoundPlayed = false;
+            lineRenderer.enabled = false;
+        }
+    }
+    void UpdateWire(CyberNode node) {
+        Vector3 playerPos = transform.position;
+        lineRenderer.enabled = true;
+        Vector3[] points = new Vector3[2];
+        if (timer < 0.25) {
+            Vector3 direction = node.position - playerPos;
+            points = new Vector3[]{
+                    playerPos,
+                    playerPos + 0.65f * direction.normalized
+                };
+            lineRenderer.material = wireUnfurlMaterial;
+            lineRenderer.widthCurve = fatWidth;
+            lineRenderer.startColor = Color.white;
+            lineRenderer.endColor = Color.white;
+
+            if (!deploySoundPlayed) {
+                deploySoundPlayed = true;
+                // audioSource.PlayOneShot(wireDeploy);
+                Toolbox.RandomizeOneShot(audioSource, wireDeploy);
+            }
+        } else {
+            points = new Vector3[]{
+                    node.position,
+                    playerPos
+                };
+            lineRenderer.material = wireAttachedMaterial;
+            lineRenderer.widthCurve = thinWidth;
+            lineRenderer.startColor = wireColor;
+            lineRenderer.endColor = wireColor;
+
+            if (!attachSoundPlayed) {
+                attachSoundPlayed = true;
+                // audioSource.PlayOneShot(wireAttach);
+                Toolbox.RandomizeOneShot(audioSource, wireAttach);
+            }
+        }
+        lineRenderer.SetPositions(points);
+        lineRenderer.positionCount = 2;
+    }
 }

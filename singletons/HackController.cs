@@ -14,6 +14,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
         public float timer;
         public float lifetime;
         public HackType type;
+        public bool done;
     }
 
     public AudioSource audioSource;
@@ -25,8 +26,16 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     public List<HackData> targets = new List<HackData>();
     public List<CyberNode> vulnerableManualNodes = new List<CyberNode>();
     public CyberNode vulnerableNetworkNode = null;
+    // public LineRenderer lineRenderer;
+    // public Material wireUnfurlMaterial;
+    // public Material wireAttachedMaterial;
+
+    // private readonly AnimationCurve fatWidth = AnimationCurve.Constant(0f, 1f, 1f);
+    // private readonly AnimationCurve thinWidth = AnimationCurve.Constant(0f, 1f, 0.1f);
+
     void Awake() {
         vulnerableNetworkNode = null;
+        // lineRenderer.enabled = false;
     }
     public void HandleHackInput(HackInput input) {
         if (targets.Count >= GameManager.I.gameData.playerData.maxConcurrentNetworkHacks)
@@ -43,32 +52,29 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             audioSource.PlayOneShot(hackStarted);
         }
     }
-    // public void HandleVulnerability(ICyberVulnerabilityExploiter exploiter) {
-    //     List<CyberNode> vulnerableNodes = exploiter.GetVulnerableNodes();
-    // }
     public void HandleVulnerableNetworkNode(CyberNode input) {
         vulnerableNetworkNode = input;
-        // Debug.Log("handle vulnerable network node");
         OnValueChanged?.Invoke(this);
     }
     public void HandleVulnerableManualNodes(List<CyberNode> input) {
         vulnerableManualNodes = input;
-        // Debug.Log("handle vulnerable manual node");
         OnValueChanged?.Invoke(this);
     }
 
-
     void Update() {
-        List<HackData> done = new List<HackData>();
         foreach (HackData data in targets) {
             data.timer += Time.deltaTime * GameManager.I.gameData.playerData.hackSpeedCoefficient;
             if (data.timer > data.lifetime) {
                 GameManager.I.SetCyberNodeState(data.node, true);
-                done.Add(data);
+                data.done = true;
                 audioSource.PlayOneShot(hackFinished);
             }
             // TODO: abort manual hacks if player moves out of range
+            if (data.type == HackType.manual) {
+                UpdateManualHack(data);
+            }
         }
+        List<HackData> done = targets.Where(x => x.done).ToList();
         if (targets.Count > 0) {
             targets = targets.Except(done).ToList();
             hackInProgressTimer += Time.deltaTime;
@@ -79,6 +85,18 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             OnValueChanged?.Invoke(this);
         } else {
             hackInProgressTimer = 0f;
+        }
+    }
+
+    void UpdateManualHack(HackData data) {
+        Vector3 playerPos = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f);
+        Vector3[] points = new Vector3[2];
+        points = new Vector3[]{
+                    data.node.position,
+                    playerPos
+                };
+        if (Vector3.Distance(points[0], points[1]) > 1.5f) {
+            data.done = true;
         }
     }
 }

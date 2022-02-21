@@ -28,6 +28,7 @@ public class PlayerData {
 
     public int maxConcurrentNetworkHacks;
     public float hackSpeedCoefficient;
+    public float hackRadius;
 
     public static PlayerData DefaultGameData() {
         return new PlayerData() {
@@ -47,7 +48,8 @@ public class PlayerData {
             items = new List<string> { "deck", "explosive" },
 
             maxConcurrentNetworkHacks = 1,
-            hackSpeedCoefficient = 1f
+            hackSpeedCoefficient = 1f,
+            hackRadius = 1.5f
         };
     }
 }
