@@ -89,6 +89,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     }
 
     void UpdateManualHack(HackData data) {
+        // really ugly
         Vector3 playerPos = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f);
         Vector3[] points = new Vector3[2];
         points = new Vector3[]{

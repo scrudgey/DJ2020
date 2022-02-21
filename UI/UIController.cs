@@ -23,7 +23,8 @@ public class UIController : MonoBehaviour {
     public ActionLogHandler actionLogHandler;
     public OverlayHandler overlayHandler;
     public GameObject UIEditorCamera;
-    public HackIndicator hackIndicator;
+    // public HackIndicator hackIndicator;
+    public HackDisplay hackDisplay;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -34,7 +35,8 @@ public class UIController : MonoBehaviour {
         interactiveHighlightHandler.cam = Camera.main;
         overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
-        hackIndicator.cam = Camera.main;
+        // hackIndicator.cam = Camera.main;
+        hackDisplay.cam = Camera.main;
 
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnMenuChange += HandleMenuChange;

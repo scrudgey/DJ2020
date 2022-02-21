@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-public class HackIndicator : MonoBehaviour, IBinder<HackController> {
+
+// TODO: multiple hacks and vulnerable nodes simultaneously  
+public class HackIndicator : MonoBehaviour { //}, IBinder<HackController> {
     public HackController target { get; set; }
     public Image image;
     public RectTransform imageRect;
@@ -18,39 +20,26 @@ public class HackIndicator : MonoBehaviour, IBinder<HackController> {
 
     void Start() {
         image.color = color;
-        ((IBinder<HackController>)this).Bind(HackController.I.gameObject);
-        HandleValueChanged(HackController.I);
     }
 
-    public void HandleValueChanged(HackController hackController) {
-        // TODO: multiple hacks and vulnerable nodes simultaneously  
-        if (hackController == null) {
-            return;
-        } else if (hackController?.targets?.Count > 0) {
+    public void Configure(CyberNode node, bool vulnerable, bool hacking) {
+        nodeTarget = node;
+        if (hacking) {
             showImage = true;
-            HackController.HackData data = hackController.targets[0];
-            nodeTarget = data.node;
-
             vulnerabilityIndicator.Disable();
-        } else if (hackController?.vulnerableManualNodes?.Count != 0) {
+        } else if (vulnerable) {
             showImage = false;
-            nodeTarget = hackController.vulnerableManualNodes[0];
-            // nodeTarget = hackController.vulnerableManualNodes[0];
-            // Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
-            // imageRect.position = screenPoint;
-            vulnerabilityIndicator.Enable();
-        } else if (hackController.vulnerableNetworkNode != null) {
-            showImage = false;
-            nodeTarget = hackController.vulnerableNetworkNode;
-            // Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
-            // imageRect.position = screenPoint;
             vulnerabilityIndicator.Enable();
         } else {
             showImage = false;
             vulnerabilityIndicator.Disable();
         }
+        Debug.Log($"{showImage} {vulnerable} {hacking}");
     }
-
+    public void Clear() {
+        showImage = false;
+        vulnerabilityIndicator.Disable();
+    }
     void Update() {
         timer += Time.deltaTime;
         if (showImage) {

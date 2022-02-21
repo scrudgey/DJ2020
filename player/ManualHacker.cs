@@ -133,7 +133,7 @@ public class ManualHacker : MonoBehaviour {
         Vector3[] points = new Vector3[2];
         if (timer < 0.25) {
             Vector3 direction = node.position - playerPos;
-            float length = 0.65f * (timer / 0.25f);
+            float length = 0.15f + 0.65f * (timer / 0.25f);
             points = new Vector3[]{
                     playerPos,
                     playerPos + length * direction.normalized
