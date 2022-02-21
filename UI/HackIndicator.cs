@@ -5,8 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-// TODO: multiple hacks and vulnerable nodes simultaneously  
-public class HackIndicator : MonoBehaviour { //}, IBinder<HackController> {
+public class HackIndicator : MonoBehaviour {
     public HackController target { get; set; }
     public Image image;
     public RectTransform imageRect;

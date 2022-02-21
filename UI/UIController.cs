@@ -18,12 +18,10 @@ public class UIController : MonoBehaviour {
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
-    // public InteractionIndicatorHandler interactionIndicatorHandler;
     public InteractiveHighlightHandler interactiveHighlightHandler;
     public ActionLogHandler actionLogHandler;
     public OverlayHandler overlayHandler;
     public GameObject UIEditorCamera;
-    // public HackIndicator hackIndicator;
     public HackDisplay hackDisplay;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -31,11 +29,9 @@ public class UIController : MonoBehaviour {
     void Start() {
         // cameras
         canvas.worldCamera = Camera.main;
-        // interactionIndicatorHandler.cam = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
         overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
-        // hackIndicator.cam = Camera.main;
         hackDisplay.cam = Camera.main;
 
         GameManager.OnFocusChanged += BindToNewTarget;

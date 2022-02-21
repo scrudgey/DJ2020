@@ -5,7 +5,6 @@ using UnityEngine;
 
 // TODO: rename to HackPanelHandler
 public class HackHandler : MonoBehaviour, IBinder<HackController> {
-
     public HackController target { get; set; }
     public Transform entriesHolder;
     HackController hackTarget;
