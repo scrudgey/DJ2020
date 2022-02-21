@@ -33,7 +33,6 @@ public class HackIndicator : MonoBehaviour {
             showImage = false;
             vulnerabilityIndicator.Disable();
         }
-        Debug.Log($"{showImage} {vulnerable} {hacking}");
     }
     public void Clear() {
         showImage = false;
