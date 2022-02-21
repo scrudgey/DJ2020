@@ -10,6 +10,8 @@ public class TagSystemData {
     // if true, don't block bullet raycasts, and on collision check for Glass component to take damage.
     public bool bulletPassthrough;
 
+    public bool noDecal;
+
     // if true, I cause the entry chime to play
     public bool isActor;
 
@@ -19,6 +21,9 @@ public class TagSystemData {
 
     // if true, I do not hide when above the player
     public bool dontHideAbove;  // TODO: use layers instead
+
+    // if true, I do not hide when above the player
+    public bool dontHideInterloper;  // TODO: use layers instead
 
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;

@@ -12,11 +12,15 @@ public class MaterialController {
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableBecauseAbove;
+    Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
     public MaterialController(GameObject gameObject, CharacterCamera camera) {
         this.camera = camera;
         this.gameObject = gameObject;
         this.tagSystemData = Toolbox.GetTagData(gameObject);
         this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>());
+        foreach (Renderer renderer in childRenderers) {
+            initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
+        }
     }
     public void InterloperStart() {
         // Debug.Log($"{gameObject} {renderer} interloper start");
@@ -52,7 +56,8 @@ public class MaterialController {
             if (renderer == null)
                 return;
             if (renderer.shadowCastingMode != ShadowCastingMode.On) {
-                renderer.shadowCastingMode = ShadowCastingMode.On;
+                // renderer.shadowCastingMode = ShadowCastingMode.On;
+                renderer.shadowCastingMode = initialShadowCastingMode[renderer];
                 // renderer.enabled = true;
             }
         }
@@ -77,7 +82,7 @@ public class MaterialController {
     }
 
     public bool active() {
-        return (disableBecauseInterloper && !tagSystemData.bulletPassthrough) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
+        return (disableBecauseInterloper && !tagSystemData.bulletPassthrough && !tagSystemData.dontHideInterloper) || (disableBecauseAbove && !tagSystemData.dontHideAbove);
     }
 }
 public class MaterialControllerCache {

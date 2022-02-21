@@ -44,8 +44,10 @@ public class Bullet {
             // TODO: these effects should be data-driven
 
             // spawn decal
-            GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.normal);
-            decalObject.transform.SetParent(hit.collider.transform, true);
+            if (!tagData.noDecal) {
+                GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.normal);
+                decalObject.transform.SetParent(hit.collider.transform, true);
+            }
 
             // spawn sparks
             GameObject.Instantiate(

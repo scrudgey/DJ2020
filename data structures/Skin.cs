@@ -24,6 +24,8 @@ public class Skin {
     public Octet<Sprite[]> unarmedRun = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedClimb = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedJump = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedUse = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedHandsUp = new Octet<Sprite[]>();
 
 
     // pistol
@@ -252,6 +254,18 @@ public class Skin {
         skin.unarmedJump[Direction.right] = new Sprite[] { torsoSprites[75] };
         skin.unarmedJump[Direction.rightUp] = new Sprite[] { torsoSprites[76] };
         skin.unarmedJump[Direction.up] = new Sprite[] { torsoSprites[77] };
+
+        skin.unarmedUse[Direction.down] = new Sprite[] { torsoSprites[78] };
+        skin.unarmedUse[Direction.rightDown] = new Sprite[] { torsoSprites[79] };
+        skin.unarmedUse[Direction.right] = new Sprite[] { torsoSprites[80] };
+        skin.unarmedUse[Direction.rightUp] = new Sprite[] { torsoSprites[81] };
+        skin.unarmedUse[Direction.up] = new Sprite[] { torsoSprites[82] };
+
+        skin.unarmedHandsUp[Direction.down] = new Sprite[] { torsoSprites[83] };
+        skin.unarmedHandsUp[Direction.rightDown] = new Sprite[] { torsoSprites[84] };
+        skin.unarmedHandsUp[Direction.right] = new Sprite[] { torsoSprites[85] };
+        skin.unarmedHandsUp[Direction.rightUp] = new Sprite[] { torsoSprites[86] };
+        skin.unarmedHandsUp[Direction.up] = new Sprite[] { torsoSprites[87] };
 
         // pistol
 
