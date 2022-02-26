@@ -28,11 +28,11 @@ namespace UI {
         public Color objectLockColor;
         private float timer;
         public float pulseInterval = 0.15f;
-        public TargetData.TargetType state;
+        public TargetData2.TargetType state;
         public int pulseSize;
 
         public void Update() {
-            if (state == TargetData.TargetType.objectLock) {
+            if (state == TargetData2.TargetType.objectLock) {
                 timer += Time.deltaTime;
                 while (timer > pulseInterval) {
                     timer -= pulseInterval;
@@ -50,19 +50,19 @@ namespace UI {
             if (gunHandler.HasGun() && gunHandler.inputMode == InputMode.gun) {
                 cursorImage.enabled = true;
 
-                TargetData data = gunHandler.lastTargetData;
+                TargetData2 data = gunHandler.lastTargetData;
                 if (data == null)
                     return;
                 cursor.position = data.screenPosition;
                 switch (data.type) {
-                    case TargetData.TargetType.none:
+                    case TargetData2.TargetType.none:
                         break;
                     default:
-                    case TargetData.TargetType.direction:
+                    case TargetData2.TargetType.direction:
                         cursorImage.sprite = directionAimSprite;
                         cursorImage.color = directionAimColor;
                         break;
-                    case TargetData.TargetType.objectLock:
+                    case TargetData2.TargetType.objectLock:
                         cursorImage.sprite = objectLockSprite;
                         cursorImage.color = objectLockColor;
                         break;
@@ -75,7 +75,7 @@ namespace UI {
 
         }
         void IBinder<CharacterController>.HandleValueChanged(CharacterController t) {
-            if (neoCharacterControllerTarget.state == CharacterState.wallPress) {
+            if (t.state == CharacterState.wallPress) {
                 cursorImage.enabled = false;
             } else {
                 cursorImage.enabled = true;

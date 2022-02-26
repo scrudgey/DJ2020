@@ -33,14 +33,12 @@ public class OverlayHandler : MonoBehaviour {
     public void Bind() {
         // TODO: this is weird.
         GameManager.OnOverlayChange += HandleOverlayChange;
-
         GameManager.OnPowerGraphChange += RefreshPowerGraph;
         GameManager.OnCyberGraphChange += RefreshCyberGraph;
 
         // TODO: cyber
         RefreshPowerGraph(GameManager.I.gameData.levelData.powerGraph);
         RefreshCyberGraph(GameManager.I.gameData.levelData.cyberGraph);
-
         HandleOverlayChange(GameManager.I.activeOverlayType);
     }
     void OnDestroy() {

@@ -48,7 +48,8 @@ public class UIController : MonoBehaviour {
     }
 
     void BindToNewTarget(GameObject target) {
-        ((IBinder<GunHandler>)weaponUIHandler).Bind(target);
+        Debug.Log("binding to new target");
+        (weaponUIHandler as IBinder<GunHandler>).Bind(target);
 
         ((IBinder<ItemHandler>)itemUIHandler).Bind(target);
 

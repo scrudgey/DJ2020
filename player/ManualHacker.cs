@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 public class ManualHackInput {
-    public PlayerCharacterInput playerInput;
+    public PlayerInput playerInput;
     public Items.BaseItem activeItem;
 }
 public class HackTargetData {
@@ -124,7 +124,7 @@ public class ManualHacker : MonoBehaviour {
             attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
-        float radius = GameManager.I?.gameData?.playerData.hackRadius ?? 1.5f;
+        float radius = GameManager.I?.gameData?.playerData?.hackRadius ?? 1.5f;
         sphereCollider.radius = radius;
     }
     void UpdateWire(CyberNode node) {

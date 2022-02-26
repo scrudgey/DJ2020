@@ -5,7 +5,7 @@ using Items;
 using UnityEngine;
 // TODO: enable buffs on/off
 
-public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
+public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IInputReceiver {
     public Action<ItemHandler> OnValueChanged { get; set; }
 
     public List<BaseItem> items = new List<BaseItem>();
@@ -17,6 +17,20 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable {
     }
     void Start() {
         OnItemEnter(activeItem);
+    }
+    public void SetInputs(PlayerInput input) {
+        if (input.incrementItem != 0) {
+            index += input.incrementItem;
+            if (index < 0) {
+                index = items.Count - 1;
+            } else if (index >= items.Count) {
+                index = 0;
+            }
+            SwitchToItem(items[index]);
+        }
+        if (input.useItem) {
+            UseItem();
+        }
     }
     public void ProcessInput(PlayerCharacterInput input) {
         if (input.incrementItem != 0) {

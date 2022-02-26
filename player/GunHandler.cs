@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInputReceiver {
     public enum GunState {
         idle,
         shooting,
@@ -24,7 +24,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     public GunInstance primary;
     public GunInstance third;
     public bool emitShell;
-    public TargetData lastTargetData;
+    public TargetData2 lastTargetData;
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
@@ -101,7 +101,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     public Vector3 gunDirection() {
-        return lastTargetData.position - this.gunPosition();
+        return lastTargetData.targetPoint(gunPosition()) - this.gunPosition();
     }
     public float inaccuracy() {
         float accuracy = 0;
@@ -111,7 +111,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             return 0f;
 
         // range
-        float distance = Vector3.Distance(lastTargetData.position, this.gunPosition());
+        float distance = Vector3.Distance(lastTargetData.targetPoint(gunPosition()), this.gunPosition());
         accuracy += gunInstance.baseGun.spread * (distance / 10f);
 
         // movement
@@ -315,7 +315,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
     }
 
-    public void ProcessGunSwitch(PlayerCharacterInput input) {
+    public void ProcessGunSwitch(PlayerInput input) {
         if (input.selectgun != -1) {
             SwitchToGun(input.selectgun);
         } else if (input.reload) {
@@ -331,7 +331,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             Reload();
         }
     }
-    public void ProcessInput(PlayerCharacterInput input) {
+    public void SetInputs(PlayerInput input) {
         inputMode = input.inputMode;
         lastTargetData = input.Fire.targetData;
         OnValueChanged?.Invoke(this);

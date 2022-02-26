@@ -26,7 +26,7 @@ public class InteractorTargetData : HighlightableTargetData {
         this.target = target;
     }
 }
-public class Interactor : MonoBehaviour, IBindable<Interactor> {
+public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
     public Action<Interactor> OnValueChanged { get; set; }
     public Action<InteractorTargetData> OnActionDone;
     public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
@@ -67,9 +67,11 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         }
         return Interactive.TopTarget(data);
     }
-    void RemoveNullInteractives() => interactives = interactives
+    void RemoveNullInteractives() {
+        interactives = interactives
             .Where(f => f.Value != null && f.Key != null)
             .ToDictionary(x => x.Key, x => x.Value);
+    }
 
     void OnTriggerEnter(Collider other)
         => AddInteractive(other);
@@ -77,18 +79,19 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     void OnTriggerExit(Collider other)
         => RemoveInteractive(other);
 
-    public void SetInputs(ref PlayerCharacterInput inputs) {
-        if (inputs.state != CharacterState.wallPress) {
-            if (inputs.Fire.targetData.highlightableTargetData != highlighted) {
-                highlighted = inputs.Fire.targetData.highlightableTargetData;
-                OnValueChanged?.Invoke(this);
-            }
-        } else {
-            if (highlighted != null) {
-                highlighted = null;
-                OnValueChanged?.Invoke(this);
-            }
-        }
+    // TODO: fix
+    public void SetInputs(PlayerInput inputs) {
+        // if (inputs.state != CharacterState.wallPress) {
+        //     if (inputs.Fire.targetData.highlightableTargetData != highlighted) {
+        //         highlighted = inputs.Fire.targetData.highlightableTargetData;
+        //         OnValueChanged?.Invoke(this);
+        //     }
+        // } else {
+        //     if (highlighted != null) {
+        //         highlighted = null;
+        //         OnValueChanged?.Invoke(this);
+        //     }
+        // }
 
         // TODO: handle the case when there's a ladder separate from interactives
         if (inputs.actionButtonPressed) {

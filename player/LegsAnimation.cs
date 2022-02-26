@@ -25,8 +25,9 @@ public struct AnimationInput {
     }
     public GunAnimationInput gunInput;
     public Direction orientation;
-    public Direction headOrientation;
-    public PlayerCharacterInput playerInputs;
+    // public Direction headOrientation;
+    // public PlayerCharacterInput playerInputs;
+    public PlayerInput playerInputs;
     public bool isMoving;
     public bool isCrouching;
     public bool isRunning;
@@ -35,9 +36,11 @@ public struct AnimationInput {
     public float wallPressTimer;
     public CharacterState state;
     public Quaternion cameraRotation;
+    public Vector2 camDir;
+    public TargetData2 targetData;
 }
 
-public class LegsAnimation : MonoBehaviour, ISaveable {
+public class LegsAnimation : MonoBehaviour, ISaveable, IBinder<CharacterController> {
     public enum State {
         idle,
         walk,
@@ -47,6 +50,8 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
         jump,
         climb
     }
+    public CharacterController target { get; set; }
+
     State state;
     private int frame;
     public SpriteRenderer spriteRenderer;
@@ -62,7 +67,17 @@ public class LegsAnimation : MonoBehaviour, ISaveable {
     public TorsoAnimation gunAnimation;
     public HeadAnimation headAnimation;
 
+    void Start() {
+        // TODO: fix
+        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+    }
+    public void HandleValueChanged(CharacterController controller) {
+        AnimationInput input = controller.BuildAnimationInput();
+        UpdateView(input);
+    }
+
     // used by animation
+
     public void SetFrame(int frame) {
         this.frame = frame;
     }

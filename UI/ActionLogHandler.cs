@@ -24,7 +24,7 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
     }
 
     public void Bind(GameObject newTargetObject) {
-        if (this.target != null) {
+        if (target != null) {
             target.OnValueChanged -= HandleValueChanged;
             target.OnActionDone -= HandleActionDone;
         }

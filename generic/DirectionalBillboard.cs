@@ -15,7 +15,7 @@ public class DirectionalBillboard : MonoBehaviour {
             return _cam;
         }
     }
-    public void Update() {
+    public virtual void Update() {
         Vector2 camDir = new Vector2(cam.PlanarDirection.x, cam.PlanarDirection.z);
         Vector2 playerDir = new Vector2(direction.x, direction.z);
         float angle = Vector2.SignedAngle(camDir, playerDir);

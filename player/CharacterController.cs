@@ -43,8 +43,9 @@ public enum ClimbingState {
     DeAnchoring
 }
 
-public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController> {
+public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver {
     public KinematicCharacterMotor Motor;
+    public CharacterCamera OrbitCamera;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
     public ItemHandler itemHandler;
@@ -152,6 +153,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private Quaternion _rotationBeforeClimbing = Quaternion.identity;
 
     private float landStunTimer;
+    private PlayerInput _lastInput;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -219,7 +221,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     /// <summary>
     /// This is called every frame by MyPlayer in order to tell the character what its inputs are
     /// </summary>
-    public void SetInputs(ref PlayerCharacterInput input) {
+    public void SetInputs(PlayerInput input) {
         // Handle ladder transitions
         _ladderUpDownInput = input.MoveAxisForward;
         if (input.actionButtonPressed) {
@@ -307,7 +309,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 wallPressRatchet = false;
 
                 // Items
-                itemHandler.ProcessInput(input);
+                itemHandler.SetInputs(input);
 
                 // Cyberdeck
                 // if (itemHandler.activeItem.EnablesManualHack()) {
@@ -324,13 +326,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
-                gunHandler.ProcessInput(input);
-                if (input.Fire.targetData != TargetData.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
-                    _shootLookDirection = input.Fire.targetData.position;
+                gunHandler.SetInputs(input);
+                Vector3 targetPoint = input.Fire.targetData.targetPoint(gunHandler.gunPosition());
+                if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
+                    _shootLookDirection = targetPoint;
                 }
 
                 // TODO: turn to face aim position?
-                Vector3 directionToCursor = input.Fire.targetData.position - transform.position;
+                Vector3 directionToCursor = targetPoint - transform.position;
                 directionToCursor.y = 0;
                 directionToCursor = directionToCursor.normalized;
                 float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
@@ -381,6 +384,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         if (input.incrementOverlay != 0) {
             GameManager.I.IncrementOverlay(input.incrementOverlay);
         }
+        _lastInput = input;
     }
 
     /// <summary>
@@ -405,7 +409,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
                 } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
-                    // Smoothly interpolate from current to target look direction
+                                                                               // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
@@ -892,5 +896,70 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
     public void LoadState(PlayerData data) {
         superJumpEnabled = data.cyberlegsLevel > 0;
+    }
+
+    public CameraInput BuildCameraInput() {
+        Vector2 finalLastWallInput = lastWallInput;
+        if (!wallPressRatchet) {
+            finalLastWallInput = Vector2.zero;
+        }
+
+        CameraInput input = new CameraInput {
+            deltaTime = Time.deltaTime,
+            wallNormal = wallNormal,
+            lastWallInput = finalLastWallInput,
+            crouchHeld = isCrouching,
+            playerPosition = transform.position,
+            state = state
+        };
+        return input;
+    }
+
+    public AnimationInput BuildAnimationInput() {
+        // update view
+        Vector2 camDir = new Vector2(OrbitCamera.Transform.forward.x, OrbitCamera.Transform.forward.z);
+        Vector2 playerDir = new Vector2(direction.x, direction.z);
+
+        // head direction
+        TargetData2 targetData = InputController.CursorToTarget(OrbitCamera);
+
+        // direction angles
+        float angle = Vector2.SignedAngle(camDir, playerDir);
+
+        // if (GameManager.I.showDebugRays)
+        //     Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
+
+        GunType gunType = GunType.unarmed;
+        Gun baseGun = null;
+        if (gunHandler.HasGun()) {
+            gunType = gunHandler.gunInstance.baseGun.type;
+            baseGun = gunHandler.gunInstance.baseGun;
+        }
+
+        return new AnimationInput {
+            orientation = Toolbox.DirectionFromAngle(angle),
+            // headOrientation = headOrientation,
+            isMoving = Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing),
+            isCrouching = isCrouching,
+            isRunning = isRunning,
+            isJumping = state == CharacterState.superJump,
+            isClimbing = state == CharacterState.climbing,
+            wallPressTimer = wallPressTimer,
+            state = state,
+            playerInputs = _lastInput,
+            gunInput = new AnimationInput.GunAnimationInput {
+                gunType = gunType,
+                gunState = gunHandler.state,
+                hasGun = gunHandler.gunInstance != null && gunHandler.HasGun(),
+                holstered = gunHandler.gunInstance == null,
+                baseGun = baseGun
+            },
+            targetData = targetData,
+            camDir = camDir
+        };
+    }
+
+    void LateUpdate() {
+        OnValueChanged?.Invoke(this);
     }
 }

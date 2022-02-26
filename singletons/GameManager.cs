@@ -37,7 +37,7 @@ public partial class GameManager : Singleton<GameManager> {
     private bool nextOverlayThisFrame;
     private bool previousOverlayThisFrame;
     public MenuType activeMenuType;
-    public OverlayType activeOverlayType;
+    public OverlayType activeOverlayType = OverlayType.none;
     private CursorType _cursorType;
     public CursorType cursorType {
         get { return _cursorType; }
@@ -47,7 +47,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public InputMode inputMode;
-
+    int numberFrames;
     public bool showDebugRays;
     public void Start() {
         // System
@@ -55,17 +55,12 @@ public partial class GameManager : Singleton<GameManager> {
             toggleConsoleThisFrame = ctx.ReadValueAsButton();
         };
 
-        // TODO: set level in gamedata
-        gameData = GameData.TestInitialData();
-
-        // TODO: a better start of level method?
-        TransitionToState(GameState.levelPlay);
-
         showDebugRays = true;
 
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
+
     public override void OnDestroy() {
         base.OnDestroy();
         CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
@@ -164,6 +159,16 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         toggleConsoleThisFrame = false;
+        if (numberFrames == 2) {
+            Debug.Log("initializing");
+            // Debug.Break();
+            // TODO: set level in gamedata
+            gameData = GameData.TestInitialData();
+
+            // TODO: a better start of level method?
+            TransitionToState(GameState.levelPlay);
+        }
+        numberFrames += 1;
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {

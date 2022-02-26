@@ -3,17 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HeadAnimation : MonoBehaviour, ISaveable {
+public class HeadAnimation : MonoBehaviour, ISaveable, IBinder<CharacterController> {
+    public CharacterController target { get; set; }
     public SpriteRenderer spriteRenderer;
     public Skin skin;
     public Direction direction;
     private int frame;
+
+    void Start() {
+        // TODO: fix
+        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+    }
+    public void HandleValueChanged(CharacterController controller) {
+        AnimationInput input = controller.BuildAnimationInput();
+        UpdateView(input);
+    }
     public void UpdateView(AnimationInput input) {
         // adjust visibility
         switch (input.state) {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
-
                 if (input.isMoving && input.isCrouching) { // crawling
                     spriteRenderer.enabled = false;
                 } else if (input.isCrouching) { // crouching
@@ -57,7 +66,12 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 }
                 break;
             case CharacterState.normal:
-                direction = Toolbox.ClampDirection(input.headOrientation, input.orientation);
+                Vector3 headDirection = (input.targetData.targetPoint(transform.position + new Vector3(0f, 1.5f, 0f)) - transform.position).normalized;
+                Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
+                float headAngle = Vector2.SignedAngle(input.camDir, headDir);
+                Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);
+                direction = Toolbox.ClampDirection(headOrientation, input.orientation);
+                direction = Direction.right;
                 if (input.isMoving) {
                     if (input.isCrouching) {
                         spriteRenderer.enabled = false;

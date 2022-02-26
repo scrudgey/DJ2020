@@ -20,7 +20,10 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
+        Debug.Log("setting focus...");
+        // if (OnFocusChanged != null) {
         OnFocusChanged?.Invoke(focus);
+        // }
     }
     void ClearSceneData() {
         poweredComponents = new Dictionary<string, HashSet<PoweredComponent>>();
@@ -29,10 +32,8 @@ public partial class GameManager : Singleton<GameManager> {
     private void InitializeLevel(string levelName) {
         // TODO: level enum input
         // TODO: load and set up asynchronously behind a screen
-
         ClearSceneData();
 
-        Debug.Log("setting focus...");
         SetFocus(GameObject.Find("playerCharacter"));
 
         // load global state
@@ -94,7 +95,7 @@ public partial class GameManager : Singleton<GameManager> {
                     break;
             };
         } else {
-            Debug.Log("called set node enabled with null node");
+            // Debug.Log("called set node enabled with null node");
         }
 
 

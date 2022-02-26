@@ -12,20 +12,23 @@ public enum CameraState { normal, wallPress, attractor }
 // a single parameter lerps between states, and there is one transitional state.
 
 public struct CameraInput {
-    public CameraAttractorZone attractor;
-    public CameraState state;
+    // public RotateInput rotation;
+    // public CameraAttractorZone attractor;
+    // public CameraState state;
     public enum RotateInput { none, left, right }
     public float deltaTime;
-    public RotateInput rotation;
     public Vector3 wallNormal;
     public Vector2 lastWallInput;
     public bool crouchHeld;
+    public Vector3 playerPosition;
+    public CharacterState state;
 }
-public class CharacterCamera : MonoBehaviour {
+public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInputReceiver {
     private CameraState _state;
     public CameraState state {
         get { return _state; }
     }
+    public CharacterController target { get; set; }
     public static Quaternion rotationOffset;
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
@@ -76,10 +79,21 @@ public class CharacterCamera : MonoBehaviour {
     private float currentFollowingSharpness;
     private float currentDistanceMovementSpeed;
     private bool clampOrthographicSize;
+    private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
+    CameraInput.RotateInput currentRotationInput;
+    CameraAttractorZone currentAttractor = null;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
 
+    public void SetInputs(PlayerInput input) {
+        currentRotationInput = CameraInput.RotateInput.none;
+        if (input.rotateCameraRightPressedThisFrame) {
+            currentRotationInput = CameraInput.RotateInput.right;
+        } else if (input.rotateCameraLeftPressedThisFrame) {
+            currentRotationInput = CameraInput.RotateInput.left;
+        }
+    }
     void Awake() {
         Transform = this.transform;
 
@@ -91,6 +105,22 @@ public class CharacterCamera : MonoBehaviour {
         currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
         currentFollowingSharpness = followingSharpnessDefault;
         currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+    }
+
+    void Start() {
+        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+        GameManager.OnFocusChanged += SetFollowTransform;
+
+        // TODO: move into on level load
+        attractors = new List<CameraAttractorZone>();
+        foreach (GameObject attractor in GameObject.FindGameObjectsWithTag("cameraAttractor")) {
+            CameraAttractorZone collider = attractor.GetComponent<CameraAttractorZone>();
+            if (collider != null)
+                attractors.Add(collider);
+        }
+
+        // IgnoredColliders.Clear();
+        // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
     public void TransitionToState(CameraState toState) {
         if (toState == _state)
@@ -133,7 +163,10 @@ public class CharacterCamera : MonoBehaviour {
         }
     }
     // Set the transform that the camera will orbit around
-    public void SetFollowTransform(Transform t) {
+    public void SetFollowTransform(GameObject g) {
+        Debug.Log("set follow transform");
+
+        Transform t = g.transform;
         FollowTransform = t;
         PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
@@ -146,14 +179,36 @@ public class CharacterCamera : MonoBehaviour {
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
         Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
         targetRotation = planarRot * verticalRot;
+
+        IgnoredColliders.Clear();
+        IgnoredColliders.AddRange(t.gameObject.GetComponentsInChildren<Collider>());
     }
 
+    public void HandleValueChanged(CharacterController controller) {
+        CameraInput input = controller.BuildCameraInput();
+        UpdateWithInput(input);
+    }
     public void UpdateWithInput(CameraInput input) {
-        TransitionToState(input.state);
+        CameraState camState = CameraState.normal;
+        currentAttractor = null;
+        if (input.state == CharacterState.wallPress) {
+            camState = CameraState.wallPress;
+        } else {
+            // check / update Attractor
+            foreach (CameraAttractorZone attractor in attractors) {
+                if (attractor.sphereCollider.bounds.Contains(input.playerPosition)) {
+                    currentAttractor = attractor;
+                    camState = CameraState.attractor;
+                    break;
+                }
+            }
+        }
+
+        TransitionToState(camState);
         if (transitionTime < 1) {
             transitionTime += Time.deltaTime;
         }
-        switch (input.state) {
+        switch (camState) {
             default:
             case CameraState.normal:
                 RenderSettings.skybox = isometricSkybox;
@@ -191,7 +246,7 @@ public class CharacterCamera : MonoBehaviour {
         Vector3 targetPosition = FollowTransform.position;
         // Process rotation input
         float rotationInput = 0f;
-        switch (input.rotation) {
+        switch (currentRotationInput) {
             case CameraInput.RotateInput.left:
                 rotationInput = 90f;
                 break;
@@ -202,6 +257,7 @@ public class CharacterCamera : MonoBehaviour {
             case CameraInput.RotateInput.none:
                 break;
         }
+        currentRotationInput = CameraInput.RotateInput.none;
         Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
         Quaternion rotationFromInput = Quaternion.Euler(Vector3.up * rotationInput);// * RotationSpeed));
         PlanarDirection = rotationFromInput * PlanarDirection;
@@ -222,13 +278,13 @@ public class CharacterCamera : MonoBehaviour {
     }
     public CameraTargetParameters AttractorUpdate(CameraInput input) {
         CameraTargetParameters parameters = NormalUpdate(input);
-        if (input.attractor != null) {
-            parameters.followingSharpness = input.attractor.movementSharpness;
-            Vector3 delta = FollowTransform.position - input.attractor.sphereCollider.bounds.center;
-            if (input.attractor.useInnerFocus && delta.magnitude < input.attractor.innerFocusRadius) {
-                parameters.orthographicSize = input.attractor.innerFocusOrthographicSize;
+        if (currentAttractor != null) {
+            parameters.followingSharpness = currentAttractor.movementSharpness;
+            Vector3 delta = FollowTransform.position - currentAttractor.sphereCollider.bounds.center;
+            if (currentAttractor.useInnerFocus && delta.magnitude < currentAttractor.innerFocusRadius) {
+                parameters.orthographicSize = currentAttractor.innerFocusOrthographicSize;
             } else {
-                parameters.targetPosition = input.attractor.sphereCollider.bounds.center;
+                parameters.targetPosition = currentAttractor.sphereCollider.bounds.center;
             }
         }
         return parameters;

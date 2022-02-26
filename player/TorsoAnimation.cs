@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class TorsoAnimation : MonoBehaviour, ISaveable {
+public class TorsoAnimation : MonoBehaviour, ISaveable, IBinder<CharacterController> {
+    public CharacterController target { get; set; }
+
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
@@ -19,6 +21,14 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     private bool bob;
     private AnimationInput lastInput;
 
+    void Start() {
+        // TODO: fix
+        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+    }
+    public void HandleValueChanged(CharacterController controller) {
+        AnimationInput input = controller.BuildAnimationInput();
+        UpdateView(input);
+    }
     void SetState(GunHandler.GunState newState) {
         state = newState;
     }

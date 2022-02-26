@@ -375,3 +375,14 @@ design for cyber networks
     does hack originate from offscreen, as original idea?
         that was so that you could hack the building before going in.
         could offer a chanc
+
+
+separate the player input / character controller setinput into interfaces
+the other part of this code is pushing updates to animation - we can refactor this to use MVC / binding
+
+unify sphereRobotAnimation and DirectionalBillboard
+flip x in directional billboard
+
+head alignment
+wallpress camera alignment
+manual hacker

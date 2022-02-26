@@ -20,7 +20,7 @@ public class HackDisplay : MonoBehaviour, IBinder<HackController> {
             indicators.Add(hackPanelEntry);
         }
         ((IBinder<HackController>)this).Bind(HackController.I.gameObject);
-        HandleValueChanged(HackController.I);
+        // HandleValueChanged(HackController.I);
     }
     public void HandleValueChanged(HackController hackController) {
         int index = 0;

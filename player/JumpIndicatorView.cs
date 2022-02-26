@@ -2,12 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpIndicatorView : MonoBehaviour {
+public class JumpIndicatorView : MonoBehaviour, IBinder<CharacterController> {
+    public CharacterController target { get; set; }
     public LineRenderer lineRenderer;
     public SpriteRenderer indicatorSprite;
     public Transform indicator;
     public CharacterController characterController;
 
+    void Start() {
+        // TODO: fix
+        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+    }
+    public void HandleValueChanged(CharacterController controller) {
+        AnimationInput input = controller.BuildAnimationInput();
+        UpdateView(input);
+    }
     public void UpdateView(AnimationInput input) {
         if (input.state == CharacterState.jumpPrep) {
             lineRenderer.enabled = true;
