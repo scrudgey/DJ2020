@@ -2,21 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SphereRobotAnimator : DirectionalBillboard, IBinder<SphereRobotController> {
-    public SphereRobotController target { get; set; }
+public class SphereRobotAnimator : IBinder<SphereRobotController> {
+    // public SphereRobotController target { get; set; }
+    public DirectionalBillboard billboard;
     public float floatMeanHeight = 1f;
     public float floatFrequency = 1f;
     public float floatAmplitude = 0.05f;
     public float floatStep = 0.01f;
-    public Octet<Sprite> sphereSprites;
+    // public Octet<Sprite> sphereSprites;
     private float timer;
     void Start() {
         target = GetComponentInParent<SphereRobotController>();
         // Debug.Log(target);
-        ((IBinder<SphereRobotController>)this).Bind(target.gameObject);
+        Bind(target.gameObject);
     }
-    public override void Update() {
-        base.Update();
+    void Update() {
+        // base.Update();
         timer += Time.deltaTime;
         float y = FloatAmount(timer);
         transform.localPosition = new Vector3(0f, y, 0f);
@@ -28,8 +29,8 @@ public class SphereRobotAnimator : DirectionalBillboard, IBinder<SphereRobotCont
         return discreteAmount;
     }
 
-    public void HandleValueChanged(SphereRobotController controller) {
-        direction = controller.direction;
+    override public void HandleValueChanged(SphereRobotController controller) {
+        billboard.direction = controller.direction;
         // Debug.Log(direction);
     }
 }

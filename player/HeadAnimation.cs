@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HeadAnimation : MonoBehaviour, ISaveable, IBinder<CharacterController> {
-    public CharacterController target { get; set; }
+public class HeadAnimation : IBinder<CharacterController>, ISaveable {
+    // public CharacterController target { get; set; }
     public SpriteRenderer spriteRenderer;
     public Skin skin;
     public Direction direction;
@@ -12,9 +12,9 @@ public class HeadAnimation : MonoBehaviour, ISaveable, IBinder<CharacterControll
 
     void Start() {
         // TODO: fix
-        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+        GameManager.OnFocusChanged += Bind;
     }
-    public void HandleValueChanged(CharacterController controller) {
+    override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
     }
@@ -126,10 +126,12 @@ public class HeadAnimation : MonoBehaviour, ISaveable, IBinder<CharacterControll
     }
 
     public void UpdateFrame() {
-        Octet<Sprite[]> octet = skin.headIdle;
-        Sprite[] sprites = octet[direction];
-        frame = Math.Min(frame, sprites.Length - 1);
-        spriteRenderer.sprite = sprites[frame];
+        if (skin != null) {
+            Octet<Sprite[]> octet = skin.headIdle;
+            Sprite[] sprites = octet[direction];
+            frame = Math.Min(frame, sprites.Length - 1);
+            spriteRenderer.sprite = sprites[frame];
+        }
     }
 
     public void LoadState(PlayerData data) {

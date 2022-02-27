@@ -5,13 +5,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI {
-    public class ItemUIHandler : MonoBehaviour, IBinder<ItemHandler> {
-        public ItemHandler target { get; set; }
+    public class ItemUIHandler : IBinder<ItemHandler> {
+        // public ItemHandler target { get; set; }
         public Image itemImage;
         public TextMeshProUGUI itemTitle;
         public TextMeshProUGUI itemCaption;
 
-        public void HandleValueChanged(ItemHandler itemHandler) {
+        override public void HandleValueChanged(ItemHandler itemHandler) {
             if (itemHandler.activeItem == null) {
                 itemImage.sprite = null;
                 itemTitle.text = "N/A";

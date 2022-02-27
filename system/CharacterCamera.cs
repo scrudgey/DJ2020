@@ -23,12 +23,12 @@ public struct CameraInput {
     public Vector3 playerPosition;
     public CharacterState state;
 }
-public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInputReceiver {
+public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private CameraState _state;
     public CameraState state {
         get { return _state; }
     }
-    public CharacterController target { get; set; }
+    // public CharacterController target { get; set; }
     public static Quaternion rotationOffset;
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
@@ -108,7 +108,7 @@ public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInp
     }
 
     void Start() {
-        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+        GameManager.OnFocusChanged += Bind;
         GameManager.OnFocusChanged += SetFollowTransform;
 
         // TODO: move into on level load
@@ -184,7 +184,7 @@ public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInp
         IgnoredColliders.AddRange(t.gameObject.GetComponentsInChildren<Collider>());
     }
 
-    public void HandleValueChanged(CharacterController controller) {
+    override public void HandleValueChanged(CharacterController controller) {
         CameraInput input = controller.BuildCameraInput();
         UpdateWithInput(input);
     }
@@ -243,7 +243,8 @@ public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInp
         public float distanceMovementSharpness;
     }
     public CameraTargetParameters NormalUpdate(CameraInput input) {
-        Vector3 targetPosition = FollowTransform.position;
+
+        Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
         // Process rotation input
         float rotationInput = 0f;
         switch (currentRotationInput) {
@@ -277,10 +278,11 @@ public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInp
         };
     }
     public CameraTargetParameters AttractorUpdate(CameraInput input) {
+
         CameraTargetParameters parameters = NormalUpdate(input);
         if (currentAttractor != null) {
             parameters.followingSharpness = currentAttractor.movementSharpness;
-            Vector3 delta = FollowTransform.position - currentAttractor.sphereCollider.bounds.center;
+            Vector3 delta = FollowTransform?.position - currentAttractor.sphereCollider.bounds.center ?? Vector3.zero;
             if (currentAttractor.useInnerFocus && delta.magnitude < currentAttractor.innerFocusRadius) {
                 parameters.orthographicSize = currentAttractor.innerFocusOrthographicSize;
             } else {
@@ -321,6 +323,8 @@ public class CharacterCamera : MonoBehaviour, IBinder<CharacterController>, IInp
         return screenPoint.x > 0.1 && screenPoint.y > 0.1 && screenPoint.x < 0.9 && screenPoint.y < 0.9;
     }
     public void ApplyTargetParameters(CameraTargetParameters input) {
+        if (FollowTransform == null)
+            return;
         // Process distance input
         TargetDistance = input.targetDistance;
         if (_distanceIsObstructed) {//&& Mathf.Abs(zoomInput) > 0f) {

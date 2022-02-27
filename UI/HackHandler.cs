@@ -4,8 +4,8 @@ using System.Linq;
 using UnityEngine;
 
 // TODO: rename to HackPanelHandler
-public class HackHandler : MonoBehaviour, IBinder<HackController> {
-    public HackController target { get; set; }
+public class HackHandler : IBinder<HackController> {
+    // public HackController target { get; set; }
     public Transform entriesHolder;
     HackController hackTarget;
     public GameObject hackPanelEntryPrefab;
@@ -24,9 +24,9 @@ public class HackHandler : MonoBehaviour, IBinder<HackController> {
             newEntry.SetActive(false);
             entries.Add(hackPanelEntry);
         }
-        ((IBinder<HackController>)this).Bind(HackController.I.gameObject);
+        Bind(HackController.I.gameObject);
     }
-    public void HandleValueChanged(HackController hackController) {
+    override public void HandleValueChanged(HackController hackController) {
         if (hackController.targets.Count == 0) {
             gameObject.SetActive(false);
         } else {

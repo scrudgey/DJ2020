@@ -4,8 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
-    Interactor IBinder<Interactor>.target { get; set; }
+public class InteractiveHighlightHandler : IBinder<Interactor> {
+    // Interactor IBinder<Interactor>.target { get; set; }
 
     public Camera cam;
     public RectTransform cursor;
@@ -19,7 +19,7 @@ public class InteractiveHighlightHandler : MonoBehaviour, IBinder<Interactor> {
     void Awake() {
         blitTextCoroutine = null;
     }
-    public void HandleValueChanged(Interactor interactor) {
+    override public void HandleValueChanged(Interactor interactor) {
         HighlightableTargetData newData = interactor.highlighted;
         InteractorTargetData activeTarget = interactor.ActiveTarget();
         if (newData == null && activeTarget == null) {

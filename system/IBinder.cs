@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public interface IBinder<T> where T : MonoBehaviour, IBindable<T> {
-    T target { get; set; }
-    void Bind(GameObject newTargetObject) {
+public abstract class IBinder<T> : MonoBehaviour where T : MonoBehaviour, IBindable<T> {
+    protected T target { get; set; }
+    public virtual void Bind(GameObject newTargetObject) {
         if (newTargetObject == null)
             return;
         // Debug.Log($"{this} binding to target {newTargetObject}");
@@ -12,9 +12,9 @@ public interface IBinder<T> where T : MonoBehaviour, IBindable<T> {
         target = newTargetObject.GetComponentInChildren<T>();
         if (target != null) {
             target.OnValueChanged += HandleValueChanged;
-            // HandleValueChanged(target);
+            HandleValueChanged(target);
         }
     }
 
-    void HandleValueChanged(T t);
+    abstract public void HandleValueChanged(T t);
 }

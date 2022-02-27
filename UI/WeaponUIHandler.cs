@@ -7,13 +7,13 @@ using UnityEngine.UI;
 
 namespace UI {
 
-    public class WeaponUIHandler : MonoBehaviour, IBinder<GunHandler> {
-        public GunHandler target { get; set; }
+    public class WeaponUIHandler : IBinder<GunHandler> {
+        // public GunHandler target { get; set; }
         public TextMeshProUGUI ammoIndicator;
         public TextMeshProUGUI ammoImageCaption;
         public Image ammoImage;
 
-        public void HandleValueChanged(GunHandler gun) {
+        override public void HandleValueChanged(GunHandler gun) {
             if (gun.HasGun()) {
                 ammoImage.enabled = true;
                 ammoIndicator.text = gun.gunInstance.baseGun.name;

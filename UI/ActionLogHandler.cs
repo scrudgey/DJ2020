@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
-    public Interactor target { get; set; }
+public class ActionLogHandler : IBinder<Interactor> {
+    // public Interactor target { get; set; }
 
     public Transform logTextHolder;
     public GameObject logTextEntryPrefab;
@@ -23,7 +23,7 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
         promptText.text = prefix;
     }
 
-    public void Bind(GameObject newTargetObject) {
+    override public void Bind(GameObject newTargetObject) {
         if (target != null) {
             target.OnValueChanged -= HandleValueChanged;
             target.OnActionDone -= HandleActionDone;
@@ -35,7 +35,7 @@ public class ActionLogHandler : MonoBehaviour, IBinder<Interactor> {
             HandleValueChanged(target);
         }
     }
-    public void HandleValueChanged(Interactor interactor) {
+    override public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
         if (!InteractorTargetData.Equality(data, newData)) {
             Disable();

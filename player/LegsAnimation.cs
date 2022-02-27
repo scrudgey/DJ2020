@@ -40,7 +40,7 @@ public struct AnimationInput {
     public TargetData2 targetData;
 }
 
-public class LegsAnimation : MonoBehaviour, ISaveable, IBinder<CharacterController> {
+public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public enum State {
         idle,
         walk,
@@ -50,7 +50,7 @@ public class LegsAnimation : MonoBehaviour, ISaveable, IBinder<CharacterControll
         jump,
         climb
     }
-    public CharacterController target { get; set; }
+    // public CharacterController target { get; set; }
 
     State state;
     private int frame;
@@ -69,9 +69,9 @@ public class LegsAnimation : MonoBehaviour, ISaveable, IBinder<CharacterControll
 
     void Start() {
         // TODO: fix
-        GameManager.OnFocusChanged += ((IBinder<CharacterController>)this).Bind;
+        GameManager.OnFocusChanged += Bind;
     }
-    public void HandleValueChanged(CharacterController controller) {
+    override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
     }
@@ -90,6 +90,8 @@ public class LegsAnimation : MonoBehaviour, ISaveable, IBinder<CharacterControll
     }
     public void SetBob(int bob) { }
     public void UpdateView(AnimationInput input) {
+        if (skin == null)
+            return;
         // set direction
         direction = input.orientation;
         switch (input.state) {

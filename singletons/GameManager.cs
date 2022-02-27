@@ -60,6 +60,18 @@ public partial class GameManager : Singleton<GameManager> {
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
+    void LateUpdate() {
+        if (numberFrames == 1) {
+            Debug.Log("initializing");
+            // Debug.Break();
+            // TODO: set level in gamedata
+            gameData = GameData.TestInitialData();
+
+            // TODO: a better start of level method?
+            TransitionToState(GameState.levelPlay);
+        }
+        numberFrames += 1;
+    }
 
     public override void OnDestroy() {
         base.OnDestroy();
@@ -159,16 +171,6 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         toggleConsoleThisFrame = false;
-        if (numberFrames == 2) {
-            Debug.Log("initializing");
-            // Debug.Break();
-            // TODO: set level in gamedata
-            gameData = GameData.TestInitialData();
-
-            // TODO: a better start of level method?
-            TransitionToState(GameState.levelPlay);
-        }
-        numberFrames += 1;
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {

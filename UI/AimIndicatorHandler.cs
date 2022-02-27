@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 namespace UI {
-    public class AimIndicatorHandler : MonoBehaviour, IBinder<GunHandler>, IBinder<CharacterController> {
+    public class AimIndicatorHandler : IBinder<GunHandler> {
 
-        private GunHandler gunHandlerTarget;
-        private CharacterController neoCharacterControllerTarget;
-        GunHandler IBinder<GunHandler>.target {
-            get { return gunHandlerTarget; }
-            set { gunHandlerTarget = value; }
-        }
+        // private GunHandler gunHandlerTarget;
+        // private CharacterController neoCharacterControllerTarget;
+        // GunHandler IBinder<GunHandler>.target {
+        //     get { return gunHandlerTarget; }
+        //     set { gunHandlerTarget = value; }
+        // }
 
-        CharacterController IBinder<CharacterController>.target {
-            get { return neoCharacterControllerTarget; }
-            set { neoCharacterControllerTarget = value; }
-        }
+        // CharacterController IBinder<CharacterController>.target {
+        //     get { return neoCharacterControllerTarget; }
+        //     set { neoCharacterControllerTarget = value; }
+        // }
 
 
         public Camera UICamera;
@@ -46,7 +46,7 @@ namespace UI {
                 pulseSize = 0;
             }
         }
-        void IBinder<GunHandler>.HandleValueChanged(GunHandler gunHandler) {
+        override public void HandleValueChanged(GunHandler gunHandler) {
             if (gunHandler.HasGun() && gunHandler.inputMode == InputMode.gun) {
                 cursorImage.enabled = true;
 
@@ -74,18 +74,18 @@ namespace UI {
             }
 
         }
-        void IBinder<CharacterController>.HandleValueChanged(CharacterController t) {
-            if (t.state == CharacterState.wallPress) {
-                cursorImage.enabled = false;
-            } else {
-                cursorImage.enabled = true;
-            }
-        }
+        // void IBinder<CharacterController>.HandleValueChanged(CharacterController t) {
+        //     if (t.state == CharacterState.wallPress) {
+        //         cursorImage.enabled = false;
+        //     } else {
+        //         cursorImage.enabled = true;
+        //     }
+        // }
         public void SetScale() {
-            float distance = Vector3.Distance(UICamera.transform.position, gunHandlerTarget.transform.position);
+            float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
             float frustumHeight = 2.0f * distance * Mathf.Tan(UICamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-            float inaccuracyLength = gunHandlerTarget.inaccuracy();
+            float inaccuracyLength = target.inaccuracy();
             float pixelsPerLength = UICamera.scaledPixelHeight / frustumHeight;
             float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
             pixelScale = Mathf.Max(10, pixelScale) + pulseSize;

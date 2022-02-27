@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HackDisplay : MonoBehaviour, IBinder<HackController> {
-    public HackController target { get; set; }
+public class HackDisplay : IBinder<HackController> {
+    // public HackController target { get; set; }
     public Camera cam;
     public GameObject hackIndicatorPrefab;
     List<HackIndicator> indicators = new List<HackIndicator>();
@@ -19,10 +19,10 @@ public class HackDisplay : MonoBehaviour, IBinder<HackController> {
             newEntry.SetActive(false);
             indicators.Add(hackPanelEntry);
         }
-        ((IBinder<HackController>)this).Bind(HackController.I.gameObject);
+        Bind(HackController.I.gameObject);
         // HandleValueChanged(HackController.I);
     }
-    public void HandleValueChanged(HackController hackController) {
+    override public void HandleValueChanged(HackController hackController) {
         int index = 0;
         if (hackController == null) {
             return;

@@ -34,7 +34,8 @@ public partial class GameManager : Singleton<GameManager> {
         // TODO: load and set up asynchronously behind a screen
         ClearSceneData();
 
-        SetFocus(GameObject.Find("playerCharacter"));
+        GameObject playerObj = GameObject.Find("playerCharacter");
+        SetFocus(playerObj);
 
         // load global state
         Debug.Log($"loading level data {levelName}...");
