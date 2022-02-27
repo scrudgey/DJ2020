@@ -12,7 +12,8 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
 
     void Start() {
         // TODO: fix
-        GameManager.OnFocusChanged += Bind;
+        // GameManager.OnFocusChanged += Bind;
+        Bind(target.gameObject);
     }
     override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
@@ -44,9 +45,9 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
                 } else { // standing
                     direction = Direction.down;
                     spriteRenderer.enabled = true;
-                    if (input.playerInputs.MoveAxisRight > 0) {
+                    if (input.playerInputs.MoveAxisRight < 0) {
                         direction = Direction.right;
-                    } else if (input.playerInputs.MoveAxisRight < 0) {
+                    } else if (input.playerInputs.MoveAxisRight > 0) {
                         direction = Direction.left;
                     }
                 }
@@ -66,12 +67,11 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
                 }
                 break;
             case CharacterState.normal:
-                Vector3 headDirection = (input.targetData.targetPoint(transform.position + new Vector3(0f, 1.5f, 0f)) - transform.position).normalized;
+                Vector3 headDirection = (input.targetData.targetPoint(transform.position + new Vector3(0f, 1f, 0f)) - transform.position).normalized;
                 Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);
                 Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);
                 direction = Toolbox.ClampDirection(headOrientation, input.orientation);
-                direction = Direction.right;
                 if (input.isMoving) {
                     if (input.isCrouching) {
                         spriteRenderer.enabled = false;

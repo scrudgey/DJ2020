@@ -37,7 +37,8 @@ public class UIController : MonoBehaviour {
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnMenuChange += HandleMenuChange;
         GameManager.OnMenuClosed += HandleMenuClosed;
-        BindToNewTarget(GameManager.I.playerObject);
+        if (GameManager.I.playerObject != null)
+            BindToNewTarget(GameManager.I.playerObject);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
@@ -49,7 +50,6 @@ public class UIController : MonoBehaviour {
 
     void BindToNewTarget(GameObject target) {
         Debug.Log("binding to new target");
-        // (weaponUIHandler as IBinder<GunHandler>).Bind(target);
         weaponUIHandler.Bind(target);
 
         itemUIHandler.Bind(target);

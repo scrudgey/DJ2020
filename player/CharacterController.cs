@@ -299,6 +299,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         switch (state) {
             case CharacterState.jumpPrep:
+                // TODO: normalize this player state
+                jumpIndicatorController.superJumpSpeed = superJumpSpeed;
+                jumpIndicatorController.gravity = Gravity;
+                jumpIndicatorController.SetInputs(input);
                 if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
@@ -938,7 +942,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
-            // headOrientation = headOrientation,
             isMoving = Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing),
             isCrouching = isCrouching,
             isRunning = isRunning,

@@ -383,6 +383,9 @@ the other part of this code is pushing updates to animation - we can refactor th
 unify sphereRobotAnimation and DirectionalBillboard
 flip x in directional billboard
 
-head alignment
-wallpress camera alignment
-manual hacker
+* head alignment
+* wallpress camera alignment
+* manual hacker
+* fix binding to global player object
+* wallpress zoom out
+jump controller

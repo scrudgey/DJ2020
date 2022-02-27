@@ -241,6 +241,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         public float followingSharpness;
         public float distanceMovementSpeed;
         public float distanceMovementSharpness;
+        public CharacterState state;
     }
     public CameraTargetParameters NormalUpdate(CameraInput input) {
 
@@ -274,7 +275,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             orthographicSize = 6, // 8 TODO: set by attractor and/or level
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
-            distanceMovementSpeed = currentDistanceMovementSpeed
+            distanceMovementSpeed = currentDistanceMovementSpeed,
+            state = input.state
         };
     }
     public CameraTargetParameters AttractorUpdate(CameraInput input) {
@@ -295,9 +297,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Find the smoothed follow position
         Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         Vector3 distOffset = input.wallNormal * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, -0.2f, 0);
+        Vector3 heightOffset = new Vector3(0, 1f, 0);
         if (input.crouchHeld) {
-            heightOffset = new Vector3(0, -0.5f, 0);
+            heightOffset = new Vector3(0, 0.5f, 0);
         }
 
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, 30f, -30, 1f), 0, 0);
@@ -315,7 +317,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            distanceMovementSpeed = currentDistanceMovementSpeed
+            distanceMovementSpeed = currentDistanceMovementSpeed,
+            state = input.state
         };
     }
 
@@ -344,35 +347,38 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float desiredOrthographicSize = input.orthographicSize;
         float previousOrthographicSize = Camera.orthographicSize;
 
-        int i = 0;
-        if (PlayerInsideBounds(screenPoint)) {
-            if (Camera.orthographicSize < desiredOrthographicSize) {
-                while (i < 10 && Camera.orthographicSize < desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+        if (input.state != CharacterState.wallPress) {
+            int i = 0;
+            if (PlayerInsideBounds(screenPoint)) {
+                if (Camera.orthographicSize < desiredOrthographicSize) {
+                    while (i < 10 && Camera.orthographicSize < desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+                        i++;
+                        Camera.orthographicSize += 0.01f;
+                        screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+                    }
+                    Camera.orthographicSize = Math.Min(desiredOrthographicSize, Camera.orthographicSize);
+                } else if (Camera.orthographicSize > desiredOrthographicSize) {
+                    while (i < 10 && Camera.orthographicSize > desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+                        i++;
+                        Camera.orthographicSize -= 0.01f;
+                        screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+                    }
+                    if (i == 1) {
+                        Camera.orthographicSize = previousOrthographicSize;
+                    } else {
+                        Camera.orthographicSize = Math.Max(desiredOrthographicSize, Camera.orthographicSize);
+                    }
+                }
+            } else {
+                while (i < 10 && !PlayerInsideBounds(screenPoint)) {
                     i++;
                     Camera.orthographicSize += 0.01f;
                     screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
                 }
-                Camera.orthographicSize = Math.Min(desiredOrthographicSize, Camera.orthographicSize);
-            } else if (Camera.orthographicSize > desiredOrthographicSize) {
-                while (i < 10 && Camera.orthographicSize > desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
-                    i++;
-                    Camera.orthographicSize -= 0.01f;
-                    screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-                }
-                if (i == 1) {
-                    Camera.orthographicSize = previousOrthographicSize;
-                } else {
-                    Camera.orthographicSize = Math.Max(desiredOrthographicSize, Camera.orthographicSize);
-                }
-            }
-
-        } else {
-            while (i < 10 && !PlayerInsideBounds(screenPoint)) {
-                i++;
-                Camera.orthographicSize += 0.01f;
-                screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
             }
         }
+
+        // Debug.Log(Camera.orthographicSize);
 
         // apply rotation
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
@@ -380,6 +386,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         // apply distance
         _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
+
+        // Debug.Log(TargetDistance);
+        // Debug.Log(_currentDistance);
 
         // Find the smoothed follow position
         _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, input.targetPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));

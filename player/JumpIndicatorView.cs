@@ -11,7 +11,8 @@ public class JumpIndicatorView : IBinder<CharacterController> {
 
     void Start() {
         // TODO: fix
-        GameManager.OnFocusChanged += Bind;
+        // GameManager.OnFocusChanged += Bind;
+        Bind(target.gameObject);
     }
     public override void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();

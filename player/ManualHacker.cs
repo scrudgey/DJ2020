@@ -92,7 +92,7 @@ public class ManualHacker : MonoBehaviour {
 
     public void SetInputs(ManualHackInput inputs) {
         bool refresh = false;
-        if (hackToolDeployed != inputs.activeItem.EnablesManualHack()) {
+        if (inputs.activeItem != null && hackToolDeployed != inputs.activeItem.EnablesManualHack()) {
             hackToolDeployed = inputs.activeItem.EnablesManualHack();
             refresh = true;
         }

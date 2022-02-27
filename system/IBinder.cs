@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public abstract class IBinder<T> : MonoBehaviour where T : MonoBehaviour, IBindable<T> {
-    protected T target { get; set; }
+    public T target;
     public virtual void Bind(GameObject newTargetObject) {
         if (newTargetObject == null)
             return;

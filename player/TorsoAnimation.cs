@@ -5,7 +5,6 @@ using KinematicCharacterController;
 using UnityEngine;
 
 public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
-    // public CharacterController target { get; set; }
 
     private GunHandler.GunState state;
     private CharacterState characterState;
@@ -16,14 +15,14 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
     public Skin skin;
-    // private float trailTimer;
     public float trailInterval = 0.05f;
     private bool bob;
     private AnimationInput lastInput;
 
     void Start() {
         // TODO: fix
-        GameManager.OnFocusChanged += Bind;
+        // GameManager.OnFocusChanged += Bind;
+        Bind(target.gameObject);
     }
     override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
@@ -66,7 +65,7 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }
                 break;
         }

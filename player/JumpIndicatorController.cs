@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class JumpIndicatorController : MonoBehaviour {
+public class JumpIndicatorController : MonoBehaviour, IInputReceiver {
     public Transform indicator;
     public float moveRatio = 0.01f;
-
-    public void SetInputs(ref PlayerCharacterInput inputs, CharacterController characterController) {
-        if (inputs.state != CharacterState.jumpPrep)
-            return;
+    public float superJumpSpeed;
+    public Vector3 gravity;
+    public void SetInputs(PlayerInput inputs) {
+        // if (inputs.state != CharacterState.jumpPrep)
+        //     return;
 
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
@@ -35,6 +36,6 @@ public class JumpIndicatorController : MonoBehaviour {
         indicator.position += moveInputVector * moveRatio;
         indicator.localPosition = Vector3.ClampMagnitude(
             indicator.localPosition,
-            Toolbox.SuperJumpRange(characterController.superJumpSpeed, characterController.Gravity.y));
+            Toolbox.SuperJumpRange(superJumpSpeed, gravity.y));
     }
 }

@@ -69,7 +69,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
 
     void Start() {
         // TODO: fix
-        GameManager.OnFocusChanged += Bind;
+        // GameManager.OnFocusChanged += Bind;
+        Bind(target.gameObject);
     }
     override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
@@ -115,7 +116,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }
                 break;
         }
@@ -168,16 +169,16 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
 
         // orientation
         // Calculate camera direction and rotation on the character plane
-        if (input.wallPressTimer <= 0 || input.state == CharacterState.wallPress) {
-            Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
-            if (cameraPlanarDirection.sqrMagnitude == 0f) {
-                cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;
-            }
-            Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
-            transform.rotation = cameraPlanarRotation;
-        } else {
-            transform.localRotation = Quaternion.identity;
-        }
+        // if (input.wallPressTimer <= 0 || input.state == CharacterState.wallPress) {
+        //     Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
+        //     if (cameraPlanarDirection.sqrMagnitude == 0f) {
+        //         cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;
+        //     }
+        //     Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
+        //     transform.rotation = cameraPlanarRotation;
+        // } else {
+        transform.localRotation = Quaternion.identity;
+        // }
 
         UpdateFrame();
     }
