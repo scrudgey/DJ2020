@@ -316,17 +316,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 itemHandler.SetInputs(input);
 
                 // Cyberdeck
-                // if (itemHandler.activeItem.EnablesManualHack()) {
-                // ItemHandlerInput itemInput = new ItemHandlerInput{
-                //     playerInput = input,
-                //     activeItem = item
-                // }
                 ManualHackInput manualHackInput = new ManualHackInput {
                     playerInput = input,
                     activeItem = itemHandler.activeItem
                 };
                 manualHacker.SetInputs(manualHackInput);
-                // }
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
@@ -385,9 +379,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
         }
 
-        if (input.incrementOverlay != 0) {
-            GameManager.I.IncrementOverlay(input.incrementOverlay);
-        }
         _lastInput = input;
     }
 

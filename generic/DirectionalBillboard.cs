@@ -19,7 +19,9 @@ public class DirectionalBillboard : MonoBehaviour {
         Vector2 camDir = new Vector2(cam.PlanarDirection.x, cam.PlanarDirection.z);
         Vector2 playerDir = new Vector2(direction.x, direction.z);
         float angle = Vector2.SignedAngle(camDir, playerDir);
-        SetFrame(0, Toolbox.DirectionFromAngle(angle));
+        Direction orientation = Toolbox.DirectionFromAngle(angle);
+        SetFrame(0, orientation);
+        spriteRenderer.flipX = orientation == Direction.left || orientation == Direction.leftUp || orientation == Direction.leftDown;
     }
     public void SetFrame(int frame, Direction direction) {
         spriteRenderer.sprite = skin[direction][frame];

@@ -8,12 +8,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class InputController : MonoBehaviour {
     public CharacterCamera OrbitCamera;
-    // public ClearSighter sighter;
-    // public Transform CameraFollowPoint;
-    // public CharacterController Character;
-    // public GunHandler gunHandler;
-    // public JumpIndicatorController jumpIndicatorController;
-    // public Interactor interactor;
 
     // have to do it this way because unity inspector doesn't know how to expose a list of interfaces
     public List<GameObject> inputTargets;
@@ -244,7 +238,6 @@ public class InputController : MonoBehaviour {
 
         PlayerInput characterInputs = new PlayerInput() {
             inputMode = GameManager.I.inputMode,
-            // state = Character.state,
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
             CameraRotation = OrbitCamera.isometricRotation,
@@ -272,6 +265,10 @@ public class InputController : MonoBehaviour {
             i.SetInputs(characterInputs);
         }
 
+        if (characterInputs.incrementOverlay != 0) {
+            GameManager.I.IncrementOverlay(characterInputs.incrementOverlay);
+        }
+
         firePressedThisFrame = false;
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
@@ -283,8 +280,6 @@ public class InputController : MonoBehaviour {
         useItemThisFrame = false;
         rotateCameraLeftPressedThisFrame = false;
         rotateCameraRightPressedThisFrame = false;
-
-        // _lastInput = characterInputs;
     }
 
 }

@@ -55,6 +55,7 @@ public class OverlayHandler : MonoBehaviour {
         cyberOverlay.Refresh(graph);
     }
     public void HandleOverlayChange(OverlayType type) {
+        // Debug.Log($"handling overlay change: {type}");
         switch (type) {
             case OverlayType.none:
             default:

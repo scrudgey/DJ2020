@@ -5,14 +5,16 @@ using KinematicCharacterController;
 using UnityEngine;
 
 
-public class SphereRobotController : MonoBehaviour, ICharacterController, IBindable<SphereRobotController> { //}, ISaveable {
+public class SphereRobotController : MonoBehaviour, ICharacterController, IBindable<SphereRobotController>, IInputReceiver { //}, ISaveable {
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;
     public float StableMovementSharpness = 15;
     public float OrientationSharpness = 10;
+    public Vector3 gravity = new Vector3(0, -30f, 0);
 
     public KinematicCharacterMotor Motor;
     public Vector3 direction;
+    Vector3 targetDirection;
     private void Start() {
         // audioSource = Toolbox.SetUpAudioSource(gameObject);
         // Assign to motor
@@ -24,14 +26,14 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     private Vector3 _moveInputVector;
     private Vector3 _lookInputVector;
     private Vector2 _moveAxis;
+    private float rotateTimer;
 
-    public void SetInputs(ref PlayerCharacterInput input) {
+    public void SetInputs(PlayerInput input) {
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
             moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
         }
-
         // Calculate camera direction and rotation on the character plane
         Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.forward, Vector3.up).normalized;
         if (cameraPlanarDirection.sqrMagnitude == 0f) {
@@ -60,14 +62,20 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     /// This is the ONLY place where you should set the character's rotation
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-        if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
-            // Smoothly interpolate from current to target look direction
-            direction = Vector3.Slerp(Motor.CharacterForward, _lookInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
-
-            // Set the current rotation (which will be used by the KinematicCharacterMotor)
-            currentRotation = Quaternion.LookRotation(direction, Vector3.up);
+        // if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
+        // Smoothly interpolate from current to target look direction
+        // direction = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+        rotateTimer -= Time.deltaTime;
+        if (rotateTimer <= 0) {
+            rotateTimer = UnityEngine.Random.Range(2f, 10f);
+            targetDirection = UnityEngine.Random.insideUnitSphere;
+            targetDirection.y = 0;
+            targetDirection = targetDirection.normalized;
         }
-        direction = UnityEngine.Random.insideUnitSphere;
+        direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+
+        // Set the current rotation (which will be used by the KinematicCharacterMotor)
+        currentRotation = Quaternion.LookRotation(direction, Vector3.up);
     }
 
     /// <summary>
@@ -86,6 +94,11 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
 
         // Smooth movement Velocity
         currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
+
+        // apply gravity
+        if (!Motor.GroundingStatus.IsStableOnGround) {
+            currentVelocity += gravity * deltaTime;
+        }
     }
 
     /// <summary>

@@ -45,7 +45,7 @@ public class PlayerData {
 
             cyberlegsLevel = 1,
 
-            items = new List<string> { "deck", "explosive" },
+            items = new List<string> { "explosive", "deck" },
 
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,

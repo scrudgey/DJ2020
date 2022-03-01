@@ -388,4 +388,4 @@ flip x in directional billboard
 * manual hacker
 * fix binding to global player object
 * wallpress zoom out
-jump controller
+* jump controller

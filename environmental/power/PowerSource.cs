@@ -12,6 +12,6 @@ public class PowerSource : PoweredComponent {
     }
     void OnDestroy() {
         base.DisableSource();
-        GameManager.I.SetPowerNodeState(this, false);
+        GameManager.I?.SetPowerNodeState(this, false);
     }
 }
