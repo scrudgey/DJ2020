@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using KinematicCharacterController;
 using UnityEngine;
-
+using UnityEngine.AI;
 
 public class SphereRobotController : MonoBehaviour, ICharacterController, IBindable<SphereRobotController>, IInputReceiver { //}, ISaveable {
     [Header("Stable Movement")]
@@ -11,7 +11,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     public float StableMovementSharpness = 15;
     public float OrientationSharpness = 10;
     public Vector3 gravity = new Vector3(0, -30f, 0);
-
+    public NavMeshAgent navMeshAgent;
     public KinematicCharacterMotor Motor;
     public Vector3 direction;
     Vector3 targetDirection;
@@ -22,31 +22,26 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     }
 
     public Action<SphereRobotController> OnValueChanged { get; set; }
-
     private Vector3 _moveInputVector;
     private Vector3 _lookInputVector;
     private Vector2 _moveAxis;
     private float rotateTimer;
-
     public void SetInputs(PlayerInput input) {
         // Clamp input
-        Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
-        if (moveInputVector.y != 0 && moveInputVector.x != 0) {
-            moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
+        if (input.moveDirection != Vector3.zero) {
+            _moveInputVector = input.moveDirection;
+        } else {
+            Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
+            if (moveInputVector.y != 0 && moveInputVector.x != 0) {
+                moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
+            }
+            // Calculate camera direction and rotation on the character plane
+            Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.forward, Vector3.up).normalized;
+            if (cameraPlanarDirection.sqrMagnitude == 0f) {
+                cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.up, Vector3.up).normalized;
+            }
+            Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
         }
-        // Calculate camera direction and rotation on the character plane
-        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.forward, Vector3.up).normalized;
-        if (cameraPlanarDirection.sqrMagnitude == 0f) {
-            cameraPlanarDirection = Vector3.ProjectOnPlane(input.CameraRotation * Vector3.up, Vector3.up).normalized;
-        }
-        Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
-
-        // Move and look inputs
-        _moveInputVector = cameraPlanarRotation * moveInputVector;
-        if (input.MoveAxisRight != 0 && input.MoveAxisForward != 0) {
-            _moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * _moveInputVector;
-        }
-        _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
     }
 
     /// <summary>
@@ -62,16 +57,22 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     /// This is the ONLY place where you should set the character's rotation
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-        // if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
+
         // Smoothly interpolate from current to target look direction
-        // direction = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
-        rotateTimer -= Time.deltaTime;
-        if (rotateTimer <= 0) {
-            rotateTimer = UnityEngine.Random.Range(2f, 10f);
-            targetDirection = UnityEngine.Random.insideUnitSphere;
-            targetDirection.y = 0;
-            targetDirection = targetDirection.normalized;
+        // targetDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+        // targetDirection = _moveInputVector;
+        if (_moveInputVector != Vector3.zero) {
+            targetDirection = _moveInputVector;
+        } else {
+            rotateTimer -= Time.deltaTime;
+            if (rotateTimer <= 0) {
+                rotateTimer = UnityEngine.Random.Range(2f, 10f);
+                targetDirection = UnityEngine.Random.insideUnitSphere;
+                targetDirection.y = 0;
+                targetDirection = targetDirection.normalized;
+            }
         }
+
         direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
         // Set the current rotation (which will be used by the KinematicCharacterMotor)

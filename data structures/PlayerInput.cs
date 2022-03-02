@@ -24,5 +24,5 @@ public struct PlayerInput {
     public int incrementOverlay;
     public bool rotateCameraRightPressedThisFrame;
     public bool rotateCameraLeftPressedThisFrame;
-
+    public Vector3 moveDirection;
 }
