@@ -28,7 +28,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
-    public PlayerCharacterInput.FireInputs lastInput;
+    public PlayerInput.FireInputs lastInput;
 
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -134,11 +134,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
 
         return accuracy;
     }
-    public void EmitBullet(PlayerCharacterInput.FireInputs input) {
+    public void EmitBullet(PlayerInput.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
 
         // determine the direction to shoot in
         Vector3 trueDirection = gunDirection();
+        if (input.targetData.position != Vector3.zero) {
+            trueDirection = input.targetData.position - gunPosition;
+        }
         // Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
@@ -159,7 +162,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         bullet.DoImpacts();
     }
 
-    public void Shoot(PlayerCharacterInput.FireInputs input) {
+    public void Shoot(PlayerInput.FireInputs input) {
         if (!HasGun()) {
             return;
         }
@@ -167,7 +170,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             // EndShoot(); maybe?
             return;
         }
-        lastInput = input;
 
         // update state
         gunInstance.Shoot();
@@ -332,6 +334,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         }
     }
     public void SetInputs(PlayerInput input) {
+        lastInput = input.Fire;
         inputMode = input.inputMode;
         lastTargetData = input.Fire.targetData;
         OnValueChanged?.Invoke(this);

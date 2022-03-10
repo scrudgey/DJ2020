@@ -11,8 +11,6 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
     private int frame;
 
     void Start() {
-        // TODO: fix
-        // GameManager.OnFocusChanged += Bind;
         Bind(target.gameObject);
     }
     override public void HandleValueChanged(CharacterController controller) {
@@ -67,7 +65,7 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
                 }
                 break;
             case CharacterState.normal:
-                Vector3 headDirection = (input.targetData.targetPoint(transform.position + new Vector3(0f, 1f, 0f)) - transform.position).normalized;
+                Vector3 headDirection = (input.targetData.targetPoint(transform.position) - transform.position).normalized;
                 Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);
                 Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);

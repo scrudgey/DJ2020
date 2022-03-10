@@ -18,13 +18,11 @@ public class SphereRobotAnimator : IBinder<SphereRobotController> {
         float y = FloatAmount(timer);
         transform.localPosition = new Vector3(0f, y, 0f);
     }
-
     float FloatAmount(float time) {
         float amount = floatMeanHeight + floatAmplitude * Mathf.Sin(time * floatFrequency);
         float discreteAmount = floatStep * (int)(amount / floatStep);
         return discreteAmount;
     }
-
     override public void HandleValueChanged(SphereRobotController controller) {
         billboard.direction = controller.direction;
     }

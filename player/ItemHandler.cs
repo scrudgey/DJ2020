@@ -32,21 +32,6 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IIn
             UseItem();
         }
     }
-    public void ProcessInput(PlayerCharacterInput input) {
-        if (input.incrementItem != 0) {
-            index += input.incrementItem;
-            if (index < 0) {
-                index = items.Count - 1;
-            } else if (index >= items.Count) {
-                index = 0;
-            }
-            SwitchToItem(items[index]);
-        }
-        if (input.useItem) {
-            UseItem();
-        }
-    }
-
     void SwitchToItem(BaseItem item) {
         OnItemExit(this.activeItem);
         this.activeItem = item;

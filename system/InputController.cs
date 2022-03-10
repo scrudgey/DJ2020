@@ -194,7 +194,7 @@ public class InputController : MonoBehaviour {
 
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
         TagSystemData priorityData = null;
-        RaycastHit priorityHit = new RaycastHit();
+        Vector3 targetPoint = Vector3.zero;
         bool prioritySet = false;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
 
@@ -210,7 +210,11 @@ public class InputController : MonoBehaviour {
                 continue;
             if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
                 priorityData = data;
-                priorityHit = hit;
+                if (data.targetPoint != null) {
+                    targetPoint = data.targetPoint.position;
+                } else {
+                    targetPoint = hit.collider.bounds.center;
+                }
                 prioritySet = true;
             }
         }
@@ -220,8 +224,9 @@ public class InputController : MonoBehaviour {
             return new TargetData2 {
                 type = TargetData2.TargetType.objectLock,
                 clickRay = clickRay,
-                screenPosition = OrbitCamera.Camera.WorldToScreenPoint(priorityHit.collider.bounds.center),
-                highlightableTargetData = interactorData
+                screenPosition = OrbitCamera.Camera.WorldToScreenPoint(targetPoint),
+                highlightableTargetData = interactorData,
+                position = targetPoint
             };
         }
 
@@ -229,7 +234,8 @@ public class InputController : MonoBehaviour {
             type = TargetData2.TargetType.direction,
             screenPosition = cursorPosition,
             highlightableTargetData = interactorData,
-            clickRay = clickRay
+            clickRay = clickRay,
+            position = targetPoint
         };
     }
     private void HandleCharacterInput() {

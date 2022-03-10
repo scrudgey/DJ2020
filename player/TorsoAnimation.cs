@@ -21,7 +21,6 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
 
     void Start() {
         // TODO: fix
-        // GameManager.OnFocusChanged += Bind;
         Bind(target.gameObject);
     }
     override public void HandleValueChanged(CharacterController controller) {

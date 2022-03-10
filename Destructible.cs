@@ -5,6 +5,8 @@ using UnityEngine;
 public class Destructible : IDestructible {
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
+    // public GameObject destructible;≥
+    public float destructionTimer = 5f;
     public DamageResult TakeBulletDamage(BulletDamage impact) {
         return new DamageResult {
             damageAmount = impact.bullet.damage
@@ -26,7 +28,7 @@ public class Destructible : IDestructible {
         Collider myCollider = GetComponentInChildren<Collider>();
         gibs?.Emit(gameObject, damage, myCollider);
 
-        Destroy(transform.parent.gameObject, 5f);
+        Destroy(transform.parent.gameObject, destructionTimer);
         foreach (GameObject fx in destructionFx) {
             GameObject.Instantiate(fx, transform.position, Quaternion.identity);
         }
