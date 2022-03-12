@@ -84,8 +84,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private bool _canWallJump = false;
     private Vector3 _wallJumpNormal;
     private Vector3 _internalVelocityAdd = Vector3.zero;
-    // private bool _shouldBeCrouching = false;
-    // private bool _shouldBeRunning = false;
     private Vector3 _shootLookDirection = Vector2.zero;
     public bool isCrouching = false;
     public bool isRunning = false;
@@ -301,7 +299,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
-                Vector3 targetPoint = input.Fire.targetData.targetPoint(gunHandler.gunPosition());
+                Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
                 if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
                     _shootLookDirection = targetPoint;
                 }

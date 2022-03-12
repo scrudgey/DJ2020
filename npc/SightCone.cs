@@ -12,12 +12,15 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
     private void OnTriggerEnter(Collider other) {
         newestAddition = other;
         fieldOfView.Add(other);
+        PruneFieldOfView();
         OnValueChanged?.Invoke(this);
     }
     private void OnTriggerExit(Collider other) {
         newestRemoval = other;
         fieldOfView.Remove(other);
+        PruneFieldOfView();
         OnValueChanged?.Invoke(this);
     }
+    void PruneFieldOfView() => fieldOfView = fieldOfView.Where((collider) => collider != null).ToHashSet();
 
 }

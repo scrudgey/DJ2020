@@ -4,20 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace UI {
     public class AimIndicatorHandler : IBinder<GunHandler> {
-
-        // private GunHandler gunHandlerTarget;
-        // private CharacterController neoCharacterControllerTarget;
-        // GunHandler IBinder<GunHandler>.target {
-        //     get { return gunHandlerTarget; }
-        //     set { gunHandlerTarget = value; }
-        // }
-
-        // CharacterController IBinder<CharacterController>.target {
-        //     get { return neoCharacterControllerTarget; }
-        //     set { neoCharacterControllerTarget = value; }
-        // }
-
-
         public Camera UICamera;
         private CharacterController targetCharacterController;
         public RectTransform cursor;
@@ -49,8 +35,7 @@ namespace UI {
         override public void HandleValueChanged(GunHandler gunHandler) {
             if (gunHandler.HasGun() && gunHandler.inputMode == InputMode.gun) {
                 cursorImage.enabled = true;
-
-                TargetData2 data = gunHandler.lastTargetData;
+                TargetData2 data = target.currentTargetData;
                 if (data == null)
                     return;
                 cursor.position = data.screenPosition;
@@ -72,20 +57,13 @@ namespace UI {
             } else {
                 cursorImage.enabled = false;
             }
-
         }
-        // void IBinder<CharacterController>.HandleValueChanged(CharacterController t) {
-        //     if (t.state == CharacterState.wallPress) {
-        //         cursorImage.enabled = false;
-        //     } else {
-        //         cursorImage.enabled = true;
-        //     }
-        // }
+
         public void SetScale() {
             float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
             float frustumHeight = 2.0f * distance * Mathf.Tan(UICamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-            float inaccuracyLength = target.inaccuracy();
+            float inaccuracyLength = target.inaccuracy(target.currentTargetData);
             float pixelsPerLength = UICamera.scaledPixelHeight / frustumHeight;
             float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
             pixelScale = Mathf.Max(10, pixelScale) + pulseSize;

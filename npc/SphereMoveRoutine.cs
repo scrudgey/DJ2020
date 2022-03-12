@@ -52,10 +52,8 @@ public class SphereMoveRoutine : SphereControlState {
     public override void OnObjectPerceived(Collider other) {
         // Debug.DrawLine(transform.position, other.transform.position, Color.yellow, 1f);
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            // CharacterController characterController = other.GetComponentInChildren<CharacterController>();
-            // Debug.Log($"Perceiving character {other}");
             Debug.Log("change state to attack");
-            owner.ChangeState(new SphereAttackRoutine(owner, navMeshAgent));
+            owner.ChangeState(new SphereAttackRoutine(owner, navMeshAgent, owner.gunHandler));
         }
     }
 }

@@ -7,14 +7,26 @@ public class SphereRobotAI : IBinder<SightCone> {
     public SightCone sightCone;
     public NavMeshAgent navMeshAgent;
     public SphereRobotController sphereController;
+    public GunHandler gunHandler;
     private SphereRobotBrain stateMachine;
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.05f;
-    readonly float MAXIMUM_SIGHT_RANGE = 10f;
+    readonly float MAXIMUM_SIGHT_RANGE = 50f;
+    readonly float LOCK_ON_TIME = 0.5f;
     public Vector3 lastSeenPlayerPosition;
+    public float timeSinceLastSeen;
+    public Collider playerCollider;
     Vector3 previousPosition;
     void Start() {
+
+        // TODO: save / load gun state
+        gunHandler.primary = new GunInstance(Gun.Load("smg"));
+        gunHandler.SwitchToGun(1);
+        gunHandler.Reload();
+        gunHandler.ClipIn();
+        gunHandler.Rack();
+
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
         StartMoveRoutine();
@@ -30,6 +42,7 @@ public class SphereRobotAI : IBinder<SightCone> {
         stateMachine.ChangeState(routine);
     }
     void Update() {
+        timeSinceLastSeen += Time.deltaTime;
         stateMachine.Update();
         SetInputs();
         perceptionCountdown -= Time.deltaTime;
@@ -37,9 +50,16 @@ public class SphereRobotAI : IBinder<SightCone> {
             perceptionCountdown += PERCEPTION_INTERVAL;
             PerceiveFieldOfView();
         }
+        if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
+            if (TargetVisible(playerCollider))
+                Perceive(playerCollider);
+        }
     }
     void SetInputs() {
-        sphereController.SetInputs(stateMachine.getInput());
+        PlayerInput input = stateMachine.getInput();
+        sphereController.SetInputs(input);
+        gunHandler.ProcessGunSwitch(input);
+        gunHandler.SetInputs(input);
     }
     private void OnTriggerEnter(Collider other) {
         Debug.Log(other);
@@ -52,6 +72,8 @@ public class SphereRobotAI : IBinder<SightCone> {
     }
     void PerceiveFieldOfView() {
         foreach (Collider collider in target.fieldOfView) {
+            if (collider == null)
+                continue;
             if (TargetVisible(collider))
                 Perceive(collider);
         }
@@ -60,22 +82,9 @@ public class SphereRobotAI : IBinder<SightCone> {
         stateMachine.currentState.OnObjectPerceived(other);
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             lastSeenPlayerPosition = other.bounds.center;
+            timeSinceLastSeen = 0f;
+            playerCollider = other;
         }
-        // CharacterController characterController = other.GetComponentInChildren<CharacterController>();
-        // // // Debug.DrawLine(transform.position, other.transform.position, Color.yellow, 1f);
-        // if (characterController != null) {
-        //     Debug.Log($"Perceiving character {other}");
-        //     if (characterController.gameObject == GameManager.I.playerObject) {
-
-        //     }
-        // }
-    }
-    void LateUpdate() {
-        // navMeshAgent.updatePosition = transform.position;
-        // navMeshAgent.
-        // Vector3 delta = transform.position - previousPosition;
-        // navMeshAgent.Move(delta);
-        // previousPosition = transform.position;
     }
 
     bool TargetVisible(Collider other) {
@@ -86,6 +95,9 @@ public class SphereRobotAI : IBinder<SightCone> {
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.transform.IsChildOf(transform.root))
                 continue;
+            TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
+            if (tagData.bulletPassthrough) continue;
+
             Color color = other == hit.collider ? Color.yellow : Color.red;
             Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
             return other == hit.collider;

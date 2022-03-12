@@ -13,6 +13,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     public Vector3 gravity = new Vector3(0, -30f, 0);
     public NavMeshAgent navMeshAgent;
     public KinematicCharacterMotor Motor;
+    public GunHandler gunHandler;
     public Vector3 direction;
     Vector3 targetDirection;
     private void Start() {
@@ -25,8 +26,15 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     private Vector3 _moveInputVector;
     private Vector3 _lookInputVector;
     private Vector2 _moveAxis;
+    private Vector3 _shootLookDirection = Vector2.zero;
     private float rotateTimer;
     public void SetInputs(PlayerInput input) {
+        if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
+
+            Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
+            _shootLookDirection = targetPoint;
+        }
+
         // Clamp input
         if (input.moveDirection != Vector3.zero) {
             _moveInputVector = input.moveDirection;
@@ -75,8 +83,16 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
 
         direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
+        if (_shootLookDirection != Vector3.zero) {
+            Vector3 target = _shootLookDirection - transform.position;
+            target.y = 0;
+            currentRotation = Quaternion.LookRotation(target, Vector3.up);
+        }
+
         // Set the current rotation (which will be used by the KinematicCharacterMotor)
         currentRotation = Quaternion.LookRotation(direction, Vector3.up);
+
+        _shootLookDirection = Vector3.zero;
     }
 
     /// <summary>

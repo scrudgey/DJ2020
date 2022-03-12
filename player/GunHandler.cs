@@ -15,7 +15,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public GunState state;
     public InputMode inputMode;
     public Action<GunHandler> OnValueChanged { get; set; }
-    static readonly public float height = 0.5f;
+    public float height = 0.5f;
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
@@ -24,18 +24,17 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public GunInstance primary;
     public GunInstance third;
     public bool emitShell;
-    public TargetData2 lastTargetData;
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
-    public PlayerInput.FireInputs lastInput;
-
+    public PlayerInput.FireInputs lastShootInput;
+    public TargetData2 currentTargetData;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
 
     public void ShootCallback() {
-        Shoot(lastInput);
+        Shoot(lastShootInput);
     }
     // used by animator
     public void AimCallback() {
@@ -100,18 +99,19 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public Vector3 gunPosition() {
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
-    public Vector3 gunDirection() {
-        return lastTargetData.targetPoint(gunPosition()) - this.gunPosition();
+    public Vector3 gunDirection(TargetData2 data) {
+        return data.targetPointFromRay(gunPosition()) - this.gunPosition();
+        // return data.position - this.gunPosition();
     }
-    public float inaccuracy() {
+    public float inaccuracy(TargetData2 input) {
         float accuracy = 0;
 
         // returns the inaccuracy in world units at the point of the last target data
-        if (gunInstance == null || gunInstance.baseGun == null || lastTargetData == null)
+        if (gunInstance == null || gunInstance.baseGun == null || input == null)
             return 0f;
 
         // range
-        float distance = Vector3.Distance(lastTargetData.targetPoint(gunPosition()), this.gunPosition());
+        float distance = Vector3.Distance(input.targetPointFromRay(gunPosition()), this.gunPosition());
         accuracy += gunInstance.baseGun.spread * (distance / 10f);
 
         // movement
@@ -138,7 +138,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         Vector3 gunPosition = this.gunPosition();
 
         // determine the direction to shoot in
-        Vector3 trueDirection = gunDirection();
+        Vector3 trueDirection = gunDirection(input.targetData);
         if (input.targetData.position != Vector3.zero) {
             trueDirection = input.targetData.position - gunPosition;
         }
@@ -159,10 +159,17 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             gunPosition = gunPosition
         };
 
+        // Debug.Log(gunPosition);
+        // Debug.Log(direction);
+        // Debug.Log()
+
+
         bullet.DoImpacts();
     }
-
-    public void Shoot(PlayerInput.FireInputs input) {
+    public void ShootImmediately(PlayerInput.FireInputs input) {
+        Shoot(lastShootInput);
+    }
+    void Shoot(PlayerInput.FireInputs input) {
         if (!HasGun()) {
             return;
         }
@@ -175,7 +182,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         gunInstance.Shoot();
 
         // shoot bullet
-        EmitBullet(input);
+        EmitBullet(input);  // uses direction
 
         // play sound
         // TODO: change depending on silencer
@@ -193,8 +200,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         // TODO: change depending on silencer
         GameObject muzzleFlashObj = GameObject.Instantiate(
             gunInstance.baseGun.muzzleFlash,
-            gunPosition() + 0.5f * motor.CharacterForward - new Vector3(0, 0.1f, 0),
-            Quaternion.LookRotation(transform.up, gunDirection())
+            gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
+            Quaternion.LookRotation(transform.up, gunDirection(input.targetData))       // uses direction
             );
         muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one;
         GameObject.Destroy(muzzleFlashObj, 0.05f);
@@ -334,20 +341,20 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         }
     }
     public void SetInputs(PlayerInput input) {
-        lastInput = input.Fire;
         inputMode = input.inputMode;
-        lastTargetData = input.Fire.targetData;
-        OnValueChanged?.Invoke(this);
+        currentTargetData = input.Fire.targetData;
         if (HasGun()) {
             if (gunInstance.CanShoot() && inputMode == InputMode.gun) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
+                        lastShootInput = input.Fire;
                         state = GunState.shooting;
                     } else if (state == GunState.shooting && !input.Fire.FireHeld) {
                         EndShoot();
                     }
                 } else { // semiautomatic
                     if (input.Fire.FirePressed) {//&& !shooting) {
+                        lastShootInput = input.Fire;
                         state = GunState.shooting;
                     }
                 }
@@ -370,6 +377,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         } else {
             crouchingInaccuracy = 0f;
         }
+        OnValueChanged?.Invoke(this);
     }
 
     // TODO: save method
