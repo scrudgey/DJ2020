@@ -299,7 +299,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
-                Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
+                // Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
+                Vector3 targetPoint = input.Fire.targetData.position;
                 if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
                     _shootLookDirection = targetPoint;
                 }

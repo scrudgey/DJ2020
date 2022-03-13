@@ -100,8 +100,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     public Vector3 gunDirection(TargetData2 data) {
-        return data.targetPointFromRay(gunPosition()) - this.gunPosition();
-        // return data.position - this.gunPosition();
+        return data.position - this.gunPosition();
     }
     public float inaccuracy(TargetData2 input) {
         float accuracy = 0;
@@ -111,7 +110,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             return 0f;
 
         // range
-        float distance = Vector3.Distance(input.targetPointFromRay(gunPosition()), this.gunPosition());
+        float distance = Vector3.Distance(input.position, this.gunPosition());
         accuracy += gunInstance.baseGun.spread * (distance / 10f);
 
         // movement
@@ -137,11 +136,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public void EmitBullet(PlayerInput.FireInputs input) {
         Vector3 gunPosition = this.gunPosition();
 
-        // determine the direction to shoot in
         Vector3 trueDirection = gunDirection(input.targetData);
-        if (input.targetData.position != Vector3.zero) {
-            trueDirection = input.targetData.position - gunPosition;
-        }
         // Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
@@ -159,15 +154,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             gunPosition = gunPosition
         };
 
-        // Debug.Log(gunPosition);
-        // Debug.Log(direction);
-        // Debug.Log()
-
-
         bullet.DoImpacts();
     }
     public void ShootImmediately(PlayerInput.FireInputs input) {
-        Shoot(lastShootInput);
+        Shoot(input);
     }
     void Shoot(PlayerInput.FireInputs input) {
         if (!HasGun()) {
@@ -182,7 +172,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         gunInstance.Shoot();
 
         // shoot bullet
-        EmitBullet(input);  // uses direction
+        EmitBullet(input);
 
         // play sound
         // TODO: change depending on silencer

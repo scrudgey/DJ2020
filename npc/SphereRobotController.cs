@@ -13,12 +13,9 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     public Vector3 gravity = new Vector3(0, -30f, 0);
     public NavMeshAgent navMeshAgent;
     public KinematicCharacterMotor Motor;
-    public GunHandler gunHandler;
     public Vector3 direction;
     Vector3 targetDirection;
     private void Start() {
-        // audioSource = Toolbox.SetUpAudioSource(gameObject);
-        // Assign to motor
         Motor.CharacterController = this;
     }
 
@@ -31,7 +28,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     public void SetInputs(PlayerInput input) {
         if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
 
-            Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
+            Vector3 targetPoint = input.Fire.targetData.position;
             _shootLookDirection = targetPoint;
         }
 

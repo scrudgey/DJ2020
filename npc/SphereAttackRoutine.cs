@@ -53,12 +53,13 @@ public class SphereAttackRoutine : SphereControlState {
         navMeshAgent.SetDestination(destination);
     }
     void ShootBullet() {
+        if (owner.lastSeenPlayerPosition == null)
+            return;
         PlayerInput.FireInputs input = new PlayerInput.FireInputs() {
             FirePressed = true,
             FireHeld = false,
             targetData = new TargetData2 {
                 type = TargetData2.TargetType.objectLock,
-                clickRay = new Ray(),
                 screenPosition = Vector3.zero,
                 highlightableTargetData = null,
                 position = owner.lastSeenPlayerPosition

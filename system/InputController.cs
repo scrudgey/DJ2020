@@ -218,12 +218,22 @@ public class InputController : MonoBehaviour {
                 prioritySet = true;
             }
         }
+        if (!prioritySet) {
+            // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
+            float distance = 0;
+            Vector3 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
+            Plane plane = new Plane(Vector3.up, origin);
+            if (plane.Raycast(clickRay, out distance)) {
+                targetPoint = clickRay.GetPoint(distance);
+            }
+        }
+
 
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
         if (prioritySet) {
             return new TargetData2 {
                 type = TargetData2.TargetType.objectLock,
-                clickRay = clickRay,
+                // clickRay = clickRay,
                 screenPosition = OrbitCamera.Camera.WorldToScreenPoint(targetPoint),
                 highlightableTargetData = interactorData,
                 position = targetPoint
@@ -234,7 +244,7 @@ public class InputController : MonoBehaviour {
             type = TargetData2.TargetType.direction,
             screenPosition = cursorPosition,
             highlightableTargetData = interactorData,
-            clickRay = clickRay,
+            // clickRay = clickRay,
             position = targetPoint
         };
     }

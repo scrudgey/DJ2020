@@ -65,7 +65,7 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
                 }
                 break;
             case CharacterState.normal:
-                Vector3 headDirection = (input.targetData.targetPointFromRay(transform.position) - transform.position).normalized;
+                Vector3 headDirection = (input.targetData.position - transform.position).normalized;
                 Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);
                 Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);
