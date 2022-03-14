@@ -4,11 +4,13 @@ public class SphereAttackRoutine : SphereControlState {
     enum State { none, approach, shoot, reload }
     State state;
     readonly float REPATH_INTERVAL = 0.1f;
-    readonly float ATTACK_TIMEOUT = 5f;
+    readonly float ATTACK_TIMEOUT = 3f;
+    readonly float ROUTINE_TIMEOUT = 10f;
     readonly float SHOOT_TIMEOUT = 1f;
     readonly float SHOOT_INTERVAL = 0.1f;
     readonly float MAX_SHOOT_RANGE = 5f;
     private float newDestinationTimer;
+    float timeSinceSawPlayer;
     float repathCountDown;
     float changeStateCountDown;
     float reloadCountDown;
@@ -23,17 +25,18 @@ public class SphereAttackRoutine : SphereControlState {
         this.gunHandler = gunHandler;
     }
     public override void Enter() {
-        changeStateCountDown = ATTACK_TIMEOUT;
+        changeStateCountDown = ROUTINE_TIMEOUT;
     }
 
     void ChangeState(State newState) {
-        Debug.Log("change state to " + newState);
+        // Debug.Log("change state to " + newState);
         if (newState == State.shoot) {
             doShootCountdown = SHOOT_TIMEOUT;
         }
         state = newState;
     }
     public override void Update() {
+        timeSinceSawPlayer += Time.deltaTime;
         repathCountDown -= Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
@@ -43,7 +46,6 @@ public class SphereAttackRoutine : SphereControlState {
             repathCountDown += REPATH_INTERVAL;
             SetDestination(owner.lastSeenPlayerPosition);
         }
-        Debug.Log(state);
         if (state == State.shoot) {
             doShootCountdown -= Time.deltaTime;
             shootTimer += Time.deltaTime;
@@ -59,7 +61,7 @@ public class SphereAttackRoutine : SphereControlState {
             }
         } else if (state == State.approach) {
             float distance = Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition);
-            if (distance <= MAX_SHOOT_RANGE) {
+            if (distance <= MAX_SHOOT_RANGE && timeSinceSawPlayer < ATTACK_TIMEOUT) {
                 ChangeState(State.shoot);
             }
         } else if (state == State.none) {
@@ -147,14 +149,14 @@ public class SphereAttackRoutine : SphereControlState {
     }
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            changeStateCountDown = ATTACK_TIMEOUT;
+            changeStateCountDown = ROUTINE_TIMEOUT;
+            timeSinceSawPlayer = 0;
         }
     }
 
 }
 
 /**
- check distance vs. last seen position
  check time since we last saw before we shoot
  pursuit: a new routine? or part of attack?
 
