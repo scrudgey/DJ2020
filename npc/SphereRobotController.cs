@@ -33,9 +33,10 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
         }
 
         // Clamp input
-        if (input.moveDirection != Vector3.zero) {
-            _moveInputVector = input.moveDirection;
-        } else {
+        // if (input.moveDirection != Vector3.zero) {
+        _moveInputVector = input.moveDirection;
+        // } else {
+        if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {
             Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
             if (moveInputVector.y != 0 && moveInputVector.x != 0) {
                 moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
@@ -47,6 +48,8 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
             }
             Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
         }
+
+        // }
     }
 
     /// <summary>
@@ -63,9 +66,8 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
 
-        // Smoothly interpolate from current to target look direction
-        // targetDirection = Vector3.Slerp(Motor.CharacterForward, _moveInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
-        // targetDirection = _moveInputVector;
+        // TODO: first thing to check
+
         if (_moveInputVector != Vector3.zero) {
             targetDirection = _moveInputVector;
         } else {

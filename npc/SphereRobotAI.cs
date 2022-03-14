@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 public class SphereRobotAI : IBinder<SightCone> {
     public SightCone sightCone;
-    public NavMeshAgent navMeshAgent;
+    public NavMeshPath navMeshPath;
     public SphereRobotController sphereController;
     public GunHandler gunHandler;
     private SphereRobotBrain stateMachine;
@@ -30,13 +30,11 @@ public class SphereRobotAI : IBinder<SightCone> {
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
         StartMoveRoutine();
-        // navMeshAgent.c
-        // navMeshAgent.updatePosition = false;
-        navMeshAgent.updateRotation = false;
-        navMeshAgent.updateUpAxis = false;
+
+        navMeshPath = new NavMeshPath();
     }
     void StartMoveRoutine() {
-        ChangeState(new SphereMoveRoutine(this, navMeshAgent, patrolZone));
+        ChangeState(new SphereMoveRoutine(this, patrolZone));
     }
     public void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
@@ -54,6 +52,10 @@ public class SphereRobotAI : IBinder<SightCone> {
             if (TargetVisible(playerCollider))
                 Perceive(playerCollider);
         }
+
+        for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
+            Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
+        }
     }
     void SetInputs() {
         PlayerInput input = stateMachine.getInput();
@@ -62,7 +64,7 @@ public class SphereRobotAI : IBinder<SightCone> {
         gunHandler.SetInputs(input);
     }
     private void OnTriggerEnter(Collider other) {
-        Debug.Log(other);
+        // Debug.Log(other);
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {

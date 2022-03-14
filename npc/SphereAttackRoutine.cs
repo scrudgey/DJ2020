@@ -1,56 +1,83 @@
 using UnityEngine;
 using UnityEngine.AI;
 public class SphereAttackRoutine : SphereControlState {
+    enum State { none, approach, shoot, reload }
+    State state;
     readonly float REPATH_INTERVAL = 0.1f;
-    readonly float ATTACK_TIMEOUT = 10f;
+    readonly float ATTACK_TIMEOUT = 5f;
     readonly float SHOOT_TIMEOUT = 1f;
     readonly float SHOOT_INTERVAL = 0.1f;
-    readonly float MAX_SHOOT_RANGE = 2f;
-    private NavMeshAgent navMeshAgent;
+    readonly float MAX_SHOOT_RANGE = 5f;
     private float newDestinationTimer;
     float repathCountDown;
     float changeStateCountDown;
+    float reloadCountDown;
     public GunHandler gunHandler;
-    public bool doShoot;
     float doShootCountdown;
     float shootTimer;
+    int pathIndex;
+    private readonly float CORNER_ARRIVAL_DISTANCE = 0.1f;
 
     public SphereAttackRoutine(SphereRobotAI ai,
-                                NavMeshAgent navMeshAgent,
                                 GunHandler gunHandler) : base(ai) {
-        this.navMeshAgent = navMeshAgent;
         this.gunHandler = gunHandler;
     }
     public override void Enter() {
         changeStateCountDown = ATTACK_TIMEOUT;
     }
+
+    void ChangeState(State newState) {
+        Debug.Log("change state to " + newState);
+        if (newState == State.shoot) {
+            doShootCountdown = SHOOT_TIMEOUT;
+        }
+        state = newState;
+    }
     public override void Update() {
         repathCountDown -= Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
-            owner.ChangeState(new SphereMoveRoutine(owner, navMeshAgent, owner.patrolZone));
+            owner.ChangeState(new SphereMoveRoutine(owner, owner.patrolZone));
         }
         if (repathCountDown <= 0) {
             repathCountDown += REPATH_INTERVAL;
             SetDestination(owner.lastSeenPlayerPosition);
         }
-        if (doShoot) {
+        Debug.Log(state);
+        if (state == State.shoot) {
             doShootCountdown -= Time.deltaTime;
             shootTimer += Time.deltaTime;
-            if (doShootCountdown <= 0) {
-                doShoot = false;
-            }
             if (shootTimer > SHOOT_INTERVAL) {
                 shootTimer -= SHOOT_INTERVAL;
                 ShootBullet();
             }
-            if (Vector3.Distance(owner.transform.position, owner.playerCollider.bounds.center) > MAX_SHOOT_RANGE) {
-                doShoot = false;
+            if (doShootCountdown <= 0) {
+                ChangeState(State.approach);
             }
+            if (Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition) > MAX_SHOOT_RANGE) {
+                ChangeState(State.approach);
+            }
+        } else if (state == State.approach) {
+            float distance = Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition);
+            if (distance <= MAX_SHOOT_RANGE) {
+                ChangeState(State.shoot);
+            }
+        } else if (state == State.none) {
+            ChangeState(State.approach);
+        } else if (state == State.reload) {
+            reloadCountDown -= Time.deltaTime;
+            if (reloadCountDown <= 0)
+                ChangeState(State.approach);
         }
     }
     void SetDestination(Vector3 destination) {
-        navMeshAgent.SetDestination(destination);
+        NavMeshHit hit = new NavMeshHit();
+        if (NavMesh.SamplePosition(destination, out hit, 10f, NavMesh.AllAreas)) {
+            NavMesh.CalculatePath(owner.transform.position, hit.position, NavMesh.AllAreas, owner.navMeshPath);
+            pathIndex = 1;
+        } else {
+            Debug.Log("could not find navmeshhit");
+        }
     }
     void ShootBullet() {
         if (owner.lastSeenPlayerPosition == null)
@@ -68,14 +95,34 @@ public class SphereAttackRoutine : SphereControlState {
         gunHandler.ShootImmediately(input);
     }
     public override PlayerInput getInput() {
-        Vector3 inputVector = doShoot ? Vector3.zero : navMeshAgent.desiredVelocity.normalized;
+        Vector3 inputVector = Vector3.zero;
+
+        if (state == State.approach) {
+            if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
+                Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
+                float distance = Vector3.Distance(nextPoint, owner.transform.position);
+                if (distance > CORNER_ARRIVAL_DISTANCE) {
+                    Vector3 direction = nextPoint - owner.transform.position;
+                    inputVector = direction.normalized;
+                    inputVector.y = 0;
+                } else {
+                    pathIndex += 1;
+                }
+            }
+        }
+
         bool reload = false;
         if (gunHandler.state == GunHandler.GunState.reloading) {
             gunHandler.ClipIn();
             gunHandler.StopReload();
         } else {
             reload = gunHandler.gunInstance.clip <= 0;
+            if (reload) {
+                ChangeState(State.reload);
+                reloadCountDown = 1f;
+            }
         }
+
         return new PlayerInput() {
             inputMode = InputMode.gun,
             MoveAxisForward = 0f,
@@ -101,8 +148,16 @@ public class SphereAttackRoutine : SphereControlState {
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             changeStateCountDown = ATTACK_TIMEOUT;
-            doShoot = true;
-            doShootCountdown = SHOOT_TIMEOUT;
         }
     }
+
 }
+
+/**
+ check distance vs. last seen position
+ check time since we last saw before we shoot
+ pursuit: a new routine? or part of attack?
+
+ separate last seen time timeout from overall attack timeout:
+ this lets robot go back to approach when it has started shooting at empty last seen position
+ */

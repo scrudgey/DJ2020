@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.AI;
 public class SphereMoveRoutine : SphereControlState {
-    private NavMeshAgent navMeshAgent;
     private float newDestinationTimer;
     private SphereCollider patrolZone;
-    public SphereMoveRoutine(SphereRobotAI ai, NavMeshAgent navMeshAgent, SphereCollider sphere) : base(ai) {
-        this.navMeshAgent = navMeshAgent;
+    int pathIndex;
+    private readonly float CORNER_ARRIVAL_DISTANCE = 0.01f;
+    public SphereMoveRoutine(SphereRobotAI ai, SphereCollider sphere) : base(ai) {
         this.patrolZone = sphere;
     }
 
@@ -17,15 +17,31 @@ public class SphereMoveRoutine : SphereControlState {
         }
     }
     void SetDestination() {
-        Vector3 destination = patrolZone.radius * UnityEngine.Random.insideUnitSphere + patrolZone.center;
-        destination.y = 0;
-        navMeshAgent.SetDestination(destination);
-        // Debug.Log($"new destination: {destination}");
+        Vector3 randPoint = patrolZone.radius * UnityEngine.Random.insideUnitSphere + patrolZone.center;
+        NavMeshHit hit = new NavMeshHit();
+        if (NavMesh.SamplePosition(randPoint, out hit, 10f, NavMesh.AllAreas)) {
+            Vector3 destination = hit.position;
+            NavMesh.CalculatePath(owner.transform.position, destination, NavMesh.AllAreas, owner.navMeshPath);
+            pathIndex = 1;
+        } else {
+            Debug.Log("could not find navmeshhit");
+        }
     }
 
     public override PlayerInput getInput() {
-        Vector3 inputVector = navMeshAgent.desiredVelocity.normalized;
-        // Vector3 inputVector = Vector3.zero;
+        Vector3 inputVector = Vector3.zero;
+        if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
+            Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
+            float distance = Vector3.Distance(nextPoint, owner.transform.position);
+            if (distance > CORNER_ARRIVAL_DISTANCE) {
+                Vector3 direction = nextPoint - owner.transform.position;
+                inputVector = direction.normalized;
+                inputVector.y = 0;
+            } else {
+                pathIndex += 1;
+            }
+        }
+
         return new PlayerInput() {
             inputMode = GameManager.I.inputMode,
             MoveAxisForward = 0f,
@@ -53,7 +69,7 @@ public class SphereMoveRoutine : SphereControlState {
         // Debug.DrawLine(transform.position, other.transform.position, Color.yellow, 1f);
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             Debug.Log("change state to attack");
-            owner.ChangeState(new SphereAttackRoutine(owner, navMeshAgent, owner.gunHandler));
+            owner.ChangeState(new SphereAttackRoutine(owner, owner.gunHandler));
         }
     }
 }
