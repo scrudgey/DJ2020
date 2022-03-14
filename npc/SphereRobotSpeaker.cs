@@ -29,4 +29,9 @@ public class SphereRobotSpeaker : MonoBehaviour {
             }
         }
     }
+
+    public void DoAttackSpeak() {
+        Toolbox.RandomizeOneShot(audioSource, angrySpeakSounds);
+        speechTextController.Say("enemy sighted");
+    }
 }

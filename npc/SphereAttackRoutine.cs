@@ -3,6 +3,7 @@ using UnityEngine.AI;
 public class SphereAttackRoutine : SphereControlState {
     enum State { none, approach, shoot, reload }
     State state;
+    public SphereRobotSpeaker speaker;
     readonly float REPATH_INTERVAL = 0.1f;
     readonly float ATTACK_TIMEOUT = 3f;
     readonly float ROUTINE_TIMEOUT = 10f;
@@ -23,6 +24,8 @@ public class SphereAttackRoutine : SphereControlState {
     public SphereAttackRoutine(SphereRobotAI ai,
                                 GunHandler gunHandler) : base(ai) {
         this.gunHandler = gunHandler;
+        speaker = owner.GetComponent<SphereRobotSpeaker>();
+        speaker.DoAttackSpeak();
     }
     public override void Enter() {
         changeStateCountDown = ROUTINE_TIMEOUT;
