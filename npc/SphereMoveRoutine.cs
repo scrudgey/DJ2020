@@ -10,6 +10,7 @@ public class SphereMoveRoutine : SphereControlState {
     }
 
     public override void Update() {
+        base.Update();
         newDestinationTimer -= Time.deltaTime;
         if (newDestinationTimer <= 0) {
             SetDestination();
@@ -41,6 +42,8 @@ public class SphereMoveRoutine : SphereControlState {
                 pathIndex += 1;
             }
         }
+        if (slewTime > 0)
+            inputVector = Vector3.zero;
 
         return new PlayerInput() {
             inputMode = GameManager.I.inputMode,
@@ -63,13 +66,5 @@ public class SphereMoveRoutine : SphereControlState {
             rotateCameraLeftPressedThisFrame = false,
             moveDirection = inputVector
         };
-    }
-
-    public override void OnObjectPerceived(Collider other) {
-        // Debug.DrawLine(transform.position, other.transform.position, Color.yellow, 1f);
-        if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            Debug.Log("change state to attack");
-            owner.ChangeState(new SphereAttackRoutine(owner, owner.gunHandler));
-        }
     }
 }

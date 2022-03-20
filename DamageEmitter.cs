@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageEmitter : IDamageable {
+public class DamageEmitter : Damageable {
     public float probability = 0.5f;
     public LoHi velocity;
     public GameObject[] particles;

@@ -25,4 +25,5 @@ public struct PlayerInput {
     public bool rotateCameraRightPressedThisFrame;
     public bool rotateCameraLeftPressedThisFrame;
     public Vector3 moveDirection;
+    public Vector3 lookAtPoint;
 }

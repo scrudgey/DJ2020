@@ -389,3 +389,7 @@ flip x in directional billboard
 * fix binding to global player object
 * wallpress zoom out
 * jump controller
+
+during slew time:
+    turn to look
+    don't shoot

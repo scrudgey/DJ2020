@@ -58,4 +58,7 @@ public class GunInstance {
             clip++;
         }
     }
+    public NoiseData GetShootNoise() {
+        return baseGun.shootNoise();
+    }
 }

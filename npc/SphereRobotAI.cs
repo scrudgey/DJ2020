@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-public class SphereRobotAI : IBinder<SightCone> {
+public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public SightCone sightCone;
     public NavMeshPath navMeshPath;
     public SphereRobotController sphereController;
@@ -18,8 +18,12 @@ public class SphereRobotAI : IBinder<SightCone> {
     public float timeSinceLastSeen;
     public Collider playerCollider;
     Vector3 previousPosition;
-    void Start() {
 
+    private void OnDrawGizmos() {
+        string customName = "Relic\\MaskedSpider.png";
+        Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
+    }
+    void Start() {
         // TODO: save / load gun state
         gunHandler.primary = new GunInstance(Gun.Load("smg"));
         gunHandler.SwitchToGun(1);
@@ -36,7 +40,16 @@ public class SphereRobotAI : IBinder<SightCone> {
     void StartMoveRoutine() {
         ChangeState(new SphereMoveRoutine(this, patrolZone));
     }
-    public void ChangeState(SphereControlState routine) {
+    public void RoutineFinished(SphereControlState routine) {
+        switch (routine) {
+            default:
+            case SphereSearchRoutine:
+            case SphereAttackRoutine:
+                ChangeState(new SphereMoveRoutine(this, patrolZone));
+                break;
+        }
+    }
+    private void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
     }
     void Update() {
@@ -86,6 +99,17 @@ public class SphereRobotAI : IBinder<SightCone> {
             lastSeenPlayerPosition = other.bounds.center;
             timeSinceLastSeen = 0f;
             playerCollider = other;
+
+            // TODO: change response depending on suspicion level
+            // player suspicion, my awareness of player suspicion
+
+            switch (stateMachine.currentState) {
+                case SphereSearchRoutine:
+                case SphereMoveRoutine:
+                    ChangeState(new SphereAttackRoutine(this, gunHandler));
+                    break;
+            }
+
         }
     }
 
@@ -105,5 +129,29 @@ public class SphereRobotAI : IBinder<SightCone> {
             return other == hit.collider;
         }
         return false;
+    }
+
+    public void TakeDamage<T>(T damage) where T : Damage {
+        switch (stateMachine.currentState) {
+            case SphereMoveRoutine:
+                ChangeState(new SphereSearchRoutine(this, damage));
+                break;
+            case SphereSearchRoutine:
+                // TODO: if ive been searching for a while, reset the search
+                break;
+        }
+    }
+
+    public void HearNoise(NoiseComponent noise) {
+        // Debug.Log($"hearing noise {noise}");
+        stateMachine.currentState.OnNoiseHeard(noise);
+        switch (stateMachine.currentState) {
+            case SphereMoveRoutine:
+                ChangeState(new SphereSearchRoutine(this, noise));
+                break;
+            case SphereSearchRoutine:
+                // TODO: if ive been searching for a while, reset the search
+                break;
+        }
     }
 }

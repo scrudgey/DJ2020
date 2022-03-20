@@ -14,8 +14,8 @@ public class Gun : ScriptableObject {
     [Header("Stats")]
     public CycleType cycle;
     public float shootInterval;
-    // public bool automatic;/
     public float muzzleflashSize = 0.025f;
+    public float noise = 3f;
     public int clipSize;
     public float range;
     public float spread;
@@ -42,5 +42,10 @@ public class Gun : ScriptableObject {
     }
     public float getBaseDamage() {
         return Random.Range(baseDamage.low, baseDamage.high);
+    }
+    public NoiseData shootNoise() {
+        return new NoiseData() {
+            volume = noise
+        };
     }
 }

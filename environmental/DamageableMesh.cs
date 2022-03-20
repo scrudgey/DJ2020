@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageableMesh : IDamageable {
+public class DamageableMesh : Damageable {
     Mesh mesh;
     Vector3[] vertices;
     int[] triangles;

@@ -140,6 +140,7 @@ public class Toolbox {
         return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
     }
     public static float RandomFromLoHi(LoHi input) {
+        // TODO: move this to LoHi
         return UnityEngine.Random.Range(input.low, input.high);
     }
     public static Explosion Explosion(Vector3 position) {
@@ -147,6 +148,12 @@ public class Toolbox {
             explosiveRadiusPrefab = Resources.Load(ExplosiveRadiusPath) as GameObject;
         }
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
+    }
+    public static NoiseComponent Noise(Vector3 position, NoiseData data) {
+        GameObject noiseObject = GameObject.Instantiate(Resources.Load("prefabs/noise"), position, Quaternion.identity) as GameObject;
+        NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
+        component.data = data;
+        return component;
     }
     public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {
         float dist = (target - source).magnitude;

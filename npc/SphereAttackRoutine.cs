@@ -39,11 +39,12 @@ public class SphereAttackRoutine : SphereControlState {
         state = newState;
     }
     public override void Update() {
+        base.Update();
         timeSinceSawPlayer += Time.deltaTime;
         repathCountDown -= Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
-            owner.ChangeState(new SphereMoveRoutine(owner, owner.patrolZone));
+            owner.RoutineFinished(this);
         }
         if (repathCountDown <= 0) {
             repathCountDown += REPATH_INTERVAL;
@@ -85,6 +86,8 @@ public class SphereAttackRoutine : SphereControlState {
         }
     }
     void ShootBullet() {
+        if (slewTime > 0)
+            return;
         if (owner.lastSeenPlayerPosition == null)
             return;
         PlayerInput.FireInputs input = new PlayerInput.FireInputs() {
@@ -128,6 +131,11 @@ public class SphereAttackRoutine : SphereControlState {
             }
         }
 
+        if (slewTime > 0) {
+            inputVector = Vector3.zero;
+
+        }
+
         return new PlayerInput() {
             inputMode = InputMode.gun,
             MoveAxisForward = 0f,
@@ -158,11 +166,3 @@ public class SphereAttackRoutine : SphereControlState {
     }
 
 }
-
-/**
- check time since we last saw before we shoot
- pursuit: a new routine? or part of attack?
-
- separate last seen time timeout from overall attack timeout:
- this lets robot go back to approach when it has started shooting at empty last seen position
- */

@@ -179,6 +179,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         audioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.shootSounds));
 
+        Toolbox.Noise(gunPosition(), gunInstance.GetShootNoise());
+
         // flash
         // TODO: change depending on silencer
         muzzleFlashLight.enabled = true;

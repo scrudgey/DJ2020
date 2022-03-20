@@ -24,18 +24,15 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     private Vector3 _lookInputVector;
     private Vector2 _moveAxis;
     private Vector3 _shootLookDirection = Vector2.zero;
-    private float rotateTimer;
     public void SetInputs(PlayerInput input) {
         if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
-
             Vector3 targetPoint = input.Fire.targetData.position;
             _shootLookDirection = targetPoint;
+        } else if (input.lookAtPoint != Vector3.zero) {
+            _shootLookDirection = input.lookAtPoint;
         }
 
-        // Clamp input
-        // if (input.moveDirection != Vector3.zero) {
         _moveInputVector = input.moveDirection;
-        // } else {
         if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {
             Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
             if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -48,8 +45,6 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
             }
             Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
         }
-
-        // }
     }
 
     /// <summary>
@@ -70,25 +65,15 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
 
         if (_moveInputVector != Vector3.zero) {
             targetDirection = _moveInputVector;
-        } else {
-            rotateTimer -= Time.deltaTime;
-            if (rotateTimer <= 0) {
-                rotateTimer = UnityEngine.Random.Range(2f, 10f);
-                targetDirection = UnityEngine.Random.insideUnitSphere;
-                targetDirection.y = 0;
-                targetDirection = targetDirection.normalized;
-            }
         }
-
-        direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
         if (_shootLookDirection != Vector3.zero) {
             Vector3 target = _shootLookDirection - transform.position;
             target.y = 0;
-            currentRotation = Quaternion.LookRotation(target, Vector3.up);
+            targetDirection = target;
         }
 
-        // Set the current rotation (which will be used by the KinematicCharacterMotor)
+        direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
         currentRotation = Quaternion.LookRotation(direction, Vector3.up);
 
         _shootLookDirection = Vector3.zero;

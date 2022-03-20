@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class IDestructible : IDamageable {
+public class IDestructible : Damageable {
     public Gibs gibs;
     public float health;
     private bool doDestruct;
