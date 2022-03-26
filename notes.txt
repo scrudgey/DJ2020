@@ -393,3 +393,82 @@ flip x in directional billboard
 during slew time:
     turn to look
     don't shoot
+
+searching:
+
+1. looking in a direction versus searching a point
+2. time evolution
+
+looking in a direction:
+    1. slew / look in direction
+    2. look left, look right
+    3. move some distance from original point towards the direction
+    4. arrive at location, stop
+    5. look left, look right
+
+searching a location
+    1. slew / look towards location
+    2. move to location
+    3. arrive at location
+    4. look left, look right
+    5. choose a new location near original location
+    6. repeat 2-5
+
+radioing to HQ
+    1. find cover
+    2. move
+    3. operate radio
+    transition to:
+        player location unknown: search
+        player location known: attack
+
+we want to queue / schedule several routines in order, with transitions governed by timers or behavior
+routines should have an update cycle and a way to check completeness
+do we have a routine stack? what about branching?
+more complex behavior would have the ability to transition to different routines depending.
+    this makes it sound like routine logic controls the transition to the next routine.
+    is the routine pushing this information or is it being polled by the state machine?
+
+routine can publish when they are done
+routine can publish transition to new state?
+
+Q: levels:
+1. individual routines (move, slew, etc)
+2. overall state machine states (search direction, search location, radio hq)
+3. state machine. time since last seen player, component references
+
+something like: nested structure. update method, complete method
+    method can publish finished, or transition to state
+
+overhaul everything to be a behavior tree.
+now we have to think: how is perception / sound going to be handled.
+    1. use the tree logic and / or to handle perception states
+    2. user perceptions to change textures
+
+the question is: what do the state machine states correspond to?
+it feels like they should be trees. recast the sequence as tree.
+
+
+1. task tree updating
+2. timed look toward task
+3. timed look left / look right
+4. retreiving player input from task
+
+timed should become a decorator
+use the namespace
+
+
+
+major issue:
+Evaluate() was the main chained thing that called sub nodes in the tree.
+but Evaluate() isn't enough? Evaluate() returns a status, but I also need there to be a current active node 
+findable from the root that is in control and returns PlayerInput.
+
+return to using Evaluate()
+but now the running node needs to somehow give playerinput
+a timer decorator runs the child node and returns Running until time up
+sequence is handled by a Sequence node
+
+Evaluate takes a ref value
+
+possibly, a Reset() mode but resetting can be handled by instantiating new state machine state

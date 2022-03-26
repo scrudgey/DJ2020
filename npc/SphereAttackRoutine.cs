@@ -86,8 +86,8 @@ public class SphereAttackRoutine : SphereControlState {
         }
     }
     void ShootBullet() {
-        if (slewTime > 0)
-            return;
+        // if (slewTime > 0)
+        //     return;
         if (owner.lastSeenPlayerPosition == null)
             return;
         PlayerInput.FireInputs input = new PlayerInput.FireInputs() {
@@ -131,10 +131,10 @@ public class SphereAttackRoutine : SphereControlState {
             }
         }
 
-        if (slewTime > 0) {
-            inputVector = Vector3.zero;
+        // if (slewTime > 0) {
+        //     inputVector = Vector3.zero;
 
-        }
+        // }
 
         return new PlayerInput() {
             inputMode = InputMode.gun,

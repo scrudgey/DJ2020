@@ -43,7 +43,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public void RoutineFinished(SphereControlState routine) {
         switch (routine) {
             default:
-            case SphereSearchRoutine:
+            case SearchDirectionState:
             case SphereAttackRoutine:
                 ChangeState(new SphereMoveRoutine(this, patrolZone));
                 break;
@@ -104,7 +104,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             // player suspicion, my awareness of player suspicion
 
             switch (stateMachine.currentState) {
-                case SphereSearchRoutine:
+                case SearchDirectionState:
                 case SphereMoveRoutine:
                     ChangeState(new SphereAttackRoutine(this, gunHandler));
                     break;
@@ -134,9 +134,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public void TakeDamage<T>(T damage) where T : Damage {
         switch (stateMachine.currentState) {
             case SphereMoveRoutine:
-                ChangeState(new SphereSearchRoutine(this, damage));
+                ChangeState(new SearchDirectionState(this, damage));
                 break;
-            case SphereSearchRoutine:
+            case SearchDirectionState:
                 // TODO: if ive been searching for a while, reset the search
                 break;
         }
@@ -147,9 +147,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         stateMachine.currentState.OnNoiseHeard(noise);
         switch (stateMachine.currentState) {
             case SphereMoveRoutine:
-                ChangeState(new SphereSearchRoutine(this, noise));
+                ChangeState(new SearchDirectionState(this, noise));
                 break;
-            case SphereSearchRoutine:
+            case SearchDirectionState:
                 // TODO: if ive been searching for a while, reset the search
                 break;
         }

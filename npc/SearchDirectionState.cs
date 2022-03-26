@@ -1,6 +1,9 @@
+using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class SphereSearchRoutine : SphereControlState {
+
+
+public class SearchDirectionState : SphereControlState {
     int pathIndex;
     private readonly float CORNER_ARRIVAL_DISTANCE = 0.01f;
     readonly float ROUTINE_TIMEOUT = 10f;
@@ -9,16 +12,17 @@ public class SphereSearchRoutine : SphereControlState {
     private Vector3 initialPosition;
     private Vector3 searchDirection;
     Vector3 targetPoint;
-    float retargetTimer;
+    // float retargetTimer; 
     LoHi retargetInterval = new LoHi(0.5f, 1f);
-    public SphereSearchRoutine(SphereRobotAI ai, Damage damage) : base(ai) {
+    private TaskNode rootTaskNode;
+    public SearchDirectionState(SphereRobotAI ai, Damage damage) : base(ai) {
         if (damage != null) {
             searchDirection = -1f * damage.direction;
         } else {
             RandomSearchDirection();
         }
     }
-    public SphereSearchRoutine(SphereRobotAI ai, NoiseComponent noise) : base(ai) {
+    public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise) : base(ai) {
         if (noise != null) {
             searchDirection = noise.transform.position - owner.transform.position;
         } else {
@@ -37,29 +41,45 @@ public class SphereSearchRoutine : SphereControlState {
 
         owner.navMeshPath = new NavMeshPath();
         targetPoint = initialPosition + searchDirection;
-        retargetTimer = Toolbox.RandomFromLoHi(retargetInterval);
+        // retargetTimer = retargetInterval.Random();
+    }
+
+    void SetupRootNode() {
+        // TODO problem: changing search direction
+        // TODO problem: null child
+        rootTaskNode = new Sequence(
+        // look left
+         new TaskTimerDectorator(
+            new TaskLookInDirection(searchDirection)
+        ),
+        // look right
+        new TaskTimerDectorator(
+            new TaskLookInDirection(searchDirection)
+        )
+        );
     }
 
     public override void Update() {
         base.Update();
+        changeStateCountDown -= Time.deltaTime;
+        if (changeStateCountDown <= 0) {
+            owner.RoutineFinished(this);
+        }
+
         // change target position inside code
         // increase search radius gradually
         // move, eventually
 
-        retargetTimer -= Time.deltaTime;
-        changeStateCountDown -= Time.deltaTime;
+        // retargetTimer -= Time.deltaTime;
 
-        if (retargetTimer <= 0) {
-            retargetTimer = Toolbox.RandomFromLoHi(retargetInterval);
+        // if (retargetTimer <= 0) {
+        //     retargetTimer = retargetInterval.Random();
 
-            Vector3 jitterPoint = Random.insideUnitSphere * 0.5f;
-            jitterPoint.y = 0;
+        Vector3 jitterPoint = Random.insideUnitSphere * 0.5f;
+        jitterPoint.y = 0;
 
-            targetPoint = initialPosition + searchDirection + jitterPoint;
-        }
-        if (changeStateCountDown <= 0) {
-            owner.RoutineFinished(this);
-        }
+        targetPoint = initialPosition + searchDirection + jitterPoint;
+        // }
     }
     void SetDestination(Vector3 position) {
         NavMeshHit hit = new NavMeshHit();
@@ -86,8 +106,8 @@ public class SphereSearchRoutine : SphereControlState {
             }
         }
 
-        if (slewTime > 0)
-            inputVector = Vector3.zero;
+        // if (slewTime > 0)
+        // inputVector = Vector3.zero;
 
         return new PlayerInput() {
             inputMode = GameManager.I.inputMode,
@@ -121,7 +141,7 @@ public class SphereSearchRoutine : SphereControlState {
         changeStateCountDown = ROUTINE_TIMEOUT;
 
         targetPoint = initialPosition + searchDirection;
-        retargetTimer = Toolbox.RandomFromLoHi(retargetInterval);
+        // retargetTimer = retargetInterval.Random();
     }
 
 }

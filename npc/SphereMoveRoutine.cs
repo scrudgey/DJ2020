@@ -42,8 +42,8 @@ public class SphereMoveRoutine : SphereControlState {
                 pathIndex += 1;
             }
         }
-        if (slewTime > 0)
-            inputVector = Vector3.zero;
+        // if (slewTime > 0)
+        //     inputVector = Vector3.zero;
 
         return new PlayerInput() {
             inputMode = GameManager.I.inputMode,

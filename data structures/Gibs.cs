@@ -33,7 +33,7 @@ public class Gib {
         fx.transform.SetParent(host.transform, true);
     }
     void EmitParticle(Damage damage, Collider bounds) {
-        int num = (int)Toolbox.RandomFromLoHi(number);
+        int num = (int)number.Random();
         for (int i = 0; i < num; i++) {
             DoEmit(damage, bounds);
         }
@@ -48,8 +48,8 @@ public class Gib {
         Rigidbody rigidbody = bit.GetComponent<Rigidbody>();
 
         Vector3 direction = (directional * inDirection) + ((1 - directional) * Vector3.up);
-        direction = (Toolbox.RandomFromLoHi(dispersion) * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
-        direction = direction.normalized * Toolbox.RandomFromLoHi(velocity);
+        direction = (dispersion.Random() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
+        direction = direction.normalized * velocity.Random();
 
         rigidbody.AddForce(direction, ForceMode.Force);
     }

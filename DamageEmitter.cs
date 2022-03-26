@@ -26,7 +26,7 @@ public class DamageEmitter : Damageable {
             GameObject particle = pool.GetObject(impact.hit.point + 0.1f * impact.hit.normal);
             particle.transform.rotation = Random.rotation;
             Rigidbody body = particle.GetComponentInChildren<Rigidbody>();
-            body.velocity = impact.hit.normal * Toolbox.RandomFromLoHi(velocity);
+            body.velocity = impact.hit.normal * velocity.Random();
             // randomize direction (how?)
         }
     }

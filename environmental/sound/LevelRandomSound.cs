@@ -12,14 +12,14 @@ public class LevelRandomSound : MonoBehaviour {
     void Awake() {
         audioSource = Toolbox.GetOrCreateComponent<AudioSource>(gameObject);
         // audioSource.spatialBlend = 0;
-        interval = Toolbox.RandomFromLoHi(intervalRange);
+        interval = intervalRange.Random();
     }
     void Update() {
         timer += Time.deltaTime;
         if (timer > interval) {
             timer -= interval;
             Toolbox.RandomizeOneShot(audioSource, audioClips);
-            interval = Toolbox.RandomFromLoHi(intervalRange);
+            interval = intervalRange.Random();
         }
     }
 }

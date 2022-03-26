@@ -139,10 +139,6 @@ public class Toolbox {
     public static Vector3 GetVertexWorldPosition(Vector3 vertex, Transform owner) {
         return owner.localToWorldMatrix.MultiplyPoint3x4(vertex);
     }
-    public static float RandomFromLoHi(LoHi input) {
-        // TODO: move this to LoHi
-        return UnityEngine.Random.Range(input.low, input.high);
-    }
     public static Explosion Explosion(Vector3 position) {
         if (explosiveRadiusPrefab == null) {
             explosiveRadiusPrefab = Resources.Load(ExplosiveRadiusPath) as GameObject;
