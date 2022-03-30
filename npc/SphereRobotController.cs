@@ -30,6 +30,8 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
             _shootLookDirection = targetPoint;
         } else if (input.lookAtPoint != Vector3.zero) {
             _shootLookDirection = input.lookAtPoint;
+        } else if (input.lookAtDirection != Vector3.zero) {
+            _shootLookDirection = transform.position + input.lookAtDirection;
         }
 
         _moveInputVector = input.moveDirection;
@@ -68,10 +70,14 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
         }
 
         if (_shootLookDirection != Vector3.zero) {
+
+            // noise.transform.position - owner.transform.position - transform.position;
+
             Vector3 target = _shootLookDirection - transform.position;
             target.y = 0;
             targetDirection = target;
         }
+        Debug.DrawRay(transform.position, targetDirection, Color.green, 0.1f);
 
         direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
         currentRotation = Quaternion.LookRotation(direction, Vector3.up);

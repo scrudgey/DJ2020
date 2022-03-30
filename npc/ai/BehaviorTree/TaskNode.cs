@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AI {
     public enum TaskState {
@@ -11,14 +12,16 @@ namespace AI {
     public abstract class TaskNode {
         protected TaskState state;
         public TaskNode parent;
-        protected List<TaskNode> children = new List<TaskNode>();
+        protected List<TaskNode> children;
         public TaskNode() {
             parent = null;
         }
         public TaskNode(TaskNode child) {
+            this.children = new List<TaskNode>();
             _Attach(child);
         }
         public TaskNode(List<TaskNode> children) {
+            this.children = new List<TaskNode>();
             foreach (TaskNode child in children)
                 _Attach(child);
         }
@@ -26,8 +29,6 @@ namespace AI {
             node.parent = this;
             children.Add(node);
         }
-        public abstract TaskState Evaluate();
-        public virtual void Update() { }
-        // TODO: some sort of playerinput
+        public abstract TaskState Evaluate(ref PlayerInput input);
     }
 }

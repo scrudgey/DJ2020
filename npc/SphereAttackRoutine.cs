@@ -22,7 +22,7 @@ public class SphereAttackRoutine : SphereControlState {
     private readonly float CORNER_ARRIVAL_DISTANCE = 0.1f;
 
     public SphereAttackRoutine(SphereRobotAI ai,
-                                GunHandler gunHandler) : base(ai) {
+                               GunHandler gunHandler) : base(ai) {
         this.gunHandler = gunHandler;
         speaker = owner.GetComponent<SphereRobotSpeaker>();
         speaker.DoAttackSpeak();
@@ -38,8 +38,7 @@ public class SphereAttackRoutine : SphereControlState {
         }
         state = newState;
     }
-    public override void Update() {
-        base.Update();
+    public override PlayerInput Update() {
         timeSinceSawPlayer += Time.deltaTime;
         repathCountDown -= Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
@@ -75,6 +74,7 @@ public class SphereAttackRoutine : SphereControlState {
             if (reloadCountDown <= 0)
                 ChangeState(State.approach);
         }
+        return getInput();
     }
     void SetDestination(Vector3 destination) {
         NavMeshHit hit = new NavMeshHit();
@@ -102,7 +102,9 @@ public class SphereAttackRoutine : SphereControlState {
         };
         gunHandler.ShootImmediately(input);
     }
-    public override PlayerInput getInput() {
+    public PlayerInput getInput() {
+        // TODO: overhaul
+
         Vector3 inputVector = Vector3.zero;
 
         if (state == State.approach) {
@@ -148,7 +150,7 @@ public class SphereAttackRoutine : SphereControlState {
             runDown = false,
             Fire = new PlayerInput.FireInputs(),
             reload = reload,
-            selectgun = -1,
+            selectgun = 0,
             actionButtonPressed = false,
             incrementItem = 0,
             useItem = false,

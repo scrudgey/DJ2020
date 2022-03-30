@@ -9,13 +9,13 @@ public class SphereMoveRoutine : SphereControlState {
         this.patrolZone = sphere;
     }
 
-    public override void Update() {
-        base.Update();
+    public override PlayerInput Update() {
         newDestinationTimer -= Time.deltaTime;
         if (newDestinationTimer <= 0) {
             SetDestination();
             newDestinationTimer = Random.Range(2f, 15f);
         }
+        return getInput();
     }
     void SetDestination() {
         Vector3 randPoint = patrolZone.radius * UnityEngine.Random.insideUnitSphere + patrolZone.center;
@@ -29,7 +29,7 @@ public class SphereMoveRoutine : SphereControlState {
         }
     }
 
-    public override PlayerInput getInput() {
+    public PlayerInput getInput() {
         Vector3 inputVector = Vector3.zero;
         if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
             Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
@@ -57,7 +57,7 @@ public class SphereMoveRoutine : SphereControlState {
             runDown = false,
             Fire = new PlayerInput.FireInputs(),
             reload = false,
-            selectgun = -1,
+            selectgun = 0,
             actionButtonPressed = false,
             incrementItem = 0,
             useItem = false,

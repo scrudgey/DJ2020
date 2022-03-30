@@ -49,7 +49,7 @@ public class UIController : MonoBehaviour {
     }
 
     void BindToNewTarget(GameObject target) {
-        Debug.Log("binding to new target");
+        // Debug.Log("binding to new target");
         weaponUIHandler.Bind(target);
 
         itemUIHandler.Bind(target);

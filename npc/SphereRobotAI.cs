@@ -54,8 +54,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     }
     void Update() {
         timeSinceLastSeen += Time.deltaTime;
-        stateMachine.Update();
-        SetInputs();
+        PlayerInput input = stateMachine.Update();
+        SetInputs(input);
         perceptionCountdown -= Time.deltaTime;
         if (perceptionCountdown <= 0) {
             perceptionCountdown += PERCEPTION_INTERVAL;
@@ -70,8 +70,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
         }
     }
-    void SetInputs() {
-        PlayerInput input = stateMachine.getInput();
+    void SetInputs(PlayerInput input) {
         sphereController.SetInputs(input);
         gunHandler.ProcessGunSwitch(input);
         gunHandler.SetInputs(input);
@@ -96,20 +95,23 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     void Perceive(Collider other) {
         stateMachine.currentState.OnObjectPerceived(other);
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            lastSeenPlayerPosition = other.bounds.center;
-            timeSinceLastSeen = 0f;
-            playerCollider = other;
+            PerceivePlayerObject(other);
+        }
+    }
 
-            // TODO: change response depending on suspicion level
-            // player suspicion, my awareness of player suspicion
+    void PerceivePlayerObject(Collider other) {
+        lastSeenPlayerPosition = other.bounds.center;
+        timeSinceLastSeen = 0f;
+        playerCollider = other;
 
-            switch (stateMachine.currentState) {
-                case SearchDirectionState:
-                case SphereMoveRoutine:
-                    ChangeState(new SphereAttackRoutine(this, gunHandler));
-                    break;
-            }
+        // TODO: change response depending on suspicion level
+        // player suspicion, my awareness of player suspicion
 
+        switch (stateMachine.currentState) {
+            case SearchDirectionState:
+            case SphereMoveRoutine:
+                ChangeState(new SphereAttackRoutine(this, gunHandler));
+                break;
         }
     }
 

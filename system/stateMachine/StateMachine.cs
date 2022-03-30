@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface IState {
     public void Enter();
-    public void Update();
+    public PlayerInput Update();
     public void Exit();
 }
 
@@ -17,7 +17,8 @@ public class StateMachine<T> where T : IState {
         currentState.Enter();
     }
 
-    public void Update() {
-        if (currentState != null) currentState.Update();
+    public PlayerInput Update() {
+        if (currentState != null) return currentState.Update();
+        return new PlayerInput();
     }
 }

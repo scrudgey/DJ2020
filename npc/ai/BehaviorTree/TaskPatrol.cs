@@ -18,7 +18,7 @@ namespace AI {
             _waypoints = waypoints;
         }
 
-        public override TaskState Evaluate() {
+        public override TaskState Evaluate(ref PlayerInput input) {
             if (_waiting) {
                 _waitCounter += Time.deltaTime;
                 if (_waitCounter >= _waitTime) {

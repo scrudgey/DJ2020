@@ -300,8 +300,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     }
     public void SwitchToGun(int idn) {
         switch (idn) {
-            default:
             case 0:
+                break;
+            case -1:
                 Holster();
                 break;
             case 1:
@@ -317,14 +318,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     }
 
     public void ProcessGunSwitch(PlayerInput input) {
-        if (input.selectgun != -1) {
-            SwitchToGun(input.selectgun);
-        } else if (input.reload) {
+        SwitchToGun(input.selectgun);
+        if (input.reload) {
             DoReload();
         }
     }
     void DoReload() {
-        if (gunInstance == null)
+        if (gunInstance == null || gunInstance.baseGun == null)
             return;
         if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
             ReloadShell();

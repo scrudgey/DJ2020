@@ -5,9 +5,9 @@ namespace AI {
         public Selector() : base() { }
         public Selector(List<TaskNode> children) : base(children) { }
 
-        public override TaskState Evaluate() {
+        public override TaskState Evaluate(ref PlayerInput input) {
             foreach (TaskNode node in children) {
-                switch (node.Evaluate()) {
+                switch (node.Evaluate(ref input)) {
                     case TaskState.failure:
                         continue;
                     case TaskState.success:

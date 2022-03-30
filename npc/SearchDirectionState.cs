@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class SearchDirectionState : SphereControlState {
     int pathIndex;
     private readonly float CORNER_ARRIVAL_DISTANCE = 0.01f;
-    readonly float ROUTINE_TIMEOUT = 10f;
+    readonly float ROUTINE_TIMEOUT = 20f;
     float changeStateCountDown;
 
     private Vector3 initialPosition;
@@ -21,6 +21,7 @@ public class SearchDirectionState : SphereControlState {
         } else {
             RandomSearchDirection();
         }
+        SetupRootNode();
     }
     public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise) : base(ai) {
         if (noise != null) {
@@ -28,6 +29,7 @@ public class SearchDirectionState : SphereControlState {
         } else {
             RandomSearchDirection();
         }
+        SetupRootNode();
     }
     void RandomSearchDirection() {
         searchDirection = Random.insideUnitSphere;
@@ -46,40 +48,46 @@ public class SearchDirectionState : SphereControlState {
 
     void SetupRootNode() {
         // TODO problem: changing search direction
-        // TODO problem: null child
+        Vector3 leftDirection = Quaternion.Euler(0, -45, 0) * searchDirection;
+        Vector3 rightDirection = Quaternion.Euler(0, 45, 0) * searchDirection;
         rootTaskNode = new Sequence(
-        // look left
-         new TaskTimerDectorator(
-            new TaskLookInDirection(searchDirection)
-        ),
-        // look right
-        new TaskTimerDectorator(
-            new TaskLookInDirection(searchDirection)
-        )
+            // look
+            new TaskTimerDectorator(new TaskLookInDirection(searchDirection), 2f),
+            // look left
+            new TaskTimerDectorator(new TaskLookInDirection(leftDirection), 2f),
+            // look right
+            new TaskTimerDectorator(new TaskLookInDirection(rightDirection), 2f)
         );
     }
 
-    public override void Update() {
-        base.Update();
+    public override PlayerInput Update() {
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
             owner.RoutineFinished(this);
         }
 
-        // change target position inside code
-        // increase search radius gradually
-        // move, eventually
+        // Vector3 jitterPoint = Random.insideUnitSphere * 0.5f;
+        // jitterPoint.y = 0;
 
-        // retargetTimer -= Time.deltaTime;
+        // targetPoint = initialPosition + searchDirection + jitterPoint;
+        Vector3 moveDirection = Vector3.zero;
+        if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
+            Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
+            float distance = Vector3.Distance(nextPoint, owner.transform.position);
+            if (distance > CORNER_ARRIVAL_DISTANCE) {
+                Vector3 direction = nextPoint - owner.transform.position;
+                moveDirection = direction.normalized;
+                moveDirection.y = 0;
+            } else {
+                pathIndex += 1;
+            }
+        }
 
-        // if (retargetTimer <= 0) {
-        //     retargetTimer = retargetInterval.Random();
-
-        Vector3 jitterPoint = Random.insideUnitSphere * 0.5f;
-        jitterPoint.y = 0;
-
-        targetPoint = initialPosition + searchDirection + jitterPoint;
-        // }
+        PlayerInput input = new PlayerInput {
+            moveDirection = moveDirection
+        };
+        rootTaskNode.Evaluate(ref input);
+        return input;
     }
     void SetDestination(Vector3 position) {
         NavMeshHit hit = new NavMeshHit();
@@ -92,47 +100,6 @@ public class SearchDirectionState : SphereControlState {
         }
     }
 
-    public override PlayerInput getInput() {
-        Vector3 inputVector = Vector3.zero;
-        if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
-            Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
-            float distance = Vector3.Distance(nextPoint, owner.transform.position);
-            if (distance > CORNER_ARRIVAL_DISTANCE) {
-                Vector3 direction = nextPoint - owner.transform.position;
-                inputVector = direction.normalized;
-                inputVector.y = 0;
-            } else {
-                pathIndex += 1;
-            }
-        }
-
-        // if (slewTime > 0)
-        // inputVector = Vector3.zero;
-
-        return new PlayerInput() {
-            inputMode = GameManager.I.inputMode,
-            MoveAxisForward = 0f,
-            MoveAxisRight = 0f,
-            CameraRotation = Quaternion.identity,
-            JumpDown = false,
-            jumpHeld = false,
-            jumpReleased = false,
-            CrouchDown = false,
-            runDown = false,
-            Fire = new PlayerInput.FireInputs(),
-            reload = false,
-            selectgun = -1,
-            actionButtonPressed = false,
-            incrementItem = 0,
-            useItem = false,
-            incrementOverlay = 0,
-            rotateCameraRightPressedThisFrame = false,
-            rotateCameraLeftPressedThisFrame = false,
-            moveDirection = inputVector,
-            lookAtPoint = targetPoint
-        };
-    }
-
     public override void OnNoiseHeard(NoiseComponent noise) {
         base.OnNoiseHeard(noise);
         initialPosition = owner.transform.position;
@@ -141,7 +108,7 @@ public class SearchDirectionState : SphereControlState {
         changeStateCountDown = ROUTINE_TIMEOUT;
 
         targetPoint = initialPosition + searchDirection;
+        SetupRootNode();
         // retargetTimer = retargetInterval.Random();
     }
-
 }

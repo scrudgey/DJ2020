@@ -92,7 +92,7 @@ public class InputController : MonoBehaviour {
         // Gun switch
         gunHolster.action.performed += ctx => {
             if (ctx.ReadValueAsButton()) {
-                selectGunThisFrame = 0;
+                selectGunThisFrame = -1;
             }
         };
         gunSecondary.action.performed += ctx => {
@@ -289,7 +289,7 @@ public class InputController : MonoBehaviour {
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
         jumpReleasedThisFrame = false;
-        selectGunThisFrame = -1;
+        selectGunThisFrame = 0;
         actionButtonPressedThisFrame = false;
         incrementItemThisFrame = 0;
         incrementOverlayThisFrame = 0;

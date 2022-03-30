@@ -470,5 +470,8 @@ a timer decorator runs the child node and returns Running until time up
 sequence is handled by a Sequence node
 
 Evaluate takes a ref value
+does Evaluate happen in an Update loop?
 
 possibly, a Reset() mode but resetting can be handled by instantiating new state machine state
+
+1. how to turn navigation etc. into task node
