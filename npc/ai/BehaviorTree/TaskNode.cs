@@ -13,6 +13,8 @@ namespace AI {
         protected TaskState state;
         public TaskNode parent;
         protected List<TaskNode> children;
+        private Dictionary<string, object> dataContext = new Dictionary<string, object>();
+        private bool initialized;
         public TaskNode() {
             parent = null;
         }
@@ -29,6 +31,49 @@ namespace AI {
             node.parent = this;
             children.Add(node);
         }
-        public abstract TaskState Evaluate(ref PlayerInput input);
+        public TaskState Evaluate(ref PlayerInput input) {
+            if (!initialized) {
+                Initialize();
+            }
+            initialized = true;
+            return DoEvaluate(ref input);
+        }
+        public virtual void Initialize() { }
+        public abstract TaskState DoEvaluate(ref PlayerInput input);
+
+        public void SetData(string key, object value) {
+            dataContext[key] = value;
+        }
+
+        public object GetData(string key) {
+            object value = null;
+            if (dataContext.TryGetValue(key, out value))
+                return value;
+
+            TaskNode node = parent;
+            while (node != null) {
+                value = node.GetData(key);
+                if (value != null)
+                    return value;
+                node = node.parent;
+            }
+            return null;
+        }
+
+        public bool ClearData(string key) {
+            if (dataContext.ContainsKey(key)) {
+                dataContext.Remove(key);
+                return true;
+            }
+
+            TaskNode node = parent;
+            while (node != null) {
+                bool cleared = node.ClearData(key);
+                if (cleared)
+                    return true;
+                node = node.parent;
+            }
+            return false;
+        }
     }
 }

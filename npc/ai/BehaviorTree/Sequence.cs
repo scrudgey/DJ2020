@@ -6,8 +6,9 @@ namespace AI {
         public Sequence() : base() { }
         public Sequence(List<TaskNode> children) : base(children) { }
         public Sequence(params TaskNode[] tasks) : base(new List<TaskNode>(tasks)) { }
-        public override TaskState Evaluate(ref PlayerInput input) {
-            // bool anyChildIsRunning = false;
+        public override TaskState DoEvaluate(ref PlayerInput input) {
+            bool anyChildIsRunning = false;
+
             foreach (TaskNode node in children) {
                 switch (node.Evaluate(ref input)) {
                     case TaskState.failure:
@@ -17,16 +18,16 @@ namespace AI {
                         continue;
                     case TaskState.running:
                         // anyChildIsRunning = true;
-                        state = TaskState.running;
-                        return state;
+                        return TaskState.running;
+                    // continue;
                     default:
                         state = TaskState.success;
                         return state;
                 }
             }
 
-            // state = anyChildIsRunning ? TaskState.running : TaskState.success;
-            return TaskState.success;
+            state = anyChildIsRunning ? TaskState.running : TaskState.success;
+            return state;
         }
 
     }

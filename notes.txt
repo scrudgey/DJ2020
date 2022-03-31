@@ -475,3 +475,41 @@ does Evaluate happen in an Update loop?
 possibly, a Reset() mode but resetting can be handled by instantiating new state machine state
 
 1. how to turn navigation etc. into task node
+
+how to handle dynamic state in the behavior tree?
+the normal solution seems to be to publish data to/from the tree. this feels clunky to me.
+Ref<> is interesting.
+TaskStatus<T>
+TaskStatus(Owner)
+
+what is the desired behavior?
+1. look left, look right, move in. look around. move to a new spot? 
+    if a new noise is heard, skip looking and move to that spot.
+    how do we retarget? in behavior tree mode, it should look like:
+    1. start path search aynchronous, running
+    2. when path is found, next in sequence: move to target
+    3. if path is not found, failed.
+
+add movement to the root node sequence, but we're already off track:
+1. resetting root node resets the entire sequence
+2. not easy to retarget position without resetting root node.
+
+how about: stop fighting the jank and use the getstate methods? it is the standard for behavior trees?
+1. magic strings
+2. unchecked casting (no strong)
+
+TaskNode<T>(T context) where T: TaskNodeContext
+then we can pass in 
+
+playerinpu ref might be a bad idea?
+
+now that we have that settled, the question is how to how to arrange the search AI as a behavior tree
+
+the look-around branch is timer controlled. it consists of a sequence of timer controlled look directives.
+    when to reset this timer? storing the timer in state allows for resetting? 
+    recreating the branch each state change results in look-around loop?
+        this is less important, we can have good control over state transition
+
+sequence:
+1. pathfind
+2. navigate

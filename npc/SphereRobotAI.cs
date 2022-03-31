@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public SightCone sightCone;
-    public NavMeshPath navMeshPath;
+    public NavMeshPath navMeshPath; // TODO: remove this
     public SphereRobotController sphereController;
     public GunHandler gunHandler;
     private SphereRobotBrain stateMachine;
@@ -127,7 +127,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             if (tagData.bulletPassthrough) continue;
 
             Color color = other == hit.collider ? Color.yellow : Color.red;
-            Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
+            // Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
             return other == hit.collider;
         }
         return false;

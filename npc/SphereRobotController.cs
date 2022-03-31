@@ -93,6 +93,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
         Vector3 targetMovementVelocity = Vector3.zero;
 
+        Debug.DrawLine(transform.position, transform.position + _moveInputVector, Color.blue, 0.1f);
 
         // Calculate target velocity
         Vector3 inputRight = Vector3.Cross(_moveInputVector, Vector3.up);

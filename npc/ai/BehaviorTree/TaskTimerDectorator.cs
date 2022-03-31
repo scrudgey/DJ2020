@@ -13,7 +13,7 @@ namespace AI {
             this.lifetime = lifetime;
             timer = 0f;
         }
-        public override TaskState Evaluate(ref PlayerInput input) {
+        public override TaskState DoEvaluate(ref PlayerInput input) {
             timer += Time.deltaTime;
             if (timer < lifetime) {
                 return wrapped.Evaluate(ref input);
