@@ -36,6 +36,7 @@ namespace AI {
                 Initialize();
             }
             initialized = true;
+            Debug.Log($"evaluating {this}");
             return DoEvaluate(ref input);
         }
         public virtual void Initialize() { }

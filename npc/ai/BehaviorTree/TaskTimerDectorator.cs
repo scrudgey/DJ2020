@@ -7,7 +7,6 @@ namespace AI {
         TaskNode wrapped;
         private float timer;
         private float lifetime = 1f;
-        // public TaskTimerDectorator(TaskNode wrapped) : base(wrapped) { this.wrapped = wrapped; }
         public TaskTimerDectorator(TaskNode wrapped, float lifetime) : base(wrapped) {
             this.wrapped = wrapped;
             this.lifetime = lifetime;

@@ -1,24 +1,18 @@
+using AI;
 using UnityEngine;
 using UnityEngine.AI;
 public class SphereAttackRoutine : SphereControlState {
-    enum State { none, approach, shoot, reload }
-    State state;
+    static readonly public string LAST_SEEN_PLAYER_POSITION_KEY = "lastSeenPlayerPosition";
+    private TaskNode rootTaskNode;
     public SphereRobotSpeaker speaker;
-    readonly float REPATH_INTERVAL = 0.1f;
     readonly float ATTACK_TIMEOUT = 3f;
     readonly float ROUTINE_TIMEOUT = 10f;
     readonly float SHOOT_TIMEOUT = 1f;
-    readonly float SHOOT_INTERVAL = 0.1f;
     readonly float MAX_SHOOT_RANGE = 5f;
-    private float newDestinationTimer;
     float timeSinceSawPlayer;
-    float repathCountDown;
     float changeStateCountDown;
-    float reloadCountDown;
     public GunHandler gunHandler;
-    float doShootCountdown;
-    float shootTimer;
-    int pathIndex;
+    Vector3 lastSeenPlayerPosition;
     private readonly float CORNER_ARRIVAL_DISTANCE = 0.1f;
 
     public SphereAttackRoutine(SphereRobotAI ai,
@@ -29,141 +23,56 @@ public class SphereAttackRoutine : SphereControlState {
     }
     public override void Enter() {
         changeStateCountDown = ROUTINE_TIMEOUT;
+        SetupRootNode();
+    }
+    void SetupRootNode() {
+        // sequence:
+        // reload gun if gun is empty
+
+        // approach last seen player position until it is in range (and i have a clear line of sight?)
+        // if (Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition) > MAX_SHOOT_RANGE)
+
+        // shoot until 
+        // shoot task ends on doShootCountdown
+        // shoot task shoots at the last seen player position 
+        rootTaskNode = new Sequence(
+            new Selector(
+                new TaskConditional(() => gunHandler.gunInstance.clip > 0),
+                new TaskReload(gunHandler)
+            ),
+            new Selector(
+                new Sequence(
+                    new TaskConditional(() => isPlayerVisible()),
+                    new TaskShoot(gunHandler)
+                ),
+                new TaskMoveToPlayer(owner.transform)
+            )
+        );
     }
 
-    void ChangeState(State newState) {
-        // Debug.Log("change state to " + newState);
-        if (newState == State.shoot) {
-            doShootCountdown = SHOOT_TIMEOUT;
-        }
-        state = newState;
+    public bool isPlayerVisible() {
+        Debug.Log($"{Vector3.Distance(owner.transform.position, lastSeenPlayerPosition) < MAX_SHOOT_RANGE} && {timeSinceSawPlayer < ATTACK_TIMEOUT}");
+        return Vector3.Distance(owner.transform.position, lastSeenPlayerPosition) < MAX_SHOOT_RANGE && timeSinceSawPlayer < ATTACK_TIMEOUT;
     }
+
     public override PlayerInput Update() {
         timeSinceSawPlayer += Time.deltaTime;
-        repathCountDown -= Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
             owner.RoutineFinished(this);
         }
-        if (repathCountDown <= 0) {
-            repathCountDown += REPATH_INTERVAL;
-            SetDestination(owner.lastSeenPlayerPosition);
-        }
-        if (state == State.shoot) {
-            doShootCountdown -= Time.deltaTime;
-            shootTimer += Time.deltaTime;
-            if (shootTimer > SHOOT_INTERVAL) {
-                shootTimer -= SHOOT_INTERVAL;
-                ShootBullet();
-            }
-            if (doShootCountdown <= 0) {
-                ChangeState(State.approach);
-            }
-            if (Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition) > MAX_SHOOT_RANGE) {
-                ChangeState(State.approach);
-            }
-        } else if (state == State.approach) {
-            float distance = Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition);
-            if (distance <= MAX_SHOOT_RANGE && timeSinceSawPlayer < ATTACK_TIMEOUT) {
-                ChangeState(State.shoot);
-            }
-        } else if (state == State.none) {
-            ChangeState(State.approach);
-        } else if (state == State.reload) {
-            reloadCountDown -= Time.deltaTime;
-            if (reloadCountDown <= 0)
-                ChangeState(State.approach);
-        }
-        return getInput();
+
+        PlayerInput input = new PlayerInput();
+        rootTaskNode.Evaluate(ref input);
+        return input;
     }
-    void SetDestination(Vector3 destination) {
-        NavMeshHit hit = new NavMeshHit();
-        if (NavMesh.SamplePosition(destination, out hit, 10f, NavMesh.AllAreas)) {
-            NavMesh.CalculatePath(owner.transform.position, hit.position, NavMesh.AllAreas, owner.navMeshPath);
-            pathIndex = 1;
-        } else {
-            Debug.Log("could not find navmeshhit");
-        }
-    }
-    void ShootBullet() {
-        // if (slewTime > 0)
-        //     return;
-        if (owner.lastSeenPlayerPosition == null)
-            return;
-        PlayerInput.FireInputs input = new PlayerInput.FireInputs() {
-            FirePressed = true,
-            FireHeld = false,
-            targetData = new TargetData2 {
-                type = TargetData2.TargetType.objectLock,
-                screenPosition = Vector3.zero,
-                highlightableTargetData = null,
-                position = owner.lastSeenPlayerPosition
-            }
-        };
-        gunHandler.ShootImmediately(input);
-    }
-    public PlayerInput getInput() {
-        // TODO: overhaul
 
-        Vector3 inputVector = Vector3.zero;
-
-        if (state == State.approach) {
-            if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
-                Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
-                float distance = Vector3.Distance(nextPoint, owner.transform.position);
-                if (distance > CORNER_ARRIVAL_DISTANCE) {
-                    Vector3 direction = nextPoint - owner.transform.position;
-                    inputVector = direction.normalized;
-                    inputVector.y = 0;
-                } else {
-                    pathIndex += 1;
-                }
-            }
-        }
-
-        bool reload = false;
-        if (gunHandler.state == GunHandler.GunState.reloading) {
-            gunHandler.ClipIn();
-            gunHandler.StopReload();
-        } else {
-            reload = gunHandler.gunInstance.clip <= 0;
-            if (reload) {
-                ChangeState(State.reload);
-                reloadCountDown = 1f;
-            }
-        }
-
-        // if (slewTime > 0) {
-        //     inputVector = Vector3.zero;
-
-        // }
-
-        return new PlayerInput() {
-            inputMode = InputMode.gun,
-            MoveAxisForward = 0f,
-            MoveAxisRight = 0f,
-            CameraRotation = Quaternion.identity,
-            JumpDown = false,
-            jumpHeld = false,
-            jumpReleased = false,
-            CrouchDown = false,
-            runDown = false,
-            Fire = new PlayerInput.FireInputs(),
-            reload = reload,
-            selectgun = 0,
-            actionButtonPressed = false,
-            incrementItem = 0,
-            useItem = false,
-            incrementOverlay = 0,
-            rotateCameraRightPressedThisFrame = false,
-            rotateCameraLeftPressedThisFrame = false,
-            moveDirection = inputVector
-        };
-    }
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             changeStateCountDown = ROUTINE_TIMEOUT;
             timeSinceSawPlayer = 0;
+            lastSeenPlayerPosition = other.bounds.center;
+            rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
         }
     }
 

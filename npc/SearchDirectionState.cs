@@ -4,13 +4,10 @@ using UnityEngine.AI;
 
 
 public class SearchDirectionState : SphereControlState {
-    int pathIndex;
-    private readonly float CORNER_ARRIVAL_DISTANCE = 0.01f;
     readonly float ROUTINE_TIMEOUT = 20f;
     float changeStateCountDown;
     private Vector3 searchDirection;
     Vector3 targetPoint;
-    LoHi retargetInterval = new LoHi(0.5f, 1f);
     private TaskNode rootTaskNode;
     public SearchDirectionState(SphereRobotAI ai, Damage damage) : base(ai) {
         if (damage != null) {
@@ -23,7 +20,6 @@ public class SearchDirectionState : SphereControlState {
         if (noise != null) {
             searchDirection = (noise.transform.position - owner.transform.position).normalized;
             searchDirection.y = 0;
-            // Debug.Log($"search direction: {searchDirection}");
         } else {
             RandomSearchDirection();
         }
@@ -37,7 +33,7 @@ public class SearchDirectionState : SphereControlState {
     public override void Enter() {
         changeStateCountDown = ROUTINE_TIMEOUT;
         owner.navMeshPath = new NavMeshPath();
-        targetPoint = owner.transform.position + 5f * searchDirection;
+        targetPoint = owner.transform.position + 2f * searchDirection;
         SetupRootNode();
     }
 
@@ -75,6 +71,6 @@ public class SearchDirectionState : SphereControlState {
         changeStateCountDown = ROUTINE_TIMEOUT;
 
         targetPoint = owner.transform.position + 5f * searchDirection;
-        SetupRootNode();
+        SetupRootNode();    // TODO: better way of handling this
     }
 }
