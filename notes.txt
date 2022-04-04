@@ -513,3 +513,10 @@ the look-around branch is timer controlled. it consists of a sequence of timer c
 sequence:
 1. pathfind
 2. navigate
+have a Reset() method
+
+sequence
+1. move to key
+2. select new random location for key
+timer decorator involved?
+timer decorator reset with repeater?

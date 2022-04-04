@@ -1,6 +1,9 @@
+using AI;
 using UnityEngine;
 using UnityEngine.AI;
 public class SphereMoveRoutine : SphereControlState {
+    public static readonly string RANDOM_POSITION_KEY = "randomPosition";
+    private TaskNode rootTaskNode;
     private float newDestinationTimer;
     private SphereCollider patrolZone;
     int pathIndex;
@@ -9,62 +12,23 @@ public class SphereMoveRoutine : SphereControlState {
         this.patrolZone = sphere;
     }
 
+    public override void Enter() {
+        base.Enter();
+        SetupRootNode();
+        rootTaskNode.SetData(RANDOM_POSITION_KEY, randomPoint());
+    }
+    void SetupRootNode() {
+        rootTaskNode = new Sequence(
+            new TaskMoveToKey(owner.transform, RANDOM_POSITION_KEY),
+            new TaskSetRandomPosition(RANDOM_POSITION_KEY, randomPoint)
+        );
+    }
+    public Vector3 randomPoint() {
+        return patrolZone.radius * UnityEngine.Random.insideUnitSphere + patrolZone.center;
+    }
     public override PlayerInput Update() {
-        newDestinationTimer -= Time.deltaTime;
-        if (newDestinationTimer <= 0) {
-            SetDestination();
-            newDestinationTimer = Random.Range(2f, 15f);
-        }
-        return getInput();
-    }
-    void SetDestination() {
-        Vector3 randPoint = patrolZone.radius * UnityEngine.Random.insideUnitSphere + patrolZone.center;
-        NavMeshHit hit = new NavMeshHit();
-        if (NavMesh.SamplePosition(randPoint, out hit, 10f, NavMesh.AllAreas)) {
-            Vector3 destination = hit.position;
-            NavMesh.CalculatePath(owner.transform.position, destination, NavMesh.AllAreas, owner.navMeshPath);
-            pathIndex = 1;
-        } else {
-            Debug.Log("could not find navmeshhit");
-        }
-    }
-
-    public PlayerInput getInput() {
-        Vector3 inputVector = Vector3.zero;
-        if (pathIndex <= owner.navMeshPath.corners.Length - 1) {
-            Vector3 nextPoint = owner.navMeshPath.corners[pathIndex];
-            float distance = Vector3.Distance(nextPoint, owner.transform.position);
-            if (distance > CORNER_ARRIVAL_DISTANCE) {
-                Vector3 direction = nextPoint - owner.transform.position;
-                inputVector = direction.normalized;
-                inputVector.y = 0;
-            } else {
-                pathIndex += 1;
-            }
-        }
-        // if (slewTime > 0)
-        //     inputVector = Vector3.zero;
-
-        return new PlayerInput() {
-            inputMode = GameManager.I.inputMode,
-            MoveAxisForward = 0f,
-            MoveAxisRight = 0f,
-            CameraRotation = Quaternion.identity,
-            JumpDown = false,
-            jumpHeld = false,
-            jumpReleased = false,
-            CrouchDown = false,
-            runDown = false,
-            Fire = new PlayerInput.FireInputs(),
-            reload = false,
-            selectgun = 0,
-            actionButtonPressed = false,
-            incrementItem = 0,
-            useItem = false,
-            incrementOverlay = 0,
-            rotateCameraRightPressedThisFrame = false,
-            rotateCameraLeftPressedThisFrame = false,
-            moveDirection = inputVector
-        };
+        PlayerInput input = new PlayerInput();
+        rootTaskNode.Evaluate(ref input);
+        return input;
     }
 }

@@ -1,0 +1,23 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace AI {
+    public class TaskRepeaterDecorator : TaskNode {
+        TaskNode wrapped;
+        public TaskRepeaterDecorator(TaskNode wrapped) : base(wrapped) {
+            this.wrapped = wrapped;
+        }
+        public override TaskState DoEvaluate(ref PlayerInput input) {
+            TaskState wrapState = wrapped.DoEvaluate(ref input);
+
+            if (wrapState == TaskState.success) {
+                wrapped.Reset();
+            }
+            return TaskState.running;
+        }
+
+    }
+
+}

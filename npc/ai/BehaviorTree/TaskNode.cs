@@ -36,10 +36,14 @@ namespace AI {
                 Initialize();
             }
             initialized = true;
-            Debug.Log($"evaluating {this}");
             return DoEvaluate(ref input);
         }
         public virtual void Initialize() { }
+        public virtual void Reset() {
+            foreach (TaskNode child in children) {
+                child.Reset();
+            }
+        }
         public abstract TaskState DoEvaluate(ref PlayerInput input);
 
         public void SetData(string key, object value) {

@@ -22,19 +22,11 @@ public class SphereAttackRoutine : SphereControlState {
         speaker.DoAttackSpeak();
     }
     public override void Enter() {
+        base.Enter();
         changeStateCountDown = ROUTINE_TIMEOUT;
         SetupRootNode();
     }
     void SetupRootNode() {
-        // sequence:
-        // reload gun if gun is empty
-
-        // approach last seen player position until it is in range (and i have a clear line of sight?)
-        // if (Vector3.Distance(owner.transform.position, owner.lastSeenPlayerPosition) > MAX_SHOOT_RANGE)
-
-        // shoot until 
-        // shoot task ends on doShootCountdown
-        // shoot task shoots at the last seen player position 
         rootTaskNode = new Sequence(
             new Selector(
                 new TaskConditional(() => gunHandler.gunInstance.clip > 0),
@@ -51,7 +43,6 @@ public class SphereAttackRoutine : SphereControlState {
     }
 
     public bool isPlayerVisible() {
-        Debug.Log($"{Vector3.Distance(owner.transform.position, lastSeenPlayerPosition) < MAX_SHOOT_RANGE} && {timeSinceSawPlayer < ATTACK_TIMEOUT}");
         return Vector3.Distance(owner.transform.position, lastSeenPlayerPosition) < MAX_SHOOT_RANGE && timeSinceSawPlayer < ATTACK_TIMEOUT;
     }
 
