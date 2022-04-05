@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace AI {
-    public class TaskSetRandomPosition : TaskNode {
-        Func<Vector3> supplier;
+    public class TaskSetKey<T> : TaskNode {
+        Func<T> supplier;
         string key;
-        public TaskSetRandomPosition(string key, Func<Vector3> supplier) : base() {
+        public TaskSetKey(string key, Func<T> supplier) : base() {
             this.key = key;
             this.supplier = supplier;
         }

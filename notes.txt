@@ -520,3 +520,16 @@ sequence
 2. select new random location for key
 timer decorator involved?
 timer decorator reset with repeater?
+
+clean up and refactor and unify tasks
+    unite all move to tasks
+    remove reset?
+    parent set data?
+
+tune up ai behaviors
+    1. add a delay to movement
+        1. constantly changing target location while sphere is at old location until location is updated
+        2. timer decorator will still be successful on the next time around 
+    2. search more locations in noise?
+    3. attack
+

@@ -17,7 +17,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public Vector3 lastSeenPlayerPosition;
     public float timeSinceLastSeen;
     public Collider playerCollider;
-    Vector3 previousPosition;
 
     private void OnDrawGizmos() {
         string customName = "Relic\\MaskedSpider.png";
@@ -33,13 +32,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
 
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
-        StartMoveRoutine();
+        ChangeState(new SphereMoveRoutine(this, patrolZone));
 
         navMeshPath = new NavMeshPath();
     }
-    void StartMoveRoutine() {
-        ChangeState(new SphereMoveRoutine(this, patrolZone));
-    }
+
     public void RoutineFinished(SphereControlState routine) {
         switch (routine) {
             default:
@@ -74,9 +71,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         sphereController.SetInputs(input);
         gunHandler.ProcessGunSwitch(input);
         gunHandler.SetInputs(input);
-    }
-    private void OnTriggerEnter(Collider other) {
-        // Debug.Log(other);
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {

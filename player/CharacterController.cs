@@ -908,7 +908,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
-            isMoving = Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing),
+            isMoving = isMoving(),
             isCrouching = isCrouching,
             isRunning = isRunning,
             isJumping = state == CharacterState.superJump,
@@ -927,7 +927,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             camDir = camDir
         };
     }
-
+    public bool isMoving() {
+        return Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing);
+    }
     void LateUpdate() {
         OnValueChanged?.Invoke(this);
     }

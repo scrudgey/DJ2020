@@ -16,6 +16,7 @@ namespace AI {
         private Dictionary<string, object> dataContext = new Dictionary<string, object>();
         private bool initialized;
         public TaskNode() {
+            this.children = new List<TaskNode>();
             parent = null;
         }
         public TaskNode(TaskNode child) {

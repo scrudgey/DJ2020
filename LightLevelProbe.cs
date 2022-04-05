@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightLevelProbe : MonoBehaviour {
+public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     public RenderTexture lightlevelProbeTexture;
     public float lightLevel;
+    public Action<LightLevelProbe> OnValueChanged { get; set; }
+    public CharacterController controller;
 
     void Update() {
         RenderTexture tempTexture = RenderTexture.GetTemporary(lightlevelProbeTexture.width, lightlevelProbeTexture.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
@@ -27,6 +30,13 @@ public class LightLevelProbe : MonoBehaviour {
             lightLevel += (0.2126f * colors[i].r) + (0.7152f * colors[i].g) + (0.0722f * colors[i].b);
         }
         lightLevel = lightLevel / 25500f;
-        // Debug.Log(lightLevel);
+
+        if (controller.isCrouching) {
+            lightLevel *= 0.7f;
+        }
+        if (controller.isMoving()) {
+            lightLevel *= 1.3f;
+        }
+        OnValueChanged(this);
     }
 }

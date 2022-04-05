@@ -23,6 +23,7 @@ public class UIController : MonoBehaviour {
     public OverlayHandler overlayHandler;
     public GameObject UIEditorCamera;
     public HackDisplay hackDisplay;
+    public VisibilityUIHandler visibilityUIHandler;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -58,6 +59,8 @@ public class UIController : MonoBehaviour {
         aimIndicatorHandler.Bind(target);
 
         interactiveHighlightHandler.Bind(target);
+
+        visibilityUIHandler.Bind(target);
 
         overlayHandler.Bind();
         actionLogHandler.Bind(target);

@@ -7,13 +7,11 @@ public class SphereAttackRoutine : SphereControlState {
     public SphereRobotSpeaker speaker;
     readonly float ATTACK_TIMEOUT = 3f;
     readonly float ROUTINE_TIMEOUT = 10f;
-    readonly float SHOOT_TIMEOUT = 1f;
     readonly float MAX_SHOOT_RANGE = 5f;
     float timeSinceSawPlayer;
     float changeStateCountDown;
     public GunHandler gunHandler;
     Vector3 lastSeenPlayerPosition;
-    private readonly float CORNER_ARRIVAL_DISTANCE = 0.1f;
 
     public SphereAttackRoutine(SphereRobotAI ai,
                                GunHandler gunHandler) : base(ai) {
@@ -37,7 +35,7 @@ public class SphereAttackRoutine : SphereControlState {
                     new TaskConditional(() => isPlayerVisible()),
                     new TaskShoot(gunHandler)
                 ),
-                new TaskMoveToPlayer(owner.transform)
+                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY)
             )
         );
     }

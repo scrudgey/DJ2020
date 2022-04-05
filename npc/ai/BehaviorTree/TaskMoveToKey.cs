@@ -60,7 +60,6 @@ namespace AI {
             if (keyObj == null)
                 return;
             Vector3 target = (Vector3)keyObj;
-            Debug.Log($"fetched {target}");
             if (NavMesh.SamplePosition(target, out hit, 10f, NavMesh.AllAreas)) {
                 Vector3 destination = hit.position;
                 NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navMeshPath);
@@ -68,6 +67,10 @@ namespace AI {
             } else {
                 Debug.Log("could not find navmeshhit");
             }
+        }
+        public override void Reset() {
+            base.Reset();
+            SetDestination();
         }
     }
 
