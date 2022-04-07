@@ -269,5 +269,38 @@ public class Toolbox {
             return Mathf.Lerp(maxLevel, minLevel, (pos - .5f) * 2f);
         }
     }
+
+    public static int DiscreteLightLevel(float lightLevel, bool isCrouching, bool isMoving) {
+        // B < 10: -
+        // 10 < B < 15: +
+        // 15 < B < 30: ++
+        // 30 < B < 60: +++
+        // 60 < B < 80: ++++
+        // 80 < B : +++++
+
+        int level = 0;
+        if (lightLevel <= 10) {
+            level = 0;
+        } else if (10 < lightLevel && lightLevel <= 15) {
+            level = 1;
+        } else if (15 < lightLevel && lightLevel <= 30) {
+            level = 2;
+        } else if (30 < lightLevel && lightLevel <= 60) {
+            level = 3;
+        } else if (60 < lightLevel && lightLevel <= 80) {
+            level = 4;
+        } else if (80 < lightLevel) {
+            level = 5;
+        }
+        if (isCrouching) {
+            level -= 1;
+        }
+        if (isMoving) {
+            level += 1;
+        }
+        level = Math.Max(0, level);
+        level = Math.Min(level, 5);
+        return level;
+    }
 }
 
