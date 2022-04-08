@@ -300,7 +300,9 @@ public class Toolbox {
         }
         level = Math.Max(0, level);
         level = Math.Min(level, 5);
+
         return level;
     }
+
 }
 

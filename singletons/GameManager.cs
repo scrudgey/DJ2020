@@ -18,7 +18,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public GameData gameData;
     public GameObject playerObject;
-
+    public LightLevelProbe playerLightLevelProbe;
 
     // UI input
     public InputActionReference showConsole;
@@ -180,5 +180,35 @@ public partial class GameManager : Singleton<GameManager> {
     public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.gun;
         inputMode = InputMode.gun;
+    }
+
+
+    public bool IsPlayerVisible(float distance) {
+
+        // B < 10: -
+        // 10 < B < 15: +
+        // 15 < B < 30: ++
+        // 30 < B < 60: +++
+        // 60 < B < 80: ++++
+        // 80 < B : +++++
+
+        // Toolbox.GetP
+        int lightLevel = playerLightLevelProbe.GetDiscreteLightLevel();
+        // Debug.Log($"{lightLevel} {distance}");
+        switch (lightLevel) {
+            case 0:
+                return distance < 1f;
+            case 1:
+                return distance < 2f;
+            case 2:
+                return distance < 4.5f;
+            default:
+            case 3:
+                return distance < 7f;
+            case 4:
+                return distance < 13f;
+            case 5:
+                return distance < 50f;
+        }
     }
 }

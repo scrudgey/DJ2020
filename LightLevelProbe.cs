@@ -4,20 +4,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
-    public int lightLevel;
+    private float lightLevel;
     public Action<LightLevelProbe> OnValueChanged { get; set; }
     public CharacterController controller;
     public RenderTexture[] lightTextures;
     void Update() {
-        float level = 0;
+        lightLevel = 0;
         foreach (RenderTexture texture in lightTextures) {
             float faceLevel = TextureToLightLevel(texture);
-            Debug.Log($"face: {faceLevel}");
-            level = Math.Max(faceLevel, level);
+            lightLevel = Math.Max(faceLevel, lightLevel);
         }
-        lightLevel = Toolbox.DiscreteLightLevel(level, controller.isCrouching, controller.isMoving());
-        OnValueChanged(this);
-        // GetTerrainTexture();
+        // lightLevel = Toolbox.DiscreteLightLevel(level, controller.isCrouching, controller.isMoving());
+        if (OnValueChanged != null) OnValueChanged(this);
+    }
+
+    public int GetDiscreteLightLevel() {
+        return Toolbox.DiscreteLightLevel(lightLevel, controller.isCrouching, controller.isMoving());
     }
 
     float TextureToLightLevel(RenderTexture texture) {
@@ -43,7 +45,6 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
             level = Math.Max(level, pixelBrightness);
         }
         level = level / (2.55f);
-
         return level;
     }
     // void Start() {

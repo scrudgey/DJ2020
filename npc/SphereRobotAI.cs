@@ -87,26 +87,33 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         }
     }
     void Perceive(Collider other) {
-        stateMachine.currentState.OnObjectPerceived(other);
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             PerceivePlayerObject(other);
+        } else {
+            stateMachine.currentState.OnObjectPerceived(other);
         }
     }
 
     void PerceivePlayerObject(Collider other) {
-        lastSeenPlayerPosition = other.bounds.center;
-        timeSinceLastSeen = 0f;
-        playerCollider = other;
+        float distance = Vector3.Distance(transform.position, other.bounds.center);
+        // LightLevelProbe
+        if (GameManager.I.IsPlayerVisible(distance)) {
+            stateMachine.currentState.OnObjectPerceived(other);
+            lastSeenPlayerPosition = other.bounds.center;
+            timeSinceLastSeen = 0f;
+            playerCollider = other;
 
-        // TODO: change response depending on suspicion level
-        // player suspicion, my awareness of player suspicion
+            // TODO: change response depending on suspicion level
+            // player suspicion, my awareness of player suspicion
 
-        switch (stateMachine.currentState) {
-            case SearchDirectionState:
-            case SphereMoveRoutine:
-                ChangeState(new SphereAttackRoutine(this, gunHandler));
-                break;
+            switch (stateMachine.currentState) {
+                case SearchDirectionState:
+                case SphereMoveRoutine:
+                    ChangeState(new SphereAttackRoutine(this, gunHandler));
+                    break;
+            }
         }
+
     }
 
     bool TargetVisible(Collider other) {

@@ -26,7 +26,7 @@ public class VisibilityUIHandler : IBinder<LightLevelProbe> {
     float highestVis = float.MinValue;
     float lowestVis = float.MaxValue;
     override public void HandleValueChanged(LightLevelProbe t) {
-        int key = t.lightLevel;
+        int key = t.GetDiscreteLightLevel();
         textMesh.text = VALUES[key];
     }
 }
