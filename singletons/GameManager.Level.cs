@@ -21,6 +21,9 @@ public partial class GameManager : Singleton<GameManager> {
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
+        this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
+        this.playerItemHandler = focus.GetComponentInChildren<ItemHandler>();
+        this.playerInteractor = focus.GetComponentInChildren<Interactor>();
         Debug.Log("setting focus...");
         // if (OnFocusChanged != null) {
         OnFocusChanged?.Invoke(focus);

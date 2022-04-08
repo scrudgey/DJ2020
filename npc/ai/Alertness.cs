@@ -1,0 +1,1 @@
+public enum Alertness { alert, distracted }

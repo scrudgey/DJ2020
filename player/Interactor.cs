@@ -40,6 +40,9 @@ public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
         RemoveNullInteractives();
         OnValueChanged?.Invoke(this);
     }
+    public Suspiciousness GetSuspiciousness() {
+        return Suspiciousness.normal;
+    }
     public void RemoveInteractive(Collider other) {
         if (interactives.ContainsKey(other)) {
             interactives[other].interactor = null;

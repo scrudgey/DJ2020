@@ -18,6 +18,9 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public GameData gameData;
     public GameObject playerObject;
+    public GunHandler playerGunHandler;
+    public ItemHandler playerItemHandler;
+    public Interactor playerInteractor;
     public LightLevelProbe playerLightLevelProbe;
 
     // UI input
@@ -210,5 +213,13 @@ public partial class GameManager : Singleton<GameManager> {
             case 5:
                 return distance < 50f;
         }
+    }
+
+    public Suspiciousness PlayerAppearance() {
+        if (playerGunHandler.gunInstance == null) {
+            return Suspiciousness.normal;
+        } else if (playerGunHandler.gunInstance != null) {
+            return Suspiciousness.suspicious;
+        } else return Suspiciousness.normal;
     }
 }

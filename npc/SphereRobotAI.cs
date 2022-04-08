@@ -17,7 +17,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public Vector3 lastSeenPlayerPosition;
     public float timeSinceLastSeen;
     public Collider playerCollider;
-
+    public Alertness alertness;
+    public bool recentlyInCombat;
+    public bool recentHeardSuspicious;
+    public bool recentlySawSuspicious;
     private void OnDrawGizmos() {
         string customName = "Relic\\MaskedSpider.png";
         Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
@@ -103,8 +106,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             timeSinceLastSeen = 0f;
             playerCollider = other;
 
-            // TODO: change response depending on suspicion level
-            // player suspicion, my awareness of player suspicion
+            ReactToPlayerSuspicion();
 
             switch (stateMachine.currentState) {
                 case SearchDirectionState:
@@ -155,6 +157,36 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             case SearchDirectionState:
                 // TODO: if ive been searching for a while, reset the search
                 break;
+        }
+    }
+
+
+    public void ReactToPlayerSuspicion() {
+        // TODO: change response depending on suspicion level
+        // player suspicion, my awareness of player suspicion
+
+        // levels have sensitivity property
+        if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.publicProperty) {
+            // guard AI: focus
+            alertness;
+
+            //player character: activity
+            GameManager.I.playerInteractor.GetSuspiciousness();
+
+            //player character: appearance
+            GameManager.I.PlayerAppearance();
+
+            //AI: state of knowledge
+            recentHeardSuspicious;
+            recentlySawSuspicious;
+            recentlyInCombat;
+
+        } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.semiprivateProperty) {
+
+        } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.privateProperty) {
+
+        } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.restrictedProperty) {
+
         }
     }
 }
