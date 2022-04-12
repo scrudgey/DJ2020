@@ -1,13 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using UnityEngine;
 using UnityEngine.AI;
+public enum Reaction { ignore, attack, investigate }
+
 public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public SightCone sightCone;
     public NavMeshPath navMeshPath; // TODO: remove this
     public SphereRobotController sphereController;
     public GunHandler gunHandler;
+    public AlertHandler alertHandler;
     private SphereRobotBrain stateMachine;
     float perceptionCountdown;
     public SphereCollider patrolZone;
@@ -17,15 +21,19 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public Vector3 lastSeenPlayerPosition;
     public float timeSinceLastSeen;
     public Collider playerCollider;
-    public Alertness alertness;
+    public Alertness alertness = Alertness.normal;
     public bool recentlyInCombat;
-    public bool recentHeardSuspicious;
-    public bool recentlySawSuspicious;
+    public Suspiciousness recentHeardSuspicious;  // TODO: set this value
+    public Suspiciousness recentlySawSuspicious; // TODO: set this value
+
+    // public TextMeshProU
     private void OnDrawGizmos() {
         string customName = "Relic\\MaskedSpider.png";
         Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
     }
     void Start() {
+        // alertIcon.enabled = false;
+        alertHandler.Hide();
         // TODO: save / load gun state
         gunHandler.primary = new GunInstance(Gun.Load("smg"));
         gunHandler.SwitchToGun(1);
@@ -40,6 +48,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         navMeshPath = new NavMeshPath();
     }
 
+
     public void RoutineFinished(SphereControlState routine) {
         switch (routine) {
             default:
@@ -51,6 +60,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     }
     private void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
+        switch (routine) {
+            case SphereAttackRoutine attack:
+                recentlyInCombat = true;
+                break;
+        }
     }
     void Update() {
         timeSinceLastSeen += Time.deltaTime;
@@ -106,16 +120,21 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             timeSinceLastSeen = 0f;
             playerCollider = other;
 
-            ReactToPlayerSuspicion();
+            Reaction reaction = ReactToPlayerSuspicion();
 
-            switch (stateMachine.currentState) {
-                case SearchDirectionState:
-                case SphereMoveRoutine:
-                    ChangeState(new SphereAttackRoutine(this, gunHandler));
-                    break;
+            if (reaction == Reaction.attack || reaction == Reaction.investigate) {
+                switch (stateMachine.currentState) {
+                    case SearchDirectionState:
+                    case SphereMoveRoutine:
+                        alertHandler.ShowAlert();
+                        ChangeState(new SphereAttackRoutine(this, gunHandler));
+                        break;
+                }
+            } else if (reaction == Reaction.investigate) {
+                alertHandler.ShowWarn();
+                Debug.Log("investigate");
             }
         }
-
     }
 
     bool TargetVisible(Collider other) {
@@ -148,7 +167,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     }
 
     public void HearNoise(NoiseComponent noise) {
-        // Debug.Log($"hearing noise {noise}");
+        recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
         stateMachine.currentState.OnNoiseHeard(noise);
         switch (stateMachine.currentState) {
             case SphereMoveRoutine:
@@ -160,33 +179,70 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         }
     }
 
-
-    public void ReactToPlayerSuspicion() {
-        // TODO: change response depending on suspicion level
-        // player suspicion, my awareness of player suspicion
-
-        // levels have sensitivity property
+    public Reaction ReactToPlayerSuspicion() {
+        recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.PlayerAppearance());
+        recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal);
         if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.publicProperty) {
+
             // guard AI: focus
-            alertness;
+            // alertness;
+            // AI: state of knowledge
+            // recentHeardSuspicious;
+            // recentlySawSuspicious;
 
-            //player character: activity
-            GameManager.I.playerInteractor.GetSuspiciousness();
+            // player character: appearance and activity
+            Suspiciousness playerActivity = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
 
-            //player character: appearance
-            GameManager.I.PlayerAppearance();
+            if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
+                return Reaction.attack;
+            } else if (playerActivity == Suspiciousness.aggressive) {
+                return Reaction.attack;
+            } else if (GameManager.I.PlayerAppearance() == Suspiciousness.suspicious) {
+                if (recentlyInCombat)
+                    return Reaction.attack;
+                return Reaction.investigate;
+            } else if (playerActivity == Suspiciousness.suspicious) {
+                if (recentlyInCombat)
+                    return Reaction.attack;
+                return Reaction.investigate;
+            }
 
-            //AI: state of knowledge
-            recentHeardSuspicious;
-            recentlySawSuspicious;
-            recentlyInCombat;
-
+            return Reaction.ignore;
         } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.semiprivateProperty) {
 
+            Suspiciousness playerActivity = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
+
+
+            if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
+                return Reaction.attack;
+            } else if (playerActivity == Suspiciousness.aggressive) {
+                return Reaction.attack;
+            } else if (GameManager.I.PlayerAppearance() == Suspiciousness.suspicious) {
+                if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
+                    return Reaction.attack;
+                return Reaction.investigate;
+            } else if (playerActivity == Suspiciousness.suspicious) {
+                if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
+                    return Reaction.attack;
+                return Reaction.investigate;
+            }
+            return Reaction.ignore;
         } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.privateProperty) {
+            Suspiciousness playerActivity = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
 
+            if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
+                return Reaction.attack;
+            } else if (playerActivity == Suspiciousness.aggressive) {
+                return Reaction.attack;
+            } else if (GameManager.I.PlayerAppearance() == Suspiciousness.suspicious) {
+                return Reaction.attack;
+            } else if (playerActivity == Suspiciousness.suspicious) {
+                return Reaction.attack;
+            }
+            return Reaction.investigate;
         } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.restrictedProperty) {
-
+            return Reaction.attack;
         }
+        return Reaction.ignore;
     }
 }

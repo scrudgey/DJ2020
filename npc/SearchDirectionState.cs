@@ -4,10 +4,11 @@ using UnityEngine.AI;
 
 
 public class SearchDirectionState : SphereControlState {
+    static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
     readonly float ROUTINE_TIMEOUT = 20f;
     float changeStateCountDown;
     private Vector3 searchDirection;
-    Vector3 targetPoint;
+    // Vector3 targetPoint;
     private TaskNode rootTaskNode;
     public SearchDirectionState(SphereRobotAI ai, Damage damage) : base(ai) {
         if (damage != null) {
@@ -15,6 +16,8 @@ public class SearchDirectionState : SphereControlState {
         } else {
             RandomSearchDirection();
         }
+        SetupRootNode();
+        rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
     }
     public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise) : base(ai) {
         if (noise != null) {
@@ -23,6 +26,8 @@ public class SearchDirectionState : SphereControlState {
         } else {
             RandomSearchDirection();
         }
+        SetupRootNode();
+        rootTaskNode.SetData(SEARCH_POSITION_KEY, noise.transform.position);
     }
     void RandomSearchDirection() {
         searchDirection = Random.insideUnitSphere;
@@ -33,8 +38,6 @@ public class SearchDirectionState : SphereControlState {
     public override void Enter() {
         changeStateCountDown = ROUTINE_TIMEOUT;
         owner.navMeshPath = new NavMeshPath();
-        targetPoint = owner.transform.position + 2f * searchDirection;
-        SetupRootNode();
     }
 
     void SetupRootNode() {
@@ -50,7 +53,7 @@ public class SearchDirectionState : SphereControlState {
                 // look right
                 new TaskTimerDectorator(new TaskLookInDirection(rightDirection), 1f)
             ), 3f),
-            new TaskMoveToPosition(owner.transform, targetPoint)
+            new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY)
         );
     }
 
@@ -66,11 +69,13 @@ public class SearchDirectionState : SphereControlState {
 
     public override void OnNoiseHeard(NoiseComponent noise) {
         base.OnNoiseHeard(noise);
-        searchDirection = noise.transform.position - owner.transform.position;
-
-        changeStateCountDown = ROUTINE_TIMEOUT;
-
-        targetPoint = owner.transform.position + 5f * searchDirection;
-        SetupRootNode();    // TODO: better way of handling this
+        if (noise.data.player) {
+            // searchDirection = noise.transform.position - owner.transform.position;
+            searchDirection = noise.transform.position;
+            changeStateCountDown = ROUTINE_TIMEOUT;
+            rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
+        }
+        // targetPoint = owner.transform.position + 5f * searchDirection;
+        // SetupRootNode();    // TODO: better way of handling this
     }
 }

@@ -31,6 +31,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
     public Action<InteractorTargetData> OnActionDone;
     public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
     public HighlightableTargetData highlighted = null;
+    public Suspiciousness suspiciousness = Suspiciousness.normal;
     public void AddInteractive(Collider other) {
         Interactive interactive = other.GetComponent<Interactive>();
         if (interactive) {
@@ -41,7 +42,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
         OnValueChanged?.Invoke(this);
     }
     public Suspiciousness GetSuspiciousness() {
-        return Suspiciousness.normal;
+        return suspiciousness;
     }
     public void RemoveInteractive(Collider other) {
         if (interactives.ContainsKey(other)) {

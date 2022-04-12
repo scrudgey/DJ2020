@@ -1,1 +1,1 @@
-public enum Alertness { alert, distracted }
+public enum Alertness { normal, alert, distracted }

@@ -145,10 +145,13 @@ public class Toolbox {
         }
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
     }
-    public static NoiseComponent Noise(Vector3 position, NoiseData data) {
+    public static NoiseComponent Noise(Vector3 position, NoiseData data, bool player = false) {
         GameObject noiseObject = GameObject.Instantiate(Resources.Load("prefabs/noise"), position, Quaternion.identity) as GameObject;
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
         component.data = data;
+        component.data.player = player;
+        if (player)
+            SuspicionAudioUIHandler.OnNoise(data);
         return component;
     }
     public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {
@@ -303,6 +306,8 @@ public class Toolbox {
 
         return level;
     }
-
+    public static T Max<T>(T a, T b) where T : IComparable {
+        return a.CompareTo(b) >= 0 ? a : b;
+    }
 }
 

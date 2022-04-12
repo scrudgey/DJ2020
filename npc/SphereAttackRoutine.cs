@@ -26,6 +26,7 @@ public class SphereAttackRoutine : SphereControlState {
     }
     void SetupRootNode() {
         rootTaskNode = new Sequence(
+            new TaskTimerDectorator(new TaskLookAtKey(LAST_SEEN_PLAYER_POSITION_KEY), 0.5f),
             new Selector(
                 new TaskConditional(() => gunHandler.gunInstance.clip > 0),
                 new TaskReload(gunHandler)

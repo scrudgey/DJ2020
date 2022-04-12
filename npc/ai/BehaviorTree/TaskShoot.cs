@@ -14,14 +14,15 @@ namespace AI {
             shootTimer += Time.deltaTime;
             if (shootTimer > SHOOT_INTERVAL) {
                 shootTimer -= SHOOT_INTERVAL;
-                ShootBullet();
+                PlayerInput.FireInputs fireData = ShootBullet();
+                input.lookAtPoint = fireData.targetData.position;
             }
             return TaskState.running;
         }
-        void ShootBullet() {
+        PlayerInput.FireInputs ShootBullet() {
             Vector3 lastSeenPlayerPosition = (Vector3)GetData("lastSeenPlayerPosition");
             if (lastSeenPlayerPosition == null)
-                return;
+                return new PlayerInput.FireInputs();
             PlayerInput.FireInputs fireInput = new PlayerInput.FireInputs() {
                 FirePressed = true,
                 FireHeld = false,
@@ -33,6 +34,7 @@ namespace AI {
                 }
             };
             gunHandler.ShootImmediately(fireInput);
+            return fireInput;
         }
 
     }

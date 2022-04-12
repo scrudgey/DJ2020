@@ -6,7 +6,6 @@ using UnityEngine;
 namespace AI {
 
     public class TaskLookInDirection : TaskNode {
-        // Vector3 lookAtPoint;
         Vector3 lookAtDirection;
         public TaskLookInDirection(Vector3 lookAtDirection) : base() { this.lookAtDirection = lookAtDirection; }
         public override TaskState DoEvaluate(ref PlayerInput input) {

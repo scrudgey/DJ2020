@@ -45,7 +45,8 @@ public class Gun : ScriptableObject {
     }
     public NoiseData shootNoise() {
         return new NoiseData() {
-            volume = noise
+            volume = noise,
+            suspiciousness = Suspiciousness.aggressive
         };
     }
 }
