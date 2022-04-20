@@ -8,7 +8,6 @@ public class SearchDirectionState : SphereControlState {
     readonly float ROUTINE_TIMEOUT = 20f;
     float changeStateCountDown;
     private Vector3 searchDirection;
-    // Vector3 targetPoint;
     private TaskNode rootTaskNode;
     public SearchDirectionState(SphereRobotAI ai, Damage damage) : base(ai) {
         if (damage != null) {
@@ -70,12 +69,9 @@ public class SearchDirectionState : SphereControlState {
     public override void OnNoiseHeard(NoiseComponent noise) {
         base.OnNoiseHeard(noise);
         if (noise.data.player) {
-            // searchDirection = noise.transform.position - owner.transform.position;
             searchDirection = noise.transform.position;
             changeStateCountDown = ROUTINE_TIMEOUT;
             rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
         }
-        // targetPoint = owner.transform.position + 5f * searchDirection;
-        // SetupRootNode();    // TODO: better way of handling this
     }
 }

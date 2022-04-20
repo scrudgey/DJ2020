@@ -12,11 +12,29 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IIn
     public int index;
     public BaseItem activeItem;
     public AudioSource audioSource;
+    public Suspiciousness suspiciousness = Suspiciousness.normal;
+    public float suspicionTimer;
+    public readonly float SUSPICION_TIMEOUT = 1.5f;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
     void Start() {
         OnItemEnter(activeItem);
+    }
+    void Update() {
+        if (suspicionTimer >= 0) {
+            suspicionTimer -= Time.deltaTime;
+            if (suspicionTimer <= 0) {
+                if (suspiciousness > Suspiciousness.normal) {
+                    suspiciousness = (Suspiciousness)((int)suspiciousness - 1);
+                    suspicionTimer = SUSPICION_TIMEOUT;
+                }
+            }
+        }
+    }
+    public void SetSuspicion(Suspiciousness target, float timeout) {
+        suspiciousness = target;
+        suspicionTimer = timeout;
     }
     public void SetInputs(PlayerInput input) {
         if (input.incrementItem != 0) {
@@ -76,5 +94,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IIn
             default:
                 break;
         }
+    }
+
+    public Suspiciousness GetSuspiciousness() {
+        return suspiciousness;
     }
 }

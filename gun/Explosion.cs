@@ -21,6 +21,11 @@ public class Explosion : MonoBehaviour {
             }
         }
         Destroy(gameObject);
+        NoiseData data = new NoiseData {
+            volume = radius * 3f,
+            suspiciousness = Suspiciousness.aggressive
+        };
+        Toolbox.Noise(transform.position, data, player: false);
     }
 
     public ExplosionDamage GetDamageAtPoint(Vector3 point) {

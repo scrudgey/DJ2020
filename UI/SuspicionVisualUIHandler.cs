@@ -13,7 +13,9 @@ public class SuspicionVisualUIHandler : MonoBehaviour {
         this.parent = parent;
     }
     public void Update() {
-        appearance = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
+        appearance = Toolbox.Max<Suspiciousness>(
+            GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal,
+            GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal);
         switch (appearance) {
             case Suspiciousness.normal:
                 image.sprite = normalAppearance;

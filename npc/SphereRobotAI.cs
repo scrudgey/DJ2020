@@ -182,6 +182,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public Reaction ReactToPlayerSuspicion() {
         recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.PlayerAppearance());
         recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal);
+        recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal);
+
+        // player character: appearance and activity
+        Suspiciousness playerActivity = Toolbox.Max<Suspiciousness>(GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal, GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal);
         if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.publicProperty) {
 
             // guard AI: focus
@@ -189,9 +193,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             // AI: state of knowledge
             // recentHeardSuspicious;
             // recentlySawSuspicious;
-
-            // player character: appearance and activity
-            Suspiciousness playerActivity = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
 
             if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
                 return Reaction.attack;
@@ -206,13 +207,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
                     return Reaction.attack;
                 return Reaction.investigate;
             }
-
             return Reaction.ignore;
         } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.semiprivateProperty) {
-
-            Suspiciousness playerActivity = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
-
-
             if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
                 return Reaction.attack;
             } else if (playerActivity == Suspiciousness.aggressive) {
@@ -228,8 +224,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             }
             return Reaction.ignore;
         } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.privateProperty) {
-            Suspiciousness playerActivity = GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal;
-
             if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
                 return Reaction.attack;
             } else if (playerActivity == Suspiciousness.aggressive) {

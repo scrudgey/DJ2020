@@ -51,7 +51,6 @@ public class SphereAttackRoutine : SphereControlState {
         if (changeStateCountDown <= 0) {
             owner.RoutineFinished(this);
         }
-
         PlayerInput input = new PlayerInput();
         rootTaskNode.Evaluate(ref input);
         return input;

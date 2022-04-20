@@ -8,13 +8,18 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     public Action<LightLevelProbe> OnValueChanged { get; set; }
     public CharacterController controller;
     public RenderTexture[] lightTextures;
+    HashSet<Collider> concealment = new HashSet<Collider>();
     void Update() {
         lightLevel = 0;
-        foreach (RenderTexture texture in lightTextures) {
-            float faceLevel = TextureToLightLevel(texture);
-            lightLevel = Math.Max(faceLevel, lightLevel);
+        if (concealment.Count > 0) {
+            lightLevel = 13f;
+        } else {
+            foreach (RenderTexture texture in lightTextures) {
+                float faceLevel = TextureToLightLevel(texture);
+                lightLevel = Math.Max(faceLevel, lightLevel);
+            }
         }
-        // lightLevel = Toolbox.DiscreteLightLevel(level, controller.isCrouching, controller.isMoving());
+
         if (OnValueChanged != null) OnValueChanged(this);
     }
 
@@ -47,6 +52,17 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
         level = level / (2.55f);
         return level;
     }
+    private void OnTriggerEnter(Collider other) {
+        if (other.tag == "concealment") {
+            concealment.Add(other);
+        }
+    }
+    private void OnTriggerExit(Collider other) {
+        if (other.tag == "concealment") {
+            concealment.Remove(other);
+        }
+    }
+
     // void Start() {
     //     t = Terrain.activeTerrain;
     // }

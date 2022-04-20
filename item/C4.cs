@@ -13,6 +13,7 @@ namespace Items {
             GameObject c4 = GameObject.Instantiate(c4Data.prefab, handler.transform.position, Quaternion.identity);
             Explosive explosive = c4.GetComponentInChildren<Explosive>();
             explosive.data = c4Data;
+            handler.SetSuspicion(Suspiciousness.aggressive, 1f);
         }
     }
 
