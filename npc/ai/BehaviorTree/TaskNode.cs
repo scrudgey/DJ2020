@@ -41,6 +41,7 @@ namespace AI {
         }
         public virtual void Initialize() { }
         public virtual void Reset() {
+            initialized = false;
             foreach (TaskNode child in children) {
                 child.Reset();
             }

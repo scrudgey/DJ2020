@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class SuspicionAppeaeranceUIHandler : MonoBehaviour {
-    public SuspicionUIHandler parent;
     public Sprite disguiseAppearance;
     public Sprite normalAppearance;
     public Sprite gunAppearance;
     public Suspiciousness appearance;
     public Image image;
 
-    public void Bind(SuspicionUIHandler parent) {
-        this.parent = parent;
-    }
-    public void Update() {
-        appearance = GameManager.I.PlayerAppearance();
+    public void HandleValueChange(SuspicionData data, SuspicionUIHandler parent) {
+        appearance = data.appearanceSuspicion;
         switch (appearance) {
             case Suspiciousness.normal:
                 image.sprite = normalAppearance;
@@ -29,6 +25,5 @@ public class SuspicionAppeaeranceUIHandler : MonoBehaviour {
                 image.color = parent.alertColor;
                 break;
         }
-        parent.OnValueChanged();
     }
 }

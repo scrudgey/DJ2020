@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class SuspicionVisualUIHandler : MonoBehaviour {
-    public SuspicionUIHandler parent;
     public Sprite normalAppearance;
     public Sprite suspiciousAppearance;
     public Sprite alarmAppearance;
     public Suspiciousness appearance;
     public Image image;
-    public void Bind(SuspicionUIHandler parent) {
-        this.parent = parent;
-    }
-    public void Update() {
-        appearance = Toolbox.Max<Suspiciousness>(
-            GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal,
-            GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal);
+    public void HandleValueChange(SuspicionData data, SuspicionUIHandler parent) {
+        // TODO: fix
+        appearance = data.playerActivity();
         switch (appearance) {
             case Suspiciousness.normal:
                 image.sprite = normalAppearance;
@@ -30,6 +25,5 @@ public class SuspicionVisualUIHandler : MonoBehaviour {
                 image.color = parent.alertColor;
                 break;
         }
-        parent.OnValueChanged();
     }
 }

@@ -41,7 +41,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
         RemoveNullInteractives();
         OnValueChanged?.Invoke(this);
     }
-    public Suspiciousness GetSuspiciousness() {
+    public Suspiciousness GetSuspiciousness() { // TODO: 
         return suspiciousness;
     }
     public void RemoveInteractive(Collider other) {

@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class SuspicionIconUIHandler : MonoBehaviour {
-    public SuspicionUIHandler parent;
     public Sprite normalAppearance;
     public Sprite warnAppearance;
     public Sprite alarmAppearance;
     public Image image;
-    public void Bind(SuspicionUIHandler parent) {
-        this.parent = parent;
-    }
-    public void UpdateImage(Suspiciousness suspiciousness) {
-        switch (suspiciousness) {
+    public void HandleValueChange(SuspicionData data, SuspicionUIHandler parent) {
+        switch (data.netValue()) {
             case Suspiciousness.normal:
                 image.sprite = normalAppearance;
                 image.color = parent.normalColor;

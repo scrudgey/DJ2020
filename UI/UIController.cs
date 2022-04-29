@@ -62,7 +62,7 @@ public class UIController : MonoBehaviour {
         interactiveHighlightHandler.Bind(target);
 
         visibilityUIHandler.Bind(target);
-        suspicionUIHandler.Bind(target);
+        suspicionUIHandler.Bind();
 
         overlayHandler.Bind();
         actionLogHandler.Bind(target);

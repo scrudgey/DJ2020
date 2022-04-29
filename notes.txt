@@ -604,3 +604,27 @@ B < 10: -
 30 < B < 60: +++
 60 < B < 80: ++++
 80 < B : +++++
+
+
+
+set billboard
+set albedo = white pixel
+set emission
+    emission map: single pixel white
+    emission color: white + intensity 2
+    emissio
+
+
+1. put suspicion warnings as icons on bottom of screen in line with visibility indicator
+    overall color and eye-catch can alert player on the fly
+
+
+suspicion UI handler binds to GameManager
+GameManager publishes when player suspicion changes
+this will push updates to the various UI components
+this could trigger an outline flash
+
+
+1. billboarded color outliner
+2. handle transitions between suspiciousness 
+fix audio suspicion

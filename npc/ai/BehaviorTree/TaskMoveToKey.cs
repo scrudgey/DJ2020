@@ -22,11 +22,11 @@ namespace AI {
             SetDestination();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            repathTimer += Time.deltaTime;
             if (repathTimer > repathInterval) {
                 repathTimer = 0f;
                 SetDestination();
             }
+            repathTimer += Time.deltaTime;
             if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
                 return TaskState.failure;
             } else if (pathIndex <= navMeshPath.corners.Length - 1) {
@@ -48,7 +48,6 @@ namespace AI {
                 }
                 return TaskState.running;
             } else {
-                // Debug.Log("move success");
                 return TaskState.success;
             }
         }

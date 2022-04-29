@@ -23,8 +23,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public Collider playerCollider;
     public Alertness alertness = Alertness.normal;
     public bool recentlyInCombat;
-    public Suspiciousness recentHeardSuspicious;  // TODO: set this value
-    public Suspiciousness recentlySawSuspicious; // TODO: set this value
+    public Suspiciousness recentHeardSuspicious;
+    public Suspiciousness recentlySawSuspicious;
+    public PatrolRoute patrolRoute;
 
     // public TextMeshProU
     private void OnDrawGizmos() {
@@ -43,9 +44,15 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
 
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
-        ChangeState(new SphereMoveRoutine(this, patrolZone));
-
         navMeshPath = new NavMeshPath();
+
+        // TODO: start in patrol state
+        if (patrolRoute != null) {
+            ChangeState(new SpherePatrolRoutine(this, patrolRoute));
+
+        } else {
+            ChangeState(new SphereMoveRoutine(this, patrolZone));
+        }
     }
 
 
@@ -180,61 +187,62 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     }
 
     public Reaction ReactToPlayerSuspicion() {
-        recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.PlayerAppearance());
-        recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal);
-        recentlySawSuspicious = Toolbox.Max<Suspiciousness>(recentlySawSuspicious, GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal);
+        SuspicionData data = GameManager.I.GetSuspicionData();
 
-        // player character: appearance and activity
-        Suspiciousness playerActivity = Toolbox.Max<Suspiciousness>(GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal, GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal);
-        if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.publicProperty) {
+        recentlySawSuspicious = new List<Suspiciousness>{
+            data.appearanceSuspicion,
+            GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal,
+            GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal
+        }.Aggregate(recentlySawSuspicious, Toolbox.Max<Suspiciousness>);
 
+        if (data.levelSensitivity == SensitivityLevel.publicProperty) {
             // guard AI: focus
             // alertness;
             // AI: state of knowledge
             // recentHeardSuspicious;
             // recentlySawSuspicious;
 
-            if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
+            if (data.appearanceSuspicion == Suspiciousness.aggressive) {
                 return Reaction.attack;
-            } else if (playerActivity == Suspiciousness.aggressive) {
+            } else if (data.playerActivity() == Suspiciousness.aggressive) {
                 return Reaction.attack;
-            } else if (GameManager.I.PlayerAppearance() == Suspiciousness.suspicious) {
+            } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
                 if (recentlyInCombat)
                     return Reaction.attack;
                 return Reaction.investigate;
-            } else if (playerActivity == Suspiciousness.suspicious) {
+            } else if (data.playerActivity() == Suspiciousness.suspicious) {
                 if (recentlyInCombat)
                     return Reaction.attack;
                 return Reaction.investigate;
             }
             return Reaction.ignore;
-        } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.semiprivateProperty) {
-            if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
+        } else if (data.levelSensitivity == SensitivityLevel.semiprivateProperty) {
+            if (data.appearanceSuspicion == Suspiciousness.aggressive) {
                 return Reaction.attack;
-            } else if (playerActivity == Suspiciousness.aggressive) {
+            } else if (data.playerActivity() == Suspiciousness.aggressive) {
                 return Reaction.attack;
-            } else if (GameManager.I.PlayerAppearance() == Suspiciousness.suspicious) {
+            } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
                 if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
                     return Reaction.attack;
                 return Reaction.investigate;
-            } else if (playerActivity == Suspiciousness.suspicious) {
+            } else if (data.playerActivity() == Suspiciousness.suspicious) {
                 if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
                     return Reaction.attack;
                 return Reaction.investigate;
             }
             return Reaction.ignore;
-        } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.privateProperty) {
-            if (GameManager.I.PlayerAppearance() == Suspiciousness.aggressive) {
+        } else if (data.levelSensitivity == SensitivityLevel.privateProperty) {
+            if (data.appearanceSuspicion == Suspiciousness.aggressive) {
                 return Reaction.attack;
-            } else if (playerActivity == Suspiciousness.aggressive) {
+            } else if (data.playerActivity() == Suspiciousness.aggressive) {
                 return Reaction.attack;
-            } else if (GameManager.I.PlayerAppearance() == Suspiciousness.suspicious) {
+            } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
                 return Reaction.attack;
-            } else if (playerActivity == Suspiciousness.suspicious) {
+            } else if (data.playerActivity() == Suspiciousness.suspicious) {
                 return Reaction.attack;
             }
             return Reaction.investigate;
-        } else if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.restrictedProperty) {
+        } else if (data.levelSensitivity == SensitivityLevel.restrictedProperty) {
             return Reaction.attack;
         }
         return Reaction.ignore;
