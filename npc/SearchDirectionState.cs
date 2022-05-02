@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class SearchDirectionState : SphereControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
-    readonly float ROUTINE_TIMEOUT = 20f;
+    readonly float ROUTINE_TIMEOUT = 5f;
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;

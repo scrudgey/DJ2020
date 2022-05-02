@@ -9,7 +9,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     public GameObject nodeIndicatorPrefab;
     protected Graph<U, T> graph;
     public Material lineRendererMaterial;
-    Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>();
+    Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
 
     Dictionary<U, V> indicators = new Dictionary<U, V>();
     void Awake() {
@@ -47,6 +47,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         SetEdgeGraphicState();
     }
     public virtual void SetEdgeGraphicState() {
+        // Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count} ");
         foreach (HashSet<string> edge in graph.edgePairs) {
             LineRenderer renderer = GetLineRenderer(edge);
             string[] nodes = edge.ToArray();
@@ -77,6 +78,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         if (lineRenderers.ContainsKey(edge)) {
             return lineRenderers[edge];
         } else {
+            // Debug.LogWarning($"{typeof(T).FullName} Initializing line renderer for edge: {string.Join(",", edge)}");
             LineRenderer renderer = InitializeLineRenderer();
             lineRenderers[edge] = renderer;
             return renderer;
@@ -106,7 +108,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         renderer.sortingLayerName = "UI";
         renderer.sortingOrder = 100;
 
-        renderer.widthCurve = new AnimationCurve(new Keyframe(0, 0.02f), new Keyframe(1, 0.02f));
+        renderer.widthCurve = new AnimationCurve(new Keyframe(0, 0.05f), new Keyframe(1, 0.05f));
         return renderer;
     }
 }

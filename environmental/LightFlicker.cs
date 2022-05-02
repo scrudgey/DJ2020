@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using perlinNoise;
 using UnityEngine;
-
 public class LightFlicker : MonoBehaviour {
     new public Light light;
     private float initialIntensity;

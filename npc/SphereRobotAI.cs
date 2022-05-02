@@ -13,6 +13,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
     private SphereRobotBrain stateMachine;
+    public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.05f;
@@ -60,6 +61,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         switch (routine) {
             default:
             case SearchDirectionState:
+                alertHandler.ShowGiveUp();
+                speechTextController.HaltSpeechForTime(2f);
+                ChangeState(new SphereMoveRoutine(this, patrolZone));
+                break;
             case SphereAttackRoutine:
                 ChangeState(new SphereMoveRoutine(this, patrolZone));
                 break;
@@ -83,8 +88,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             PerceiveFieldOfView();
         }
         if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
-            if (TargetVisible(playerCollider))
-                Perceive(playerCollider);
+            // Debug.DrawRay(transform.position, target.transform.up, Color.cyan, 5f);
+            // Debug.DrawRay(transform.position, playerCollider.transform.position - transform.position, Color.magenta, 5f);
+            // Debug.Log(Vector3.Dot(target.transform.up, playerCollider.transform.position - transform.position) < 0);
+            if (Vector3.Dot(target.transform.up, playerCollider.transform.position - transform.position) < 0) {
+                if (TargetVisible(playerCollider))
+                    Perceive(playerCollider);
+            }
         }
 
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
@@ -129,17 +139,17 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
 
             Reaction reaction = ReactToPlayerSuspicion();
 
-            if (reaction == Reaction.attack || reaction == Reaction.investigate) {
+            if (reaction == Reaction.attack || reaction == Reaction.investigate) { // TODO: investigate routine
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
                     case SphereMoveRoutine:
+                    case SpherePatrolRoutine:
                         alertHandler.ShowAlert();
                         ChangeState(new SphereAttackRoutine(this, gunHandler));
                         break;
                 }
             } else if (reaction == Reaction.investigate) {
                 alertHandler.ShowWarn();
-                Debug.Log("investigate");
             }
         }
     }
@@ -156,7 +166,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             if (tagData.bulletPassthrough) continue;
 
             Color color = other == hit.collider ? Color.yellow : Color.red;
-            // Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
+            Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
             return other == hit.collider;
         }
         return false;
@@ -165,24 +175,31 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public void TakeDamage<T>(T damage) where T : Damage {
         switch (stateMachine.currentState) {
             case SphereMoveRoutine:
+            case SpherePatrolRoutine:
                 ChangeState(new SearchDirectionState(this, damage));
                 break;
             case SearchDirectionState:
-                // TODO: if ive been searching for a while, reset the search
+                if (stateMachine.timeInCurrentState > 1f)
+                    ChangeState(new SearchDirectionState(this, damage));
                 break;
         }
     }
 
     public void HearNoise(NoiseComponent noise) {
         recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
+        // Debug.Log(recentHeardSuspicious);
         stateMachine.currentState.OnNoiseHeard(noise);
-        switch (stateMachine.currentState) {
-            case SphereMoveRoutine:
-                ChangeState(new SearchDirectionState(this, noise));
-                break;
-            case SearchDirectionState:
-                // TODO: if ive been searching for a while, reset the search
-                break;
+        if (noise.data.suspiciousness > Suspiciousness.normal) {
+            switch (stateMachine.currentState) {
+                case SphereMoveRoutine:
+                case SpherePatrolRoutine:
+                    ChangeState(new SearchDirectionState(this, noise));
+                    break;
+                case SearchDirectionState:
+                    if (stateMachine.timeInCurrentState > 1f)
+                        ChangeState(new SearchDirectionState(this, noise));
+                    break;
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 public class Footsteps : MonoBehaviour {
     public AudioSource audioSource;
@@ -34,6 +34,12 @@ public class Footsteps : MonoBehaviour {
                 } else {
                     Toolbox.RandomizeOneShot(audioSource, leftFoot);
                 }
+                NoiseData noise = new NoiseData {
+                    player = true,
+                    suspiciousness = Suspiciousness.normal,
+                    volume = 1
+                };
+                Toolbox.Noise(transform.position, noise, player: true);
             }
         }
 
@@ -46,6 +52,8 @@ public class Footsteps : MonoBehaviour {
         lastSurfaceType = surfaceBelowMe;
     }
     private SurfaceType GetCurrentSurfaceType() {
+        // TODO: use surface map.
+
         TagSystemData data = new TagSystemData();
         RaycastHit[] hits = Physics.RaycastAll(transform.position, -1f * transform.up, 0.5f); // get all hits
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found

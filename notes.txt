@@ -627,4 +627,20 @@ this could trigger an outline flash
 
 1. billboarded color outliner
 2. handle transitions between suspiciousness 
+
 fix audio suspicion
+    gunshot investigation does not lead to attacking the guy holding a gun
+* aim & shoot broken
+investigate routine
+start with suspicion / gunout etc
+
+AI test arena (VR theme)
+dummy targets
+
+
+1. new assets
+    AC unit and ducts
+    white interior 
+    office 
+    trees & bushes
+2. new spritesheet for player

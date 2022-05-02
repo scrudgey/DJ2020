@@ -13,7 +13,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     public HashSet<HashSet<string>> edgePairs;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
-        edgePairs = new HashSet<HashSet<string>>();
+        edgePairs = new HashSet<HashSet<string>>(HashSet<string>.CreateSetComparer());
         edges = new SerializableDictionary<string, HashSet<string>>();
     }
     public void AddEdge(Node from, Node to) {

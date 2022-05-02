@@ -10,12 +10,14 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
     public Collider newestRemoval;
     public Action<SightCone> OnValueChanged { get; set; }
     private void OnTriggerEnter(Collider other) {
+        // Debug.Log($"FOV enter: {other}");
         newestAddition = other;
         fieldOfView.Add(other);
         PruneFieldOfView();
         OnValueChanged?.Invoke(this);
     }
     private void OnTriggerExit(Collider other) {
+        // Debug.Log($"FOV exit: {other}");
         newestRemoval = other;
         fieldOfView.Remove(other);
         PruneFieldOfView();

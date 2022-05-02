@@ -12,7 +12,6 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, CyberNodeIndicat
             string[] nodes = edge.ToArray();
             CyberNode node1 = graph.nodes[nodes[0]];
             CyberNode node2 = graph.nodes[nodes[1]];
-
             if (node1.compromised && node2.compromised) {
                 renderer.material.color = colorSet.deadColor;
             } else {

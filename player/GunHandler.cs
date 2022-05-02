@@ -335,12 +335,16 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public void SetInputs(PlayerInput input) {
         inputMode = input.inputMode;
         currentTargetData = input.Fire.targetData;
+        // Debug.Log($"{} {} {}")
         if (HasGun()) {
             if (gunInstance.CanShoot() && inputMode == InputMode.gun) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
                         lastShootInput = input.Fire;
+                        // Debug.Log($"lastShootInput: {lastShootInput.targetData.position}");
                         state = GunState.shooting;
+                    } else if (input.Fire.FireHeld) {
+                        lastShootInput = input.Fire;
                     } else if (state == GunState.shooting && !input.Fire.FireHeld) {
                         EndShoot();
                     }

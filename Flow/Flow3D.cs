@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using perlinNoise;
+using UnityEngine;
 
 [RequireComponent(typeof(ParticleSystem))]
 public class Flow3D : MonoBehaviour {

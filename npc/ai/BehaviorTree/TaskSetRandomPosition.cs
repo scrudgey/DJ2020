@@ -13,7 +13,7 @@ namespace AI {
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             parent.SetData(key, supplier());
-            Debug.Log($"setting {key}");
+            // Debug.Log($"setting {key}");
             return TaskState.success;
         }
     }
