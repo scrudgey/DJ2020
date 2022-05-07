@@ -899,12 +899,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         // if (GameManager.I.showDebugRays)
         //     Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
-        GunType gunType = GunType.unarmed;
-        Gun baseGun = null;
-        if (gunHandler.HasGun()) {
-            gunType = gunHandler.gunInstance.baseGun.type;
-            baseGun = gunHandler.gunInstance.baseGun;
-        }
+        // GunType gunType = GunType.unarmed;
+        // Gun baseGun = null;
+        // if (gunHandler.HasGun()) {
+        //     gunType = gunHandler.gunInstance.baseGun.type;
+        //     baseGun = gunHandler.gunInstance.baseGun;
+        // }
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
@@ -916,13 +916,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             wallPressTimer = wallPressTimer,
             state = state,
             playerInputs = _lastInput,
-            gunInput = new AnimationInput.GunAnimationInput {
-                gunType = gunType,
-                gunState = gunHandler.state,
-                hasGun = gunHandler.gunInstance != null && gunHandler.HasGun(),
-                holstered = gunHandler.gunInstance == null,
-                baseGun = baseGun
-            },
+            gunInput = gunHandler.BuildAnimationInput(),
             targetData = targetData,
             camDir = camDir
         };

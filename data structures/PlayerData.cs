@@ -33,8 +33,8 @@ public class PlayerData {
     public static PlayerData DefaultGameData() {
         return new PlayerData() {
 
-            // primaryGun = new GunInstance(Gun.Load("rifle")),
-            primaryGun = new GunInstance(Gun.Load("smg")),
+            primaryGun = new GunInstance(Gun.Load("rifle")),
+            // primaryGun = new GunInstance(Gun.Load("smg")),
             secondaryGun = new GunInstance(Gun.Load("pistol")),
             tertiaryGun = new GunInstance(Gun.Load("shotgun")),
             activeGun = 2,

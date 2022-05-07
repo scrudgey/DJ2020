@@ -28,6 +28,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
     public PlayerInput.FireInputs lastShootInput;
+    public bool shootRequestedThisFrame;
     public TargetData2 currentTargetData;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -335,6 +336,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public void SetInputs(PlayerInput input) {
         inputMode = input.inputMode;
         currentTargetData = input.Fire.targetData;
+        shootRequestedThisFrame = false;
         // Debug.Log($"{} {} {}")
         if (HasGun()) {
             if (gunInstance.CanShoot() && inputMode == InputMode.gun) {
@@ -352,6 +354,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
                     if (input.Fire.FirePressed) {//&& !shooting) {
                         lastShootInput = input.Fire;
                         state = GunState.shooting;
+                        shootRequestedThisFrame = true;
                     }
                 }
             } else {
@@ -374,6 +377,23 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             crouchingInaccuracy = 0f;
         }
         OnValueChanged?.Invoke(this);
+    }
+
+    public AnimationInput.GunAnimationInput BuildAnimationInput() {
+        GunType gunType = GunType.unarmed;
+        Gun baseGun = null;
+        if (HasGun()) {
+            gunType = gunInstance.baseGun.type;
+            baseGun = gunInstance.baseGun;
+        }
+        return new AnimationInput.GunAnimationInput {
+            gunType = gunType,
+            gunState = state,
+            hasGun = gunInstance != null && HasGun(),
+            holstered = gunInstance == null,
+            baseGun = baseGun,
+            shootRequestedThisFrame = shootRequestedThisFrame
+        };
     }
 
     // TODO: save method

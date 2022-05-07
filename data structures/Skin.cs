@@ -275,11 +275,11 @@ public class Skin {
         skin.pistolIdle[Direction.rightUp] = new Sprite[] { pistolSprites[9] };
         skin.pistolIdle[Direction.up] = new Sprite[] { pistolSprites[12] };
 
-        skin.pistolShoot[Direction.down] = new Sprite[] { pistolSprites[1] };
-        skin.pistolShoot[Direction.rightDown] = new Sprite[] { pistolSprites[4] };
-        skin.pistolShoot[Direction.right] = new Sprite[] { pistolSprites[7] };
-        skin.pistolShoot[Direction.rightUp] = new Sprite[] { pistolSprites[10] };
-        skin.pistolShoot[Direction.up] = new Sprite[] { pistolSprites[13] };
+        skin.pistolShoot[Direction.down] = new Sprite[] { pistolSprites[1], pistolSprites[2] };
+        skin.pistolShoot[Direction.rightDown] = new Sprite[] { pistolSprites[4], pistolSprites[5] };
+        skin.pistolShoot[Direction.right] = new Sprite[] { pistolSprites[7], pistolSprites[8] };
+        skin.pistolShoot[Direction.rightUp] = new Sprite[] { pistolSprites[10], pistolSprites[11] };
+        skin.pistolShoot[Direction.up] = new Sprite[] { pistolSprites[13], pistolSprites[14] };
 
         skin.pistolReload[Direction.down] = new Sprite[] { pistolSprites[15], pistolSprites[16], pistolSprites[17], pistolSprites[18], pistolSprites[19], pistolSprites[20] };
         skin.pistolReload[Direction.rightDown] = new Sprite[] { pistolSprites[24], pistolSprites[25], pistolSprites[26], pistolSprites[27], pistolSprites[28], pistolSprites[29] };

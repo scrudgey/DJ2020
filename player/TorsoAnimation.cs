@@ -84,7 +84,7 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
         if (input.gunInput.hasGun) {
             switch (state) {
                 case GunHandler.GunState.shooting:
-                    SetAnimation(input.gunInput.baseGun.shootAnimation);
+                    SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
                     break;
                 case GunHandler.GunState.reloading:
                     SetAnimation(input.gunInput.baseGun.reloadAnimation);
@@ -112,8 +112,11 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
 
         UpdateFrame();
     }
-    private void SetAnimation(AnimationClip clip) {
-        if (animator.clip != clip) {
+    private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
+        if (forcePlay) {
+            animator.Stop();
+        }
+        if (animator.clip != clip || forcePlay) {
             bob = false;
             animator.clip = clip;
             animator.Play();
