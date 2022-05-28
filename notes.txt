@@ -671,9 +671,144 @@ destructible AC unit
 outline issues:
     crouching & head
     wall press scale orientation
-stutter in between  clipin and rack animation
+* stutter in between  clipin and rack animation
 use the same method in rifle as pistol (animation restart) to control fire interval and allow for trailing gunup
 wallpress, crouch and gun: head is facing backwards (head always facing left)
 question: can we adjust the stance when shooting smg, rifle?
     crouch / tactical?
 
+
+legs UR idle
+legs walking: ensure torso belt
+torso unarmed walking: ensure torso belt not present?
+
+
+1. move camera as we move cursor around
+2. point gun once cursor is far enough away
+3. right click to enter over the shoulder mode
+4. scroll to zoom in and out.
+
+
+fix wood window bottom
+elevator interior
+elevator panel
+exit signs
+stairwell
+bathroom
+
+carpet
+wallC
+wallC window
+wallC window pane
+desk
+wallC front/back issue
+chair: from back toward front, legs
+
+
+
+1. use standard shader 
+    can change opaque to transparent using shaderutils
+    then can't use shader to determine distance from camera
+2. use custom shader
+    then we can use 
+    v2f vert (appdata_t v)
+    {
+        v2f o;
+        o.vertex = mul (UNITY_MATRIX_MVP, v.vertex);       
+        o.screenPos = ComputeScreenPos(o.vertex);
+        return o;
+    }
+    4th component is distance
+    now we must switch between standard shader and custom interloper shader 
+    use a standard surf shader and make it transparent
+
+
+1. everything above player is shadows only.
+2. everything between player and camera in a cylinder of radius r is switched to interloper shader.
+3. objects closest to player are least transparent.
+
+somehow, lerp the values.
+we want to lerp from solid to transparent.
+lerp in and lerp out.
+to me, suggests that the parameter must be controlled from script, setting a value in the shader.
+can we offload any calculation to the shader?
+    1. set player world position. let shader calculate distance, occlusion, if above, if between player and camera.
+        this is a good idea.
+        if we do this, then it could all be done in shader except:
+            1. it means everything must use interloper shader
+            2. therefore everything using transparent tags means the depth is fucked
+            3. therefore we simply must switch between shaders in script.
+            4. therefore switching shaders is restricted to the things that should be hidden
+            5. therefore hiding logic belongs to script.
+    2. set lerping parameter. this is a separate consideration.
+
+3 follows because the shader logic can't switch zwrite / tags on and off.
+    functionally this is handled by switching shaders. so it is fundamentally that way.
+    therefore we are using different shaders either way.
+
+logic: everything in a cylinder coaxial with camera forward up to player position.
+
+if we really need to, we can switch ceiling occlusion to be done by shader. but then we need:
+    transparent shader
+    opaque shader
+    plant shader ?
+
+
+1. InvokeRepeating instead of Update. 
+2. use spherecollider for ceiling check.
+    disable because above: target alpha = 0
+3. use cylinder trigger for interloper check.
+    disable because interloper: target alpha = decreasing with inverse radius of cylinder.
+4. on make apparent:
+    target alpha = 1
+
+on change state:
+    lerp parameter = 0
+on update:
+    if 
+    lerp parameter += Time.deltaTime
+
+*always lerp between 0 and 1, and use lerp parameter to control alpha.
+*don't even lerp. just modify alpha parameter directly in code.
+
+
+* cylinder collider
+* don't fully disappear interloper
+* target alpha set by distance
+InvokeRepeating
+OverlapSphereNonAlloc
+don't update ceiling  calculation when in the air
+
+
+void Start()
+ {
+     _PlayerPos_ID = Shader.PropertyToID("_PlayerPos");
+ }
+ 
+ void Update()
+ {
+     Shader.SetGlobalVector(_PlayerPos_ID, gameObject.transform.position);
+ }
+
+ var target : Camera; function Update() { 
+  var n = target.transform.position - transform.position;
+  transform.rotation = Quaternion.LookRotation( n ); } 
+
+  transform.rotation = Quaternion.LookRotation(n)
+
+* destructible walls
+* destructible computers
+* hack network
+* fix broken invisibility bug
+
+prevent invisibility for some objects
+
+next:
+controllability
+    right-click for ove the shoulder aiming
+    camera moves to point toward the aimpoint
+make a real mission. 
+    1. 7-11 worker sprite
+    2. civilian man
+    3. civilian woman
+    4. security guard

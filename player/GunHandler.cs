@@ -66,7 +66,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     }
     // used by animator
     public void StopReload() {
-        state = GunState.idle;
+        // TODO: change state
+        if (gunInstance.CheckRack()) {
+            state = GunState.racking;
+        } else state = GunState.idle;
     }
 
 

@@ -5,26 +5,40 @@ using UnityEngine;
 using UnityEngine.Rendering;
 public class MaterialController {
     // public Renderer renderer;
+    enum State { opaque, transparent, fadeOut, fadeIn }
+    State state;
     public List<Renderer> childRenderers;
     public GameObject gameObject;
+    public Collider collider;
     public CharacterCamera camera;
     public TagSystemData tagSystemData;
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableBecauseAbove;
+    public float ceilingHeight = 1.5f;
+    Material normalMaterial;
+    Material interloperMaterial;
+    public float targetAlpha;
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
     public MaterialController(GameObject gameObject, CharacterCamera camera) {
         this.camera = camera;
         this.gameObject = gameObject;
         this.tagSystemData = Toolbox.GetTagData(gameObject);
         this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>());
+        this.collider = gameObject.GetComponentInChildren<Collider>();
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
+            if (renderer.material != null)
+                normalMaterial = renderer.material;
+        }
+        if (normalMaterial != null) {
+
+            interloperMaterial = new Material(normalMaterial);
+            interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
         }
     }
     public void InterloperStart() {
-        // Debug.Log($"{gameObject} {renderer} interloper start");
-        timer = 1f;
+        timer = 0.1f;
     }
     public void CeilingCheck(Collider collider, Vector3 position) {
         if (collider.bounds.center.y < position.y) {
@@ -33,26 +47,40 @@ public class MaterialController {
         }
         Vector3 otherFloor = collider.bounds.center - new Vector3(0f, collider.bounds.extents.y, 0f);
         Vector3 direction = otherFloor - position;
-        if (direction.y > 2.0f) {
+        if (direction.y > ceilingHeight) {
+            // TODO: don't disable when character is midair.
             disableBecauseAbove = true;
         } else {
             disableBecauseAbove = false;
         }
     }
-    public void MakeTransparent() {
-        // handle transparent objects differently
+    public void MakeFadeOut() {
+        if (state == State.transparent || state == State.fadeOut)
+            return;
+        state = State.fadeOut;
         foreach (Renderer renderer in childRenderers) {
             if (renderer == null)
                 continue;
-            if (renderer.shadowCastingMode != ShadowCastingMode.ShadowsOnly) {
-                renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-                // renderer.enabled = false;
-            }
+            renderer.material = interloperMaterial;
+            renderer.material.SetFloat("_TargetAlpha", 1);
+            targetAlpha = 1;
         }
     }
-    public void MakeApparent() {
+    public void MakeFadeIn() {
+        if (state == State.opaque || state == State.fadeIn)
+            return;
+        state = State.fadeIn;
         foreach (Renderer renderer in childRenderers) {
-
+            renderer.enabled = true;
+        }
+        // if (renderer.shadowCastingMode != ShadowCastingMode.On) {
+        //     // renderer.shadowCastingMode = ShadowCastingMode.On;
+        //     renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+        //     // renderer.enabled = true;
+        // }
+    }
+    public void MakeOpaque() {
+        foreach (Renderer renderer in childRenderers) {
             if (renderer == null)
                 return;
             if (renderer.shadowCastingMode != ShadowCastingMode.On) {
@@ -60,11 +88,53 @@ public class MaterialController {
                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];
                 // renderer.enabled = true;
             }
+            renderer.material = normalMaterial;
         }
     }
-    public void Update() {
+    public void Update(float offAxisLength) {
         if (childRenderers.Count == 0)
             return;
+        float minimumAlpha = 0.2f;
+        if (disableBecauseAbove) {
+            minimumAlpha = 0f;
+        } else {
+            // minimumAlpha = 0.2f + (0.8f * (offAxisLength / 10f));
+            minimumAlpha = (1f * (offAxisLength / 2f));
+            // Debug.Log(offAxisLength);
+            // Debug.Log(minimumAlpha);
+        }
+        if (state == State.fadeIn) {
+            if (targetAlpha < 1) {
+                targetAlpha += Time.unscaledDeltaTime * 3f;
+            } else {
+                MakeOpaque();
+            }
+
+        } else if (state == State.fadeOut) {
+            if (targetAlpha > minimumAlpha) {
+                targetAlpha -= Time.unscaledDeltaTime * 3f;
+                targetAlpha = Mathf.Max(targetAlpha, minimumAlpha);
+            } else {
+                targetAlpha = minimumAlpha;
+            }
+            foreach (Renderer renderer in childRenderers) {
+                if (targetAlpha == 0) {
+                    renderer.enabled = false;
+                } else {
+                    renderer.enabled = true;
+                }
+            }
+        }
+
+        targetAlpha = Mathf.Max(0f, targetAlpha);
+        targetAlpha = Mathf.Min(1f, targetAlpha);
+
+        if (state == State.fadeIn || state == State.fadeOut) {
+            foreach (Renderer renderer in childRenderers) {
+                renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+            }
+        }
+
         // interloper logic
         if (timer > 0)
             timer -= Time.deltaTime;
@@ -75,9 +145,9 @@ public class MaterialController {
         }
 
         if (active() && (camera.state == CameraState.normal || camera.state == CameraState.attractor)) {
-            MakeTransparent();
+            MakeFadeOut();
         } else {
-            MakeApparent();
+            MakeFadeIn();
         }
     }
 
@@ -107,58 +177,97 @@ public class MaterialControllerCache {
 public class ClearSighter : MonoBehaviour {
     public MaterialControllerCache controllers;
     public CharacterCamera myCamera;
+    public Shader normalShader;
+    public Shader interloperShader;
+    public Collider cylinderCollider;
     Transform myTransform;
+    public List<MaterialController> interlopers = new List<MaterialController>();
+    public Transform followTransform;
     void Start() {
         controllers = new MaterialControllerCache(GameObject.FindObjectOfType<CharacterCamera>());
         myTransform = transform;
+        // InvokeRepeating("DoUpdate", 0f, 1f);
     }
 
-    void Update() {
+    void LateUpdate() {
+        myTransform.position = followTransform.position;
+
+        // TODO: invokeRepeating here
+        // TODO: set cylinder height
+        // TODO: set cylinder position
+
+        Vector3 directionToCamera = (myCamera.transform.position - myTransform.position).normalized;
+        myTransform.rotation = Quaternion.LookRotation(directionToCamera);
+
+        // garbage collect
+        HashSet<MaterialController> removeControllers = new HashSet<MaterialController>();
+
         // colliders above me
         Collider[] others = Physics.OverlapSphere(myTransform.position, 20f, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.shell, Layer.bulletPassThrough));
         foreach (Collider collider in others) {
-            if (collider.transform.IsChildOf(myTransform))
+            if (collider == null || collider.gameObject == null)
+                continue;
+            if (collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                 continue;
             MaterialController controller = controllers.get(collider.gameObject);
             if (controller != null)
                 controller.CeilingCheck(collider, myTransform.position);
         }
-
-        // collider between me and the camera
-        foreach (Vector3 startPosition in new Vector3[] {
-            transform.position + new Vector3(0, 1f, 0) ,
-            transform.position + new Vector3(0, 0.1f, 0)
-            }) {
-            float distance = Vector3.Distance(myCamera.transform.position, startPosition);
-            Vector3 direction = -1f * myCamera.transform.forward;
-            // Debug.Log(myCamera.transform.forward);
-            if (GameManager.I.showDebugRays)
-                Debug.DrawRay(startPosition, direction * distance, Color.magenta, 0.1f);
-
-            // TODO: use layer mask
-            foreach (RaycastHit hit in Physics.RaycastAll(startPosition, direction, distance).OrderBy(x => x.distance)) {
-                if (hit.collider.transform.IsChildOf(transform)) {
-                    continue;
-                }
-                MaterialController controller = controllers.get(hit.collider.gameObject);
-                if (controller != null) {
-                    controller.InterloperStart();
-                }
-            }
-        }
-
-        // garbage collect
-        HashSet<MaterialController> removeControllers = new HashSet<MaterialController>();
-        foreach (MaterialController controller in controllers.controllers.Values) {
-            if (controller == null)
+        foreach (MaterialController interloper in interlopers) {
+            if (interloper == null || interloper.gameObject == null) {
+                removeControllers.Add(interloper);
                 continue;
-            controller.Update();
-            if (!controller.active()) {
-                removeControllers.Add(controller);
             }
+            Vector3 directionToInterloper = interloper.gameObject.transform.position - myTransform.position;
+            if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > 0)
+                interloper.InterloperStart();
         }
-        foreach (MaterialController key in removeControllers) {
-            controllers.controllers.Remove(key.gameObject);
+
+
+
+        foreach (MaterialController controller in controllers.controllers.Values) {
+            if (controller == null || controller.gameObject == null) {
+                removeControllers.Add(controller);
+                continue;
+            }
+            Vector3 directionToMesh = myCamera.transform.position - controller.collider.bounds.center;
+            float axialDistance = Vector3.Dot(directionToMesh, directionToCamera);
+            Vector3 offAxis = directionToMesh - (axialDistance * directionToCamera);
+            float offAxisLength = offAxis.magnitude;
+            controller.Update(offAxisLength);
+
         }
+        // foreach (MaterialController key in removeControllers) {
+        //     controllers.controllers.Remove(key.gameObject);
+        // }
+    }
+
+    void OnTriggerEnter(Collider other)
+    => AddInterloper(other);
+
+    void OnTriggerExit(Collider other)
+        => RemoveInterloper(other);
+
+    void AddInterloper(Collider other) {
+        // Debug.Log("onaddinterloper");
+        if (other.transform.IsChildOf(myTransform.root) || other.transform.IsChildOf(followTransform)) {
+            return;
+        }
+        MaterialController controller = controllers.get(other.gameObject);
+        interlopers.Add(controller);
+        RemoveNullInterlopers();
+    }
+    void RemoveInterloper(Collider other) {
+        if (other.transform.IsChildOf(myTransform.root) || other.transform.IsChildOf(followTransform)) {
+            return;
+        }
+        MaterialController controller = controllers.get(other.gameObject);
+        interlopers.Remove(controller);
+        RemoveNullInterlopers();
+    }
+    void RemoveNullInterlopers() {
+        interlopers = interlopers
+            .Where(f => f != null)
+            .ToList();
     }
 }

@@ -133,8 +133,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     private void OnStateEnter(CameraState state, CameraState fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
+        Camera.clearFlags = CameraClearFlags.SolidColor;
         switch (state) {
             case CameraState.wallPress:
+                Camera.clearFlags = CameraClearFlags.Skybox;
                 currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
                 currentFollowingSharpness = followingSharpnessDefault * 3f;
                 currentDistanceMovementSpeed = distanceMovementSpeedDefault * 3f;
@@ -273,6 +275,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             targetDistance = 20,
             targetPosition = targetPosition,
             orthographicSize = 6, // 8 TODO: set by attractor and/or level
+            // orthographicSize = 3, // 8 TODO: set by attractor and/or level
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
             distanceMovementSpeed = currentDistanceMovementSpeed,

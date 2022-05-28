@@ -33,15 +33,18 @@ public class PlayerData {
     public static PlayerData DefaultGameData() {
         return new PlayerData() {
 
-            primaryGun = new GunInstance(Gun.Load("rifle")),
-            // primaryGun = new GunInstance(Gun.Load("smg")),
+            // primaryGun = new GunInstance(Gun.Load("rifle")),
+            primaryGun = new GunInstance(Gun.Load("smg")),
             secondaryGun = new GunInstance(Gun.Load("pistol")),
             tertiaryGun = new GunInstance(Gun.Load("shotgun")),
             activeGun = 2,
 
-            legSkin = "generic64",
-            // legSkin = "cyber",
-            bodySkin = "generic64",
+            // legSkin = "generic64",
+            // // legSkin = "cyber",
+            // bodySkin = "generic64",
+
+            legSkin = "Jack",
+            bodySkin = "Jack",
 
             cyberlegsLevel = 1,
 
