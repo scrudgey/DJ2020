@@ -104,7 +104,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     void SetInputs(PlayerInput input) {
         sphereController.SetInputs(input);
         gunHandler.ProcessGunSwitch(input);
-        gunHandler.SetInputs(input);
+        gunHandler.SetInputs(input, skipAnimation: true);
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {

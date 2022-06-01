@@ -16,6 +16,7 @@ public class InputController : MonoBehaviour {
     [Header("Inputs")]
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
+    public InputActionReference AimAction;
     public InputActionReference CrouchAction;
     public InputActionReference RunAction;
     public InputActionReference JumpAction;
@@ -36,6 +37,7 @@ public class InputController : MonoBehaviour {
     private Vector2 inputVector;
     private bool firePressedHeld;
     private bool firePressedThisFrame;
+    private bool aimPressedThisFrame;
     private bool crouchHeld;
     private bool runHeld;
     private bool rotateCameraRightPressedThisFrame;
@@ -57,6 +59,11 @@ public class InputController : MonoBehaviour {
         FireAction.action.performed += ctx => {
             firePressedThisFrame = ctx.ReadValueAsButton();
             firePressedHeld = ctx.ReadValueAsButton();
+        };
+
+        // Aim
+        AimAction.action.performed += ctx => {
+            aimPressedThisFrame = ctx.ReadValueAsButton();
         };
 
         // Crouch
@@ -175,82 +182,23 @@ public class InputController : MonoBehaviour {
             .ToList();
     }
 
-    public static TargetData2 CursorToTarget(CharacterCamera OrbitCamera) {
-        Vector2 cursorPosition = Mouse.current.position.ReadValue();
-
-        Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, OrbitCamera.Camera.nearClipPlane);
-        Ray projection = OrbitCamera.Camera.ScreenPointToRay(cursorPoint);
-        Vector3 direction = OrbitCamera.transform.forward;
-        if (GameManager.I.showDebugRays)
-            Debug.DrawRay(projection.origin, direction * 100, Color.magenta, 0.1f);
-        Ray clickRay = new Ray(projection.origin, direction);
-
-        // 1. determine if the click ray is hovering over a targetable object
-        //      if so, determine the priority targetable and highlight it
-        //      this can aim up or down as necessary
-        // 2. if not, shoot in the direction indicated by the mouse
-        //      this will be in the player's gun's height plane.
-
-
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
-        TagSystemData priorityData = null;
-        Vector3 targetPoint = Vector3.zero;
-        bool prioritySet = false;
-        HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
-
-        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            Highlightable interactive = hit.collider.GetComponent<Highlightable>();
-            if (interactive != null) {
-                targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
-            }
-            TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
-            if (data == null)
-                continue;
-            if (data.targetPriority == -1)
-                continue;
-            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
-                priorityData = data;
-                if (data.targetPoint != null) {
-                    targetPoint = data.targetPoint.position;
-                } else {
-                    targetPoint = hit.collider.bounds.center;
-                }
-                prioritySet = true;
-            }
-        }
-        if (!prioritySet) {
-            // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
-            float distance = 0;
-            Vector3 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
-            Plane plane = new Plane(Vector3.up, origin);
-            if (plane.Raycast(clickRay, out distance)) {
-                targetPoint = clickRay.GetPoint(distance);
-            }
-        }
-
-
-        HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
-        if (prioritySet) {
-            return new TargetData2 {
-                type = TargetData2.TargetType.objectLock,
-                // clickRay = clickRay,
-                screenPosition = OrbitCamera.Camera.WorldToScreenPoint(targetPoint),
-                highlightableTargetData = interactorData,
-                position = targetPoint
-            };
-        }
-
-        return new TargetData2 {
-            type = TargetData2.TargetType.direction,
-            screenPosition = cursorPosition,
-            highlightableTargetData = interactorData,
-            // clickRay = clickRay,
-            position = targetPoint
-        };
-    }
     private void HandleCharacterInput() {
 
-        TargetData2 targetData = CursorToTarget(OrbitCamera);
+        if (aimPressedThisFrame) {
+            if (GameManager.I.inputMode != InputMode.aim) {
+                GameManager.I.TransitionToInputMode(InputMode.aim);
+            } else {
+                GameManager.I.TransitionToInputMode(InputMode.gun);
+            }
+        }
+        TargetData2 targetData = TargetData2.none;
+
+        if (GameManager.I.inputMode == InputMode.aim) {
+            targetData = OrbitCamera.AimToTarget();
+        } else if (GameManager.I.inputMode == InputMode.gun) {
+            targetData = OrbitCamera.CursorToTarget();
+        }
+
 
         PlayerInput characterInputs = new PlayerInput() {
             inputMode = GameManager.I.inputMode,
@@ -265,7 +213,8 @@ public class InputController : MonoBehaviour {
             Fire = new PlayerInput.FireInputs() {
                 FirePressed = firePressedThisFrame,
                 FireHeld = firePressedHeld,
-                targetData = targetData
+                targetData = targetData,
+                AimPressed = aimPressedThisFrame
             },
             reload = reloadPressedThisFrame,
             selectgun = selectGunThisFrame,
@@ -286,6 +235,7 @@ public class InputController : MonoBehaviour {
         }
 
         firePressedThisFrame = false;
+        aimPressedThisFrame = false;
         jumpPressedThisFrame = false;
         reloadPressedThisFrame = false;
         jumpReleasedThisFrame = false;

@@ -223,8 +223,6 @@ public class ClearSighter : MonoBehaviour {
                 interloper.InterloperStart();
         }
 
-
-
         foreach (MaterialController controller in controllers.controllers.Values) {
             if (controller == null || controller.gameObject == null) {
                 removeControllers.Add(controller);

@@ -128,6 +128,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
     private float landStunTimer;
     private PlayerInput _lastInput;
+    private TargetData2 lastTargetDataInput;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -224,6 +225,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             }
         }
 
+
+
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -243,7 +246,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             _moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * _moveInputVector;
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
-
 
         // Run input
         if (input.runDown) {
@@ -271,6 +273,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             jumpHeldTimer = 0;
         }
 
+        TargetData2 targetData = TargetData2.none;
         switch (state) {
             case CharacterState.jumpPrep:
                 // TODO: normalize this player state
@@ -299,22 +302,25 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
+
                 // Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
-                Vector3 targetPoint = input.Fire.targetData.position;
-                if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
+                Vector3 targetPoint = targetData.position;
+                if (targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
                     _shootLookDirection = targetPoint;
                 }
 
                 // TODO: turn to face aim position?
-                Vector3 directionToCursor = targetPoint - transform.position;
-                directionToCursor.y = 0;
-                directionToCursor = directionToCursor.normalized;
-                float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
+                if (GameManager.I.inputMode != InputMode.aim) {
+                    Vector3 directionToCursor = targetPoint - transform.position;
+                    directionToCursor.y = 0;
+                    directionToCursor = directionToCursor.normalized;
+                    float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
 
-                if (dotproduct < 0 && moveInputVector == Vector3.zero) {
-                    _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
-                } else {
-                    _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
+                    if (dotproduct < 0 && moveInputVector == Vector3.zero) {
+                        _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
+                    } else {
+                        _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
+                    }
                 }
 
                 // Jumping input
@@ -355,6 +361,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         }
 
         _lastInput = input;
+        lastTargetDataInput = targetData;
     }
 
     /// <summary>
@@ -602,7 +609,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
                     targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
 
-                    if (isRunning) {
+                    if (GameManager.I.inputMode == InputMode.aim) {
+                        targetMovementVelocity /= 2f;
+                    } else if (isRunning) {
                         targetMovementVelocity *= runSpeedFraction;
                     } else if (isCrouching) {
                         // crawling
@@ -880,7 +889,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             lastWallInput = finalLastWallInput,
             crouchHeld = isCrouching,
             playerPosition = transform.position,
-            state = state
+            state = state,
+            targetData = lastTargetDataInput,
+            playerDirection = direction
         };
         return input;
     }
@@ -891,7 +902,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector2 playerDir = new Vector2(direction.x, direction.z);
 
         // head direction
-        TargetData2 targetData = InputController.CursorToTarget(OrbitCamera);
+        TargetData2 targetData = OrbitCamera.CursorToTarget();
 
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);

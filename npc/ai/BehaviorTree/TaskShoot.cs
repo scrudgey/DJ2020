@@ -16,6 +16,7 @@ namespace AI {
                 shootTimer -= SHOOT_INTERVAL;
                 PlayerInput.FireInputs fireData = ShootBullet();
                 input.lookAtPoint = fireData.targetData.position;
+                input.Fire = fireData;
             }
             return TaskState.running;
         }
@@ -24,8 +25,8 @@ namespace AI {
             if (lastSeenPlayerPosition == null)
                 return new PlayerInput.FireInputs();
             PlayerInput.FireInputs fireInput = new PlayerInput.FireInputs() {
-                FirePressed = true,
-                FireHeld = false,
+                FirePressed = false,
+                FireHeld = true,
                 targetData = new TargetData2 {
                     type = TargetData2.TargetType.objectLock,
                     screenPosition = Vector3.zero,
@@ -33,10 +34,7 @@ namespace AI {
                     position = lastSeenPlayerPosition
                 }
             };
-            gunHandler.ShootImmediately(fireInput);
             return fireInput;
         }
-
     }
-
 }

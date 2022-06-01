@@ -802,13 +802,77 @@ void Start()
 * fix broken invisibility bug
 
 prevent invisibility for some objects
-
+why do gibs fall through the wall/floor?
 next:
 controllability
     right-click for ove the shoulder aiming
-    camera moves to point toward the aimpoint
+    * camera moves to point toward the aimpoint
+
 make a real mission. 
     1. 7-11 worker sprite
     2. civilian man
     3. civilian woman
     4. security guard
+
+
+1. character & head orient in correct direction when aim mode
+2. animation shows recoil
+3. shoot toward cursor
+4. camera a little above, oriented down
+5. display different UI when in aim mode
+6. laser pointer
+7. turn left & right when cursor near the edge ..?
+8. camera moves slightly in direction of cursor
+
+
+problem:
+target data is created by input controller in a way specific to top-down input.
+    it doesn't work for aim, or wallpress
+    also weird is the head animation (!) creates target data, separately.
+    then target data is created in taskshoot in a totally different way.
+the way target data is made should be dependent on state.
+    because: in the one case, we are aiming from the camera down to the level, then projecting to a coplanar position with player, then aiming from player;
+    in the other case, we are aiming from the camera across the player, toward a plane in front of player. 
+    in the third case, we are AI trying to aim at last seen position.
+    the only difference is the state we are in.
+but if it is part of playerinput, then it can't be dependent on state, and it already is set before character controller.
+so: let character controller create the targetdata as required?
+this means: remove targetData from playerInput.
+    if we do this, gunhandler is not an IInputReceiver.
+    it can take playerinput Fire input, but should also take targetdata.
+note all the instances of creating an empty PlayerInput only to wrap a targetData.
+
+only things that reference playerinput.Fire.targetData:
+    charactercontroller
+    robot controller
+    taskshoot
+    gunhandler
+
+note the robot controller already short-circuits this model. it uses a "shoot immediately" method that is not totally appropriate.
+
+this should be okay.
+main problem: the AI model is to pass around a reference to a PlayerInput and modify it as required.
+in this sense, playerinput was supposed to be the master input that contained all information.
+but it can't be if fire input is state dependent.
+solution: pass around an AI input.
+    AI input wraps both playerInput and TargetData.
+    this is bad: now AI and player are not interchangeable.
+by moving targetData calculation to controller, we are mixing model and control.
+targetData should be fully determined at input stage, 
+
+counterpoint: leave targetData as part of PlayerInput.
+determine it at input stage.
+let aim & top-down modes be distinguished in GameManager InputMode.
+    but now we're tracking state in: character controller, and game manager.
+    what happens when e.g. we enter aim mode but also press on the wall?
+    in a single state, these are exclusive. otherwise we need extra logic for tracking all combinations of states in e.g. camera controller.
+
+either gun input is in addition to controller input, or it is part of controller input.
+how e.g. will player input work for the sphere robot?
+    we can say this is the kind of architecture thing i dont want to worry about in this game but if not, what is the point of unified playerInput?
+question: is right click aim a feature of the input (direction i'm heading in) or is it a feature of the character?
+i.e. if we control the robot and right click it should enter aim mode right?
+    then the camera control should be referencing gamemanager input state, not character state.
+
+how to fix headAnimation?
+aimindicatorhandler?

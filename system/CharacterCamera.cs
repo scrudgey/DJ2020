@@ -4,17 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering.PostProcessing;
 
 // TODO: eliminate this enum
-public enum CameraState { normal, wallPress, attractor }
-
-// a single parameter lerps between states, and there is one transitional state.
+// a single parameter lerps between states, and there is one transitional state. ...?
+public enum CameraState { normal, wallPress, attractor, aim }
 
 public struct CameraInput {
-    // public RotateInput rotation;
-    // public CameraAttractorZone attractor;
-    // public CameraState state;
     public enum RotateInput { none, left, right }
     public float deltaTime;
     public Vector3 wallNormal;
@@ -22,13 +19,15 @@ public struct CameraInput {
     public bool crouchHeld;
     public Vector3 playerPosition;
     public CharacterState state;
+    public Vector3 cursorPosition;
+    public TargetData2 targetData;
+    public Vector3 playerDirection;
 }
 public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private CameraState _state;
     public CameraState state {
         get { return _state; }
     }
-    // public CharacterController target { get; set; }
     public static Quaternion rotationOffset;
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
@@ -118,7 +117,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             if (collider != null)
                 attractors.Add(collider);
         }
-
         // IgnoredColliders.Clear();
         // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
@@ -135,6 +133,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Debug.Log($"entering state {state} from {fromState}");
         Camera.clearFlags = CameraClearFlags.SolidColor;
         switch (state) {
+            case CameraState.aim:
+                Camera.clearFlags = CameraClearFlags.Skybox;
+                currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
+                currentFollowingSharpness = followingSharpnessDefault * 3f;
+                currentDistanceMovementSpeed = distanceMovementSpeedDefault * 3f;
+                break;
             case CameraState.wallPress:
                 Camera.clearFlags = CameraClearFlags.Skybox;
                 currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
@@ -152,6 +156,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 }
                 break;
             default:
+                Camera.clearFlags = CameraClearFlags.SolidColor;
                 currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
                 currentFollowingSharpness = followingSharpnessDefault;
                 currentDistanceMovementSpeed = distanceMovementSpeedDefault;
@@ -191,9 +196,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         UpdateWithInput(input);
     }
     public void UpdateWithInput(CameraInput input) {
+        if (FollowTransform == null)
+            return;
         CameraState camState = CameraState.normal;
         currentAttractor = null;
-        if (input.state == CharacterState.wallPress) {
+
+        if (GameManager.I.inputMode == InputMode.aim) {
+            camState = CameraState.aim;
+        } else if (input.state == CharacterState.wallPress) {
             camState = CameraState.wallPress;
         } else {
             // check / update Attractor
@@ -216,6 +226,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 RenderSettings.skybox = isometricSkybox;
                 break;
             case CameraState.wallPress:
+            case CameraState.aim:
                 RenderSettings.skybox = wallPressSkybox;
                 break;
         }
@@ -230,6 +241,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         } else if (state == CameraState.wallPress) {
             ApplyTargetParameters(WallPressUpdate(input));
             volume.profile = wallPressProfile;
+        } else if (state == CameraState.aim) {
+            ApplyTargetParameters(AimUpdate(input));
+            volume.profile = wallPressProfile;
         }
     }
     public class CameraTargetParameters {
@@ -243,11 +257,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         public float followingSharpness;
         public float distanceMovementSpeed;
         public float distanceMovementSharpness;
-        public CharacterState state;
+        public CharacterState state; // TODO: remove this
     }
     public CameraTargetParameters NormalUpdate(CameraInput input) {
-
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
+        if (input.targetData != null) {
+            targetPosition = (FollowTransform.position + input.targetData.position / 2f) / 2f;
+        }
+
         // Process rotation input
         float rotationInput = 0f;
         switch (currentRotationInput) {
@@ -324,6 +341,32 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             state = input.state
         };
     }
+    public CameraTargetParameters AimUpdate(CameraInput input) {
+        // Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
+        Vector3 distOffset = input.playerDirection * -1f * TargetDistance;
+        Vector3 heightOffset = new Vector3(0, 1f, 0);
+        if (input.crouchHeld) {
+            heightOffset = new Vector3(0, 0.5f, 0);
+        }
+
+        Vector3 camDirection = input.playerDirection;
+        camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+
+        return new CameraTargetParameters() {
+            fieldOfView = 45f,
+            orthographic = false,
+            rotation = planarRot,
+            deltaTime = input.deltaTime,
+            targetDistance = 1.5f,
+            targetPosition = FollowTransform.position + distOffset + heightOffset,
+            orthographicSize = 4f,
+            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            distanceMovementSpeed = currentDistanceMovementSpeed,
+            state = input.state
+        };
+    }
 
     bool PlayerInsideBounds(Vector3 screenPoint) {
         return screenPoint.x > 0.1 && screenPoint.y > 0.1 && screenPoint.x < 0.9 && screenPoint.y < 0.9;
@@ -350,7 +393,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float desiredOrthographicSize = input.orthographicSize;
         float previousOrthographicSize = Camera.orthographicSize;
 
-        if (input.state != CharacterState.wallPress) {
+        if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim) {
+            // TODO: move this logic?
             int i = 0;
             if (PlayerInsideBounds(screenPoint)) {
                 if (Camera.orthographicSize < desiredOrthographicSize) {
@@ -390,15 +434,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // apply distance
         _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
 
-        // Debug.Log(TargetDistance);
-        // Debug.Log(_currentDistance);
-
         // Find the smoothed follow position
         _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, input.targetPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
 
         // Find the smoothed camera orbit position
         Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);
-
 
         // Handle framing
         targetPosition += Transform.right * FollowPointFraming.x;
@@ -407,5 +447,100 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Apply position
         Transform.position = targetPosition;
         isometricRotation = Transform.rotation;
+    }
+
+    public TargetData2 CursorToTarget() {
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+
+        Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
+        Ray projection = Camera.ScreenPointToRay(cursorPoint);
+        Vector3 direction = transform.forward;
+        if (GameManager.I.showDebugRays)
+            Debug.DrawRay(projection.origin, direction * 100, Color.magenta);
+        Ray clickRay = new Ray(projection.origin, direction);
+
+        // 1. determine if the click ray is hovering over a targetable object
+        //      if so, determine the priority targetable and highlight it
+        //      this can aim up or down as necessary
+        // 2. if not, shoot in the direction indicated by the mouse
+        //      this will be in the player's gun's height plane.
+
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
+        TagSystemData priorityData = null;
+        Vector3 targetPoint = Vector3.zero;
+        bool prioritySet = false;
+        HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
+
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            Highlightable interactive = hit.collider.GetComponent<Highlightable>();
+            if (interactive != null) {
+                targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
+            }
+            TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
+            if (data == null)
+                continue;
+            if (data.targetPriority == -1)
+                continue;
+            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
+                priorityData = data;
+                if (data.targetPoint != null) {
+                    targetPoint = data.targetPoint.position;
+                } else {
+                    targetPoint = hit.collider.bounds.center;
+                }
+                prioritySet = true;
+            }
+        }
+        if (!prioritySet) {
+            // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
+            float distance = 0;
+            Vector3 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
+            Plane plane = new Plane(Vector3.up, origin);
+            if (plane.Raycast(clickRay, out distance)) {
+                targetPoint = clickRay.GetPoint(distance);
+            }
+        }
+
+        HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
+        if (prioritySet) {
+            return new TargetData2 {
+                type = TargetData2.TargetType.objectLock,
+                // clickRay = clickRay,
+                screenPosition = Camera.WorldToScreenPoint(targetPoint),
+                highlightableTargetData = interactorData,
+                position = targetPoint
+            };
+        }
+
+        return new TargetData2 {
+            type = TargetData2.TargetType.direction,
+            screenPosition = cursorPosition,
+            highlightableTargetData = interactorData,
+            // clickRay = clickRay,
+            position = targetPoint
+        };
+    }
+
+    public TargetData2 AimToTarget() {
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+
+        Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
+        Ray projection = Camera.ScreenPointToRay(cursorPoint);
+        Vector3 direction = transform.forward;
+        Ray clickRay = new Ray(projection.origin, direction);
+
+        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
+        Vector3 targetPoint = Vector3.zero;
+
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            targetPoint = hit.point;
+        }
+
+        return new TargetData2 {
+            type = TargetData2.TargetType.direction,
+            screenPosition = cursorPosition,
+            highlightableTargetData = null,
+            position = targetPoint
+        };
     }
 }

@@ -53,7 +53,8 @@ namespace UI {
                         break;
                 }
                 state = data.type;
-                SetScale();
+                // TODO: handle this?
+                // SetScale();
             } else {
                 cursorImage.enabled = false;
             }

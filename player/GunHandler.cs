@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInputReceiver {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     public enum GunState {
         idle,
         shooting,
@@ -27,7 +27,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
-    public PlayerInput.FireInputs lastShootInput;
+    public TargetData2 lastShootInput;
     public bool shootRequestedThisFrame;
     public TargetData2 currentTargetData;
     void Awake() {
@@ -127,6 +127,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         accuracy += shootingInaccuracy;
 
         // skills
+        // TODO: this doesn't work for enemies
         int skillLevel = GameManager.I.gameData.playerData.gunSkillLevel[gunInstance.baseGun.type];
         float skillBonus = (1 - skillLevel) * (0.1f);
         accuracy += skillBonus;
@@ -137,10 +138,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
 
         return accuracy;
     }
-    public void EmitBullet(PlayerInput.FireInputs input) {
+    public void EmitBullet(TargetData2 input) {
         Vector3 gunPosition = this.gunPosition();
 
-        Vector3 trueDirection = gunDirection(input.targetData);
+        Vector3 trueDirection = gunDirection(input);
         // Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
@@ -159,11 +160,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         };
 
         bullet.DoImpacts();
+
+        Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
     }
-    public void ShootImmediately(PlayerInput.FireInputs input) {
+    public void ShootImmediately(TargetData2 input) {
         Shoot(input);
     }
-    void Shoot(PlayerInput.FireInputs input) {
+    void Shoot(TargetData2 input) {
         if (!HasGun()) {
             return;
         }
@@ -197,7 +200,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         GameObject muzzleFlashObj = GameObject.Instantiate(
             gunInstance.baseGun.muzzleFlash,
             gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
-            Quaternion.LookRotation(transform.up, gunDirection(input.targetData))       // uses direction
+            Quaternion.LookRotation(transform.up, gunDirection(input))
             );
         muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one;
         GameObject.Destroy(muzzleFlashObj, 0.05f);
@@ -336,28 +339,28 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             Reload();
         }
     }
-    public void SetInputs(PlayerInput input) {
+    public void SetInputs(PlayerInput input, bool skipAnimation = false) {
         inputMode = input.inputMode;
         currentTargetData = input.Fire.targetData;
         shootRequestedThisFrame = false;
-        // Debug.Log($"{} {} {}")
         if (HasGun()) {
-            if (gunInstance.CanShoot() && inputMode == InputMode.gun) {
+            if (gunInstance.CanShoot() && (inputMode == InputMode.gun || inputMode == InputMode.aim)) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
-                        lastShootInput = input.Fire;
+                        lastShootInput = input.Fire.targetData;
                         // Debug.Log($"lastShootInput: {lastShootInput.targetData.position}");
                         state = GunState.shooting;
                     } else if (input.Fire.FireHeld) {
-                        lastShootInput = input.Fire;
+                        lastShootInput = input.Fire.targetData;
                     } else if (state == GunState.shooting && !input.Fire.FireHeld) {
                         EndShoot();
                     }
                 } else { // semiautomatic
                     if (input.Fire.FirePressed) {//&& !shooting) {
-                        lastShootInput = input.Fire;
+                        lastShootInput = input.Fire.targetData;
                         state = GunState.shooting;
                         shootRequestedThisFrame = true;
+                        Debug.Log("shoot requested this frame");
                     }
                 }
             } else {
@@ -380,6 +383,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             crouchingInaccuracy = 0f;
         }
         OnValueChanged?.Invoke(this);
+
+        if (skipAnimation)
+            ShootImmediately(input.Fire.targetData);
     }
 
     public AnimationInput.GunAnimationInput BuildAnimationInput() {

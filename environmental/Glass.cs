@@ -68,6 +68,5 @@ public class Glass : IDestructible {
             Collider gibsCollider = shard.GetComponentInChildren<Collider>();
             Physics.IgnoreCollision(gibsCollider, myCollider, true);
         }
-        // Debug.Break();
     }
 }

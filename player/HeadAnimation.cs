@@ -65,6 +65,7 @@ public class HeadAnimation : IBinder<CharacterController>, ISaveable {
                 }
                 break;
             case CharacterState.normal:
+                // TODO: adjust for aim mode.
                 Vector3 headDirection = (input.targetData.position - transform.position).normalized;
                 Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);

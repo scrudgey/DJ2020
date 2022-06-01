@@ -8,7 +8,7 @@ public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
 public enum OverlayType { none, power, cyber }
 public enum CursorType { gun, pointer }
-public enum InputMode { none, gun, cyber }
+public enum InputMode { none, gun, cyber, aim }
 public struct CursorData {
     public Texture2D mouseCursor;
     public Vector2 hotSpot;
@@ -50,7 +50,10 @@ public partial class GameManager : Singleton<GameManager> {
             SetCursor(value);
         }
     }
-    public InputMode inputMode;
+    private InputMode _inputMode;
+    public InputMode inputMode {
+        get { return _inputMode; }
+    }
     int numberFrames;
     public bool showDebugRays;
     private SuspicionData previousSuspicionData;
@@ -89,13 +92,19 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.state = newState;
         OnStateEnter(newState, tmpInitialState);
     }
+    public void TransitionToInputMode(InputMode newInputMode) {
+        if (newInputMode == inputMode)
+            return;
+        _inputMode = newInputMode;
+        OnInputModeChange?.Invoke(newInputMode);
+    }
     private void OnStateEnter(GameState state, GameState fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
                 // TODO: data-driven level load 
                 cursorType = CursorType.gun;
-                inputMode = InputMode.gun;
+                TransitionToInputMode(InputMode.gun);
                 break;
             case GameState.inMenu:
                 Time.timeScale = 0f;
@@ -186,11 +195,13 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.pointer;
-        inputMode = InputMode.cyber;
+        TransitionToInputMode(InputMode.cyber);
+
     }
     public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.gun;
-        inputMode = InputMode.gun;
+        // inputMode = InputMode.gun;
+        TransitionToInputMode(InputMode.gun);
     }
 
     public bool IsPlayerVisible(float distance) {
