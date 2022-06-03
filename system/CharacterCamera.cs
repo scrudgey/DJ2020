@@ -82,6 +82,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
     CameraAttractorZone currentAttractor = null;
+    private static float shakeJitter = 0f;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
@@ -237,7 +238,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             ApplyTargetParameters(AttractorParameters(input));
             volume.profile = isometricProfile;
         } else if (state == CameraState.normal) {
-            ApplyTargetParameters(NormalUpdate(input));
+            ApplyTargetParameters(NormalParameters(input));
             volume.profile = isometricProfile;
         } else if (state == CameraState.wallPress) {
             ApplyTargetParameters(WallPressParameters(input));
@@ -260,7 +261,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         public float distanceMovementSharpness;
         public CharacterState state; // TODO: remove this
     }
-    public CameraTargetParameters NormalUpdate(CameraInput input) {
+    public CameraTargetParameters NormalParameters(CameraInput input) {
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
         if (transitionTime >= 0.1f && input.targetData != null) {
             targetPosition = (FollowTransform.position + input.targetData.position / 2f) / 2f;
@@ -301,8 +302,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         };
     }
     public CameraTargetParameters AttractorParameters(CameraInput input) {
-
-        CameraTargetParameters parameters = NormalUpdate(input);
+        CameraTargetParameters parameters = NormalParameters(input);
         if (currentAttractor != null) {
             parameters.followingSharpness = currentAttractor.movementSharpness;
             Vector3 delta = FollowTransform?.position - currentAttractor.sphereCollider.bounds.center ?? Vector3.zero;
@@ -351,7 +351,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
-
         float parity = cursorPosition.x > horizontalPixels / 2 ? 1f : -1f;
         Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f * parity;
 
@@ -442,7 +441,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
 
         // Find the smoothed follow position
-        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, input.targetPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
+        Vector3 followPosition = input.targetPosition + (UnityEngine.Random.insideUnitSphere * shakeJitter);
+        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, followPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
 
         // Find the smoothed camera orbit position
         Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);
@@ -501,10 +501,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
         if (prioritySet) {
+            Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
             return new TargetData2 {
                 type = TargetData2.TargetType.objectLock,
                 // clickRay = clickRay,
-                screenPosition = Camera.WorldToScreenPoint(targetPoint),
+                screenPosition = pointPosition,
+                screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
                 position = targetPoint
             };
@@ -519,12 +521,18 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             return new TargetData2 {
                 type = TargetData2.TargetType.direction,
                 screenPosition = cursorPosition,
+                screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
                 position = targetPoint
             };
         }
+    }
 
+    Vector2 normalizeScreenPosition(Vector2 cursorPosition) {
+        float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
+        float verticalPixels = Camera.scaledPixelHeight;
+        return new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels);
     }
 
     public TargetData2 AimToTarget() {
@@ -563,10 +571,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
         if (prioritySet) {
+            Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
             return new TargetData2 {
                 type = TargetData2.TargetType.objectLock,
                 // clickRay = clickRay,
-                screenPosition = Camera.WorldToScreenPoint(targetPoint),
+                screenPosition = pointPosition,
+                screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
                 position = targetPoint
             };
@@ -577,10 +587,28 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             return new TargetData2 {
                 type = TargetData2.TargetType.direction,
                 screenPosition = cursorPosition,
+                screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = null,
                 position = targetPoint
             };
         }
 
+    }
+
+    public static IEnumerator DoShake(float intensity, float lifetime) {
+        float timer = 0;
+        shakeJitter = intensity;
+        while (timer < lifetime) {
+            timer += Time.deltaTime;
+            shakeJitter = (float)PennerDoubleAnimation.CircEaseOut(timer, intensity, -intensity, lifetime);
+            yield return null;
+        }
+        shakeJitter = 0f;
+        yield return null;
+    }
+
+    // TODO: use a single coroutine here
+    public static void Shake(float intensity, float lifetime) {
+        GameManager.I.StartCoroutine(DoShake(intensity, lifetime));
     }
 }

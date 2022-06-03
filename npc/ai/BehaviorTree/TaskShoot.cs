@@ -29,7 +29,8 @@ namespace AI {
                 FireHeld = true,
                 targetData = new TargetData2 {
                     type = TargetData2.TargetType.objectLock,
-                    screenPosition = Vector3.zero,
+                    screenPosition = Vector2.zero,
+                    screenPositionNormalized = Vector2.zero,
                     highlightableTargetData = null,
                     position = lastSeenPlayerPosition
                 }

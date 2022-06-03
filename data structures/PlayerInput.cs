@@ -28,4 +28,5 @@ public struct PlayerInput {
     public Vector3 moveDirection;
     public Vector3 lookAtPoint;
     public Vector3 lookAtDirection;
+    public Vector3 torque;
 }

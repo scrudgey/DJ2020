@@ -775,9 +775,7 @@ on update:
 * cylinder collider
 * don't fully disappear interloper
 * target alpha set by distance
-InvokeRepeating
-OverlapSphereNonAlloc
-don't update ceiling  calculation when in the air
+
 
 
 void Start()
@@ -800,29 +798,6 @@ void Start()
 * destructible computers
 * hack network
 * fix broken invisibility bug
-
-prevent invisibility for some objects
-why do gibs fall through the wall/floor?
-next:
-controllability
-    right-click for ove the shoulder aiming
-    * camera moves to point toward the aimpoint
-
-make a real mission. 
-    1. 7-11 worker sprite
-    2. civilian man
-    3. civilian woman
-    4. security guard
-
-
-1. character & head orient in correct direction when aim mode
-2. animation shows recoil
-3. shoot toward cursor
-4. camera a little above, oriented down
-5. display different UI when in aim mode
-6. laser pointer
-7. turn left & right when cursor near the edge ..?
-8. camera moves slightly in direction of cursor
 
 
 problem:
@@ -874,10 +849,33 @@ question: is right click aim a feature of the input (direction i'm heading in) o
 i.e. if we control the robot and right click it should enter aim mode right?
     then the camera control should be referencing gamemanager input state, not character state.
 
-how to fix headAnimation?
-aimindicatorhandler?
+* how to fix headAnimation?
+* aimindicatorhandler?
+* switch back and forth from left / right when cursor pans left / right
+* controllability
+    * right-click for ove the shoulder aiming
+    * camera moves to point toward the aimpoint
+* character & head orient in correct direction when aim mode
+* shoot toward cursor
+* camera a little above, oriented down
+* camera moves slightly in direction of cursor
+* turn left & right when cursor near the edge ..?
+animation shows recoil
+display different UI when in aim mode
+laser pointer
+don't clip through wall
+prevent invisibility for some objects
+UI: gun wireframe in lower-right corner.
 head look around if player has been idle
-switch back and forth from left / right when cursor pans left / right
 make elevator
-
 draw a circle for inaccuracy
+why do gibs fall through the wall/floor?
+clearsight InvokeRepeating
+clearsight OverlapSphereNonAlloc
+clearsight don't update ceiling  calculation when in the air
+
+make a real mission. 
+    1. 7-11 worker sprite
+    2. civilian man
+    3. civilian woman
+    4. security guard

@@ -73,6 +73,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private Collider[] _probedColliders = new Collider[8];
     private Vector2 _moveAxis;
     private Vector3 _moveInputVector;
+    private Vector3 _inputTorque;
     private Vector3 _lookInputVector;
     private bool _jumpRequested = false;
     private bool _jumpConsumed = false;
@@ -225,8 +226,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             }
         }
 
-
-
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -246,6 +245,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             _moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * _moveInputVector;
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
+
+        // TODO: rotate input
+        _inputTorque = input.torque;
 
         // Run input
         if (input.runDown) {
@@ -317,13 +319,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     directionToCursor.y = 0;
                     directionToCursor = directionToCursor.normalized;
                     float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
-
                     if (dotproduct < 0 && moveInputVector == Vector3.zero) {
                         // _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
                     } else {
                         _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
                     }
-
                     if (targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
                         _shootLookDirection = directionToCursor;
                     }
@@ -407,6 +407,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 }
+                Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
+                currentRotation = torqueRotation * currentRotation;
                 break;
             case CharacterState.wallPress:
                 currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);

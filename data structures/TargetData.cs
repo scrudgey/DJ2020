@@ -5,6 +5,7 @@ public class TargetData2 {
     public TargetType type;
     public Vector3 position = Vector3.zero;
     public Vector2 screenPosition;
+    public Vector3 screenPositionNormalized;
     public HighlightableTargetData highlightableTargetData;
     public static TargetData2 none = new TargetData2();
 }

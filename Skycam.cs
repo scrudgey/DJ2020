@@ -17,6 +17,7 @@ public class Skycam : MonoBehaviour {
     }
     void Update() {
         transform.position = myInitialPosition + (masterCameraTransform.position - masterCameraInitialPosition) * translationRatio;
-        transform.rotation = masterCameraTransform.rotation;
+        // transform.rotation = masterCameraTransform.rotation;
+        // myCamera.fieldOfView = masterCamera.fieldOfView;
     }
 }

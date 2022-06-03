@@ -216,6 +216,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
 
         // state change callbacks
         OnValueChanged?.Invoke(this);
+
+        CharacterCamera.Shake(gunInstance.baseGun.noise / 5f, 0.1f);
     }
     public void EmitShell() {
         emitShell = true;
