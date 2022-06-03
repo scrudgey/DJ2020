@@ -349,7 +349,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
 
-        Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f;
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+        float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
+
+        float parity = cursorPosition.x > horizontalPixels / 2 ? 1f : -1f;
+        Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f * parity;
 
         Vector3 camDirection = input.playerDirection;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
