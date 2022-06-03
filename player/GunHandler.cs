@@ -142,12 +142,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         Vector3 gunPosition = this.gunPosition();
 
         Vector3 trueDirection = gunDirection(input);
-        // Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
+        Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
         Vector3 aimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
 
-        Vector3 jitter = UnityEngine.Random.insideUnitSphere * gunInstance.baseGun.spread;
+        // Vector3 jitter = UnityEngine.Random.insideUnitSphere * gunInstance.baseGun.spread;
+        Vector3 jitter = UnityEngine.Random.insideUnitSphere * inaccuracy(input);
         Vector3 jitterPoint = aimpoint + jitter;
 
         Vector3 direction = jitterPoint - gunPosition;
@@ -360,7 +361,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
                         lastShootInput = input.Fire.targetData;
                         state = GunState.shooting;
                         shootRequestedThisFrame = true;
-                        Debug.Log("shoot requested this frame");
+                        // Debug.Log("shoot requested this frame");
                     }
                 }
             } else {

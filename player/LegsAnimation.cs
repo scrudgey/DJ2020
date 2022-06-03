@@ -155,7 +155,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
             } else if (input.isCrouching) {
                 shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
                 state = State.crouch;
                 spriteRenderer.sprite = skin.legsCrouch[direction][0];
             } else {

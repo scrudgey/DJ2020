@@ -273,7 +273,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             jumpHeldTimer = 0;
         }
 
-        TargetData2 targetData = TargetData2.none;
+        TargetData2 targetData = input.Fire.targetData;
         switch (state) {
             case CharacterState.jumpPrep:
                 // TODO: normalize this player state
@@ -303,23 +303,29 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
 
-                // Vector3 targetPoint = input.Fire.targetData.targetPointFromRay(gunHandler.gunPosition());
-                Vector3 targetPoint = targetData.position;
-                if (targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
-                    _shootLookDirection = targetPoint;
-                }
+                Vector3 directionToCursor = targetData.position - transform.position;
 
-                // TODO: turn to face aim position?
+                _lookInputVector = Vector3.zero;
+
+                // turn to face aim position?
+                if (input.Fire.AimPressed) {
+                    _shootLookDirection = directionToCursor;
+                    // Debug.Log($"setting aimpress shoot look direction: {_shootLookDirection}");
+                }
+                Debug.DrawRay(transform.position, directionToCursor, Color.yellow);
                 if (GameManager.I.inputMode != InputMode.aim) {
-                    Vector3 directionToCursor = targetPoint - transform.position;
                     directionToCursor.y = 0;
                     directionToCursor = directionToCursor.normalized;
                     float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
 
                     if (dotproduct < 0 && moveInputVector == Vector3.zero) {
-                        _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
+                        // _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
                     } else {
                         _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
+                    }
+
+                    if (targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
+                        _shootLookDirection = directionToCursor;
                     }
                 }
 
@@ -382,11 +388,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             default:
             case CharacterState.normal:
                 if (_shootLookDirection != Vector3.zero) {
-                    Vector3 target = _shootLookDirection - transform.position;
+                    Vector3 target = _shootLookDirection;
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                    // Debug.Log($"applying shoot look direction: {_shootLookDirection}");
+                    // Debug.Break();
                 } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
-                                                                               // Smoothly interpolate from current to target look direction
+                    // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
 
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
@@ -422,7 +430,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 break;
         }
-
+        _lookInputVector = Vector3.zero;
         _shootLookDirection = Vector3.zero;
     }
     bool ColliderRay(Vector3 offset) {
@@ -430,7 +438,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector3 start = transform.position + offset;
         Vector3 dir = -1f * wallNormal;
         float length = 0.4f;
-        Debug.DrawRay(start, length * dir);
+        // Debug.DrawRay(start, length * dir);
         foreach (RaycastHit hit in Physics.RaycastAll(start, dir, length).OrderBy(x => x.distance)) {
             if (hit.collider.transform.IsChildOf(transform)) {
                 continue;
@@ -440,6 +448,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         return false;
     }
     bool DetectWallPress() {
+        if (GameManager.I.inputMode == InputMode.aim)
+            return false;
         if (wallNormal == Vector3.zero)
             return false;
         return ColliderRay(new Vector3(0f, wallPressHeight, 0f));
@@ -830,7 +840,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         }
         if (GameManager.I.showDebugRays)
-            Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.green, 0.1f);
+            Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.red);
 
     }
 
@@ -902,7 +912,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector2 playerDir = new Vector2(direction.x, direction.z);
 
         // head direction
-        TargetData2 targetData = OrbitCamera.CursorToTarget();
+        TargetData2 targetData = TargetData2.none;
+        if (GameManager.I.inputMode == InputMode.aim) {
+            targetData = OrbitCamera.AimToTarget();
+        } else {
+            targetData = OrbitCamera.CursorToTarget();
+        }
 
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);

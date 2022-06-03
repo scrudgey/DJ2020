@@ -33,7 +33,7 @@ namespace UI {
             }
         }
         override public void HandleValueChanged(GunHandler gunHandler) {
-            if (gunHandler.HasGun() && gunHandler.inputMode == InputMode.gun) {
+            if (gunHandler.HasGun()) {
                 cursorImage.enabled = true;
                 TargetData2 data = target.currentTargetData;
                 if (data == null)
@@ -53,24 +53,69 @@ namespace UI {
                         break;
                 }
                 state = data.type;
-                // TODO: handle this?
-                // SetScale();
+                SetScale();
             } else {
                 cursorImage.enabled = false;
             }
         }
 
         public void SetScale() {
-            float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
-            float frustumHeight = 2.0f * distance * Mathf.Tan(UICamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
-
             float inaccuracyLength = target.inaccuracy(target.currentTargetData);
-            float pixelsPerLength = UICamera.scaledPixelHeight / frustumHeight;
-            float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
-            pixelScale = Mathf.Max(10, pixelScale) + pulseSize;
+            float inaccuracyInPixels = 1f;
+            if (UICamera.orthographic) {
+                // length per angle: (UICamera.orthographicSize * 2?) / (UICamera.fieldOfView) ???
+                // pixels per degree: (UICamera.scaledPixelHeight / UICamera.fieldOfView)
+                // (inaccuracy / length per angle) * (pixels per degree) = inaccuracy in pixels
+                float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
+                float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
+                inaccuracyInPixels = (inaccuracyLength / lengthPerAngle) * (pixelsPerDegree);
 
-            cursor.sizeDelta = pixelScale * Vector2.one;
+            } else {
+                float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
+                float inaccuracyDegree = Mathf.Atan(inaccuracyLength / distance) * Mathf.Rad2Deg;
+                float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
+                inaccuracyInPixels = inaccuracyDegree * pixelsPerDegree / 2f;
+            }
+            cursor.sizeDelta = inaccuracyInPixels * Vector2.one;
         }
     }
+    //      l
+    //  |-------
+    //  |     /
+    //  |    /
+    //d |   / 
+    //  |  /
+    //  |θ/
+    //  |/
+    // 
+    //  tan(θ) = l / d
+    // 
 
+    // FOV = width / height (degrees)
+
+    // ultimately, we have:
+    // inaccuracy is length
+    // inaccuracy / (length per angle) -> inaccuracy in degrees
+    // (inaccuracy in degrees) * (pixels per degree) -> inaccuracy in pixels
+    // (inaccuracy / length per angle) * (pixels per degree) -> inaccuracy in pixels
+
+
+    // UICamera.fieldOfView: vertical field of fiew in degrees
+    // UICamera.orthographicSize: Camera's half-size when in orthographic mode. (length?)
+    //      The orthographicSize is half the size of the vertical viewing volume. 
+    // UICamera.scaledPixelHeight: How tall is the camera in pixels (accounting for dynamic resolution scaling) (Read Only)
+
+    // length per angle: (UICamera.orthographicSize * 2?) / (UICamera.fieldOfView)
+    // or squared or something?
+    // pixels per degree: (UICamera.scaledPixelHeight / UICamera.fieldOfView)
+
+
+    // (inaccuracy / length per angle) * (pixels per degree) -> inaccuracy in pixels
+    // (inaccuracy / (UICamera.orthographicSize * 2?) / (UICamera.fieldOfView)) * (UICamera.scaledPixelHeight / UICamera.fieldOfView) -> inaccuracy in pixels
+
+    // this is for something at the frustrum plane.
+
+    // next, to establish a size at a distance:
+    // tan(θ) = l / d
+    // 
 }

@@ -32,6 +32,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
     public PostProcessProfile wallPressProfile;
+    public PostProcessProfile aimProfile;
     public Material isometricSkybox;
     public Material wallPressSkybox;
     public Transform maskCylinder;
@@ -233,17 +234,17 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
 
         if (state == CameraState.attractor) {
-            ApplyTargetParameters(AttractorUpdate(input));
+            ApplyTargetParameters(AttractorParameters(input));
             volume.profile = isometricProfile;
         } else if (state == CameraState.normal) {
             ApplyTargetParameters(NormalUpdate(input));
             volume.profile = isometricProfile;
         } else if (state == CameraState.wallPress) {
-            ApplyTargetParameters(WallPressUpdate(input));
+            ApplyTargetParameters(WallPressParameters(input));
             volume.profile = wallPressProfile;
         } else if (state == CameraState.aim) {
-            ApplyTargetParameters(AimUpdate(input));
-            volume.profile = wallPressProfile;
+            ApplyTargetParameters(AimParameters(input));
+            volume.profile = aimProfile;
         }
     }
     public class CameraTargetParameters {
@@ -261,7 +262,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     public CameraTargetParameters NormalUpdate(CameraInput input) {
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
-        if (input.targetData != null) {
+        if (transitionTime >= 0.1f && input.targetData != null) {
             targetPosition = (FollowTransform.position + input.targetData.position / 2f) / 2f;
         }
 
@@ -299,7 +300,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             state = input.state
         };
     }
-    public CameraTargetParameters AttractorUpdate(CameraInput input) {
+    public CameraTargetParameters AttractorParameters(CameraInput input) {
 
         CameraTargetParameters parameters = NormalUpdate(input);
         if (currentAttractor != null) {
@@ -313,7 +314,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         }
         return parameters;
     }
-    public CameraTargetParameters WallPressUpdate(CameraInput input) {
+    public CameraTargetParameters WallPressParameters(CameraInput input) {
         // Find the smoothed follow position
         Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         Vector3 distOffset = input.wallNormal * TargetDistance;
@@ -341,16 +342,18 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             state = input.state
         };
     }
-    public CameraTargetParameters AimUpdate(CameraInput input) {
-        // Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
-        Vector3 distOffset = input.playerDirection * -1f * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, 1f, 0);
+    public CameraTargetParameters AimParameters(CameraInput input) {
+        Vector3 distOffset = input.playerDirection * -0.5f * TargetDistance;
+        Vector3 heightOffset = new Vector3(0f, 1.2f, 0);
         if (input.crouchHeld) {
-            heightOffset = new Vector3(0, 0.5f, 0);
+            heightOffset -= new Vector3(0, 0.5f, 0);
         }
+
+        Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f;
 
         Vector3 camDirection = input.playerDirection;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
+        // camDirection -= new Vector3(0, 0.05f, 0);
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
 
         return new CameraTargetParameters() {
@@ -359,7 +362,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             rotation = planarRot,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
-            targetPosition = FollowTransform.position + distOffset + heightOffset,
+            targetPosition = FollowTransform.position + distOffset + heightOffset + horizontalOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -393,7 +396,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float desiredOrthographicSize = input.orthographicSize;
         float previousOrthographicSize = Camera.orthographicSize;
 
-        if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim) {
+        if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim && transitionTime >= 1) {
             // TODO: move this logic?
             int i = 0;
             if (PlayerInsideBounds(screenPoint)) {
@@ -466,11 +469,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         //      this will be in the player's gun's height plane.
 
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
-        TagSystemData priorityData = null;
         Vector3 targetPoint = Vector3.zero;
+
+        TagSystemData priorityData = null;
         bool prioritySet = false;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
-
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             Highlightable interactive = hit.collider.GetComponent<Highlightable>();
             if (interactive != null) {
@@ -491,17 +494,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 prioritySet = true;
             }
         }
-        if (!prioritySet) {
-            // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
-            float distance = 0;
-            Vector3 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
-            Plane plane = new Plane(Vector3.up, origin);
-            if (plane.Raycast(clickRay, out distance)) {
-                targetPoint = clickRay.GetPoint(distance);
-            }
-        }
-
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
+
         if (prioritySet) {
             return new TargetData2 {
                 type = TargetData2.TargetType.objectLock,
@@ -510,15 +504,23 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 highlightableTargetData = interactorData,
                 position = targetPoint
             };
+        } else {
+            // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
+            float distance = 0;
+            Vector3 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
+            Plane plane = new Plane(Vector3.up, origin);
+            if (plane.Raycast(clickRay, out distance)) {
+                targetPoint = clickRay.GetPoint(distance);
+            }
+            return new TargetData2 {
+                type = TargetData2.TargetType.direction,
+                screenPosition = cursorPosition,
+                highlightableTargetData = interactorData,
+                // clickRay = clickRay,
+                position = targetPoint
+            };
         }
 
-        return new TargetData2 {
-            type = TargetData2.TargetType.direction,
-            screenPosition = cursorPosition,
-            highlightableTargetData = interactorData,
-            // clickRay = clickRay,
-            position = targetPoint
-        };
     }
 
     public TargetData2 AimToTarget() {
@@ -527,20 +529,54 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         Vector3 direction = transform.forward;
-        Ray clickRay = new Ray(projection.origin, direction);
 
         RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
-        Vector3 targetPoint = Vector3.zero;
+        Vector3 targetPoint = projection.GetPoint(100f);
 
+        TagSystemData priorityData = null;
+        bool prioritySet = false;
+        HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            targetPoint = hit.point;
+            Highlightable interactive = hit.collider.GetComponent<Highlightable>();
+            if (interactive != null) {
+                targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
+            }
+            TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
+            if (data == null)
+                continue;
+            if (data.targetPriority == -1)
+                continue;
+            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
+                priorityData = data;
+                if (data.targetPoint != null) {
+                    targetPoint = data.targetPoint.position;
+                } else {
+                    targetPoint = hit.collider.bounds.center;
+                }
+                prioritySet = true;
+            }
+        }
+        HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
+
+        if (prioritySet) {
+            return new TargetData2 {
+                type = TargetData2.TargetType.objectLock,
+                // clickRay = clickRay,
+                screenPosition = Camera.WorldToScreenPoint(targetPoint),
+                highlightableTargetData = interactorData,
+                position = targetPoint
+            };
+        } else {
+            // TODO: aim through transparent objects
+            if (hits.Length > 0)
+                targetPoint = hits.OrderBy(h => h.distance).FirstOrDefault().point;
+            return new TargetData2 {
+                type = TargetData2.TargetType.direction,
+                screenPosition = cursorPosition,
+                highlightableTargetData = null,
+                position = targetPoint
+            };
         }
 
-        return new TargetData2 {
-            type = TargetData2.TargetType.direction,
-            screenPosition = cursorPosition,
-            highlightableTargetData = null,
-            position = targetPoint
-        };
     }
 }

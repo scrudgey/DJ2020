@@ -183,14 +183,6 @@ public class InputController : MonoBehaviour {
     }
 
     private void HandleCharacterInput() {
-
-        if (aimPressedThisFrame) {
-            if (GameManager.I.inputMode != InputMode.aim) {
-                GameManager.I.TransitionToInputMode(InputMode.aim);
-            } else {
-                GameManager.I.TransitionToInputMode(InputMode.gun);
-            }
-        }
         TargetData2 targetData = TargetData2.none;
 
         if (GameManager.I.inputMode == InputMode.aim) {
@@ -199,6 +191,13 @@ public class InputController : MonoBehaviour {
             targetData = OrbitCamera.CursorToTarget();
         }
 
+        if (aimPressedThisFrame) {
+            if (GameManager.I.inputMode != InputMode.aim) {
+                GameManager.I.TransitionToInputMode(InputMode.aim);
+            } else {
+                GameManager.I.TransitionToInputMode(InputMode.gun);
+            }
+        }
 
         PlayerInput characterInputs = new PlayerInput() {
             inputMode = GameManager.I.inputMode,

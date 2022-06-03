@@ -876,3 +876,8 @@ i.e. if we control the robot and right click it should enter aim mode right?
 
 how to fix headAnimation?
 aimindicatorhandler?
+head look around if player has been idle
+switch back and forth from left / right when cursor pans left / right
+make elevator
+
+draw a circle for inaccuracy

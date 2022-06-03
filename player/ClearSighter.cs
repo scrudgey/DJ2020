@@ -209,6 +209,8 @@ public class ClearSighter : MonoBehaviour {
                 continue;
             if (collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                 continue;
+            if (collider.tag == "shell")
+                continue;
             MaterialController controller = controllers.get(collider.gameObject);
             if (controller != null)
                 controller.CeilingCheck(collider, myTransform.position);
