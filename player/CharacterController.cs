@@ -914,12 +914,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector2 playerDir = new Vector2(direction.x, direction.z);
 
         // head direction
-        TargetData2 targetData = TargetData2.none;
-        if (GameManager.I.inputMode == InputMode.aim) {
-            targetData = OrbitCamera.AimToTarget();
-        } else {
-            targetData = OrbitCamera.CursorToTarget();
-        }
+        TargetData2 targetData = OrbitCamera.GetTargetData();
 
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);

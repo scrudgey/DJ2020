@@ -862,17 +862,19 @@ i.e. if we control the robot and right click it should enter aim mode right?
 * turn left & right when cursor near the edge ..?
 animation shows recoil
 display different UI when in aim mode
-laser pointer
-don't clip through wall
+laser pointer attachment
+flashlight attachment
+camera: don't clip camera through wall
 prevent invisibility for some objects
 UI: gun wireframe in lower-right corner.
+UI: draw a circle for inaccuracy? cone?
 head look around if player has been idle
 make elevator
-draw a circle for inaccuracy
 why do gibs fall through the wall/floor?
 clearsight InvokeRepeating
 clearsight OverlapSphereNonAlloc
-clearsight don't update ceiling  calculation when in the air
+clearsight don't update ceiling calculation when in the air
+blinking arrow indicator when switching perspectives
 
 make a real mission. 
     1. 7-11 worker sprite

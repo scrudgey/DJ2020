@@ -455,8 +455,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Transform.position = targetPosition;
         isometricRotation = Transform.rotation;
     }
-
-    public TargetData2 CursorToTarget() {
+    public TargetData2 GetTargetData() {
+        if (GameManager.I.inputMode == InputMode.aim) {
+            return AimToTarget();
+        } else {
+            return CursorToTarget();
+        }
+    }
+    private TargetData2 CursorToTarget() {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
 
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
@@ -535,7 +541,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         return new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels);
     }
 
-    public TargetData2 AimToTarget() {
+
+    private TargetData2 AimToTarget() {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
 
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);

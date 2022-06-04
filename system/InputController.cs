@@ -183,17 +183,14 @@ public class InputController : MonoBehaviour {
     }
 
     private void HandleCharacterInput() {
-        TargetData2 targetData = TargetData2.none;
+        TargetData2 targetData = OrbitCamera.GetTargetData();
         Vector3 torque = Vector3.zero;
         if (GameManager.I.inputMode == InputMode.aim) {
-            targetData = OrbitCamera.AimToTarget();
             if (targetData.screenPositionNormalized.x > 0.9) {
                 torque = new Vector3(0f, -0.02f, 0f);
             } else if (targetData.screenPositionNormalized.x < 0.1) {
                 torque = new Vector3(0f, 0.02f, 0f);
             }
-        } else if (GameManager.I.inputMode == InputMode.gun) {
-            targetData = OrbitCamera.CursorToTarget();
         }
 
         if (aimPressedThisFrame) {
@@ -203,7 +200,6 @@ public class InputController : MonoBehaviour {
                 GameManager.I.TransitionToInputMode(InputMode.gun);
             }
         }
-        Debug.Log(torque);
 
         PlayerInput characterInputs = new PlayerInput() {
             inputMode = GameManager.I.inputMode,
