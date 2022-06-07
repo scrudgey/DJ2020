@@ -864,10 +864,11 @@ animation shows recoil
 display different UI when in aim mode
 laser pointer attachment
 flashlight attachment
-camera: don't clip camera through wall
+don't clip camera through wall
 prevent invisibility for some objects
 UI: gun wireframe in lower-right corner.
 UI: draw a circle for inaccuracy? cone?
+gun inaccuracy in over the shoulder mode should be constant angular size
 head look around if player has been idle
 make elevator
 why do gibs fall through the wall/floor?
@@ -875,9 +876,34 @@ clearsight InvokeRepeating
 clearsight OverlapSphereNonAlloc
 clearsight don't update ceiling calculation when in the air
 blinking arrow indicator when switching perspectives
+perhaps a smoother transition to/from aim mode?
+put arrow above, switch to isometric zoomed all the way in, in correct location, zoom out
+TODO: configurable scale, possibly involve aspect ratio
+alarms and flashing lights on infrastructure damage
 
 make a real mission. 
     1. 7-11 worker sprite
+        draw base
+        draw guns
     2. civilian man
+        * draw base
+        * draw guns
     3. civilian woman
+        draw base
+        draw guns
     4. security guard
+        draw base
+        draw guns
+
+fix head
+    how to fix head?
+    essentially, we want to place the custom head at the appropriate point in each part of the relevant spritesheet.
+    1. extend the head spritesheet and export the proper head in the proper position in the spritesheet, like we do with torso / legs.
+    2. define a set of data points per frame that define where the head should be, and which head sprite.
+        if we hardcode this, then every spritesheet from now to finish has to have the same points or we break compatibility.
+        idea: leverage unity editor
+            if we can select the torso sprite, then select head sprite and adjust position while seeing in the editor.
+            this would be a tool with unity editor code.
+            set up the design, then export a data object.
+            load the data object with 
+ceiling clearsighter shadowsonly

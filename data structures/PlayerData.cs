@@ -43,8 +43,13 @@ public class PlayerData {
             // // legSkin = "cyber",
             // bodySkin = "generic64",
 
-            legSkin = "Jack",
-            bodySkin = "Jack",
+            // legSkin = "Jack",
+            // bodySkin = "Jack",
+
+
+            legSkin = "civ_male",
+            bodySkin = "civ_male",
+
 
             cyberlegsLevel = 1,
 

@@ -854,7 +854,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     }
 
     public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
-
         // TODO: consider breaking out by state
 
         // We can wall jump only if we are not stable on ground and are moving against an obstruction
@@ -921,13 +920,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         // if (GameManager.I.showDebugRays)
         //     Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
-
-        // GunType gunType = GunType.unarmed;
-        // Gun baseGun = null;
-        // if (gunHandler.HasGun()) {
-        //     gunType = gunHandler.gunInstance.baseGun.type;
-        //     baseGun = gunHandler.gunInstance.baseGun;
-        // }
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),

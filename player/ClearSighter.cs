@@ -131,6 +131,8 @@ public class MaterialController {
 
         if (state == State.fadeIn || state == State.fadeOut) {
             foreach (Renderer renderer in childRenderers) {
+                if (renderer == null)
+                    continue;
                 renderer.material.SetFloat("_TargetAlpha", targetAlpha);
             }
         }

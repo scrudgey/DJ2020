@@ -19,7 +19,7 @@ public struct CameraInput {
     public bool crouchHeld;
     public Vector3 playerPosition;
     public CharacterState state;
-    public Vector3 cursorPosition;
+    // public Vector3 cursorPosition;
     public TargetData2 targetData;
     public Vector3 playerDirection;
 }
@@ -79,6 +79,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private float currentFollowingSharpness;
     private float currentDistanceMovementSpeed;
     private bool clampOrthographicSize;
+    public Vector3 lastTargetPosition;
+
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
     CameraAttractorZone currentAttractor = null;
@@ -263,9 +265,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     public CameraTargetParameters NormalParameters(CameraInput input) {
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
-        if (transitionTime >= 0.1f && input.targetData != null) {
-            targetPosition = (FollowTransform.position + input.targetData.position / 2f) / 2f;
-        }
+
 
         // Process rotation input
         float rotationInput = 0f;
@@ -286,6 +286,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         PlanarDirection = rotationFromInput * PlanarDirection;
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
+
+        if (transitionTime >= 0.1f && input.targetData != null) {
+            Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
+            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y);
+            // TODO: configurable scale, possibly involve aspect ratio
+            targetPosition = FollowTransform.position + worldOffset;
+            lastTargetPosition = targetPosition;
+        }
         return new CameraTargetParameters() {
             fieldOfView = 70f,
             orthographic = true,
@@ -617,5 +625,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     // TODO: use a single coroutine here
     public static void Shake(float intensity, float lifetime) {
         GameManager.I.StartCoroutine(DoShake(intensity, lifetime));
+    }
+
+    private void OnDrawGizmos() {
+        string customName = "Relic\\MaskedSpider.png";
+        Gizmos.DrawIcon(lastTargetPosition, customName, true);
     }
 }
