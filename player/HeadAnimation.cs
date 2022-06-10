@@ -9,8 +9,9 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
     public Direction direction;
     private int frame;
 
-    public void UpdateView(AnimationInput input, TorsoSpriteData torsoSpriteData) {
+    public void UpdateView(AnimationInput input, SpriteData torsoSpriteData) {
         // adjust visibility
+        // TODO: simplify
         switch (input.state) {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
@@ -68,7 +69,7 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
         billboard.skin = skin.headIdle;
     }
 
-    public void UpdateFrame(TorsoSpriteData torsoSpriteData) {
+    public void UpdateFrame(SpriteData torsoSpriteData) {
         if (skin != null) {
             Octet<Sprite[]> octet = skin.headIdle;
             if (torsoSpriteData.overrideHeadDirection) {

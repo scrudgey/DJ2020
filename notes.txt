@@ -924,3 +924,6 @@ visibility, position, direction, sprite.
 the torso sprite data is ultimately keyed on torso frame, which is determined by torso animator.
 
 the key: child head animation to torso animation.
+
+generalize to gun
+right click from edge of wallpress to enter shoot mode

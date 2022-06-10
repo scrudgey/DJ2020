@@ -7,6 +7,8 @@ using UnityEngine;
 
 [CustomEditor(typeof(SpriteDataSystem))]
 public class SpriteDataSystemEditor : Editor {
+    static string[] spriteSheetTypes = new string[] { "Torso", "pistol", "smg", "rifle", "shotgun" };
+
     SpriteDataSystem spriteDataSystem;
     bool firstSprite;
 
@@ -19,7 +21,7 @@ public class SpriteDataSystemEditor : Editor {
     int headOffsetY;
     bool overrideHeadDirection;
     bool headInFront;
-
+    int sheetIndex;
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
 
@@ -35,15 +37,18 @@ public class SpriteDataSystemEditor : Editor {
         headOffsetY = base.serializedObject.FindProperty("headOffsetY").intValue;
 
         GUILayout.Space(50);
-
+        sheetIndex = EditorGUILayout.Popup(sheetIndex, spriteSheetTypes);
+        string sheetTypeString = spriteSheetTypes[sheetIndex];
         GUILayout.Label("Controls");
-        if (GUILayout.Button("Load Skin")) {
-            Sprite[] output = Resources.LoadAll<Sprite>($"sprites/spritesheets/{spriteDataSystem.skinName}/Torso") as Sprite[];
+        if (GUILayout.Button("Load Spritesheet")) {
+            Debug.Log(sheetTypeString);
+            Sprite[] output = Resources.LoadAll<Sprite>($"sprites/spritesheets/{spriteDataSystem.skinName}/{sheetTypeString}") as Sprite[];
             Sprite[] headOutput = Resources.LoadAll<Sprite>($"sprites/spritesheets/{spriteDataSystem.skinName}/Head") as Sprite[];
             spriteDataSystem.torsoSprites = output;
             spriteDataSystem.headSprites = headOutput;
             spriteDataSystem.torsoIndex = 0;
             spriteDataSystem.headIndex = 0;
+            spriteDataSystem.torsoSprite = output[0];
             SetSprites();
         }
 
@@ -92,21 +97,24 @@ public class SpriteDataSystemEditor : Editor {
 
         GUILayout.Label("Sprite Data");
         if (GUILayout.Button("Add")) {
-            TorsoSpriteData newData = new TorsoSpriteData {
+            SpriteData newData = new SpriteData {
                 torsoSprite = spriteDataSystem.torsoIndex,
                 headSprite = spriteDataSystem.headIndex,
                 headOffset = new Vector2(headOffsetX, headOffsetY),
                 headInFrontOfTorso = headInFront,
                 overrideHeadDirection = overrideHeadDirection
             };
-            spriteDataSystem.torsoSpriteData.Add(newData);
+            spriteDataSystem.spriteData.Add(newData);
         }
         if (GUILayout.Button("Save Sprite Data")) {
-            Save(spriteDataSystem.skinName, spriteDataSystem.torsoSpriteData);
+            Save(spriteDataSystem.skinName, spriteDataSystem.spriteData, sheetTypeString);
             Debug.Log("Saved!");
         }
         if (GUILayout.Button("Load Sprite Data")) {
             Debug.Log("Loading...");
+            spriteDataSystem.spriteData = Load(spriteDataSystem.skinName, sheetTypeString);
+            spriteDataSystem.dataIndex = 0;
+            ReloadSpriteData();
         }
 
         GUILayout.Label("Edit Specific Data");
@@ -127,16 +135,12 @@ public class SpriteDataSystemEditor : Editor {
             }
             ReloadSpriteData();
         }
-
-        // call update on your serializedObject before testing and changing properties.
-        // work with the serialized property's methods to make changes: InsertArrayElementAtIndex should be useful to you
-        // when you're finished a round of changes, call ApplyModifiedProperties on the object
-
         SetSprites();
+        base.serializedObject.ApplyModifiedProperties();
     }
 
     void ReloadSpriteData() {
-        TorsoSpriteData data = spriteDataSystem.torsoSpriteData[spriteDataSystem.dataIndex];
+        SpriteData data = spriteDataSystem.spriteData[spriteDataSystem.dataIndex];
         spriteDataSystem.torsoIndex = data.torsoSprite;
         spriteDataSystem.headIndex = data.headSprite;
         torsoSprite = spriteDataSystem.torsoSprites[spriteDataSystem.torsoIndex];
@@ -167,9 +171,11 @@ public class SpriteDataSystemEditor : Editor {
             headSpriteRenderer.sortingOrder = -100;
         }
         headSpriteRenderer.enabled = overrideHeadDirection;
-        base.serializedObject.ApplyModifiedProperties();
     }
-    void Save(string skin, List<TorsoSpriteData> spriteData) {
-        Skin.SaveSpriteData(skin, spriteData);
+    void Save(string skin, List<SpriteData> spriteData, string sheetTypeString) {
+        Skin.SaveSpriteData(skin, spriteData, sheetTypeString);
+    }
+    List<SpriteData> Load(string skin, string sheetTypeString) {
+        return Skin.LoadSpriteData(skin, sheetTypeString);
     }
 }

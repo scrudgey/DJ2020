@@ -2,14 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class TorsoSpriteData {
-    public int torsoSprite;
-    public int headSprite;
-    public Vector2 headOffset;
-    public bool overrideHeadDirection;
-    public bool headInFrontOfTorso;
-}
+
 public class SpriteDataSystem : MonoBehaviour {
     public string skinName;
     [Header("Display")]
@@ -23,7 +16,7 @@ public class SpriteDataSystem : MonoBehaviour {
     public bool overrideHeadDirection;
     public bool headInFrontOfTorso;
     [Header("Data Model")]
-    public List<TorsoSpriteData> torsoSpriteData;
+    public List<SpriteData> spriteData;
 
     [HideInInspector]
     public Sprite[] torsoSprites;

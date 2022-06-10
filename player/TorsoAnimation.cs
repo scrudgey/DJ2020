@@ -5,7 +5,6 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
-
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
@@ -28,10 +27,17 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
         int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
-        TorsoSpriteData torsoSpriteData = skin.torsoSpriteData[sheetIndex];
-        ApplyTorsoSpriteData(input, torsoSpriteData);
+        SpriteData[] torsoSpriteData = input.gunInput.gunType switch {
+            GunType.unarmed => skin.unarmedSpriteData,
+            GunType.pistol => skin.pistolSpriteData,
+            GunType.smg => skin.smgSpriteData,
+            GunType.rifle => skin.rifleSpriteData,
+            GunType.shotgun => skin.shotgunSpriteData,
+            _ => skin.unarmedSpriteData
+        };
+        ApplyTorsoSpriteData(input, torsoSpriteData[sheetIndex]);
     }
-    void ApplyTorsoSpriteData(AnimationInput input, TorsoSpriteData torsoSpriteData) {
+    void ApplyTorsoSpriteData(AnimationInput input, SpriteData torsoSpriteData) {
         headAnimation.UpdateView(input, torsoSpriteData);
         transform.rotation = input.cameraRotation;
         Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);

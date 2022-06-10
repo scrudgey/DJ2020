@@ -61,7 +61,11 @@ public class Skin {
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
 
     // data
-    public TorsoSpriteData[] torsoSpriteData;
+    public SpriteData[] unarmedSpriteData;
+    public SpriteData[] pistolSpriteData;
+    public SpriteData[] smgSpriteData;
+    public SpriteData[] rifleSpriteData;
+    public SpriteData[] shotgunSpriteData;
 
 
     public Octet<Sprite[]> gunIdleSprites(GunType type) {
@@ -167,7 +171,6 @@ public class Skin {
         return $"sprites/spritesheets/{name}/{sheet}";
     }
     public static Skin LoadSkin(string name) {
-        // TODO: load offset data
         Sprite[] legSprites = loadSprites(name, "legs");
 
         Sprite[] torsoSprites = loadSprites(name, "torso");
@@ -182,7 +185,12 @@ public class Skin {
 
         Sprite[] headSprites = loadSprites(name, "head");
 
-        List<TorsoSpriteData> torsoSpriteData = LoadSpriteData(name);
+        // TODO: load more data
+        List<SpriteData> torsoSpriteData = LoadSpriteData(name, "Torso");
+        List<SpriteData> pistolSpriteData = LoadSpriteData(name, "pistol");
+        List<SpriteData> smgSpriteData = LoadSpriteData(name, "smg");
+        List<SpriteData> rifleSpriteData = LoadSpriteData(name, "rifle");
+        List<SpriteData> shotgunSpriteData = LoadSpriteData(name, "rifle");
 
         Skin skin = new Skin();
 
@@ -404,7 +412,11 @@ public class Skin {
         skin.rifleRack[Direction.up] = new Sprite[] { rifleSprites[49] };
 
         // data
-        skin.torsoSpriteData = torsoSpriteData.ToArray();
+        skin.unarmedSpriteData = torsoSpriteData.ToArray();
+        skin.pistolSpriteData = pistolSpriteData.ToArray();
+        skin.smgSpriteData = smgSpriteData.ToArray();
+        skin.rifleSpriteData = rifleSpriteData.ToArray();
+        skin.shotgunSpriteData = shotgunSpriteData.ToArray();
 
         return skin;
     }
@@ -462,9 +474,9 @@ public class Skin {
         }
     }
 
-    public static void SaveSpriteData(string skinName, List<TorsoSpriteData> spriteData) {
-        XmlSerializer serializer = new XmlSerializer(typeof(List<TorsoSpriteData>));
-        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), "TorsoSpriteData.xml");
+    public static void SaveSpriteData(string skinName, List<SpriteData> spriteData, string sheetType) {
+        XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
+        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
         if (File.Exists(path)) {
             File.Delete(path);
         }
@@ -473,12 +485,13 @@ public class Skin {
         }
         AssetDatabase.Refresh();
     }
-    public static List<TorsoSpriteData> LoadSpriteData(string skinName) {
-        XmlSerializer serializer = new XmlSerializer(typeof(List<TorsoSpriteData>));
-        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), "TorsoSpriteData.xml");
+    public static List<SpriteData> LoadSpriteData(string skinName, string sheetType) {
+        // TODO: load other sheets
+        XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
+        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
         if (File.Exists(path)) {
             using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-                return (List<TorsoSpriteData>)serializer.Deserialize(sceneStream);
+                return (List<SpriteData>)serializer.Deserialize(sceneStream);
             }
         } else {
             Debug.LogError($"sprite data file not found: {path}");
