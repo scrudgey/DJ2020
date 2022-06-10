@@ -1,11 +1,17 @@
 using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
+using UnityEditor;
 using UnityEngine;
 
 public class Skin {
     // head
     public Octet<Sprite[]> headIdle = new Octet<Sprite[]>();
-
+    public Sprite[] headSprites;
     // legs
     public Octet<Sprite[]> legsIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsWalk = new Octet<Sprite[]>();
@@ -53,6 +59,9 @@ public class Skin {
     public Octet<Sprite[]> rifleShoot = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
+
+    // data
+    public TorsoSpriteData[] torsoSpriteData;
 
 
     public Octet<Sprite[]> gunIdleSprites(GunType type) {
@@ -146,12 +155,19 @@ public class Skin {
         }
     }
     private static Sprite[] loadSprites(string name, string sheet) {
-        Sprite[] output = Resources.LoadAll<Sprite>($"sprites/spritesheets/{name}/{sheet}") as Sprite[];
+        Sprite[] output = Resources.LoadAll<Sprite>(PathToSkinSpritesheet(name, sheet)) as Sprite[];
         if (output.Length == 0) {
-            return Resources.LoadAll<Sprite>($"sprites/spritesheets/generic/{sheet}") as Sprite[];
+            return Resources.LoadAll<Sprite>(PathToSkinSpritesheet("generic", sheet)) as Sprite[];
         } else return output;
     }
+    public static string PathToSkinDirectory(string name) {
+        return $"sprites/spritesheets/{name}";
+    }
+    public static string PathToSkinSpritesheet(string name, string sheet) {
+        return $"sprites/spritesheets/{name}/{sheet}";
+    }
     public static Skin LoadSkin(string name) {
+        // TODO: load offset data
         Sprite[] legSprites = loadSprites(name, "legs");
 
         Sprite[] torsoSprites = loadSprites(name, "torso");
@@ -166,6 +182,8 @@ public class Skin {
 
         Sprite[] headSprites = loadSprites(name, "head");
 
+        List<TorsoSpriteData> torsoSpriteData = LoadSpriteData(name);
+
         Skin skin = new Skin();
 
         // head
@@ -174,6 +192,7 @@ public class Skin {
         skin.headIdle[Direction.right] = new Sprite[] { headSprites[2] };
         skin.headIdle[Direction.rightUp] = new Sprite[] { headSprites[3] };
         skin.headIdle[Direction.up] = new Sprite[] { headSprites[4] };
+        skin.headSprites = headSprites;
 
         // legs
         skin.legsIdle[Direction.down] = new Sprite[] { legSprites[0] };
@@ -383,6 +402,10 @@ public class Skin {
         skin.rifleRack[Direction.right] = new Sprite[] { rifleSprites[35], rifleSprites[36], rifleSprites[37], rifleSprites[36] };
         skin.rifleRack[Direction.rightUp] = new Sprite[] { rifleSprites[43], rifleSprites[44], rifleSprites[45], rifleSprites[44] };
         skin.rifleRack[Direction.up] = new Sprite[] { rifleSprites[49] };
+
+        // data
+        skin.torsoSpriteData = torsoSpriteData.ToArray();
+
         return skin;
     }
 
@@ -436,6 +459,30 @@ public class Skin {
                     } else return gunIdleSprites(input.gunInput.gunType);
 
                 }
+        }
+    }
+
+    public static void SaveSpriteData(string skinName, List<TorsoSpriteData> spriteData) {
+        XmlSerializer serializer = new XmlSerializer(typeof(List<TorsoSpriteData>));
+        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), "TorsoSpriteData.xml");
+        if (File.Exists(path)) {
+            File.Delete(path);
+        }
+        using (FileStream sceneStream = File.Create(path)) {
+            serializer.Serialize(sceneStream, spriteData);
+        }
+        AssetDatabase.Refresh();
+    }
+    public static List<TorsoSpriteData> LoadSpriteData(string skinName) {
+        XmlSerializer serializer = new XmlSerializer(typeof(List<TorsoSpriteData>));
+        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), "TorsoSpriteData.xml");
+        if (File.Exists(path)) {
+            using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
+                return (List<TorsoSpriteData>)serializer.Deserialize(sceneStream);
+            }
+        } else {
+            Debug.LogError($"sprite data file not found: {path}");
+            return null;
         }
     }
 }

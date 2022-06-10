@@ -1,15 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
-
 public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
 
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
     private Direction _direction;
+    public HeadAnimation headAnimation;
     public SpriteRenderer spriteRenderer;
     public Animation animator;
     public AnimationClip idleAnimation;
@@ -26,6 +27,23 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
+        int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
+        TorsoSpriteData torsoSpriteData = skin.torsoSpriteData[sheetIndex];
+        ApplyTorsoSpriteData(input, torsoSpriteData);
+    }
+    void ApplyTorsoSpriteData(AnimationInput input, TorsoSpriteData torsoSpriteData) {
+        headAnimation.UpdateView(input, torsoSpriteData);
+        transform.rotation = input.cameraRotation;
+        Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
+        if (headAnimation.spriteRenderer.flipX) {
+            offset.x *= -1f;
+        }
+        headAnimation.transform.localPosition = offset;
+        if (torsoSpriteData.headInFrontOfTorso) {
+            headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
+        } else {
+            headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
+        }
     }
     void SetState(GunHandler.GunState newState) {
         state = newState;
@@ -45,13 +63,6 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
         lastInput = input;
 
         switch (input.state) {
-            // case CharacterState.superJump:
-            //     trailTimer += Time.deltaTime;
-            //     if (trailTimer > trailInterval) {
-            //         trailTimer = 0f;
-            //         SpawnTrail();
-            //     }
-            //     break;
             default:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {

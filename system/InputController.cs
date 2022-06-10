@@ -33,6 +33,9 @@ public class InputController : MonoBehaviour {
     public InputActionReference useItem;
     public InputActionReference nextOverlay;
     public InputActionReference previousOverlay;
+    [Header("Debug")]
+    public InputActionReference DebugBreakAction;
+
 
     private Vector2 inputVector;
     private bool firePressedHeld;
@@ -94,6 +97,12 @@ public class InputController : MonoBehaviour {
         // Reload
         reload.action.performed += ctx => {
             reloadPressedThisFrame = ctx.ReadValueAsButton();
+        };
+
+        DebugBreakAction.action.performed += ctx => {
+            if (ctx.ReadValueAsButton()) {
+                Debug.Break();
+            }
         };
 
         // Gun switch

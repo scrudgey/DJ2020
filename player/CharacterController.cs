@@ -918,11 +918,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);
 
-        // if (GameManager.I.showDebugRays)
-        //     Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
+        if (GameManager.I.showDebugRays)
+            Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
+
+        // TODO:
+        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(OrbitCamera.isometricRotation * Vector3.forward, Vector3.up).normalized;
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
+            direction = direction,
             isMoving = isMoving(),
             isCrouching = isCrouching,
             isRunning = isRunning,
@@ -933,7 +937,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             playerInputs = _lastInput,
             gunInput = gunHandler.BuildAnimationInput(),
             targetData = targetData,
-            camDir = camDir
+            camDir = camDir,
+            cameraPlanarDirection = cameraPlanarDirection,
+            cameraRotation = OrbitCamera.transform.rotation
         };
     }
     public bool isMoving() {

@@ -16,6 +16,7 @@ public class Gun : ScriptableObject {
     public float shootInterval;
     public float muzzleflashSize = 0.025f;
     public float noise = 3f;
+    public float pitch = 1f;
     public int clipSize;
     public float range;
     public float spread;
@@ -46,7 +47,8 @@ public class Gun : ScriptableObject {
     public NoiseData shootNoise() {
         return new NoiseData() {
             volume = noise,
-            suspiciousness = Suspiciousness.aggressive
+            suspiciousness = Suspiciousness.aggressive,
+            pitch = pitch
         };
     }
 }

@@ -880,6 +880,8 @@ perhaps a smoother transition to/from aim mode?
 put arrow above, switch to isometric zoomed all the way in, in correct location, zoom out
 TODO: configurable scale, possibly involve aspect ratio
 alarms and flashing lights on infrastructure damage
+ceiling clearsighter shadowsonly
+fog of breath
 
 make a real mission. 
     1. 7-11 worker sprite
@@ -906,4 +908,19 @@ fix head
             this would be a tool with unity editor code.
             set up the design, then export a data object.
             load the data object with 
-ceiling clearsighter shadowsonly
+
+* redesign data structure so it can generalize to multiple skins
+* make it easier to select the next torso sprite (spritesheet parameter?)
+sprite data: 
+    override head direction
+    head in front of torso 
+
+editor: no way to inspect torso data after written.
+
+save and load data functionality.
+
+new problem: now head animation can be overridden by torso animation.
+visibility, position, direction, sprite.
+the torso sprite data is ultimately keyed on torso frame, which is determined by torso animator.
+
+the key: child head animation to torso animation.

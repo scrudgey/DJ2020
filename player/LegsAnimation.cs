@@ -26,8 +26,7 @@ public struct AnimationInput {
     }
     public GunAnimationInput gunInput;
     public Direction orientation;
-    // public Direction headOrientation;
-    // public PlayerCharacterInput playerInputs;
+    public Vector3 direction;
     public PlayerInput playerInputs;
     public bool isMoving;
     public bool isCrouching;
@@ -38,6 +37,7 @@ public struct AnimationInput {
     public CharacterState state;
     public Quaternion cameraRotation;
     public Vector2 camDir;
+    public Vector3 cameraPlanarDirection;
     public TargetData2 targetData;
 }
 
@@ -122,7 +122,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 break;
         }
 
-
         // set mode and animation
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
         shadowCaster.localPosition = new Vector3(0f, 0.7f, 0f);
@@ -168,18 +167,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             }
         }
 
-        // orientation
-        // Calculate camera direction and rotation on the character plane
-        // if (input.wallPressTimer <= 0 || input.state == CharacterState.wallPress) {
-        //     Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.forward, Vector3.up).normalized;
-        //     if (cameraPlanarDirection.sqrMagnitude == 0f) {
-        //         cameraPlanarDirection = Vector3.ProjectOnPlane(input.cameraRotation * Vector3.up, Vector3.up).normalized;
-        //     }
-        //     Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
-        //     transform.rotation = cameraPlanarRotation;
-        // } else {
-        transform.localRotation = Quaternion.identity;
-        // }
+        // transform.localRotation = Quaternion.identity;
+        transform.rotation = input.cameraRotation;
 
         UpdateFrame();
     }
