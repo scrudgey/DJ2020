@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -185,12 +183,11 @@ public class Skin {
 
         Sprite[] headSprites = loadSprites(name, "head");
 
-        // TODO: load more data
         List<SpriteData> torsoSpriteData = LoadSpriteData(name, "Torso");
         List<SpriteData> pistolSpriteData = LoadSpriteData(name, "pistol");
         List<SpriteData> smgSpriteData = LoadSpriteData(name, "smg");
         List<SpriteData> rifleSpriteData = LoadSpriteData(name, "rifle");
-        List<SpriteData> shotgunSpriteData = LoadSpriteData(name, "rifle");
+        List<SpriteData> shotgunSpriteData = LoadSpriteData(name, "shotgun");
 
         Skin skin = new Skin();
 
@@ -486,7 +483,6 @@ public class Skin {
         AssetDatabase.Refresh();
     }
     public static List<SpriteData> LoadSpriteData(string skinName, string sheetType) {
-        // TODO: load other sheets
         XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
         string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
         if (File.Exists(path)) {

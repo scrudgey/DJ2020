@@ -26,18 +26,24 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
+        // TODO: handle case when running with rifle or shotgun
+        ApplyTorsoSpriteData(input);
+    }
+    void ApplyTorsoSpriteData(AnimationInput input) {
         int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
-        SpriteData[] torsoSpriteData = input.gunInput.gunType switch {
+        SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
             GunType.unarmed => skin.unarmedSpriteData,
             GunType.pistol => skin.pistolSpriteData,
             GunType.smg => skin.smgSpriteData,
-            GunType.rifle => skin.rifleSpriteData,
-            GunType.shotgun => skin.shotgunSpriteData,
+            GunType.rifle => input.isRunning ? skin.smgSpriteData : skin.rifleSpriteData,
+            GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
             _ => skin.unarmedSpriteData
         };
-        ApplyTorsoSpriteData(input, torsoSpriteData[sheetIndex]);
-    }
-    void ApplyTorsoSpriteData(AnimationInput input, SpriteData torsoSpriteData) {
+        if (input.isCrouching && input.isMoving) { // crawling
+            torsoSpriteDatas = skin.unarmedSpriteData;
+        }
+        SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
+
         headAnimation.UpdateView(input, torsoSpriteData);
         transform.rotation = input.cameraRotation;
         Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);

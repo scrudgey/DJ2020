@@ -860,38 +860,34 @@ i.e. if we control the robot and right click it should enter aim mode right?
 * camera a little above, oriented down
 * camera moves slightly in direction of cursor
 * turn left & right when cursor near the edge ..?
-animation shows recoil
-display different UI when in aim mode
-laser pointer attachment
-flashlight attachment
-don't clip camera through wall
-prevent invisibility for some objects
-UI: gun wireframe in lower-right corner.
-UI: draw a circle for inaccuracy? cone?
-gun inaccuracy in over the shoulder mode should be constant angular size
-head look around if player has been idle
-make elevator
-why do gibs fall through the wall/floor?
-clearsight InvokeRepeating
-clearsight OverlapSphereNonAlloc
-clearsight don't update ceiling calculation when in the air
-blinking arrow indicator when switching perspectives
-perhaps a smoother transition to/from aim mode?
-put arrow above, switch to isometric zoomed all the way in, in correct location, zoom out
-TODO: configurable scale, possibly involve aspect ratio
-alarms and flashing lights on infrastructure damage
-ceiling clearsighter shadowsonly
-fog of breath
+- animation shows recoil
+- display different UI when in aim mode
+- laser pointer attachment
+- flashlight attachment
+- don't clip camera through wall
+- UI: gun wireframe in lower-right corner.
+- gun inaccuracy in over the shoulder mode should be constant angular size
+- head look around if player has been idle
+- make elevator
+- why do gibs fall through the wall/floor?
+- clearsight InvokeRepeating
+- clearsight OverlapSphereNonAlloc
+- clearsight don't update ceiling calculation when in the air
+- blinking arrow indicator when switching perspectives
+- perhaps a smoother transition to/from aim mode?
+- TODO: configurable scale, possibly involve aspect ratio
+- ceiling clearsighter shadowsonly
+- fog of breath
 
 make a real mission. 
     1. 7-11 worker sprite
         draw base
         draw guns
-    2. civilian man
+    * civilian man
         * draw base
         * draw guns
     3. civilian woman
-        draw base
+        * draw base
         draw guns
     4. security guard
         draw base
@@ -911,19 +907,16 @@ fix head
 
 * redesign data structure so it can generalize to multiple skins
 * make it easier to select the next torso sprite (spritesheet parameter?)
-sprite data: 
-    override head direction
-    head in front of torso 
+* sprite data: 
+    * override head direction
+    * head in front of torso 
+* editor: no way to inspect torso data after written.
+* save and load data functionality.
+* generalize to gun
+* fix smg and shotgun head positioning
+- mright click from edge of wallpress to enter shoot mode
+- controls to zoom in / out, fix camera at target
+- water drips outside
 
-editor: no way to inspect torso data after written.
-
-save and load data functionality.
-
-new problem: now head animation can be overridden by torso animation.
-visibility, position, direction, sprite.
-the torso sprite data is ultimately keyed on torso frame, which is determined by torso animator.
-
-the key: child head animation to torso animation.
-
-generalize to gun
-right click from edge of wallpress to enter shoot mode
+? prevent invisibility for some objects
+? UI: draw a circle for inaccuracy? cone?
