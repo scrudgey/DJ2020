@@ -920,3 +920,21 @@ fix head
 
 ? prevent invisibility for some objects
 ? UI: draw a circle for inaccuracy? cone?
+
+
+* disable run in aim mode
+* crack is black
+* crouch graphics are wrong
+* rotation orientation issues
+* sphere walks on people
+* don't shake camera when shooter is not player
+searching AI hears gunshot?
+clearsighter affecting ground
+wallpress orientation is wrong
+clearsighter still being weird
+
+
+AI on person notes
+    * sightcone tracks head position
+    * set head position properly
+    * input vector vs. move direction

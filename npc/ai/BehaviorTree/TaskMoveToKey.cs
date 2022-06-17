@@ -43,6 +43,9 @@ namespace AI {
                 inputVector.y = 0;
                 input.moveDirection = inputVector;
 
+                // TODO: this is setting head orientation.
+                input.Fire.targetData.position = transform.position + inputVector;
+
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
                 }

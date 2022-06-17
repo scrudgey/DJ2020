@@ -4,20 +4,14 @@ using UnityEngine;
 
 namespace AI {
     public class TaskShoot : TaskNode {
-        readonly float SHOOT_INTERVAL = 0.1f;
-        float shootTimer;
         GunHandler gunHandler;
         public TaskShoot(GunHandler gunHandler) : base() {
             this.gunHandler = gunHandler;
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            shootTimer += Time.deltaTime;
-            if (shootTimer > SHOOT_INTERVAL) {
-                shootTimer -= SHOOT_INTERVAL;
-                PlayerInput.FireInputs fireData = ShootBullet();
-                input.lookAtPoint = fireData.targetData.position;
-                input.Fire = fireData;
-            }
+            PlayerInput.FireInputs fireData = ShootBullet();
+            input.lookAtPoint = fireData.targetData.position;
+            input.Fire = fireData;
             return TaskState.running;
         }
         PlayerInput.FireInputs ShootBullet() {

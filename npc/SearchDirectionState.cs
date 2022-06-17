@@ -56,12 +56,11 @@ public class SearchDirectionState : SphereControlState {
         );
     }
 
-    public override PlayerInput Update() {
+    public override PlayerInput Update(ref PlayerInput input) {
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
             owner.RoutineFinished(this);
         }
-        PlayerInput input = new PlayerInput();
         rootTaskNode.Evaluate(ref input);
         return input;
     }

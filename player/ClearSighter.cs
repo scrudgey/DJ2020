@@ -24,7 +24,7 @@ public class MaterialController {
         this.camera = camera;
         this.gameObject = gameObject;
         this.tagSystemData = Toolbox.GetTagData(gameObject);
-        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>());
+        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).Where(x => !(x is SpriteRenderer)).ToList();
         this.collider = gameObject.GetComponentInChildren<Collider>();
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
@@ -41,7 +41,7 @@ public class MaterialController {
         timer = 0.1f;
     }
     public void CeilingCheck(Collider collider, Vector3 position) {
-        if (collider.bounds.center.y < position.y) {
+        if (collider.bounds.center.y < position.y + 0.05f) {
             disableBecauseAbove = false;
             return;
         }

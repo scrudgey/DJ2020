@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface IState {
     public void Enter();
-    public PlayerInput Update();
+    public PlayerInput Update(ref PlayerInput input);
     public void Exit();
 }
 
@@ -19,7 +19,7 @@ public class StateMachine<T> where T : IState {
 
     public PlayerInput Update() {
         timeInCurrentState += Time.deltaTime;
-        if (currentState != null) return currentState.Update();
-        return new PlayerInput();
+        PlayerInput input = PlayerInput.none;
+        return currentState?.Update(ref input) ?? input;
     }
 }

@@ -17,7 +17,9 @@ public class SphereAttackRoutine : SphereControlState {
                                GunHandler gunHandler) : base(ai) {
         this.gunHandler = gunHandler;
         speaker = owner.GetComponent<SphereRobotSpeaker>();
-        speaker.DoAttackSpeak();
+        if (speaker != null) {
+            speaker.DoAttackSpeak();
+        }
     }
     public override void Enter() {
         base.Enter();
@@ -45,13 +47,12 @@ public class SphereAttackRoutine : SphereControlState {
         return Vector3.Distance(owner.transform.position, lastSeenPlayerPosition) < MAX_SHOOT_RANGE && timeSinceSawPlayer < ATTACK_TIMEOUT;
     }
 
-    public override PlayerInput Update() {
+    public override PlayerInput Update(ref PlayerInput input) {
         timeSinceSawPlayer += Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
             owner.RoutineFinished(this);
         }
-        PlayerInput input = new PlayerInput();
         rootTaskNode.Evaluate(ref input);
         return input;
     }

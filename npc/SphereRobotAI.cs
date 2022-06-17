@@ -9,7 +9,8 @@ public enum Reaction { ignore, attack, investigate }
 public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public SightCone sightCone;
     public NavMeshPath navMeshPath; // TODO: remove this
-    public SphereRobotController sphereController;
+    public GameObject controllable;
+    public IInputReceiver sphereController;
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
     private SphereRobotBrain stateMachine;
@@ -27,16 +28,28 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public Suspiciousness recentHeardSuspicious;
     public Suspiciousness recentlySawSuspicious;
     public PatrolRoute patrolRoute;
+    public bool skipShootAnimation;
 
-    // public TextMeshProU
     private void OnDrawGizmos() {
         string customName = "Relic\\MaskedSpider.png";
         Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
     }
     void Start() {
-        // alertIcon.enabled = false;
-        alertHandler.Hide();
+        sphereController = controllable.GetComponent<IInputReceiver>();
+
+        // TODO: change this hack!
         // TODO: save / load gun state
+        TorsoAnimation torsoAnimation = controllable.GetComponentInChildren<TorsoAnimation>();
+        LegsAnimation legsAnimation = controllable.GetComponentInChildren<LegsAnimation>();
+        HeadAnimation headAnimation = controllable.GetComponentInChildren<HeadAnimation>();
+        if (torsoAnimation != null) {
+            PlayerData data = PlayerData.DefaultGameData();
+            foreach (ISaveable saveable in controllable.GetComponentsInChildren<ISaveable>()) {
+                saveable.LoadState(data);
+            }
+        }
+
+        alertHandler.Hide();
         gunHandler.primary = new GunInstance(Gun.Load("smg"));
         gunHandler.SwitchToGun(1);
         gunHandler.Reload();
@@ -47,10 +60,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         stateMachine = new SphereRobotBrain();
         navMeshPath = new NavMeshPath();
 
-        // TODO: start in patrol state
         if (patrolRoute != null) {
             ChangeState(new SpherePatrolRoutine(this, patrolRoute));
-
         } else {
             ChangeState(new SphereMoveRoutine(this, patrolZone));
         }
@@ -88,9 +99,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             PerceiveFieldOfView();
         }
         if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
-            // Debug.DrawRay(transform.position, target.transform.up, Color.cyan, 5f);
-            // Debug.DrawRay(transform.position, playerCollider.transform.position - transform.position, Color.magenta, 5f);
-            // Debug.Log(Vector3.Dot(target.transform.up, playerCollider.transform.position - transform.position) < 0);
             if (Vector3.Dot(target.transform.up, playerCollider.transform.position - transform.position) < 0) {
                 if (TargetVisible(playerCollider))
                     Perceive(playerCollider);
@@ -104,7 +112,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     void SetInputs(PlayerInput input) {
         sphereController.SetInputs(input);
         gunHandler.ProcessGunSwitch(input);
-        gunHandler.SetInputs(input, skipAnimation: true);
+        gunHandler.SetInputs(input, skipAnimation: skipShootAnimation);
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
@@ -130,7 +138,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
 
     void PerceivePlayerObject(Collider other) {
         float distance = Vector3.Distance(transform.position, other.bounds.center);
-        // LightLevelProbe
         if (GameManager.I.IsPlayerVisible(distance)) {
             stateMachine.currentState.OnObjectPerceived(other);
             lastSeenPlayerPosition = other.bounds.center;

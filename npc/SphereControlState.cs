@@ -5,7 +5,7 @@ public abstract class SphereControlState : IState {
     public SphereControlState(SphereRobotAI handler) {
         this.owner = handler;
     }
-    public abstract PlayerInput Update();
+    public abstract PlayerInput Update(ref PlayerInput input);
     public virtual void Enter() { }
     public virtual void Exit() { }
     public virtual void OnObjectPerceived(Collider other) { }

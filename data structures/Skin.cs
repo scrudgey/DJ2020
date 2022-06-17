@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using UnityEditor;
 using UnityEngine;
 
+[System.Serializable]
 public class Skin {
     // head
     public Octet<Sprite[]> headIdle = new Octet<Sprite[]>();

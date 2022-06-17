@@ -2,7 +2,6 @@ using AI;
 using UnityEngine;
 using UnityEngine.AI;
 public class SpherePatrolRoutine : SphereControlState {
-    // public static readonly string RANDOM_POSITION_KEY = "randomPosition";
     private TaskNode rootTaskNode;
     private PatrolRoute patrolRoute;
     public SpherePatrolRoutine(SphereRobotAI ai, PatrolRoute patrolRoute) : base(ai) {
@@ -11,7 +10,6 @@ public class SpherePatrolRoutine : SphereControlState {
     public override void Enter() {
         base.Enter();
         SetupRootNode();
-        // rootTaskNode.SetData(RANDOM_POSITION_KEY, randomPoint());
     }
     void SetupRootNode() {
         // rootTaskNode = new TaskRepeaterDecorator(new Sequence(
@@ -22,8 +20,7 @@ public class SpherePatrolRoutine : SphereControlState {
         rootTaskNode = new TaskPatrol(owner.transform, patrolRoute);
     }
 
-    public override PlayerInput Update() {
-        PlayerInput input = new PlayerInput();
+    public override PlayerInput Update(ref PlayerInput input) {
         rootTaskNode.Evaluate(ref input);
         return input;
     }

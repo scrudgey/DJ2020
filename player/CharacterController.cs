@@ -227,7 +227,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         }
 
         // Clamp input
+        // TODO: this is weird
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
+        if (input.moveDirection != Vector3.zero) {
+            moveInputVector = Vector3.ClampMagnitude(input.moveDirection, 1f);
+        }
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
             moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
         }
@@ -250,10 +254,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         _inputTorque = input.torque;
 
         // Run input
-        if (input.runDown) {
-            if (!isRunning) {
-                isRunning = true;
-            }
+        if (input.runDown && input.inputMode != InputMode.aim) {
+            isRunning = true;
         } else {
             isRunning = false;
 
@@ -315,7 +317,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     // Debug.Log($"setting aimpress shoot look direction: {_shootLookDirection}");
                 }
                 Debug.DrawRay(transform.position, directionToCursor, Color.yellow);
-                if (GameManager.I.inputMode != InputMode.aim) {
+                if (input.inputMode != InputMode.aim) {
                     directionToCursor.y = 0;
                     directionToCursor = directionToCursor.normalized;
                     float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);

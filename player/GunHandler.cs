@@ -217,7 +217,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         // state change callbacks
         OnValueChanged?.Invoke(this);
 
-        CharacterCamera.Shake(gunInstance.baseGun.noise / 5f, 0.1f);
+        if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            CharacterCamera.Shake(gunInstance.baseGun.noise / 5f, 0.1f);
+        }
     }
     public void EmitShell() {
         emitShell = true;
@@ -354,6 +356,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
                         // Debug.Log($"lastShootInput: {lastShootInput.targetData.position}");
                         state = GunState.shooting;
                     } else if (input.Fire.FireHeld) {
+                        state = GunState.shooting;
                         lastShootInput = input.Fire.targetData;
                     } else if (state == GunState.shooting && !input.Fire.FireHeld) {
                         EndShoot();
@@ -387,7 +390,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
         OnValueChanged?.Invoke(this);
 
-        if (skipAnimation)
+        if (skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.cooldownTimer <= 0)
             ShootImmediately(input.Fire.targetData);
     }
 

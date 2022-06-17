@@ -6,6 +6,9 @@ public struct PlayerInput {
         public bool AimPressed;
         public bool FireHeld;
         public TargetData2 targetData;
+        public static FireInputs none = new FireInputs {
+            targetData = TargetData2.none
+        };
     }
     public InputMode inputMode;
     public float MoveAxisForward;
@@ -29,4 +32,7 @@ public struct PlayerInput {
     public Vector3 lookAtPoint;
     public Vector3 lookAtDirection;
     public Vector3 torque;
+    public static PlayerInput none = new PlayerInput {
+        Fire = FireInputs.none
+    };
 }

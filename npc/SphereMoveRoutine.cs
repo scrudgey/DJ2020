@@ -24,8 +24,7 @@ public class SphereMoveRoutine : SphereControlState {
     public Vector3 randomPoint() {
         return patrolZone.radius * UnityEngine.Random.insideUnitSphere + patrolZone.center;
     }
-    public override PlayerInput Update() {
-        PlayerInput input = new PlayerInput();
+    public override PlayerInput Update(ref PlayerInput input) {
         rootTaskNode.Evaluate(ref input);
         return input;
     }
