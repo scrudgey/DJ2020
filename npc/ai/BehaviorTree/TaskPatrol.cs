@@ -16,25 +16,23 @@ namespace AI {
         public TaskPatrol(Transform transform, PatrolRoute patrolRoute) : base() {
             this.patrolRoute = patrolRoute;
             this.transform = transform;
-            navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position));
+            setupRootNode();
+        }
+        public override TaskState DoEvaluate(ref PlayerInput input) {
+            TaskState result = rootNode.DoEvaluate(ref input);
+            if (result == TaskState.success && navPoints.Count == 0) {
+                setupRootNode();
+            }
+            return result;
+        }
 
+        void setupRootNode() {
+            navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position));
             this.rootNode = new TaskUntilFailRepeater(new Sequence(
                 new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
                 new TaskMoveToKey(transform, NAV_POINT_KEY)
             ));
             this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());
-        }
-        public override TaskState DoEvaluate(ref PlayerInput input) {
-            if (navPoints.Count == 0) {
-                navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position));
-                this.rootNode = new TaskUntilFailRepeater(new Sequence(
-                    new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
-                    new TaskMoveToKey(transform, NAV_POINT_KEY)
-                ));
-                this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());
-            }
-            // this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());
-            return rootNode.DoEvaluate(ref input);
         }
     }
 

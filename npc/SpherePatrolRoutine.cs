@@ -17,6 +17,8 @@ public class SpherePatrolRoutine : SphereControlState {
         //     new TaskTimerDectorator(2f),
         //     new TaskSetKey<Vector3>(RANDOM_POSITION_KEY, randomPoint)
         // ));
+        Debug.Log("set up root node");
+
         rootTaskNode = new TaskPatrol(owner.transform, patrolRoute);
     }
 

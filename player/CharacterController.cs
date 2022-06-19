@@ -231,8 +231,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
         if (input.moveDirection != Vector3.zero) {
             moveInputVector = Vector3.ClampMagnitude(input.moveDirection, 1f);
-        }
-        if (moveInputVector.y != 0 && moveInputVector.x != 0) {
+        } else if (moveInputVector.y != 0 && moveInputVector.x != 0) {
             moveInputVector = CharacterCamera.rotationOffset * moveInputVector;
         }
 

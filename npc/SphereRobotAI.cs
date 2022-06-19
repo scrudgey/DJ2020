@@ -193,9 +193,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     }
 
     public void HearNoise(NoiseComponent noise) {
+        if (noise == null)
+            return;
         recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
         // Debug.Log(recentHeardSuspicious);
-        stateMachine.currentState.OnNoiseHeard(noise);
+        if (stateMachine != null && stateMachine.currentState != null)
+            stateMachine.currentState.OnNoiseHeard(noise);
         if (noise.data.suspiciousness > Suspiciousness.normal) {
             switch (stateMachine.currentState) {
                 case SphereMoveRoutine:

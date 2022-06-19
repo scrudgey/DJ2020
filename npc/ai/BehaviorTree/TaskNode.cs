@@ -34,9 +34,9 @@ namespace AI {
         }
         public TaskState Evaluate(ref PlayerInput input) {
             if (!initialized) {
+                initialized = true;
                 Initialize();
             }
-            initialized = true;
             return DoEvaluate(ref input);
         }
         public virtual void Initialize() { }
