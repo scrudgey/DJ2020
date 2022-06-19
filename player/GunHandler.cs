@@ -73,9 +73,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
 
 
-    public bool HasGun() {
-        return gunInstance != null && gunInstance.baseGun != null;
-    }
+    public bool HasGun() => gunInstance != null && gunInstance.baseGun != null;
+
+    public bool CanShoot() => gunInstance.CanShoot() && (inputMode == InputMode.gun || inputMode == InputMode.aim) && (state != GunState.reloading && state != GunState.racking);
+
     public void Update() {
         if (gunInstance == null) {
             state = GunState.idle;
@@ -248,6 +249,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
     }
     public void EmitMagazine() {
+        Debug.Log("Emit magazine");
         GameObject mag = GameObject.Instantiate(
                 gunInstance.baseGun.magazine,
                 gunPosition() + 0.2f * transform.right + 0.2f * transform.forward - 0.2f * transform.up,
@@ -335,7 +337,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             DoReload();
         }
     }
-    void DoReload() {
+    public void DoReload() {
         if (gunInstance == null || gunInstance.baseGun == null)
             return;
         if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
@@ -349,7 +351,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         currentTargetData = input.Fire.targetData;
         shootRequestedThisFrame = false;
         if (HasGun()) {
-            if (gunInstance.CanShoot() && (inputMode == InputMode.gun || inputMode == InputMode.aim)) {
+            if (CanShoot()) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
                         lastShootInput = input.Fire.targetData;

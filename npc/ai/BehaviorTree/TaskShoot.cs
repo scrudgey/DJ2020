@@ -12,6 +12,7 @@ namespace AI {
             PlayerInput.FireInputs fireData = ShootBullet();
             input.lookAtPoint = fireData.targetData.position;
             input.Fire = fireData;
+            input.inputMode = InputMode.gun;
             return TaskState.running;
         }
         PlayerInput.FireInputs ShootBullet() {

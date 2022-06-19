@@ -9,8 +9,14 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
     public Collider newestAddition;
     public Collider newestRemoval;
     public Action<SightCone> OnValueChanged { get; set; }
+    private Transform myRootTransform;
+    void Start() {
+        myRootTransform = transform.root;
+    }
     private void OnTriggerEnter(Collider other) {
         // Debug.Log($"FOV enter: {other}");
+        if (other.transform.root.IsChildOf(myRootTransform))
+            return;
         newestAddition = other;
         fieldOfView.Add(other);
         PruneFieldOfView();
@@ -18,6 +24,8 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
     }
     private void OnTriggerExit(Collider other) {
         // Debug.Log($"FOV exit: {other}");
+        if (other.transform.root.IsChildOf(myRootTransform))
+            return;
         newestRemoval = other;
         fieldOfView.Remove(other);
         PruneFieldOfView();

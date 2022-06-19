@@ -13,7 +13,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     public IInputReceiver sphereController;
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
-    private SphereRobotBrain stateMachine;
+    public SphereRobotBrain stateMachine;
     public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
@@ -52,9 +52,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         alertHandler.Hide();
         gunHandler.primary = new GunInstance(Gun.Load("smg"));
         gunHandler.SwitchToGun(1);
-        gunHandler.Reload();
-        gunHandler.ClipIn();
-        gunHandler.Rack();
+        if (skipShootAnimation) {
+            gunHandler.Reload();
+            gunHandler.ClipIn();
+            gunHandler.Rack();
+        } else {
+            gunHandler.DoReload();
+        }
 
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
@@ -85,6 +89,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         stateMachine.ChangeState(routine);
         switch (routine) {
             case SphereAttackRoutine attack:
+                Debug.Log("entering attack state");
                 recentlyInCombat = true;
                 break;
         }
@@ -143,9 +148,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             lastSeenPlayerPosition = other.bounds.center;
             timeSinceLastSeen = 0f;
             playerCollider = other;
-
             Reaction reaction = ReactToPlayerSuspicion();
-
             if (reaction == Reaction.attack || reaction == Reaction.investigate) { // TODO: investigate routine
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:

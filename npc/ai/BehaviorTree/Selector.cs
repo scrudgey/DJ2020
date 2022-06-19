@@ -24,6 +24,5 @@ namespace AI {
             state = TaskState.failure;
             return state;
         }
-
     }
 }

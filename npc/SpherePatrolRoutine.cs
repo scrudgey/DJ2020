@@ -12,13 +12,6 @@ public class SpherePatrolRoutine : SphereControlState {
         SetupRootNode();
     }
     void SetupRootNode() {
-        // rootTaskNode = new TaskRepeaterDecorator(new Sequence(
-        //     new TaskMoveToKey(owner.transform, RANDOM_POSITION_KEY),
-        //     new TaskTimerDectorator(2f),
-        //     new TaskSetKey<Vector3>(RANDOM_POSITION_KEY, randomPoint)
-        // ));
-        Debug.Log("set up root node");
-
         rootTaskNode = new TaskPatrol(owner.transform, patrolRoute);
     }
 

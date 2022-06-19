@@ -928,11 +928,14 @@ fix head
 * rotation orientation issues
 * sphere walks on people
 * don't shake camera when shooter is not player
-searching AI hears gunshot?
+* reloading for animated character
+* searching AI hears gunshot?
+
 clearsighter affecting ground
 wallpress orientation is wrong
 clearsighter still being weird
-
+head looking in correct direction
+muzzle flash when looking head-on
 
 AI on person notes
     * sightcone tracks head position
