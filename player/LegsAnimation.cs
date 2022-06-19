@@ -117,7 +117,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
                 }
                 break;
         }
@@ -168,6 +168,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         }
 
         // transform.localRotation = Quaternion.identity;
+        // TODO: this is what makes the head offset work. but it causes weird clipping and leaning. we should set this, apply offset, then set it back after applying offset
         transform.rotation = input.cameraRotation;
 
         UpdateFrame();

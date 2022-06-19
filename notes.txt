@@ -930,11 +930,10 @@ fix head
 * don't shake camera when shooter is not player
 * reloading for animated character
 * searching AI hears gunshot?
-
-clearsighter affecting ground
-wallpress orientation is wrong
-clearsighter still being weird
+* wallpress orientation is wrong
 head looking in correct direction
+clearsighter affecting ground
+clearsighter still being weird
 muzzle flash when looking head-on
 
 AI on person notes

@@ -249,7 +249,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
     }
     public void EmitMagazine() {
-        Debug.Log("Emit magazine");
         GameObject mag = GameObject.Instantiate(
                 gunInstance.baseGun.magazine,
                 gunPosition() + 0.2f * transform.right + 0.2f * transform.forward - 0.2f * transform.up,

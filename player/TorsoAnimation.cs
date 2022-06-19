@@ -87,7 +87,7 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
             case CharacterState.wallPress:
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
-                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight < 0;
                 }
                 break;
         }

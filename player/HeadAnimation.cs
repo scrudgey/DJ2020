@@ -29,9 +29,9 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 } else { // standing
                     direction = Direction.down;
                     if (input.playerInputs.MoveAxisRight < 0) {
-                        direction = Direction.right;
-                    } else if (input.playerInputs.MoveAxisRight > 0) {
                         direction = Direction.left;
+                    } else if (input.playerInputs.MoveAxisRight > 0) {
+                        direction = Direction.right;
                     }
                 }
                 break;

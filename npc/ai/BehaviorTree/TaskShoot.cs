@@ -16,7 +16,10 @@ namespace AI {
             return TaskState.running;
         }
         PlayerInput.FireInputs ShootBullet() {
-            Vector3 lastSeenPlayerPosition = (Vector3)GetData("lastSeenPlayerPosition");
+            object lastSeenPlayerPositionObject = GetData("lastSeenPlayerPosition");
+            if (lastSeenPlayerPositionObject == null)
+                return new PlayerInput.FireInputs();
+            Vector3 lastSeenPlayerPosition = (Vector3)lastSeenPlayerPositionObject;
             if (lastSeenPlayerPosition == null)
                 return new PlayerInput.FireInputs();
             PlayerInput.FireInputs fireInput = new PlayerInput.FireInputs() {
