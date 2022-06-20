@@ -27,9 +27,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     private float movementInaccuracy;
     private float crouchingInaccuracy;
     private float shootingInaccuracy;
-    public TargetData2 lastShootInput;
+    public CursorData lastShootInput;
     public bool shootRequestedThisFrame;
-    public TargetData2 currentTargetData;
+    public CursorData currentTargetData;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
@@ -104,10 +104,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     public Vector3 gunPosition() {
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
-    public Vector3 gunDirection(TargetData2 data) {
-        return data.position - this.gunPosition();
+    public Vector3 gunDirection(CursorData data) {
+        return data.worldPosition - this.gunPosition();
     }
-    public float inaccuracy(TargetData2 input) {
+    public float inaccuracy(CursorData input) {
         float accuracy = 0;
 
         // returns the inaccuracy in world units at the point of the last target data
@@ -115,7 +115,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             return 0f;
 
         // range
-        float distance = Vector3.Distance(input.position, this.gunPosition());
+        float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
         accuracy += gunInstance.baseGun.spread * (distance / 10f);
 
         // movement
@@ -139,7 +139,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
 
         return accuracy;
     }
-    public void EmitBullet(TargetData2 input) {
+    public void EmitBullet(CursorData input) {
         Vector3 gunPosition = this.gunPosition();
 
         Vector3 trueDirection = gunDirection(input);
@@ -165,10 +165,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
 
         Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
     }
-    public void ShootImmediately(TargetData2 input) {
+    public void ShootImmediately(CursorData input) {
         Shoot(input);
     }
-    void Shoot(TargetData2 input) {
+    void Shoot(CursorData input) {
         if (!HasGun()) {
             return;
         }
@@ -347,24 +347,24 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
     }
     public void SetInputs(PlayerInput input, bool skipAnimation = false) {
         inputMode = input.inputMode;
-        currentTargetData = input.Fire.targetData;
+        currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
         if (HasGun()) {
             if (CanShoot()) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
-                        lastShootInput = input.Fire.targetData;
+                        lastShootInput = input.Fire.cursorData;
                         // Debug.Log($"lastShootInput: {lastShootInput.targetData.position}");
                         state = GunState.shooting;
                     } else if (input.Fire.FireHeld) {
                         state = GunState.shooting;
-                        lastShootInput = input.Fire.targetData;
+                        lastShootInput = input.Fire.cursorData;
                     } else if (state == GunState.shooting && !input.Fire.FireHeld) {
                         EndShoot();
                     }
                 } else { // semiautomatic
                     if (input.Fire.FirePressed) {//&& !shooting) {
-                        lastShootInput = input.Fire.targetData;
+                        lastShootInput = input.Fire.cursorData;
                         state = GunState.shooting;
                         shootRequestedThisFrame = true;
                         // Debug.Log("shoot requested this frame");
@@ -392,7 +392,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         OnValueChanged?.Invoke(this);
 
         if (skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.cooldownTimer <= 0)
-            ShootImmediately(input.Fire.targetData);
+            ShootImmediately(input.Fire.cursorData);
     }
 
     public AnimationInput.GunAnimationInput BuildAnimationInput() {

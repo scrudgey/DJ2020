@@ -21,17 +21,17 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
 
     public Action<SphereRobotController> OnValueChanged { get; set; }
     private Vector3 _moveInputVector;
-    private Vector3 _lookInputVector;
+    // private Vector3 slewLookDirection;
     private Vector2 _moveAxis;
-    private Vector3 _shootLookDirection = Vector2.zero;
+    private Vector3 snapLookDirection = Vector2.zero;
     public void SetInputs(PlayerInput input) {
-        if (input.Fire.targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
-            Vector3 targetPoint = input.Fire.targetData.position;
-            _shootLookDirection = targetPoint;
-        } else if (input.lookAtPoint != Vector3.zero) {
-            _shootLookDirection = input.lookAtPoint;
-        } else if (input.lookAtDirection != Vector3.zero) {
-            _shootLookDirection = transform.position + input.lookAtDirection;
+        if (input.Fire.cursorData != CursorData.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
+            Vector3 targetPoint = input.Fire.cursorData.worldPosition;
+            snapLookDirection = targetPoint;
+        } else if (input.orientTowardPoint != Vector3.zero) {
+            snapLookDirection = input.orientTowardPoint;
+        } else if (input.orientTowardDirection != Vector3.zero) {
+            snapLookDirection = transform.position + input.orientTowardDirection;
         }
 
         _moveInputVector = input.moveDirection;
@@ -68,21 +68,17 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
         if (_moveInputVector != Vector3.zero) {
             targetDirection = _moveInputVector;
         }
-
-        if (_shootLookDirection != Vector3.zero) {
-
+        if (snapLookDirection != Vector3.zero) {
             // noise.transform.position - owner.transform.position - transform.position;
-
-            Vector3 target = _shootLookDirection - transform.position;
-            target.y = 0;
-            targetDirection = target;
+            targetDirection = snapLookDirection - transform.position;
+            targetDirection.y = 0;
         }
-        Debug.DrawRay(transform.position, targetDirection, Color.green, 0.1f);
+        // Debug.DrawRay(transform.position, targetDirection, Color.green, 0.1f);
 
         direction = Vector3.Slerp(direction, targetDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
         currentRotation = Quaternion.LookRotation(direction, Vector3.up);
 
-        _shootLookDirection = Vector3.zero;
+        snapLookDirection = Vector3.zero;
     }
 
     /// <summary>

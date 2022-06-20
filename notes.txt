@@ -932,6 +932,11 @@ fix head
 * searching AI hears gunshot?
 * wallpress orientation is wrong
 head looking in correct direction
+    pass a separate look at direction / point instead of taking it from firedata
+        direction / point and key vs vector
+        look at 
+    unify look at point / look at direction
+
 clearsighter affecting ground
 clearsighter still being weird
 muzzle flash when looking head-on

@@ -9,7 +9,7 @@ public enum MenuType { none, console }
 public enum OverlayType { none, power, cyber }
 public enum CursorType { gun, pointer }
 public enum InputMode { none, gun, cyber, aim }
-public struct CursorData {
+public struct PointerData {
     public Texture2D mouseCursor;
     public Vector2 hotSpot;
     public CursorMode cursorMode;
@@ -128,20 +128,20 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SetCursor(CursorType cursorType) {
-        CursorData data = cursorType switch {
-            CursorType.pointer => new CursorData() {
+        PointerData data = cursorType switch {
+            CursorType.pointer => new PointerData() {
                 // mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
                 // hotSpot = new Vector2(8, 8),
                 mouseCursor = Resources.Load("sprites/UI/elements/Cursor") as Texture2D,
                 hotSpot = new Vector2(0, 0),
                 cursorMode = CursorMode.Auto
             },
-            CursorType.gun => new CursorData {
+            CursorType.gun => new PointerData {
                 mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 0") as Texture2D,
                 hotSpot = new Vector2(8, 8),
                 cursorMode = CursorMode.Auto
             },
-            _ => new CursorData()
+            _ => new PointerData()
         };
         Cursor.SetCursor(data.mouseCursor, data.hotSpot, data.cursorMode);
     }

@@ -65,9 +65,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         navMeshPath = new NavMeshPath();
 
         if (patrolRoute != null) {
-            ChangeState(new SpherePatrolRoutine(this, patrolRoute));
+            ChangeState(new SpherePatrolState(this, patrolRoute));
         } else {
-            ChangeState(new SphereMoveRoutine(this, patrolZone));
+            ChangeState(new SphereMoveState(this, patrolZone));
         }
     }
 
@@ -78,18 +78,17 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
                 speechTextController.HaltSpeechForTime(2f);
-                ChangeState(new SphereMoveRoutine(this, patrolZone));
+                ChangeState(new SphereMoveState(this, patrolZone));
                 break;
-            case SphereAttackRoutine:
-                ChangeState(new SphereMoveRoutine(this, patrolZone));
+            case SphereAttackState:
+                ChangeState(new SphereMoveState(this, patrolZone));
                 break;
         }
     }
     private void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
         switch (routine) {
-            case SphereAttackRoutine attack:
-                Debug.Log("entering attack state");
+            case SphereAttackState attack:
                 recentlyInCombat = true;
                 break;
         }
@@ -152,10 +151,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             if (reaction == Reaction.attack || reaction == Reaction.investigate) { // TODO: investigate routine
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
-                    case SphereMoveRoutine:
-                    case SpherePatrolRoutine:
+                    case SphereMoveState:
+                    case SpherePatrolState:
                         alertHandler.ShowAlert();
-                        ChangeState(new SphereAttackRoutine(this, gunHandler));
+                        ChangeState(new SphereAttackState(this, gunHandler));
                         break;
                 }
             } else if (reaction == Reaction.investigate) {
@@ -184,8 +183,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
 
     public void TakeDamage<T>(T damage) where T : Damage {
         switch (stateMachine.currentState) {
-            case SphereMoveRoutine:
-            case SpherePatrolRoutine:
+            case SphereMoveState:
+            case SpherePatrolState:
                 ChangeState(new SearchDirectionState(this, damage));
                 break;
             case SearchDirectionState:
@@ -204,8 +203,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
             stateMachine.currentState.OnNoiseHeard(noise);
         if (noise.data.suspiciousness > Suspiciousness.normal) {
             switch (stateMachine.currentState) {
-                case SphereMoveRoutine:
-                case SpherePatrolRoutine:
+                case SphereMoveState:
+                case SpherePatrolState:
                     ChangeState(new SearchDirectionState(this, noise));
                     break;
                 case SearchDirectionState:

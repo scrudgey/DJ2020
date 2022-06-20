@@ -1,7 +1,7 @@
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class SphereAttackRoutine : SphereControlState {
+public class SphereAttackState : SphereControlState {
     static readonly public string LAST_SEEN_PLAYER_POSITION_KEY = "lastSeenPlayerPosition";
     private TaskNode rootTaskNode;
     public SphereRobotSpeaker speaker;
@@ -13,7 +13,7 @@ public class SphereAttackRoutine : SphereControlState {
     public GunHandler gunHandler;
     Vector3 lastSeenPlayerPosition;
 
-    public SphereAttackRoutine(SphereRobotAI ai,
+    public SphereAttackState(SphereRobotAI ai,
                                GunHandler gunHandler) : base(ai) {
         this.gunHandler = gunHandler;
         speaker = owner.GetComponent<SphereRobotSpeaker>();
@@ -28,7 +28,11 @@ public class SphereAttackRoutine : SphereControlState {
     }
     void SetupRootNode() {
         rootTaskNode = new Sequence(
-            new TaskTimerDectorator(new TaskLookAtKey(LAST_SEEN_PLAYER_POSITION_KEY), 0.5f),
+            new TaskTimerDectorator(new TaskLookAt() {
+                lookType = TaskLookAt.LookType.position,
+                key = LAST_SEEN_PLAYER_POSITION_KEY,
+                useKey = true
+            }, 0.5f),
             new Selector(
                 new TaskConditional(() => gunHandler.gunInstance.clip > 0),
                 new TaskReload(gunHandler)

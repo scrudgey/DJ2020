@@ -74,7 +74,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private Vector2 _moveAxis;
     private Vector3 _moveInputVector;
     private Vector3 _inputTorque;
-    private Vector3 _lookInputVector;
+    private Vector3 slewLookVector;
     private bool _jumpRequested = false;
     private bool _jumpConsumed = false;
     private bool _jumpedThisFrame = false;
@@ -85,7 +85,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private bool _canWallJump = false;
     private Vector3 _wallJumpNormal;
     private Vector3 _internalVelocityAdd = Vector3.zero;
-    private Vector3 _shootLookDirection = Vector2.zero;
+    private Vector3 snapToDirection = Vector2.zero;
     public bool isCrouching = false;
     public bool isRunning = false;
 
@@ -129,7 +129,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
     private float landStunTimer;
     private PlayerInput _lastInput;
-    private TargetData2 lastTargetDataInput;
+    private CursorData lastTargetDataInput;
+    private Vector3 lookAtDirection;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -276,7 +277,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             jumpHeldTimer = 0;
         }
 
-        TargetData2 targetData = input.Fire.targetData;
+        CursorData cursorData = input.Fire.cursorData;
         switch (state) {
             case CharacterState.jumpPrep:
                 // TODO: normalize this player state
@@ -306,28 +307,23 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
 
-                Vector3 directionToCursor = targetData.position - transform.position;
-
-                _lookInputVector = Vector3.zero;
-
-                // turn to face aim position?
-                if (input.Fire.AimPressed) {
-                    _shootLookDirection = directionToCursor;
-                    // Debug.Log($"setting aimpress shoot look direction: {_shootLookDirection}");
-                }
-                Debug.DrawRay(transform.position, directionToCursor, Color.yellow);
-                if (input.inputMode != InputMode.aim) {
+                // Turn to face cursor or movement direction
+                slewLookVector = Vector3.zero;
+                if (input.Fire.AimPressed || input.Fire.FireHeld || input.Fire.FirePressed) {
+                    Vector3 directionToCursor = cursorData.worldPosition - transform.position;
                     directionToCursor.y = 0;
-                    directionToCursor = directionToCursor.normalized;
-                    float dotproduct = Vector3.Dot(Motor.CharacterForward, directionToCursor);
-                    if (dotproduct < 0 && moveInputVector == Vector3.zero) {
-                        // _lookInputVector = Vector3.Lerp(_lookInputVector, directionToCursor, 0.1f);
-                    } else {
-                        _lookInputVector = Vector3.Lerp(_lookInputVector, _moveInputVector, 0.1f);
-                    }
-                    if (targetData != TargetData2.none && (input.Fire.FireHeld || input.Fire.FirePressed)) {
-                        _shootLookDirection = directionToCursor;
-                    }
+                    snapToDirection = directionToCursor;
+                }
+                if (input.inputMode != InputMode.aim) {
+                    slewLookVector = Vector3.Lerp(slewLookVector, _moveInputVector, 0.1f);
+                }
+
+                // TODO: distinguish betwen lookAtDirection and lookAtPoint
+                if (input.lookAtPosition != Vector3.zero) {
+                    lookAtDirection = input.lookAtPosition - transform.position;
+                }
+                if (input.lookAtDirection != Vector3.zero) {
+                    lookAtDirection = input.lookAtDirection;
                 }
 
                 // Jumping input
@@ -367,8 +363,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
         }
 
+
         _lastInput = input;
-        lastTargetDataInput = targetData;
+        lastTargetDataInput = cursorData;
     }
 
     /// <summary>
@@ -388,23 +385,19 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         switch (state) {
             default:
             case CharacterState.normal:
-                if (_shootLookDirection != Vector3.zero) {
-                    Vector3 target = _shootLookDirection;
+                if (snapToDirection != Vector3.zero) {
+                    Vector3 target = snapToDirection;
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
-                    // Debug.Log($"applying shoot look direction: {_shootLookDirection}");
-                    // Debug.Break();
                 } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
                     // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
-
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     // currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
-                } else if (_lookInputVector != Vector3.zero && OrientationSharpness > 0f) {
+                } else if (slewLookVector != Vector3.zero && OrientationSharpness > 0f) {
                     // Smoothly interpolate from current to target look direction
-                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _lookInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
-
+                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, slewLookVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 }
@@ -433,8 +426,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 break;
         }
-        _lookInputVector = Vector3.zero;
-        _shootLookDirection = Vector3.zero;
+        slewLookVector = Vector3.zero;
+        snapToDirection = Vector3.zero;
     }
     bool ColliderRay(Vector3 offset) {
         // TODO: filter on layer
@@ -914,7 +907,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector2 playerDir = new Vector2(direction.x, direction.z);
 
         // head direction
-        TargetData2 targetData = OrbitCamera.GetTargetData();
+        CursorData targetData = OrbitCamera.GetTargetData();
 
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);
@@ -927,7 +920,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
-            direction = direction,
             isMoving = isMoving(),
             isCrouching = isCrouching,
             isRunning = isRunning,
@@ -937,10 +929,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             state = state,
             playerInputs = _lastInput,
             gunInput = gunHandler.BuildAnimationInput(),
-            targetData = targetData,
             camDir = camDir,
-            cameraPlanarDirection = cameraPlanarDirection,
-            cameraRotation = OrbitCamera.transform.rotation
+            cameraRotation = OrbitCamera.transform.rotation,
+            lookAtDirection = lookAtDirection
         };
     }
     public bool isMoving() {

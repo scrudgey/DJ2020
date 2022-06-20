@@ -4,43 +4,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public enum Direction {
-    right,      // 0
-    rightUp,    // 1
-    up,         // 2
-    leftUp,     // 3
-    left,       // 4
-    leftDown,   // 5
-    down,       // 6
-    rightDown,  // 7
-}
-
-public struct AnimationInput {
-    public struct GunAnimationInput {
-        public GunType gunType;
-        public GunHandler.GunState gunState;
-        public bool hasGun;
-        public bool holstered;
-        public Gun baseGun;
-        public bool shootRequestedThisFrame;
-    }
-    public GunAnimationInput gunInput;
-    public Direction orientation;
-    public Vector3 direction;
-    public PlayerInput playerInputs;
-    public bool isMoving;
-    public bool isCrouching;
-    public bool isRunning;
-    public bool isJumping;
-    public bool isClimbing;
-    public float wallPressTimer;
-    public CharacterState state;
-    public Quaternion cameraRotation;
-    public Vector2 camDir;
-    public Vector3 cameraPlanarDirection;
-    public TargetData2 targetData;
-}
-
 public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public enum State {
         idle,
@@ -51,8 +14,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         jump,
         climb
     }
-    // public CharacterController target { get; set; }
-
     State state;
     private int frame;
     public SpriteRenderer spriteRenderer;

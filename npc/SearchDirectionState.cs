@@ -46,11 +46,20 @@ public class SearchDirectionState : SphereControlState {
         rootTaskNode = new Sequence(
             new TaskTimerDectorator(new Sequence(
                 // look
-                new TaskTimerDectorator(new TaskLookInDirection(searchDirection), 1f),
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.direction,
+                    lookAt = searchDirection
+                }, 1f),
                 // look left
-                new TaskTimerDectorator(new TaskLookInDirection(leftDirection), 1f),
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.direction,
+                    lookAt = leftDirection
+                }, 1f),
                 // look right
-                new TaskTimerDectorator(new TaskLookInDirection(rightDirection), 1f)
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.direction,
+                    lookAt = rightDirection
+                }, 1f)
             ), 3f),
             new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY)
         );

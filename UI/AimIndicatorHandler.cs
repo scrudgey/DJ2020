@@ -14,11 +14,11 @@ namespace UI {
         public Color objectLockColor;
         private float timer;
         public float pulseInterval = 0.15f;
-        public TargetData2.TargetType state;
+        public CursorData.TargetType state;
         public int pulseSize;
 
         public void Update() {
-            if (state == TargetData2.TargetType.objectLock) {
+            if (state == CursorData.TargetType.objectLock) {
                 timer += Time.deltaTime;
                 while (timer > pulseInterval) {
                     timer -= pulseInterval;
@@ -35,19 +35,19 @@ namespace UI {
         override public void HandleValueChanged(GunHandler gunHandler) {
             if (gunHandler.HasGun()) {
                 cursorImage.enabled = true;
-                TargetData2 data = target.currentTargetData;
+                CursorData data = target.currentTargetData;
                 if (data == null)
                     return;
                 cursor.position = data.screenPosition;
                 switch (data.type) {
-                    case TargetData2.TargetType.none:
+                    case CursorData.TargetType.none:
                         break;
                     default:
-                    case TargetData2.TargetType.direction:
+                    case CursorData.TargetType.direction:
                         cursorImage.sprite = directionAimSprite;
                         cursorImage.color = directionAimColor;
                         break;
-                    case TargetData2.TargetType.objectLock:
+                    case CursorData.TargetType.objectLock:
                         cursorImage.sprite = objectLockSprite;
                         cursorImage.color = objectLockColor;
                         break;

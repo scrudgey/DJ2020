@@ -5,9 +5,9 @@ public struct PlayerInput {
         public bool FirePressed;
         public bool AimPressed;
         public bool FireHeld;
-        public TargetData2 targetData;
+        public CursorData cursorData;
         public static FireInputs none = new FireInputs {
-            targetData = TargetData2.none
+            cursorData = CursorData.none
         };
     }
     public InputMode inputMode;
@@ -29,8 +29,10 @@ public struct PlayerInput {
     public bool rotateCameraRightPressedThisFrame;
     public bool rotateCameraLeftPressedThisFrame;
     public Vector3 moveDirection;
-    public Vector3 lookAtPoint;
+    public Vector3 orientTowardPoint; // used only by sphere controller and taskshoot
+    public Vector3 orientTowardDirection; // used only by sphere
     public Vector3 lookAtDirection;
+    public Vector3 lookAtPosition;
     public Vector3 torque;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none

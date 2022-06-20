@@ -40,9 +40,8 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
             case CharacterState.landStun:
             case CharacterState.jumpPrep:
             case CharacterState.normal:
-                // TODO: adjust for aim mode.
-                Vector3 headDirection = (input.targetData.position - transform.position).normalized;
-                Vector2 headDir = new Vector2(headDirection.x, headDirection.z);
+                Vector3 lookDirection = input.lookAtDirection;
+                Vector2 headDir = new Vector2(lookDirection.x, lookDirection.z);
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);
                 Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);
                 direction = Toolbox.ClampDirection(headOrientation, input.orientation);

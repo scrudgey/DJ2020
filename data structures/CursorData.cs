@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class TargetData2 {
+public class CursorData {
     public enum TargetType { none, direction, objectLock, interactiveHighlight }
     public TargetType type;
-    public Vector3 position = Vector3.zero;
+    public Vector3 worldPosition = Vector3.zero;
     public Vector2 screenPosition;
     public Vector2 screenPositionNormalized;
     public HighlightableTargetData highlightableTargetData;
-    public static TargetData2 none = new TargetData2();
+    public static CursorData none = new CursorData();
 }

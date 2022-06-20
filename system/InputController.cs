@@ -192,7 +192,7 @@ public class InputController : MonoBehaviour {
     }
 
     private void HandleCharacterInput() {
-        TargetData2 targetData = OrbitCamera.GetTargetData();
+        CursorData targetData = OrbitCamera.GetTargetData();
         Vector3 torque = Vector3.zero;
         if (GameManager.I.inputMode == InputMode.aim) {
             if (targetData.screenPositionNormalized.x > 0.9) {
@@ -210,39 +210,40 @@ public class InputController : MonoBehaviour {
             }
         }
 
-        PlayerInput characterInputs = new PlayerInput() {
-            inputMode = GameManager.I.inputMode,
-            MoveAxisForward = inputVector.y,
-            MoveAxisRight = inputVector.x,
-            CameraRotation = OrbitCamera.isometricRotation,
-            JumpDown = jumpPressedThisFrame,
-            jumpHeld = jumpHeld,
-            jumpReleased = jumpReleasedThisFrame,
-            CrouchDown = crouchHeld,
-            runDown = runHeld,
-            Fire = new PlayerInput.FireInputs() {
-                FirePressed = firePressedThisFrame,
-                FireHeld = firePressedHeld,
-                targetData = targetData,
-                AimPressed = aimPressedThisFrame
-            },
-            reload = reloadPressedThisFrame,
-            selectgun = selectGunThisFrame,
-            actionButtonPressed = actionButtonPressedThisFrame,
-            incrementItem = incrementItemThisFrame,
-            useItem = useItemThisFrame,
-            incrementOverlay = incrementOverlayThisFrame,
-            rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
-            rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
-            torque = torque
-        };
-
         foreach (IInputReceiver i in inputReceivers) {
+            Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
+            PlayerInput characterInputs = new PlayerInput() {
+                inputMode = GameManager.I.inputMode,
+                MoveAxisForward = inputVector.y,
+                MoveAxisRight = inputVector.x,
+                CameraRotation = OrbitCamera.isometricRotation,
+                JumpDown = jumpPressedThisFrame,
+                jumpHeld = jumpHeld,
+                jumpReleased = jumpReleasedThisFrame,
+                CrouchDown = crouchHeld,
+                runDown = runHeld,
+                Fire = new PlayerInput.FireInputs() {
+                    FirePressed = firePressedThisFrame,
+                    FireHeld = firePressedHeld,
+                    cursorData = targetData,
+                    AimPressed = aimPressedThisFrame
+                },
+                reload = reloadPressedThisFrame,
+                selectgun = selectGunThisFrame,
+                actionButtonPressed = actionButtonPressedThisFrame,
+                incrementItem = incrementItemThisFrame,
+                useItem = useItemThisFrame,
+                incrementOverlay = incrementOverlayThisFrame,
+                rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
+                rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
+                torque = torque,
+                lookAtDirection = directionToCursor
+            };
             i.SetInputs(characterInputs);
         }
 
-        if (characterInputs.incrementOverlay != 0) {
-            GameManager.I.IncrementOverlay(characterInputs.incrementOverlay);
+        if (incrementOverlayThisFrame != 0) {
+            GameManager.I.IncrementOverlay(incrementOverlayThisFrame);
         }
 
         firePressedThisFrame = false;

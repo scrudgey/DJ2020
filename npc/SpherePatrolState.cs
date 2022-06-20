@@ -1,10 +1,10 @@
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class SpherePatrolRoutine : SphereControlState {
+public class SpherePatrolState : SphereControlState {
     private TaskNode rootTaskNode;
     private PatrolRoute patrolRoute;
-    public SpherePatrolRoutine(SphereRobotAI ai, PatrolRoute patrolRoute) : base(ai) {
+    public SpherePatrolState(SphereRobotAI ai, PatrolRoute patrolRoute) : base(ai) {
         this.patrolRoute = patrolRoute;
     }
     public override void Enter() {

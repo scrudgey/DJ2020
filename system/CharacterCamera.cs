@@ -20,7 +20,7 @@ public struct CameraInput {
     public Vector3 playerPosition;
     public CharacterState state;
     // public Vector3 cursorPosition;
-    public TargetData2 targetData;
+    public CursorData targetData;
     public Vector3 playerDirection;
 }
 public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
@@ -463,14 +463,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Transform.position = targetPosition;
         isometricRotation = Transform.rotation;
     }
-    public TargetData2 GetTargetData() {
+    public CursorData GetTargetData() {
         if (GameManager.I.inputMode == InputMode.aim) {
             return AimToTarget();
         } else {
             return CursorToTarget();
         }
     }
-    private TargetData2 CursorToTarget() {
+    private CursorData CursorToTarget() {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
 
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
@@ -516,13 +516,13 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         if (prioritySet) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
-            return new TargetData2 {
-                type = TargetData2.TargetType.objectLock,
+            return new CursorData {
+                type = CursorData.TargetType.objectLock,
                 // clickRay = clickRay,
                 screenPosition = pointPosition,
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
-                position = targetPoint
+                worldPosition = targetPoint
             };
         } else {
             // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
@@ -532,13 +532,13 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             if (plane.Raycast(clickRay, out distance)) {
                 targetPoint = clickRay.GetPoint(distance);
             }
-            return new TargetData2 {
-                type = TargetData2.TargetType.direction,
+            return new CursorData {
+                type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,
                 screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
-                position = targetPoint
+                worldPosition = targetPoint
             };
         }
     }
@@ -550,7 +550,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
 
 
-    private TargetData2 AimToTarget() {
+    private CursorData AimToTarget() {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
 
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
@@ -587,24 +587,24 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         if (prioritySet) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
-            return new TargetData2 {
-                type = TargetData2.TargetType.objectLock,
+            return new CursorData {
+                type = CursorData.TargetType.objectLock,
                 // clickRay = clickRay,
                 screenPosition = pointPosition,
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
-                position = targetPoint
+                worldPosition = targetPoint
             };
         } else {
             // TODO: aim through transparent objects
             if (hits.Length > 0)
                 targetPoint = hits.OrderBy(h => h.distance).FirstOrDefault().point;
-            return new TargetData2 {
-                type = TargetData2.TargetType.direction,
+            return new CursorData {
+                type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,
                 screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = null,
-                position = targetPoint
+                worldPosition = targetPoint
             };
         }
 

@@ -10,7 +10,7 @@ namespace AI {
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             PlayerInput.FireInputs fireData = ShootBullet();
-            input.lookAtPoint = fireData.targetData.position;
+            input.orientTowardPoint = fireData.cursorData.worldPosition;
             input.Fire = fireData;
             input.inputMode = InputMode.gun;
             return TaskState.running;
@@ -25,12 +25,12 @@ namespace AI {
             PlayerInput.FireInputs fireInput = new PlayerInput.FireInputs() {
                 FirePressed = false,
                 FireHeld = true,
-                targetData = new TargetData2 {
-                    type = TargetData2.TargetType.objectLock,
+                cursorData = new CursorData {
+                    type = CursorData.TargetType.objectLock,
                     screenPosition = Vector2.zero,
                     screenPositionNormalized = Vector2.zero,
                     highlightableTargetData = null,
-                    position = lastSeenPlayerPosition
+                    worldPosition = lastSeenPlayerPosition
                 }
             };
             return fireInput;

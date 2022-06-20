@@ -1,11 +1,11 @@
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class SphereMoveRoutine : SphereControlState {
+public class SphereMoveState : SphereControlState {
     public static readonly string RANDOM_POSITION_KEY = "randomPosition";
     private TaskNode rootTaskNode;
     private SphereCollider patrolZone;
-    public SphereMoveRoutine(SphereRobotAI ai, SphereCollider sphere) : base(ai) {
+    public SphereMoveState(SphereRobotAI ai, SphereCollider sphere) : base(ai) {
         this.patrolZone = sphere;
     }
 
