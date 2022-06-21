@@ -931,17 +931,21 @@ fix head
 * reloading for animated character
 * searching AI hears gunshot?
 * wallpress orientation is wrong
-head looking in correct direction
-    pass a separate look at direction / point instead of taking it from firedata
-        direction / point and key vs vector
-        look at 
-    unify look at point / look at direction
+* head looking in correct direction
+* muzzle flash when looking head-on
 
+more sprites to decorate the world with
+    garbage
+    trash bag
+    milk crate
 clearsighter affecting ground
 clearsighter still being weird
-muzzle flash when looking head-on
+AI does wallpress
+tasklookAt returns running, should return success?
 
 AI on person notes
     * sightcone tracks head position
     * set head position properly
     * input vector vs. move direction
+
+AREA OF AUTO-AIM

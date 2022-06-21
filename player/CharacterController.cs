@@ -309,12 +309,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
                 // Turn to face cursor or movement direction
                 slewLookVector = Vector3.zero;
-                if (input.Fire.AimPressed || input.Fire.FireHeld || input.Fire.FirePressed) {
-                    Vector3 directionToCursor = cursorData.worldPosition - transform.position;
-                    directionToCursor.y = 0;
-                    snapToDirection = directionToCursor;
-                }
+
                 if (input.inputMode != InputMode.aim) {
+                    if (input.Fire.AimPressed || input.Fire.FireHeld || input.Fire.FirePressed) {
+                        Vector3 directionToCursor = cursorData.worldPosition - transform.position;
+                        directionToCursor.y = 0;
+                        snapToDirection = directionToCursor;
+                    }
+
                     slewLookVector = Vector3.Lerp(slewLookVector, _moveInputVector, 0.1f);
                 }
 

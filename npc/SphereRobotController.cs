@@ -29,9 +29,13 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
             snapLookDirection = targetPoint;
         } else if (input.orientTowardPoint != Vector3.zero) {
-            snapLookDirection = input.orientTowardPoint;
+            snapLookDirection = input.orientTowardPoint - transform.position;
         } else if (input.orientTowardDirection != Vector3.zero) {
-            snapLookDirection = transform.position + input.orientTowardDirection;
+            snapLookDirection = input.orientTowardDirection;
+        } else if (input.lookAtDirection != Vector3.zero) {
+            snapLookDirection = input.lookAtDirection;
+        } else if (input.lookAtPosition != Vector3.zero) {
+            snapLookDirection = input.lookAtPosition - transform.position;
         }
 
         _moveInputVector = input.moveDirection;
@@ -67,8 +71,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
 
         if (_moveInputVector != Vector3.zero) {
             targetDirection = _moveInputVector;
-        }
-        if (snapLookDirection != Vector3.zero) {
+        } else if (snapLookDirection != Vector3.zero) {
             // noise.transform.position - owner.transform.position - transform.position;
             targetDirection = snapLookDirection - transform.position;
             targetDirection.y = 0;
