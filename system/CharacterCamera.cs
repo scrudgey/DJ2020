@@ -22,6 +22,7 @@ public struct CameraInput {
     // public Vector3 cursorPosition;
     public CursorData targetData;
     public Vector3 playerDirection;
+    public Vector3 playerLookDirection;
 }
 public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private CameraState _state;
@@ -352,6 +353,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     public CameraTargetParameters AimParameters(CameraInput input) {
         Vector3 distOffset = input.playerDirection * -0.5f * TargetDistance;
+        // Vector3 distOffset = input.playerLookDirection * -0.5f * TargetDistance;
         Vector3 heightOffset = new Vector3(0f, 1.2f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
@@ -361,8 +363,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
         float parity = cursorPosition.x > horizontalPixels / 2 ? 1f : -1f;
         Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f * parity;
+        // Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerLookDirection) * 0.5f * parity;
 
         Vector3 camDirection = input.playerDirection;
+        // Vector3 camDirection = input.playerLookDirection;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         // camDirection -= new Vector3(0, 0.05f, 0);
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);

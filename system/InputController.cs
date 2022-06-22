@@ -7,6 +7,8 @@ using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class InputController : MonoBehaviour {
+    // TODO: input mode could belong to me?
+
     public CharacterCamera OrbitCamera;
 
     // have to do it this way because unity inspector doesn't know how to expose a list of interfaces

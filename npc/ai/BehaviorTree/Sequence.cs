@@ -17,7 +17,8 @@ namespace AI {
                         continue;
                     case TaskState.running:
                         anyChildRunning = true;
-                        continue;
+                        // continue;
+                        return TaskState.running;
                     default:
                         state = TaskState.success;
                         return state;

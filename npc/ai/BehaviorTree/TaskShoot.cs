@@ -13,15 +13,16 @@ namespace AI {
             input.orientTowardPoint = fireData.cursorData.worldPosition;
             input.Fire = fireData;
             input.inputMode = InputMode.gun;
+            input.lookAtPosition = fireData.cursorData.worldPosition;
             return TaskState.running;
         }
         PlayerInput.FireInputs ShootBullet() {
             object lastSeenPlayerPositionObject = GetData("lastSeenPlayerPosition");
             if (lastSeenPlayerPositionObject == null)
-                return new PlayerInput.FireInputs();
+                return PlayerInput.FireInputs.none;
             Vector3 lastSeenPlayerPosition = (Vector3)lastSeenPlayerPositionObject;
             if (lastSeenPlayerPosition == null)
-                return new PlayerInput.FireInputs();
+                return PlayerInput.FireInputs.none;
             PlayerInput.FireInputs fireInput = new PlayerInput.FireInputs() {
                 FirePressed = false,
                 FireHeld = true,

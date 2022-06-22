@@ -88,6 +88,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     private void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
         switch (routine) {
+            case SearchDirectionState search:
+                Debug.Log("enter search direction state");
+                break;
             case SphereAttackState attack:
                 recentlyInCombat = true;
                 break;
@@ -96,6 +99,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     void Update() {
         timeSinceLastSeen += Time.deltaTime;
         PlayerInput input = stateMachine.Update();
+        input.preventWallPress = true;
         SetInputs(input);
         perceptionCountdown -= Time.deltaTime;
         if (perceptionCountdown <= 0) {

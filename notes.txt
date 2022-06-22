@@ -880,14 +880,14 @@ i.e. if we control the robot and right click it should enter aim mode right?
 - fog of breath
 
 make a real mission. 
-    1. 7-11 worker sprite
-        draw base
-        draw guns
     * civilian man
         * draw base
         * draw guns
-    3. civilian woman
+    * civilian woman
         * draw base
+        * draw guns
+    1. 7-11 worker sprite
+        draw base
         draw guns
     4. security guard
         draw base
@@ -914,14 +914,8 @@ fix head
 * save and load data functionality.
 * generalize to gun
 * fix smg and shotgun head positioning
-- mright click from edge of wallpress to enter shoot mode
-- controls to zoom in / out, fix camera at target
-- water drips outside
-
 ? prevent invisibility for some objects
 ? UI: draw a circle for inaccuracy? cone?
-
-
 * disable run in aim mode
 * crack is black
 * crouch graphics are wrong
@@ -933,6 +927,9 @@ fix head
 * wallpress orientation is wrong
 * head looking in correct direction
 * muzzle flash when looking head-on
+* look toward noise
+* AI does wallpress
+* aim mode start from lookat
 
 more sprites to decorate the world with
     garbage
@@ -940,12 +937,16 @@ more sprites to decorate the world with
     milk crate
 clearsighter affecting ground
 clearsighter still being weird
-AI does wallpress
-tasklookAt returns running, should return success?
-
-AI on person notes
-    * sightcone tracks head position
-    * set head position properly
-    * input vector vs. move direction
-
+    build list of all static mesh positions sorted by y, x, z
 AREA OF AUTO-AIM
+right click from edge of wallpress to enter shoot mode
+controls to zoom in / out, fix camera at target
+water drips outside
+
+tasklookAt returns running, should return success?
+look around while walking
+head on a swivel 
+    when on alert
+transition back to patrol
+allow NPC to have its own save state, different skin
+handle the case when multiple gunshots are heard repeatedly.

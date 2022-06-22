@@ -1,6 +1,8 @@
 using UnityEngine;
 
 public struct PlayerInput {
+
+
     public struct FireInputs {
         public bool FirePressed;
         public bool AimPressed;
@@ -34,6 +36,7 @@ public struct PlayerInput {
     public Vector3 lookAtDirection;
     public Vector3 lookAtPosition;
     public Vector3 torque;
+    public bool preventWallPress;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };

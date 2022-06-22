@@ -37,7 +37,6 @@ namespace AI {
                 Vector3 inputVector = Vector3.zero;
                 Vector3 nextPoint = navMeshPath.corners[pathIndex];
                 float distance = Vector3.Distance(nextPoint, transform.position);
-                // Debug.Log($"dist:{distance}\tat point:{distance <= CORNER_ARRIVAL_DISTANCE}\tnext:{nextPoint}\tdirection:{nextPoint - transform.position}");
                 if (distance > CORNER_ARRIVAL_DISTANCE) {
                     Vector3 direction = nextPoint - transform.position;
                     inputVector = direction;
@@ -48,6 +47,7 @@ namespace AI {
                 inputVector.y = 0;
                 input.moveDirection = inputVector.normalized;
                 input.lookAtDirection = inputVector;
+                // input.lookAtDirection = inputVector + Random.insideUnitSphere;
 
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);

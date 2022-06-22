@@ -250,7 +250,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
 
-        // TODO: rotate input
         _inputTorque = input.torque;
 
         // Run input
@@ -308,24 +307,25 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 gunHandler.SetInputs(input);
 
                 // Turn to face cursor or movement direction
-                slewLookVector = Vector3.zero;
 
+                if (input.lookAtPosition != Vector3.zero) {
+                    lookAtDirection = input.lookAtPosition - transform.position;
+                }
+                if (input.lookAtDirection != Vector3.zero) {
+                    lookAtDirection = input.lookAtDirection;
+                }
+
+                slewLookVector = Vector3.zero;
                 if (input.inputMode != InputMode.aim) {
                     if (input.Fire.AimPressed || input.Fire.FireHeld || input.Fire.FirePressed) {
                         Vector3 directionToCursor = cursorData.worldPosition - transform.position;
                         directionToCursor.y = 0;
                         snapToDirection = directionToCursor;
                     }
-
                     slewLookVector = Vector3.Lerp(slewLookVector, _moveInputVector, 0.1f);
                 }
-
-                // TODO: distinguish betwen lookAtDirection and lookAtPoint
-                if (input.lookAtPosition != Vector3.zero) {
-                    lookAtDirection = input.lookAtPosition - transform.position;
-                }
-                if (input.lookAtDirection != Vector3.zero) {
-                    lookAtDirection = input.lookAtDirection;
+                if (input.Fire.AimPressed) {
+                    snapToDirection = lookAtDirection;
                 }
 
                 // Jumping input
@@ -390,7 +390,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (snapToDirection != Vector3.zero) {
                     Vector3 target = snapToDirection;
                     target.y = 0;
+                    Debug.Log($"snapping to direction {target}");
+                    Debug.Log(currentRotation);
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                    Debug.Log(currentRotation);
                 } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
                     // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
@@ -446,7 +449,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         return false;
     }
     bool DetectWallPress() {
-        if (GameManager.I.inputMode == InputMode.aim)
+        if (_lastInput.inputMode == InputMode.aim)
             return false;
         if (wallNormal == Vector3.zero)
             return false;
@@ -455,12 +458,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     bool AtRightEdge() {
         if (wallNormal == Vector3.zero)
             return false;
-        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + 0.2f * Motor.CharacterRight);
+        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + 0.4f * Motor.CharacterRight);
     }
     bool AtLeftEdge() {
         if (wallNormal == Vector3.zero)
             return false;
-        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.2f * Motor.CharacterRight);
+        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.4f * Motor.CharacterRight);
     }
 
     Ladder GetOverlappingLadder() {
@@ -484,7 +487,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     /// This is the ONLY place where you can set the character's velocity
     /// </summary>
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-        bool pressingOnWall = DetectWallPress();
+        bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
         switch (state) {
             case CharacterState.jumpPrep:
@@ -898,7 +901,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             playerPosition = transform.position,
             state = state,
             targetData = lastTargetDataInput,
-            playerDirection = direction
+            playerDirection = direction,
+            playerLookDirection = lookAtDirection
         };
         return input;
     }
