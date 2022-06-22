@@ -25,7 +25,7 @@ public class Explosion : MonoBehaviour {
             volume = radius * 3f,
             suspiciousness = Suspiciousness.aggressive
         };
-        Toolbox.Noise(transform.position, data, player: false);
+        Toolbox.Noise(transform.position, data);
     }
 
     public ExplosionDamage GetDamageAtPoint(Vector3 point) {

@@ -30,7 +30,9 @@ namespace AI {
             navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position));
             this.rootNode = new TaskUntilFailRepeater(new Sequence(
                 new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
-                new TaskMoveToKey(transform, NAV_POINT_KEY)
+                new TaskMoveToKey(transform, NAV_POINT_KEY) {
+                    headBehavior = TaskMoveToKey.HeadBehavior.casual
+                }
             ));
             this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());
         }

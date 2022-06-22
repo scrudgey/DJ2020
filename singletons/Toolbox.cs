@@ -145,12 +145,11 @@ public class Toolbox {
         }
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
     }
-    public static NoiseComponent Noise(Vector3 position, NoiseData data, bool player = false) {
+    public static NoiseComponent Noise(Vector3 position, NoiseData data) {
         GameObject noiseObject = GameObject.Instantiate(Resources.Load("prefabs/noise"), position, Quaternion.identity) as GameObject;
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
         component.data = data;
-        component.data.player = player;
-        if (player)
+        if (component.data.player)
             SuspicionAudioUIHandler.OnNoise(data);
         return component;
     }

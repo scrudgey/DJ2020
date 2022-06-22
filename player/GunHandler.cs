@@ -186,9 +186,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         // play sound
         // TODO: change depending on silencer
         NoiseData noiseData = gunInstance.GetShootNoise();
+        noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.shootSounds));
-        Toolbox.Noise(gunPosition(), noiseData, player: transform.IsChildOf(GameManager.I.playerObject.transform));
+        Toolbox.Noise(gunPosition(), noiseData);
 
         // flash
         // TODO: change depending on silencer

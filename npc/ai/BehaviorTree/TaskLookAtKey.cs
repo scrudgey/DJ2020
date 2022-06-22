@@ -31,7 +31,7 @@ namespace AI {
             } else if (lookType == LookType.direction) {
                 input.lookAtDirection = lookAt;
             }
-            Debug.Log($"look at key: position:{input.lookAtPosition} direction:{input.lookAtDirection}");
+            // Debug.Log($"look at key: position:{input.lookAtPosition} direction:{input.lookAtDirection}");
 
             // TODO: return complete if looking in correct direction?
             return TaskState.running;

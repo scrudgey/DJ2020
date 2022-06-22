@@ -390,10 +390,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (snapToDirection != Vector3.zero) {
                     Vector3 target = snapToDirection;
                     target.y = 0;
-                    Debug.Log($"snapping to direction {target}");
-                    Debug.Log(currentRotation);
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
-                    Debug.Log(currentRotation);
                 } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
                     // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;

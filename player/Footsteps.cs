@@ -35,11 +35,11 @@ public class Footsteps : MonoBehaviour {
                     Toolbox.RandomizeOneShot(audioSource, leftFoot);
                 }
                 NoiseData noise = new NoiseData {
-                    player = true,
+                    player = gameObject == GameManager.I.playerObject,
                     suspiciousness = Suspiciousness.normal,
                     volume = 1
                 };
-                Toolbox.Noise(transform.position, noise, player: true);
+                Toolbox.Noise(transform.position, noise);
             }
         }
 

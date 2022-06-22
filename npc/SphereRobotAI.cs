@@ -64,6 +64,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         stateMachine = new SphereRobotBrain();
         navMeshPath = new NavMeshPath();
 
+        EnterDefaultState();
+    }
+
+    void EnterDefaultState() {
         if (patrolRoute != null) {
             ChangeState(new SpherePatrolState(this, patrolRoute));
         } else {
@@ -72,16 +76,18 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
     }
 
 
-    public void RoutineFinished(SphereControlState routine) {
+    public void StateFinished(SphereControlState routine) {
         switch (routine) {
             default:
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
                 speechTextController.HaltSpeechForTime(2f);
-                ChangeState(new SphereMoveState(this, patrolZone));
+                // ChangeState(new SphereMoveState(this, patrolZone));
+                EnterDefaultState();
                 break;
             case SphereAttackState:
-                ChangeState(new SphereMoveState(this, patrolZone));
+                EnterDefaultState();
+                // ChangeState(new SphereMoveState(this, patrolZone));
                 break;
         }
     }
@@ -205,15 +211,15 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         // Debug.Log(recentHeardSuspicious);
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
-        if (noise.data.suspiciousness > Suspiciousness.normal) {
+        if (noise.data.suspiciousness > Suspiciousness.normal && noise.data.player) {
             switch (stateMachine.currentState) {
                 case SphereMoveState:
                 case SpherePatrolState:
                     ChangeState(new SearchDirectionState(this, noise));
                     break;
                 case SearchDirectionState:
-                    if (stateMachine.timeInCurrentState > 1f)
-                        ChangeState(new SearchDirectionState(this, noise));
+                    if (stateMachine.timeInCurrentState > 3f)
+                        ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                     break;
             }
         }

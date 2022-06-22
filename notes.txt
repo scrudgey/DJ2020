@@ -930,7 +930,13 @@ fix head
 * look toward noise
 * AI does wallpress
 * aim mode start from lookat
+* look around while walking
+* head on a swivel 
+* transition back to patrol
+* head behavior changes with AI state
+* handle the case when multiple gunshots are heard repeatedly.
 
+tasklookAt returns running, should return success?
 more sprites to decorate the world with
     garbage
     trash bag
@@ -942,11 +948,7 @@ AREA OF AUTO-AIM
 right click from edge of wallpress to enter shoot mode
 controls to zoom in / out, fix camera at target
 water drips outside
-
-tasklookAt returns running, should return success?
-look around while walking
-head on a swivel 
-    when on alert
-transition back to patrol
+new york style rolling shutter businesses with graffiti
+puddle
 allow NPC to have its own save state, different skin
-handle the case when multiple gunshots are heard repeatedly.
+crawl animation slower

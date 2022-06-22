@@ -7,6 +7,8 @@ using UnityEngine.AI;
 namespace AI {
 
     public class TaskMoveToKey : TaskNode {
+        public enum HeadBehavior { normal, casual, search }
+        public HeadBehavior headBehavior;
         private static readonly float CORNER_ARRIVAL_DISTANCE = 0.1f;
         public NavMeshPath navMeshPath;
         int pathIndex;
@@ -14,6 +16,10 @@ namespace AI {
         string key;
         float repathTimer;
         float repathInterval = 1f;
+
+        public float headSwivelOffset;
+        public float speedCoefficient = 1f;
+
         public TaskMoveToKey(Transform transform, string key) : base() {
             navMeshPath = new NavMeshPath();
             pathIndex = -1;
@@ -30,6 +36,14 @@ namespace AI {
                 SetDestination();
             }
             repathTimer += Time.deltaTime;
+
+            if (headBehavior == HeadBehavior.casual) {
+                // TODO: abstract out to some equivalent of an easing function
+                headSwivelOffset = 45f * Mathf.Sin(Time.time);
+            } else if (headBehavior == HeadBehavior.search) {
+                headSwivelOffset = 45f * Mathf.Sin(Time.time * 2f);
+            }
+
             if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
                 // return TaskState.failure;
                 return TaskState.running;
@@ -44,10 +58,11 @@ namespace AI {
                     pathIndex += 1;
                 }
 
+                Vector3 lookDirection = inputVector;
+                lookDirection = Quaternion.AngleAxis(headSwivelOffset, Vector3.up) * lookDirection;
                 inputVector.y = 0;
-                input.moveDirection = inputVector.normalized;
-                input.lookAtDirection = inputVector;
-                // input.lookAtDirection = inputVector + Random.insideUnitSphere;
+                input.moveDirection = speedCoefficient * inputVector.normalized;
+                input.lookAtDirection = lookDirection;
 
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
