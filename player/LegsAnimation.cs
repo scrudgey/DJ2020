@@ -22,6 +22,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip walkAnimation;
+    public AnimationClip crawlAnimation;
     public Skin skin;
     public Direction direction;
     private float trailTimer;
@@ -102,10 +103,19 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             } else {
                 state = State.walk;
             }
-            if (animator.clip != walkAnimation) {
-                animator.clip = walkAnimation;
-                animator.Play();
+
+            if (state == State.crawl) {
+                if (animator.clip != crawlAnimation) {
+                    animator.clip = crawlAnimation;
+                    animator.Play();
+                }
+            } else {
+                if (animator.clip != walkAnimation) {
+                    animator.clip = walkAnimation;
+                    animator.Play();
+                }
             }
+
         } else { // stopped
             if (input.isJumping) {
                 state = State.jump;

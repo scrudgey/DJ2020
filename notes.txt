@@ -936,6 +936,9 @@ fix head
 * head behavior changes with AI state
 * handle the case when multiple gunshots are heard repeatedly.
 
+
+allow NPC to have its own save state, different skin
+
 tasklookAt returns running, should return success?
 more sprites to decorate the world with
     garbage
@@ -950,5 +953,7 @@ controls to zoom in / out, fix camera at target
 water drips outside
 new york style rolling shutter businesses with graffiti
 puddle
-allow NPC to have its own save state, different skin
 crawl animation slower
+restrict movement when crouching, make it sticky
+when crawling reduce step height
+transition between crouch and crawl, stand and crouch

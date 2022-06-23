@@ -14,6 +14,7 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
+    public AnimationClip crawlAnimation;
     public Skin skin;
     public float trailInterval = 0.05f;
     private bool bob;
@@ -126,7 +127,12 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
             }
         } else {
             if (input.isMoving) {
-                SetAnimation(walkAnimation);
+                if (input.isCrouching) {
+                    SetAnimation(crawlAnimation);
+                } else {
+                    SetAnimation(walkAnimation);
+                }
+                // SetAnimation(walkAnimation);
             } else {
                 _frame = 0;
                 SetAnimation(idleAnimation);
