@@ -81,6 +81,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private float currentDistanceMovementSpeed;
     private bool clampOrthographicSize;
     public Vector3 lastTargetPosition;
+    public float zoomCoefficient;
 
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
@@ -97,6 +98,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         } else if (input.rotateCameraLeftPressedThisFrame) {
             currentRotationInput = CameraInput.RotateInput.left;
         }
+        zoomCoefficient -= input.zoomInput.y / 50f;
+        zoomCoefficient = Math.Max(0.5f, zoomCoefficient);
+        zoomCoefficient = Math.Min(1.5f, zoomCoefficient);
     }
     void Awake() {
         Transform = this.transform;
@@ -179,6 +183,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Debug.Log("set follow transform");
 
         Transform t = g.transform;
+        Transform follow = t.Find("cameraFollowPoint");
+        if (follow != null) t = follow;
         FollowTransform = t;
         PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
@@ -406,41 +412,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // apply orthographic
         Camera.orthographic = input.orthographic;
 
-        // TODO: lerp it
-        Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-        float desiredOrthographicSize = input.orthographicSize;
-        float previousOrthographicSize = Camera.orthographicSize;
-
         if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim && transitionTime >= 1) {
-            // TODO: move this logic?
-            int i = 0;
-            if (PlayerInsideBounds(screenPoint)) {
-                if (Camera.orthographicSize < desiredOrthographicSize) {
-                    while (i < 10 && Camera.orthographicSize < desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
-                        i++;
-                        Camera.orthographicSize += 0.01f;
-                        screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-                    }
-                    Camera.orthographicSize = Math.Min(desiredOrthographicSize, Camera.orthographicSize);
-                } else if (Camera.orthographicSize > desiredOrthographicSize) {
-                    while (i < 10 && Camera.orthographicSize > desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
-                        i++;
-                        Camera.orthographicSize -= 0.01f;
-                        screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-                    }
-                    if (i == 1) {
-                        Camera.orthographicSize = previousOrthographicSize;
-                    } else {
-                        Camera.orthographicSize = Math.Max(desiredOrthographicSize, Camera.orthographicSize);
-                    }
-                }
-            } else {
-                while (i < 10 && !PlayerInsideBounds(screenPoint)) {
-                    i++;
-                    Camera.orthographicSize += 0.01f;
-                    screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-                }
-            }
+            UpdateCameraZoom(input);
         }
 
         // Debug.Log(Camera.orthographicSize);
@@ -466,6 +439,44 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Apply position
         Transform.position = targetPosition;
         isometricRotation = Transform.rotation;
+    }
+
+    void UpdateCameraZoom(CameraTargetParameters input) {
+        // TODO: this is all weird and bad
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        float desiredOrthographicSize = input.orthographicSize * zoomCoefficient;
+        float previousOrthographicSize = Camera.orthographicSize;
+        // Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, desiredOrthographicSize, Time.deltaTime);
+        // Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, desiredOrthographicSize, Time.deltaTime * 4f);
+        Camera.orthographicSize = desiredOrthographicSize;
+        // int i = 0;
+        // if (PlayerInsideBounds(screenPoint)) {
+        //     if (Camera.orthographicSize < desiredOrthographicSize) {
+        //         while (i < 10 && Camera.orthographicSize < desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+        //             i++;
+        //             Camera.orthographicSize += 0.05f;
+        //             screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        //         }
+        //         Camera.orthographicSize = Math.Min(desiredOrthographicSize, Camera.orthographicSize);
+        //     } else if (Camera.orthographicSize > desiredOrthographicSize) {
+        //         while (i < 10 && Camera.orthographicSize > desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
+        //             i++;
+        //             Camera.orthographicSize -= 0.05f;
+        //             screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        //         }
+        //         if (i == 1) {
+        //             Camera.orthographicSize = previousOrthographicSize;
+        //         } else {
+        //             Camera.orthographicSize = Math.Max(desiredOrthographicSize, Camera.orthographicSize);
+        //         }
+        //     }
+        // } else {
+        //     while (i < 10 && !PlayerInsideBounds(screenPoint)) {
+        //         i++;
+        //         Camera.orthographicSize += 0.01f;
+        //         screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
+        //     }
+        // }
     }
     public CursorData GetTargetData() {
         if (GameManager.I.inputMode == InputMode.aim) {

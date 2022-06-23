@@ -935,25 +935,6 @@ fix head
 * transition back to patrol
 * head behavior changes with AI state
 * handle the case when multiple gunshots are heard repeatedly.
-
-
-allow NPC to have its own save state, different skin
-
+* crawl animation slower
 tasklookAt returns running, should return success?
-more sprites to decorate the world with
-    garbage
-    trash bag
-    milk crate
-clearsighter affecting ground
-clearsighter still being weird
-    build list of all static mesh positions sorted by y, x, z
-AREA OF AUTO-AIM
-right click from edge of wallpress to enter shoot mode
-controls to zoom in / out, fix camera at target
-water drips outside
-new york style rolling shutter businesses with graffiti
-puddle
-crawl animation slower
-restrict movement when crouching, make it sticky
-when crawling reduce step height
-transition between crouch and crawl, stand and crouch
+

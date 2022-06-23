@@ -24,6 +24,7 @@ public class InputController : MonoBehaviour {
     public InputActionReference JumpAction;
     public InputActionReference RotateCameraRight;
     public InputActionReference RotateCameraLeft;
+    public InputActionReference ZoomCamera;
     public InputActionReference reload;
     public InputActionReference gunHolster;
     public InputActionReference gunSecondary;
@@ -47,6 +48,7 @@ public class InputController : MonoBehaviour {
     private bool runHeld;
     private bool rotateCameraRightPressedThisFrame;
     private bool rotateCameraLeftPressedThisFrame;
+    private Vector2 zoomInput;
     private bool jumpPressedThisFrame;
     private bool jumpReleasedThisFrame;
     private bool jumpHeld;
@@ -94,6 +96,9 @@ public class InputController : MonoBehaviour {
         };
         RotateCameraRight.action.performed += ctx => {
             rotateCameraRightPressedThisFrame = ctx.ReadValueAsButton();
+        };
+        ZoomCamera.action.performed += ctx => {
+            zoomInput = ctx.ReadValue<Vector2>();
         };
 
         // Reload
@@ -239,7 +244,8 @@ public class InputController : MonoBehaviour {
                 rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
                 rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
                 torque = torque,
-                lookAtDirection = directionToCursor
+                lookAtDirection = directionToCursor,
+                zoomInput = zoomInput
             };
             i.SetInputs(characterInputs);
         }
@@ -260,6 +266,7 @@ public class InputController : MonoBehaviour {
         useItemThisFrame = false;
         rotateCameraLeftPressedThisFrame = false;
         rotateCameraRightPressedThisFrame = false;
+        zoomInput = Vector2.zero;
     }
 
 }

@@ -37,6 +37,7 @@ public struct PlayerInput {
     public Vector3 lookAtPosition;
     public Vector3 torque;
     public bool preventWallPress;
+    public Vector2 zoomInput;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };
