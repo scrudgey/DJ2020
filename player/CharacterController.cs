@@ -38,6 +38,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public float OrientationSharpness = 10;
     [Header("Crawling")]
     public float crawlSpeedFraction = 1f;
+    public float crawlStickiness = 0.1f;
+
     [Header("Running")]
     public float runSpeedFraction = 2f;
 
@@ -131,6 +133,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private PlayerInput _lastInput;
     private CursorData lastTargetDataInput;
     private Vector3 lookAtDirection;
+    private float inputDirectionHeldTimer;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -365,9 +368,28 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
         }
 
-
+        if (Vector2.Distance(InputThreshold(input.MoveAxis()), InputThreshold(_lastInput.MoveAxis())) > 0.1f) {
+            inputDirectionHeldTimer = 0f;
+        } else {
+            inputDirectionHeldTimer += Time.deltaTime;
+        }
         _lastInput = input;
         lastTargetDataInput = cursorData;
+    }
+
+    Vector2 InputThreshold(Vector2 input) {
+        float X = input.x switch {
+            float x when x > 0.5 => 1,
+            float x when x < -0.5 => -1,
+            _ => 0
+        };
+        float Y = input.y switch {
+            float y when y > 0.5 => 1,
+            float y when y < 0.5 => -1,
+            _ => 0
+        };
+        Vector2 output = new Vector2(X, Y);
+        return output;
     }
 
     /// <summary>
@@ -383,7 +405,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     /// This is the ONLY place where you should set the character's rotation
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-
+        if (IsMovementSticking())
+            return;
         switch (state) {
             default:
             case CharacterState.normal:
@@ -623,8 +646,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                         targetMovementVelocity *= runSpeedFraction;
                     } else if (isCrouching) {
                         // crawling
-                        targetMovementVelocity *= crawlSpeedFraction;
+                        if (inputDirectionHeldTimer > crawlStickiness) {
+                            targetMovementVelocity *= crawlSpeedFraction;
+                        } else {
+                            targetMovementVelocity = Vector3.zero;
+                        }
                     }
+
 
                     // Smooth movement Velocity
                     currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
@@ -910,7 +938,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector2 playerDir = new Vector2(direction.x, direction.z);
 
         // head direction
-        CursorData targetData = OrbitCamera.GetTargetData();
+        // CursorData targetData = OrbitCamera.GetTargetData();
 
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);
@@ -934,9 +962,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             gunInput = gunHandler.BuildAnimationInput(),
             camDir = camDir,
             cameraRotation = OrbitCamera.transform.rotation,
-            lookAtDirection = lookAtDirection
+            lookAtDirection = lookAtDirection,
+            movementSticking = IsMovementSticking()
         };
     }
+    bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);
     public bool isMoving() {
         return Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing);
     }

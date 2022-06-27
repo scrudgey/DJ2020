@@ -31,6 +31,9 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
         ApplyTorsoSpriteData(input);
     }
     void ApplyTorsoSpriteData(AnimationInput input) {
+        if (input.movementSticking)
+            return;
+
         int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
         SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
             GunType.unarmed => skin.unarmedSpriteData,
@@ -74,6 +77,9 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     }
     public void UpdateView(AnimationInput input) {
         lastInput = input;
+
+        if (input.movementSticking)
+            return;
 
         switch (input.state) {
             default:
@@ -138,7 +144,6 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
                 SetAnimation(idleAnimation);
             }
         }
-
         UpdateFrame();
     }
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {

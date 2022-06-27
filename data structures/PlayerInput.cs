@@ -41,4 +41,7 @@ public struct PlayerInput {
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };
+    public Vector2 MoveAxis() {
+        return new Vector2(MoveAxisForward, MoveAxisRight);
+    }
 }

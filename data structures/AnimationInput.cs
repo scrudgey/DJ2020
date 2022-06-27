@@ -21,4 +21,5 @@ public struct AnimationInput {
     public Quaternion cameraRotation;
     public Vector2 camDir;
     public Vector3 lookAtDirection;
+    public bool movementSticking;
 }

@@ -938,3 +938,8 @@ fix head
 * crawl animation slower
 tasklookAt returns running, should return success?
 
+
+
+smg torso face left, head face down looks odd
+female walk left / right torso offset is incorrect?
+proper NPC AI

@@ -49,7 +49,8 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 Vector2 headDir = new Vector2(lookDirection.x, lookDirection.z);
 
                 // TODO: this should not belong to animation code!!!
-                transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                if (lookDirection != Vector3.zero)
+                    transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
 
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);
                 Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);

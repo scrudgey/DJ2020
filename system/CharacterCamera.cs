@@ -333,9 +333,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Find the smoothed follow position
         Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         Vector3 distOffset = input.wallNormal * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, 1f, 0);
+        Vector3 heightOffset = new Vector3(0, -0.5f, 0);
+
         if (input.crouchHeld) {
-            heightOffset = new Vector3(0, 0.5f, 0);
+            heightOffset = new Vector3(0, -0.75f, 0);
         }
 
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, 30f, -30, 1f), 0, 0);
@@ -360,9 +361,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public CameraTargetParameters AimParameters(CameraInput input) {
         Vector3 distOffset = input.playerDirection * -0.5f * TargetDistance;
         // Vector3 distOffset = input.playerLookDirection * -0.5f * TargetDistance;
-        Vector3 heightOffset = new Vector3(0f, 1.2f, 0);
+        Vector3 heightOffset = new Vector3(0, 0f, 0);
         if (input.crouchHeld) {
-            heightOffset -= new Vector3(0, 0.5f, 0);
+            // heightOffset = new Vector3(0, -0.75f, 0);
         }
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();

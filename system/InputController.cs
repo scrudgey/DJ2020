@@ -60,7 +60,10 @@ public class InputController : MonoBehaviour {
     private bool useItemThisFrame;
     public void Awake() {
         // Move
-        MoveAction.action.performed += ctx => inputVector = ctx.ReadValue<Vector2>();
+        MoveAction.action.performed += ctx => {
+            inputVector = ctx.ReadValue<Vector2>();
+            // Debug.Log(inputVector);
+        };
 
         // Fire
         FireAction.action.performed += ctx => {

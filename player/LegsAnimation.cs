@@ -56,6 +56,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public void UpdateView(AnimationInput input) {
         if (skin == null)
             return;
+        if (input.movementSticking)
+            return;
         // set direction
         direction = input.orientation;
         switch (input.state) {
@@ -141,7 +143,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         // transform.localRotation = Quaternion.identity;
         // TODO: this is what makes the head offset work. but it causes weird clipping and leaning. we should set this, apply offset, then set it back after applying offset
         transform.rotation = input.cameraRotation;
-
         UpdateFrame();
     }
 
