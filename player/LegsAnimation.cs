@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,6 +30,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public float trailInterval = 0.05f;
     public TorsoAnimation gunAnimation;
     public HeadAnimation headAnimation;
+    bool isMoving;
+    bool isCrouching;
+    bool isCrawling;
 
     void Start() {
         // TODO: fix
@@ -60,6 +64,14 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             return;
         // set direction
         direction = input.orientation;
+        isMoving = input.isMoving;
+        isCrouching = input.isCrouching;
+        if (!isCrawling && isMoving && isCrouching) {
+            isCrawling = true;
+        }
+        if (isCrawling && !isCrouching) {
+            isCrawling = false;
+        }
         switch (input.state) {
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
@@ -126,10 +138,10 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 state = State.climb;
                 spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
             } else if (input.isCrouching) {
-                shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
                 state = State.crouch;
-                spriteRenderer.sprite = skin.legsCrouch[direction][0];
+                shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
+                if (!isCrawling)
+                    spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
             } else {
                 state = State.idle;
                 spriteRenderer.sprite = skin.legsIdle[direction][0];
@@ -151,7 +163,11 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     }
 
     public void UpdateFrame() {
-        Octet<Sprite[]> octet = skin.GetCurrentLegsOctet(state);
+        Octet<Sprite[]> octet = null;
+        octet = skin.GetCurrentLegsOctet(state);
+        if (isCrawling) {
+            octet = skin.legsCrawl;
+        }
         Sprite[] sprites = octet[direction];
         frame = Math.Min(frame, sprites.Length - 1);
         spriteRenderer.sprite = sprites[frame];

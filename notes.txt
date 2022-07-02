@@ -937,9 +937,30 @@ fix head
 * handle the case when multiple gunshots are heard repeatedly.
 * crawl animation slower
 tasklookAt returns running, should return success?
+head should look around when in search mode.
+allow independent level data
+
+proper NPC AI
+
+new idea: instead of stickiness timer, in crouch mode, input just makes 
+the character slew toward direction.
+
+we never noticed the weird turning effects because it was never possible to turn in crouch mode.
+
+wallpress head sprite is messed up
+wallpress left/right is weird
+
+fix orientation weirdness 
+    child torso under legs
+    reset orientation after positioning
+
+adjust walk animation speed with movement
+
+
 
 
 
 smg torso face left, head face down looks odd
 female walk left / right torso offset is incorrect?
-proper NPC AI
+
+ensure torso bob is correct

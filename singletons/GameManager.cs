@@ -70,11 +70,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void LateUpdate() {
         if (numberFrames == 1) {
-            Debug.Log("initializing");
-            // Debug.Break();
             // TODO: set level in gamedata
             gameData = GameData.TestInitialData();
-
             // TODO: a better start of level method?
             TransitionToState(GameState.levelPlay);
         }

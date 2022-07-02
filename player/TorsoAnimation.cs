@@ -19,6 +19,10 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     public float trailInterval = 0.05f;
     private bool bob;
     private AnimationInput lastInput;
+    bool isMoving;
+    bool isCrouching;
+    bool isCrawling;
+    GunType gunType;
 
     void Start() {
         // TODO: fix
@@ -104,13 +108,22 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
         _direction = input.orientation;
 
         transform.localPosition = Vector3.zero;
-        if (bob) {
+        if (bob && !isCrawling) {
             transform.localPosition -= new Vector3(0f, 0.02f, 0f);
         }
 
         SetState(input.gunInput.gunState);
         characterState = input.state;
 
+        isMoving = input.isMoving;
+        isCrouching = input.isCrouching;
+        if (!isCrawling && isMoving && isCrouching) {
+            isCrawling = true;
+        }
+        if (isCrawling && !isCrouching) {
+            isCrawling = false;
+        }
+        gunType = input.gunInput.gunType;
         if (input.gunInput.hasGun) {
             switch (state) {
                 case GunHandler.GunState.shooting:
@@ -138,7 +151,6 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
                 } else {
                     SetAnimation(walkAnimation);
                 }
-                // SetAnimation(walkAnimation);
             } else {
                 _frame = 0;
                 SetAnimation(idleAnimation);
@@ -159,7 +171,19 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
     public void UpdateFrame() {
         if (skin == null)
             return;
+
         Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(lastInput);
+        if (isCrouching) {
+            if (isMoving) {
+                _sprites = skin.unarmedCrawl;
+            } else {
+                if (isCrawling) {
+                    _sprites = skin.unarmedCrawl;
+                } else {
+                    _sprites = skin.gunCrouchSprites(gunType);
+                }
+            }
+        }
 
         if (_sprites == null)
             return;

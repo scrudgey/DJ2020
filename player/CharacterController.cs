@@ -36,9 +36,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public float MaxStableMoveSpeed = 10f;
     public float StableMovementSharpness = 15;
     public float OrientationSharpness = 10;
+    public float stepHeight = 0.2f;
     [Header("Crawling")]
     public float crawlSpeedFraction = 1f;
     public float crawlStickiness = 0.1f;
+    public float crawlStepHeight = 0.02f;
 
     [Header("Running")]
     public float runSpeedFraction = 2f;
@@ -256,6 +258,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         _inputTorque = input.torque;
 
         // Run input
+        Motor.MaxStepHeight = stepHeight;
         if (input.runDown && input.inputMode != InputMode.aim) {
             isRunning = true;
         } else {
@@ -267,6 +270,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     isCrouching = true;
                     Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 }
+                Motor.MaxStepHeight = crawlStepHeight;
             }
         }
 
@@ -325,11 +329,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                         directionToCursor.y = 0;
                         snapToDirection = directionToCursor;
                     }
-                    slewLookVector = Vector3.Lerp(slewLookVector, _moveInputVector, 0.1f);
+                    slewLookVector = _moveInputVector;
                 }
                 if (input.Fire.AimPressed) {
                     snapToDirection = lookAtDirection;
                 }
+                // if (IsMovementSticking()) {
+                //     snapToDirection = moveInputVector;
+                // }
 
                 // Jumping input
                 if (input.jumpReleased) {
@@ -337,6 +344,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     _jumpRequested = true;
                 }
 
+                if (isCrouching) {
+                    if (Vector3.Dot(_moveInputVector, direction) < 0.99f) {
+                        _moveInputVector = Vector3.zero;
+                    }
+                }
                 break;
             case CharacterState.wallPress:
                 // allow gun switch
@@ -405,8 +417,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     /// This is the ONLY place where you should set the character's rotation
     /// </summary>
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-        if (IsMovementSticking())
+        if (IsMovementSticking()) {
             return;
+        }
         switch (state) {
             default:
             case CharacterState.normal:
@@ -422,7 +435,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 } else if (slewLookVector != Vector3.zero && OrientationSharpness > 0f) {
                     // Smoothly interpolate from current to target look direction
-                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, slewLookVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+                    float sharpness = OrientationSharpness;
+                    if (isCrouching) sharpness *= 0.5f;
+                    Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, slewLookVector, 1 - Mathf.Exp(-sharpness * deltaTime)).normalized;
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 }

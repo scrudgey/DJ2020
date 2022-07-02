@@ -30,8 +30,10 @@ namespace AI {
         }
         void DoPopFromStack() {
             if (stack.Count > 0) {
-                parent.SetData(valueKey, stack.Pop());
+                T t = stack.Pop();
+                parent.SetData(valueKey, t);
                 emptyStack = false;
+                // Debug.Log($"popping from stack: {t}");
             } else {
                 emptyStack = true;
             }

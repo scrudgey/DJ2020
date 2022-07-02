@@ -63,7 +63,6 @@ namespace AI {
                 inputVector.y = 0;
                 input.moveDirection = speedCoefficient * inputVector.normalized;
                 input.lookAtDirection = lookDirection;
-
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
                 }
