@@ -14,10 +14,8 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
         // TODO: simplify
         switch (input.state) {
             case CharacterState.wallPress:
-
                 // TODO: should not belong to animation code
                 transform.localRotation = Quaternion.identity;
-
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.isCrouching) { // crouching
                     if (direction == Direction.right || direction == Direction.down) {
@@ -47,11 +45,6 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 Vector3 lookDirection = input.lookAtDirection;
                 lookDirection.y = 0;
                 Vector2 headDir = new Vector2(lookDirection.x, lookDirection.z);
-
-                // TODO: this should not belong to animation code!!!
-                if (lookDirection != Vector3.zero)
-                    transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-
                 float headAngle = Vector2.SignedAngle(input.camDir, headDir);
                 Direction headOrientation = Toolbox.DirectionFromAngle(headAngle);
                 direction = Toolbox.ClampDirection(headOrientation, input.orientation);
@@ -64,11 +57,9 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
             default:
                 break;
         }
-
         if (torsoSpriteData.overrideHeadDirection) {
             direction = input.orientation;
         }
-
         spriteRenderer.flipX = direction == Direction.left || direction == Direction.leftUp || direction == Direction.leftDown;
         UpdateFrame(torsoSpriteData);
     }

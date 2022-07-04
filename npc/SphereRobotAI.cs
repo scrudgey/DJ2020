@@ -63,7 +63,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
         navMeshPath = new NavMeshPath();
-
         EnterDefaultState();
     }
 
@@ -75,19 +74,16 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         }
     }
 
-
     public void StateFinished(SphereControlState routine) {
         switch (routine) {
             default:
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
                 speechTextController.HaltSpeechForTime(2f);
-                // ChangeState(new SphereMoveState(this, patrolZone));
                 EnterDefaultState();
                 break;
             case SphereAttackState:
                 EnterDefaultState();
-                // ChangeState(new SphereMoveState(this, patrolZone));
                 break;
         }
     }
@@ -95,7 +91,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
         stateMachine.ChangeState(routine);
         switch (routine) {
             case SearchDirectionState search:
-                Debug.Log("enter search direction state");
                 break;
             case SphereAttackState attack:
                 recentlyInCombat = true;
@@ -118,7 +113,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
                     Perceive(playerCollider);
             }
         }
-
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
         }

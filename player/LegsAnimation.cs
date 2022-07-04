@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using UnityEditor;
 using UnityEngine;
-
 public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public enum State {
         idle,
@@ -33,22 +33,24 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     bool isMoving;
     bool isCrouching;
     bool isCrawling;
+    float crouchTransitionTimer;
 
     void Start() {
         // TODO: fix
         // GameManager.OnFocusChanged += Bind;
         Bind(target.gameObject);
     }
+
     override public void HandleValueChanged(CharacterController controller) {
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
     }
 
     // used by animation
-
     public void SetFrame(int frame) {
         this.frame = frame;
     }
+
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
@@ -56,22 +58,35 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         gunAnimation?.SpawnTrail();
         headAnimation?.SpawnTrail();
     }
+
     public void SetBob(int bob) { }
+
     public void UpdateView(AnimationInput input) {
         if (skin == null)
             return;
         if (input.movementSticking)
             return;
+        crouchTransitionTimer += Time.deltaTime;
+
         // set direction
         direction = input.orientation;
         isMoving = input.isMoving;
-        isCrouching = input.isCrouching;
+        if (isCrouching != input.isCrouching) {
+            isCrouching = input.isCrouching;
+            crouchTransitionTimer = 0f;
+        }
         if (!isCrawling && isMoving && isCrouching) {
             isCrawling = true;
         }
         if (isCrawling && !isCrouching) {
             isCrawling = false;
         }
+        float scaleFactor = 1f;
+        if (crouchTransitionTimer < 0.1f) {
+            scaleFactor = (float)PennerDoubleAnimation.BounceEaseIn(crouchTransitionTimer, 1.1f, -0.1f, 0.1f);
+        }
+        Vector3 scale = new Vector3(1f, scaleFactor, 1f) * 2.5f;
+        transform.localScale = scale;
         switch (input.state) {
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
@@ -152,10 +167,13 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             }
         }
 
-        // transform.localRotation = Quaternion.identity;
         // TODO: this is what makes the head offset work. but it causes weird clipping and leaning. we should set this, apply offset, then set it back after applying offset
         transform.rotation = input.cameraRotation;
         UpdateFrame();
+        gunAnimation.UpdateView(input);
+        Vector3 absoluteWorldPosition = headAnimation.transform.position;
+        transform.localRotation = Quaternion.identity;
+        headAnimation.transform.position = absoluteWorldPosition;
     }
 
     public void LoadState(PlayerData data) {

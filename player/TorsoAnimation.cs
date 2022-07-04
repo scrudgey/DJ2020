@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
-public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
+public class TorsoAnimation : MonoBehaviour, ISaveable {
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
@@ -26,14 +26,14 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
 
     void Start() {
         // TODO: fix
-        Bind(target.gameObject);
+        // Bind(target.gameObject);
     }
-    override public void HandleValueChanged(CharacterController controller) {
-        AnimationInput input = controller.BuildAnimationInput();
-        UpdateView(input);
-        // TODO: handle case when running with rifle or shotgun
-        ApplyTorsoSpriteData(input);
-    }
+    // override public void HandleValueChanged(CharacterController controller) {
+    //     AnimationInput input = controller.BuildAnimationInput();
+    //     UpdateView(input);
+    //     // TODO: handle case when running with rifle or shotgun
+    //     // ApplyTorsoSpriteData(input);
+    // }
     void ApplyTorsoSpriteData(AnimationInput input) {
         if (input.movementSticking)
             return;
@@ -53,7 +53,6 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
         SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
 
         headAnimation.UpdateView(input, torsoSpriteData);
-        transform.rotation = input.cameraRotation;
         Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
         if (headAnimation.spriteRenderer.flipX) {
             offset.x *= -1f;
@@ -157,6 +156,7 @@ public class TorsoAnimation : IBinder<CharacterController>, ISaveable {
             }
         }
         UpdateFrame();
+        ApplyTorsoSpriteData(input);
     }
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
         if (forcePlay) {
