@@ -938,8 +938,9 @@ fix head
 * crawl animation slower
 * new idea: instead of stickiness timer, in crouch mode, input just makes the character slew toward direction.
 * we never noticed the weird turning effects because it was never possible to turn in crouch mode.
-* wallpress head sprite is messed up
-* wallpress left/right is weird
+* subtly aim up & down
+* smoothly interpolate between left and right focus points.
+* narrower field of view and further distance
 * ensure torso bob is correct
 
 tasklookAt returns running, should return success?
@@ -950,11 +951,14 @@ prevent extreme zoom maneuvers with lerping
 position call-out
 adjust walk animation speed with movement
 
+wallpress head sprite is messed up
+wallpress left/right is weird
+head position when laying on floor is wrong
+wallpress whe crawling
+camera wall clipping
+less itense wall sticking
+combat test arena
 
 
 smg torso face left, head face down looks odd
 female walk left / right torso offset is incorrect?
-
-in aim mode:
-subtly aim up & down
-smoothly interpolate between left and right focus points.

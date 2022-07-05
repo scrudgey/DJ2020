@@ -108,7 +108,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
 
         transform.localPosition = Vector3.zero;
         if (bob && !isCrawling) {
-            transform.localPosition -= new Vector3(0f, 0.02f, 0f);
+            transform.localPosition -= new Vector3(0f, 0.01f, 0f);
         }
 
         SetState(input.gunInput.gunState);
