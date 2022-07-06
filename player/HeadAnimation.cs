@@ -14,8 +14,10 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
         // TODO: simplify
         switch (input.state) {
             case CharacterState.wallPress:
+
                 // TODO: should not belong to animation code
                 transform.localRotation = Quaternion.identity;
+
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.isCrouching) { // crouching
                     if (direction == Direction.right || direction == Direction.down) {
@@ -23,16 +25,16 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                     } else if (direction == Direction.left) {
                         direction = Direction.leftDown;
                     }
-                    if (input.playerInputs.MoveAxisRight > 0) {
+                    if (input.playerInputs.MoveAxisRight < 0) {
                         direction = Direction.rightDown;
-                    } else if (input.playerInputs.MoveAxisRight < 0) {
+                    } else if (input.playerInputs.MoveAxisRight > 0) {
                         direction = Direction.leftDown;
                     }
                 } else { // standing
                     direction = Direction.down;
-                    if (input.playerInputs.MoveAxisRight < 0) {
+                    if (input.playerInputs.MoveAxisRight > 0) {
                         direction = Direction.left;
-                    } else if (input.playerInputs.MoveAxisRight > 0) {
+                    } else if (input.playerInputs.MoveAxisRight < 0) {
                         direction = Direction.right;
                     }
                 }
@@ -80,6 +82,9 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 spriteRenderer.sprite = sprites[frame];
             }
         }
+        // if (torsoSpriteData.overrideHeadDirection) {
+        //     Debug.Log($"{torsoSpriteData.overrideHeadDirection} {torsoSpriteData.headSprite}");
+        // }
     }
 
     public void LoadState(PlayerData data) {

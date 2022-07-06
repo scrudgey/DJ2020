@@ -942,6 +942,8 @@ fix head
 * smoothly interpolate between left and right focus points.
 * narrower field of view and further distance
 * ensure torso bob is correct
+* wallpress head sprite is messed up
+* wallpress left/right is weird
 
 tasklookAt returns running, should return success?
 head should look around when in search mode.
@@ -951,13 +953,12 @@ prevent extreme zoom maneuvers with lerping
 position call-out
 adjust walk animation speed with movement
 
-wallpress head sprite is messed up
-wallpress left/right is weird
+wallpress when crawling
 head position when laying on floor is wrong
-wallpress whe crawling
 camera wall clipping
 less itense wall sticking
 combat test arena
+fix emoji text
 
 
 smg torso face left, head face down looks odd
