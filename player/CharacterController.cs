@@ -474,7 +474,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector3 start = transform.position + offset;
         Vector3 dir = -1f * wallNormal;
         float length = 0.4f;
-        // Debug.DrawRay(start, length * dir);
+        Debug.DrawRay(start, length * dir, new Color(162, 142, 149));
         foreach (RaycastHit hit in Physics.RaycastAll(start, dir, length).OrderBy(x => x.distance)) {
             if (hit.collider.transform.IsChildOf(transform)) {
                 continue;

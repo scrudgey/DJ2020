@@ -10,8 +10,6 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
     private int frame;
 
     public void UpdateView(AnimationInput input, SpriteData torsoSpriteData) {
-        // adjust visibility
-        // TODO: simplify
         switch (input.state) {
             case CharacterState.wallPress:
 
@@ -82,9 +80,6 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 spriteRenderer.sprite = sprites[frame];
             }
         }
-        // if (torsoSpriteData.overrideHeadDirection) {
-        //     Debug.Log($"{torsoSpriteData.overrideHeadDirection} {torsoSpriteData.headSprite}");
-        // }
     }
 
     public void LoadState(PlayerData data) {

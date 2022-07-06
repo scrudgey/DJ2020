@@ -954,7 +954,9 @@ position call-out
 adjust walk animation speed with movement
 
 wallpress when crawling
+head position when crouching in wallpress is wrong
 head position when laying on floor is wrong
+
 camera wall clipping
 less itense wall sticking
 combat test arena
@@ -963,3 +965,12 @@ fix emoji text
 
 smg torso face left, head face down looks odd
 female walk left / right torso offset is incorrect?
+z-fighting between torso, legs, head
+
+
+wallnormal = hitnormal
+rotation = camera rotation
+
+in wallpress, wall normal orientation is opposite of camera orientation. 
+we set up to camera orientation when arrange the positions / offsets, then we set orientation to I.
+
