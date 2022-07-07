@@ -905,6 +905,32 @@ fix head
             set up the design, then export a data object.
             load the data object with 
 
+
+it's billboarded. this is the difference between the editor and runtime.
+although the character is rotated, we want to de-rotate the sprites.
+offset x, y must always be set in the plane normal to the camera. this is why the trick works.
+    by turning the transform rotation to that of the camera, we align the plane of the camera. 
+    we then set the offset using local transform coordinates: this would work in any order actually.
+    we record the world position, then rotate back.
+
+Q: so why does this fail on the wallpress mode? 
+    we turn the transform to the camera plane, away from the camera.
+    once we rotate back and allow the wallpress to orient, we are faced toward the camera.
+    billboarding is disabled, so we are oriented opposite of normal billboard.
+Q: why does it work normally?
+    we rotate the transform to the camera plane.
+    we set the world position of the head to match where it should be during billboard orientation up to projection.
+    the transform is rotated to whatever direction it points in.
+    the rotation doesn't matter because billboarding is applied and the world positioning simulates the correct offset.
+    if the sprite is flipped, the offset is incorrect! so we adjust it at this point.
+        it is incorrect because the choice of orientation at the beginning was just the camera plane.
+        if sprite renderer is flipped, we could choose the inverse orientation.
+Q: what is the proper solution?
+    we need a billboard & non-billboard solution?
+
+now we just need to fix the head flipx.
+
+
 * redesign data structure so it can generalize to multiple skins
 * make it easier to select the next torso sprite (spritesheet parameter?)
 * sprite data: 
@@ -944,6 +970,13 @@ fix head
 * ensure torso bob is correct
 * wallpress head sprite is messed up
 * wallpress left/right is weird
+* head position when crouching in wallpress is wrong
+* head position when laying on floor is wrong
+
+graphical issues:
+    smg torso face left, head face down looks odd
+    female walk left / right torso offset is incorrect?
+    z-fighting between torso, legs, head
 
 tasklookAt returns running, should return success?
 head should look around when in search mode.
@@ -952,25 +985,12 @@ proper NPC AI
 prevent extreme zoom maneuvers with lerping
 position call-out
 adjust walk animation speed with movement
+blink cursor when reaching maximum aim
+combat test arena
 
 wallpress when crawling
-head position when crouching in wallpress is wrong
-head position when laying on floor is wrong
-
 camera wall clipping
 less itense wall sticking
-combat test arena
+slower turn radius when crawling
+only rotate when moving while crawling
 fix emoji text
-
-
-smg torso face left, head face down looks odd
-female walk left / right torso offset is incorrect?
-z-fighting between torso, legs, head
-
-
-wallnormal = hitnormal
-rotation = camera rotation
-
-in wallpress, wall normal orientation is opposite of camera orientation. 
-we set up to camera orientation when arrange the positions / offsets, then we set orientation to I.
-

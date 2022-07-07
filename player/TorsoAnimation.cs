@@ -8,7 +8,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
-    private Direction _direction;
+    private Direction direction;
     public HeadAnimation headAnimation;
     public SpriteRenderer spriteRenderer;
     public Animation animator;
@@ -24,16 +24,6 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     bool isCrawling;
     GunType gunType;
 
-    void Start() {
-        // TODO: fix
-        // Bind(target.gameObject);
-    }
-    // override public void HandleValueChanged(CharacterController controller) {
-    //     AnimationInput input = controller.BuildAnimationInput();
-    //     UpdateView(input);
-    //     // TODO: handle case when running with rifle or shotgun
-    //     // ApplyTorsoSpriteData(input);
-    // }
     void ApplyTorsoSpriteData(AnimationInput input) {
         if (input.movementSticking)
             return;
@@ -52,12 +42,10 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         }
         SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
 
-        headAnimation.UpdateView(input, torsoSpriteData);
         Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
-        if (headAnimation.spriteRenderer.flipX) {
-            offset.x *= -1f;
-        }
         headAnimation.transform.localPosition = offset;
+        headAnimation.UpdateView(input, torsoSpriteData);
+
         if (torsoSpriteData.headInFrontOfTorso) {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
         } else {
@@ -104,7 +92,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
 
         AnimationClip walkAnimation = unarmedWalkAnimation;
 
-        _direction = input.orientation;
+        direction = input.orientation;
 
         transform.localPosition = Vector3.zero;
         if (bob && !isCrawling) {
@@ -184,16 +172,15 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
                 }
             }
         }
-
         if (_sprites == null)
             return;
-        if (_sprites[_direction] == null)
+        if (_sprites[direction] == null)
             return;
 
-        int frame = Math.Min(_frame, _sprites[_direction].Length - 1);
-        if (_sprites[_direction][frame] == null)
+        int frame = Math.Min(_frame, _sprites[direction].Length - 1);
+        if (_sprites[direction][frame] == null)
             return;
-        spriteRenderer.sprite = _sprites[_direction][frame];
+        spriteRenderer.sprite = _sprites[direction][frame];
     }
     public void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;

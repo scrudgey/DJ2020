@@ -102,6 +102,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                     spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 } else {
                     spriteRenderer.material.EnableKeyword("_BILLBOARD");
+                    // spriteRenderer.material.IsKeywordEnabled("_BILLBOARD");
                 }
                 spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
@@ -129,6 +130,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 shadowCaster.localScale = new Vector3(0.5f, 0.1f, 0.5f);
                 shadowCaster.localPosition = new Vector3(0f, 0.1f, 0f);
                 state = State.crawl;
+                // actively moving
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             } else {
                 state = State.walk;
             }
@@ -155,8 +158,13 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             } else if (input.isCrouching) {
                 state = State.crouch;
                 shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
-                if (!isCrawling)
+                if (!isCrawling) {
                     spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
+
+                } else {
+                    spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+
+                }
             } else {
                 state = State.idle;
                 spriteRenderer.sprite = skin.legsIdle[direction][0];
@@ -167,12 +175,32 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             }
         }
 
-        // TODO: this is what makes the head offset work. but it causes weird clipping and leaning. we should set this, apply offset, then set it back after applying offset
-        transform.rotation = input.cameraRotation;
         UpdateFrame();
         gunAnimation.UpdateView(input);
+
+        // set rotation to be coplanar with the camera plane
+        transform.rotation = input.cameraRotation;
+
+        if (spriteRenderer.flipX) {
+            Vector3 headPosition = headAnimation.transform.localPosition;
+            headPosition.x *= -1f;
+            headAnimation.transform.localPosition = headPosition;
+            // headAnimation.spriteRenderer.flipX = !headAnimation.spriteRenderer.flipX;
+        }
+        if (input.state == CharacterState.wallPress) {
+            Vector3 headPosition = headAnimation.transform.localPosition;
+            headPosition.x *= -1f;
+            headAnimation.transform.localPosition = headPosition;
+            headAnimation.spriteRenderer.flipX = spriteRenderer.flipX;
+        }
+
+        // record the rotated position
         Vector3 absoluteWorldPosition = headAnimation.transform.position;
+
+        // set rotation back to identity.
         transform.localRotation = Quaternion.identity;
+
+        // set position back to the rotated position.
         headAnimation.transform.position = absoluteWorldPosition;
     }
 
