@@ -308,5 +308,16 @@ public class Toolbox {
     public static T Max<T>(T a, T b) where T : IComparable {
         return a.CompareTo(b) >= 0 ? a : b;
     }
+
+    // static public float SquareWave(float currentphase) {
+    //     return (1 + Mathf.Sign(Mathf.Sin(currentphase * 2f * (float)Math.PI))) / 2f;
+    // }
+
+    static public float SquareWave(float currentphase, float dutycycle = 0f) {
+        // dutycyle: [-1, 1] float
+        // -1: constant 0
+        // +1: constant 1
+        return (1 + Mathf.Sign(Mathf.Sin(currentphase * 2f * (float)Math.PI) + dutycycle)) / 2f;
+    }
 }
 

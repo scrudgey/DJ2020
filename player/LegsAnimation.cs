@@ -172,7 +172,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 animator.Play();
             }
         }
-        shadowCaster.localPosition = new Vector3(0f, shadowCaster.localScale.y, 0f);
+        shadowCaster.localPosition = new Vector3(0f, shadowCaster.localScale.y - 0.05f, 0f);
 
         UpdateFrame();
         SpriteData torsoSpriteData = gunAnimation.UpdateView(input);

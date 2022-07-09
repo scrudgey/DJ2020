@@ -675,13 +675,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                         targetMovementVelocity /= 2f;
                     } else if (isRunning) {
                         targetMovementVelocity *= runSpeedFraction;
-                    } else if (isCrouching) {
-                        // crawling
+                    } else if (isCrouching) {// crawling
                         if (inputDirectionHeldTimer > crawlStickiness && crouchMovementInputTimer > 0.3f) {
-                            targetMovementVelocity *= crawlSpeedFraction;
                             if (targetMovementVelocity != Vector3.zero & !pressingOnWall) {
                                 targetMovementVelocity = direction;
                             }
+                            Vector3 initialMovementVelocity = targetMovementVelocity;
+                            targetMovementVelocity *= crawlSpeedFraction * Toolbox.SquareWave(crouchMovementInputTimer, dutycycle: 0.75f);
+                            targetMovementVelocity += 0.5f * crawlSpeedFraction * initialMovementVelocity;
                         } else {
                             targetMovementVelocity = Vector3.zero;
                         }

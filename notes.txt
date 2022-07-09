@@ -975,6 +975,7 @@ now we just need to fix the head flipx.
 * wallpress when crawling
 * slower turn radius when crawling
 * only rotate when moving while crawling
+* make crawl nonuniform speed
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -989,6 +990,7 @@ prevent extreme zoom maneuvers with lerping
 position call-out
 adjust walk animation speed with movement
 blink cursor when reaching maximum aim
+bigger aim reticle
 combat test arena VR
 glass break fx
 
@@ -1000,9 +1002,3 @@ less intense wall sticking
     when moving, you should move in an arc.
         this means that movement is in direction of orientation.
 fix emoji text
-
-
-head offset visual bug is because of the way we do the transform-untransform effect.
-when we transform to camera rotation, this is exactly for true billboarding.
-in our billboarding, we do the "y trick," where the y coordinate is not billboarded.
-this can be remedied by 

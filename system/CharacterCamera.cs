@@ -362,10 +362,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
-        Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels);
+        Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
         Vector3 camDirection = input.playerDirection;
         Vector3 distOffset = input.playerDirection * -0.5f * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, 0.1f, 0);
+        Vector3 heightOffset = new Vector3(0, 0.25f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
@@ -415,8 +415,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim && transitionTime >= 1) {
             UpdateCameraZoom(input);
         }
-
-        // Debug.Log(Camera.orthographicSize);
 
         // apply rotation
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
