@@ -63,6 +63,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public AudioClip[] superJumpSounds;
     public AudioClip[] jumpPrepSounds;
     public AudioClip[] landingSounds;
+    public AudioClip[] crouchingSounds;
     public bool superJumpEnabled;
 
     [Header("Ladder Climbing")]
@@ -92,6 +93,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private Vector3 snapToDirection = Vector2.zero;
     public bool isCrouching = false;
     public bool isRunning = false;
+    public bool isCrawling = false;
 
     [Header("Wall press")]
     public float pressRadius = 0.1f;
@@ -136,6 +138,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private CursorData lastTargetDataInput;
     private Vector3 lookAtDirection;
     private float inputDirectionHeldTimer;
+    private float crouchMovementInputTimer;
+    private bool inputCrouchDown;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -269,8 +273,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (!isCrouching) {
                     isCrouching = true;
                     Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                    Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
                 }
                 Motor.MaxStepHeight = crawlStepHeight;
+            }
+            if (!isCrawling && isMoving() && isCrouching) {
+                isCrawling = true;
+            }
+            if (isCrawling && !isCrouching) {
+                isCrawling = false;
             }
         }
 
@@ -283,6 +294,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             jumpHeldTimer = 0;
         }
 
+        inputCrouchDown = input.CrouchDown;
         CursorData cursorData = input.Fire.cursorData;
         switch (state) {
             case CharacterState.jumpPrep:
@@ -314,12 +326,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 gunHandler.SetInputs(input);
 
                 // Turn to face cursor or movement direction
-
+                // TODO: exclude when crawling
                 if (input.lookAtPosition != Vector3.zero) {
                     lookAtDirection = input.lookAtPosition - transform.position;
                 }
                 if (input.lookAtDirection != Vector3.zero) {
                     lookAtDirection = input.lookAtDirection;
+                }
+                if (isCrouching && !isCrawling && crouchMovementInputTimer < 0.3f) {
+                    snapToDirection = _moveInputVector;
                 }
 
                 slewLookVector = Vector3.zero;
@@ -334,21 +349,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (input.Fire.AimPressed) {
                     snapToDirection = lookAtDirection;
                 }
-                // if (IsMovementSticking()) {
-                //     snapToDirection = moveInputVector;
-                // }
 
                 // Jumping input
                 if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
                 }
-
-                if (isCrouching) {
-                    if (Vector3.Dot(_moveInputVector, direction) < 0.99f) {
-                        _moveInputVector = Vector3.zero;
-                    }
+                if (isCrouching && _moveInputVector != Vector3.zero) {
+                    crouchMovementInputTimer += Time.deltaTime;
+                } else {
+                    crouchMovementInputTimer = 0f;
                 }
+                // if (isCrouching && state != CharacterState.wallPress && wallPressTimer == 0f) {
+                //     if (Vector3.Dot(_moveInputVector, direction) < 0.99f) {
+                //         _moveInputVector = Vector3.zero;
+                //     }
+                // }
                 break;
             case CharacterState.wallPress:
                 // allow gun switch
@@ -436,7 +452,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 } else if (slewLookVector != Vector3.zero && OrientationSharpness > 0f) {
                     // Smoothly interpolate from current to target look direction
                     float sharpness = OrientationSharpness;
-                    if (isCrouching) sharpness *= 0.5f;
+                    if (isCrouching) sharpness *= 0.15f;
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, slewLookVector, 1 - Mathf.Exp(-sharpness * deltaTime)).normalized;
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
@@ -661,18 +677,17 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                         targetMovementVelocity *= runSpeedFraction;
                     } else if (isCrouching) {
                         // crawling
-                        if (inputDirectionHeldTimer > crawlStickiness) {
+                        if (inputDirectionHeldTimer > crawlStickiness && crouchMovementInputTimer > 0.3f) {
                             targetMovementVelocity *= crawlSpeedFraction;
+                            if (targetMovementVelocity != Vector3.zero & !pressingOnWall) {
+                                targetMovementVelocity = direction;
+                            }
                         } else {
                             targetMovementVelocity = Vector3.zero;
                         }
                     }
-
-
                     // Smooth movement Velocity
                     currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
-
-
                 } else {
                     // Add move input
                     if (_moveInputVector.sqrMagnitude > 0f) {
@@ -783,7 +798,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     }
 
     void CheckUncrouch() {
-        if (isCrouching) {
+        if (isCrouching && !inputCrouchDown) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
             Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
             _probedColliders = new Collider[8];
@@ -961,9 +976,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         if (GameManager.I.showDebugRays)
             Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
-        // TODO:
-        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(OrbitCamera.isometricRotation * Vector3.forward, Vector3.up).normalized;
-
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
             isMoving = isMoving(),
@@ -978,7 +990,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             camDir = camDir,
             cameraRotation = OrbitCamera.transform.rotation,
             lookAtDirection = lookAtDirection,
-            movementSticking = IsMovementSticking()
+            movementSticking = IsMovementSticking(),
+            directionToCamera = OrbitCamera.Transform.position - transform.position
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

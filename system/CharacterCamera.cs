@@ -365,12 +365,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels);
         Vector3 camDirection = input.playerDirection;
         Vector3 distOffset = input.playerDirection * -0.5f * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, -0.25f, 0);
+        Vector3 heightOffset = new Vector3(0, 0.1f, 0);
         if (input.crouchHeld) {
-            heightOffset = new Vector3(0, -0.75f, 0);
+            heightOffset -= new Vector3(0, 0.5f, 0);
         }
         float heightOffsetCoefficient = 0.5f - cursorPositionNormalized.y;
-        // float horizontalParity = cursorPositionNormalized.x > 0.5f ? 1f : -1f;
         float horizontalParity = cursorPositionNormalized.x - 0.5f;
 
         Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f * horizontalParity;

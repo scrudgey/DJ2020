@@ -78,7 +78,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         if (!isCrawling && isMoving && isCrouching) {
             isCrawling = true;
         }
-        if (isCrawling && !isCrouching) {
+        if (isCrawling && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
             isCrawling = false;
         }
         float scaleFactor = 1f;
@@ -115,9 +115,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         }
 
         // set mode and animation
-        shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
-        shadowCaster.localPosition = new Vector3(0f, 0.7f, 0f);
         spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+        shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
 
         if (input.isMoving) { //
             if (input.isJumping) {
@@ -126,12 +125,11 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 state = State.climb;
             } else if (input.isRunning) {
                 state = State.run;
-            } else if (input.isCrouching) {
-                shadowCaster.localScale = new Vector3(0.5f, 0.1f, 0.5f);
-                shadowCaster.localPosition = new Vector3(0f, 0.1f, 0f);
+            } else if (input.isCrouching) { // crawling
                 state = State.crawl;
-                // actively moving
                 spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+                shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
+                shadowCaster.rotation = Quaternion.LookRotation(transform.right, transform.up);
             } else {
                 state = State.walk;
             }
@@ -155,15 +153,15 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             } else if (input.isClimbing) {
                 state = State.climb;
                 spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
-            } else if (input.isCrouching) {
+            } else if (input.isCrouching) { // crouching or crawling
                 state = State.crouch;
-                shadowCaster.localScale = new Vector3(0.25f, 0.4f, 0.25f);
-                if (!isCrawling) {
+                if (!isCrawling) { // crouching
                     spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
-
-                } else {
+                    shadowCaster.localScale = new Vector3(0.5f, 0.4f, 0.5f);
+                } else { // crawling
                     spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
-
+                    // shadowCaster.localScale = new Vector3(0.5f, 0.3f, 0.5f);
+                    shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 }
             } else {
                 state = State.idle;
@@ -174,12 +172,17 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 animator.Play();
             }
         }
+        shadowCaster.localPosition = new Vector3(0f, shadowCaster.localScale.y, 0f);
 
         UpdateFrame();
-        gunAnimation.UpdateView(input);
+        SpriteData torsoSpriteData = gunAnimation.UpdateView(input);
 
         // set rotation to be coplanar with the camera plane
-        transform.rotation = input.cameraRotation;
+        Vector3 directionToCamera = input.directionToCamera;
+        directionToCamera.y = 0f;
+        Quaternion lookTowardCamera = Quaternion.LookRotation(-1f * directionToCamera, Vector3.up);
+        // transform.rotation = input.cameraRotation;
+        transform.rotation = lookTowardCamera;
 
         if (spriteRenderer.flipX) {
             Vector3 headPosition = headAnimation.transform.localPosition;
@@ -202,6 +205,15 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
 
         // set position back to the rotated position.
         headAnimation.transform.position = absoluteWorldPosition;
+
+        gunAnimation.transform.position += 0.001f * directionToCamera;
+        if (torsoSpriteData.headInFrontOfTorso) {
+            headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
+            headAnimation.transform.position += 0.002f * input.directionToCamera;
+        } else {
+            headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
+            headAnimation.transform.position -= 0.002f * input.directionToCamera;
+        }
     }
 
     public void LoadState(PlayerData data) {

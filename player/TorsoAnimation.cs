@@ -24,9 +24,9 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     bool isCrawling;
     GunType gunType;
 
-    void ApplyTorsoSpriteData(AnimationInput input) {
-        if (input.movementSticking)
-            return;
+    SpriteData ApplyTorsoSpriteData(AnimationInput input) {
+        // if (input.movementSticking)
+        //     return null;
 
         int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
         SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
@@ -46,11 +46,14 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         headAnimation.transform.localPosition = offset;
         headAnimation.UpdateView(input, torsoSpriteData);
 
-        if (torsoSpriteData.headInFrontOfTorso) {
-            headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
-        } else {
-            headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
-        }
+        // if (torsoSpriteData.headInFrontOfTorso) {
+        //     headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
+        //     headAnimation.transform.position += 0.002f * input.directionToCamera;
+        // } else {
+        //     headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
+        //     headAnimation.transform.position -= 0.002f * input.directionToCamera;
+        // }
+        return torsoSpriteData;
     }
     void SetState(GunHandler.GunState newState) {
         state = newState;
@@ -66,11 +69,11 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     public void SetBob(int bob) {
         this.bob = bob == 1;
     }
-    public void UpdateView(AnimationInput input) {
+    public SpriteData UpdateView(AnimationInput input) {
         lastInput = input;
 
-        if (input.movementSticking)
-            return;
+        // if (input.movementSticking)
+        //     return;
 
         switch (input.state) {
             default:
@@ -107,7 +110,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         if (!isCrawling && isMoving && isCrouching) {
             isCrawling = true;
         }
-        if (isCrawling && !isCrouching) {
+        if (isCrawling && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
             isCrawling = false;
         }
         gunType = input.gunInput.gunType;
@@ -143,8 +146,8 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
                 SetAnimation(idleAnimation);
             }
         }
-        UpdateFrame();
-        ApplyTorsoSpriteData(input);
+        UpdateFrame(input);
+        return ApplyTorsoSpriteData(input);
     }
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
         if (forcePlay) {
@@ -156,7 +159,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             animator.Play();
         }
     }
-    public void UpdateFrame() {
+    public void UpdateFrame(AnimationInput input) {
         if (skin == null)
             return;
 
