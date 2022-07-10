@@ -995,10 +995,9 @@ fix emoji text
 when spotted, zoom camera out to shows 
 gestural aiming with auto-lock
 aim mode snap to isometric direction
-level intro: ninja-gaiden style runnning footsteps, jump sound, trenchcoat flapping, land
-level intro: pan camera down / up rapidly like megaman style
 don't do outline highlight if i am not the player
 find some fixed relation between distance and depth of field.
+fix camera position in wallpress mode when near edge
 
 UI:
     blink cursor when reaching maximum aim
@@ -1017,3 +1016,8 @@ then NPC AI
 better aim mode: move character to left / right.
 fix clearsighter
 fix jump crouch sound
+
+damage result should be broadcast to all components?
+    this makes a natural fit for sphere AI instead of implementing IDamageReceiver?
+    or IDamageReceiver is good enough.
+enemy gunshots louder

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageableMesh : Damageable {
+public class DamageableMesh : MonoBehaviour, IDamageReceiver {
     Mesh mesh;
     Vector3[] vertices;
     int[] triangles;
@@ -18,7 +18,12 @@ public class DamageableMesh : Damageable {
             hits[i] = false;
         }
         damagePool = PoolManager.I.RegisterPool("prefabs/fx/damageDecal");
-        RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
+        // RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
+    }
+    public void TakeDamage(Damage damage) {
+        if (damage is BulletDamage bullet) {
+            TakeBulletDamage(bullet);
+        }
     }
     protected DamageResult TakeBulletDamage(BulletDamage damage) {
         if (damage.hit.triangleIndex == -1 || hits[damage.hit.triangleIndex]) {

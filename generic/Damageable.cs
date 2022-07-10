@@ -27,7 +27,7 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
             damageHandlers[tType] = wrapper;
         }
     }
-    public virtual void TakeDamage<T>(T damage) where T : Damage {
+    public virtual void TakeDamage(Damage damage) {
         HandleDamage(damage, damage.GetType());
         HandleDamage(damage, typeof(Damage));
     }

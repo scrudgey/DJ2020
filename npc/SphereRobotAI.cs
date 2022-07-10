@@ -185,7 +185,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
         return false;
     }
 
-    public void TakeDamage<T>(T damage) where T : Damage {
+    public void TakeDamage(Damage damage) {
         switch (stateMachine.currentState) {
             case SphereMoveState:
             case SpherePatrolState:

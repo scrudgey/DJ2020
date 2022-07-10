@@ -8,7 +8,7 @@ public class Destructible : Damageable {
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
 
-    override public void TakeDamage<T>(T damage) {
+    override public void TakeDamage(Damage damage) {
         base.TakeDamage(damage);
         if (health <= 0) {
             doDestruct = true;

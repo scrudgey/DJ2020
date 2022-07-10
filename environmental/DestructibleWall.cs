@@ -10,15 +10,10 @@ public class DestructibleWall : Destructible {
             foreach (Gib gib in gibs.gibs) {
                 PoolManager.I.RegisterPool(gib.prefab);
             }
-        RegisterDamageCallback<ExplosionDamage>(DoTakeDamage);
+        RegisterDamageCallback<ExplosionDamage>(TakeExplosionDamage);
     }
 
-    public DamageResult DoTakeDamage(ExplosionDamage damage) {
-        // Vector3 myPosition = transform.position;
-        // if (myCollider != null) {
-        //     myPosition = myCollider.bounds.center;
-        // }
-        // Vector3 force = damage.force;
+    public DamageResult TakeExplosionDamage(ExplosionDamage damage) {
         return new DamageResult {
             damageAmount = damage.amount
         };

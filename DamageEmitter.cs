@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageEmitter : Damageable {
+public class DamageEmitter : IDamageReceiver {
     public float probability = 0.5f;
     public LoHi velocity;
     public GameObject[] particles;
@@ -11,13 +11,11 @@ public class DamageEmitter : Damageable {
         foreach (GameObject particle in particles) {
             pools[particle] = PoolManager.I.RegisterPool(particle);
         }
-        RegisterDamageCallback<BulletDamage>(TakeDamage);
     }
-    public DamageResult TakeDamage(BulletDamage impact) {
-        if (Random.Range(0, 1f) < probability) {
-            Emit(impact);
+    public void TakeDamage(Damage impact) {
+        if (impact is BulletDamage bullet && Random.Range(0, 1f) < probability) {
+            Emit(bullet);
         }
-        return new DamageResult();
     }
     public void Emit(BulletDamage impact) {
         GameObject prefab = particles[Random.Range(0, particles.Length)];
