@@ -11,7 +11,8 @@ public class Glass : Destructible {
     public GameObject glassGibs;
     private PrefabPool glassGibsPool;
     Collider myCollider;
-    public void Awake() {
+    public override void Awake() {
+        base.Awake();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         glassGibsPool = PoolManager.I.RegisterPool(glassGibs);
         myCollider = GetComponent<Collider>();

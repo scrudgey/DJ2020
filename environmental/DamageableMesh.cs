@@ -25,9 +25,9 @@ public class DamageableMesh : MonoBehaviour, IDamageReceiver {
             TakeBulletDamage(bullet);
         }
     }
-    protected DamageResult TakeBulletDamage(BulletDamage damage) {
+    protected void TakeBulletDamage(BulletDamage damage) {
         if (damage.hit.triangleIndex == -1 || hits[damage.hit.triangleIndex]) {
-            return new DamageResult();
+            return;
         } else {
             hits[damage.hit.triangleIndex] = true;
         }
@@ -82,6 +82,5 @@ public class DamageableMesh : MonoBehaviour, IDamageReceiver {
         // mesh.SetUVs(1, uv);
 
         meshFilter.mesh = mesh;
-        return new DamageResult();
     }
 }

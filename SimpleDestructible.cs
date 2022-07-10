@@ -13,7 +13,8 @@ public class SimpleDestructible : Destructible {
             damageAmount = explosion.amount
         };
     }
-    void Awake() {
+    public override void Awake() {
+        base.Awake();
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
         RegisterDamageCallback<ExplosionDamage>(TakeExplosiveDamage);
     }

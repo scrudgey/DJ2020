@@ -7,7 +7,12 @@ public class Destructible : Damageable {
     public float destructionTimer = 5f;
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
-
+    virtual public void Awake() {
+        if (gibs != null)
+            foreach (Gib gib in gibs.gibs) {
+                PoolManager.I.RegisterPool(gib.prefab);
+            }
+    }
     override public void TakeDamage(Damage damage) {
         base.TakeDamage(damage);
         if (health <= 0) {
