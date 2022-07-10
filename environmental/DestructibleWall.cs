@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DestructibleWall : IDestructible {
+public class DestructibleWall : Destructible {
     Collider myCollider;
     void Awake() {
         myCollider = GetComponent<Collider>();

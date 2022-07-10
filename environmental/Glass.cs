@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Glass : IDestructible {
+public class Glass : Destructible {
     public AudioClip[] hitSounds;
     public AudioClip[] destroySounds;
     public AudioSource audioSource;

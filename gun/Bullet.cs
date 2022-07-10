@@ -31,7 +31,7 @@ public class Bullet {
 
         TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
 
-        foreach (IDamageable damageable in hit.transform.GetComponentsInChildren<IDamageable>()) {
+        foreach (IDamageReceiver damageable in hit.transform.GetComponentsInChildren<IDamageReceiver>()) {
             damageable.TakeDamage(bulletDamage);
         }
 

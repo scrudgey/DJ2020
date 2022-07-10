@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 public enum Reaction { ignore, attack, investigate }
 
-public class SphereRobotAI : IBinder<SightCone>, IDamageable, IListener {
+public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
     public SightCone sightCone;
     public NavMeshPath navMeshPath; // TODO: remove this
     public GameObject controllable;

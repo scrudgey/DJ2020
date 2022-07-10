@@ -15,7 +15,7 @@ public class Explosion : MonoBehaviour {
                 rb.AddExplosionForce(power * 20f, explosionPos, radius, 3.0F);
 
             // TODO: unify this with bullet method
-            foreach (IDamageable damageable in hit.GetComponentsInChildren<IDamageable>()) {
+            foreach (IDamageReceiver damageable in hit.GetComponentsInChildren<IDamageReceiver>()) {
                 // TODO: calculate damage at point.
                 damageable.TakeDamage(GetDamageAtPoint(hit.bounds.center));
             }

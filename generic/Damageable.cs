@@ -4,12 +4,12 @@ using UnityEngine;
 public struct DamageResult {
     public float damageAmount;
 }
-public abstract class Damageable : MonoBehaviour, IDamageable {
+public abstract class Damageable : MonoBehaviour, IDamageReceiver {
+    // basic message bus pattern
+
     protected Damage lastDamage;
     protected DamageResult lastResult;
-
     Dictionary<Type, Func<Damage, DamageResult>> damageHandlers = new Dictionary<Type, Func<Damage, DamageResult>>();
-
     protected void RegisterDamageCallback<T>(Func<T, DamageResult> handler) where T : Damage {
         Type tType = typeof(T);
         Func<Damage, DamageResult> wrapper = (Damage damage) => {
@@ -31,7 +31,6 @@ public abstract class Damageable : MonoBehaviour, IDamageable {
         HandleDamage(damage, damage.GetType());
         HandleDamage(damage, typeof(Damage));
     }
-
     void HandleDamage(Damage damage, Type type) {
         if (damageHandlers.ContainsKey(type) && damageHandlers[type] != null) {
             DamageResult result = damageHandlers[type](damage);
