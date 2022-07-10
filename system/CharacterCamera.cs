@@ -345,7 +345,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
 
         return new CameraTargetParameters() {
-            fieldOfView = 45f,
+            fieldOfView = 70f,
             orthographic = false,
             rotation = planarRot,
             deltaTime = input.deltaTime,
@@ -378,7 +378,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
         return new CameraTargetParameters() {
-            fieldOfView = 29f,
+            fieldOfView = 50f,
             orthographic = false,
             rotation = planarRot,
             deltaTime = input.deltaTime,
@@ -426,6 +426,43 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Find the smoothed follow position
         Vector3 followPosition = input.targetPosition + (UnityEngine.Random.insideUnitSphere * shakeJitter);
         _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, followPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
+
+        // Handle obstructions
+        if (input.state == CharacterState.wallPress || state == CameraState.aim) {
+            RaycastHit closestHit = new RaycastHit();
+            closestHit.distance = Mathf.Infinity;
+            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, ObstructionLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < _obstructionCount; i++) {
+                bool isIgnored = false;
+                for (int j = 0; j < IgnoredColliders.Count; j++) {
+                    if (IgnoredColliders[j] == _obstructions[i].collider) {
+                        isIgnored = true;
+                        break;
+                    }
+                }
+                for (int j = 0; j < IgnoredColliders.Count; j++) {
+                    if (IgnoredColliders[j] == _obstructions[i].collider) {
+                        isIgnored = true;
+                        break;
+                    }
+                }
+
+                if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance > 0) {
+                    closestHit = _obstructions[i];
+                }
+            }
+
+            // If obstructions detecter
+            if (closestHit.distance < Mathf.Infinity) {
+                _distanceIsObstructed = true;
+                _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
+            }
+            // If no obstruction
+            else {
+                _distanceIsObstructed = false;
+                _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
+            }
+        }
 
         // Find the smoothed camera orbit position
         Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);

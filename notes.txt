@@ -976,6 +976,8 @@ now we just need to fix the head flipx.
 * slower turn radius when crawling
 * only rotate when moving while crawling
 * make crawl nonuniform speed
+* camera wall clipping
+* crouch, crawl sounds
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -985,20 +987,26 @@ graphical issues:
 tasklookAt returns running, should return success?
 head should look around when in search mode.
 allow independent level data
-proper NPC AI
 prevent extreme zoom maneuvers with lerping
 position call-out
 adjust walk animation speed with movement
-blink cursor when reaching maximum aim
-bigger aim reticle
-combat test arena VR
-glass break fx
-
-crouch, crawl sounds
-camera wall clipping
-less intense wall sticking
-    basically, you should not be able to turn in place.
-        this means rotation is tied to movement
-    when moving, you should move in an arc.
-        this means that movement is in direction of orientation.
+less intense wall sticking?
 fix emoji text
+when spotted, zoom camera out to shows 
+gestural aiming with auto-lock
+aim mode snap to isometric direction
+
+UI:
+    blink cursor when reaching maximum aim
+    bigger aim reticle
+
+graphic / environment
+    combat test arena VR
+    glass break fx
+
+VR environment, 
+then set up combat, 
+then NPC AI
+
+
+

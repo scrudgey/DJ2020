@@ -64,6 +64,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public AudioClip[] jumpPrepSounds;
     public AudioClip[] landingSounds;
     public AudioClip[] crouchingSounds;
+    public AudioClip[] crawlSounds;
     public bool superJumpEnabled;
 
     [Header("Ladder Climbing")]
@@ -139,6 +140,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private Vector3 lookAtDirection;
     private float inputDirectionHeldTimer;
     private float crouchMovementInputTimer;
+    private float crouchMovementSoundTimer;
     private bool inputCrouchDown;
 
     public void TransitionToState(CharacterState newState) {
@@ -359,6 +361,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     crouchMovementInputTimer += Time.deltaTime;
                 } else {
                     crouchMovementInputTimer = 0f;
+                    crouchMovementInputTimer = 1f;
                 }
                 // if (isCrouching && state != CharacterState.wallPress && wallPressTimer == 0f) {
                 //     if (Vector3.Dot(_moveInputVector, direction) < 0.99f) {
@@ -679,10 +682,18 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                         if (inputDirectionHeldTimer > crawlStickiness && crouchMovementInputTimer > 0.3f) {
                             if (targetMovementVelocity != Vector3.zero & !pressingOnWall) {
                                 targetMovementVelocity = direction;
+                                // play sound
+                                crouchMovementSoundTimer += Time.deltaTime;
+                                if (crouchMovementSoundTimer >= 1f) {
+                                    Toolbox.RandomizeOneShot(audioSource, crawlSounds);
+                                    crouchMovementSoundTimer -= 1f;
+                                }
                             }
                             Vector3 initialMovementVelocity = targetMovementVelocity;
                             targetMovementVelocity *= crawlSpeedFraction * Toolbox.SquareWave(crouchMovementInputTimer, dutycycle: 0.75f);
                             targetMovementVelocity += 0.5f * crawlSpeedFraction * initialMovementVelocity;
+
+
                         } else {
                             targetMovementVelocity = Vector3.zero;
                         }
