@@ -275,7 +275,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (!isCrouching) {
                     isCrouching = true;
                     Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
-                    Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
+                    if (input.CrouchDown)
+                        Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
                 }
                 Motor.MaxStepHeight = crawlStepHeight;
             }
