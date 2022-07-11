@@ -5,12 +5,14 @@ using UnityEngine;
 public class SimpleDestructible : Destructible {
     public DamageResult TakeBulletDamage(BulletDamage impact) {
         return new DamageResult {
-            damageAmount = impact.bullet.damage
+            damageAmount = impact.bullet.damage,
+            damage = impact
         };
     }
     public DamageResult TakeExplosiveDamage(ExplosionDamage explosion) {
         return new DamageResult {
-            damageAmount = explosion.amount
+            damageAmount = explosion.amount,
+            damage = explosion
         };
     }
     public override void Awake() {

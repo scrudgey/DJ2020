@@ -1,23 +1,17 @@
 using UnityEngine;
 
 public class Destructible : Damageable {
-    public Gibs gibs;
     public float health;
     private bool doDestruct;
     public float destructionTimer = 5f;
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
-    virtual public void Awake() {
-        if (gibs != null)
-            foreach (Gib gib in gibs.gibs) {
-                PoolManager.I.RegisterPool(gib.prefab);
-            }
-    }
-    override public void TakeDamage(Damage damage) {
-        base.TakeDamage(damage);
+    override public DamageResult TakeDamage(Damage damage) {
+        DamageResult result = base.TakeDamage(damage);
         if (health <= 0) {
             doDestruct = true;
         }
+        return result;
     }
     protected override void ApplyDamageResult(DamageResult result) {
         base.ApplyDamageResult(result);
@@ -32,12 +26,11 @@ public class Destructible : Damageable {
     }
 
     virtual protected void Destruct(Damage damage) {
-        Collider myCollider = GetComponentInChildren<Collider>();
         Destroy(transform.parent.gameObject, destructionTimer);
         TagSystemData data = Toolbox.GetTagData(gameObject);
         data.targetPriority = -1;
 
-        gibs?.Emit(gameObject, damage, myCollider);
+        gibs?.EmitOnDamage(gameObject, damage, myCollider);
         foreach (GameObject fx in destructionFx) {
             GameObject.Instantiate(fx, transform.position, Quaternion.identity);
         }

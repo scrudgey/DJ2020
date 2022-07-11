@@ -185,7 +185,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
         return false;
     }
 
-    public void TakeDamage(Damage damage) {
+    public DamageResult TakeDamage(Damage damage) {
         switch (stateMachine.currentState) {
             case SphereMoveState:
             case SpherePatrolState:
@@ -196,6 +196,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
                     ChangeState(new SearchDirectionState(this, damage));
                 break;
         }
+        return DamageResult.NONE;
     }
 
     public void HearNoise(NoiseComponent noise) {

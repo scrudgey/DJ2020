@@ -12,10 +12,11 @@ public class DamageEmitter : IDamageReceiver {
             pools[particle] = PoolManager.I.RegisterPool(particle);
         }
     }
-    public void TakeDamage(Damage impact) {
+    public DamageResult TakeDamage(Damage impact) {
         if (impact is BulletDamage bullet && Random.Range(0, 1f) < probability) {
             Emit(bullet);
         }
+        return DamageResult.NONE;
     }
     public void Emit(BulletDamage impact) {
         GameObject prefab = particles[Random.Range(0, particles.Length)];

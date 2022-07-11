@@ -1,3 +1,3 @@
 public interface IDamageReceiver {
-    abstract public void TakeDamage(Damage damage);
+    abstract public DamageResult TakeDamage(Damage damage);
 }

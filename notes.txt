@@ -1021,3 +1021,58 @@ damage result should be broadcast to all components?
     this makes a natural fit for sphere AI instead of implementing IDamageReceiver?
     or IDamageReceiver is good enough.
 enemy gunshots louder
+
+
+character hurtable
+blood splatter on hit
+hit reaction animation / graphic
+hitstun for NPCs
+temp invulnerability for player character
+syndicate-style blowback deaths
+gibs from explosions
+interface for designing multiple scenarios
+    danger room
+
+first encounter: how to handle impact effects?
+impact effect is a result of :
+    1. the thing doing the impacting
+        bullet vs. fist vs. incendiary bullet 
+    2. the thing being impacted
+        wall (no damageable) : spark
+        humanoid : blood
+        robot : spark
+    3. the damage result:
+        impact : bleed
+        block : none
+
+the damageable takes the damage and returns some information to the damager?
+the damager then does something with that?
+    but what about bleeding?
+
+where do we handle the impact?
+no component (bullet default) vs.
+damageable vs.
+destructible vs.
+characterhurtable
+
+
+how to structure impact fx, damage fx, impact audio
+    similar filter on damage type, result 
+
+how can we do damage conditional without damagetype?
+damageconditional can be defined in code with pattern matching.
+so when we destruct, we can select on gibs here?
+when we are impacted, we can select on gibs here?
+how to integrate with unity editor?
+
+
+one set of gibs
+some are marked for impact, some are marked for destruction
+damage type conditional still applies
+impact gibs take a damageresult
+    filter on damage result here: damage result conditional
+destruction gibs take a damage
+    filter on damage type here: damage conditional
+
+
+damage result addition is weird

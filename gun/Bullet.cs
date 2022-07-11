@@ -31,8 +31,13 @@ public class Bullet {
 
         TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
 
-        foreach (IDamageReceiver damageable in hit.transform.GetComponentsInChildren<IDamageReceiver>()) {
-            damageable.TakeDamage(bulletDamage);
+        DamageResult result = DamageResult.NONE;
+        foreach (IDamageReceiver receiver in hit.transform.GetComponentsInChildren<IDamageReceiver>()) {
+            if (receiver is Damageable damageable) {
+                result = result.Add(damageable.TakeDamage(bulletDamage));
+            } else {
+                receiver.TakeDamage(bulletDamage);
+            }
         }
 
         Rigidbody body = hit.transform.GetComponent<Rigidbody>();
@@ -41,8 +46,6 @@ public class Bullet {
         }
 
         if (!tagData.bulletPassthrough) {
-            // TODO: these effects should be data-driven
-
             // spawn decal
             if (!tagData.noDecal) {
                 GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.normal);
@@ -50,6 +53,7 @@ public class Bullet {
             }
 
             // spawn sparks
+            // TODO: this should be data driven in some way.
             GameObject.Instantiate(
                 Resources.Load("prefabs/fx/impactSpark"),
                 hit.point + (hit.normal * 0.025f),

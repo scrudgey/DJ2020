@@ -1,20 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/Gibs")]
 public class Gibs : ScriptableObject {
     public List<Gib> gibs;
-    public void Emit(GameObject host, Damage damage, Collider bounds) {
-        foreach (Gib gib in gibs) {
+    public void EmitOnDamage(GameObject host, Damage damage, Collider bounds) =>
+        gibs.Where(gib =>
+            !gib.impact &&
+            gib.damageConditional.ConditionIsMet(damage))
+        .ToList()
+        .ForEach(gib => {
             gib.Emit(host, damage, bounds);
-        }
-    }
+        });
+    public void EmitOnImpact(GameObject host, DamageResult result, Collider bounds) =>
+        gibs.Where(gib =>
+            gib.impact &&
+            gib.impactConditional.ConditionIsMet(result))
+        .ToList()
+        .ForEach(gib => {
+            gib.Emit(host, result.damage, bounds);
+        });
 }
 public enum GibType { normal, particleEffect }
 
 [System.Serializable]
 public class Gib {
+    public DamageConditional damageConditional;
+    public DamageResultConditional impactConditional;
+    public bool impact;
     public GibType type;
     public LoHi number;
     public GameObject prefab;

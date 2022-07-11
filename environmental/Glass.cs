@@ -10,7 +10,6 @@ public class Glass : Destructible {
     public List<GameObject> decals = new List<GameObject>();
     public GameObject glassGibs;
     private PrefabPool glassGibsPool;
-    Collider myCollider;
     public override void Awake() {
         base.Awake();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -26,12 +25,14 @@ public class Glass : Destructible {
 
         Toolbox.AudioSpeaker(damage.hit.point, hitSounds);
         return new DamageResult {
-            damageAmount = damage.amount
+            damageAmount = damage.amount,
+            damage = damage
         };
     }
     public DamageResult TakeExplosionDamage(ExplosionDamage explosion) {
         return new DamageResult {
-            damageAmount = explosion.amount
+            damageAmount = explosion.amount,
+            damage = explosion
         };
     }
 

@@ -20,10 +20,11 @@ public class DamageableMesh : MonoBehaviour, IDamageReceiver {
         damagePool = PoolManager.I.RegisterPool("prefabs/fx/damageDecal");
         // RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
     }
-    public void TakeDamage(Damage damage) {
+    public DamageResult TakeDamage(Damage damage) {
         if (damage is BulletDamage bullet) {
             TakeBulletDamage(bullet);
         }
+        return DamageResult.NONE;
     }
     protected void TakeBulletDamage(BulletDamage damage) {
         if (damage.hit.triangleIndex == -1 || hits[damage.hit.triangleIndex]) {
