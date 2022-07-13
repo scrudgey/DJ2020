@@ -188,7 +188,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         NoiseData noiseData = gunInstance.GetShootNoise();
         noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
-        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.shootSounds));
+        // audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.shootSounds));
         Toolbox.Noise(gunPosition(), noiseData);
 
         // flash

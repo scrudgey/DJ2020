@@ -1,4 +1,6 @@
 public struct DamageResult {
+    public enum Type { impact, blocked, none }
+    public Type type;
     public float damageAmount;
     public Damage damage;
 
@@ -10,6 +12,7 @@ public struct DamageResult {
     }
 
     public readonly static DamageResult NONE = new DamageResult() {
-        damage = Damage.NONE
+        damage = Damage.NONE,
+        type = Type.none
     };
 }

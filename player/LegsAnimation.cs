@@ -30,6 +30,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public float trailInterval = 0.05f;
     public TorsoAnimation gunAnimation;
     public HeadAnimation headAnimation;
+    public Vector3 offset;
+    public Vector3 scaleOffset;
     bool isMoving;
     bool isCrouching;
     bool isCrawling;
@@ -86,7 +88,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             scaleFactor = (float)PennerDoubleAnimation.BounceEaseIn(crouchTransitionTimer, 1.1f, -0.1f, 0.1f);
         }
         Vector3 scale = new Vector3(1f, scaleFactor, 1f) * 2.5f;
-        transform.localScale = scale;
+        transform.localScale = scale + scaleOffset;
         switch (input.state) {
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
@@ -173,6 +175,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             }
         }
         shadowCaster.localPosition = new Vector3(0f, shadowCaster.localScale.y - 0.05f, 0f);
+        spriteRenderer.transform.localPosition += offset;
 
         UpdateFrame();
         SpriteData torsoSpriteData = gunAnimation.UpdateView(input);

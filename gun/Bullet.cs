@@ -47,18 +47,19 @@ public class Bullet {
 
         if (!tagData.bulletPassthrough) {
             // spawn decal
+            // TODO: make this data driven
             if (!tagData.noDecal) {
                 GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.normal);
                 decalObject.transform.SetParent(hit.collider.transform, true);
             }
 
-            // spawn sparks
-            // TODO: this should be data driven in some way.
-            GameObject.Instantiate(
-                Resources.Load("prefabs/fx/impactSpark"),
-                hit.point + (hit.normal * 0.025f),
-                Quaternion.LookRotation(hit.normal)
-                );
+            // spawn sparks by default
+            if (result.Equals(DamageResult.NONE))
+                GameObject.Instantiate(
+                    Resources.Load("prefabs/fx/impactSpark"),
+                    hit.point + (hit.normal * 0.025f),
+                    Quaternion.LookRotation(hit.normal)
+                    );
 
             return true;
         }

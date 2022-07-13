@@ -6,6 +6,11 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/Gibs")]
 public class Gibs : ScriptableObject {
     public List<Gib> gibs;
+    void Awake() {
+        foreach (Gib gib in gibs) {
+            PoolManager.I.RegisterPool(gib.prefab);
+        }
+    }
     public void EmitOnDamage(GameObject host, Damage damage, Collider bounds) =>
         gibs.Where(gib =>
             !gib.impact &&
@@ -66,7 +71,8 @@ public class Gib {
         direction = (dispersion.Random() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
         direction = direction.normalized * velocity.Random();
 
-        rigidbody.AddForce(direction, ForceMode.Force);
+        if (rigidbody != null)
+            rigidbody.AddForce(direction, ForceMode.Force);
     }
 
 }

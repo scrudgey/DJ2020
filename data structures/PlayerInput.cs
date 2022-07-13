@@ -35,6 +35,7 @@ public struct PlayerInput {
     public Vector3 orientTowardDirection; // used only by sphere
     public Vector3 lookAtDirection;
     public Vector3 lookAtPosition;
+    public bool snapToLook;
     public Vector3 torque;
     public bool preventWallPress;
     public Vector2 zoomInput;

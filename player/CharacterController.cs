@@ -352,6 +352,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (input.Fire.AimPressed) {
                     snapToDirection = lookAtDirection;
                 }
+                if (input.snapToLook) {
+                    if (input.lookAtPosition != Vector3.zero) {
+                        snapToDirection = input.lookAtPosition - transform.position;
+                    }
+                    if (input.lookAtDirection != Vector3.zero) {
+                        snapToDirection = input.lookAtDirection;
+                    }
+                }
 
                 // Jumping input
                 if (input.jumpReleased) {
