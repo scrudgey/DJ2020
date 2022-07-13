@@ -37,6 +37,7 @@ VertexOutput vert(VertexInput input)
 	VertexOutput output;
 	
 	UNITY_SETUP_INSTANCE_ID(input);
+    // UNITY_TRANSFER_INSTANCE_ID(v, output);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 	
 	output.pos = calculateLocalPos(input.vertex);	
@@ -53,10 +54,6 @@ VertexOutput vert(VertexInput input)
 ////////////////////////////////////////
 // Fragment program
 //
-
-
-
-
 fixed4 frag(VertexOutput input) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);

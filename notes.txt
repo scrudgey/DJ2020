@@ -1040,10 +1040,13 @@ damage result addition is weird
 
 blood particle effects
 blood pooling
+scale blood splatter random
 blood splatter
 hurtable impact
     turn to face bullet
     shake
     hitstun
 
-fix unlit billboarding
+* fix unlit billboarding
+look direction not working
+shader logic for unlit vs. lit.

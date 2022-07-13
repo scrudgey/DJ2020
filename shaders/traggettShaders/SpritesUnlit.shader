@@ -31,7 +31,7 @@ Shader "Sprite (Unlit)"
 	
 	SubShader
 	{
-		Tags { "Queue"="Transparent" "RenderType"="Sprite" "AlphaDepth"="False" "CanUseSpriteAtlas"="True" "IgnoreProjector"="True" }
+		Tags { "Queue"="Transparent" "RenderType"="Sprite" "AlphaDepth"="False" "CanUseSpriteAtlas"="True" "IgnoreProjector"="True" "DisableBatching"="True"}
 		LOD 100
 		
 		Pass
@@ -44,6 +44,8 @@ Shader "Sprite (Unlit)"
 			Lighting Off
 			
 			CGPROGRAM			
+				#pragma target 3.0
+
 				#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
 				#pragma shader_feature _ALPHA_CLIP
 				#pragma shader_feature _TEXTURE_BLEND
@@ -76,6 +78,8 @@ Shader "Sprite (Unlit)"
 			Lighting Off
 			
 			CGPROGRAM
+				#pragma target 3.0
+
                 #pragma shader_feature _BILLBOARD
 
 				#pragma fragmentoption ARB_precision_hint_fastest

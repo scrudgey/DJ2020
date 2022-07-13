@@ -23,8 +23,6 @@ public class AnimateFrames : MonoBehaviour {
         animationTimer += Time.deltaTime;
         if (animationTimer > frameTime) {
             frameIndex += 1;
-            animationTimer = 0f;
-            spriteRenderer.sprite = frames[frameIndex];
             if (frameIndex == frames.Count) {
                 frameIndex = 0;
                 if (destroyOnFinished) {
@@ -35,6 +33,8 @@ public class AnimateFrames : MonoBehaviour {
                         audioSource.PlayOneShot(flipSound);
                 }
             }
+            animationTimer = 0f;
+            spriteRenderer.sprite = frames[frameIndex];
         }
     }
 }
