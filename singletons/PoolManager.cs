@@ -7,11 +7,14 @@ public class PrefabPool {
     private int maxConcurrentObjects = 100;
     private Queue<GameObject> objectsInPool;
     private Queue<GameObject> objectsActiveInWorld;
-    public PrefabPool(string prefabPath) {
+    public PrefabPool(string prefabPath, int poolSize = 100) {
         this.prefab = Resources.Load(prefabPath) as GameObject;
+        this.maxConcurrentObjects = poolSize;
     }
-    public PrefabPool(GameObject prefab) {
+    public PrefabPool(GameObject prefab, int poolSize = 100) {
         this.prefab = prefab;
+        this.maxConcurrentObjects = poolSize;
+
     }
     protected GameObject InstantiatePrefab() {
         GameObject obj = GameObject.Instantiate(prefab);
@@ -93,10 +96,11 @@ public class PrefabPool {
 public class PoolManager : Singleton<PoolManager> {
     private Dictionary<GameObject, PrefabPool> prefabPools = new Dictionary<GameObject, PrefabPool>();
 
-    public enum DecalType { normal, glass }
+    public enum DecalType { normal, glass, blood }
     public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
         {DecalType.normal, "sprites/particles/bulletholes_normal"},
-        {DecalType.glass, "sprites/particles/bulletholes_glass"}
+        {DecalType.glass, "sprites/particles/bulletholes_glass"},
+        {DecalType.blood, "sprites/particles/blood_decal"}
     };
     private static readonly Dictionary<DecalType, Sprite[]> decalSprites = new Dictionary<DecalType, Sprite[]>();
     void Awake() {
@@ -104,17 +108,18 @@ public class PoolManager : Singleton<PoolManager> {
             decalSprites[kvp.Key] = Resources.LoadAll<Sprite>(kvp.Value) as Sprite[];
         }
         RegisterPool("prefabs/fx/bullethole");
+        RegisterPool("prefabs/fx/blood_decal", poolSize: 5);
     }
-    public PrefabPool RegisterPool(string prefabPath) {
+    public PrefabPool RegisterPool(string prefabPath, int poolSize = 100) {
         GameObject prefab = Resources.Load(prefabPath) as GameObject;
-        return RegisterPool(prefab);
+        return RegisterPool(prefab, poolSize: poolSize);
     }
-    public PrefabPool RegisterPool(GameObject prefab) {
+    public PrefabPool RegisterPool(GameObject prefab, int poolSize = 100) {
         if (prefabPools.ContainsKey(prefab)) {
             return prefabPools[prefab];
         }
         // Debug.Log($"initializing prefabpool for {prefab}");
-        PrefabPool pool = new PrefabPool(prefab);
+        PrefabPool pool = new PrefabPool(prefab, poolSize: poolSize);
         prefabPools[prefab] = pool;
         pool.InitializePool();
         return pool;
@@ -158,7 +163,7 @@ public class PoolManager : Singleton<PoolManager> {
         }
     }
     public GameObject CreateDecal(RaycastHit hit, DecalType type) {
-        PrefabPool pool = GetPool("prefabs/fx/bullethole");
+        PrefabPool pool = GetPool("prefabs/fx/bullethole"); // TODO: fix?
         GameObject decal = pool.GetObject(hit.point + (hit.normal * 0.025f));
         if (decal != null) {
             RandomizeSprite decalRandomizer = decal.GetComponent<RandomizeSprite>();

@@ -1032,14 +1032,14 @@ Phillip K Dick: A reality where the savior had returned.
 * look direction not working
 * blood particle effects
 * ejected in the direction of the bullet
+* blood splat on walls
+- hit reaction animation / graphic ?
 
 gibs from explosions
 interface for designing multiple scenarios
     danger room
 
 blood pooling
-hit reaction animation / graphic 
-blood splat on walls
 death blowback
 impact knockback
     slide, kneel, get up?
@@ -1047,7 +1047,8 @@ corpse
 hurtable impact
     * turn to face bullet
     * shake
-    hitstun for NPC
+    hitstun for NPC 
+        message system ? revisit this
     temp invuln for player
 
 graphics:
@@ -1062,3 +1063,4 @@ damage result addition is weird
 verify that sparks still work properly
 object pooling for particle effects
 support mixers in setupaudiosource
+fix bullethole prefab / material / decal system

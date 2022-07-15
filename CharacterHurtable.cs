@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CharacterHurtable : Destructible {
     private HitState _hitState;
+    public float wallDecalDistance = 1f;
+    public float wallDecalProbability = 0.2f;
+
     public HitState hitState {
         get { return _hitState; }
         set {
@@ -37,6 +41,8 @@ public class CharacterHurtable : Destructible {
             StopCoroutine(shakeRoutine);
         shakeRoutine = StartCoroutine(Shake(0.05f, 0.15f));
 
+        CheckWallDecal(damage);
+
         return new DamageResult {
             damageAmount = damage.amount,
             damage = damage
@@ -63,5 +69,21 @@ public class CharacterHurtable : Destructible {
         }
         legsAnimation.offset = Vector3.zero;
         legsAnimation.scaleOffset = Vector3.zero;
+    }
+
+    public void CheckWallDecal(BulletDamage damage) {
+        if (Random.Range(0f, 1f) > wallDecalProbability)
+            return;
+        Ray ray = new Ray(damage.position, damage.direction);
+        RaycastHit[] hits = Physics.RaycastAll(ray, wallDecalDistance, LayerUtil.GetMask(Layer.def, Layer.obj));
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            if (hit.transform.IsChildOf(transform.root))
+                continue;
+            TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
+            if (tagData.bulletPassthrough) continue;
+            GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.blood);
+            Debug.Log("blood decal create");
+            break;
+        }
     }
 }
