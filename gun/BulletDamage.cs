@@ -6,5 +6,6 @@ public class BulletDamage : Damage {
     public BulletDamage(Bullet bullet, RaycastHit hit) : base(bullet.damage, bullet.ray.direction, hit.point) {
         this.bullet = bullet;
         this.hit = hit;
+        this.direction = bullet.ray.direction;
     }
 }

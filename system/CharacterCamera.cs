@@ -577,7 +577,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         } else {
             // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
             float distance = 0;
-            Vector3 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
+
+            Vector3 origin = Vector3.zero;
+            if (GameManager.I.playerObject != null) {
+                origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
+            }
+
             Plane plane = new Plane(Vector3.up, origin);
             if (plane.Raycast(clickRay, out distance)) {
                 targetPoint = clickRay.GetPoint(distance);

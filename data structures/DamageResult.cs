@@ -7,7 +7,8 @@ public struct DamageResult {
     public DamageResult Add(DamageResult other) {
         return new DamageResult {
             damageAmount = damageAmount + other.damageAmount,
-            damage = other.damage
+            // damage = other.damage
+            damage = damage
         };
     }
 

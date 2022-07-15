@@ -3,6 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterHurtable : Destructible {
+    private HitState _hitState;
+    public HitState hitState {
+        get { return _hitState; }
+        set {
+            // if value has changed, send a message:
+            if (value != _hitState) {
+                _hitState = value;
+                MessageHitStun message = new MessageHitStun();
+                message.hitState = value;
+                Toolbox.SendMessage(gameObject, this, message);
+            }
+        }
+    }
     public CharacterController controller;
     public LegsAnimation legsAnimation;
     Coroutine shakeRoutine;

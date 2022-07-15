@@ -2,17 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RandomizeScale : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+public class RandomizeScale : MonoBehaviour {
+    public LoHi scale;
+    void Start() {
+        DoRandomize();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+    void DoRandomize() {
+        transform.localScale = scale.Random() * Vector3.one;
+        Destroy(this);
     }
 }

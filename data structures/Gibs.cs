@@ -41,16 +41,23 @@ public class Gib {
     public LoHi velocity;
     public LoHi dispersion;
     public float directional = 1f;
+    public float probability = 1f;
     public void Emit(GameObject host, Damage damage, Collider collider) {
-        if (type == GibType.normal) {
-            EmitParticle(damage, collider);
-        } else if (type == GibType.particleEffect) {
-            EmitParticleSystem(host, damage, collider);
+        if (probability == 1f || Random.Range(0f, 1f) <= probability) {
+            if (type == GibType.normal) {
+                EmitParticle(damage, collider);
+            } else if (type == GibType.particleEffect) {
+                EmitParticleSystem(host, damage, collider);
+            }
         }
     }
     void EmitParticleSystem(GameObject host, Damage damage, Collider collider) {
-        GameObject fx = GameObject.Instantiate(prefab, collider.bounds.center, Quaternion.identity);
+        Vector3 direction = (directional * damage.direction) + ((1 - directional) * Vector3.up);
+        direction = (dispersion.Random() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
+        GameObject fx = PoolManager.I.GetPool(prefab).GetObject(collider.bounds.center);
         fx.transform.SetParent(host.transform, true);
+        fx.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+        fx.transform.position = damage.position;
     }
     void EmitParticle(Damage damage, Collider bounds) {
         int num = (int)number.Random();
@@ -60,8 +67,8 @@ public class Gib {
     }
     void DoEmit(Damage damage, Collider bounds) {
         Vector3 position = Toolbox.RandomInsideBounds(bounds);
-        Vector3 force = damage.force;
-        DoEmit(position, force);
+        Vector3 direction = damage.direction;
+        DoEmit(position, direction);
     }
     void DoEmit(Vector3 position, Vector3 inDirection) {
         GameObject bit = PoolManager.I.GetPool(prefab).GetObject(position);

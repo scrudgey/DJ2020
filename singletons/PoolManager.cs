@@ -148,6 +148,8 @@ public class PoolManager : Singleton<PoolManager> {
         GameObject prefab = Resources.Load(prefabPath) as GameObject;
         return GetPool(prefab);
     }
+
+    // TODO: refactor, use Instantiate syntax.
     public PrefabPool GetPool(GameObject prefab) {
         if (prefabPools.ContainsKey(prefab)) {
             return prefabPools[prefab];

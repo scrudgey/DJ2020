@@ -4,7 +4,7 @@ public class Damage {
     public float amount;
     public Vector3 direction;
     public Vector3 position;
-    public Vector3 force;
+    public Vector3 force;   // TODO: difference between force and direction?
     public Damage(float amount, Vector3 direction, Vector3 position) {
         this.amount = amount;
         this.direction = direction;

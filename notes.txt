@@ -1024,29 +1024,41 @@ enemy gunshots louder
 
 Phillip K Dick: A reality where the savior had returned.
 
-character hurtable
-blood splatter on hit
-hit reaction animation / graphic
-hitstun for NPCs
-temp invulnerability for player character
-syndicate-style blowback deaths
+* character hurtable
+* blood splatter on hit
+* scale blood splatter random
+* blood splatter
+* fix unlit billboarding
+* look direction not working
+* blood particle effects
+* ejected in the direction of the bullet
+
 gibs from explosions
 interface for designing multiple scenarios
     danger room
 
-damage result addition is weird
-
-
-
-blood particle effects
 blood pooling
-scale blood splatter random
-blood splatter
+hit reaction animation / graphic 
+blood splat on walls
+death blowback
+impact knockback
+    slide, kneel, get up?
+corpse
 hurtable impact
-    turn to face bullet
-    shake
-    hitstun
+    * turn to face bullet
+    * shake
+    hitstun for NPC
+    temp invuln for player
 
-* fix unlit billboarding
-look direction not working
-shader logic for unlit vs. lit.
+graphics:
+    impact animation
+    blood particle
+    death graphic
+    corpse graphic
+
+put player audio source on a separate mix from other audio sources
+guard can't see over midheight obstacle
+damage result addition is weird
+verify that sparks still work properly
+object pooling for particle effects
+support mixers in setupaudiosource

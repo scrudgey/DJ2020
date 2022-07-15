@@ -188,6 +188,7 @@ public class Toolbox {
     }
 
     public static AudioSource SetUpAudioSource(GameObject g) {
+        // TODO: support sound mixers
         AudioSource source = GetOrCreateComponent<AudioSource>(g);
         if (sfxMixer == null) {
             sfxMixer = Resources.Load("mixers/SoundEffectMixer") as AudioMixer;
@@ -309,15 +310,34 @@ public class Toolbox {
         return a.CompareTo(b) >= 0 ? a : b;
     }
 
-    // static public float SquareWave(float currentphase) {
-    //     return (1 + Mathf.Sign(Mathf.Sin(currentphase * 2f * (float)Math.PI))) / 2f;
-    // }
-
     static public float SquareWave(float currentphase, float dutycycle = 0f) {
         // dutycyle: [-1, 1] float
         // -1: constant 0
         // +1: constant 1
         return (1 + Mathf.Sign(Mathf.Sin(currentphase * 2f * (float)Math.PI) + dutycycle)) / 2f;
+    }
+
+
+    public static void SendMessage(GameObject host, Component messenger, Message message, bool sendUpwards = false) {
+        message.messenger = messenger;
+        // TODO: do not propagate all the way to held objects
+        HashSet<MessageRouter> routers = ChildRouters(host);
+        if (sendUpwards) {
+            foreach (MessageRouter superRouter in host.GetComponentsInParent<MessageRouter>()) {
+                routers.Add(superRouter);
+            }
+        }
+        foreach (MessageRouter router in routers) {
+            router.ReceiveMessage(message);
+        }
+    }
+    public static void RegisterMessageCallback<T>(Component component, Action<T> handler) where T : Message {
+        MessageRouter router = GetOrCreateComponent<MessageRouter>(component.gameObject);
+        router.Subscribe<T>(handler);
+    }
+    public static HashSet<MessageRouter> ChildRouters(GameObject host) {
+        HashSet<MessageRouter> routers = new HashSet<MessageRouter>(host.GetComponentsInChildren<MessageRouter>());
+        return routers;
     }
 }
 
