@@ -8,6 +8,7 @@ public struct PlayerInput {
         public bool AimPressed;
         public bool FireHeld;
         public CursorData cursorData;
+        public bool skipAnimation;
         public static FireInputs none = new FireInputs {
             cursorData = CursorData.none
         };

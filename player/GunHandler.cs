@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInputReceiver {
     public enum GunState {
         idle,
         shooting,
@@ -346,7 +346,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
             Reload();
         }
     }
-    public void SetInputs(PlayerInput input, bool skipAnimation = false) {
+    public void SetInputs(PlayerInput input) {
         inputMode = input.inputMode;
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
@@ -392,7 +392,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable {
         }
         OnValueChanged?.Invoke(this);
 
-        if (skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.cooldownTimer <= 0)
+        if (input.Fire.skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.cooldownTimer <= 0)
             ShootImmediately(input.Fire.cursorData);
     }
 

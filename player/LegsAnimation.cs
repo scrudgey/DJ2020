@@ -16,6 +16,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         climb
     }
     State state;
+    HitState hitState;
     private int frame;
     public SpriteRenderer spriteRenderer;
     public Transform shadowCaster;
@@ -39,7 +40,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
 
     void Start() {
         // TODO: fix
-        // GameManager.OnFocusChanged += Bind;
         Bind(target.gameObject);
     }
 
@@ -69,6 +69,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         if (input.movementSticking)
             return;
         crouchTransitionTimer += Time.deltaTime;
+        hitState = input.hitState;
 
         // set direction
         direction = input.orientation;
@@ -90,6 +91,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         Vector3 scale = new Vector3(1f, scaleFactor, 1f) * 2.5f;
         transform.localScale = scale + scaleOffset;
         switch (input.state) {
+            case CharacterState.dead:
+                break;
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
                 if (trailTimer > trailInterval) {
@@ -120,7 +123,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
 
-        if (input.isMoving) { //
+        if (input.hitState == HitState.dead) {
+            animator.Stop();
+        } else if (input.isMoving) {
             if (input.isJumping) {
                 state = State.jump;
             } else if (input.isClimbing) {
@@ -132,7 +137,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
                 shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 shadowCaster.rotation = Quaternion.LookRotation(transform.right, transform.up);
-            } else {
+            } else if (true) {
                 state = State.walk;
             }
 
@@ -228,6 +233,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         octet = skin.GetCurrentLegsOctet(state);
         if (isCrawling) {
             octet = skin.legsCrawl;
+        }
+        if (hitState == HitState.dead) {
+            octet = skin.legsDead;
         }
         Sprite[] sprites = octet[direction];
         frame = Math.Min(frame, sprites.Length - 1);

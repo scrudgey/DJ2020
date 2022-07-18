@@ -25,9 +25,6 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     GunType gunType;
 
     SpriteData ApplyTorsoSpriteData(AnimationInput input) {
-        // if (input.movementSticking)
-        //     return null;
-
         int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
         SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
             GunType.unarmed => skin.unarmedSpriteData,
@@ -37,7 +34,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
             _ => skin.unarmedSpriteData
         };
-        if (input.isCrouching && input.isMoving) { // crawling
+        if ((input.isCrouching && input.isMoving) || input.hitState == HitState.dead) { // crawling
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
         SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
@@ -45,14 +42,6 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
         headAnimation.transform.localPosition = offset;
         headAnimation.UpdateView(input, torsoSpriteData);
-
-        // if (torsoSpriteData.headInFrontOfTorso) {
-        //     headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
-        //     headAnimation.transform.position += 0.002f * input.directionToCamera;
-        // } else {
-        //     headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
-        //     headAnimation.transform.position -= 0.002f * input.directionToCamera;
-        // }
         return torsoSpriteData;
     }
     void SetState(GunHandler.GunState newState) {
@@ -72,10 +61,9 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     public SpriteData UpdateView(AnimationInput input) {
         lastInput = input;
 
-        // if (input.movementSticking)
-        //     return;
-
         switch (input.state) {
+            case CharacterState.dead:
+                break;
             default:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {
@@ -114,7 +102,9 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             isCrawling = false;
         }
         gunType = input.gunInput.gunType;
-        if (input.gunInput.hasGun) {
+        if (input.hitState == HitState.dead) {
+            animator.Stop();
+        } else if (input.gunInput.hasGun) {
             switch (state) {
                 case GunHandler.GunState.shooting:
                     SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
@@ -174,6 +164,9 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
                     _sprites = skin.gunCrouchSprites(gunType);
                 }
             }
+        }
+        if (input.hitState == HitState.dead) {
+            _sprites = skin.unarmedDead;
         }
         if (_sprites == null)
             return;

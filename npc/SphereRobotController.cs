@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class SphereRobotController : MonoBehaviour, ICharacterController, IBindable<SphereRobotController>, IInputReceiver { //}, ISaveable {
+    public GunHandler gunHandler;
+
     [Header("Stable Movement")]
     public float MaxStableMoveSpeed = 10f;
     public float StableMovementSharpness = 15;
@@ -17,6 +19,14 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     Vector3 targetDirection;
     private void Start() {
         Motor.CharacterController = this;
+
+        // TODO: remove?
+
+        gunHandler.primary = new GunInstance(Gun.Load("smg"));
+        gunHandler.SwitchToGun(1);
+        gunHandler.Reload();
+        gunHandler.ClipIn();
+        gunHandler.Rack();
     }
 
     public Action<SphereRobotController> OnValueChanged { get; set; }
@@ -51,6 +61,10 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
             }
             Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
         }
+
+        input.Fire.skipAnimation = true;
+        gunHandler.ProcessGunSwitch(input);
+        gunHandler.SetInputs(input);
     }
 
     /// <summary>

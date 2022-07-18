@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using KinematicCharacterController;
 using UnityEngine;
-
 public enum CharacterState {
     normal,
     wallPress,
@@ -12,6 +12,7 @@ public enum CharacterState {
     jumpPrep,
     superJump,
     landStun,
+    dead
 }
 public enum ClimbingState {
     Anchoring,
@@ -19,8 +20,9 @@ public enum ClimbingState {
     DeAnchoring
 }
 
-public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver {
+public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber {
     public KinematicCharacterMotor Motor;
+    public CharacterHurtable characterHurtable;
     public CharacterCamera OrbitCamera;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
@@ -109,9 +111,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public CharacterState state {
         get { return _state; }
     }
+    public HitState hitState { get; set; }
 
     // Ladder vars
-
     private float _ladderUpDownInput;
     private Ladder _activeLadder { get; set; }
     private ClimbingState _internalClimbingState;
@@ -142,6 +144,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private float crouchMovementInputTimer;
     private float crouchMovementSoundTimer;
     private bool inputCrouchDown;
+    private Vector3 deadMoveVelocity;
+    private float deadTimer;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -179,8 +183,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 _ladderTargetRotation = _activeLadder.transform.rotation;
                 Toolbox.RandomizeOneShot(audioSource, _activeLadder.sounds);
                 break;
+            case CharacterState.dead:
+                break;
         }
     }
+
     public void OnStateExit(CharacterState state, CharacterState toState) {
         switch (state) {
             default:
@@ -199,11 +206,28 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
         }
     }
-
     private void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         // Assign to motor
         Motor.CharacterController = this;
+        characterHurtable.OnHitStateChanged += HandleHurtableChanged;
+    }
+    void OnDestroy() {
+        characterHurtable.OnHitStateChanged -= HandleHurtableChanged;
+    }
+    private void HandleHurtableChanged(Destructible hurtable) {
+        ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);
+        deadMoveVelocity = hurtable.lastDamage.direction;
+    }
+    public void OnHitStateEnter(HitState state, HitState fromState) {
+        switch (state) {
+            default:
+                break;
+            case HitState.dead:
+                TransitionToState(CharacterState.dead);
+                break;
+        }
+        OnValueChanged?.Invoke(this);
     }
 
     /// <summary>
@@ -300,6 +324,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         inputCrouchDown = input.CrouchDown;
         CursorData cursorData = input.Fire.cursorData;
         switch (state) {
+            case CharacterState.dead:
+                break;
             case CharacterState.jumpPrep:
                 // TODO: normalize this player state
                 jumpIndicatorController.superJumpSpeed = superJumpSpeed;
@@ -310,7 +336,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     _jumpRequested = true;
                 }
                 break;
-            default:
             case CharacterState.normal:
                 wallPressRatchet = false;
 
@@ -372,11 +397,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     crouchMovementInputTimer = 0f;
                     crouchMovementInputTimer = 1f;
                 }
-                // if (isCrouching && state != CharacterState.wallPress && wallPressTimer == 0f) {
-                //     if (Vector3.Dot(_moveInputVector, direction) < 0.99f) {
-                //         _moveInputVector = Vector3.zero;
-                //     }
-                // }
                 break;
             case CharacterState.wallPress:
                 // allow gun switch
@@ -449,7 +469,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             return;
         }
         switch (state) {
-            default:
+            case CharacterState.dead:
+                slewLookVector = -1f * Motor.Velocity;
+                lookAtDirection = -1f * Motor.Velocity;
+                break;
             case CharacterState.normal:
                 if (snapToDirection != Vector3.zero) {
                     Vector3 target = snapToDirection;
@@ -553,6 +576,19 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
         switch (state) {
+            case CharacterState.dead:
+                deadTimer += Time.deltaTime;
+                if (deadTimer <= 1.5f) {
+                    currentVelocity = (float)PennerDoubleAnimation.QuintEaseInOut(deadTimer, 3, -3, 1.25f) * deadMoveVelocity;
+                }
+                // if (Motor.GroundingStatus.IsStableOnGround) {
+                //     currentVelocity += Gravity * deltaTime;
+                // }
+                if (deadTimer >= 1.1f) {
+                    Destroy(transform.root.gameObject);
+                    GameObject.Instantiate(Resources.Load("prefabs/gibs/corpse"), transform.position, Quaternion.identity);
+                }
+                break;
             case CharacterState.jumpPrep:
                 _jumpedThisFrame = false;
                 _timeSinceJumpRequested += deltaTime;
@@ -649,7 +685,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     TransitionToState(CharacterState.normal);
                 }
                 break;
-            default:
             case CharacterState.normal:
                 if (Motor.GroundingStatus.IsStableOnGround) {
                     // Reorient velocity on slope
@@ -814,8 +849,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 break;
         }
-
-
     }
 
     void CheckUncrouch() {
@@ -843,7 +876,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         switch (state) {
             case CharacterState.landStun:
                 break;
-            default:
+            case CharacterState.dead:
+                break;
             case CharacterState.normal:
                 // Handle jump-related values
                 // Handle jumping pre-ground grace period
@@ -988,9 +1022,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Vector2 camDir = new Vector2(OrbitCamera.Transform.forward.x, OrbitCamera.Transform.forward.z);
         Vector2 playerDir = new Vector2(direction.x, direction.z);
 
-        // head direction
-        // CursorData targetData = OrbitCamera.GetTargetData();
-
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);
 
@@ -1012,7 +1043,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             cameraRotation = OrbitCamera.transform.rotation,
             lookAtDirection = lookAtDirection,
             movementSticking = IsMovementSticking(),
-            directionToCamera = OrbitCamera.Transform.position - transform.position
+            directionToCamera = OrbitCamera.Transform.position - transform.position,
+            hitState = hitState
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

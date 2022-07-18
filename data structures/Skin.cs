@@ -19,6 +19,7 @@ public class Skin {
     public Octet<Sprite[]> legsRun = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsClimb = new Octet<Sprite[]>();
     public Octet<Sprite[]> legsJump = new Octet<Sprite[]>();
+    public Octet<Sprite[]> legsDead = new Octet<Sprite[]>();
 
 
     // unarmed
@@ -31,6 +32,7 @@ public class Skin {
     public Octet<Sprite[]> unarmedJump = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedUse = new Octet<Sprite[]>();
     public Octet<Sprite[]> unarmedHandsUp = new Octet<Sprite[]>();
+    public Octet<Sprite[]> unarmedDead = new Octet<Sprite[]>();
 
 
     // pistol
@@ -240,6 +242,12 @@ public class Skin {
         skin.legsJump[Direction.rightUp] = new Sprite[] { legSprites[76] };
         skin.legsJump[Direction.up] = new Sprite[] { legSprites[77] };
 
+        skin.legsDead[Direction.down] = new Sprite[] { legSprites[88] };
+        skin.legsDead[Direction.rightDown] = new Sprite[] { legSprites[89] };
+        skin.legsDead[Direction.right] = new Sprite[] { legSprites[90] };
+        skin.legsDead[Direction.rightUp] = new Sprite[] { legSprites[91] };
+        skin.legsDead[Direction.up] = new Sprite[] { legSprites[92] };
+
         // unarmed
         skin.unarmedIdle[Direction.down] = new Sprite[] { torsoSprites[0] };
         skin.unarmedIdle[Direction.rightDown] = new Sprite[] { torsoSprites[1] };
@@ -291,6 +299,12 @@ public class Skin {
         skin.unarmedHandsUp[Direction.right] = new Sprite[] { torsoSprites[85] };
         skin.unarmedHandsUp[Direction.rightUp] = new Sprite[] { torsoSprites[86] };
         skin.unarmedHandsUp[Direction.up] = new Sprite[] { torsoSprites[87] };
+
+        skin.unarmedDead[Direction.down] = new Sprite[] { torsoSprites[88] };
+        skin.unarmedDead[Direction.rightDown] = new Sprite[] { torsoSprites[89] };
+        skin.unarmedDead[Direction.right] = new Sprite[] { torsoSprites[90] };
+        skin.unarmedDead[Direction.rightUp] = new Sprite[] { torsoSprites[91] };
+        skin.unarmedDead[Direction.up] = new Sprite[] { torsoSprites[92] };
 
         // pistol
 

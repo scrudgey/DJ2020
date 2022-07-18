@@ -1033,34 +1033,58 @@ Phillip K Dick: A reality where the savior had returned.
 * blood particle effects
 * ejected in the direction of the bullet
 * blood splat on walls
+* blood pooling
 - hit reaction animation / graphic ?
+* object pooling for particle effects
 
 gibs from explosions
 interface for designing multiple scenarios
     danger room
-
-blood pooling
-death blowback
+corpse
 impact knockback
     slide, kneel, get up?
-corpse
 hurtable impact
     * turn to face bullet
     * shake
-    hitstun for NPC 
-        message system ? revisit this
-    temp invuln for player
-
 graphics:
-    impact animation
-    blood particle
-    death graphic
+    * blood particle
+    * death graphic
+        * import spritesheet
+        * define new skin components
     corpse graphic
+
+death mode (?)
+    overrides kinematic controller, animation states
+        not just a new controller for character motor. a new mode.
+    use rigidbody mechanics? 
+hitstun for NPC 
+    instead of message passing, use delegates
+    have each relevant component subscribe to changes in hitstate.
+    temp invuln for player
 
 put player audio source on a separate mix from other audio sources
 guard can't see over midheight obstacle
 damage result addition is weird
 verify that sparks still work properly
-object pooling for particle effects
 support mixers in setupaudiosource
 fix bullethole prefab / material / decal system
+
+how to handle death mode?
+Q: what does it look like?
+A: AI disabled. Kinematic character controller disabled. Rigidbody becomes simulated. A force is applied and the body goes flying. 
+The leg, torso, head animation become the death frame.
+Upon end of motion, create a corpse object.
+
+Q:how to handle hitstun?
+
+Q:how to handle knockback?
+
+so: character controller subscribes to hurtable.
+    character controller maintains hitstate from that.
+    character controller logic knows how to do a regular update vs. hitstun vs. dead
+    upon hitstate change to dead, it knows to initiate dead mode
+    animation handlers know how to handle hitstate as well.
+
+AI routine for reloading and racking?
+abstract out hitstate provider so sphere AI can subscribe to hitstate changes.
+fix crouch gun animations

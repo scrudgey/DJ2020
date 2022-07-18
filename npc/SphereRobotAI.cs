@@ -6,7 +6,9 @@ using UnityEngine;
 using UnityEngine.AI;
 public enum Reaction { ignore, attack, investigate }
 
-public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
+public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHitstateSubscriber {
+    public Destructible characterHurtable;
+    public HitState hitState { get; set; }
     public SightCone sightCone;
     public NavMeshPath navMeshPath; // TODO: remove this
     public GameObject controllable;
@@ -50,20 +52,28 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
         }
 
         alertHandler.Hide();
-        gunHandler.primary = new GunInstance(Gun.Load("smg"));
-        gunHandler.SwitchToGun(1);
-        if (skipShootAnimation) {
-            gunHandler.Reload();
-            gunHandler.ClipIn();
-            gunHandler.Rack();
-        } else {
-            gunHandler.DoReload();
-        }
+
+        // // TODO: fix this hack. leave it up to AI routines
+        // gunHandler.primary = new GunInstance(Gun.Load("smg"));
+        // gunHandler.SwitchToGun(1);
+        // if (skipShootAnimation) {
+        //     gunHandler.Reload();
+        //     gunHandler.ClipIn();
+        //     gunHandler.Rack();
+        // } else {
+        //     gunHandler.DoReload();
+        // }
 
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
         navMeshPath = new NavMeshPath();
         EnterDefaultState();
+        if (characterHurtable != null) {
+            characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
+        }
+    }
+    void OnDestroy() {
+        characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;
     }
 
     void EnterDefaultState() {
@@ -98,6 +108,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
         }
     }
     void Update() {
+        if (hitState == HitState.dead) {
+            return;
+        }
         timeSinceLastSeen += Time.deltaTime;
         PlayerInput input = stateMachine.Update();
         input.preventWallPress = true;
@@ -119,8 +132,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener {
     }
     void SetInputs(PlayerInput input) {
         sphereController.SetInputs(input);
-        gunHandler.ProcessGunSwitch(input);
-        gunHandler.SetInputs(input, skipAnimation: skipShootAnimation);
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {

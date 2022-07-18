@@ -5,11 +5,10 @@ using UnityEngine;
 public abstract class Damageable : MonoBehaviour, IDamageReceiver {
     // basic message bus pattern
     public Gibs gibs;
-    protected Damage lastDamage;
-    protected DamageResult lastResult;
+    public Damage lastDamage;
+    public DamageResult lastResult;
     protected Collider myCollider;
     Dictionary<Type, Func<Damage, DamageResult>> damageHandlers = new Dictionary<Type, Func<Damage, DamageResult>>();
-
 
     virtual public void Awake() {
         myCollider = GetComponentInChildren<Collider>();

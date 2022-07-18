@@ -316,28 +316,5 @@ public class Toolbox {
         // +1: constant 1
         return (1 + Mathf.Sign(Mathf.Sin(currentphase * 2f * (float)Math.PI) + dutycycle)) / 2f;
     }
-
-
-    public static void SendMessage(GameObject host, Component messenger, Message message, bool sendUpwards = false) {
-        message.messenger = messenger;
-        // TODO: do not propagate all the way to held objects
-        HashSet<MessageRouter> routers = ChildRouters(host);
-        if (sendUpwards) {
-            foreach (MessageRouter superRouter in host.GetComponentsInParent<MessageRouter>()) {
-                routers.Add(superRouter);
-            }
-        }
-        foreach (MessageRouter router in routers) {
-            router.ReceiveMessage(message);
-        }
-    }
-    public static void RegisterMessageCallback<T>(Component component, Action<T> handler) where T : Message {
-        MessageRouter router = GetOrCreateComponent<MessageRouter>(component.gameObject);
-        router.Subscribe<T>(handler);
-    }
-    public static HashSet<MessageRouter> ChildRouters(GameObject host) {
-        HashSet<MessageRouter> routers = new HashSet<MessageRouter>(host.GetComponentsInChildren<MessageRouter>());
-        return routers;
-    }
 }
 

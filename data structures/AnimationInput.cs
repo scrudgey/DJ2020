@@ -23,4 +23,5 @@ public struct AnimationInput {
     public Vector3 lookAtDirection;
     public bool movementSticking;
     public Vector3 directionToCamera;
+    public HitState hitState;
 }

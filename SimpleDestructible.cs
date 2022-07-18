@@ -21,8 +21,8 @@ public class SimpleDestructible : Destructible {
         RegisterDamageCallback<ExplosionDamage>(TakeExplosiveDamage);
     }
 
-    override protected void Destruct(Damage damage) {
-        base.Destruct(damage);
+    override protected void DoDestruct(Damage damage) {
+        base.DoDestruct(damage);
         Rigidbody rigidbody = GetComponent<Rigidbody>();
         if (rigidbody != null) {
             Vector3 force = 50f * Random.onUnitSphere;
