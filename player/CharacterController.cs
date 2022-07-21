@@ -12,7 +12,8 @@ public enum CharacterState {
     jumpPrep,
     superJump,
     landStun,
-    dead
+    dead,
+    hitstun
 }
 public enum ClimbingState {
     Anchoring,
@@ -217,14 +218,28 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     }
     private void HandleHurtableChanged(Destructible hurtable) {
         ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);
-        deadMoveVelocity = hurtable.lastDamage.direction;
+        if (hurtable.lastDamage != null)
+            deadMoveVelocity = hurtable.lastDamage.direction;
     }
     public void OnHitStateEnter(HitState state, HitState fromState) {
         switch (state) {
             default:
                 break;
+            case HitState.hitstun:
+                TransitionToState(CharacterState.hitstun);
+                break;
             case HitState.dead:
                 TransitionToState(CharacterState.dead);
+                break;
+        }
+        OnValueChanged?.Invoke(this);
+    }
+    public void OnHitStateExit(HitState state, HitState toState) {
+        switch (state) {
+            default:
+                break;
+            case HitState.hitstun:
+                TransitionToState(CharacterState.normal);
                 break;
         }
         OnValueChanged?.Invoke(this);
@@ -324,6 +339,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         inputCrouchDown = input.CrouchDown;
         CursorData cursorData = input.Fire.cursorData;
         switch (state) {
+            case CharacterState.hitstun:
             case CharacterState.dead:
                 break;
             case CharacterState.jumpPrep:
@@ -469,6 +485,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             return;
         }
         switch (state) {
+            case CharacterState.hitstun:
             case CharacterState.dead:
                 slewLookVector = -1f * Motor.Velocity;
                 lookAtDirection = -1f * Motor.Velocity;
@@ -576,6 +593,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
         switch (state) {
+            case CharacterState.hitstun:
+                currentVelocity = currentVelocity * 0.9f;
+                break;
             case CharacterState.dead:
                 deadTimer += Time.deltaTime;
                 if (deadTimer <= 1.5f) {
@@ -1044,7 +1064,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             lookAtDirection = lookAtDirection,
             movementSticking = IsMovementSticking(),
             directionToCamera = OrbitCamera.Transform.position - transform.position,
-            hitState = hitState
+            hitState = hitState,
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

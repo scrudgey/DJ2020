@@ -29,7 +29,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public Direction direction;
     private float trailTimer;
     public float trailInterval = 0.05f;
-    public TorsoAnimation gunAnimation;
+    public TorsoAnimation torsoAnimation;
     public HeadAnimation headAnimation;
     public Vector3 offset;
     public Vector3 scaleOffset;
@@ -37,9 +37,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     bool isCrouching;
     bool isCrawling;
     float crouchTransitionTimer;
-
+    float hitstunTimer;
+    bool hitstunEffect;
     void Start() {
-        // TODO: fix
         Bind(target.gameObject);
     }
 
@@ -52,12 +52,55 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public void SetFrame(int frame) {
         this.frame = frame;
     }
-
+    public IEnumerator Shake(float intensity, float interval) {
+        float blinkTimer = 0;
+        while (blinkTimer < interval) {
+            blinkTimer += Time.unscaledDeltaTime;
+            offset = UnityEngine.Random.insideUnitSphere * intensity;
+            scaleOffset = UnityEngine.Random.insideUnitSphere * intensity * 10f;
+            yield return null;
+        }
+        offset = Vector3.zero;
+        scaleOffset = Vector3.zero;
+    }
+    void Update() {
+        // TODO: replace this with a coroutine initiated by animation input
+        if (hitState == HitState.hitstun) {
+            hitstunTimer += Time.deltaTime;
+            if (hitstunTimer >= 0.01f) {
+                hitstunTimer -= 0.01f;
+                float intensity = 0.05f;
+                offset = UnityEngine.Random.insideUnitSphere * intensity;
+                scaleOffset = UnityEngine.Random.insideUnitSphere * intensity * 10f;
+            }
+        } else if (hitState == HitState.invulnerable) {
+            hitstunTimer += Time.deltaTime;
+            if (hitstunTimer >= 0.05f) {
+                hitstunTimer -= 0.05f;
+                hitstunEffect = !hitstunEffect;
+                if (hitstunEffect) {
+                    spriteRenderer.enabled = false;
+                    torsoAnimation.spriteRenderer.enabled = false;
+                    headAnimation.spriteRenderer.enabled = false;
+                } else {
+                    spriteRenderer.enabled = true;
+                    torsoAnimation.spriteRenderer.enabled = true;
+                    headAnimation.spriteRenderer.enabled = true;
+                }
+            }
+        } else {
+            spriteRenderer.enabled = true;
+            torsoAnimation.spriteRenderer.enabled = true;
+            headAnimation.spriteRenderer.enabled = true;
+            offset = Vector3.zero;
+            scaleOffset = Vector3.zero;
+        }
+    }
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
         billboard.skin = skin.GetCurrentLegsOctet(state);
-        gunAnimation?.SpawnTrail();
+        torsoAnimation?.SpawnTrail();
         headAnimation?.SpawnTrail();
     }
 
@@ -183,7 +226,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         spriteRenderer.transform.localPosition += offset;
 
         UpdateFrame();
-        SpriteData torsoSpriteData = gunAnimation.UpdateView(input);
+        SpriteData torsoSpriteData = torsoAnimation.UpdateView(input);
 
         // set rotation to be coplanar with the camera plane
         Vector3 directionToCamera = input.directionToCamera;
@@ -214,7 +257,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         // set position back to the rotated position.
         headAnimation.transform.position = absoluteWorldPosition;
 
-        gunAnimation.transform.position += 0.001f * directionToCamera;
+        torsoAnimation.transform.position += 0.001f * directionToCamera;
         if (torsoSpriteData.headInFrontOfTorso) {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
             headAnimation.transform.position += 0.002f * input.directionToCamera;
@@ -241,4 +284,5 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         frame = Math.Min(frame, sprites.Length - 1);
         spriteRenderer.sprite = sprites[frame];
     }
+
 }

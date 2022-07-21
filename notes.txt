@@ -998,29 +998,18 @@ aim mode snap to isometric direction
 don't do outline highlight if i am not the player
 find some fixed relation between distance and depth of field.
 fix camera position in wallpress mode when near edge
-
 UI:
     blink cursor when reaching maximum aim
     bigger aim reticle
 
 graphic / environment
-    combat test arena VR
+    * combat test arena VR
     glass break fx
 
-VR environment, 
-then set up combat, 
+* VR environment, 
+* then set up combat, 
 then NPC AI
 
-
-
-better aim mode: move character to left / right.
-fix clearsighter
-fix jump crouch sound
-
-damage result should be broadcast to all components?
-    this makes a natural fit for sphere AI instead of implementing IDamageReceiver?
-    or IDamageReceiver is good enough.
-enemy gunshots louder
 
 Phillip K Dick: A reality where the savior had returned.
 
@@ -1036,11 +1025,10 @@ Phillip K Dick: A reality where the savior had returned.
 * blood pooling
 - hit reaction animation / graphic ?
 * object pooling for particle effects
+* corpse
+* fix jump crouch sound
 
-gibs from explosions
-interface for designing multiple scenarios
-    danger room
-corpse
+
 impact knockback
     slide, kneel, get up?
 hurtable impact
@@ -1053,38 +1041,27 @@ graphics:
         * define new skin components
     corpse graphic
 
-death mode (?)
-    overrides kinematic controller, animation states
-        not just a new controller for character motor. a new mode.
-    use rigidbody mechanics? 
-hitstun for NPC 
-    instead of message passing, use delegates
-    have each relevant component subscribe to changes in hitstate.
-    temp invuln for player
 
-put player audio source on a separate mix from other audio sources
+
+better aim mode: move character to left / right.
+fix clearsighter
+    it breaks when you crouch
+AI routine for reloading and racking?
 guard can't see over midheight obstacle
 damage result addition is weird
 verify that sparks still work properly
-support mixers in setupaudiosource
-fix bullethole prefab / material / decal system
+verify that sphere robot still works properly
+gibs from explosions
+interface for designing multiple scenarios
+    danger room
+    spawning enemies
+    
+put player audio source on a separate mix from other audio sources
+    support mixers in setupaudiosource
+    enemy gunshots louder
 
-how to handle death mode?
-Q: what does it look like?
-A: AI disabled. Kinematic character controller disabled. Rigidbody becomes simulated. A force is applied and the body goes flying. 
-The leg, torso, head animation become the death frame.
-Upon end of motion, create a corpse object.
+fix bullethole prefab / material / decal system 
+    allow different materials or different prefabs accordingly
 
-Q:how to handle hitstun?
-
-Q:how to handle knockback?
-
-so: character controller subscribes to hurtable.
-    character controller maintains hitstate from that.
-    character controller logic knows how to do a regular update vs. hitstun vs. dead
-    upon hitstate change to dead, it knows to initiate dead mode
-    animation handlers know how to handle hitstate as well.
-
-AI routine for reloading and racking?
-abstract out hitstate provider so sphere AI can subscribe to hitstate changes.
+crawl idle head position
 fix crouch gun animations

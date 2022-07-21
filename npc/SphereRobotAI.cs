@@ -16,7 +16,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
     public SphereRobotBrain stateMachine;
-    public SpeechTextController speechTextController;
+    // public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.05f;
@@ -54,15 +54,15 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         alertHandler.Hide();
 
         // // TODO: fix this hack. leave it up to AI routines
-        // gunHandler.primary = new GunInstance(Gun.Load("smg"));
-        // gunHandler.SwitchToGun(1);
-        // if (skipShootAnimation) {
-        //     gunHandler.Reload();
-        //     gunHandler.ClipIn();
-        //     gunHandler.Rack();
-        // } else {
-        //     gunHandler.DoReload();
-        // }
+        gunHandler.primary = new GunInstance(Gun.Load("smg"));
+        gunHandler.SwitchToGun(1);
+        if (skipShootAnimation) {
+            gunHandler.Reload();
+            gunHandler.ClipIn();
+            gunHandler.Rack();
+        } else {
+            gunHandler.DoReload();
+        }
 
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();
@@ -89,7 +89,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             default:
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
-                speechTextController.HaltSpeechForTime(2f);
+                // speechTextController.HaltSpeechForTime(2f);
                 EnterDefaultState();
                 break;
             case SphereAttackState:
