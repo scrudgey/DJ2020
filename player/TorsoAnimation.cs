@@ -34,7 +34,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
             _ => skin.unarmedSpriteData
         };
-        if ((input.isCrouching && input.isMoving) || input.hitState == HitState.dead) { // crawling
+        if (isCrawling || input.hitState == HitState.dead) { // crawling
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
         SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
@@ -46,6 +46,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     }
     void SetState(GunHandler.GunState newState) {
         state = newState;
+        // Debug.Log("set gunstate: " + state);
     }
     void OnEnable() {
         animator.Play();
@@ -102,11 +103,13 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             isCrawling = false;
         }
         gunType = input.gunInput.gunType;
+        // Debug.Log($"hasgun: {input.gunInput.hasGun}");
         if (input.hitState == HitState.dead) {
             animator.Stop();
         } else if (input.gunInput.hasGun) {
             switch (state) {
                 case GunHandler.GunState.shooting:
+                    Debug.Log($"shoot branch: {input.gunInput.baseGun.shootAnimation}");
                     SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
                     break;
                 case GunHandler.GunState.reloading:
@@ -147,6 +150,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             bob = false;
             animator.clip = clip;
             animator.Play();
+            Debug.Log($"play animation: {clip}");
         }
     }
     public void UpdateFrame(AnimationInput input) {
@@ -154,16 +158,20 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             return;
 
         Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(lastInput);
-        if (isCrouching) {
-            if (isMoving) {
-                _sprites = skin.unarmedCrawl;
-            } else {
-                if (isCrawling) {
-                    _sprites = skin.unarmedCrawl;
-                } else {
-                    _sprites = skin.gunCrouchSprites(gunType);
-                }
-            }
+        // if (isCrouching) {
+        //     if (isMoving) {
+        //         _sprites = skin.unarmedCrawl;
+        //     } else {
+        //         if (isCrawling) {
+        //             _sprites = skin.unarmedCrawl;
+        //         } else {
+        //             _sprites = skin.gunCrouchSprites(gunType);
+        //         }
+        //     }
+        // }
+
+        if (isCrawling) {
+            _sprites = skin.unarmedCrawl;
         }
         if (input.hitState == HitState.dead) {
             _sprites = skin.unarmedDead;

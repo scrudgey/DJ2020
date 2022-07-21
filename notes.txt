@@ -905,7 +905,6 @@ fix head
             set up the design, then export a data object.
             load the data object with 
 
-
 it's billboarded. this is the difference between the editor and runtime.
 although the character is rotated, we want to de-rotate the sprites.
 offset x, y must always be set in the plane normal to the camera. this is why the trick works.
@@ -927,8 +926,6 @@ Q: why does it work normally?
         if sprite renderer is flipped, we could choose the inverse orientation.
 Q: what is the proper solution?
     we need a billboard & non-billboard solution?
-
-now we just need to fix the head flipx.
 
 
 * redesign data structure so it can generalize to multiple skins
@@ -978,41 +975,7 @@ now we just need to fix the head flipx.
 * make crawl nonuniform speed
 * camera wall clipping
 * crouch, crawl sounds
-
-graphical issues:
-    smg torso face left, head face down looks odd
-    female walk left / right torso offset is incorrect?
-    z-fighting between torso, legs, head
-
-tasklookAt returns running, should return success?
-head should look around when in search mode.
-allow independent level data
-prevent extreme zoom maneuvers with lerping
-position call-out
-adjust walk animation speed with movement
-less intense wall sticking?
-fix emoji text
-when spotted, zoom camera out to shows 
-gestural aiming with auto-lock
-aim mode snap to isometric direction
-don't do outline highlight if i am not the player
-find some fixed relation between distance and depth of field.
-fix camera position in wallpress mode when near edge
-UI:
-    blink cursor when reaching maximum aim
-    bigger aim reticle
-
-graphic / environment
-    * combat test arena VR
-    glass break fx
-
-* VR environment, 
-* then set up combat, 
-then NPC AI
-
-
-Phillip K Dick: A reality where the savior had returned.
-
+* z-fighting between torso, legs, head
 * character hurtable
 * blood splatter on hit
 * scale blood splatter random
@@ -1027,7 +990,11 @@ Phillip K Dick: A reality where the savior had returned.
 * object pooling for particle effects
 * corpse
 * fix jump crouch sound
+* VR environment
+* crawl idle head position
+* fix crouch gun animations
 
+Phillip K Dick: A reality where the savior had returned.
 
 impact knockback
     slide, kneel, get up?
@@ -1035,14 +1002,36 @@ hurtable impact
     * turn to face bullet
     * shake
 graphics:
+    * combat test arena VR
     * blood particle
     * death graphic
         * import spritesheet
         * define new skin components
     corpse graphic
+    glass break fx
+UI:
+    blink cursor when reaching maximum aim
+    bigger aim reticle
 
+graphical issues:
+    smg torso face left, head face down looks odd
+    female walk left / right torso offset is incorrect?
 
-
+tasklookAt returns running, should return success?
+head should look around when in search mode.
+allow independent level data
+prevent extreme zoom maneuvers with lerping
+position call-out
+adjust walk animation speed with movement
+less intense wall sticking?
+fix emoji text
+when spotted, zoom camera out to show aggressor
+gestural aiming with auto-lock
+aim mode snap to isometric direction
+don't do outline highlight if i am not the player
+find some fixed relation between distance and depth of field.
+fix camera position in wallpress mode when near edge
+don't crawl in aim mode
 better aim mode: move character to left / right.
 fix clearsighter
     it breaks when you crouch
@@ -1063,5 +1052,3 @@ put player audio source on a separate mix from other audio sources
 fix bullethole prefab / material / decal system 
     allow different materials or different prefabs accordingly
 
-crawl idle head position
-fix crouch gun animations

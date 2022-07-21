@@ -481,7 +481,6 @@ public class Skin {
                     if (input.isCrouching) {
                         return gunCrouchSprites(input.gunInput.gunType);
                     } else return gunIdleSprites(input.gunInput.gunType);
-
                 }
         }
     }
