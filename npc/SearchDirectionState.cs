@@ -43,6 +43,8 @@ public class SearchDirectionState : SphereControlState {
         // TODO problem: changing search direction
         Vector3 leftDirection = Quaternion.Euler(0, -45, 0) * searchDirection;
         Vector3 rightDirection = Quaternion.Euler(0, 45, 0) * searchDirection;
+
+        // TODO: if from noise, stop and turn head toward noise for a split second first...?
         if (intro) {
             rootTaskNode = new Sequence(
                 new TaskTimerDectorator(new Sequence(
@@ -87,6 +89,7 @@ public class SearchDirectionState : SphereControlState {
 
     public override void OnNoiseHeard(NoiseComponent noise) {
         base.OnNoiseHeard(noise);
+        // TODO: more detailed decision making if sound is suspicious
         if (noise.data.player) {
             searchDirection = noise.transform.position;
             changeStateCountDown = ROUTINE_TIMEOUT;

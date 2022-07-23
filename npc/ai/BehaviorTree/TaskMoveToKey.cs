@@ -19,6 +19,7 @@ namespace AI {
 
         public float headSwivelOffset;
         public float speedCoefficient = 1f;
+        Vector3 baseLookDirection;
 
         public TaskMoveToKey(Transform transform, string key) : base() {
             navMeshPath = new NavMeshPath();
@@ -43,6 +44,9 @@ namespace AI {
             } else if (headBehavior == HeadBehavior.search) {
                 headSwivelOffset = 45f * Mathf.Sin(Time.time * 2f);
             }
+            Vector3 lookDirection = baseLookDirection;
+            lookDirection = Quaternion.AngleAxis(headSwivelOffset, Vector3.up) * lookDirection;
+            input.lookAtDirection = lookDirection;
 
             if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
                 // return TaskState.failure;
@@ -58,11 +62,10 @@ namespace AI {
                     pathIndex += 1;
                 }
 
-                Vector3 lookDirection = inputVector;
-                lookDirection = Quaternion.AngleAxis(headSwivelOffset, Vector3.up) * lookDirection;
                 inputVector.y = 0;
+                baseLookDirection = inputVector;
                 input.moveDirection = speedCoefficient * inputVector.normalized;
-                input.lookAtDirection = lookDirection;
+
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
                 }

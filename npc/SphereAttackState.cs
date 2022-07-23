@@ -69,5 +69,14 @@ public class SphereAttackState : SphereControlState {
             rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
         }
     }
-
+    public override void OnNoiseHeard(NoiseComponent noise) {
+        base.OnNoiseHeard(noise);
+        // TODO: more detailed decision making if sound is suspicious
+        if (noise.data.player) {
+            if (timeSinceSawPlayer > 0.1f) {
+                timeSinceSawPlayer = 100f;
+                rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, noise.transform.position);
+            }
+        }
+    }
 }

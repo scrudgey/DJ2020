@@ -1052,13 +1052,16 @@ gestural aiming with auto-lock
 don't do outline highlight if i am not the player
 
 adjust stealth parameters until it feels like it makes a difference
-AI: show question mark when startled by suspicious sound, look in directions
-AI: when in combat mode, pay attention to sounds
-in investigate mode, sounds should have much smaller radius
-head should look around when in search mode.
+* AI: show question mark when startled by suspicious sound, look in directions
+* AI: when in combat mode, pay attention to sounds
+* in investigate mode, sounds should have much smaller radius
+* head should look around when in search mode.
+* crouching behind cover should be safe.
+visually indicate stealth / allow player to melt into shadows
+
 adjust walk animation speed with movement
 creep button
-
+corpse can be shot / exploded
 
 fix bullethole prefab / material / decal system 
     allow different materials or different prefabs accordingly

@@ -314,7 +314,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             if (input.CrouchDown || input.jumpHeld) {
                 if (!isCrouching) {
                     isCrouching = true;
-                    Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                    Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
                     if (input.CrouchDown)
                         Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
                 }
@@ -600,7 +600,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             case CharacterState.dead:
                 deadTimer += Time.deltaTime;
                 if (deadTimer <= 1.5f) {
-                currentVelocity = (float)PennerDoubleAnimation.QuintEaseOut(deadTimer, 4, -4, 1.25f) * deadMoveVelocity;
+                    currentVelocity = (float)PennerDoubleAnimation.QuintEaseOut(deadTimer, 4, -4, 1.25f) * deadMoveVelocity;
                 }
                 // if (Motor.GroundingStatus.IsStableOnGround) {
                 //     currentVelocity += Gravity * deltaTime;
@@ -851,7 +851,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
 
                 if (!isCrouching && Motor.GroundingStatus.IsStableOnGround)
-                    footsteps.UpdateWithVelocity(currentVelocity);
+                    footsteps.UpdateWithVelocity(currentVelocity, isRunning);
 
                 break;
             case CharacterState.climbing:
@@ -861,7 +861,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     case ClimbingState.Climbing:
                         currentVelocity = (_ladderUpDownInput * _activeLadder.transform.up).normalized * ClimbingSpeed;
                         footsteps.SetFootstepSounds(_activeLadder.surfaceType);
-                        footsteps.UpdateWithVelocity(currentVelocity);
+                        footsteps.UpdateWithVelocity(currentVelocity, false);
                         break;
                     case ClimbingState.Anchoring:
                     case ClimbingState.DeAnchoring:

@@ -17,7 +17,7 @@ public class Footsteps : MonoBehaviour {
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
-    public void UpdateWithVelocity(Vector3 velocity) {
+    public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {
         if (velocity.magnitude <= 0.01) {
             leftFoot = null;
             rightFoot = null;
@@ -34,10 +34,12 @@ public class Footsteps : MonoBehaviour {
                 } else {
                     Toolbox.RandomizeOneShot(audioSource, leftFoot);
                 }
+                float volume = isRunning ? 4f : 1.5f;
+
                 NoiseData noise = new NoiseData {
                     player = gameObject == GameManager.I.playerObject,
                     suspiciousness = Suspiciousness.normal,
-                    volume = 1
+                    volume = volume
                 };
                 Toolbox.Noise(transform.position, noise);
             }

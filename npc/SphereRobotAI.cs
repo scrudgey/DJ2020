@@ -212,6 +212,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         switch (stateMachine.currentState) {
             case SphereMoveState:
             case SpherePatrolState:
+                // TODO: better handling of do intro
                 ChangeState(new SearchDirectionState(this, damage));
                 break;
             case SearchDirectionState:
@@ -233,6 +234,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             switch (stateMachine.currentState) {
                 case SphereMoveState:
                 case SpherePatrolState:
+                    alertHandler.ShowWarn();
                     ChangeState(new SearchDirectionState(this, noise));
                     break;
                 case SearchDirectionState:

@@ -149,8 +149,10 @@ public class Toolbox {
         GameObject noiseObject = GameObject.Instantiate(Resources.Load("prefabs/noise"), position, Quaternion.identity) as GameObject;
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
         component.data = data;
-        if (component.data.player)
+        component.sphereCollider.radius = data.volume;
+        if (component.data.player) {
             SuspicionAudioUIHandler.OnNoise(data);
+        }
         return component;
     }
     public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {

@@ -8,6 +8,7 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     public Action<LightLevelProbe> OnValueChanged { get; set; }
     public CharacterController controller;
     public RenderTexture[] lightTextures;
+    public SpriteRenderer[] spriteRenderers;
     HashSet<Collider> concealment = new HashSet<Collider>();
     void Update() {
         lightLevel = 0;
@@ -17,7 +18,13 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
             foreach (RenderTexture texture in lightTextures) {
                 float faceLevel = TextureToLightLevel(texture);
                 lightLevel = Math.Max(faceLevel, lightLevel);
+
             }
+        }
+
+        Color spriteColor = Color.white;
+        foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
+
         }
 
         if (OnValueChanged != null) OnValueChanged(this);

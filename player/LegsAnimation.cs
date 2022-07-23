@@ -177,7 +177,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 state = State.run;
             } else if (input.isCrouching) { // crawling
                 state = State.crawl;
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+                // spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
                 shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 shadowCaster.rotation = Quaternion.LookRotation(transform.right, transform.up);
             } else if (true) {
@@ -206,7 +206,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             } else if (input.isCrouching) { // crouching or crawling
                 state = State.crouch;
                 if (!isCrawling) { // crouching
-                    spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
+                    // spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
                     shadowCaster.localScale = new Vector3(0.5f, 0.4f, 0.5f);
                 } else { // crawling
                     spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);

@@ -220,7 +220,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         OnValueChanged?.Invoke(this);
 
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            CharacterCamera.Shake(gunInstance.baseGun.noise / 5f, 0.1f);
+            CharacterCamera.Shake(gunInstance.baseGun.noise / 50f, 0.1f);
         }
     }
     public void EmitShell() {
