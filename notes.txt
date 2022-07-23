@@ -993,61 +993,72 @@ Q: what is the proper solution?
 * VR environment
 * crawl idle head position
 * fix crouch gun animations
-
-Phillip K Dick: A reality where the savior had returned.
-
-impact knockback
-    slide, kneel, get up?
-hurtable impact
+* put player audio source on a separate mix from other audio sources
+    * support mixers in setupaudiosource
+    * enemy gunshots louder
+* hurtable impact
     * turn to face bullet
     * shake
-graphics:
+* fix clearsighter
+* verify that sparks still work properly
+* verify that sphere robot still works properly
+* graphics:
     * combat test arena VR
     * blood particle
     * death graphic
         * import spritesheet
         * define new skin components
-    corpse graphic
-    glass break fx
+    * corpse graphic
+
+Phillip K Dick: A reality where the savior had returned.
+
+impact knockback
+    slide, kneel, get up?
+
 UI:
     blink cursor when reaching maximum aim
     bigger aim reticle
+    health display
 
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
 
 tasklookAt returns running, should return success?
-head should look around when in search mode.
 allow independent level data
 prevent extreme zoom maneuvers with lerping
 position call-out
-adjust walk animation speed with movement
 less intense wall sticking?
-fix emoji text
 when spotted, zoom camera out to show aggressor
-gestural aiming with auto-lock
-aim mode snap to isometric direction
-don't do outline highlight if i am not the player
-find some fixed relation between distance and depth of field.
 fix camera position in wallpress mode when near edge
-don't crawl in aim mode
-better aim mode: move character to left / right.
-fix clearsighter
-    it breaks when you crouch
+glass break fx
+better aim mode: 
+    aim mode snap to isometric direction
+    find some fixed relation between distance and depth of field. ?
+    don't crawl in aim mode
+    get character out of the way of aim
+    swing into position, then subtly zoom in to focus on reticle
 AI routine for reloading and racking?
 guard can't see over midheight obstacle
 damage result addition is weird
-verify that sparks still work properly
-verify that sphere robot still works properly
+sparks on destructible walls
 gibs from explosions
+don't destroy on dead; recall to pool.
+apply skin graphics to corpse
 interface for designing multiple scenarios
     danger room
     spawning enemies
-    
-put player audio source on a separate mix from other audio sources
-    support mixers in setupaudiosource
-    enemy gunshots louder
+gestural aiming with auto-lock
+don't do outline highlight if i am not the player
+
+adjust stealth parameters until it feels like it makes a difference
+AI: show question mark when startled by suspicious sound, look in directions
+AI: when in combat mode, pay attention to sounds
+in investigate mode, sounds should have much smaller radius
+head should look around when in search mode.
+adjust walk animation speed with movement
+creep button
+
 
 fix bullethole prefab / material / decal system 
     allow different materials or different prefabs accordingly

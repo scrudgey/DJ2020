@@ -32,7 +32,6 @@ public class MaterialController {
                 normalMaterial = renderer.material;
         }
         if (normalMaterial != null) {
-
             interloperMaterial = new Material(normalMaterial);
             interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
         }
@@ -98,10 +97,7 @@ public class MaterialController {
         if (disableBecauseAbove) {
             minimumAlpha = 0f;
         } else {
-            // minimumAlpha = 0.2f + (0.8f * (offAxisLength / 10f));
             minimumAlpha = (1f * (offAxisLength / 2f));
-            // Debug.Log(offAxisLength);
-            // Debug.Log(minimumAlpha);
         }
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {
@@ -214,19 +210,25 @@ public class ClearSighter : MonoBehaviour {
             if (collider.tag == "shell")
                 continue;
             MaterialController controller = controllers.get(collider.gameObject);
-            if (controller != null)
+            if (controller != null) {
                 controller.CeilingCheck(collider, myTransform.position);
+            } else {
+                removeControllers.Add(controller);
+            }
         }
+
+        // interloper colliders
         foreach (MaterialController interloper in interlopers) {
             if (interloper == null || interloper.gameObject == null) {
                 removeControllers.Add(interloper);
                 continue;
             }
             Vector3 directionToInterloper = interloper.gameObject.transform.position - myTransform.position;
-            if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > 0)
+            if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > -0.03f)
                 interloper.InterloperStart();
         }
 
+        // update
         foreach (MaterialController controller in controllers.controllers.Values) {
             if (controller == null || controller.gameObject == null) {
                 removeControllers.Add(controller);
@@ -237,10 +239,10 @@ public class ClearSighter : MonoBehaviour {
             Vector3 offAxis = directionToMesh - (axialDistance * directionToCamera);
             float offAxisLength = offAxis.magnitude;
             controller.Update(offAxisLength);
-
         }
         // foreach (MaterialController key in removeControllers) {
-        //     controllers.controllers.Remove(key.gameObject);
+        //     // controllers.controllers.Remove(key.gameObject);
+        //     controllers.controllers.rem
         // }
     }
 

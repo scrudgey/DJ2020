@@ -13,7 +13,8 @@ public enum CharacterState {
     superJump,
     landStun,
     dead,
-    hitstun
+    hitstun,
+    keelOver
 }
 public enum ClimbingState {
     Anchoring,
@@ -599,14 +600,27 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             case CharacterState.dead:
                 deadTimer += Time.deltaTime;
                 if (deadTimer <= 1.5f) {
-                    currentVelocity = (float)PennerDoubleAnimation.QuintEaseInOut(deadTimer, 3, -3, 1.25f) * deadMoveVelocity;
+                currentVelocity = (float)PennerDoubleAnimation.QuintEaseOut(deadTimer, 4, -4, 1.25f) * deadMoveVelocity;
                 }
                 // if (Motor.GroundingStatus.IsStableOnGround) {
                 //     currentVelocity += Gravity * deltaTime;
                 // }
                 if (deadTimer >= 1.1f) {
+                    TransitionToState(CharacterState.keelOver);
+                }
+                break;
+            case CharacterState.keelOver:
+                deadTimer += Time.deltaTime;
+                currentVelocity = Vector3.zero;
+                // if (Motor.GroundingStatus.IsStableOnGround) {
+                //     currentVelocity += Gravity * deltaTime;
+                // }
+                if (deadTimer >= 1.8f) {
+                    // TODO: use object pooling
                     Destroy(transform.root.gameObject);
-                    GameObject.Instantiate(Resources.Load("prefabs/gibs/corpse"), transform.position, Quaternion.identity);
+                    GameObject corpseObject = GameObject.Instantiate(Resources.Load("prefabs/gibs/corpse"), transform.position + new Vector3(0f, 0.83f, 0f), Quaternion.identity) as GameObject;
+                    Corpse corpse = corpseObject.GetComponent<Corpse>();
+                    // corpse.legSpriteRenderer.sprite = legr
                 }
                 break;
             case CharacterState.jumpPrep:

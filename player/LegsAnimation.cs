@@ -225,7 +225,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         shadowCaster.localPosition = new Vector3(0f, shadowCaster.localScale.y - 0.05f, 0f);
         spriteRenderer.transform.localPosition += offset;
 
-        UpdateFrame();
+        UpdateFrame(input.state);
         SpriteData torsoSpriteData = torsoAnimation.UpdateView(input);
 
         // set rotation to be coplanar with the camera plane
@@ -271,7 +271,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         skin = Skin.LoadSkin(data.legSkin);
     }
 
-    public void UpdateFrame() {
+    public void UpdateFrame(CharacterState characterState) {
+        // TODO: handle this in the same way as torso animation. and / or put the logic in Skin.
         Octet<Sprite[]> octet = null;
         octet = skin.GetCurrentLegsOctet(state);
         if (isCrawling) {
@@ -279,6 +280,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         }
         if (hitState == HitState.dead) {
             octet = skin.legsDead;
+        }
+        if (characterState == CharacterState.keelOver) {
+            octet = skin.legsKeelOver;
         }
         Sprite[] sprites = octet[direction];
         frame = Math.Min(frame, sprites.Length - 1);

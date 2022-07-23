@@ -10,6 +10,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public Destructible characterHurtable;
     public HitState hitState { get; set; }
     public SightCone sightCone;
+    public Transform sightOrigin;
     public NavMeshPath navMeshPath; // TODO: remove this
     public GameObject controllable;
     public IInputReceiver sphereController;
@@ -179,20 +180,31 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     bool TargetVisible(Collider other) {
-        Vector3 position = transform.position + new Vector3(0f, 1f, 0f);
-        Vector3 direction = other.bounds.center - position;
-        Ray ray = new Ray(position, direction);
-        RaycastHit[] hits = Physics.RaycastAll(ray, MAXIMUM_SIGHT_RANGE, LayerUtil.GetMask(Layer.def, Layer.obj));
-        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            if (hit.transform.IsChildOf(transform.root))
-                continue;
-            TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
-            if (tagData.bulletPassthrough) continue;
+        Vector3 position = sightOrigin.position; // TODO: configurable
+        Vector3[] directions = new Vector3[]{
+            other.bounds.center - position,
+            (other.bounds.center + other.bounds.extents) - position,
+            (other.bounds.center - other.bounds.extents) - position,
+        };
+        foreach (Vector3 direction in directions) {
+            Ray ray = new Ray(position, direction);
+            RaycastHit[] hits = Physics.RaycastAll(ray, MAXIMUM_SIGHT_RANGE, LayerUtil.GetMask(Layer.def, Layer.obj));
+            foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+                if (hit.transform.IsChildOf(transform.root))
+                    continue;
+                TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
+                if (tagData.bulletPassthrough) continue;
 
-            Color color = other == hit.collider ? Color.yellow : Color.red;
-            Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
-            return other == hit.collider;
+                Color color = other == hit.collider ? Color.yellow : Color.red;
+                Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
+                if (other == hit.collider) {
+                    return true;
+                } else break;
+                // return other == hit.collider;
+            }
         }
+        // Vector3 direction = other.bounds.center - position;
+
         return false;
     }
 

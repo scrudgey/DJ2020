@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Glass : Destructible {
     public AudioClip[] hitSounds;
-    public AudioClip[] destroySounds;
     public AudioSource audioSource;
     public List<GameObject> decals = new List<GameObject>();
     public GameObject glassGibs;
@@ -70,5 +69,6 @@ public class Glass : Destructible {
             Collider gibsCollider = shard.GetComponentInChildren<Collider>();
             Physics.IgnoreCollision(gibsCollider, myCollider, true);
         }
+        
     }
 }

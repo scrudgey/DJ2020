@@ -190,10 +190,10 @@ public class Toolbox {
     public static AudioSource SetUpAudioSource(GameObject g) {
         // TODO: support sound mixers
         AudioSource source = GetOrCreateComponent<AudioSource>(g);
-        if (sfxMixer == null) {
+        if (source.outputAudioMixerGroup == null) {
             sfxMixer = Resources.Load("mixers/SoundEffectMixer") as AudioMixer;
+            source.outputAudioMixerGroup = sfxMixer.FindMatchingGroups("General")[0];
         }
-        source.outputAudioMixerGroup = sfxMixer.FindMatchingGroups("Master")[0];
         source.rolloffMode = AudioRolloffMode.Logarithmic;
         source.minDistance = 1f;
         source.maxDistance = 5.42f;

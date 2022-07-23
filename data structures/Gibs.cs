@@ -12,7 +12,7 @@ public class Gibs : ScriptableObject {
         }
     }
     public void EmitOnDamage(GameObject host, Damage damage, Collider bounds) =>
-        gibs.Where(gib =>
+        gibs?.Where(gib =>
             !gib.impact &&
             gib.damageConditional.ConditionIsMet(damage))
         .ToList()
@@ -20,7 +20,7 @@ public class Gibs : ScriptableObject {
             gib.Emit(host, damage, bounds);
         });
     public void EmitOnImpact(GameObject host, DamageResult result, Collider bounds) =>
-        gibs.Where(gib =>
+        gibs?.Where(gib =>
             gib.impact &&
             gib.impactConditional.ConditionIsMet(result))
         .ToList()

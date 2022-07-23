@@ -39,7 +39,7 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
         DamageResult result2 = HandleDamage(damage, typeof(Damage));
         DamageResult result = result1.Add(result2);
 
-        gibs.EmitOnImpact(gameObject, result, myCollider);
+        gibs?.EmitOnImpact(gameObject, result, myCollider);
         return result;
     }
     DamageResult HandleDamage(Damage damage, Type type) {

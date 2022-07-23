@@ -31,7 +31,7 @@ namespace AI {
                     screenPosition = Vector2.zero,
                     screenPositionNormalized = Vector2.zero,
                     highlightableTargetData = null,
-                    worldPosition = lastSeenPlayerPosition
+                    worldPosition = lastSeenPlayerPosition + new Vector3(0f, 0.4f, 0f)
                 }
             };
             return fireInput;

@@ -109,7 +109,6 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         } else if (input.gunInput.hasGun) {
             switch (state) {
                 case GunHandler.GunState.shooting:
-                    Debug.Log($"shoot branch: {input.gunInput.baseGun.shootAnimation}");
                     SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
                     break;
                 case GunHandler.GunState.reloading:
@@ -150,7 +149,6 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             bob = false;
             animator.clip = clip;
             animator.Play();
-            Debug.Log($"play animation: {clip}");
         }
     }
     public void UpdateFrame(AnimationInput input) {
@@ -175,6 +173,9 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         }
         if (input.hitState == HitState.dead) {
             _sprites = skin.unarmedDead;
+        }
+        if (input.state == CharacterState.keelOver) {
+            _sprites = skin.unarmedKeelOver;
         }
         if (_sprites == null)
             return;
