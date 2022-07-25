@@ -10,6 +10,8 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     public RenderTexture[] lightTextures;
     public SpriteRenderer[] spriteRenderers;
     HashSet<Collider> concealment = new HashSet<Collider>();
+    public Color targetSpriteColor;
+    public Color currentSpriteColor;
     void Update() {
         lightLevel = 0;
         if (concealment.Count > 0) {
@@ -22,9 +24,20 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
             }
         }
 
-        Color spriteColor = Color.white;
-        foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
+        int discreteLightLevel = Toolbox.DiscreteLightLevel(lightLevel, controller.isCrouching, controller.isMoving());
 
+        targetSpriteColor = discreteLightLevel switch {
+            0 => Color.black,
+            1 => new Color(0.25f, 0.25f, 0.25f, 1f),
+            2 => new Color(0.5f, 0.5f, 0.5f, 1f),
+            _ => Color.white
+        };
+
+        currentSpriteColor = Color.Lerp(currentSpriteColor, targetSpriteColor, 2f * Time.unscaledDeltaTime);
+        currentSpriteColor.a = 1f;
+
+        foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
+            spriteRenderer.color = currentSpriteColor;
         }
 
         if (OnValueChanged != null) OnValueChanged(this);

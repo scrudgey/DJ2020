@@ -419,7 +419,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // allow gun switch
                 gunHandler.ProcessGunSwitch(input);
 
-                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 if (_moveAxis != Vector2.zero) {
                     lastWallInput = _moveAxis;
                 } else {

@@ -1009,6 +1009,13 @@ Q: what is the proper solution?
         * import spritesheet
         * define new skin components
     * corpse graphic
+* AI: show question mark when startled by suspicious sound, look in directions
+* AI: when in combat mode, pay attention to sounds
+* in investigate mode, sounds should have much smaller radius
+* head should look around when in search mode.
+* crouching behind cover should be safe.
+* visually indicate stealth / allow player to melt into shadows
+* adjust stealth parameters until it feels like it makes a difference
 
 Phillip K Dick: A reality where the savior had returned.
 
@@ -1019,11 +1026,16 @@ UI:
     blink cursor when reaching maximum aim
     bigger aim reticle
     health display
+    square drops in on targets, stats appear in side 
 
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
 
+fix bullethole prefab / material / decal system 
+    allow different materials or different prefabs accordingly
+
+leaves and junk in the street that blows around
 tasklookAt returns running, should return success?
 allow independent level data
 prevent extreme zoom maneuvers with lerping
@@ -1032,37 +1044,29 @@ less intense wall sticking?
 when spotted, zoom camera out to show aggressor
 fix camera position in wallpress mode when near edge
 glass break fx
-better aim mode: 
-    aim mode snap to isometric direction
-    find some fixed relation between distance and depth of field. ?
-    don't crawl in aim mode
-    get character out of the way of aim
-    swing into position, then subtly zoom in to focus on reticle
 AI routine for reloading and racking?
 guard can't see over midheight obstacle
 damage result addition is weird
 sparks on destructible walls
-gibs from explosions
+
 don't destroy on dead; recall to pool.
-apply skin graphics to corpse
+spawn new NPC when 
 interface for designing multiple scenarios
     danger room
     spawning enemies
 gestural aiming with auto-lock
 don't do outline highlight if i am not the player
 
-adjust stealth parameters until it feels like it makes a difference
-* AI: show question mark when startled by suspicious sound, look in directions
-* AI: when in combat mode, pay attention to sounds
-* in investigate mode, sounds should have much smaller radius
-* head should look around when in search mode.
-* crouching behind cover should be safe.
-visually indicate stealth / allow player to melt into shadows
-
 adjust walk animation speed with movement
 creep button
+gibs from explosions
 corpse can be shot / exploded
+apply skin graphics to corpse
+better reaction to hearing noise in search / combat when noise is not suspicious
 
-fix bullethole prefab / material / decal system 
-    allow different materials or different prefabs accordingly
-
+better aim mode: 
+    leave aim mode snap to isometric direction
+    find some fixed relation between distance and depth of field. ?
+    don't crawl in aim mode
+    * get character out of the way of aim
+    swing into position, then subtly zoom in to focus on reticle

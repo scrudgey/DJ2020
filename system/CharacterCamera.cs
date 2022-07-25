@@ -82,6 +82,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private bool clampOrthographicSize;
     public Vector3 lastTargetPosition;
     public float zoomCoefficient;
+    private bool horizontalAimParity;
 
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
@@ -363,27 +364,47 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
-        Vector3 camDirection = input.playerDirection;
-        Vector3 distOffset = input.playerDirection * -0.5f * TargetDistance;
+        Vector3 distOffset = Vector3.zero;
+
+        input.playerDirection.y = 0f;
+
+        // float heightOffsetCoefficient = 0.5f - cursorPositionNormalized.y;
         Vector3 heightOffset = new Vector3(0, 0.25f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
-        float heightOffsetCoefficient = 0.5f - cursorPositionNormalized.y;
-        float horizontalParity = cursorPositionNormalized.x - 0.5f;
+        // heightOffset *= -1f * heightOffsetCoefficient;
 
-        Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * 0.5f * horizontalParity;
-        heightOffset *= -1f * heightOffsetCoefficient;
-        camDirection += new Vector3(0f, -0.1f, 0f) * heightOffsetCoefficient;
-        // camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
-        Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+        // float horizontalParity = cursorPositionNormalized.x - 0.5f;
+        // Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * horizontalParity * 2f;
+        float horizontalParity = horizontalAimParity ? 1f : -1f;
+        Vector3 horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection);
+
+        if (cursorPositionNormalized.x > 0.9f) {
+            horizontalAimParity = true;
+        }
+        if (cursorPositionNormalized.x < 0.1f) {
+            horizontalAimParity = false;
+        }
+
+        // TODO: aim camera at a point projected from the player towards a plane at an offset
+
+        Vector3 camDirectionPoint = Vector3.zero;
+        camDirectionPoint += input.playerDirection;
+        camDirectionPoint += Vector3.up * cursorPositionNormalized.y + new Vector3(0f, -0.5f, 0f);
+        camDirectionPoint += Vector3.Cross(Vector3.up, input.playerDirection) * cursorPositionNormalized.x;
+        Quaternion cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
+
+        // Vector3 camDirection = input.playerDirection;
+        // camDirection += new Vector3(0f, -0.1f, 0f) * heightOffsetCoefficient;
+        // Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
-            rotation = planarRot,
+            rotation = cameraRotation,
             deltaTime = input.deltaTime,
-            targetDistance = 2.5f,
-            targetPosition = FollowTransform.position + distOffset + heightOffset + horizontalOffset,
+            targetDistance = 0.5f,
+            targetPosition = FollowTransform.position + horizontalOffset + heightOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
