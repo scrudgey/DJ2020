@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -318,5 +319,8 @@ public class Toolbox {
         // +1: constant 1
         return (1 + Mathf.Sign(Mathf.Sin(currentphase * 2f * (float)Math.PI) + dutycycle)) / 2f;
     }
+
+    static public Quaternion SnapToClosestRotation(Quaternion input, List<Quaternion> lattice) =>
+        lattice.Aggregate((curMin, x) => (curMin == null || (Quaternion.Angle(input, x)) < Quaternion.Angle(input, curMin) ? x : curMin));
 }
 

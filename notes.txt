@@ -1016,8 +1016,14 @@ Q: what is the proper solution?
 * crouching behind cover should be safe.
 * visually indicate stealth / allow player to melt into shadows
 * adjust stealth parameters until it feels like it makes a difference
+* better aim mode: 
+    * leave aim mode snap to isometric direction
+    * get character out of the way of aim
+    * find some fixed relation between distance and depth of field. ?
+    * don't crawl in aim mode
 
-Phillip K Dick: A reality where the savior had returned.
+aim: swing into position, then subtly zoom in to focus on reticle
+    accompanied by rotating reticle element
 
 impact knockback
     slide, kneel, get up?
@@ -1047,7 +1053,6 @@ glass break fx
 AI routine for reloading and racking?
 guard can't see over midheight obstacle
 damage result addition is weird
-sparks on destructible walls
 
 don't destroy on dead; recall to pool.
 spawn new NPC when 
@@ -1064,9 +1069,4 @@ corpse can be shot / exploded
 apply skin graphics to corpse
 better reaction to hearing noise in search / combat when noise is not suspicious
 
-better aim mode: 
-    leave aim mode snap to isometric direction
-    find some fixed relation between distance and depth of field. ?
-    don't crawl in aim mode
-    * get character out of the way of aim
-    swing into position, then subtly zoom in to focus on reticle
+sparks on destructible walls

@@ -305,7 +305,20 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
         // Run input
         Motor.MaxStepHeight = stepHeight;
-        if (input.runDown && input.inputMode != InputMode.aim) {
+        if (input.inputMode == InputMode.aim) {
+            isRunning = false;
+            // isCrouching = false;
+            isCrawling = false;
+
+            if (input.CrouchDown) {
+                if (!isCrouching) {
+                    isCrouching = true;
+                    Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
+                    Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
+                }
+                Motor.MaxStepHeight = crawlStepHeight;
+            }
+        } else if (input.runDown) {
             isRunning = true;
         } else {
             isRunning = false;
@@ -320,6 +333,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 Motor.MaxStepHeight = crawlStepHeight;
             }
+
+
             if (!isCrawling && isMoving() && isCrouching) {
                 isCrawling = true;
             }
@@ -753,7 +768,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
 
                     if (GameManager.I.inputMode == InputMode.aim) {
-                        targetMovementVelocity /= 2f;
+                        if (isCrouching) {
+                            targetMovementVelocity = Vector3.zero;
+                        } else {
+                            targetMovementVelocity /= 2f;
+                        }
                     } else if (isRunning) {
                         targetMovementVelocity *= runSpeedFraction;
                     } else if (isCrouching) {// crawling
@@ -1032,10 +1051,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     }
 
     public CameraInput BuildCameraInput() {
-        Vector2 finalLastWallInput = lastWallInput;
-        if (!wallPressRatchet) {
-            finalLastWallInput = Vector2.zero;
-        }
+        Vector2 finalLastWallInput = wallPressRatchet ? lastWallInput : Vector2.zero;
 
         CameraInput input = new CameraInput {
             deltaTime = Time.deltaTime,

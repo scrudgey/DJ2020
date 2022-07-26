@@ -54,7 +54,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public float RotationSpeed = 1f;
     public float RotationSharpness = 10000f;
     Quaternion targetRotation = Quaternion.identity;
-
+    public float initialRotationOffset = 20f;
+    public float verticalRotationOffset = 30f;
 
     [Header("Obstruction")]
     public float ObstructionCheckRadius = 0.2f;
@@ -83,6 +84,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public Vector3 lastTargetPosition;
     public float zoomCoefficient;
     private bool horizontalAimParity;
+    private List<Quaternion> cardinalDirections;
 
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
@@ -187,17 +189,20 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Transform follow = t.Find("cameraFollowPoint");
         if (follow != null) t = follow;
         FollowTransform = t;
-        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
         _currentFollowPosition = FollowTransform.position;
 
+        // initial planar
         // the initial rotation here will be an offset to all subsequent rotations
-        rotationOffset = Quaternion.Euler(Vector3.up * 20f);
+        PlanarDirection = Quaternion.Euler(0, 45, 0) * Vector3.right; // TODO: configurable per level
+        rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
         Quaternion rotationFromInput = rotationOffset;
         PlanarDirection = rotationFromInput * PlanarDirection;
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
-        Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
+        Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
         targetRotation = planarRot * verticalRot;
+
+        cardinalDirections = new List<float> { 0f, 90f, 180f, 270f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
 
         IgnoredColliders.Clear();
         IgnoredColliders.AddRange(t.gameObject.GetComponentsInChildren<Collider>());
@@ -276,21 +281,20 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
 
         // Process rotation input
-        float rotationInput = 0f;
+        float rotationInputDegrees = 0f;
         switch (currentRotationInput) {
             case CameraInput.RotateInput.left:
-                rotationInput = 90f;
+                rotationInputDegrees = 90f;
                 break;
             case CameraInput.RotateInput.right:
-                rotationInput = -90f;
+                rotationInputDegrees = -90f;
                 break;
             default:
             case CameraInput.RotateInput.none:
                 break;
         }
-        currentRotationInput = CameraInput.RotateInput.none;
-        Quaternion verticalRot = Quaternion.Euler(30f, 0, 0);
-        Quaternion rotationFromInput = Quaternion.Euler(Vector3.up * rotationInput);// * RotationSpeed));
+        Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
+        Quaternion rotationFromInput = Quaternion.Euler(Vector3.up * rotationInputDegrees);// * RotationSpeed));
         PlanarDirection = rotationFromInput * PlanarDirection;
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
@@ -302,6 +306,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             targetPosition = FollowTransform.position + worldOffset;
             lastTargetPosition = targetPosition;
         }
+
         return new CameraTargetParameters() {
             fieldOfView = 70f,
             orthographic = true,
@@ -340,7 +345,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             heightOffset = new Vector3(0, -0.75f, 0);
         }
 
-        Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, 30f, -30, 1f), 0, 0);
+        Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
         Vector3 camDirection = -1f * input.wallNormal;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
@@ -368,15 +373,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         input.playerDirection.y = 0f;
 
-        // float heightOffsetCoefficient = 0.5f - cursorPositionNormalized.y;
         Vector3 heightOffset = new Vector3(0, 0.25f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
-        // heightOffset *= -1f * heightOffsetCoefficient;
 
-        // float horizontalParity = cursorPositionNormalized.x - 0.5f;
-        // Vector3 horizontalOffset = Vector3.Cross(Vector3.up, input.playerDirection) * horizontalParity * 2f;
         float horizontalParity = horizontalAimParity ? 1f : -1f;
         Vector3 horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection);
 
@@ -387,17 +388,16 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             horizontalAimParity = false;
         }
 
-        // TODO: aim camera at a point projected from the player towards a plane at an offset
-
         Vector3 camDirectionPoint = Vector3.zero;
         camDirectionPoint += input.playerDirection;
         camDirectionPoint += Vector3.up * cursorPositionNormalized.y + new Vector3(0f, -0.5f, 0f);
         camDirectionPoint += Vector3.Cross(Vector3.up, input.playerDirection) * cursorPositionNormalized.x;
         Quaternion cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
 
-        // Vector3 camDirection = input.playerDirection;
-        // camDirection += new Vector3(0f, -0.1f, 0f) * heightOffsetCoefficient;
-        // Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+        // update PlanarDirection to snap to nearest of 4 quadrants
+        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
+        PlanarDirection = closestCardinal * Vector3.forward;
+
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
