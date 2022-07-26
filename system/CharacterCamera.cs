@@ -193,7 +193,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         // initial planar
         // the initial rotation here will be an offset to all subsequent rotations
-        PlanarDirection = Quaternion.Euler(0, 45, 0) * Vector3.right; // TODO: configurable per level
+        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
         rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
         Quaternion rotationFromInput = rotationOffset;
         PlanarDirection = rotationFromInput * PlanarDirection;
@@ -202,7 +202,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
         targetRotation = planarRot * verticalRot;
 
-        cardinalDirections = new List<float> { 0f, 90f, 180f, 270f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
+        cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
 
         IgnoredColliders.Clear();
         IgnoredColliders.AddRange(t.gameObject.GetComponentsInChildren<Collider>());

@@ -1,6 +1,8 @@
-public struct DamageResult {
-    public enum Type { impact, blocked, none }
-    public Type type;
+using System;
+
+public struct DamageResult : IEquatable<DamageResult> {
+    public enum Type { none, impact, blocked }
+    public DamageResult.Type type;
     public float damageAmount;
     public Damage damage;
 
@@ -16,4 +18,15 @@ public struct DamageResult {
         damage = Damage.NONE,
         type = Type.none
     };
+
+
+    public override bool Equals(object? obj) => obj is DamageResult other && this.Equals(other);
+
+    public bool Equals(DamageResult p) => type == p.type && damageAmount == p.damageAmount;  // TODO: COMPARE damage as well
+
+    public override int GetHashCode() => (type, damageAmount, damage).GetHashCode();
+
+    public static bool operator ==(DamageResult lhs, DamageResult rhs) => lhs.Equals(rhs);
+
+    public static bool operator !=(DamageResult lhs, DamageResult rhs) => !(lhs == rhs);
 }

@@ -1021,6 +1021,8 @@ Q: what is the proper solution?
     * get character out of the way of aim
     * find some fixed relation between distance and depth of field. ?
     * don't crawl in aim mode
+* sparks on destructible walls
+* guard can't see over midheight obstacle
 
 aim: swing into position, then subtly zoom in to focus on reticle
     accompanied by rotating reticle element
@@ -1041,6 +1043,7 @@ graphical issues:
 fix bullethole prefab / material / decal system 
     allow different materials or different prefabs accordingly
 
+damage result addition is weird
 leaves and junk in the street that blows around
 tasklookAt returns running, should return success?
 allow independent level data
@@ -1051,14 +1054,14 @@ when spotted, zoom camera out to show aggressor
 fix camera position in wallpress mode when near edge
 glass break fx
 AI routine for reloading and racking?
-guard can't see over midheight obstacle
-damage result addition is weird
 
 don't destroy on dead; recall to pool.
-spawn new NPC when 
+spawn new NPC 
 interface for designing multiple scenarios
     danger room
     spawning enemies
+    enemy count
+    victory conditions
 gestural aiming with auto-lock
 don't do outline highlight if i am not the player
 
@@ -1069,4 +1072,3 @@ corpse can be shot / exploded
 apply skin graphics to corpse
 better reaction to hearing noise in search / combat when noise is not suspicious
 
-sparks on destructible walls
