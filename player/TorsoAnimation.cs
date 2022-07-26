@@ -14,6 +14,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
+    public AnimationClip unarmedWalkSlowAnimation;
     public AnimationClip crawlAnimation;
     public Skin skin;
     public float trailInterval = 0.05f;
@@ -82,7 +83,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
                 break;
         }
 
-        AnimationClip walkAnimation = unarmedWalkAnimation;
+        AnimationClip walkAnimation = (input.velocity.magnitude < 2f) ? unarmedWalkSlowAnimation : unarmedWalkAnimation;
 
         direction = input.orientation;
 

@@ -1095,6 +1095,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             movementSticking = IsMovementSticking(),
             directionToCamera = OrbitCamera.Transform.position - transform.position,
             hitState = hitState,
+            velocity = Motor.Velocity
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

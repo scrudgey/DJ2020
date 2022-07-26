@@ -1023,12 +1023,20 @@ Q: what is the proper solution?
     * don't crawl in aim mode
 * sparks on destructible walls
 * guard can't see over midheight obstacle
+* adjust walk animation speed with movement
 
+graphical issues:
+    smg torso face left, head face down looks odd
+    female walk left / right torso offset is incorrect?
 aim: swing into position, then subtly zoom in to focus on reticle
     accompanied by rotating reticle element
-
 impact knockback
     slide, kneel, get up?
+fix bullethole prefab / material / decal system 
+    allow different materials or different prefabs accordingly
+tasklookAt returns running, should return success?
+less intense wall sticking?
+creep button (crawling is?)
 
 UI:
     blink cursor when reaching maximum aim
@@ -1036,24 +1044,23 @@ UI:
     health display
     square drops in on targets, stats appear in side 
 
-graphical issues:
-    smg torso face left, head face down looks odd
-    female walk left / right torso offset is incorrect?
-
-fix bullethole prefab / material / decal system 
-    allow different materials or different prefabs accordingly
-
 damage result addition is weird
 leaves and junk in the street that blows around
-tasklookAt returns running, should return success?
 allow independent level data
 prevent extreme zoom maneuvers with lerping
 position call-out
-less intense wall sticking?
 when spotted, zoom camera out to show aggressor
+    slow time a little bit
 fix camera position in wallpress mode when near edge
 glass break fx
 AI routine for reloading and racking?
+don't do outline highlight if i am not the player
+
+gibs from explosions
+corpse can be shot / exploded
+apply skin graphics to corpse
+better reaction to hearing noise in search / combat when noise is not suspicious
+gestural aiming with auto-lock
 
 don't destroy on dead; recall to pool.
 spawn new NPC 
@@ -1062,13 +1069,3 @@ interface for designing multiple scenarios
     spawning enemies
     enemy count
     victory conditions
-gestural aiming with auto-lock
-don't do outline highlight if i am not the player
-
-adjust walk animation speed with movement
-creep button
-gibs from explosions
-corpse can be shot / exploded
-apply skin graphics to corpse
-better reaction to hearing noise in search / combat when noise is not suspicious
-

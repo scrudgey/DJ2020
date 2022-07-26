@@ -24,6 +24,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip walkAnimation;
+    public AnimationClip walkSlowAnimation;
     public AnimationClip crawlAnimation;
     public Skin skin;
     public Direction direction;
@@ -177,7 +178,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 state = State.run;
             } else if (input.isCrouching) { // crawling
                 state = State.crawl;
-                // spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.95f, 0f);
                 shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 shadowCaster.rotation = Quaternion.LookRotation(transform.right, transform.up);
             } else if (true) {
@@ -190,9 +191,16 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                     animator.Play();
                 }
             } else {
-                if (animator.clip != walkAnimation) {
-                    animator.clip = walkAnimation;
-                    animator.Play();
+                if (input.velocity.magnitude < 2f) {
+                    if (animator.clip != walkSlowAnimation) {
+                        animator.clip = walkSlowAnimation;
+                        animator.Play();
+                    }
+                } else {
+                    if (animator.clip != walkAnimation) {
+                        animator.clip = walkAnimation;
+                        animator.Play();
+                    }
                 }
             }
 
@@ -206,11 +214,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             } else if (input.isCrouching) { // crouching or crawling
                 state = State.crouch;
                 if (!isCrawling) { // crouching
-                    // spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
                     shadowCaster.localScale = new Vector3(0.5f, 0.4f, 0.5f);
                 } else { // crawling
-                    spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
-                    // shadowCaster.localScale = new Vector3(0.5f, 0.3f, 0.5f);
+                    spriteRenderer.transform.localPosition = new Vector3(0f, 0.95f, 0f);
                     shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 }
             } else {
@@ -232,14 +238,12 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         Vector3 directionToCamera = input.directionToCamera;
         directionToCamera.y = 0f;
         Quaternion lookTowardCamera = Quaternion.LookRotation(-1f * directionToCamera, Vector3.up);
-        // transform.rotation = input.cameraRotation;
         transform.rotation = lookTowardCamera;
 
         if (spriteRenderer.flipX) {
             Vector3 headPosition = headAnimation.transform.localPosition;
             headPosition.x *= -1f;
             headAnimation.transform.localPosition = headPosition;
-            // headAnimation.spriteRenderer.flipX = !headAnimation.spriteRenderer.flipX;
         }
         if (input.state == CharacterState.wallPress) {
             Vector3 headPosition = headAnimation.transform.localPosition;
