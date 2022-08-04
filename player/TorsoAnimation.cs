@@ -22,7 +22,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
     private AnimationInput lastInput;
     bool isMoving;
     bool isCrouching;
-    bool isCrawling;
+    // bool isCrawling;
     GunType gunType;
 
     SpriteData ApplyTorsoSpriteData(AnimationInput input) {
@@ -35,7 +35,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
             _ => skin.unarmedSpriteData
         };
-        if (isCrawling || input.hitState == HitState.dead) { // crawling
+        if (input.isProne || input.hitState == HitState.dead) { // crawling
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
         SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
@@ -88,7 +88,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         direction = input.orientation;
 
         transform.localPosition = Vector3.zero;
-        if (bob && !isCrawling) {
+        if (bob && !input.isProne) {
             transform.localPosition -= new Vector3(0f, 0.01f, 0f);
         }
 
@@ -97,11 +97,11 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
 
         isMoving = input.isMoving;
         isCrouching = input.isCrouching;
-        if (!isCrawling && isMoving && isCrouching) {
-            isCrawling = true;
+        if (!input.isProne && isMoving && isCrouching) {
+            input.isProne = true;
         }
-        if (isCrawling && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
-            isCrawling = false;
+        if (input.isProne && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
+            input.isProne = false;
         }
         gunType = input.gunInput.gunType;
         // Debug.Log($"hasgun: {input.gunInput.hasGun}");
@@ -157,19 +157,8 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             return;
 
         Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(lastInput);
-        // if (isCrouching) {
-        //     if (isMoving) {
-        //         _sprites = skin.unarmedCrawl;
-        //     } else {
-        //         if (isCrawling) {
-        //             _sprites = skin.unarmedCrawl;
-        //         } else {
-        //             _sprites = skin.gunCrouchSprites(gunType);
-        //         }
-        //     }
-        // }
-
-        if (isCrawling) {
+        // TODO: why is this logic not part of getCurrentTorsoOctet?
+        if (input.isProne) {
             _sprites = skin.unarmedCrawl;
         }
         if (input.hitState == HitState.dead) {

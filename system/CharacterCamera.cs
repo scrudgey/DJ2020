@@ -183,8 +183,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(GameObject g) {
-        Debug.Log("set follow transform");
-
         Transform t = g.transform;
         Transform follow = t.Find("cameraFollowPoint");
         if (follow != null) t = follow;

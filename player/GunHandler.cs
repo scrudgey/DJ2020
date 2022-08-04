@@ -115,6 +115,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             return 0f;
 
         // range
+        // TODO: change this. use a fixed angular 
         float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
         accuracy += gunInstance.baseGun.spread * (distance / 10f);
 

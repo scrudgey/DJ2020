@@ -1,8 +1,6 @@
 using UnityEngine;
 
 public struct PlayerInput {
-
-
     public struct FireInputs {
         public bool FirePressed;
         public bool AimPressed;

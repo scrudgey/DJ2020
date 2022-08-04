@@ -98,7 +98,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private Vector3 snapToDirection = Vector2.zero;
     public bool isCrouching = false;
     public bool isRunning = false;
-    public bool isCrawling = false;
+    public bool isProne = false;
 
     [Header("Wall press")]
     public float pressRadius = 0.1f;
@@ -308,12 +308,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         if (input.inputMode == InputMode.aim) {
             isRunning = false;
             // isCrouching = false;
-            isCrawling = false;
+            isProne = false;
 
             if (input.CrouchDown) {
+                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
                 if (!isCrouching) {
                     isCrouching = true;
-                    Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
                     Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
                 }
                 Motor.MaxStepHeight = crawlStepHeight;
@@ -325,21 +325,19 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
             // Crouching input
             if (input.CrouchDown || input.jumpHeld) {
+                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
                 if (!isCrouching) {
                     isCrouching = true;
-                    Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
                     if (input.CrouchDown)
                         Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
                 }
                 Motor.MaxStepHeight = crawlStepHeight;
             }
-
-
-            if (!isCrawling && isMoving() && isCrouching) {
-                isCrawling = true;
+            if (!isProne && isMoving() && isCrouching) {
+                isProne = true;
             }
-            if (isCrawling && !isCrouching) {
-                isCrawling = false;
+            if (isProne && !isCrouching) {
+                isProne = false;
             }
         }
 
@@ -393,7 +391,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (input.lookAtDirection != Vector3.zero) {
                     lookAtDirection = input.lookAtDirection;
                 }
-                if (isCrouching && !isCrawling && crouchMovementInputTimer < 0.3f) {
+                if (isCrouching && !isProne && crouchMovementInputTimer < 0.3f) {
                     snapToDirection = _moveInputVector;
                 }
 
@@ -434,7 +432,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // allow gun switch
                 gunHandler.ProcessGunSwitch(input);
 
-                // Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                // Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.75f);
                 if (_moveAxis != Vector2.zero) {
                     lastWallInput = _moveAxis;
                 } else {
@@ -711,6 +709,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // Smooth movement Velocity
                 currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
 
+                // Gravity
+                // currentVelocity += Gravity * deltaTime;
                 break;
             case CharacterState.landStun:
                 if (Motor.GroundingStatus.IsStableOnGround) {
@@ -912,12 +912,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             if (Motor.CharacterCollisionsOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders) > 0) {
                 // If obstructions, just stick to crouching dimensions
                 Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
-                // Debug.Log("cancel the uncrouch");
             } else {
                 // If no obstructions, uncrouch
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 isCrouching = false;
-                // Debug.Log("uncrouching");
             }
         }
     }
@@ -1082,6 +1080,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             orientation = Toolbox.DirectionFromAngle(angle),
             isMoving = isMoving(),
             isCrouching = isCrouching,
+            isProne = isProne,
             isRunning = isRunning,
             isJumping = state == CharacterState.superJump,
             isClimbing = state == CharacterState.climbing,

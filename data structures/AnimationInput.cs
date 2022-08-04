@@ -13,6 +13,7 @@ public struct AnimationInput {
     public PlayerInput playerInputs;
     public bool isMoving;
     public bool isCrouching;
+    public bool isProne;
     public bool isRunning;
     public bool isJumping;
     public bool isClimbing;

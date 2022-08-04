@@ -36,7 +36,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
     public Vector3 scaleOffset;
     bool isMoving;
     bool isCrouching;
-    bool isCrawling;
     float crouchTransitionTimer;
     float hitstunTimer;
     bool hitstunEffect;
@@ -92,7 +91,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         } else {
             spriteRenderer.enabled = true;
             torsoAnimation.spriteRenderer.enabled = true;
-            headAnimation.spriteRenderer.enabled = true;
+            headAnimation.spriteRenderer.enabled = true; // TODO: ok?xs
             offset = Vector3.zero;
             scaleOffset = Vector3.zero;
         }
@@ -122,12 +121,13 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             isCrouching = input.isCrouching;
             crouchTransitionTimer = 0f;
         }
-        if (!isCrawling && isMoving && isCrouching) {
-            isCrawling = true;
-        }
-        if (isCrawling && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
-            isCrawling = false;
-        }
+        // if (!isCrawling && isMoving && isCrouching) {
+        //     isCrawling = true;
+        // }
+        // if (isCrawling && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
+        //     isCrawling = false;
+        //     Debug.Log("unset isCrawling: false");
+        // }
         float scaleFactor = 1f;
         if (crouchTransitionTimer < 0.1f) {
             scaleFactor = (float)PennerDoubleAnimation.BounceEaseIn(crouchTransitionTimer, 1.1f, -0.1f, 0.1f);
@@ -164,9 +164,23 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         }
 
         // set mode and animation
-        spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+        if (input.isCrouching) {
+            if (input.isProne && !(input.state == CharacterState.wallPress || input.wallPressTimer > 0)) {
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+            } else {
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+            }
+            // TODO: fix this
+            // if (input.state == CharacterState.wallPress || input.wallPressTimer > 0) {
+            //     Debug.Log("wallpress crawl");
+            //     spriteRenderer.transform.localPosition = new Vector3(0f, 0.95f, 0f);
+            // } else {
+            //     spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
+            // }
+        } else {
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+        }
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
-
         if (input.hitState == HitState.dead) {
             animator.Stop();
         } else if (input.isMoving) {
@@ -178,7 +192,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 state = State.run;
             } else if (input.isCrouching) { // crawling
                 state = State.crawl;
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.95f, 0f);
+                spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
                 shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 shadowCaster.rotation = Quaternion.LookRotation(transform.right, transform.up);
             } else if (true) {
@@ -203,7 +217,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                     }
                 }
             }
-
         } else { // stopped
             if (input.isJumping) {
                 state = State.jump;
@@ -213,10 +226,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
             } else if (input.isCrouching) { // crouching or crawling
                 state = State.crouch;
-                if (!isCrawling) { // crouching
+                if (!input.isProne) { // crouching
                     shadowCaster.localScale = new Vector3(0.5f, 0.4f, 0.5f);
                 } else { // crawling
-                    spriteRenderer.transform.localPosition = new Vector3(0f, 0.95f, 0f);
                     shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
                 }
             } else {
@@ -231,7 +243,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         shadowCaster.localPosition = new Vector3(0f, shadowCaster.localScale.y - 0.05f, 0f);
         spriteRenderer.transform.localPosition += offset;
 
-        UpdateFrame(input.state);
+        UpdateFrame(input);
         SpriteData torsoSpriteData = torsoAnimation.UpdateView(input);
 
         // set rotation to be coplanar with the camera plane
@@ -245,7 +257,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             headPosition.x *= -1f;
             headAnimation.transform.localPosition = headPosition;
         }
-        if (input.state == CharacterState.wallPress) {
+        if (input.state == CharacterState.wallPress || input.wallPressTimer > 0f) {
             Vector3 headPosition = headAnimation.transform.localPosition;
             headPosition.x *= -1f;
             headAnimation.transform.localPosition = headPosition;
@@ -275,18 +287,17 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         skin = Skin.LoadSkin(data.legSkin);
     }
 
-    public void UpdateFrame(CharacterState characterState) {
+    public void UpdateFrame(AnimationInput input) {
         // TODO: handle this in the same way as torso animation. and / or put the logic in Skin.
         Octet<Sprite[]> octet = null;
         octet = skin.GetCurrentLegsOctet(state);
-        if (isCrawling) {
-            octet = skin.legsCrawl;
-        }
+
         if (hitState == HitState.dead) {
             octet = skin.legsDead;
-        }
-        if (characterState == CharacterState.keelOver) {
+        } else if (input.state == CharacterState.keelOver) {
             octet = skin.legsKeelOver;
+        } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
+            octet = skin.legsCrawl;
         }
         Sprite[] sprites = octet[direction];
         frame = Math.Min(frame, sprites.Length - 1);

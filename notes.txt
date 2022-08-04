@@ -1024,48 +1024,74 @@ Q: what is the proper solution?
 * sparks on destructible walls
 * guard can't see over midheight obstacle
 * adjust walk animation speed with movement
+* wallpress crouch
+* wallpress crouch head visibility
+* vertical offset when crawling in wallpress mode should be higher
 
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
-aim: swing into position, then subtly zoom in to focus on reticle
-    accompanied by rotating reticle element
-impact knockback
-    slide, kneel, get up?
-fix bullethole prefab / material / decal system 
-    allow different materials or different prefabs accordingly
-tasklookAt returns running, should return success?
-less intense wall sticking?
-creep button (crawling is?)
 
-UI:
-    blink cursor when reaching maximum aim
-    bigger aim reticle
-    health display
-    square drops in on targets, stats appear in side 
+uncertain:
+    tasklookAt returns running, should return success?
+    less intense wall sticking?
+    creep button (crawling is?)
+        slow walk?
+
+nice to have / future goals:
+    aim: swing into position, then subtly zoom in to focus on reticle
+        accompanied by rotating reticle element
+    impact knockback
+        slide, kneel, get up?
+    fix bullethole prefab / material / decal system 
+        allow different materials or different prefabs accordingly
+    glass break fx
+    leaves and junk in the street that blows around
+    fix camera position in wallpress mode when near edge
+
+
+
+
 
 damage result addition is weird
-leaves and junk in the street that blows around
 allow independent level data
+allow independent NPC data
 prevent extreme zoom maneuvers with lerping
-position call-out
-when spotted, zoom camera out to show aggressor
-    slow time a little bit
-fix camera position in wallpress mode when near edge
-glass break fx
+    also, initialize camera with proper zoom?
 AI routine for reloading and racking?
 don't do outline highlight if i am not the player
-
 gibs from explosions
 corpse can be shot / exploded
 apply skin graphics to corpse
 better reaction to hearing noise in search / combat when noise is not suspicious
-gestural aiming with auto-lock
+gibs awake clone
+use object pooling for audio sources
+broken superjump
+torso spritesheet has head included
+pool the noiseobject
 
-don't destroy on dead; recall to pool.
-spawn new NPC 
-interface for designing multiple scenarios
-    danger room
-    spawning enemies
-    enemy count
-    victory conditions
+control / combat:
+    gestural aiming with auto-lock
+    better shotgun
+    aim: fixed angular size
+    alert level change:
+        when spotted, zoom camera out to show aggressor
+        slow time a little bit
+        show in UI
+
+UI:
+    blink cursor when reaching maximum aim
+    sound effects accompany UI elements
+    bigger aim reticle
+    health display
+    square drops in on targets, stats appear in side 
+    position call-out
+
+VR combat training:
+    don't destroy on dead; recall to pool.
+    spawn new NPC 
+    interface for designing multiple scenarios
+        danger room
+        spawning enemies
+        enemy count
+        victory conditions

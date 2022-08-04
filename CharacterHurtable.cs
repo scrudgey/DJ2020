@@ -9,7 +9,7 @@ public enum HitState { normal, hitstun, dead, invulnerable }
 public class CharacterHurtable : Destructible {
     public enum HitStunType { timer, invulnerable }
     public HitStunType hitstunType;
-    private HitState _hitState;
+    // private HitState _hitState;
     public float wallDecalDistance = 1f;
     public float wallDecalProbability = 0.2f;
     public CharacterController controller;
