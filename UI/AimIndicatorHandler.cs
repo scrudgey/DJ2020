@@ -71,6 +71,7 @@ namespace UI {
                 inaccuracyInPixels = (inaccuracyLength / lengthPerAngle) * (pixelsPerDegree);
 
             } else {
+                // TODO: fix this, should be fixed angular radius
                 float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
                 float inaccuracyDegree = Mathf.Atan(inaccuracyLength / distance) * Mathf.Rad2Deg;
                 float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
@@ -118,4 +119,6 @@ namespace UI {
     // next, to establish a size at a distance:
     // tan(θ) = l / d
     // 
+
+
 }

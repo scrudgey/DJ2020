@@ -5,9 +5,6 @@ using cakeslice;
 using UnityEngine;
 public class PlayerOutlineHandler : MonoBehaviour {
     public List<Outline> outlines;
-    // public Outline legsOutline;
-    // public Outline torsoOutline;
-    // public Outline headOutline;
 
     public float period = 0.1f;
     public int cycles = 3;

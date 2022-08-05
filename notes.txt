@@ -1078,6 +1078,10 @@ control / combat:
         when spotted, zoom camera out to show aggressor
         slow time a little bit
         show in UI
+    suspicion:
+        audio indicator
+        text indicator
+        pulse image outward
 
 UI:
     blink cursor when reaching maximum aim
@@ -1095,3 +1099,9 @@ VR combat training:
         spawning enemies
         enemy count
         victory conditions
+
+
+lock on:
+    * draw lock radius
+    lock when enemy in radius
+    lock to closer when multiple enemies in radius
