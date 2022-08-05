@@ -18,7 +18,8 @@ public class UIController : MonoBehaviour {
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
-    public LockRadiusIndicatorHandler lockRadiusIndicator;
+    public LockRadiusIndicatorHandler lockRadiusIndicatorHandler;
+    public LockIndicatorHandler lockIndicatorHandler;
     public InteractiveHighlightHandler interactiveHighlightHandler;
     public ActionLogHandler actionLogHandler;
     public OverlayHandler overlayHandler;
@@ -35,7 +36,8 @@ public class UIController : MonoBehaviour {
         interactiveHighlightHandler.cam = Camera.main;
         overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
-        lockRadiusIndicator.UICamera = Camera.main;
+        lockRadiusIndicatorHandler.UICamera = Camera.main;
+        lockIndicatorHandler.UICamera = Camera.main;
         hackDisplay.cam = Camera.main;
 
         GameManager.OnFocusChanged += BindToNewTarget;
@@ -59,7 +61,8 @@ public class UIController : MonoBehaviour {
         itemUIHandler.Bind(target);
 
         aimIndicatorHandler.Bind(target);
-        lockRadiusIndicator.Bind(target);
+        lockRadiusIndicatorHandler.Bind(target);
+        lockIndicatorHandler.Bind(target);
 
         interactiveHighlightHandler.Bind(target);
 

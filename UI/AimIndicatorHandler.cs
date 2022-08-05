@@ -63,9 +63,6 @@ namespace UI {
             float inaccuracyLength = target.inaccuracy(target.currentTargetData);
             float inaccuracyInPixels = 1f;
             if (UICamera.orthographic) {
-                // length per angle: (UICamera.orthographicSize * 2?) / (UICamera.fieldOfView) ???
-                // pixels per degree: (UICamera.scaledPixelHeight / UICamera.fieldOfView)
-                // (inaccuracy / length per angle) * (pixels per degree) = inaccuracy in pixels
                 float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
                 float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
                 inaccuracyInPixels = (inaccuracyLength / lengthPerAngle) * (pixelsPerDegree);

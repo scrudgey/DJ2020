@@ -101,7 +101,7 @@ public class Toolbox {
         }
     }
     static public TagSystemData GetTagData(GameObject target) {
-        TagSystem system = target.GetComponentInChildren<TagSystem>();
+        TagSystem system = target.transform.root.GetComponentInChildren<TagSystem>();
         if (system != null) {
             return system.data;
         } else return new TagSystemData();

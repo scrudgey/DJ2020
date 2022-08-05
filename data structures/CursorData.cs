@@ -8,4 +8,5 @@ public class CursorData {
     public Vector2 screenPositionNormalized;
     public HighlightableTargetData highlightableTargetData;
     public static CursorData none = new CursorData();
+    public Collider targetCollider;
 }

@@ -1090,6 +1090,7 @@ UI:
     health display
     square drops in on targets, stats appear in side 
     position call-out
+    off-screen indicator for active threats?
 
 VR combat training:
     don't destroy on dead; recall to pool.
@@ -1103,5 +1104,9 @@ VR combat training:
 
 lock on:
     * draw lock radius
-    lock when enemy in radius
-    lock to closer when multiple enemies in radius
+    * lock when enemy in radius
+        * disable lock radius indicator
+    * lock to closer when multiple enemies in radius
+    * lerp in the lock indicator
+    configurable lock distance
+    camera should move a bit to the lock or something?

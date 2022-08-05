@@ -560,6 +560,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         TagSystemData priorityData = null;
         bool prioritySet = false;
+        Collider targetCollider = null;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             Highlightable interactive = hit.collider.GetComponent<Highlightable>();
@@ -579,19 +580,22 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                     targetPoint = hit.collider.bounds.center;
                 }
                 prioritySet = true;
+                targetCollider = hit.collider;
             }
         }
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
         if (prioritySet) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
+            // TODO: set collider
             return new CursorData {
                 type = CursorData.TargetType.objectLock,
                 // clickRay = clickRay,
                 screenPosition = pointPosition,
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
-                worldPosition = targetPoint
+                worldPosition = targetPoint,
+                targetCollider = targetCollider
             };
         } else {
             // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
@@ -606,13 +610,40 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             if (plane.Raycast(clickRay, out distance)) {
                 targetPoint = clickRay.GetPoint(distance);
             }
+
+            // if priority is not set, try lock 
+            Collider[] others = Physics.OverlapSphere(targetPoint, 2f, LayerUtil.GetMask(Layer.obj))
+                .Where(collider => !collider.transform.IsChildOf(GameManager.I.playerObject.transform)).ToArray();
+
+            if (others.Length > 0) {
+                Collider nearestOther = others.Aggregate((curMin, x) => (curMin == null || (Vector3.Distance(targetPoint, x.bounds.center)) < Vector3.Distance(targetPoint, curMin.bounds.center) ? x : curMin));
+                nearestOther = nearestOther.transform.root.GetComponentInChildren<Collider>();
+
+                targetPoint = nearestOther.bounds.center;
+                TagSystemData tagData = Toolbox.GetTagData(nearestOther.gameObject);
+                if (tagData != null && tagData.targetPoint != null) {
+                    targetPoint = tagData.targetPoint.position;
+                }
+                Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
+                return new CursorData {
+                    type = CursorData.TargetType.objectLock,
+                    // clickRay = clickRay,
+                    screenPosition = pointPosition,
+                    screenPositionNormalized = normalizeScreenPosition(pointPosition),
+                    highlightableTargetData = interactorData,
+                    worldPosition = targetPoint,
+                    targetCollider = nearestOther
+                };
+            }
+
             return new CursorData {
                 type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,
                 screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
-                worldPosition = targetPoint
+                worldPosition = targetPoint,
+                // targetCollider = interactorData.collider
             };
         }
     }
