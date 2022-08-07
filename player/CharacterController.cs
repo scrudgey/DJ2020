@@ -210,6 +210,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     }
     private void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        gunHandler.characterCamera = OrbitCamera;
         // Assign to motor
         Motor.CharacterController = this;
         characterHurtable.OnHitStateChanged += HandleHurtableChanged;

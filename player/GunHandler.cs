@@ -12,6 +12,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         racking,
         reloading,
     }
+    public CharacterCamera characterCamera;
     public GunState state;
     public InputMode inputMode;
     public Action<GunHandler> OnValueChanged { get; set; }
@@ -30,6 +31,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public CursorData lastShootInput;
     public bool shootRequestedThisFrame;
     public CursorData currentTargetData;
+    public Collider lockedOnCollider;
+    public Vector3 lockedOnPoint;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
@@ -351,12 +354,38 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         inputMode = input.inputMode;
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
+
+        Vector3 targetPoint = input.Fire.cursorData.worldPosition;
         if (HasGun()) {
+            // if priority is not set, try lock 
+            float lockRadius = gunInstance.baseGun.lockOnSize;
+            Collider[] others = Physics.OverlapSphere(targetPoint, lockRadius, LayerUtil.GetMask(Layer.obj))
+                .Where(collider => !collider.transform.IsChildOf(GameManager.I.playerObject.transform))
+                .ToArray();
+            if (others.Length > 0) {
+                Collider nearestOther = others.Aggregate((curMin, x) => (curMin == null || (Vector3.Distance(targetPoint, x.bounds.center)) < Vector3.Distance(targetPoint, curMin.bounds.center) ? x : curMin));
+                nearestOther = nearestOther.transform.root.GetComponentInChildren<Collider>();
+                targetPoint = nearestOther.bounds.center;
+                TagSystemData tagData = Toolbox.GetTagData(nearestOther.gameObject);
+                if (tagData != null && tagData.targetPoint != null) {
+                    targetPoint = tagData.targetPoint.position;
+                }
+                lockedOnCollider = nearestOther;
+                lockedOnPoint = targetPoint;
+                Vector2 pointPosition = characterCamera.Camera.WorldToScreenPoint(targetPoint);
+                input.Fire.cursorData.type = CursorData.TargetType.objectLock;
+                input.Fire.cursorData.screenPosition = pointPosition;
+                input.Fire.cursorData.worldPosition = targetPoint;
+                input.Fire.cursorData.targetCollider = nearestOther;
+            } else {
+                lockedOnCollider = null;
+                lockedOnPoint = Vector3.zero;
+            }
+
             if (CanShoot()) {
                 if (gunInstance.baseGun.cycle == CycleType.automatic) {
                     if (input.Fire.FirePressed && state != GunState.shooting) {
                         lastShootInput = input.Fire.cursorData;
-                        // Debug.Log($"lastShootInput: {lastShootInput.targetData.position}");
                         state = GunState.shooting;
                     } else if (input.Fire.FireHeld) {
                         state = GunState.shooting;
@@ -369,7 +398,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
                         lastShootInput = input.Fire.cursorData;
                         state = GunState.shooting;
                         shootRequestedThisFrame = true;
-                        // Debug.Log("shoot requested this frame");
                     }
                 }
             } else {

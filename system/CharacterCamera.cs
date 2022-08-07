@@ -19,7 +19,6 @@ public struct CameraInput {
     public bool crouchHeld;
     public Vector3 playerPosition;
     public CharacterState state;
-    // public Vector3 cursorPosition;
     public CursorData targetData;
     public Vector3 playerDirection;
     public Vector3 playerLookDirection;
@@ -500,47 +499,16 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
         float desiredOrthographicSize = input.orthographicSize * zoomCoefficient;
         float previousOrthographicSize = Camera.orthographicSize;
-        // Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, desiredOrthographicSize, Time.deltaTime);
-        // Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, desiredOrthographicSize, Time.deltaTime * 4f);
         Camera.orthographicSize = desiredOrthographicSize;
-        // int i = 0;
-        // if (PlayerInsideBounds(screenPoint)) {
-        //     if (Camera.orthographicSize < desiredOrthographicSize) {
-        //         while (i < 10 && Camera.orthographicSize < desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
-        //             i++;
-        //             Camera.orthographicSize += 0.05f;
-        //             screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-        //         }
-        //         Camera.orthographicSize = Math.Min(desiredOrthographicSize, Camera.orthographicSize);
-        //     } else if (Camera.orthographicSize > desiredOrthographicSize) {
-        //         while (i < 10 && Camera.orthographicSize > desiredOrthographicSize && PlayerInsideBounds(screenPoint)) {
-        //             i++;
-        //             Camera.orthographicSize -= 0.05f;
-        //             screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-        //         }
-        //         if (i == 1) {
-        //             Camera.orthographicSize = previousOrthographicSize;
-        //         } else {
-        //             Camera.orthographicSize = Math.Max(desiredOrthographicSize, Camera.orthographicSize);
-        //         }
-        //     }
-        // } else {
-        //     while (i < 10 && !PlayerInsideBounds(screenPoint)) {
-        //         i++;
-        //         Camera.orthographicSize += 0.01f;
-        //         screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-        //     }
-        // }
     }
-    public CursorData GetTargetData() {
+    public CursorData GetTargetData(Vector2 cursorPosition) {
         if (GameManager.I.inputMode == InputMode.aim) {
-            return AimToTarget();
+            return AimToTarget(cursorPosition);
         } else {
-            return CursorToTarget();
+            return CursorToTarget(cursorPosition);
         }
     }
-    private CursorData CursorToTarget() {
-        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+    private CursorData CursorToTarget(Vector2 cursorPosition) {
 
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
@@ -611,31 +579,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 targetPoint = clickRay.GetPoint(distance);
             }
 
-            // if priority is not set, try lock 
-            Collider[] others = Physics.OverlapSphere(targetPoint, 2f, LayerUtil.GetMask(Layer.obj))
-                .Where(collider => !collider.transform.IsChildOf(GameManager.I.playerObject.transform)).ToArray();
-
-            if (others.Length > 0) {
-                Collider nearestOther = others.Aggregate((curMin, x) => (curMin == null || (Vector3.Distance(targetPoint, x.bounds.center)) < Vector3.Distance(targetPoint, curMin.bounds.center) ? x : curMin));
-                nearestOther = nearestOther.transform.root.GetComponentInChildren<Collider>();
-
-                targetPoint = nearestOther.bounds.center;
-                TagSystemData tagData = Toolbox.GetTagData(nearestOther.gameObject);
-                if (tagData != null && tagData.targetPoint != null) {
-                    targetPoint = tagData.targetPoint.position;
-                }
-                Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
-                return new CursorData {
-                    type = CursorData.TargetType.objectLock,
-                    // clickRay = clickRay,
-                    screenPosition = pointPosition,
-                    screenPositionNormalized = normalizeScreenPosition(pointPosition),
-                    highlightableTargetData = interactorData,
-                    worldPosition = targetPoint,
-                    targetCollider = nearestOther
-                };
-            }
-
             return new CursorData {
                 type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,
@@ -648,15 +591,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         }
     }
 
-    Vector2 normalizeScreenPosition(Vector2 cursorPosition) {
+    public Vector2 normalizeScreenPosition(Vector2 cursorPosition) {
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
         float verticalPixels = Camera.scaledPixelHeight;
         return new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels);
     }
 
 
-    private CursorData AimToTarget() {
-        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+    private CursorData AimToTarget(Vector2 cursorPosition) {
 
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);

@@ -1027,6 +1027,14 @@ Q: what is the proper solution?
 * wallpress crouch
 * wallpress crouch head visibility
 * vertical offset when crawling in wallpress mode should be higher
+* lock on:
+    * draw lock radius
+    * lock when enemy in radius
+        * disable lock radius indicator
+    * lock to closer when multiple enemies in radius
+    * lerp in the lock indicator
+    * configurable lock distance
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1048,7 +1056,8 @@ nice to have / future goals:
     glass break fx
     leaves and junk in the street that blows around
     fix camera position in wallpress mode when near edge
-
+    camera should move a bit to the lock or something?
+        or: off-screen lock indicator?
 
 
 
@@ -1069,6 +1078,7 @@ use object pooling for audio sources
 broken superjump
 torso spritesheet has head included
 pool the noiseobject
+a third grid: alarm systems
 
 control / combat:
     gestural aiming with auto-lock
@@ -1091,6 +1101,11 @@ UI:
     square drops in on targets, stats appear in side 
     position call-out
     off-screen indicator for active threats?
+    graph system:
+        [<<][ELECTRICAL][>>]
+         -                +
+        and these are buttons you can click
+    pixel perfect shaders
 
 VR combat training:
     don't destroy on dead; recall to pool.
@@ -1100,13 +1115,3 @@ VR combat training:
         spawning enemies
         enemy count
         victory conditions
-
-
-lock on:
-    * draw lock radius
-    * lock when enemy in radius
-        * disable lock radius indicator
-    * lock to closer when multiple enemies in radius
-    * lerp in the lock indicator
-    configurable lock distance
-    camera should move a bit to the lock or something?

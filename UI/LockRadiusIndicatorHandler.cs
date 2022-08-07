@@ -22,7 +22,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
                 return;
             }
             cursorMaskRect.position = data.screenPosition;
-            SetScale();
+            SetScale(gunHandler);
         } else {
             DisableCursorImage();
         }
@@ -30,12 +30,13 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     void DisableCursorImage() {
         cursorImage.enabled = false;
     }
-    public void SetScale() {
-        float locksizeInPixels = 1f;
+    public void SetScale(GunHandler gunHandler) {
+        // TODO: locksize depends on gun
+        float locksizeInPixels = gunHandler.gunInstance.baseGun.lockOnSize;
         if (UICamera.orthographic) {
             float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
             float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
-            locksizeInPixels = (2f / lengthPerAngle) * (pixelsPerDegree);
+            locksizeInPixels = (locksizeInPixels / lengthPerAngle) * (pixelsPerDegree);
         }
         cursorRect.sizeDelta = Vector2.one * locksizeInPixels * 1.02f;
         cursorMaskRect.sizeDelta = Vector2.one * locksizeInPixels;

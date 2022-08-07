@@ -21,8 +21,10 @@ public class Gun : ScriptableObject {
     public float range;
     public float spread;
     public float shootInaccuracy;
+    public float lockOnSize = 1f;
     public LoHi baseDamage;
     public Sprite image;
+
 
     [Header("Resources")]
     public AudioClip[] shootSounds;

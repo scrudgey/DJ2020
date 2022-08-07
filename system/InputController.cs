@@ -202,7 +202,8 @@ public class InputController : MonoBehaviour {
     }
 
     private void HandleCharacterInput() {
-        CursorData targetData = OrbitCamera.GetTargetData();
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+        CursorData targetData = OrbitCamera.GetTargetData(cursorPosition);
         Vector3 torque = Vector3.zero;
         if (GameManager.I.inputMode == InputMode.aim) {
             if (targetData.screenPositionNormalized.x > 0.9) {
