@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum HitState { normal, hitstun, dead, invulnerable }
 
-public class CharacterHurtable : Destructible {
+public class CharacterHurtable : Destructible, IBindable<CharacterHurtable> {
     public enum HitStunType { timer, invulnerable }
     public HitStunType hitstunType;
     // private HitState _hitState;
@@ -16,22 +16,25 @@ public class CharacterHurtable : Destructible {
     public LegsAnimation legsAnimation;
     private float hitstunCountdown;
     public float hitstunAmount = 0.1f;
+    public Action<CharacterHurtable> OnValueChanged { get; set; }
     public override void Awake() {
         base.Awake();
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
         RegisterDamageCallback<ExplosionDamage>(TakeExplosionDamage);
     }
     public override DamageResult TakeDamage(Damage damage) {
-        if (hitState == HitState.invulnerable) {
-            return DamageResult.NONE;
-        } else {
-            return base.TakeDamage(damage);
+        DamageResult result = DamageResult.NONE;
+        if (hitState != HitState.invulnerable) {
+            result = base.TakeDamage(damage);
         }
+        OnValueChanged?.Invoke(this);
+        return result;
     }
     public DamageResult TakeBulletDamage(BulletDamage damage) {
         PlayerInput snapInput = new PlayerInput {
             lookAtPosition = damage.bullet.ray.origin,
-            snapToLook = true
+            snapToLook = true,
+            Fire = PlayerInput.FireInputs.none
         };
         controller.SetInputs(snapInput);
 

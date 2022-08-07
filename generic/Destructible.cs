@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 public class Destructible : Damageable {
     public float health;
+    public float fullHealthAmount;
     private bool doDestruct;
     public float destructionTimer = 5f;
     public GameObject[] destructionFx;

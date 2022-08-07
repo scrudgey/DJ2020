@@ -32,7 +32,7 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
             }
             if (data.type == CursorData.TargetType.objectLock) {
                 if (targetLockCollider != data.targetCollider) {
-                    Debug.Log($"{targetLockCollider} {data.targetCollider}");
+                    // Debug.Log($"{targetLockCollider} {data.targetCollider}");
                     transitionTime = 0f;
                     // TODO: play lock sound
                     audioSource.PlayOneShot(mouseoverSound);

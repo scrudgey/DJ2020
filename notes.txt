@@ -1097,7 +1097,6 @@ UI:
     blink cursor when reaching maximum aim
     sound effects accompany UI elements
     bigger aim reticle
-    health display
     square drops in on targets, stats appear in side 
     position call-out
     off-screen indicator for active threats?
@@ -1115,3 +1114,13 @@ VR combat training:
         spawning enemies
         enemy count
         victory conditions
+
+
+* health display
+    * display number
+    * display pips
+    * display empty pips based on full health
+
+increase resolution / font size for other ui elements
+embellishments
+    small font text near locked-on character

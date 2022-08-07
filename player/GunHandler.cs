@@ -355,8 +355,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
 
-        Vector3 targetPoint = input.Fire.cursorData.worldPosition;
         if (HasGun()) {
+            Vector3 targetPoint = input.Fire.cursorData.worldPosition;
+
             // if priority is not set, try lock 
             float lockRadius = gunInstance.baseGun.lockOnSize;
             Collider[] others = Physics.OverlapSphere(targetPoint, lockRadius, LayerUtil.GetMask(Layer.obj))

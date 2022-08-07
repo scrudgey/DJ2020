@@ -27,6 +27,7 @@ public class UIController : MonoBehaviour {
     public HackDisplay hackDisplay;
     public VisibilityUIHandler visibilityUIHandler;
     public SuspicionUIHandler suspicionUIHandler;
+    public HealthIndicatorController healthIndicatorController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -71,6 +72,8 @@ public class UIController : MonoBehaviour {
 
         overlayHandler.Bind();
         actionLogHandler.Bind(target);
+
+        healthIndicatorController.Bind(target);
     }
 
     void HandleMenuChange(MenuType type) {
