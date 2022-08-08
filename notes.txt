@@ -1034,7 +1034,14 @@ Q: what is the proper solution?
     * lock to closer when multiple enemies in radius
     * lerp in the lock indicator
     * configurable lock distance
-
+* health display
+    * display number
+    * display pips
+    * display empty pips based on full health
+* increase resolution / font size for other ui elements
+* lerp in autoaim circle
+    * first time you pull the gun out?
+    * circle comes in from outside
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1095,10 +1102,8 @@ control / combat:
 
 UI:
     blink cursor when reaching maximum aim
-    sound effects accompany UI elements
-    bigger aim reticle
-    square drops in on targets, stats appear in side 
-    position call-out
+    * bigger aim reticle
+    * square drops in on targets, stats appear in side 
     off-screen indicator for active threats?
     graph system:
         [<<][ELECTRICAL][>>]
@@ -1116,11 +1121,16 @@ VR combat training:
         victory conditions
 
 
-* health display
-    * display number
-    * display pips
-    * display empty pips based on full health
-
-increase resolution / font size for other ui elements
 embellishments
     small font text near locked-on character
+    [[ LOCKED ]] text blink
+    arcs swing about lock size indicator
+    small text indicates size of autoaim circle
+
+sound effects accompany UI elements
+    * change sound for lock
+    sound for unlock?
+position call-out
+    outline square
+    text?
+    pull-in from sides?

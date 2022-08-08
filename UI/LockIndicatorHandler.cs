@@ -18,8 +18,6 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
     float alpha = 1f;
     float effectScale = 0.25f;
 
-    // TODO: parametetrize the scale factor 
-
     void Start() {
         initialColor = cursorImage.color;
     }
@@ -32,9 +30,7 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
             }
             if (data.type == CursorData.TargetType.objectLock) {
                 if (targetLockCollider != data.targetCollider) {
-                    // Debug.Log($"{targetLockCollider} {data.targetCollider}");
                     transitionTime = 0f;
-                    // TODO: play lock sound
                     audioSource.PlayOneShot(mouseoverSound);
                 }
                 targetLockCollider = data.targetCollider;
@@ -59,7 +55,6 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
     }
     void DisableCursorImage() {
         if (targetLockCollider != null) {
-            // Debug.Break();
         }
         cursorImage.enabled = false;
         targetLockCollider = null;
@@ -118,9 +113,8 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
 
         cursorImage.enabled = true;
         cursorRect.position = data.screenPosition;
-        cursorRect.sizeDelta = new Vector2(total_max_x - total_min_x, total_max_y - total_min_y) * scaleFactor;
+        cursorRect.sizeDelta = new Vector2(total_max_x - total_min_x, total_max_y - total_min_y) * scaleFactor * 1.05f;
 
-        Color newColor = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
-        cursorImage.color = newColor;
+        cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
     }
 }

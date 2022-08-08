@@ -16,6 +16,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public AudioSource audioSource;
     public Image cursorImage;
     private float timer;
+    public Color color;
     void Awake() {
         blitTextCoroutine = null;
     }
@@ -60,15 +61,10 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         } else if (data != null) {
             Vector3 screenPoint = cam.WorldToScreenPoint(data.collider.bounds.center);
             cursor.position = screenPoint;
-            cursorText.color = Color.green;
-            dotText.color = Color.green;
-            cursorImage.color = Color.green;
+            cursorText.color = color;
+            dotText.color = color;
+            cursorImage.color = color;
             SetScale();
-            // if (timer < 1f) {
-            //     cursorImage.enabled = true;
-            // } else {
-            //     cursorImage.enabled = false;
-            // }
             cursorImage.enabled = false;
         }
     }

@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
+
 using UnityEngine;
-using UnityEngine.UI;
-public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
-    // public Image cursorImage;
+public class PlayerCalloutHandler : MonoBehaviour {
     public CutoutMaskUI cursorImage;
     public RectTransform cursorRect;
     public RectTransform cursorMaskRect;
@@ -12,7 +11,6 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     public AudioSource audioSource;
     public AudioClip activateSound;
     Color initialColor;
-    bool hasGun;
     float transitionTime;
     float transitionDuration = 0.5f;
     float scaleFactor = 1f;
@@ -21,31 +19,14 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     void Start() {
         initialColor = cursorImage.color;
     }
-    override public void HandleValueChanged(GunHandler gunHandler) {
-        if (gunHandler.HasGun()) {
-            cursorImage.enabled = true;
-            CursorData data = gunHandler.currentTargetData;
-            if (data == null) {
-                DisableCursorImage();
-                return;
-            }
-            if (data.type == CursorData.TargetType.objectLock) {
-                DisableCursorImage();
-                return;
-            }
-            if (!hasGun) {
-                transitionTime = 0f;
-                scaleFactor = 1f + effectScale;
-                alpha = 0f;
-                audioSource.PlayOneShot(activateSound);
-            }
-            cursorMaskRect.position = data.screenPosition;
-            SetScale(gunHandler);
-            hasGun = true;
-        } else {
-            DisableCursorImage();
-            hasGun = false;
-        }
+    public void ActivatePlayerCallout() {
+        cursorImage.enabled = true;
+        transitionTime = 0f;
+        scaleFactor = 1f + effectScale;
+        alpha = 0f;
+        audioSource.PlayOneShot(activateSound);
+        cursorMaskRect.position = data.screenPosition;
+        SetScale();
     }
     void DisableCursorImage() {
         cursorImage.enabled = false;
@@ -61,7 +42,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
             }
         }
     }
-    public void SetScale(GunHandler gunHandler) {
+    public void SetScale() {
         // TODO: locksize depends on gun
         float locksizeInPixels = gunHandler.gunInstance.baseGun.lockOnSize;
         if (UICamera.orthographic) {

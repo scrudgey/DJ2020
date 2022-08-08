@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 public class ActionLogHandler : IBinder<Interactor> {
-    // public Interactor target { get; set; }
-
     public Transform logTextHolder;
     public GameObject logTextEntryPrefab;
     public TextMeshProUGUI promptText;
     public InteractorTargetData data;
     Coroutine blitTextCoroutine;
     public AudioSource audioSource;
-
     static readonly string prefix = ">";
     static readonly string dot = "<sprite index=1 tint>";
-
-
     void Start() {
         foreach (Transform child in logTextHolder) {
             Destroy(child.gameObject);
