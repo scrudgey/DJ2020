@@ -28,6 +28,7 @@ public class UIController : MonoBehaviour {
     public VisibilityUIHandler visibilityUIHandler;
     public SuspicionUIHandler suspicionUIHandler;
     public HealthIndicatorController healthIndicatorController;
+    public PlayerCalloutHandler playerCalloutHandler;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -39,6 +40,7 @@ public class UIController : MonoBehaviour {
         aimIndicatorHandler.UICamera = Camera.main;
         lockRadiusIndicatorHandler.UICamera = Camera.main;
         lockIndicatorHandler.UICamera = Camera.main;
+        playerCalloutHandler.UICamera = Camera.main;
         hackDisplay.cam = Camera.main;
 
         GameManager.OnFocusChanged += BindToNewTarget;

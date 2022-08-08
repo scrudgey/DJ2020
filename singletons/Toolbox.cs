@@ -324,5 +324,59 @@ public class Toolbox {
 
     static public Quaternion SnapToClosestRotation(Quaternion input, List<Quaternion> lattice) =>
         lattice.Aggregate((curMin, x) => (curMin == null || (Quaternion.Angle(input, x)) < Quaternion.Angle(input, curMin) ? x : curMin));
+
+
+    static public Rect GetTotalRenderBoundingBox(Transform root, Camera UICamera) {
+        float total_min_x = float.MaxValue;
+        float total_max_x = float.MinValue;
+        float total_min_y = float.MaxValue;
+        float total_max_y = float.MinValue;
+        foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>()) {
+            if (renderer is LineRenderer) continue;
+            if (renderer.name.ToLower().Contains("jumppoint")) continue;
+            if (renderer.name.ToLower().Contains("alerticon")) continue;
+            if (renderer.name.ToLower().Contains("shadowcaster")) continue;
+            if (renderer.name.ToLower().Contains("blood_spray")) continue;
+            if (renderer.name.ToLower().Contains("cube")) continue;
+            // Debug.Log(renderer.name);
+
+            Bounds bounds = renderer.bounds;
+            if (renderer is SpriteRenderer) {
+                SpriteRenderer spriteRenderer = (SpriteRenderer)renderer;
+                if (spriteRenderer.sprite != null) {
+                    bounds = spriteRenderer.sprite.bounds;
+
+                    // weird hack. maybe because billboarding?
+                    Vector3 extents = bounds.extents;
+                    extents.y *= 1.3f;
+                    bounds.extents = extents;
+                }
+            }
+            // add offset
+            bounds.center += renderer.transform.position - root.position;
+
+            Vector3[] screenSpaceCorners = new Vector3[8];
+            screenSpaceCorners[0] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z + bounds.extents.z));
+            screenSpaceCorners[1] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z - bounds.extents.z));
+            screenSpaceCorners[2] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z + bounds.extents.z));
+            screenSpaceCorners[3] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z - bounds.extents.z));
+
+            screenSpaceCorners[4] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z + bounds.extents.z));
+            screenSpaceCorners[5] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z - bounds.extents.z));
+            screenSpaceCorners[6] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z + bounds.extents.z));
+            screenSpaceCorners[7] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z - bounds.extents.z));
+
+            float min_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x < curMin.x ? x : curMin)).x;
+            float max_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x > curMin.x ? x : curMin)).x;
+            float min_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y < curMin.y ? x : curMin)).y;
+            float max_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y > curMin.y ? x : curMin)).y;
+
+            total_max_x = Mathf.Max(total_max_x, max_x);
+            total_min_x = Mathf.Min(total_min_x, min_x);
+            total_max_y = Mathf.Max(total_max_y, max_y);
+            total_min_y = Mathf.Min(total_min_y, min_y);
+        }
+        return new Rect(total_min_x, total_min_y, total_max_x - total_min_x, total_max_y - total_min_y);
+    }
 }
 

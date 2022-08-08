@@ -1,57 +1,105 @@
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
-
 using UnityEngine;
+using UnityEngine.UI;
 public class PlayerCalloutHandler : MonoBehaviour {
-    public CutoutMaskUI cursorImage;
+    public Image cursorImage;
     public RectTransform cursorRect;
-    public RectTransform cursorMaskRect;
+    // public RectTransform cursorMaskRect;
     public Camera UICamera;
     public AudioSource audioSource;
     public AudioClip activateSound;
-    Color initialColor;
+    // Color initialColor;
+    public Color highlightColor;
+    public Color baseColor;
     float transitionTime;
-    float transitionDuration = 0.5f;
+    float blinkTimer;
+    bool doBlink;
+    float blinkInterval = 0.05f;
+    float easeSizeDuration = 1.5f;
+    float blinkDuration = 0.5f;
+    float hangDuration = 1f;
     float scaleFactor = 1f;
     float alpha = 1f;
-    float effectScale = 0.45f;
+    float effectScale = 2f;
+    GameObject target;
+    bool active;
     void Start() {
-        initialColor = cursorImage.color;
+        // initialColor = cursorImage.color;
+        GameManager.OnFocusChanged += ActivatePlayerCallout;
+        GameManager.OnInputModeChange += HandleInputModeChange;
     }
-    public void ActivatePlayerCallout() {
+    void OnDestroy() {
+        GameManager.OnFocusChanged -= ActivatePlayerCallout;
+        GameManager.OnInputModeChange -= HandleInputModeChange;
+    }
+    public void HandleInputModeChange(InputMode fromMode, InputMode toMode) {
+        if (fromMode == InputMode.aim && toMode == InputMode.gun) {
+            ActivatePlayerCallout(GameManager.I.playerObject);
+        }
+    }
+    public void ActivatePlayerCallout(GameObject playerObject) {
+        active = true;
+        target = playerObject;
         cursorImage.enabled = true;
         transitionTime = 0f;
         scaleFactor = 1f + effectScale;
         alpha = 0f;
         audioSource.PlayOneShot(activateSound);
-        cursorMaskRect.position = data.screenPosition;
         SetScale();
     }
-    void DisableCursorImage() {
+    void DisablePlayerCallout() {
         cursorImage.enabled = false;
+        active = false;
     }
     void Update() {
-        if (cursorImage.enabled) {
-            transitionTime += Time.unscaledDeltaTime;
-            if (transitionTime > transitionDuration) {
+        if (active) {
+            transitionTime += Time.deltaTime; // TODO: change to unscaled
+            if (transitionTime < easeSizeDuration) {
+                cursorImage.enabled = true;
+
+                scaleFactor = (float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, 1f + effectScale, -1f * effectScale, easeSizeDuration);
+                alpha = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 0f, baseColor.a, easeSizeDuration);
+                SetScale();
+            } else if (transitionTime > easeSizeDuration && transitionTime < easeSizeDuration + blinkDuration) {
                 scaleFactor = 1f;
+                alpha = baseColor.a;
+                blinkTimer += Time.deltaTime;
+                if (blinkTimer >= blinkInterval) {
+                    blinkTimer -= blinkInterval;
+                    doBlink = !doBlink;
+                }
+                SetScale();
+                if (doBlink) {
+                    // cursorImage.enabled = false;
+                    cursorImage.color = highlightColor;
+                } else {
+                    cursorImage.color = baseColor;
+                    // cursorImage.enabled = true;
+                }
+            } else if (transitionTime > easeSizeDuration + blinkDuration && transitionTime < easeSizeDuration + blinkDuration + hangDuration) {
+                cursorImage.enabled = true;
+                SetScale();
             } else {
-                scaleFactor = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 1f + effectScale, -1f * effectScale, transitionDuration);
-                alpha = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 0f, initialColor.a, transitionDuration);
+                Debug.Log("end sequence");
+                cursorImage.enabled = false;
+                active = false;
             }
         }
     }
     public void SetScale() {
-        // TODO: locksize depends on gun
-        float locksizeInPixels = gunHandler.gunInstance.baseGun.lockOnSize;
-        if (UICamera.orthographic) {
-            float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
-            float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
-            locksizeInPixels = (locksizeInPixels / lengthPerAngle) * (pixelsPerDegree);
-        }
-        cursorRect.sizeDelta = Vector2.one * locksizeInPixels * 1.02f * scaleFactor;
-        cursorMaskRect.sizeDelta = Vector2.one * locksizeInPixels * scaleFactor;
-        cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
+        Transform root = target.transform;
+        Rect bounds = Toolbox.GetTotalRenderBoundingBox(root, UICamera);
+        cursorRect.position = UICamera.WorldToScreenPoint(root.position) + new Vector3(0f, bounds.height / 2f, 0f);
+        cursorRect.sizeDelta = new Vector2(bounds.width, bounds.height) * scaleFactor * 1.05f;
+        cursorImage.color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
     }
 }
+
+
+// zoom in
+// arrive at bounds
+// blink / flash
+// hang
+// disable

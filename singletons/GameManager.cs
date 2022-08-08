@@ -23,7 +23,6 @@ public partial class GameManager : Singleton<GameManager> {
     public Interactor playerInteractor;
     public PlayerOutlineHandler playerOutlineHandler;
     public LightLevelProbe playerLightLevelProbe;
-
     // UI input
     public InputActionReference showConsole;
 
@@ -33,7 +32,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<OverlayType> OnOverlayChange;
-    public static Action<InputMode> OnInputModeChange;
+    public static Action<InputMode, InputMode> OnInputModeChange;
     public static Action<CursorType> OnCursorTypeChange;
     public static Action<SuspicionData> OnSuspicionDataChange;
     // UI state
@@ -92,8 +91,8 @@ public partial class GameManager : Singleton<GameManager> {
     public void TransitionToInputMode(InputMode newInputMode) {
         if (newInputMode == inputMode)
             return;
+        OnInputModeChange?.Invoke(inputMode, newInputMode);
         _inputMode = newInputMode;
-        OnInputModeChange?.Invoke(newInputMode);
     }
     private void OnStateEnter(GameState state, GameState fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
