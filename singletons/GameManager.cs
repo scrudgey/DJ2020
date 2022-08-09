@@ -57,15 +57,13 @@ public partial class GameManager : Singleton<GameManager> {
     public bool showDebugRays;
     private SuspicionData previousSuspicionData;
     public void Start() {
-        // System
-        showConsole.action.performed += ctx => {
-            toggleConsoleThisFrame = ctx.ReadValueAsButton();
-        };
-
         showDebugRays = true;
-
+        showConsole.action.performed += HandleShowConsleAction;
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
+    }
+    void HandleShowConsleAction(InputAction.CallbackContext ctx) {
+        toggleConsoleThisFrame = ctx.ReadValueAsButton();
     }
     void LateUpdate() {
         if (numberFrames == 1) {
@@ -79,6 +77,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public override void OnDestroy() {
         base.OnDestroy();
+        showConsole.action.performed -= HandleShowConsleAction;
         CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
     }

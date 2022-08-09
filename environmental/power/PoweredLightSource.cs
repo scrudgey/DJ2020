@@ -26,19 +26,4 @@ public class PoweredLightSource : MonoBehaviour {
             light.enabled = node.power;
         }
     }
-    // override protected void OnPowerOn() {
-    //     meshRenderer.material.EnableKeyword("_EMISSION");
-    //     // meshRenderer.material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-    //     meshRenderer.materxial.SetColor("_EmissionColor", Color.white);
-    //     // foreach (Light light in lights) {
-    //     //     light.enabled = true;
-    //     // }
-    // }
-    // override protected void OnPowerOff() {
-    //     meshRenderer.material.DisableKeyword("_EMISSION");
-    //     meshRenderer.material.SetColor("_EmissionColor", Color.black);
-    //     // foreach (Light light in lights) {
-    //     //     light.enabled = false;
-    //     // }
-    // }
 }

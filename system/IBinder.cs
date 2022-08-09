@@ -15,6 +15,10 @@ public abstract class IBinder<T> : MonoBehaviour where T : MonoBehaviour, IBinda
             HandleValueChanged(target);
         }
     }
+    virtual public void OnDestroy() {
+        if (target != null && target.OnValueChanged != null)
+            target.OnValueChanged -= HandleValueChanged;
+    }
 
     abstract public void HandleValueChanged(T t);
 }

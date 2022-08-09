@@ -58,137 +58,197 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
-    public void Awake() {
-        // Move
-        MoveAction.action.performed += ctx => {
-            inputVector = ctx.ReadValue<Vector2>();
-            // Debug.Log(inputVector);
-        };
 
-        // Fire
-        FireAction.action.performed += ctx => {
-            firePressedThisFrame = ctx.ReadValueAsButton();
-            firePressedHeld = ctx.ReadValueAsButton();
-        };
-
-        // Aim
-        AimAction.action.performed += ctx => {
-            aimPressedThisFrame = ctx.ReadValueAsButton();
-        };
-
-        // Crouch
-        CrouchAction.action.performed += ctx => {
-            crouchHeld = ctx.ReadValueAsButton();
-            // Debug.Log(crouchHeld);
-        };
-
-        // Run
-        RunAction.action.performed += ctx => {
-            runHeld = ctx.ReadValueAsButton();
-        };
-
-        // Jump
-        JumpAction.action.performed += ctx => {
-            jumpPressedThisFrame = ctx.ReadValueAsButton();
-            jumpHeld = ctx.ReadValueAsButton();
-        };
-
-        // Camera rotation
-        RotateCameraLeft.action.performed += ctx => {
-            rotateCameraLeftPressedThisFrame = ctx.ReadValueAsButton();
-        };
-        RotateCameraRight.action.performed += ctx => {
-            rotateCameraRightPressedThisFrame = ctx.ReadValueAsButton();
-        };
-        ZoomCamera.action.performed += ctx => {
-            zoomInput = ctx.ReadValue<Vector2>();
-        };
-
-        // Reload
-        reload.action.performed += ctx => {
-            reloadPressedThisFrame = ctx.ReadValueAsButton();
-        };
-
-        DebugBreakAction.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                Debug.Break();
-            }
-        };
-
-        // Gun switch
-        gunHolster.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                selectGunThisFrame = -1;
-            }
-        };
-        gunSecondary.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                selectGunThisFrame = 2;
-            }
-        };
-        gunPrimary.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                selectGunThisFrame = 1;
-            }
-        };
-        gunThird.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                selectGunThisFrame = 3;
-            }
-        };
-        actionButton.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                actionButtonPressedThisFrame = ctx.ReadValueAsButton();
-            }
-        };
-
-        // Item
-        nextItem.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                incrementItemThisFrame = 1;
-            }
-        };
-
-        previousItem.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                incrementItemThisFrame = -1;
-            }
-        };
-
-        // Overlay
-        nextOverlay.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                incrementOverlayThisFrame = 1;
-            }
-        };
-
-        previousOverlay.action.performed += ctx => {
-            if (ctx.ReadValueAsButton()) {
-                incrementOverlayThisFrame = -1;
-            }
-        };
-
-        useItem.action.performed += ctx => {
-            useItemThisFrame = ctx.ReadValueAsButton();
-        };
-
-        // Button up
-        FireAction.action.canceled += _ => firePressedHeld = false;
-        CrouchAction.action.canceled += _ => {
-            crouchHeld = false;
-            // Debug.Log("uncrouch");
-        };
-        RunAction.action.canceled += _ => runHeld = false;
-        MoveAction.action.canceled += _ => inputVector = Vector2.zero;
-        JumpAction.action.canceled += _ => {
-            jumpHeld = false;
-            jumpReleasedThisFrame = true;
-        };
-
+    public void HandleMoveAction(InputAction.CallbackContext ctx) {
+        inputVector = ctx.ReadValue<Vector2>();
+    }
+    public void HandleFireAction(InputAction.CallbackContext ctx) {
+        firePressedThisFrame = ctx.ReadValueAsButton();
+        firePressedHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleAimAction(InputAction.CallbackContext ctx) {
+        aimPressedThisFrame = ctx.ReadValueAsButton();
+    }
+    public void HandleCrouchAction(InputAction.CallbackContext ctx) {
+        crouchHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleRunAction(InputAction.CallbackContext ctx) {
+        runHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleJumpAction(InputAction.CallbackContext ctx) {
+        jumpPressedThisFrame = ctx.ReadValueAsButton();
+        jumpHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleRotateCameraLeftAction(InputAction.CallbackContext ctx) {
+        rotateCameraLeftPressedThisFrame = ctx.ReadValueAsButton();
+    }
+    public void HandleRotateCameraRightAction(InputAction.CallbackContext ctx) {
+        rotateCameraRightPressedThisFrame = ctx.ReadValueAsButton();
+    }
+    public void HandleZoomCameraAction(InputAction.CallbackContext ctx) {
+        zoomInput = ctx.ReadValue<Vector2>();
+    }
+    public void HandleReloadAction(InputAction.CallbackContext ctx) {
+        reloadPressedThisFrame = ctx.ReadValueAsButton();
+    }
+    public void HandleDebugBreakAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            Debug.Break();
+        }
+    }
+    public void HandleGunHolsterAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            selectGunThisFrame = -1;
+        }
+    }
+    public void HandleGunPrimaryAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            selectGunThisFrame = 1;
+        }
+    }
+    public void HandleGunSecondaryAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            selectGunThisFrame = 2;
+        }
+    }
+    public void HandleGunThirdAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            selectGunThisFrame = 3;
+        }
+    }
+    public void HandleActionButtonAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            actionButtonPressedThisFrame = ctx.ReadValueAsButton();
+        }
+    }
+    public void HandleNextItemAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            incrementItemThisFrame = 1;
+        }
+    }
+    public void HandlePrevItemAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            incrementItemThisFrame = -1;
+        }
+    }
+    public void HandleNextOverlayAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            incrementOverlayThisFrame = 1;
+        }
+    }
+    public void HandlePrevOverlayAction(InputAction.CallbackContext ctx) {
+        if (ctx.ReadValueAsButton()) {
+            incrementOverlayThisFrame = -1;
+        }
+    }
+    public void HandleUseItemAction(InputAction.CallbackContext ctx) {
+        useItemThisFrame = ctx.ReadValueAsButton();
+    }
+    public void HandleFireActionCanceled(InputAction.CallbackContext ctx) {
+        firePressedHeld = false;
+    }
+    public void HandleCrouchActionCanceled(InputAction.CallbackContext ctx) {
         crouchHeld = false;
-        selectGunThisFrame = -1;
+    }
+    public void HandleRunActionCanceled(InputAction.CallbackContext ctx) {
+        runHeld = false;
+    }
+    public void HandleMoveActionCanceled(InputAction.CallbackContext ctx) {
+        inputVector = Vector2.zero;
+    }
+    public void HandleJumpActionCanceled(InputAction.CallbackContext ctx) {
+        jumpHeld = false;
+        jumpReleasedThisFrame = true;
+    }
+    public void Awake() {
+        RegisterCallbacks();
+    }
+    void OnDestroy() {
+        DeregisterCallbacks();
     }
 
+    void RegisterCallbacks() {
+        // Move
+        MoveAction.action.performed += HandleMoveAction;
+        // Fire
+        FireAction.action.performed += HandleFireAction;
+        // Aim
+        AimAction.action.performed += HandleAimAction;
+        // Crouch
+        CrouchAction.action.performed += HandleCrouchAction;
+        // Run
+        RunAction.action.performed += HandleRunAction;
+        // Jump
+        JumpAction.action.performed += HandleJumpAction;
+        // Camera rotation
+        RotateCameraLeft.action.performed += HandleRotateCameraLeftAction;
+        RotateCameraRight.action.performed += HandleRotateCameraRightAction;
+        ZoomCamera.action.performed += HandleZoomCameraAction;
+        // Reload
+        reload.action.performed += HandleReloadAction;
+        DebugBreakAction.action.performed += HandleDebugBreakAction;
+        // Gun switch
+        gunHolster.action.performed += HandleGunHolsterAction;
+        gunPrimary.action.performed += HandleGunPrimaryAction;
+        gunSecondary.action.performed += HandleGunSecondaryAction;
+        gunThird.action.performed += HandleGunThirdAction;
+        // action buttom
+        actionButton.action.performed += HandleActionButtonAction;
+        // Item
+        nextItem.action.performed += HandleNextItemAction;
+        previousItem.action.performed += HandlePrevItemAction;
+        // Overlay
+        nextOverlay.action.performed += HandleNextOverlayAction;
+        previousOverlay.action.performed += HandlePrevOverlayAction;
+        useItem.action.performed += HandleUseItemAction;
+        // Button up
+        FireAction.action.canceled += HandleFireActionCanceled;
+        CrouchAction.action.canceled += HandleCrouchActionCanceled;
+        RunAction.action.canceled += HandleRunActionCanceled;
+        MoveAction.action.canceled += HandleMoveActionCanceled;
+        JumpAction.action.canceled += HandleJumpActionCanceled;
+    }
+    void DeregisterCallbacks() {
+        // Move
+        MoveAction.action.performed -= HandleMoveAction;
+        // Fire
+        FireAction.action.performed -= HandleFireAction;
+        // Aim
+        AimAction.action.performed -= HandleAimAction;
+        // Crouch
+        CrouchAction.action.performed -= HandleCrouchAction;
+        // Run
+        RunAction.action.performed -= HandleRunAction;
+        // Jump
+        JumpAction.action.performed -= HandleJumpAction;
+        // Camera rotation
+        RotateCameraLeft.action.performed -= HandleRotateCameraLeftAction;
+        RotateCameraRight.action.performed -= HandleRotateCameraRightAction;
+        ZoomCamera.action.performed -= HandleZoomCameraAction;
+        // Reload
+        reload.action.performed -= HandleReloadAction;
+        DebugBreakAction.action.performed -= HandleDebugBreakAction;
+        // Gun switch
+        gunHolster.action.performed -= HandleGunHolsterAction;
+        gunPrimary.action.performed -= HandleGunPrimaryAction;
+        gunSecondary.action.performed -= HandleGunSecondaryAction;
+        gunThird.action.performed -= HandleGunThirdAction;
+        // action buttom
+        actionButton.action.performed -= HandleActionButtonAction;
+        // Item
+        nextItem.action.performed -= HandleNextItemAction;
+        previousItem.action.performed -= HandlePrevItemAction;
+        // Overlay
+        nextOverlay.action.performed -= HandleNextOverlayAction;
+        previousOverlay.action.performed -= HandlePrevOverlayAction;
+        useItem.action.performed -= HandleUseItemAction;
+        // Button up
+        FireAction.action.canceled -= HandleFireActionCanceled;
+        CrouchAction.action.canceled -= HandleCrouchActionCanceled;
+        RunAction.action.canceled -= HandleRunActionCanceled;
+        MoveAction.action.canceled -= HandleMoveActionCanceled;
+        JumpAction.action.canceled -= HandleJumpActionCanceled;
+    }
 
     private void Update() {
         HandleCharacterInput();

@@ -131,7 +131,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // IgnoredColliders.Clear();
         // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
-    void OnDestroy() {
+    override public void OnDestroy() {
+        base.OnDestroy();
         GameManager.OnFocusChanged -= Bind;
         GameManager.OnFocusChanged -= SetFollowTransform;
     }

@@ -53,8 +53,6 @@ public class UIController : MonoBehaviour {
         GameManager.OnFocusChanged -= BindToNewTarget;
         GameManager.OnMenuChange -= HandleMenuChange;
         GameManager.OnMenuClosed -= HandleMenuClosed;
-        GameManager.OnPowerGraphChange -= overlayHandler.RefreshPowerGraph;
-        GameManager.OnOverlayChange -= overlayHandler.HandleOverlayChange;
     }
 
     void BindToNewTarget(GameObject target) {

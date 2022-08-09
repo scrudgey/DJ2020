@@ -30,6 +30,12 @@ public class ActionLogHandler : IBinder<Interactor> {
             HandleValueChanged(target);
         }
     }
+    override public void OnDestroy() {
+        if (target != null) {
+            target.OnValueChanged -= HandleValueChanged;
+            target.OnActionDone -= HandleActionDone;
+        }
+    }
     override public void HandleValueChanged(Interactor interactor) {
         InteractorTargetData newData = interactor.ActiveTarget();
         if (!InteractorTargetData.Equality(data, newData)) {

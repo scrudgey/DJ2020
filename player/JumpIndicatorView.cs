@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class JumpIndicatorView : IBinder<CharacterController> {
-    // public CharacterController target { get; set; }
     public LineRenderer lineRenderer;
     public SpriteRenderer indicatorSprite;
     public Transform indicator;
     public CharacterController characterController;
 
     void Start() {
-        // TODO: fix
-        // GameManager.OnFocusChanged += Bind;
         Bind(target.gameObject);
     }
     public override void HandleValueChanged(CharacterController controller) {

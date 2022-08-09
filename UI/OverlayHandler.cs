@@ -42,8 +42,9 @@ public class OverlayHandler : MonoBehaviour {
         HandleOverlayChange(GameManager.I.activeOverlayType);
     }
     void OnDestroy() {
-        GameManager.OnPowerGraphChange -= RefreshPowerGraph;
         GameManager.OnOverlayChange -= HandleOverlayChange;
+        GameManager.OnPowerGraphChange -= RefreshPowerGraph;
+        GameManager.OnCyberGraphChange -= RefreshCyberGraph;
     }
 
     public void RefreshPowerGraph(PowerGraph graph) {
