@@ -568,7 +568,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
                 worldPosition = targetPoint,
-                targetCollider = targetCollider
+                targetCollider = targetCollider,
+                mousePosition = cursorPosition
             };
         } else {
             // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
@@ -591,6 +592,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
                 worldPosition = targetPoint,
+                mousePosition = cursorPosition
                 // targetCollider = interactorData.collider
             };
         }

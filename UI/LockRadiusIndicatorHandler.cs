@@ -11,6 +11,8 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     public Camera UICamera;
     public AudioSource audioSource;
     public AudioClip activateSound;
+    public EmbellishDotText embellishDotText;
+    public RectTransform embellishRectTransform;
     Color initialColor;
     bool hasGun;
     float transitionTime;
@@ -18,6 +20,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     float scaleFactor = 1f;
     float alpha = 1f;
     float effectScale = 0.45f;
+    float currentScale;
     void Start() {
         initialColor = cursorImage.color;
     }
@@ -30,7 +33,9 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
                 return;
             }
             if (data.type == CursorData.TargetType.objectLock) {
-                DisableCursorImage();
+                // DisableCursorImage();
+                cursorMaskRect.position = data.mousePosition;
+                cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, initialColor.a / 6f);
                 return;
             }
             if (!hasGun) {
@@ -39,8 +44,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
                 alpha = 0f;
                 audioSource.PlayOneShot(activateSound);
             }
-            cursorMaskRect.position = data.screenPosition;
-            SetScale(gunHandler);
+            SetScale(gunHandler, data);
             hasGun = true;
         } else {
             DisableCursorImage();
@@ -49,6 +53,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     }
     void DisableCursorImage() {
         cursorImage.enabled = false;
+        embellishDotText.Disable();
     }
     void Update() {
         if (cursorImage.enabled) {
@@ -61,16 +66,22 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
             }
         }
     }
-    public void SetScale(GunHandler gunHandler) {
-        // TODO: locksize depends on gun
+    public void SetScale(GunHandler gunHandler, CursorData data) {
+        cursorMaskRect.position = data.screenPosition;
         float locksizeInPixels = gunHandler.gunInstance.baseGun.lockOnSize;
-        if (UICamera.orthographic) {
-            float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
-            float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
-            locksizeInPixels = (locksizeInPixels / lengthPerAngle) * (pixelsPerDegree);
-        }
-        cursorRect.sizeDelta = Vector2.one * locksizeInPixels * 1.02f * scaleFactor;
-        cursorMaskRect.sizeDelta = Vector2.one * locksizeInPixels * scaleFactor;
+        float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
+        float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
+        locksizeInPixels = (locksizeInPixels / lengthPerAngle) * (pixelsPerDegree);
+        // pix          :       m   / (m / θ)           * (pix / θ)
         cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
+
+        float targetScale = locksizeInPixels * scaleFactor;
+        currentScale = Mathf.Lerp(currentScale, targetScale, 0.1f);
+        cursorRect.sizeDelta = Vector2.one * currentScale * 1.02f;
+        cursorMaskRect.sizeDelta = Vector2.one * currentScale;
+        embellishRectTransform.position = data.screenPosition + currentScale * new Vector2(0.25f, -0.55f);
+        embellishDotText.Enable($"Lock: {currentScale / pixelsPerDegree * lengthPerAngle:0.00}m", blitText: false);
+        //                                  pix       /     (pix / θ)   *    (m / θ)
+
     }
 }

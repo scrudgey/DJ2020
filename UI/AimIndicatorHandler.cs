@@ -13,9 +13,11 @@ namespace UI {
         public Color directionAimColor;
         public Color objectLockColor;
         private float timer;
+        private float timeInNormalAim;
         public float pulseInterval = 0.15f;
         public CursorData.TargetType state;
         public int pulseSize;
+        Vector2 currentPosition;
 
         public void Update() {
             if (state == CursorData.TargetType.objectLock) {
@@ -38,20 +40,29 @@ namespace UI {
                 CursorData data = target.currentTargetData;
                 if (data == null)
                     return;
-                cursor.position = data.screenPosition;
+                Vector2 targetPosition = data.screenPosition;
                 switch (data.type) {
                     case CursorData.TargetType.none:
+                        timeInNormalAim = 0f;
                         break;
                     default:
                     case CursorData.TargetType.direction:
+                        timeInNormalAim += Time.unscaledDeltaTime;
+                        if (timeInNormalAim < 0.25f) {
+                            targetPosition = Vector2.Lerp(currentPosition, targetPosition, 0.15f);
+                        }
                         cursorImage.sprite = directionAimSprite;
                         cursorImage.color = directionAimColor;
                         break;
                     case CursorData.TargetType.objectLock:
+                        timeInNormalAim = 0f;
                         cursorImage.sprite = objectLockSprite;
                         cursorImage.color = objectLockColor;
+                        targetPosition = Vector2.Lerp(currentPosition, targetPosition, 0.15f);
                         break;
                 }
+                cursor.position = targetPosition;
+                currentPosition = cursor.position;
                 state = data.type;
                 SetScale();
             } else {
@@ -74,6 +85,7 @@ namespace UI {
                 float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
                 inaccuracyInPixels = inaccuracyDegree * pixelsPerDegree / 2f;
             }
+            inaccuracyInPixels = Mathf.Max(25, inaccuracyInPixels);
             cursor.sizeDelta = inaccuracyInPixels * Vector2.one;
         }
     }

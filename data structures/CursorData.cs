@@ -9,4 +9,5 @@ public class CursorData {
     public HighlightableTargetData highlightableTargetData;
     public static CursorData none = new CursorData();
     public Collider targetCollider;
+    public Vector2 mousePosition;
 }

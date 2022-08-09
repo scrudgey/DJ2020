@@ -1042,6 +1042,10 @@ Q: what is the proper solution?
 * lerp in autoaim circle
     * first time you pull the gun out?
     * circle comes in from outside
+* position call-out
+    * outline square
+    * pull-in from sides?
+* fix all danging action callbacks!!
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1065,6 +1069,8 @@ nice to have / future goals:
     fix camera position in wallpress mode when near edge
     camera should move a bit to the lock or something?
         or: off-screen lock indicator?
+    off-screen indicator for active threats?
+    pixel perfect shaders
 
 
 
@@ -1087,29 +1093,56 @@ torso spritesheet has head included
 pool the noiseobject
 a third grid: alarm systems
 
-control / combat:
-    gestural aiming with auto-lock
-    better shotgun
-    aim: fixed angular size
+
+
+embellishments
+    * small text indicates size of autoaim circle
+    small font text near locked-on character
+    [[ LOCKED ]] text blink (this might not work very well with constant lost / reacquired lock)
+    arcs swing about lock size indicator
+
+better suspicion handler
+    something like, different tiers of suspicion, different status effects
+    and different tiers of response, a two-phase ladder that indicates visually when the circuit completes and an alarm triggers
+    and the circuit looks like evangelion interface
     alert level change:
         when spotted, zoom camera out to show aggressor
         slow time a little bit
         show in UI
+        play sound when arriving at a higher alert level
     suspicion:
         audio indicator
         text indicator
         pulse image outward
 
+
+
 UI:
-    blink cursor when reaching maximum aim
+    * smooth between different radii
+    * lerp targeting reticle toward target
     * bigger aim reticle
     * square drops in on targets, stats appear in side 
-    off-screen indicator for active threats?
+    * ease the transition between lock and unlock
+        * possibly, just make lock circle very transparent
+    blink cursor when reaching maximum aim
+    larger mouse cursor, with color
+    easier to see target reticle
     graph system:
         [<<][ELECTRICAL][>>]
          -                +
         and these are buttons you can click
-    pixel perfect shaders
+    callout:
+        extended mode callout vs quick callout
+        text? 
+            PLAYER:
+            STATUS: INNOCENT BYSTANDER
+            integration with suspicion handler
+        special transition when into attractor mode
+
+control / combat:
+    * gestural aiming with auto-lock
+    better shotgun
+    aim: fixed angular size
 
 VR combat training:
     don't destroy on dead; recall to pool.
@@ -1120,20 +1153,3 @@ VR combat training:
         enemy count
         victory conditions
 
-
-embellishments
-    small font text near locked-on character
-    [[ LOCKED ]] text blink
-    arcs swing about lock size indicator
-    small text indicates size of autoaim circle
-
-sound effects accompany UI elements
-    * change sound for lock
-    sound for unlock?
-position call-out
-    outline square
-    text?
-    pull-in from sides?
-
-fix all danging action callbacks!!
-InputController

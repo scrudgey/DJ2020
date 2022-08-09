@@ -17,16 +17,15 @@ public class PlayerCalloutHandler : MonoBehaviour {
     float blinkTimer;
     bool doBlink;
     float blinkInterval = 0.05f;
-    float easeSizeDuration = 1.5f;
+    float easeSizeDuration = 0.75f;
     float blinkDuration = 0.5f;
-    float hangDuration = 1f;
+    float hangDuration = 3f;
     float scaleFactor = 1f;
     float alpha = 1f;
     float effectScale = 2f;
     GameObject target;
     bool active;
     void Start() {
-        // initialColor = cursorImage.color;
         GameManager.OnFocusChanged += ActivatePlayerCallout;
         GameManager.OnInputModeChange += HandleInputModeChange;
     }
@@ -38,7 +37,12 @@ public class PlayerCalloutHandler : MonoBehaviour {
         if (fromMode == InputMode.aim && toMode == InputMode.gun) {
             ActivatePlayerCallout(GameManager.I.playerObject);
         }
+        if (fromMode == InputMode.aim && toMode == InputMode.gun) {
+            ActivatePlayerCallout(GameManager.I.playerObject);
+        }
     }
+
+    // TODO: long and short player callouts
     public void ActivatePlayerCallout(GameObject playerObject) {
         active = true;
         target = playerObject;
@@ -59,8 +63,9 @@ public class PlayerCalloutHandler : MonoBehaviour {
             if (transitionTime < easeSizeDuration) {
                 cursorImage.enabled = true;
 
-                scaleFactor = (float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, 1f + effectScale, -1f * effectScale, easeSizeDuration);
-                alpha = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 0f, baseColor.a, easeSizeDuration);
+                scaleFactor = (float)PennerDoubleAnimation.CircEaseOut(transitionTime, 1f + effectScale, -1f * effectScale, easeSizeDuration);
+                alpha = (float)PennerDoubleAnimation.CircEaseOut(transitionTime, 0f, baseColor.a, easeSizeDuration);
+                Debug.Log(alpha);
                 SetScale();
             } else if (transitionTime > easeSizeDuration && transitionTime < easeSizeDuration + blinkDuration) {
                 scaleFactor = 1f;
