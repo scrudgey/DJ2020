@@ -1,0 +1,231 @@
+
+alert and suspicion HUD
+    something like, different tiers of suspicion, different status effects
+    and different tiers of response, a two-phase ladder that indicates visually when the circuit completes and an alarm triggers
+    and the circuit looks like evangelion interface
+    alert level change:
+        when spotted, zoom camera out to show aggressor
+        slow time a little bit
+        show in UI
+        play sound when arriving at a higher alert level
+    suspicion:
+        audio indicator
+        text indicator
+        pulse image outward
+alarm network graph
+    cameras and security systems are on the alarm network 
+    severed connections prevent the alarm from radioing back to hq 
+
+
+information to be displayed:
+
+2. current "statuses" <- need a better word for suspicion tokens
+    (this is SuspicionData)
+    silent - noise - loud noise - suspicious noise - hostile noise 
+    gunshots heard / explosions heard
+    all quiet - warnings raised (security permiter breach?) - alarms raised - global alert 
+    normal appearance - suspicious appearance - hostile appearance
+        APPEARANCE ... OK!!
+        STATUS: INNOCENT BYSTANDER
+
+3. level "status" <- need a better word for alarm threshold
+    public / semiprivate / private / restricted
+        TRESPASSING
+        LETHAL FORCE AUTHORIZED
+    ultimately, these present certain thresholds for raising alarm
+        if public property, player can be suspicious but not hostile 
+        if private property, player can be normal but not suspicious 
+        if restricted property, player must be disguised or nothing at all.
+        well, they provide thresholds, but for what ?
+            approximately, how an NPC responds to you 
+            but this is bigger than just this simple threshold 
+            (now, we look for examples. questions to settle:)
+                1. can current system be reduced to a simple threhold?
+                2. is more complex logic masking an additive property?
+                3. how does local state interplay with global state?
+                    is there a symmetric relationship? statuses and thresholds and alert levels?
+                4. how does behavior change when the alarm is raised?
+    unify ReactToPlayerSuspicion with some global system?
+
+1. Once an alert level is reached:
+    normal - warn - alert - alarm - search
+    upon entering a higher state than before,
+        * play alert sound 
+        * adjust camera (pan, or orient + zoom)
+        * slow time briefly
+    warning: entered when an enemy becomes suspicious. not a global status?
+    alert: enemies on the screen are aware of your presence
+    alarm: enemies globall aware of your presence
+    armed response: team dispatched from HQ to catch / kill you 
+    search: enemies searching for you
+    distinguishing between alert and alarm?
+        alert: locally aware of the player's presence 
+        alarm: globall aware of the player's presence, an alarm is sounding 
+
+an enemy responds to stimuli by changing their internal state (currently in ReactToPlayerSuspicion)
+
+** my problem here: i want to do something very game mechanic-y, easily-understood and representable like adding suspicion tokens 
+I) if suspicion exceeds threshold for the level, raise the alarm 
+II) buffs and disguises can provide negative points 
+III) different threshold depending on level 
+
+but this risks the AI not feeling real. I introduced specific tokens for serving specific conditionals in the ai. 
+proposal I: who raises the alarm? what about the physicality of the alarm network 
+i like the idea of displaying global tokens in the HUD, like gunshots heard 
+but what about the guard at the other side of the compound that didn't hear the gunshots?
+    does he now hear the gunshots because they've reached global level?
+    does the HUD just display the global state?
+    or does it just display recent events or statuses with no real bearing on AI decision making?
+        well, it has bearing on how suspicious the player is in that moment?
+
+AI decision points:
+    seeing the player 
+        state: local state, global state 
+    a camera sees the player 
+    a noise is heard 
+    an explosion occurs
+
+
+
+
+in DJ1: individual states, and global alarm state
+
+AI local state is basically just variations of suspicion data, recently
+recentlyInCombat        (highest level of alarm mode witnessed)
+recentHeardSuspicious   (highest level of audioSuspicion witnessed)
+recentlySawSuspicious   (highest level of appearance + item + interactor suspicion witnessed)
+
+this might simplify... but there's still global state and local state.
+
+we can keep display of global values with 
+    "gunshots heard"
+    and that doesn't really affect anything but provides info
+
+report on ReactToPlayerSuspicion:
+    the logic can be simplified. tokens and thresholds may work.
+    where else is local state used?
+        specific logic in tasks?
+        reacting to noises?
+    preserve the granularity that might be necessary.
+
+    data.appearanceSuspicion and data.playerActivity() are used identically
+    probably what we want is net visual suspicion and net audio suspicion and net suspicion
+        * either net, or sum? i.e. tokens?
+    
+    could "recently*" local state actually refer to global state? sort of.
+    "recent" is used when differentiating in ambiguous circumstances.
+        semiprivateProperty and I see suspicious
+
+if this is true, then there should be exact parallels in situations:
+1. NPC sees player
+2. NPC hears player 
+3. alarm system sees player 
+4. alarm system hears player 
+
+stimulus + state + level thresholds = reaction
+reaction -> alarm level 
+state: 
+    highest previous stimulus (decaying)
+    highest previous alarm level (decaying)
+
+react to audio and react to visual should be handled equally
+
+comparing stimulus vs. level threshold -> reaction
+comparing stimulus vs. previous alarm level -> reaction
+comparing stimulus vs. global previous alarm level -> reaction
+
+compare stimuls vs. state  is strange 
+compare stimulus vs. level threshold
+compare stimulus vs. previous alarm threshold 
+    we would like to eliminate compare stimulus vs. previous state because it doesn't make sense (stimulus compared to stimulus)
+    the difference here: 
+        I heard gunshots (suspicion: suspicious), which lead to investigation (alarm level: warn). later, i hear more gunshots. i go back to investigation.
+        i heard an explosion (suspicion: aggressive), which lead to attack mode (alarm level: alert). later, i hear a gunshot. i go back to alert.
+
+propagating state from lower to upper, upper to lower? no need necessarily
+how global state changes is similar to how local state changes: with stimuli input
+
+it seems there is a way to unify it all in the way outlined. but then the open questions:
+Q1. what is the UI showing?
+    pros: i like having a place to catalog recent activity and show its suspiciousness
+          i like having a big status that can say TRESPASSING or OK
+    cons: what if we want to extend to more states i.e. search, armed response?
+         what is the UI representing? we accumulate some indicators as player feedback, but they don't immediately spill over into alert changes.
+         so when does the check happen? if we are displaying global state, then only when player is seen by alarm network or reported by guard.
+
+i like giving the player feedback about their status, but there isn't a single global thing to represent here.
+even our audio and visual have different suspicion levels, or is that true?
+can we apply a single suspicion rating to the player combinging appearance and recent audio?
+
+a suspicious noise is not heard, but created by the player: now the player is suspicious.
+a suspicious noise is heard: now the player is suspicious (even to distant guards?)
+so, we can tame things here sensibly.
+
+next, there's the level context. this is a threshold. but is is applied when the stimulus is interpreted.
+it could be dealt with by modifying appearance. 
+
+lastly, there's response.
+
+level:      public - protected - private - restricted
+status:     disguised - safe - trespassing - aggressive
+alert:      quiet - investigate - alarm
+suspicion:  normal - suspicious - aggressive
+
+not sure where "TRESPASSING" comes from but I really want it 
+
+APPEARANCE ... OK!!
+STATUS: INNOCENT BYSTANDER
+
+APPEARANCE ... SUSPICIOUS!!
+|
+|
+v
+STATUS: SUSPICIOUS LURKER
+
+APPEARANCE ... AGGRESSIVE!!
+STATUS: ENEMY
+
+everything discussed in the proposal document is player + global.
+    the player status feeds into an overall suspicion.
+    the suspicion feeds into the context to determine a result, but this could just as well be an appearance rating.
+
+private property + suspicious = investigate response
+private property + suspicious = suspicious 
+publuc property + suspicious = innocent bystander
+
+appearance (suspicion) -> status (response)
+
+so the proposal is:
+    display the statuses,
+        the net suspiciousness,
+        the wiring through context,
+            label public / protected / private / restricted
+            + disguise , - previous alarm
+        the net status 
+    display appearance text:
+        APPEARANCE ... OK!!
+    display the net result text:
+        STATUS: OK          (will be ignored)
+        STATUS: SUSPICIOUS  (will be investigated)
+        STATUS: ENEMY       (will be attacked)
+
+Q: how do we label public / private / restricted?
+    tresspassing is identical to "private property"
+Q: how do we distinguish between suspicion and status
+
+we can apply various status perks to the status bar.
+    * suspicious noise heard
+    * gunshots heard 
+    * brandishing a weapon
+    * an alarm happened recently (timeout 2:32)
+    * an enemy has been spotted in the location (timeout 5:00)
+some are timed, some are more permanent.
+
+
+how to structure suspicion handler.
+current: gamemanager polls just in time multiple player components.
+move it all to a new singleton?
+* maintains a list of statuses, some with lifetimes
+
+right now it's set up that gamemanager Pulls suspicion data from multiple sources every frame and notifies on change.
+instead anything that changes player suspicion should register with the handler
