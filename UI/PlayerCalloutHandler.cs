@@ -6,11 +6,9 @@ using UnityEngine.UI;
 public class PlayerCalloutHandler : MonoBehaviour {
     public Image cursorImage;
     public RectTransform cursorRect;
-    // public RectTransform cursorMaskRect;
     public Camera UICamera;
     public AudioSource audioSource;
     public AudioClip activateSound;
-    // Color initialColor;
     public Color highlightColor;
     public Color baseColor;
     float transitionTime;
@@ -50,7 +48,7 @@ public class PlayerCalloutHandler : MonoBehaviour {
         transitionTime = 0f;
         scaleFactor = 1f + effectScale;
         alpha = 0f;
-        audioSource.PlayOneShot(activateSound);
+        // audioSource.PlayOneShot(activateSound);
         SetScale();
     }
     void DisablePlayerCallout() {

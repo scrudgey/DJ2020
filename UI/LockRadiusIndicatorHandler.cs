@@ -36,6 +36,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
                 // DisableCursorImage();
                 cursorMaskRect.position = data.mousePosition;
                 cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, initialColor.a / 6f);
+                embellishDotText.Disable();
                 return;
             }
             if (!hasGun) {

@@ -228,7 +228,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (noise == null)
             return;
         recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
-        // Debug.Log(recentHeardSuspicious);
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
         if (noise.data.suspiciousness > Suspiciousness.normal && noise.data.player) {
@@ -277,15 +276,17 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
             return Reaction.ignore;
         } else if (data.levelSensitivity == SensitivityLevel.semiprivateProperty) {
-            if (data.appearanceSuspicion == Suspiciousness.aggressive) {
+            if (data.appearanceSuspicion == Suspiciousness.aggressive) {        // these two conditionals are saying the same thing 
                 return Reaction.attack;
             } else if (data.playerActivity() == Suspiciousness.aggressive) {
                 return Reaction.attack;
             } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
+                // if appearance is suspicious, you get a pass unless recently things were bad
                 if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
                     return Reaction.attack;
                 return Reaction.investigate;
             } else if (data.playerActivity() == Suspiciousness.suspicious) {
+                // same conditional here, redundant
                 if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
                     return Reaction.attack;
                 return Reaction.investigate;
