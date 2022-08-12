@@ -26,7 +26,8 @@ public class UIController : MonoBehaviour {
     public GameObject UIEditorCamera;
     public HackDisplay hackDisplay;
     public VisibilityUIHandler visibilityUIHandler;
-    public SuspicionUIHandler suspicionUIHandler;
+    // public SuspicionUIHandler suspicionUIHandler;
+    public SuspicionIndicatorHandler suspicionIndicatorHandler;
     public HealthIndicatorController healthIndicatorController;
     public PlayerCalloutHandler playerCalloutHandler;
     void Awake() {
@@ -68,7 +69,8 @@ public class UIController : MonoBehaviour {
         interactiveHighlightHandler.Bind(target);
 
         visibilityUIHandler.Bind(target);
-        suspicionUIHandler.Bind();
+        // suspicionUIHandler.Bind();
+        suspicionIndicatorHandler.Bind();
 
         overlayHandler.Bind();
         actionLogHandler.Bind(target);

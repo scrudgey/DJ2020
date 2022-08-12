@@ -228,9 +228,19 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (noise == null)
             return;
         recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
+
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
         if (noise.data.suspiciousness > Suspiciousness.normal && noise.data.player) {
+
+            SuspicionRecord record = new SuspicionRecord {
+                content = "a suspicious noise was heard",
+                suspiciousness = noise.data.suspiciousness,
+                lifetime = 10f,
+                maxLifetime = 10f
+            };
+            GameManager.I.AddSuspicionRecord(record);
+
             switch (stateMachine.currentState) {
                 case SphereMoveState:
                 case SpherePatrolState:
@@ -246,66 +256,55 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public Reaction ReactToPlayerSuspicion() {
-        SuspicionData data = GameManager.I.GetSuspicionData();
+        // guard AI: focus
+        // alertness;
+        // AI: state of knowledge
+        // recentHeardSuspicious;
+        // recentlySawSuspicious;
 
-        recentlySawSuspicious = new List<Suspiciousness>{
-            data.appearanceSuspicion,
-            GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal,
-            GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal
-        }.Aggregate(recentlySawSuspicious, Toolbox.Max<Suspiciousness>);
+        Suspiciousness totalSuspicion = GameManager.I.GetTotalSuspicion();
+        SensitivityLevel sensitivityLevel = GameManager.I.GetCurrentSensitivity();
 
-        if (data.levelSensitivity == SensitivityLevel.publicProperty) {
-            // guard AI: focus
-            // alertness;
-            // AI: state of knowledge
-            // recentHeardSuspicious;
-            // recentlySawSuspicious;
-
-            if (data.appearanceSuspicion == Suspiciousness.aggressive) {
-                return Reaction.attack;
-            } else if (data.playerActivity() == Suspiciousness.aggressive) {
-                return Reaction.attack;
-            } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
-                if (recentlyInCombat)
-                    return Reaction.attack;
-                return Reaction.investigate;
-            } else if (data.playerActivity() == Suspiciousness.suspicious) {
-                if (recentlyInCombat)
-                    return Reaction.attack;
-                return Reaction.investigate;
-            }
-            return Reaction.ignore;
-        } else if (data.levelSensitivity == SensitivityLevel.semiprivateProperty) {
-            if (data.appearanceSuspicion == Suspiciousness.aggressive) {        // these two conditionals are saying the same thing 
-                return Reaction.attack;
-            } else if (data.playerActivity() == Suspiciousness.aggressive) {
-                return Reaction.attack;
-            } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
-                // if appearance is suspicious, you get a pass unless recently things were bad
-                if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
-                    return Reaction.attack;
-                return Reaction.investigate;
-            } else if (data.playerActivity() == Suspiciousness.suspicious) {
-                // same conditional here, redundant
-                if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
-                    return Reaction.attack;
-                return Reaction.investigate;
-            }
-            return Reaction.ignore;
-        } else if (data.levelSensitivity == SensitivityLevel.privateProperty) {
-            if (data.appearanceSuspicion == Suspiciousness.aggressive) {
-                return Reaction.attack;
-            } else if (data.playerActivity() == Suspiciousness.aggressive) {
-                return Reaction.attack;
-            } else if (data.appearanceSuspicion == Suspiciousness.suspicious) {
-                return Reaction.attack;
-            } else if (data.playerActivity() == Suspiciousness.suspicious) {
-                return Reaction.attack;
-            }
-            return Reaction.investigate;
-        } else if (data.levelSensitivity == SensitivityLevel.restrictedProperty) {
-            return Reaction.attack;
+        recentlySawSuspicious = Toolbox.Max(recentlySawSuspicious, totalSuspicion);
+        // recentlySawSuspicious = new List<Suspiciousness>{
+        //     data.appearanceSuspicion,
+        //     GameManager.I.playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal,
+        //     GameManager.I.playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal
+        // }.Aggregate(recentlySawSuspicious, Toolbox.Max<Suspiciousness>);
+        // if (sensitivityLevel == SensitivityLevel.publicProperty) {
+        //     if (totalSuspicion == Suspiciousness.aggressive) {
+        //         return Reaction.attack;
+        //     } else if (totalSuspicion == Suspiciousness.suspicious) {
+        //         if (recentlyInCombat)
+        //             return Reaction.attack;
+        //         return Reaction.investigate;
+        //     }
+        //     return Reaction.ignore;
+        // } else if (sensitivityLevel == SensitivityLevel.semiprivateProperty) {
+        //     if (totalSuspicion == Suspiciousness.aggressive) {        // these two conditionals are saying the same thing 
+        //         return Reaction.attack;
+        //     } else if (totalSuspicion == Suspiciousness.suspicious) {
+        //         // if appearance is suspicious, you get a pass unless recently things were bad
+        //         if (recentlyInCombat || alertness == Alertness.alert || recentHeardSuspicious >= Suspiciousness.suspicious || recentlySawSuspicious >= Suspiciousness.suspicious)
+        //             return Reaction.attack;
+        //         return Reaction.investigate;
+        //     }
+        //     return Reaction.ignore;
+        // } else if (sensitivityLevel == SensitivityLevel.privateProperty) {
+        //     if (totalSuspicion == Suspiciousness.aggressive) {
+        //         return Reaction.attack;
+        //     } else if (totalSuspicion == Suspiciousness.suspicious) {
+        //         return Reaction.attack;
+        //     }
+        //     return Reaction.investigate;
+        // } else if (sensitivityLevel == SensitivityLevel.restrictedProperty) {
+        //     return Reaction.attack;
+        // }
+        // return Reaction.ignore;
+        Reaction reaction = GameManager.I.GetSuspicionReaction();
+        if (reaction == Reaction.investigate && recentlyInCombat) {
+            reaction = Reaction.attack;
         }
-        return Reaction.ignore;
+        return reaction;
     }
 }

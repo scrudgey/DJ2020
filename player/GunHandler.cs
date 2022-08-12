@@ -33,6 +33,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     public CursorData currentTargetData;
     public Collider lockedOnCollider;
     public Vector3 lockedOnPoint;
+    static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
+        content = "brandishing weapon",
+        suspiciousness = Suspiciousness.suspicious
+    };
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
@@ -311,10 +315,16 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         PoolManager.I.RegisterPool(gunInstance.baseGun.shellCasing);
 
         OnValueChanged?.Invoke(this);
+        if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            GameManager.I.AddSuspicionRecord(BrandishingWeaponRecord);
+        }
     }
     public void Holster() {
         gunInstance = null;
         OnValueChanged?.Invoke(this);
+        if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            GameManager.I.RemoveSuspicionRecord(BrandishingWeaponRecord);
+        }
     }
     public void SwitchToGun(int idn) {
         switch (idn) {

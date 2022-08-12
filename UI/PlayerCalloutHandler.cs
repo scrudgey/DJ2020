@@ -63,7 +63,6 @@ public class PlayerCalloutHandler : MonoBehaviour {
 
                 scaleFactor = (float)PennerDoubleAnimation.CircEaseOut(transitionTime, 1f + effectScale, -1f * effectScale, easeSizeDuration);
                 alpha = (float)PennerDoubleAnimation.CircEaseOut(transitionTime, 0f, baseColor.a, easeSizeDuration);
-                Debug.Log(alpha);
                 SetScale();
             } else if (transitionTime > easeSizeDuration && transitionTime < easeSizeDuration + blinkDuration) {
                 scaleFactor = 1f;

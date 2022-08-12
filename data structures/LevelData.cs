@@ -12,7 +12,8 @@ public class LevelData {
     public static LevelData LoadLevelData(string levelName) {
         PowerGraph powerGraph = Graph<PowerNode, PowerGraph>.LoadAll(levelName);
         CyberGraph cyberGraph = Graph<CyberNode, CyberGraph>.LoadAll(levelName);
-        SensitivityLevel sensitivityLevel = SensitivityLevel.publicProperty;
+        // SensitivityLevel sensitivityLevel = SensitivityLevel.publicProperty;
+        SensitivityLevel sensitivityLevel = SensitivityLevel.semiprivateProperty;
         return new LevelData {
             powerGraph = powerGraph,
             cyberGraph = cyberGraph,

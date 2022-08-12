@@ -152,9 +152,9 @@ public class Toolbox {
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
         component.data = data;
         component.sphereCollider.radius = data.volume;
-        if (component.data.player) {
-            SuspicionAudioUIHandler.OnNoise(data);
-        }
+        // if (component.data.player) {
+        //     SuspicionAudioUIHandler.OnNoise(data);
+        // }
         GameObject.Destroy(noiseObject, 0.01f);
         return component;
     }

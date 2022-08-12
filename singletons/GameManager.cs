@@ -34,7 +34,6 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<OverlayType> OnOverlayChange;
     public static Action<InputMode, InputMode> OnInputModeChange;
     public static Action<CursorType> OnCursorTypeChange;
-    public static Action<SuspicionData> OnSuspicionDataChange;
     // UI state
     private bool toggleConsoleThisFrame;
     private bool nextOverlayThisFrame;
@@ -55,7 +54,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     int numberFrames;
     public bool showDebugRays;
-    private SuspicionData previousSuspicionData;
     public void Start() {
         showDebugRays = true;
         showConsole.action.performed += HandleShowConsleAction;
@@ -181,11 +179,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
         toggleConsoleThisFrame = false;
 
-        SuspicionData newSuspicionData = GetSuspicionData();
-        if (!newSuspicionData.Equals(previousSuspicionData)) {
-            OnSuspicionDataChange?.Invoke(newSuspicionData);
-        }
-        previousSuspicionData = newSuspicionData;
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
@@ -225,24 +218,5 @@ public partial class GameManager : Singleton<GameManager> {
             case 5:
                 return distance < 50f;
         }
-    }
-
-    private Suspiciousness PlayerAppearance() {  // TODO: change this
-        if (playerGunHandler == null) return Suspiciousness.normal;
-        if (playerGunHandler.gunInstance == null) {
-            return Suspiciousness.normal;
-        } else if (playerGunHandler.gunInstance != null) {
-            return Suspiciousness.suspicious;
-        } else return Suspiciousness.normal;
-    }
-
-    public SuspicionData GetSuspicionData() {
-        return new SuspicionData {
-            appearanceSuspicion = PlayerAppearance(),
-            interactorSuspicion = playerInteractor?.GetSuspiciousness() ?? Suspiciousness.normal,
-            audioSuspicion = Suspiciousness.normal, // TODO: fix
-            itemHandlerSuspicion = playerItemHandler?.GetSuspiciousness() ?? Suspiciousness.normal,
-            levelSensitivity = gameData.levelData.sensitivityLevel
-        };
     }
 }

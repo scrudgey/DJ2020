@@ -12,18 +12,17 @@ public class PlayerOutlineHandler : MonoBehaviour {
     public float maxTime = 2;
 
     public void Bind() {
-        GameManager.OnSuspicionDataChange += HandleSuspicionChange;
-        HandleSuspicionChange(GameManager.I.GetSuspicionData());
+        GameManager.OnSuspicionChange += HandleSuspicionChange;
+        HandleSuspicionChange();
     }
     public void UnBind() {
-        GameManager.OnSuspicionDataChange -= HandleSuspicionChange;
-
+        GameManager.OnSuspicionChange -= HandleSuspicionChange;
     }
     void OnDestroy() {
         UnBind();
     }
-    public void HandleSuspicionChange(SuspicionData data) {
-        Suspiciousness sus = data.netValue();
+    public void HandleSuspicionChange() {
+        Suspiciousness sus = GameManager.I.GetTotalSuspicion();
         SetOutlineColor(sus);
         if (sus == Suspiciousness.normal) {
             // DisableOutlines();
