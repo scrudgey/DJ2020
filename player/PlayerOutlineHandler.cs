@@ -64,7 +64,7 @@ public class PlayerOutlineHandler : MonoBehaviour {
         foreach (Outline outline in outlines) {
             outline.color = sus switch {
                 Suspiciousness.normal => 1,
-                Suspiciousness.suspicious => 0,
+                Suspiciousness.suspicious => 2,
                 Suspiciousness.aggressive => 0,
                 _ => 0
             };

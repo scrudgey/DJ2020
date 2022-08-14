@@ -266,8 +266,3 @@ blink or emphasize summary text
     blinking cursor
     blit text
 
-if enemy is shot from forward angle, see player immediately
-if NPC is shot, prioritize looking and searching in that direction
-stickier red status? somehow? combat?
-NPC can radio HQ to report hostiles engaged
-

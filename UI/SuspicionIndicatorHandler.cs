@@ -149,7 +149,6 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             } else {
                 easeInAlarmChevron = false;
             }
-            rightChevronVerticalLayoutGroup.padding = new RectOffset(-30, 0, (int)(16f - 60f * factor), 50);
             Vector2 size = new Vector2(215f, factor * 33f);
             alarmChevronRect.sizeDelta = size;
             topSpacerRect.sizeDelta = size;
@@ -162,6 +161,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             } else {
                 easeInDisguiseChevron = false;
             }
+            rightChevronVerticalLayoutGroup.padding = new RectOffset(-30, 0, (int)(16f - 60f * factor), 50);
             disguiseChevronRect.sizeDelta = new Vector2(215f, factor * 33f);
             bottomSpacerRect.sizeDelta = new Vector2(215f, factor * 33f);
         }
@@ -176,7 +176,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 suspicionNormalChevron.color = activeColor;
                 suspicionSuspiciousChevron.color = disabledColor;
                 suspicionAggressiveChevron.color = disabledColor;
-                SetLeftLineTargetHeight(194);
+                SetLeftLineTargetHeight(78);
 
                 SetNormalConnectionLineColor(activeColor);
                 SetSuspiciousConnectionLineColor(disabledColor);
@@ -204,7 +204,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 suspicionNormalChevron.color = disabledColor;
                 suspicionSuspiciousChevron.color = disabledColor;
                 suspicionAggressiveChevron.color = activeColor;
-                SetLeftLineTargetHeight(78);
+                SetLeftLineTargetHeight(194);
 
                 SetNormalConnectionLineColor(disabledColor);
                 SetSuspiciousConnectionLineColor(disabledColor);
@@ -244,13 +244,13 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         }
         switch (GameManager.I.GetSuspicionReaction(netSuspicion, applyModifiers: false)) {
             case Reaction.ignore:
-                SetRightLineTargetHeight(27);
+                SetRightLineTargetHeight(145);
                 break;
             case Reaction.investigate:
                 SetRightLineTargetHeight(85);
                 break;
             case Reaction.attack:
-                SetRightLineTargetHeight(145);
+                SetRightLineTargetHeight(27);
                 break;
         }
 
@@ -260,12 +260,9 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 alarmChevronEaseTimer = 0f;
             }
             alarmChevronObject.SetActive(true);
-            // topChevronSpacer.SetActive(true);
-            // targetRightLineHeight += 18f;
         } else {
             alarmChevronObject.SetActive(false);
-            // topChevronSpacer.SetActive(false);
-            rightChevronVerticalLayoutGroup.padding = new RectOffset(-30, 0, 16, 50);
+
         }
 
         if (GameManager.I.gameData.playerData.disguise) {
@@ -275,11 +272,9 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             }
 
             disguiseChevronObject.SetActive(true);
-            // bottomChevronSpacer.SetActive(true);
-            // targetLeftLineHeight += 18f;
         } else {
             disguiseChevronObject.SetActive(false);
-            // bottomChevronSpacer.SetActive(false);
+            rightChevronVerticalLayoutGroup.padding = new RectOffset(-30, 0, 16, 50);
         }
     }
 
@@ -437,7 +432,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         summaryText2.text = reaction switch {
             Reaction.ignore => "status: innocent bystander",
             Reaction.investigate => "status: attracting attention",
-            Reaction.attack => "status: enemy",
+            Reaction.attack => "status: attack on sight",
             _ => ""
         };
     }

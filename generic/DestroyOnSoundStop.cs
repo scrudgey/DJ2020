@@ -16,7 +16,7 @@ public class DestroyOnSoundStop : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if (!audioSource.isPlaying) {
-            Destroy(gameObject);
+            PoolManager.I.RecallObject(gameObject);
         }
     }
 }

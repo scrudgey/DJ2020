@@ -10,7 +10,6 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
     protected Collider myCollider;
     Dictionary<Type, Func<Damage, DamageResult>> damageHandlers = new Dictionary<Type, Func<Damage, DamageResult>>();
 
-    // private Action OnDestroyed;
     virtual public void Awake() {
         myCollider = GetComponentInChildren<Collider>();
         if (gibs != null)

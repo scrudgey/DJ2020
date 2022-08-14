@@ -5,13 +5,6 @@ using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-public class UIInput {
-    public bool toggleConsole;
-}
-
-public class MouseInputData {
-    public Vector3 mousePosition;
-}
 public class UIController : MonoBehaviour {
     public Canvas canvas;
     public TerminalController terminal;

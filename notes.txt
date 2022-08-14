@@ -860,24 +860,7 @@ i.e. if we control the robot and right click it should enter aim mode right?
 * camera a little above, oriented down
 * camera moves slightly in direction of cursor
 * turn left & right when cursor near the edge ..?
-- animation shows recoil
-- display different UI when in aim mode
-- laser pointer attachment
-- flashlight attachment
-- don't clip camera through wall
-- UI: gun wireframe in lower-right corner.
-- gun inaccuracy in over the shoulder mode should be constant angular size
-- head look around if player has been idle
-- make elevator
-- why do gibs fall through the wall/floor?
-- clearsight InvokeRepeating
-- clearsight OverlapSphereNonAlloc
-- clearsight don't update ceiling calculation when in the air
-- blinking arrow indicator when switching perspectives
-- perhaps a smoother transition to/from aim mode?
-- TODO: configurable scale, possibly involve aspect ratio
-- ceiling clearsighter shadowsonly
-- fog of breath
+
 
 make a real mission. 
     * civilian man
@@ -1055,6 +1038,13 @@ Q: what is the proper solution?
     * gestural aiming with auto-lock
     * small text indicates size of autoaim circle
     * easier to see target reticle
+* AI routine for reloading and racking?
+* torso spritesheet has head included
+* reverse normal / aggro heights
+* don't do outline highlight if i am not the player
+* blinking arrow indicator when switching perspectives
+* perhaps a smoother transition to/from aim mode?
+* TODO: configurable scale, possibly involve aspect ratio
 
 
 graphical issues:
@@ -1081,40 +1071,42 @@ nice to have / future goals:
         or: off-screen lock indicator?
     off-screen indicator for active threats?
     pixel perfect shaders
+    apply skin graphics to corpse
+    - animation shows recoil
+    - laser pointer attachment
+    - flashlight attachment
+    - head look around if player has been idle
+    make elevator
 
-
+don't clip camera through wall
+why do gibs fall through the wall/floor?
+clearsight InvokeRepeating
+clearsight OverlapSphereNonAlloc
+clearsight don't update ceiling calculation when in the air
+ceiling clearsighter shadowsonly
+fog of breath
 damage result addition is weird
-allow independent level data
-allow independent NPC data
 prevent extreme zoom maneuvers with lerping
-    also, initialize camera with proper zoom?
-AI routine for reloading and racking?
-don't do outline highlight if i am not the player
-gibs from explosions
-corpse can be shot / exploded
-apply skin graphics to corpse
-better reaction to hearing noise in search / combat when noise is not suspicious
-gibs awake clone
-use object pooling for audio sources
-broken superjump
-torso spritesheet has head included
-pool the noiseobject
-a third grid: alarm systems
+    also, initialize camera with proper zoom?'
 
-
-
-embellishments
+UI embellishments
     small font text near locked-on character
-    [[ LOCKED ]] text blink (this might not work very well with constant lost / reacquired lock)
+    ? [[ LOCKED ]] text blink (this might not work very well with constant lost / reacquired lock)
     arcs swing about lock size indicator
     callout:
         extended mode callout on level start vs quick callout on display changes 
         text? 
             PLAYER: STATS
 
+save system:
+    allow independent level data
+    allow independent NPC data
+
 UI:
+    - display different UI when in aim mode
+    - UI: gun wireframe in lower-right corner.
     blink cursor when reaching maximum aim
-    larger mouse cursor, with color
+    * larger mouse cursor, with color
     aim lock stats system 
         scan time 
         retain stats after breaking lock up to N 
@@ -1125,15 +1117,38 @@ graph system:
         -                +
     and these are buttons you can click
 
-control / combat:
-    better shotgun
-    aim: fixed angular size
-
 VR combat training:
     don't destroy on dead; recall to pool.
     spawn new NPC 
     interface for designing multiple scenarios
+        prereq: set up a title menu i guess
+        new stage: infiltration
         danger room
         spawning enemies
         enemy count
         victory conditions
+
+control / combat:
+    better shotgun
+    aim: fixed angular size
+
+stealth:
+    alarm sounds 
+    NPC can radio HQ to report hostiles engaged
+    NPC investigate routine
+    better reaction to hearing noise in search / combat when noise is not suspicious (?)
+    a third grid: alarm systems
+    if enemy is shot from forward angle, see player immediately
+    if NPC is shot, prioritize looking and searching in that direction
+    stickier red status? somehow? combat?
+
+
+* death animation graphical glitch
+* gibs awake clone
+* pool the noiseobject
+* use object pooling for audio sources
+aim recenter cursor to center
+gibs from explosions
+corpse can be shot / exploded
+broken superjump
+

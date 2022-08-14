@@ -294,7 +294,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
 
         if (hitState == HitState.dead) {
             octet = skin.legsDead;
-        } else if (input.state == CharacterState.keelOver) {
+        }
+        if (input.state == CharacterState.keelOver) {
             octet = skin.legsKeelOver;
         } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
             octet = skin.legsCrawl;

@@ -51,19 +51,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 saveable.LoadState(data);
             }
         }
-
-        alertHandler.Hide();
-
-        // // TODO: fix this hack. leave it up to AI routines
         gunHandler.primary = new GunInstance(Gun.Load("smg"));
         gunHandler.SwitchToGun(1);
-        if (skipShootAnimation) {
-            gunHandler.Reload();
-            gunHandler.ClipIn();
-            gunHandler.Rack();
-        } else {
-            gunHandler.DoReload();
-        }
+
+        alertHandler.Hide();
 
         Bind(sightCone.gameObject);
         stateMachine = new SphereRobotBrain();

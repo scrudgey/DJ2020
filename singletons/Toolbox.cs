@@ -45,7 +45,7 @@ public class Toolbox {
         RandomizeOneShot(audioSource, RandomFromList(audioClips), randomPitchWidth: randomPitchWidth);
     }
     public static AudioSource AudioSpeaker(Vector3 position, AudioClip[] clips, float volume = 1f) {
-        GameObject audioSpeaker = GameObject.Instantiate(Resources.Load("prefabs/audioSpeaker"), position, Quaternion.identity) as GameObject;
+        GameObject audioSpeaker = PoolManager.I.GetPool("prefabs/audioSpeaker").GetObject(position);
         DestroyOnSoundStop ds = audioSpeaker.GetComponent<DestroyOnSoundStop>();
         if (ds != null) {
             ds.clip = clips;
@@ -147,15 +147,10 @@ public class Toolbox {
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
     }
     public static NoiseComponent Noise(Vector3 position, NoiseData data) {
-        // TODO: pool this object
-        GameObject noiseObject = GameObject.Instantiate(Resources.Load("prefabs/noise"), position, Quaternion.identity) as GameObject;
+        GameObject noiseObject = PoolManager.I.GetPool("prefabs/noise").GetObject(position);
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
         component.data = data;
         component.sphereCollider.radius = data.volume;
-        // if (component.data.player) {
-        //     SuspicionAudioUIHandler.OnNoise(data);
-        // }
-        GameObject.Destroy(noiseObject, 0.01f);
         return component;
     }
     public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {
