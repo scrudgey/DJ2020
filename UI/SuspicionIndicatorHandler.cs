@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,7 +60,24 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     [Header("Summary")]
     public TextMeshProUGUI summaryText1;
     public TextMeshProUGUI summaryText2;
-
+    [Header("Alarm / disguise modifiers")]
+    public GameObject alarmChevronObject;
+    public GameObject disguiseChevronObject;
+    public GameObject topChevronSpacer;
+    public GameObject bottomChevronSpacer;
+    public RectTransform alarmChevronRect;
+    public RectTransform disguiseChevronRect;
+    public RectTransform bottomSpacerRect;
+    public RectTransform topSpacerRect;
+    public VerticalLayoutGroup rightChevronVerticalLayoutGroup;
+    public RectTransform rightChevronColumnRect;
+    public float alarmChevronEaseTimer;
+    public float disguiseChevronEaseTimer;
+    public bool easeInAlarmChevron;
+    public bool easeInDisguiseChevron;
+    public bool easeOutAlarmChevron;
+    public bool easeOutDisguiseChevron;
+    public float alarmChevronEaseDuration = 1f;
     float targetLeftLineHeight;
     float targetRightLineHeight;
     public void Bind() {
@@ -78,7 +96,6 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
 
         SetSummaryText();
     }
-
     public void UpdateSensitivity() {
         switch (GameManager.I.GetCurrentSensitivity()) {
             case SensitivityLevel.publicProperty:
@@ -123,6 +140,31 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         float rightHeight = Mathf.Lerp(rightLine.rect.height, targetRightLineHeight, 0.1f);
         SetLineHeight(leftLine, leftHeight);
         SetLineHeight(rightLine, rightHeight);
+
+        if (easeInAlarmChevron) {
+            float factor = 1f;
+            alarmChevronEaseTimer += Time.unscaledDeltaTime;
+            if (alarmChevronEaseTimer < alarmChevronEaseDuration) {
+                factor = (float)PennerDoubleAnimation.QuartEaseOut(alarmChevronEaseTimer, 0f, 1f, alarmChevronEaseDuration);
+            } else {
+                easeInAlarmChevron = false;
+            }
+            rightChevronVerticalLayoutGroup.padding = new RectOffset(-30, 0, (int)(16f - 60f * factor), 50);
+            Vector2 size = new Vector2(215f, factor * 33f);
+            alarmChevronRect.sizeDelta = size;
+            topSpacerRect.sizeDelta = size;
+        }
+        if (easeInDisguiseChevron) {
+            float factor = 1f;
+            disguiseChevronEaseTimer += Time.unscaledDeltaTime;
+            if (disguiseChevronEaseTimer < alarmChevronEaseDuration) {
+                factor = (float)PennerDoubleAnimation.QuartEaseOut(disguiseChevronEaseTimer, 0f, 1f, alarmChevronEaseDuration);
+            } else {
+                easeInDisguiseChevron = false;
+            }
+            disguiseChevronRect.sizeDelta = new Vector2(215f, factor * 33f);
+            bottomSpacerRect.sizeDelta = new Vector2(215f, factor * 33f);
+        }
     }
 
     public void UpdateIndicators() {
@@ -179,7 +221,6 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreChevron.color = activeColor;
                 reactionInvestigateChevron.color = disabledColor;
                 reactionAttackChevron.color = disabledColor;
-                SetRightLineTargetHeight(27);
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
@@ -188,7 +229,6 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreChevron.color = disabledColor;
                 reactionInvestigateChevron.color = activeColor;
                 reactionAttackChevron.color = disabledColor;
-                SetRightLineTargetHeight(85);
                 reactionIgnoreLight.color = lightGreenDisabled;
                 reactionInvestigateLight.color = lightYellowActive;
                 reactionAttackLight.color = lightRedDisabled;
@@ -197,16 +237,55 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreChevron.color = disabledColor;
                 reactionInvestigateChevron.color = disabledColor;
                 reactionAttackChevron.color = activeColor;
-                SetRightLineTargetHeight(145);
                 reactionIgnoreLight.color = lightGreenDisabled;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
                 break;
         }
+        switch (GameManager.I.GetSuspicionReaction(netSuspicion, applyModifiers: false)) {
+            case Reaction.ignore:
+                SetRightLineTargetHeight(27);
+                break;
+            case Reaction.investigate:
+                SetRightLineTargetHeight(85);
+                break;
+            case Reaction.attack:
+                SetRightLineTargetHeight(145);
+                break;
+        }
+
+        if (GameManager.I.gameData.levelData.alarm) {
+            if (!alarmChevronObject.activeInHierarchy) {
+                easeInAlarmChevron = true;
+                alarmChevronEaseTimer = 0f;
+            }
+            alarmChevronObject.SetActive(true);
+            // topChevronSpacer.SetActive(true);
+            // targetRightLineHeight += 18f;
+        } else {
+            alarmChevronObject.SetActive(false);
+            // topChevronSpacer.SetActive(false);
+            rightChevronVerticalLayoutGroup.padding = new RectOffset(-30, 0, 16, 50);
+        }
+
+        if (GameManager.I.gameData.playerData.disguise) {
+            if (!disguiseChevronObject.activeInHierarchy) {
+                easeInDisguiseChevron = true;
+                disguiseChevronEaseTimer = 0f;
+            }
+
+            disguiseChevronObject.SetActive(true);
+            // bottomChevronSpacer.SetActive(true);
+            // targetLeftLineHeight += 18f;
+        } else {
+            disguiseChevronObject.SetActive(false);
+            // bottomChevronSpacer.SetActive(false);
+        }
     }
 
     public void SetSuspiciousConnectionLineColor(Color color) {
-        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.suspicious);
+        // don't apply modifiers here
+        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.suspicious, applyModifiers: false);
         switch (reaction) {
             case Reaction.ignore:
                 foreach (Image image in susSuspiciousConnectionIgnoreLines) {
@@ -248,7 +327,9 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     }
 
     public void SetNormalConnectionLineColor(Color color) {
-        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.normal);
+        // don't apply modifiers here
+
+        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.normal, applyModifiers: false);
         switch (reaction) {
             case Reaction.ignore:
                 foreach (Image image in susNormalConnectionIgnoreLines) {
@@ -291,7 +372,9 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
 
 
     public void SetAggroConnectionLineColor(Color color) {
-        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.aggressive);
+        // don't apply modifiers here
+
+        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.aggressive, applyModifiers: false);
         switch (reaction) {
             case Reaction.ignore:
                 foreach (Image image in susAggroConnectionIgnoreLines) {

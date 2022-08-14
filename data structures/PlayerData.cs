@@ -30,6 +30,8 @@ public class PlayerData {
     public float hackSpeedCoefficient;
     public float hackRadius;
 
+    public bool disguise;
+
     public static PlayerData DefaultGameData() {
         return new PlayerData() {
 

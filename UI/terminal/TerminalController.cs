@@ -18,6 +18,8 @@ namespace UI {
 
             commands["set"] = SetValue;
             commands["test"] = RunTests;
+            commands["alarm"] = ToggleAlarm;
+            commands["disguise"] = ToggleDisguise;
         }
         public void OnEnable() {
             TakeFocus();
@@ -54,6 +56,20 @@ namespace UI {
         public void RunTests(string[] args) {
             Println($"running test suite...");
             TestSuite.RunToolboxTests();
+        }
+        public void ToggleAlarm(string[] args) {
+            bool alarm = GameManager.I.gameData.levelData.alarm;
+            if (alarm)
+                GameManager.I.DeactivateAlarm();
+            else
+                GameManager.I.ActivateAlarm();
+        }
+        public void ToggleDisguise(string[] args) {
+            bool disguise = GameManager.I.gameData.playerData.disguise;
+            if (disguise)
+                GameManager.I.DeactivateDisguise();
+            else
+                GameManager.I.ActivateDisguise();
         }
         public void SetValue(string[] args) {
             string fieldName = args[0];

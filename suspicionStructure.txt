@@ -246,7 +246,6 @@ possible to fire a shot, not be seen, run away, and be labeled suspicious in HUD
         but then: what is aggro?
     but bad guy spotted should be applied to suspiciousness
     shooting gun should make aggro appearance for a while
-
 what is suspicious appearance:
     ?
     when spotted by camera 
@@ -260,21 +259,15 @@ what is suspicious appearance:
     * ease new entries 
 * adjust wiring when public or private 
 * indicate timer on timed statuses
+* allow alarm  
+* allow disguise
 
-
-allow alarm  
-allow disguise
 blink or emphasize summary text
     blinking cursor
     blit text
+
 if enemy is shot from forward angle, see player immediately
 if NPC is shot, prioritize looking and searching in that direction
-
-when disguise enabled:
-    enable bottomspacer
-    left line heights longer
-when alarm enabled:
-    enable topspacer
-    right line height longer
 stickier red status? somehow? combat?
 NPC can radio HQ to report hostiles engaged
+

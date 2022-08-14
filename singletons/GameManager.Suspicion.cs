@@ -6,7 +6,6 @@ using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
     public static Action OnSuspicionChange;
     public Dictionary<String, SuspicionRecord> suspicionRecords = new Dictionary<string, SuspicionRecord>();
-
     void UpdateSuspicion() {
         List<SuspicionRecord> timedOutRecords = new List<SuspicionRecord>();
         foreach (SuspicionRecord record in suspicionRecords.Values) {
@@ -49,28 +48,69 @@ public partial class GameManager : Singleton<GameManager> {
     public SensitivityLevel GetCurrentSensitivity() =>
         gameData.levelData.sensitivityLevel;
 
-    public Reaction GetSuspicionReaction(Suspiciousness totalSuspicion) {
+    public Reaction GetSuspicionReaction(Suspiciousness totalSuspicion, bool applyModifiers = true) {
+        Reaction reaction = Reaction.ignore;
         switch (GetCurrentSensitivity()) {
             default:
             case SensitivityLevel.semiprivateProperty:
             case SensitivityLevel.publicProperty:
                 if (totalSuspicion < Suspiciousness.aggressive) {
-                    return Reaction.ignore;
-                } else return Reaction.attack;
+                    reaction = Reaction.ignore;
+                } else reaction = Reaction.attack;
+                break;
             case SensitivityLevel.privateProperty:
                 if (totalSuspicion == Suspiciousness.normal) {
-                    return Reaction.ignore;
+                    reaction = Reaction.ignore;
                 } else if (totalSuspicion == Suspiciousness.suspicious) {
-                    return Reaction.investigate;
+                    reaction = Reaction.investigate;
                 } else {
-                    return Reaction.attack;
+                    reaction = Reaction.attack;
                 }
+                break;
             case SensitivityLevel.restrictedProperty:
                 if (totalSuspicion == Suspiciousness.normal) {
-                    return Reaction.investigate;
+                    reaction = Reaction.investigate;
                 } else {
-                    return Reaction.attack;
+                    reaction = Reaction.attack;
                 }
+                break;
         }
+        if (applyModifiers) {
+            if (gameData.levelData.alarm) {
+                if (reaction == Reaction.ignore) {
+                    reaction = Reaction.investigate;
+                } else if (reaction == Reaction.investigate) {
+                    reaction = Reaction.attack;
+                } else if (reaction == Reaction.attack) {
+                    // trigger alarm again?
+                }
+            }
+            if (gameData.playerData.disguise) {
+                if (reaction == Reaction.investigate) {
+                    reaction = Reaction.ignore;
+                } else if (reaction == Reaction.attack) {
+                    reaction = Reaction.investigate;
+                }
+            }
+        }
+        return reaction;
+    }
+
+    public void ActivateAlarm() {
+        gameData.levelData.alarm = true;
+        OnSuspicionChange?.Invoke();
+    }
+    public void DeactivateAlarm() {
+        gameData.levelData.alarm = false;
+        OnSuspicionChange?.Invoke();
+    }
+
+    public void ActivateDisguise() {
+        gameData.playerData.disguise = true;
+        OnSuspicionChange?.Invoke();
+    }
+    public void DeactivateDisguise() {
+        gameData.playerData.disguise = false;
+        OnSuspicionChange?.Invoke();
     }
 }
