@@ -221,7 +221,6 @@ we can apply various status perks to the status bar.
     * an enemy has been spotted in the location (timeout 5:00)
 some are timed, some are more permanent.
 
-
 how to structure suspicion handler.
 current: gamemanager polls just in time multiple player components.
 move it all to a new singleton?
@@ -230,18 +229,52 @@ move it all to a new singleton?
 right now it's set up that gamemanager Pulls suspicion data from multiple sources every frame and notifies on change.
 instead anything that changes player suspicion should register with the handler
 
-
 robot AI suspicion reaction local state really is just "recently in combat"
 
 try different states
 
 how to 
 
-
-maybe apply a status when a suspicious person is sighted.
 possible to take out gun, shoot a guy, put it away, and now guy's reaction is contradictory to display
+    * display local reaction or suspicion in relation to NPC
+    * adjust statuses to make local stuff more global
+        maybe apply a status when a suspicious person is sighted.
 
-* adjust wiring when public or private 
+possible to fire a shot, not be seen, run away, and be labeled suspicious in HUD
+    heard noise should not apply to suspiciousness.
+        or: should be suspicious, not aggro
+        but then: what is aggro?
+    but bad guy spotted should be applied to suspiciousness
+    shooting gun should make aggro appearance for a while
+
+what is suspicious appearance:
+    ?
+    when spotted by camera 
+    when alarm sounding 
+    special level effects
+
+* use timing
+* rearrange the top & bottom.
 * easing when things change 
-* allow alarm 
-* allow disguise
+    * ease line heights
+    * ease new entries 
+* adjust wiring when public or private 
+* indicate timer on timed statuses
+
+
+allow alarm  
+allow disguise
+blink or emphasize summary text
+    blinking cursor
+    blit text
+if enemy is shot from forward angle, see player immediately
+if NPC is shot, prioritize looking and searching in that direction
+
+when disguise enabled:
+    enable bottomspacer
+    left line heights longer
+when alarm enabled:
+    enable topspacer
+    right line height longer
+stickier red status? somehow? combat?
+NPC can radio HQ to report hostiles engaged

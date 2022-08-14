@@ -229,6 +229,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
 
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
             CharacterCamera.Shake(gunInstance.baseGun.noise / 50f, 0.1f);
+            // GameManager.I.RemoveSuspicionRecord(BrandishingWeaponRecord);
+            SuspicionRecord record = new SuspicionRecord {
+                content = "shooting gun",
+                suspiciousness = Suspiciousness.aggressive,
+                maxLifetime = 1f,
+                lifetime = 1f
+            };
+            GameManager.I.AddSuspicionRecord(record);
         }
     }
     public void EmitShell() {

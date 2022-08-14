@@ -39,11 +39,29 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     public Color activeColor;
     public Color disabledColor;
     public Image susNormalConnectionLine;
-    public Image susSuspiciousConnectionLine;
     public Image susAggroConnectionLine;
+
+    [Header("Normal connectors")]
+    public Image[] susNormalConnectionInvestigateLines;
+    public Image[] susNormalConnectionIgnoreLines;
+    public Image[] susNormalConnectionAttackLines;
+
+    [Header("Suspicious connectors")]
+    public Image[] susSuspiciousConnectionInvestigateLines;
+    public Image[] susSuspiciousConnectionIgnoreLines;
+    public Image[] susSuspiciousConnectionAttackLines;
+
+    [Header("Aggro connectors")]
+    public Image[] susAggroConnectionInvestigateLines;
+    public Image[] susAggroConnectionIgnoreLines;
+    public Image[] susAggroConnectionAttackLines;
+
     [Header("Summary")]
     public TextMeshProUGUI summaryText1;
     public TextMeshProUGUI summaryText2;
+
+    float targetLeftLineHeight;
+    float targetRightLineHeight;
     public void Bind() {
         GameManager.OnSuspicionChange += HandleSuspicionChange;
     }
@@ -82,9 +100,13 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         }
     }
     public void UpdateStatusFeed() {
-        List<string> activeRecords = GameManager.I.suspicionRecords.Keys.ToList();
+        // List<string> activeRecords = GameManager.I.suspicionRecords.Keys.ToList();
+        List<string> activeRecords = new List<string>();
 
         foreach (Transform child in statusRecordsContainer) {
+            SuspicionStatusRecordIndicatorHandler handler = child.GetComponent<SuspicionStatusRecordIndicatorHandler>();
+            if (handler != null && handler.suspicionRecord != null)
+                activeRecords.Add(handler.suspicionRecord.content);
             Destroy(child.gameObject);
         }
 
@@ -92,23 +114,31 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             GameObject obj = GameObject.Instantiate(statusRecordPrefab);
             obj.transform.SetParent(statusRecordsContainer, worldPositionStays: false);
             SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
-            handler.Configure(record);
+            handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
         }
+    }
+
+    void Update() {
+        float leftHeight = Mathf.Lerp(leftLine.rect.height, targetLeftLineHeight, 0.1f);
+        float rightHeight = Mathf.Lerp(rightLine.rect.height, targetRightLineHeight, 0.1f);
+        SetLineHeight(leftLine, leftHeight);
+        SetLineHeight(rightLine, rightHeight);
     }
 
     public void UpdateIndicators() {
         Suspiciousness netSuspicion = GameManager.I.GetTotalSuspicion();
-        Reaction reaction = GameManager.I.GetSuspicionReaction();
+        Reaction reaction = GameManager.I.GetSuspicionReaction(netSuspicion);
 
         switch (netSuspicion) {
             case Suspiciousness.normal:
                 suspicionNormalChevron.color = activeColor;
                 suspicionSuspiciousChevron.color = disabledColor;
                 suspicionAggressiveChevron.color = disabledColor;
-                SetLineHeight(leftLine, 31);
-                susNormalConnectionLine.color = activeColor;
-                susSuspiciousConnectionLine.color = disabledColor;
-                susAggroConnectionLine.color = disabledColor;
+                SetLeftLineTargetHeight(194);
+
+                SetNormalConnectionLineColor(activeColor);
+                SetSuspiciousConnectionLineColor(disabledColor);
+                SetAggroConnectionLineColor(disabledColor);
 
                 suspicionNormalLight.color = lightGreenActive;
                 suspicionSuspiciousLight.color = lightYellowDisabled;
@@ -118,10 +148,11 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 suspicionNormalChevron.color = disabledColor;
                 suspicionSuspiciousChevron.color = activeColor;
                 suspicionAggressiveChevron.color = disabledColor;
-                SetLineHeight(leftLine, 87);
-                susNormalConnectionLine.color = disabledColor;
-                susSuspiciousConnectionLine.color = activeColor;
-                susAggroConnectionLine.color = disabledColor;
+                SetLeftLineTargetHeight(137);
+
+                SetNormalConnectionLineColor(disabledColor);
+                SetSuspiciousConnectionLineColor(activeColor);
+                SetAggroConnectionLineColor(disabledColor);
 
                 suspicionNormalLight.color = lightGreenDisabled;
                 suspicionSuspiciousLight.color = lightYellowActive;
@@ -131,10 +162,11 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 suspicionNormalChevron.color = disabledColor;
                 suspicionSuspiciousChevron.color = disabledColor;
                 suspicionAggressiveChevron.color = activeColor;
-                SetLineHeight(leftLine, 144);
-                susNormalConnectionLine.color = disabledColor;
-                susSuspiciousConnectionLine.color = disabledColor;
-                susAggroConnectionLine.color = activeColor;
+                SetLeftLineTargetHeight(78);
+
+                SetNormalConnectionLineColor(disabledColor);
+                SetSuspiciousConnectionLineColor(disabledColor);
+                SetAggroConnectionLineColor(activeColor);
 
                 suspicionNormalLight.color = lightGreenDisabled;
                 suspicionSuspiciousLight.color = lightYellowDisabled;
@@ -147,8 +179,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreChevron.color = activeColor;
                 reactionInvestigateChevron.color = disabledColor;
                 reactionAttackChevron.color = disabledColor;
-                SetLineHeight(rightLine, 202);
-
+                SetRightLineTargetHeight(27);
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
@@ -157,8 +188,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreChevron.color = disabledColor;
                 reactionInvestigateChevron.color = activeColor;
                 reactionAttackChevron.color = disabledColor;
-                SetLineHeight(rightLine, 143);
-
+                SetRightLineTargetHeight(85);
                 reactionIgnoreLight.color = lightGreenDisabled;
                 reactionInvestigateLight.color = lightYellowActive;
                 reactionAttackLight.color = lightRedDisabled;
@@ -167,8 +197,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreChevron.color = disabledColor;
                 reactionInvestigateChevron.color = disabledColor;
                 reactionAttackChevron.color = activeColor;
-                SetLineHeight(rightLine, 85);
-
+                SetRightLineTargetHeight(145);
                 reactionIgnoreLight.color = lightGreenDisabled;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
@@ -176,13 +205,146 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         }
     }
 
+    public void SetSuspiciousConnectionLineColor(Color color) {
+        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.suspicious);
+        switch (reaction) {
+            case Reaction.ignore:
+                foreach (Image image in susSuspiciousConnectionIgnoreLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                foreach (Image image in susSuspiciousConnectionInvestigateLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susSuspiciousConnectionAttackLines) {
+                    image.enabled = false;
+                }
+                break;
+            case Reaction.investigate:
+                foreach (Image image in susSuspiciousConnectionIgnoreLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susSuspiciousConnectionInvestigateLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                foreach (Image image in susSuspiciousConnectionAttackLines) {
+                    image.enabled = false;
+                }
+                break;
+            case Reaction.attack:
+                foreach (Image image in susSuspiciousConnectionIgnoreLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susSuspiciousConnectionInvestigateLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susSuspiciousConnectionAttackLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                break;
+        }
+    }
+
+    public void SetNormalConnectionLineColor(Color color) {
+        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.normal);
+        switch (reaction) {
+            case Reaction.ignore:
+                foreach (Image image in susNormalConnectionIgnoreLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                foreach (Image image in susNormalConnectionInvestigateLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susNormalConnectionAttackLines) {
+                    image.enabled = false;
+                }
+                break;
+            case Reaction.investigate:
+                foreach (Image image in susNormalConnectionIgnoreLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susNormalConnectionInvestigateLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                foreach (Image image in susSuspiciousConnectionAttackLines) {
+                    image.enabled = false;
+                }
+                break;
+            case Reaction.attack:
+                foreach (Image image in susNormalConnectionIgnoreLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susNormalConnectionInvestigateLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susNormalConnectionAttackLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                break;
+        }
+    }
+
+
+    public void SetAggroConnectionLineColor(Color color) {
+        Reaction reaction = GameManager.I.GetSuspicionReaction(Suspiciousness.aggressive);
+        switch (reaction) {
+            case Reaction.ignore:
+                foreach (Image image in susAggroConnectionIgnoreLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                foreach (Image image in susAggroConnectionInvestigateLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susAggroConnectionAttackLines) {
+                    image.enabled = false;
+                }
+                break;
+            case Reaction.investigate:
+                foreach (Image image in susAggroConnectionIgnoreLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susAggroConnectionInvestigateLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                foreach (Image image in susAggroConnectionAttackLines) {
+                    image.enabled = false;
+                }
+                break;
+            case Reaction.attack:
+                foreach (Image image in susAggroConnectionIgnoreLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susAggroConnectionInvestigateLines) {
+                    image.enabled = false;
+                }
+                foreach (Image image in susAggroConnectionAttackLines) {
+                    image.color = color;
+                    image.enabled = true;
+                }
+                break;
+        }
+    }
+
     void SetLineHeight(RectTransform rectTransform, float height) {
         rectTransform.sizeDelta = new Vector2(3f, height);
+    }
+    void SetLeftLineTargetHeight(float height) {
+        targetLeftLineHeight = height;
+    }
+    void SetRightLineTargetHeight(float height) {
+        targetRightLineHeight = height;
     }
 
     void SetSummaryText() {
         Suspiciousness suspiciousness = GameManager.I.GetTotalSuspicion();
-        Reaction reaction = GameManager.I.GetSuspicionReaction();
+        Reaction reaction = GameManager.I.GetSuspicionReaction(suspiciousness);
         summaryText1.text = suspiciousness switch {
             Suspiciousness.normal => "appearance ... OK <i>!!<.i>",
             Suspiciousness.suspicious => "appearance ... shady",
