@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-public class Destructible : Damageable {
+public class Destructible : Damageable, IPoolable {
     public float health;
     public float fullHealthAmount;
     private bool doDestruct;
@@ -55,5 +55,17 @@ public class Destructible : Damageable {
         if (destructSounds.Length > 0) {
             Toolbox.AudioSpeaker(transform.position, destructSounds, volume: 2f);
         }
+    }
+
+    public virtual void OnPoolActivate() {
+        health = fullHealthAmount;
+        hitState = HitState.normal;
+    }
+    public virtual void OnPoolDectivate() {
+        health = fullHealthAmount;
+        hitState = HitState.normal;
+        TagSystemData data = Toolbox.GetTagData(gameObject);
+        data.targetPriority = 1;
+        Debug.Log("pool deactivate on destructible");
     }
 }

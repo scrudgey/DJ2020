@@ -38,12 +38,19 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         if (input.isProne || input.hitState == HitState.dead) { // crawling
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
-        SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
+        try {
 
-        Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
-        headAnimation.transform.localPosition = offset;
-        headAnimation.UpdateView(input, torsoSpriteData);
-        return torsoSpriteData;
+            SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
+
+            Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
+            headAnimation.transform.localPosition = offset;
+            headAnimation.UpdateView(input, torsoSpriteData);
+            return torsoSpriteData;
+        }
+        catch (Exception e) {
+            Debug.LogError($"**** {sheetIndex} {spriteRenderer.sprite.name} {input.isProne || input.hitState == HitState.dead} {input.gunInput.gunType}");
+            return null;
+        }
     }
     void SetState(GunHandler.GunState newState) {
         state = newState;

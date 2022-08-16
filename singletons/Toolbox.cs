@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Audio;
-
 // random from list
 // play a sound with random pitch from randomized list
 // maybe use loudspeaker object
@@ -13,6 +13,7 @@ public class Toolbox {
     public static GameObject explosiveRadiusPrefab;
     public static readonly string ExplosiveRadiusPath = "prefabs/explosiveRadius";
     public static AudioMixer sfxMixer;
+    static Regex cloneFinder = new Regex(@"(.+)\(Clone\)$", RegexOptions.Multiline);
     static public IEnumerator RunAfterTime(float delay, Action function) {
         float timer = 0;
         while (timer < delay) {
@@ -32,6 +33,22 @@ public class Toolbox {
             audioSource.pitch = UnityEngine.Random.Range(1 - (randomPitchWidth / 2f), 1 + (randomPitchWidth / 2f));
         }
         audioSource.PlayOneShot(audioClip);
+    }
+    static public string NameWithoutClone(GameObject gameObject) {
+        return CloneRemover(gameObject.name);
+    }
+    public static string CloneRemover(string input) {
+        string output = input;
+        if (input != null) {
+            MatchCollection matches = cloneFinder.Matches(input);
+            if (matches.Count > 0) {                                    // the object is a clone, capture just the normal name
+                foreach (Match match in matches) {
+                    output = match.Groups[1].Value;
+                }
+            }
+            // TODO: numbermatcher
+        }
+        return output;
     }
     static public void RandomizeOneShot(AudioSource audioSource, AudioClip[] audioClips, float randomPitchWidth = 0.2f) {
         if (audioSource == null) {
@@ -373,5 +390,6 @@ public class Toolbox {
         }
         return new Rect(total_min_x, total_min_y, total_max_x - total_min_x, total_max_y - total_min_y);
     }
+
 }
 

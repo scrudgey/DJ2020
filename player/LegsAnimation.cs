@@ -274,7 +274,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         headAnimation.transform.position = absoluteWorldPosition;
 
         torsoAnimation.transform.position += 0.001f * directionToCamera;
-        if (torsoSpriteData.headInFrontOfTorso) {
+        // TODO: this is a hack/patch.
+        if (torsoSpriteData != null && torsoSpriteData.headInFrontOfTorso) {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
             headAnimation.transform.position += 0.002f * input.directionToCamera;
         } else {

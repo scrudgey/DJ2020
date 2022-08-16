@@ -5,4 +5,5 @@ using UnityEngine;
 public class Corpse : MonoBehaviour {
     public SpriteRenderer torsoSpriteRenderer;
     public SpriteRenderer legSpriteRenderer;
+    public Skin skin;
 }

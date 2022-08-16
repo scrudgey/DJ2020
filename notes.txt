@@ -1044,8 +1044,27 @@ Q: what is the proper solution?
 * don't do outline highlight if i am not the player
 * blinking arrow indicator when switching perspectives
 * perhaps a smoother transition to/from aim mode?
-* TODO: configurable scale, possibly involve aspect ratio
-
+* TODO: configurable scale, possibly involve aspect ratio (not sure what this meant)
+* death animation graphical glitch
+* gibs awake clone
+* pool the noiseobject
+* use object pooling for audio sources
+* to reset the NPC character:
+    * reset ai machine state
+    * reset hurtable state
+     gun instance
+    * sphere AI came back shooting
+* when spawning an NPC, we need some scene references:
+    * character controller: orbit camera
+    * sphere AI: patrol route
+* VR combat training
+    * don't destroy on dead; recall to pool.
+    * spawn new NPC some time after the first one dies, at a random point
+* scenario manager: track the number of active NPCs.
+    * when there aren't enough, spawn a new one
+    * track the active NPCs: how? 
+        * track the pool objects.
+* eliminate poolobject?
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1088,6 +1107,7 @@ fog of breath
 damage result addition is weird
 prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
+reset gun instance on pool operations
 
 UI embellishments
     small font text near locked-on character
@@ -1100,11 +1120,11 @@ UI embellishments
 
 save system:
     allow independent level data
-    allow independent NPC data
+    allow independent NPC data: this is a little harder 
 
 UI:
-    - display different UI when in aim mode
-    - UI: gun wireframe in lower-right corner.
+    display different UI when in aim mode
+    UI: gun wireframe in lower-right corner.
     blink cursor when reaching maximum aim
     * larger mouse cursor, with color
     aim lock stats system 
@@ -1117,16 +1137,15 @@ graph system:
         -                +
     and these are buttons you can click
 
-VR combat training:
-    don't destroy on dead; recall to pool.
-    spawn new NPC 
-    interface for designing multiple scenarios
-        prereq: set up a title menu i guess
+interface for designing multiple VR scenarios
+        prereq: set up a title menu i guess?
         new stage: infiltration
         danger room
         spawning enemies
         enemy count
         victory conditions
+        select player loadout
+        select enemy loadout
 
 control / combat:
     better shotgun
@@ -1136,18 +1155,15 @@ stealth:
     alarm sounds 
     NPC can radio HQ to report hostiles engaged
     NPC investigate routine
+    NPC reacts to corpses
     better reaction to hearing noise in search / combat when noise is not suspicious (?)
-    a third grid: alarm systems
-    if enemy is shot from forward angle, see player immediately
+        when i'm already startled, if i hear more gunshots, skip ahead to running toward / looking.
     if NPC is shot, prioritize looking and searching in that direction
+        if enemy is shot from forward angle, see player immediately
     stickier red status? somehow? combat?
+third grid: alarm systems
 
-
-* death animation graphical glitch
-* gibs awake clone
-* pool the noiseobject
-* use object pooling for audio sources
-aim recenter cursor to center
+aim recenter cursor to center 
 gibs from explosions
 corpse can be shot / exploded
 broken superjump

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
 
 public class PrefabPool {
     protected GameObject prefab;
     private int maxConcurrentObjects = 100;
-    private Queue<GameObject> objectsInPool;
-    private Queue<GameObject> objectsActiveInWorld;
+    public Queue<GameObject> objectsInPool;
+    public Queue<GameObject> objectsActiveInWorld;
     public PrefabPool(string prefabPath, int poolSize = 100) {
         this.prefab = Resources.Load(prefabPath) as GameObject;
         this.maxConcurrentObjects = poolSize;
@@ -23,18 +23,15 @@ public class PrefabPool {
     protected virtual void EnableObject(GameObject obj) {
         obj.SetActive(true);
         obj.transform.SetParent(null, true);
-        // allow decals to define enable methods
-        PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
-        if (poolObject != null) {
-            poolObject.OnPoolActivate();
+        foreach (IPoolable poolable in obj.GetComponentsInChildren<IPoolable>()) {
+            poolable.OnPoolActivate();
         }
     }
     protected virtual void DisableObject(GameObject obj) {
         obj.SetActive(false);
-        // allow decals to define disable methods
-        PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
-        if (poolObject != null) {
-            poolObject.OnPoolDectivate();
+        foreach (IPoolable poolable in obj.GetComponentsInChildren<IPoolable>()) {
+            Debug.Log($"deactivating {poolable}");
+            poolable.OnPoolDectivate();
         }
     }
     public virtual void InitializePool() {
@@ -53,9 +50,9 @@ public class PrefabPool {
         if (obj == null) {
             Debug.LogWarning("RecallObject called with null value");
         }
-        // decal.SetActive(false);
         DisableObject(obj);
         objectsInPool.Enqueue(obj);
+        objectsActiveInWorld = new Queue<GameObject>(objectsActiveInWorld.Where(x => x != obj));
         obj.transform.SetParent(null);
     }
     public void RecallObjects(GameObject[] objects) {
@@ -73,7 +70,6 @@ public class PrefabPool {
         GameObject obj = GetNextAvailableObject();
         if (obj != null) {
             obj.transform.position = position;
-            // obj.GetComponent<Rigidbody>().Move
         } else {
             obj = InstantiatePrefab();
         }
@@ -94,7 +90,7 @@ public class PrefabPool {
 
 
 public class PoolManager : Singleton<PoolManager> {
-    private Dictionary<GameObject, PrefabPool> prefabPools = new Dictionary<GameObject, PrefabPool>();
+    private Dictionary<string, PrefabPool> prefabPools = new Dictionary<string, PrefabPool>();
 
     public enum DecalType { normal, glass, blood }
     public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
@@ -115,38 +111,27 @@ public class PoolManager : Singleton<PoolManager> {
         return RegisterPool(prefab, poolSize: poolSize);
     }
     public PrefabPool RegisterPool(GameObject prefab, int poolSize = 100) {
-        if (prefabPools.ContainsKey(prefab)) {
-            return prefabPools[prefab];
+        string prefabname = Toolbox.NameWithoutClone(prefab);
+        if (prefabPools.ContainsKey(prefabname)) {
+            return prefabPools[prefabname];
         }
-        // Debug.Log($"initializing prefabpool for {prefab}");
+        Debug.Log($"initializing prefabpool for {prefab}");
         PrefabPool pool = new PrefabPool(prefab, poolSize: poolSize);
-        prefabPools[prefab] = pool;
+        prefabPools[prefabname] = pool;
         pool.InitializePool();
         return pool;
     }
     public void RecallObject(GameObject obj) {
         if (obj == null)
             return;
-        // get key from component
-        PoolObject poolObject = obj.GetComponent<PoolObject>();
-        if (poolObject != null) {
-            GetPool(poolObject.prefabKey).RecallObject(obj);
-        } else {
-            Debug.LogWarning($"PoolObject not found on RecallObject {obj}");
-        }
+        GetPool(obj).RecallObject(obj);
     }
     public void RecallObjects(GameObject[] objects) {
         PrefabPool pool = null;
         foreach (GameObject obj in objects) {
             if (obj == null) continue;
-            if (pool == null) {
-                PoolObject poolObject = obj.GetComponentInChildren<PoolObject>();
-                if (poolObject != null) {
-                    pool = GetPool(poolObject.prefabKey);
-                }
-            } else {
-                pool.RecallObject(obj);
-            }
+            pool = GetPool(obj);
+            pool.RecallObject(obj);
         }
     }
     public PrefabPool GetPool(string prefabPath) {
@@ -156,8 +141,9 @@ public class PoolManager : Singleton<PoolManager> {
 
     // TODO: refactor, use Instantiate syntax.
     public PrefabPool GetPool(GameObject prefab) {
-        if (prefabPools.ContainsKey(prefab)) {
-            return prefabPools[prefab];
+        string prefabname = Toolbox.NameWithoutClone(prefab);
+        if (prefabPools.ContainsKey(prefabname)) {
+            return prefabPools[prefabname];
         } else {
             return RegisterPool(prefab);
         }

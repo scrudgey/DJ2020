@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 public enum Reaction { ignore, attack, investigate }
 
-public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHitstateSubscriber {
+public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHitstateSubscriber, IPoolable {
     public Destructible characterHurtable;
     public HitState hitState { get; set; }
     public SightCone sightCone;
@@ -17,7 +17,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
     public SphereRobotBrain stateMachine;
-    // public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.05f;
@@ -263,5 +262,23 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             reaction = Reaction.attack;
         }
         return reaction;
+    }
+
+    public void OnPoolActivate() {
+
+    }
+    public void OnPoolDectivate() {
+        perceptionCountdown = 0f;
+        lastSeenPlayerPosition = Vector3.zero;
+        timeSinceLastSeen = 0f;
+        playerCollider = null;
+        // alertness = Alertness.normal;
+        recentlyInCombat = false;
+        recentHeardSuspicious = Suspiciousness.normal;
+        recentlySawSuspicious = Suspiciousness.normal;
+        stateMachine = new SphereRobotBrain();
+        EnterDefaultState();
+
+        // TODO: reset gun state...?!?
     }
 }

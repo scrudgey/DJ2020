@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerminateAfterTime : PoolObject {
+public class TerminateAfterTime : MonoBehaviour, IPoolable {
     public float lifetime;
     private float timer;
     void Update() {
@@ -28,7 +28,7 @@ public class TerminateAfterTime : PoolObject {
         }
     }
 
-    public override void OnPoolActivate() {
+    public void OnPoolActivate() {
         timer = 0;
         this.enabled = true;
         foreach (Collider collider in GetComponents<Collider>()) {
@@ -46,4 +46,5 @@ public class TerminateAfterTime : PoolObject {
             rigidbody.isKinematic = false;
         }
     }
+    public void OnPoolDectivate() { }
 }

@@ -6,7 +6,6 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
     // basic message bus pattern
     public Gibs gibs;
     public Damage lastDamage;
-    public DamageResult lastResult;
     protected Collider myCollider;
     Dictionary<Type, Func<Damage, DamageResult>> damageHandlers = new Dictionary<Type, Func<Damage, DamageResult>>();
 

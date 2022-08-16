@@ -22,7 +22,7 @@ public enum ClimbingState {
     DeAnchoring
 }
 
-public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber {
+public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber, IPoolable {
     public KinematicCharacterMotor Motor;
     public CharacterHurtable characterHurtable;
     public CharacterCamera OrbitCamera;
@@ -631,10 +631,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 // }
                 if (deadTimer >= 1.8f) {
                     // TODO: use object pooling
-                    Destroy(transform.root.gameObject);
-                    GameObject corpseObject = GameObject.Instantiate(Resources.Load("prefabs/gibs/corpse"), transform.position + new Vector3(0f, 0.83f, 0f), Quaternion.identity) as GameObject;
-                    Corpse corpse = corpseObject.GetComponent<Corpse>();
-                    // corpse.legSpriteRenderer.sprite = legr
+                    CreateCorpse();
+                    PoolManager.I.RecallObject(transform.root.gameObject);
                 }
                 break;
             case CharacterState.jumpPrep:
@@ -1007,6 +1005,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
     }
 
+    void CreateCorpse() {
+        GameObject corpseObject = GameObject.Instantiate(Resources.Load("prefabs/gibs/corpse"), transform.position + new Vector3(0f, 0.83f, 0f), Quaternion.identity) as GameObject;
+        Corpse corpse = corpseObject.GetComponent<Corpse>();
+        // TODO: initialize corpse.
+    }
+
     public bool IsColliderValidForCollisions(Collider coll) {
         return true;
     }
@@ -1104,5 +1108,26 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     }
     void LateUpdate() {
         OnValueChanged?.Invoke(this);
+    }
+
+    public void OnPoolActivate() {
+
+    }
+    public void OnPoolDectivate() {
+        deadTimer = 0f;
+        // state = CharacterState.normal;
+        TransitionToState(CharacterState.normal);
+        hitState = HitState.normal;
+
+        landStunTimer = 0f;
+        _lastInput = PlayerInput.none;
+        lastTargetDataInput = CursorData.none;
+        lookAtDirection = Vector3.zero;
+        inputDirectionHeldTimer = 0f;
+        crouchMovementInputTimer = 0f;
+        crouchMovementSoundTimer = 0f;
+        inputCrouchDown = false;
+        deadMoveVelocity = Vector3.zero;
+        deadTimer = 0f;
     }
 }

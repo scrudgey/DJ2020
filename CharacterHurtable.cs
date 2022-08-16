@@ -6,14 +6,13 @@ using UnityEngine;
 
 public enum HitState { normal, hitstun, dead, invulnerable }
 
-public class CharacterHurtable : Destructible, IBindable<CharacterHurtable> {
+public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPoolable {
     public enum HitStunType { timer, invulnerable }
     public HitStunType hitstunType;
     // private HitState _hitState;
     public float wallDecalDistance = 1f;
     public float wallDecalProbability = 0.2f;
     public CharacterController controller;
-    public LegsAnimation legsAnimation;
     private float hitstunCountdown;
     public float hitstunAmount = 0.1f;
     public Action<CharacterHurtable> OnValueChanged { get; set; }
@@ -91,5 +90,9 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable> {
             GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.blood);
             break;
         }
+    }
+    public override void OnPoolDectivate() {
+        base.OnPoolDectivate();
+        hitstunCountdown = 0;
     }
 }

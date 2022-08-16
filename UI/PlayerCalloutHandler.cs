@@ -74,17 +74,14 @@ public class PlayerCalloutHandler : MonoBehaviour {
                 }
                 SetScale();
                 if (doBlink) {
-                    // cursorImage.enabled = false;
                     cursorImage.color = highlightColor;
                 } else {
                     cursorImage.color = baseColor;
-                    // cursorImage.enabled = true;
                 }
             } else if (transitionTime > easeSizeDuration + blinkDuration && transitionTime < easeSizeDuration + blinkDuration + hangDuration) {
                 cursorImage.enabled = true;
                 SetScale();
             } else {
-                Debug.Log("end sequence");
                 cursorImage.enabled = false;
                 active = false;
             }
