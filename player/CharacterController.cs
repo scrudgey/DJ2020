@@ -308,7 +308,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         Motor.MaxStepHeight = stepHeight;
         if (input.inputMode == InputMode.aim) {
             isRunning = false;
-            // isCrouching = false;
             isProne = false;
 
             if (input.CrouchDown) {

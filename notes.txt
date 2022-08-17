@@ -1096,6 +1096,10 @@ nice to have / future goals:
     - flashlight attachment
     - head look around if player has been idle
     make elevator
+aim recenter cursor to center 
+    define a mouse offset, and on entering aim mode, set the offset such that the cursor will be in the center of the screen
+    or use input method
+try to pop around a corner and aim: it doesn't work
 
 don't clip camera through wall
 why do gibs fall through the wall/floor?
@@ -1131,6 +1135,8 @@ UI:
         scan time 
         retain stats after breaking lock up to N 
         small health bar 
+    minimap
+    weapon wheel
 
 graph system:
     [<<][ELECTRICAL][>>]
@@ -1150,21 +1156,32 @@ interface for designing multiple VR scenarios
 control / combat:
     better shotgun
     aim: fixed angular size
+    pop out from wall
 
 stealth:
-    alarm sounds 
-    NPC can radio HQ to report hostiles engaged
     NPC investigate routine
     NPC reacts to corpses
-    better reaction to hearing noise in search / combat when noise is not suspicious (?)
-        when i'm already startled, if i hear more gunshots, skip ahead to running toward / looking.
-    if NPC is shot, prioritize looking and searching in that direction
-        if enemy is shot from forward angle, see player immediately
     stickier red status? somehow? combat?
 third grid: alarm systems
+HQ
+    NPC can radio HQ to report hostiles engaged
+    alarm sounds 
+    alarm activation
+    response team
 
-aim recenter cursor to center 
+
 gibs from explosions
 corpse can be shot / exploded
-broken superjump
+bug: broken superjump
+bug: left/right shoulder
+bug: aim indicator in aim mode
+bug: boxes in aim mode
 
+better reaction to hearing noise in search / combat when noise is not suspicious (?)
+    when i'm already startled, if i hear more gunshots, skip ahead to running toward / looking.
+if NPC is shot, prioritize looking and searching in that direction
+    if enemy is shot from forward angle, see player immediately
+
+test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
+
+VR environment: infiltration level

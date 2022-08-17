@@ -8,7 +8,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.PostProcessing;
 
 // TODO: eliminate this enum
-// a single parameter lerps between states, and there is one transitional state. ...?
 public enum CameraState { normal, wallPress, attractor, aim }
 
 public struct CameraInput {
@@ -84,7 +83,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public float zoomCoefficient;
     private bool horizontalAimParity;
     private List<Quaternion> cardinalDirections;
-
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
     CameraAttractorZone currentAttractor = null;
@@ -269,6 +267,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         public float fieldOfView;
         public float deltaTime;
         public Quaternion rotation;
+        public Quaternion snapToRotation;
         public bool orthographic;
         public float orthographicSize;
         public float targetDistance;
@@ -280,7 +279,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     public CameraTargetParameters NormalParameters(CameraInput input) {
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
-
 
         // Process rotation input
         float rotationInputDegrees = 0f;
@@ -313,6 +311,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             fieldOfView = 70f,
             orthographic = true,
             rotation = planarRot * verticalRot,
+            snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 20,
             targetPosition = targetPosition,
@@ -356,6 +355,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             fieldOfView = 70f,
             orthographic = false,
             rotation = planarRot,
+            snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
             targetPosition = FollowTransform.position + distOffset + LROffset + heightOffset,
@@ -367,11 +367,15 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         };
     }
     public CameraTargetParameters AimParameters(CameraInput input) {
-        Vector2 cursorPosition = Mouse.current.position.ReadValue();
         float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+        if (GameManager.I.inputMode == InputMode.aim) {
+            cursorPosition += InputController.mouseCursorOffset;
+        }
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
         Vector3 distOffset = Vector3.zero;
+        // Debug.Log($"{cursorPosition} {cursorPositionNormalized}");
 
         input.playerDirection.y = 0f;
 
@@ -404,6 +408,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             fieldOfView = 50f,
             orthographic = false,
             rotation = cameraRotation,
+            snapToRotation = cameraRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0.5f,
             targetPosition = FollowTransform.position + horizontalOffset + heightOffset,
@@ -441,6 +446,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         // apply rotation
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
+        if (input.snapToRotation != Quaternion.identity) {
+            targetRotation = input.snapToRotation;
+        }
         Transform.rotation = targetRotation;
 
         // apply distance
