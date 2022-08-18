@@ -9,6 +9,9 @@ public class SearchDirectionState : SphereControlState {
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
+    int gunshotsHeard;
+    float gunshotsHeardCountdownTimer;
+    TaskTimerDectorator lookAround;
     public SearchDirectionState(SphereRobotAI ai, Damage damage, bool doIntro = true) : base(ai) {
         if (damage != null) {
             searchDirection = -1f * damage.direction;
@@ -44,26 +47,26 @@ public class SearchDirectionState : SphereControlState {
         Vector3 leftDirection = Quaternion.Euler(0, -45, 0) * searchDirection;
         Vector3 rightDirection = Quaternion.Euler(0, 45, 0) * searchDirection;
 
-        // TODO: if from noise, stop and turn head toward noise for a split second first...?
         if (intro) {
-            rootTaskNode = new Sequence(
-                new TaskTimerDectorator(new Sequence(
-                    // look
-                    new TaskTimerDectorator(new TaskLookAt() {
-                        lookType = TaskLookAt.LookType.direction,
-                        lookAt = searchDirection
-                    }, 1f),
-                    // look left
-                    new TaskTimerDectorator(new TaskLookAt() {
-                        lookType = TaskLookAt.LookType.direction,
-                        lookAt = leftDirection
-                    }, 1f),
-                    // look right
-                    new TaskTimerDectorator(new TaskLookAt() {
-                        lookType = TaskLookAt.LookType.direction,
-                        lookAt = rightDirection
-                    }, 1f)
-                ), 3f),
+            lookAround = new TaskTimerDectorator(new Sequence(
+                   // look
+                   new TaskTimerDectorator(new TaskLookAt() {
+                       lookType = TaskLookAt.LookType.direction,
+                       lookAt = searchDirection
+                   }, 1f),
+                   // look left
+                   new TaskTimerDectorator(new TaskLookAt() {
+                       lookType = TaskLookAt.LookType.direction,
+                       lookAt = leftDirection
+                   }, 1f),
+                   // look right
+                   new TaskTimerDectorator(new TaskLookAt() {
+                       lookType = TaskLookAt.LookType.direction,
+                       lookAt = rightDirection
+                   }, 1f)
+               ), 3f);
+
+            rootTaskNode = new Sequence(lookAround,
                 new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = 0.5f
@@ -83,6 +86,17 @@ public class SearchDirectionState : SphereControlState {
         if (changeStateCountDown <= 0) {
             owner.StateFinished(this);
         }
+        if (gunshotsHeardCountdownTimer > 0) {
+            gunshotsHeardCountdownTimer -= Time.deltaTime;
+            if (gunshotsHeardCountdownTimer <= 0) {
+                gunshotsHeard -= 1;
+                if (gunshotsHeard > 0) {
+                    gunshotsHeardCountdownTimer = 5f;
+                }
+                gunshotsHeard = Mathf.Min(gunshotsHeard, 3);
+                gunshotsHeard = Mathf.Max(0, gunshotsHeard);
+            }
+        }
         rootTaskNode.Evaluate(ref input);
         return input;
     }
@@ -91,9 +105,15 @@ public class SearchDirectionState : SphereControlState {
         base.OnNoiseHeard(noise);
         // TODO: more detailed decision making if sound is suspicious
         if (noise.data.player) {
-            searchDirection = noise.transform.position;
-            changeStateCountDown = ROUTINE_TIMEOUT;
-            rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
+            if (noise.data.suspiciousness > Suspiciousness.normal) {
+                gunshotsHeard += 1;
+                gunshotsHeardCountdownTimer = 5f;
+                searchDirection = noise.transform.position;
+                changeStateCountDown = ROUTINE_TIMEOUT;
+                rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
+                if (lookAround != null)
+                    lookAround.Abort();
+            }
         }
     }
 }

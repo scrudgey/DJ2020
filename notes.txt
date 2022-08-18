@@ -1065,6 +1065,9 @@ Q: what is the proper solution?
     * track the active NPCs: how? 
         * track the pool objects.
 * eliminate poolobject?
+* better reaction to hearing noise in search / combat when noise is not suspicious (?)
+    * when i'm already startled, if i hear more gunshots, skip ahead to running toward / looking.
+* if NPC is shot, prioritize looking in that direction
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1177,11 +1180,9 @@ bug: left/right shoulder
 bug: aim indicator in aim mode
 bug: boxes in aim mode
 
-better reaction to hearing noise in search / combat when noise is not suspicious (?)
-    when i'm already startled, if i hear more gunshots, skip ahead to running toward / looking.
-if NPC is shot, prioritize looking and searching in that direction
-    if enemy is shot from forward angle, see player immediately
 
 test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
 VR environment: infiltration level
+if an NPC sees another NPC shooting at something, look / search in that direction
+better react to being shot 

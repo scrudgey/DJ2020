@@ -13,7 +13,7 @@ public class ScenarioManager : MonoBehaviour {
     public CharacterCamera characterCamera;
     public PatrolRoute[] patrolRoutes;
     void Start() {
-        PoolManager.I.RegisterPool(NPCPrefab, poolSize: 1);
+        PoolManager.I.RegisterPool(NPCPrefab, poolSize: 5);
     }
 
     void FixedUpdate() {

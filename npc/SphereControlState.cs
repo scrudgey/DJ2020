@@ -10,4 +10,5 @@ public abstract class SphereControlState : IState {
     public virtual void Exit() { }
     public virtual void OnObjectPerceived(Collider other) { }
     public virtual void OnNoiseHeard(NoiseComponent noise) { }
+    public virtual void OnDamage(Damage damage) { }
 }

@@ -30,7 +30,7 @@ public class PrefabPool {
     protected virtual void DisableObject(GameObject obj) {
         obj.SetActive(false);
         foreach (IPoolable poolable in obj.GetComponentsInChildren<IPoolable>()) {
-            Debug.Log($"deactivating {poolable}");
+            // Debug.Log($"deactivating {poolable}");
             poolable.OnPoolDectivate();
         }
     }
@@ -54,6 +54,8 @@ public class PrefabPool {
         objectsInPool.Enqueue(obj);
         objectsActiveInWorld = new Queue<GameObject>(objectsActiveInWorld.Where(x => x != obj));
         obj.transform.SetParent(null);
+        // if (obj.name.ToLower().Contains("npc"))
+        //     Debug.Log($"RECALL active: {objectsActiveInWorld.Count} pooled: {objectsInPool.Count}");
     }
     public void RecallObjects(GameObject[] objects) {
         foreach (GameObject obj in objects) {
@@ -75,6 +77,8 @@ public class PrefabPool {
         }
         EnableObject(obj);
         objectsActiveInWorld.Enqueue(obj);
+        // if (obj.name.ToLower().Contains("npc"))
+        //     Debug.Log($"GET active: {objectsActiveInWorld.Count} pooled: {objectsInPool.Count}");
         return obj;
     }
     public GameObject GetObject() {
@@ -84,6 +88,8 @@ public class PrefabPool {
         }
         EnableObject(obj);
         objectsActiveInWorld.Enqueue(obj);
+        // if (obj.name.ToLower().Contains("npc"))
+        //     Debug.Log($"GET active: {objectsActiveInWorld.Count} pooled: {objectsInPool.Count}");
         return obj;
     }
 }
@@ -115,7 +121,7 @@ public class PoolManager : Singleton<PoolManager> {
         if (prefabPools.ContainsKey(prefabname)) {
             return prefabPools[prefabname];
         }
-        Debug.Log($"initializing prefabpool for {prefab}");
+        Debug.Log($"initializing prefabpool for {prefab} size {poolSize}");
         PrefabPool pool = new PrefabPool(prefab, poolSize: poolSize);
         prefabPools[prefabname] = pool;
         pool.InitializePool();

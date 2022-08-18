@@ -30,6 +30,10 @@ namespace AI {
             base.Reset();
             timer = 0f;
         }
+
+        public void Abort() {
+            timer = lifetime;
+        }
     }
 
 }

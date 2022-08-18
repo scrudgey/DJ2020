@@ -72,7 +72,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (patrolRoute != null) {
             ChangeState(new SpherePatrolState(this, patrolRoute));
         } else {
-            ChangeState(new SphereMoveState(this, patrolZone));
+            // ChangeState(new SphereMoveState(this, patrolZone));
         }
     }
 
@@ -200,15 +200,14 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public DamageResult TakeDamage(Damage damage) {
+        if (stateMachine != null && stateMachine.currentState != null)
+            stateMachine.currentState.OnDamage(damage);
         switch (stateMachine.currentState) {
             case SphereMoveState:
             case SpherePatrolState:
-                // TODO: better handling of do intro
-                ChangeState(new SearchDirectionState(this, damage));
-                break;
             case SearchDirectionState:
                 if (stateMachine.timeInCurrentState > 1f)
-                    ChangeState(new SearchDirectionState(this, damage));
+                    ChangeState(new ReactToAttackState(this, damage));
                 break;
         }
         return DamageResult.NONE;
@@ -221,29 +220,41 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
-        if (noise.data.suspiciousness > Suspiciousness.normal && noise.data.player) {
-
-            SuspicionRecord record = new SuspicionRecord {
-                content = "a suspicious noise was heard",
-                // suspiciousness = noise.data.suspiciousness,
-                suspiciousness = Suspiciousness.suspicious,
-                lifetime = 10f,
-                maxLifetime = 10f
-            };
-            GameManager.I.AddSuspicionRecord(record);
-
-            switch (stateMachine.currentState) {
-                case SphereMoveState:
-                case SpherePatrolState:
-                    alertHandler.ShowWarn();
-                    ChangeState(new SearchDirectionState(this, noise));
-                    break;
-                case SearchDirectionState:
-                    if (stateMachine.timeInCurrentState > 3f)
-                        ChangeState(new SearchDirectionState(this, noise, doIntro: false));
-                    break;
+        if (noise.data.player) {
+            if (noise.data.suspiciousness > Suspiciousness.normal) {
+                SuspicionRecord record = new SuspicionRecord {
+                    content = "a suspicious noise was heard",
+                    // suspiciousness = noise.data.suspiciousness,
+                    suspiciousness = Suspiciousness.suspicious,
+                    lifetime = 10f,
+                    maxLifetime = 10f
+                };
+                GameManager.I.AddSuspicionRecord(record);
+                switch (stateMachine.currentState) {
+                    case SphereMoveState:
+                    case SpherePatrolState:
+                        alertHandler.ShowWarn();
+                        ChangeState(new SearchDirectionState(this, noise));
+                        break;
+                    case SearchDirectionState:
+                        if (stateMachine.timeInCurrentState > 3f)
+                            ChangeState(new SearchDirectionState(this, noise, doIntro: false));
+                        break;
+                }
+            }
+        } else {
+            // not player
+            if (noise.data.suspiciousness > Suspiciousness.normal) {
+                switch (stateMachine.currentState) {
+                    case SphereMoveState:
+                    case SpherePatrolState:
+                        alertHandler.ShowWarn();
+                        ChangeState(new SearchDirectionState(this, noise));
+                        break;
+                }
             }
         }
+
     }
 
     public Reaction ReactToPlayerSuspicion() {
