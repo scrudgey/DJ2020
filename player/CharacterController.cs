@@ -1077,8 +1077,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         // direction angles
         float angle = Vector2.SignedAngle(camDir, playerDir);
 
-        if (GameManager.I.showDebugRays)
-            Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
+        // if (GameManager.I.showDebugRays)
+        //     Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),

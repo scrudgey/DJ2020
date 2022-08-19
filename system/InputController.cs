@@ -270,7 +270,7 @@ public class InputController : MonoBehaviour {
             float horizontalPixels = (OrbitCamera.Camera.scaledPixelHeight * OrbitCamera.Camera.aspect);
             float verticalPixels = OrbitCamera.Camera.scaledPixelHeight;
             Vector2 warpedPosition = new Vector2(horizontalPixels * 0.5f, verticalPixels * 0.5f);
-            mouseCursorOffset = warpedPosition - cursorPosition;
+            // mouseCursorOffset = warpedPosition - cursorPosition;
             // InputSystem.QueueDeltaStateEvent(Mouse.current.position, warpedPosition);
             // Mouse.current.WarpCursorPosition(warpedPosition);
             // InputState.Change(Mouse.current.position, warpedPosition);

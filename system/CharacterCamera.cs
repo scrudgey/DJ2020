@@ -276,6 +276,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         public float distanceMovementSpeed;
         public float distanceMovementSharpness;
         public CharacterState state; // TODO: remove this
+        public Vector3 playerDirection;
     }
     public CameraTargetParameters NormalParameters(CameraInput input) {
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
@@ -320,7 +321,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
             distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state
+            state = input.state,
+            playerDirection = input.playerDirection
         };
     }
     public CameraTargetParameters AttractorParameters(CameraInput input) {
@@ -363,7 +365,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state
+            state = input.state,
+            playerDirection = input.playerDirection
         };
     }
     public CameraTargetParameters AimParameters(CameraInput input) {
@@ -384,9 +387,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
 
-        float horizontalParity = horizontalAimParity ? 1f : -1f;
-        Vector3 horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection);
-
         if (cursorPositionNormalized.x > 0.9f) {
             horizontalAimParity = true;
         }
@@ -394,9 +394,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             horizontalAimParity = false;
         }
 
+        float horizontalParity = horizontalAimParity ? 1f : -1f;
+        Vector3 horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection) * 0.65f;
+
         Vector3 camDirectionPoint = Vector3.zero;
-        camDirectionPoint += input.playerDirection;
-        camDirectionPoint += Vector3.up * cursorPositionNormalized.y + new Vector3(0f, -0.5f, 0f);
+        camDirectionPoint += input.playerDirection * 7;
+        camDirectionPoint += Vector3.up * cursorPositionNormalized.y;// + new Vector3(0f, -0.5f, 0f);
         camDirectionPoint += Vector3.Cross(Vector3.up, input.playerDirection) * cursorPositionNormalized.x;
         Quaternion cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
 
@@ -404,6 +407,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
         PlanarDirection = closestCardinal * Vector3.forward;
 
+        // Debug.DrawRay(input.playerPosition + Vector3.up, input.playerDirection, Color.green);
+        // Debug.DrawRay(input.playerPosition + Vector3.up, horizontalOffset, Color.green);
+        // Debug.DrawLine(input.playerPosition + Vector3.up, FollowTransform.position + horizontalOffset + heightOffset, Color.red);
+        // Debug.DrawRay(FollowTransform.position + horizontalOffset + heightOffset, camDirectionPoint, Color.magenta);
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
@@ -416,7 +423,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state
+            state = input.state,
+            playerDirection = input.playerDirection
         };
     }
 
@@ -428,9 +436,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             return;
         // Process distance input
         TargetDistance = input.targetDistance;
-        if (_distanceIsObstructed) {//&& Mathf.Abs(zoomInput) > 0f) {
-            TargetDistance = _currentDistance;
-        }
         TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
 
         // apply FOV
