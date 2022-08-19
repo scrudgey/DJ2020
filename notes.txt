@@ -1161,6 +1161,10 @@ control / combat:
     aim: fixed angular size
     pop out from wall
 
+camera:
+    over the shoulder mode
+    bug: left/right shoulder
+
 stealth:
     NPC investigate routine
     NPC reacts to corpses
@@ -1176,7 +1180,6 @@ HQ
 gibs from explosions
 corpse can be shot / exploded
 bug: broken superjump
-bug: left/right shoulder
 bug: aim indicator in aim mode
 bug: boxes in aim mode
 
@@ -1185,4 +1188,3 @@ test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, e
 
 VR environment: infiltration level
 if an NPC sees another NPC shooting at something, look / search in that direction
-better react to being shot 

@@ -13,9 +13,7 @@ public class ReactToAttackState : SphereControlState {
     public ReactToAttackState(SphereRobotAI ai, Damage damage) : base(ai) {
         Vector3 damageSourcePosition = ai.transform.position + -10f * damage.direction;
         Vector3 coverPosition = ai.transform.position + 10f * damage.direction;
-        rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
-        rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
-        SetupRootNode(damage);
+        SetupRootNode(damage, damageSourcePosition, coverPosition);
     }
 
     public override void Enter() {
@@ -23,7 +21,7 @@ public class ReactToAttackState : SphereControlState {
         owner.navMeshPath = new NavMeshPath();
     }
 
-    void SetupRootNode(Damage damage) {
+    void SetupRootNode(Damage damage, Vector3 damageSourcePosition, Vector3 coverPosition) {
         rootTaskNode = new Sequence(
                     new TaskTimerDectorator(new TaskLookAt() {
                         lookType = TaskLookAt.LookType.position,
@@ -35,6 +33,8 @@ public class ReactToAttackState : SphereControlState {
                         speedCoefficient = 2f
                     }
                 );
+        rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
+        rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
     }
 
     public override PlayerInput Update(ref PlayerInput input) {
