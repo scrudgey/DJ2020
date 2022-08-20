@@ -121,7 +121,6 @@ public class PoolManager : Singleton<PoolManager> {
         if (prefabPools.ContainsKey(prefabname)) {
             return prefabPools[prefabname];
         }
-        Debug.Log($"initializing prefabpool for {prefab} size {poolSize}");
         PrefabPool pool = new PrefabPool(prefab, poolSize: poolSize);
         prefabPools[prefabname] = pool;
         pool.InitializePool();

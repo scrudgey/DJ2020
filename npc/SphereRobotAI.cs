@@ -31,6 +31,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public Suspiciousness recentlySawSuspicious;
     public PatrolRoute patrolRoute;
     public bool skipShootAnimation;
+    NoiseComponent lastGunshotHeard;
+    Damage lastDamage;
 
     private void OnDrawGizmos() {
         string customName = "Relic\\MaskedSpider.png";
@@ -79,9 +81,22 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void StateFinished(SphereControlState routine) {
         switch (routine) {
             default:
+            case ReactToAttackState:
+                if (lastDamage != null) {
+                    ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
+
+                    // TODO: do something different. we were just attacked
+
+                } else if (lastGunshotHeard != null) {
+                    ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
+                }
+                break;
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
                 // speechTextController.HaltSpeechForTime(2f);
+                if (lastDamage != null || recentlyInCombat) {
+                    // TODO: we were just in combat. 
+                }
                 EnterDefaultState();
                 break;
             case SphereAttackState:
@@ -91,6 +106,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
     private void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
+        // Debug.Log($"changing state {routine}");
         switch (routine) {
             case SearchDirectionState search:
                 break;
@@ -160,6 +176,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SearchDirectionState:
                     case SphereMoveState:
                     case SpherePatrolState:
+                    case ReactToAttackState:
                         alertHandler.ShowAlert();
                         ChangeState(new SphereAttackState(this, gunHandler));
                         break;
@@ -200,14 +217,15 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public DamageResult TakeDamage(Damage damage) {
+        lastDamage = damage;
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnDamage(damage);
         switch (stateMachine.currentState) {
             case SphereMoveState:
             case SpherePatrolState:
             case SearchDirectionState:
-                if (stateMachine.timeInCurrentState > 1f)
-                    ChangeState(new ReactToAttackState(this, damage));
+                alertHandler.ShowAlert();
+                ChangeState(new ReactToAttackState(this, damage));
                 break;
         }
         return DamageResult.NONE;
@@ -220,7 +238,24 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
-        if (noise.data.player) {
+        if (noise.data.isGunshot) {
+            lastGunshotHeard = noise;
+            SuspicionRecord record = new SuspicionRecord {
+                content = "gunshots heard",
+                suspiciousness = Suspiciousness.aggressive,
+                lifetime = 60f,
+                maxLifetime = 60f
+            };
+            GameManager.I.AddSuspicionRecord(record);
+            switch (stateMachine.currentState) {
+                case SphereMoveState:
+                case SpherePatrolState:
+                case SearchDirectionState:
+                    alertHandler.ShowAlert();
+                    ChangeState(new ReactToAttackState(this, noise));
+                    break;
+            }
+        } else if (noise.data.player) {
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 SuspicionRecord record = new SuspicionRecord {
                     content = "a suspicious noise was heard",
@@ -230,6 +265,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     maxLifetime = 10f
                 };
                 GameManager.I.AddSuspicionRecord(record);
+
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
                     case SpherePatrolState:

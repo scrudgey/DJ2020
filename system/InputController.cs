@@ -59,7 +59,6 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
-    public static Vector2 mouseCursorOffset;
 
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -265,19 +264,6 @@ public class InputController : MonoBehaviour {
 
     private void HandleCharacterInput() {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
-
-        if (aimPressedThisFrame && GameManager.I.inputMode != InputMode.aim) {
-            float horizontalPixels = (OrbitCamera.Camera.scaledPixelHeight * OrbitCamera.Camera.aspect);
-            float verticalPixels = OrbitCamera.Camera.scaledPixelHeight;
-            Vector2 warpedPosition = new Vector2(horizontalPixels * 0.5f, verticalPixels * 0.5f);
-            // mouseCursorOffset = warpedPosition - cursorPosition;
-            // InputSystem.QueueDeltaStateEvent(Mouse.current.position, warpedPosition);
-            // Mouse.current.WarpCursorPosition(warpedPosition);
-            // InputState.Change(Mouse.current.position, warpedPosition);
-        }
-        if (GameManager.I.inputMode == InputMode.aim) {
-            cursorPosition += mouseCursorOffset;
-        }
 
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition);
         Vector3 torque = Vector3.zero;

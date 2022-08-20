@@ -66,6 +66,6 @@ public class Destructible : Damageable, IPoolable {
         hitState = HitState.normal;
         TagSystemData data = Toolbox.GetTagData(gameObject);
         data.targetPriority = 1;
-        Debug.Log("pool deactivate on destructible");
+        // Debug.Log("pool deactivate on destructible");
     }
 }

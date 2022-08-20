@@ -11,6 +11,7 @@ namespace AI {
         public string key;
         public Vector3 lookAt;
         public bool useKey;
+        public bool reorient;
         float repathTimer;
         float repathInterval = 1f;
         public TaskLookAt() : base() {
@@ -28,8 +29,16 @@ namespace AI {
 
             if (lookType == LookType.position) {
                 input.lookAtPosition = lookAt;
+                if (reorient) {
+                    input.orientTowardPoint = lookAt;
+                    input.orientTowardPoint.y = 0;
+                }
             } else if (lookType == LookType.direction) {
                 input.lookAtDirection = lookAt;
+                if (reorient) {
+                    input.orientTowardDirection = lookAt;
+                    input.orientTowardDirection.y = 0;
+                }
             }
             // Debug.Log($"look at key: position:{input.lookAtPosition} direction:{input.lookAtDirection}");
 

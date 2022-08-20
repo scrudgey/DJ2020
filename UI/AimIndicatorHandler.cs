@@ -62,14 +62,7 @@ namespace UI {
                         targetPosition = Vector2.Lerp(currentPosition, targetPosition, 0.15f);
                         break;
                 }
-                // if (GameManager.I.inputMode == InputMode.aim && GameManager.I.inputMode != lastInputMode) {
-                //     // cursor.position = new Vector2(0.5f, 0.5f);
-                //     Cursor.lockState = CursorLockMode.Locked;
-                //     Cursor.lockState = CursorLockMode.None;
-
-                // } else {
                 cursor.position = targetPosition;
-                // }
                 currentPosition = cursor.position;
                 state = data.type;
                 SetScale();

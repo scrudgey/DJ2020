@@ -6,4 +6,6 @@ public class NoiseData {
     public Suspiciousness suspiciousness;
     public bool player;
     public float pitch;
+    public bool isGunshot;
+    public bool isFootsteps;
 }

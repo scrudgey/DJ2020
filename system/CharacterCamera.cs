@@ -373,9 +373,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
         float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
-        if (GameManager.I.inputMode == InputMode.aim) {
-            cursorPosition += InputController.mouseCursorOffset;
-        }
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
         Vector3 distOffset = Vector3.zero;
         // Debug.Log($"{cursorPosition} {cursorPositionNormalized}");

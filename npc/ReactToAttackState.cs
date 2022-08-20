@@ -6,14 +6,24 @@ using UnityEngine.AI;
 public class ReactToAttackState : SphereControlState {
     static readonly public string DAMAGE_SOURCE_KEY = "damageSourceKey";
     static readonly public string COVER_POSITION_KEY = "coverPositionKey";
-    readonly float ROUTINE_TIMEOUT = 5f;
+    readonly float ROUTINE_TIMEOUT = 60f;
     float changeStateCountDown;
     private TaskNode rootTaskNode;
 
     public ReactToAttackState(SphereRobotAI ai, Damage damage) : base(ai) {
         Vector3 damageSourcePosition = ai.transform.position + -10f * damage.direction;
         Vector3 coverPosition = ai.transform.position + 10f * damage.direction;
-        SetupRootNode(damage, damageSourcePosition, coverPosition);
+        SetupRootNode(initialPause: 2f); // enough to time out hitstun
+
+        rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
+        rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
+    }
+    public ReactToAttackState(SphereRobotAI ai, NoiseComponent noise) : base(ai) {
+        Vector3 damageSourcePosition = noise.transform.position;
+        Vector3 coverPosition = (noise.transform.position - ai.transform.position).normalized * -5f;
+        SetupRootNode();
+        rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
+        rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
     }
 
     public override void Enter() {
@@ -21,20 +31,24 @@ public class ReactToAttackState : SphereControlState {
         owner.navMeshPath = new NavMeshPath();
     }
 
-    void SetupRootNode(Damage damage, Vector3 damageSourcePosition, Vector3 coverPosition) {
+    void SetupRootNode(float initialPause = 1f) {
         rootTaskNode = new Sequence(
                     new TaskTimerDectorator(new TaskLookAt() {
                         lookType = TaskLookAt.LookType.position,
                         key = DAMAGE_SOURCE_KEY,
-                        useKey = true
-                    }, 0.1f),
+                        useKey = true,
+                        reorient = true
+                    }, initialPause),
                     new TaskMoveToKey(owner.transform, COVER_POSITION_KEY) {
                         headBehavior = TaskMoveToKey.HeadBehavior.search,
                         speedCoefficient = 2f
-                    }
+                    },
+                    new TaskTimerDectorator(new TaskLookAt() {
+                        lookType = TaskLookAt.LookType.position,
+                        key = DAMAGE_SOURCE_KEY,
+                        useKey = true
+                    }, 2f)
                 );
-        rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
-        rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
     }
 
     public override PlayerInput Update(ref PlayerInput input) {
@@ -42,7 +56,10 @@ public class ReactToAttackState : SphereControlState {
         if (changeStateCountDown <= 0) {
             owner.StateFinished(this);
         }
-        rootTaskNode.Evaluate(ref input);
+        TaskState result = rootTaskNode.Evaluate(ref input);
+        if (result == TaskState.success) {
+            owner.StateFinished(this);
+        }
         return input;
     }
 

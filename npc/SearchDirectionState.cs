@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class SearchDirectionState : SphereControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
-    readonly float ROUTINE_TIMEOUT = 5f;
+    readonly float ROUTINE_TIMEOUT = 60f;
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
@@ -70,13 +70,25 @@ public class SearchDirectionState : SphereControlState {
                 new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = 0.5f
-                }
+                },
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.position,
+                    key = SEARCH_POSITION_KEY,
+                    useKey = true
+                }, 1f)
             );
         } else {
-            rootTaskNode = new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
-                headBehavior = TaskMoveToKey.HeadBehavior.search,
-                speedCoefficient = 2f
-            };
+            rootTaskNode = new Sequence(
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
+                    headBehavior = TaskMoveToKey.HeadBehavior.search,
+                    speedCoefficient = 1f
+                },
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.position,
+                    key = SEARCH_POSITION_KEY,
+                    useKey = true
+                }, 3f)
+            );
         }
 
     }
@@ -97,7 +109,10 @@ public class SearchDirectionState : SphereControlState {
                 gunshotsHeard = Mathf.Max(0, gunshotsHeard);
             }
         }
-        rootTaskNode.Evaluate(ref input);
+        TaskState result = rootTaskNode.Evaluate(ref input);
+        if (result == TaskState.success) {
+            owner.StateFinished(this);
+        }
         return input;
     }
 

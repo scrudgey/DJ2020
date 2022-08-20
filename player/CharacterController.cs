@@ -401,8 +401,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                         Vector3 directionToCursor = cursorData.worldPosition - transform.position;
                         directionToCursor.y = 0;
                         snapToDirection = directionToCursor;
+                    } else if (input.orientTowardDirection != Vector3.zero) {
+                        slewLookVector = input.orientTowardDirection;
+                    } else if (input.orientTowardPoint != Vector3.zero) {
+                        slewLookVector = input.orientTowardPoint - transform.position;
+                    } else {
+                        slewLookVector = _moveInputVector;
                     }
-                    slewLookVector = _moveInputVector;
                 }
                 if (input.Fire.AimPressed) {
                     snapToDirection = lookAtDirection;

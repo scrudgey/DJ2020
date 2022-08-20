@@ -1068,6 +1068,9 @@ Q: what is the proper solution?
 * better reaction to hearing noise in search / combat when noise is not suspicious (?)
     * when i'm already startled, if i hear more gunshots, skip ahead to running toward / looking.
 * if NPC is shot, prioritize looking in that direction
+* camera:
+    * over the shoulder mode
+    * bug: left/right shoulder
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1133,7 +1136,7 @@ UI:
     display different UI when in aim mode
     UI: gun wireframe in lower-right corner.
     blink cursor when reaching maximum aim
-    * larger mouse cursor, with color
+    larger mouse cursor, with color
     aim lock stats system 
         scan time 
         retain stats after breaking lock up to N 
@@ -1161,9 +1164,7 @@ control / combat:
     aim: fixed angular size
     pop out from wall
 
-camera:
-    over the shoulder mode
-    bug: left/right shoulder
+
 
 stealth:
     NPC investigate routine
@@ -1180,11 +1181,32 @@ HQ
 gibs from explosions
 corpse can be shot / exploded
 bug: broken superjump
+
+
+
+INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
+
+* VR environment: infiltration level
+HQ
+    NPC can radio HQ to report hostiles engaged
+    alarm sounds 
+    alarm activation
+    response team
+Better response to being shot
+    gunshots should be treated differently from other sounds 
+        could be a red status for a while 
+        does it make sense?
+        how does AI treat it?
+    * calibrate gunshot sound radius sizes
+        * rifle should be heard from across the map
+    everyone should stop and look in the direction
+        if they get shot, they should take cover
+    yellow ! indicator
+    then run for cover and radio HQ
 bug: aim indicator in aim mode
 bug: boxes in aim mode
+bug: outline flip x backwards
 
-
-test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
-
-VR environment: infiltration level
 if an NPC sees another NPC shooting at something, look / search in that direction
+
+800 890 8007

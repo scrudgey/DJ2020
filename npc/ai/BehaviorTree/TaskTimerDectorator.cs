@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// either 
+
 namespace AI {
     public class TaskTimerDectorator : TaskNode {
         TaskNode wrapped;
@@ -20,11 +23,16 @@ namespace AI {
             timer += Time.deltaTime;
             if (timer < lifetime) {
                 if (wrapped != null) {
-                    return wrapped.Evaluate(ref input);
+                    // return wrapped.Evaluate(ref input);
+                    wrapped.Evaluate(ref input);
+                    return TaskState.running;
                 } else {
                     return TaskState.running;
                 }
-            } else { return TaskState.success; }
+            } else {
+                return TaskState.success;
+                // return wrapped.Evaluate(ref input);
+            }
         }
         public override void Reset() {
             base.Reset();
