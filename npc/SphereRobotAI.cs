@@ -82,31 +82,47 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         switch (routine) {
             default:
             case ReactToAttackState:
+                // TODO: do something different. we were just attacked
                 if (lastDamage != null) {
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
-
-                    // TODO: do something different. we were just attacked
-
                 } else if (lastGunshotHeard != null) {
                     ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
+                } else {
+                    EnterDefaultState();
                 }
                 break;
             case SearchDirectionState:
+
                 alertHandler.ShowGiveUp();
                 // speechTextController.HaltSpeechForTime(2f);
-                if (lastDamage != null || recentlyInCombat) {
-                    // TODO: we were just in combat. 
-                }
+                // if (recentlyInCombat) {
+                //     
+                // } else 
+                // if (lastDamage != null) {
+                //     // TODO: we were just in combat. report to HQ?
+                //     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
+                // } else if (lastGunshotHeard != null) {
+                //     ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
+                // } else {
                 EnterDefaultState();
+                // }
                 break;
             case SphereAttackState:
-                EnterDefaultState();
+                // TODO: we were just in combat. report to HQ
+                if (lastDamage != null) {
+                    // TODO: we were just in combat. report to HQ?
+                    ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
+                } else if (lastGunshotHeard != null) {
+                    ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
+                } else {
+                    EnterDefaultState();
+                }
                 break;
         }
     }
     private void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
-        // Debug.Log($"changing state {routine}");
+        Debug.Log($"changing state {routine}");
         switch (routine) {
             case SearchDirectionState search:
                 break;
@@ -224,7 +240,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case SphereMoveState:
             case SpherePatrolState:
             case SearchDirectionState:
-                alertHandler.ShowAlert();
+                alertHandler.ShowAlert(useWarnMaterial: true);
                 ChangeState(new ReactToAttackState(this, damage));
                 break;
         }
@@ -251,7 +267,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case SphereMoveState:
                 case SpherePatrolState:
                 case SearchDirectionState:
-                    alertHandler.ShowAlert();
+                    alertHandler.ShowAlert(useWarnMaterial: true);
                     ChangeState(new ReactToAttackState(this, noise));
                     break;
             }

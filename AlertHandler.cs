@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class AlertHandler : MonoBehaviour {
     public RectTransform alertRect;
-    // public TextMeshProUGUI textMesh;
     public SpriteRenderer spriteRenderer;
     public Material alertMaterial;
     public Material warnMaterial;
@@ -14,24 +13,22 @@ public class AlertHandler : MonoBehaviour {
     private Sprite[] alertSprites;
     void Awake() {
         spriteRenderer.enabled = false;
-        // textMesh.enabled = false;
     }
     void Start() {
         alertSprites = Resources.LoadAll<Sprite>("sprites/UI/Alert") as Sprite[];
     }
     public void Hide() {
         spriteRenderer.enabled = false;
-        // textMesh.enabled = false;
     }
 
     void ResetCoroutine(IEnumerator newCoroutine) {
         if (coroutine != null) {
             StopCoroutine(coroutine);
         }
-        StartCoroutine(newCoroutine);
+        coroutine = StartCoroutine(newCoroutine);
     }
-    public void ShowAlert() {
-        ResetCoroutine(ShowAlertIcon());
+    public void ShowAlert(bool useWarnMaterial = false) {
+        ResetCoroutine(ShowAlertIcon(useWarnMaterial: useWarnMaterial));
     }
     public void ShowWarn() {
         ResetCoroutine(ShowQuestionIcon());
@@ -40,13 +37,22 @@ public class AlertHandler : MonoBehaviour {
         // ResetCoroutine(ShowText("<sprite=9>"));
         ResetCoroutine(ShowQuestionIcon());
     }
+    public void ShowRadio() {
+        ResetCoroutine(ShowRadioIcon());
+    }
+    public void HideRadio() {
+        if (coroutine != null) {
+            StopCoroutine(coroutine);
+        }
+        spriteRenderer.enabled = false;
+    }
 
-    IEnumerator ShowAlertIcon() {
+    IEnumerator ShowAlertIcon(bool useWarnMaterial = false) {
         float appearanceInterval = 0.25f;
         float timer = 0f;
         spriteRenderer.enabled = true;
         spriteRenderer.sprite = alertSprites[1];
-        spriteRenderer.material = alertMaterial;
+        spriteRenderer.material = useWarnMaterial ? warnMaterial : alertMaterial;
         while (timer < appearanceInterval) {
             timer += Time.deltaTime;
             Vector2 sizeDelta = new Vector2();
@@ -82,6 +88,37 @@ public class AlertHandler : MonoBehaviour {
             yield return null;
         }
         alertRect.sizeDelta = Vector2.one;
+        spriteRenderer.enabled = false;
+    }
+
+    IEnumerator ShowRadioIcon() {
+        int alertIndex = 6;
+        spriteRenderer.enabled = true;
+        spriteRenderer.sprite = alertSprites[7];
+        spriteRenderer.material = warnMaterial;
+        float totalTimer = 0f;
+        float intervalTimer = 0f;
+
+        float totalDuration = 10f;
+        float intervalDuration = 0.2f;
+        while (totalTimer < totalDuration) {
+            totalTimer += Time.deltaTime;
+            intervalTimer += Time.unscaledDeltaTime;
+            if (intervalTimer > intervalDuration) {
+                intervalTimer -= intervalDuration;
+                alertIndex += 1;
+                if (alertIndex > 9) {
+                    alertIndex = 6;
+                }
+                if (alertIndex == 6) {
+                    spriteRenderer.enabled = false;
+                } else {
+                    spriteRenderer.enabled = true;
+                }
+                spriteRenderer.sprite = alertSprites[alertIndex];
+            }
+            yield return null;
+        }
         spriteRenderer.enabled = false;
     }
 

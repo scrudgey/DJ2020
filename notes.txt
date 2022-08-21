@@ -1071,13 +1071,23 @@ Q: what is the proper solution?
 * camera:
     * over the shoulder mode
     * bug: left/right shoulder
+* Better response to being shot
+    * gunshots should be treated differently from other sounds 
+        * could be a red status for a while 
+    * calibrate gunshot sound radius sizes
+        * rifle should be heard from across the map
+    * everyone should stop and look in the direction
+        * if they get shot, they should take cover
+    * yellow ! indicator
+* aim recenter cursor to center 
+* tasklookAt returns running, should return success?
+* VR environment: infiltration level
 
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
 
 uncertain:
-    tasklookAt returns running, should return success?
     less intense wall sticking?
     creep button (crawling is?)
         slow walk?
@@ -1102,11 +1112,10 @@ nice to have / future goals:
     - flashlight attachment
     - head look around if player has been idle
     make elevator
-aim recenter cursor to center 
-    define a mouse offset, and on entering aim mode, set the offset such that the cursor will be in the center of the screen
-    or use input method
-try to pop around a corner and aim: it doesn't work
+    if an NPC sees another NPC shooting at something, look / search in that direction
 
+
+try to pop around a corner and aim: it doesn't work
 don't clip camera through wall
 why do gibs fall through the wall/floor?
 clearsight InvokeRepeating
@@ -1118,6 +1127,9 @@ damage result addition is weird
 prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
 reset gun instance on pool operations
+gibs from explosions
+corpse can be shot / exploded
+bug: broken superjump
 
 UI embellishments
     small font text near locked-on character
@@ -1166,47 +1178,56 @@ control / combat:
 
 
 
-stealth:
-    NPC investigate routine
-    NPC reacts to corpses
-    stickier red status? somehow? combat?
-third grid: alarm systems
-HQ
-    NPC can radio HQ to report hostiles engaged
-    alarm sounds 
-    alarm activation
-    response team
-
-
-gibs from explosions
-corpse can be shot / exploded
-bug: broken superjump
 
 
 
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
-* VR environment: infiltration level
 HQ
-    NPC can radio HQ to report hostiles engaged
     alarm sounds 
     alarm activation
     response team
-Better response to being shot
-    gunshots should be treated differently from other sounds 
-        could be a red status for a while 
-        does it make sense?
-        how does AI treat it?
-    * calibrate gunshot sound radius sizes
-        * rifle should be heard from across the map
-    everyone should stop and look in the direction
-        if they get shot, they should take cover
-    yellow ! indicator
-    then run for cover and radio HQ
+stealth:
+    NPC investigate routine
+    NPC reacts to corpses
+    stickier red status? somehow? combat?
+    louder / better footsteps
+    better reaction to footsteps
+        when there is any suspicion, stop and investigate
+
+third grid: alarm systems
+
 bug: aim indicator in aim mode
 bug: boxes in aim mode
 bug: outline flip x backwards
+hide NPC when above 
 
-if an NPC sees another NPC shooting at something, look / search in that direction
+more thorough search
+    choose a second position
+    head looks around when standing in place
+better take cover
+    move into another room
+NPC has better vision when they're specifically searching for you
+hearing gunshot when searching for gunshot resets the sequence
+very easy to shoot someone when they're distracted (they don't react appropriately)
 
-800 890 8007
+point of last interest:
+    gunshot -> damage -> last seen player position
+use the same logic in other state transitions
+
+
+radio indicator icon could be lower and bigger
+radio HQ behavior:
+    raise alarm
+    interact with level data 
+    report specific details
+    text shows NPC speech
+    HQ text shows response
+    don't radio HQ if HQ is already aware or being radioed?
+    ? radio graphic?
+
+who owns the HQ code?
+    obvious answer is GameManager
+    HQ will be level specific:
+        level data determines if HQ is even alive or active, potentially
+        there may not be an HQ in some cases.

@@ -96,8 +96,14 @@ public class MaterialController {
         float minimumAlpha = 0.2f;
         if (disableBecauseAbove) {
             minimumAlpha = 0f;
+            // foreach (Renderer renderer in childRenderers) {
+            //     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+            // }
         } else {
             minimumAlpha = (1f * (offAxisLength / 2f));
+            // foreach (Renderer renderer in childRenderers) {
+            //     renderer.shadowCastingMode = ShadowCastingMode.On;
+            // }
         }
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {

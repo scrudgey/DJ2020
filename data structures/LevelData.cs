@@ -10,6 +10,7 @@ public class LevelData {
     public CyberGraph cyberGraph;
     public SensitivityLevel sensitivityLevel;
     public bool alarm;
+    public bool hasHQ;
     public static LevelData LoadLevelData(string levelName) {
         PowerGraph powerGraph = Graph<PowerNode, PowerGraph>.LoadAll(levelName);
         CyberGraph cyberGraph = Graph<CyberNode, CyberGraph>.LoadAll(levelName);
@@ -20,7 +21,8 @@ public class LevelData {
         return new LevelData {
             powerGraph = powerGraph,
             cyberGraph = cyberGraph,
-            sensitivityLevel = sensitivityLevel
+            sensitivityLevel = sensitivityLevel,
+            hasHQ = true
         };
     }
 }

@@ -16,7 +16,7 @@ namespace AI {
         string key;
         float repathTimer;
         float repathInterval = 1f;
-
+        int navFailures = 0;
         public float headSwivelOffset;
         public float speedCoefficient = 1f;
         Vector3 baseLookDirection;
@@ -32,6 +32,9 @@ namespace AI {
             SetDestination();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
+            if (navFailures >= 3) {
+                return TaskState.failure;
+            }
             if (repathTimer > repathInterval) {
                 repathTimer = 0f;
                 SetDestination();
@@ -49,7 +52,6 @@ namespace AI {
             input.lookAtDirection = lookDirection;
 
             if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
-                // return TaskState.failure;
                 return TaskState.running;
             } else if (pathIndex <= navMeshPath.corners.Length - 1) {
                 Vector3 inputVector = Vector3.zero;
@@ -87,6 +89,7 @@ namespace AI {
                 pathIndex = 1;
             } else {
                 Debug.LogError($"could not find navmeshhit for {target}");
+                navFailures += 1;
             }
         }
         public override void Reset() {
