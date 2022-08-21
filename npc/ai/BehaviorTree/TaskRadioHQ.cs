@@ -26,6 +26,7 @@ namespace AI {
             } else {
                 if (!stopped) {
                     alertHandler.HideRadio();
+                    GameManager.I.ReportToHQ(true);
                     stopped = true;
                 }
                 return TaskState.success;

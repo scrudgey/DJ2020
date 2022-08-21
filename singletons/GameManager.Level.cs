@@ -8,6 +8,8 @@ public partial class GameManager : Singleton<GameManager> {
     static Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
     static Dictionary<string, HashSet<CyberComponent>> cyberComponents;
 
+    Transform strikeTeamSpawnPoint;
+
     public static class Level {
         public static string LevelDataPath(string levelName) {
             string path = Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName);
@@ -81,6 +83,13 @@ public partial class GameManager : Singleton<GameManager> {
         // TODO: abstract this?
         RefreshPowerGraph();
         RefreshCyberGraph();
+
+
+        PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 6);
+        alarmSoundInterval = 2f;
+        // initialize spawn point
+        strikeTeamSpawnPoint = GameObject.Find("strikeTeamSpawnPoint")?.transform;
+        alarmSound = Resources.Load(gameData.levelData.alarmAudioClipPath) as AudioClip;
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now

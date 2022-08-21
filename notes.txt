@@ -1082,6 +1082,22 @@ Q: what is the proper solution?
 * aim recenter cursor to center 
 * tasklookAt returns running, should return success?
 * VR environment: infiltration level
+    * alarm times down
+    * raise alarm
+    * interact with level data 
+* initialize NPC pool on level load
+* radio indicator icon could be lower and bigger
+    * if HQ supports dispatches, dispatch a strike team
+* HQ
+    * alarm sounds 
+    * alarm activation
+    * response team
+    * stickier red status? somehow? combat?
+    * don't radio for alarm if alarm is already active
+    * there may not be an HQ in some cases.
+* hearing gunshot when searching for gunshot resets the sequence
+* don't do the run away from gunshot thing if alarm is sounding (the strike team ran away)
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1113,7 +1129,8 @@ nice to have / future goals:
     - head look around if player has been idle
     make elevator
     if an NPC sees another NPC shooting at something, look / search in that direction
-
+    NPC better take cover
+        move into another room
 
 try to pop around a corner and aim: it doesn't work
 don't clip camera through wall
@@ -1129,6 +1146,7 @@ prevent extreme zoom maneuvers with lerping
 reset gun instance on pool operations
 gibs from explosions
 corpse can be shot / exploded
+suspicion indicator highlights should reflect alarm / disguise status.
 bug: broken superjump
 
 UI embellishments
@@ -1176,58 +1194,68 @@ control / combat:
     aim: fixed angular size
     pop out from wall
 
-
+sound
+    ambience
+        hums in internal spaces
+        distant traffic sounds
 
 
 
 
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
-HQ
-    alarm sounds 
-    alarm activation
-    response team
 stealth:
     NPC investigate routine
     NPC reacts to corpses
-    stickier red status? somehow? combat?
     louder / better footsteps
+        NPC footsteps should be louder
+        footstep sound and volume should be significant to stealth
     better reaction to footsteps
         when there is any suspicion, stop and investigate
 
 third grid: alarm systems
-
 bug: aim indicator in aim mode
 bug: boxes in aim mode
 bug: outline flip x backwards
 hide NPC when above 
-
 more thorough search
     choose a second position
     head looks around when standing in place
-better take cover
-    move into another room
 NPC has better vision when they're specifically searching for you
-hearing gunshot when searching for gunshot resets the sequence
 very easy to shoot someone when they're distracted (they don't react appropriately)
-
 point of last interest:
     gunshot -> damage -> last seen player position
-use the same logic in other state transitions
+    use the same logic in other state transitions
+show alarm countdown somewhere
 
-
-radio indicator icon could be lower and bigger
 radio HQ behavior:
-    raise alarm
-    interact with level data 
-    report specific details
-    text shows NPC speech
-    HQ text shows response
-    don't radio HQ if HQ is already aware or being radioed?
-    ? radio graphic?
+    don't radio HQ if HQ is already being radioed
+    report specific details: gunshots heard, taking fire
+        text shows NPC speech
+        HQ text shows response
+    ? radio animation?
+    radio HQ when we've lost track of the player and want to downgrade the alarm
+        initiate cooldown sequence
+    if the NPC is unable to complete the radio sequence, send a search team
 
-who owns the HQ code?
-    obvious answer is GameManager
-    HQ will be level specific:
-        level data determines if HQ is even alive or active, potentially
-        there may not be an HQ in some cases.
+HQ will be level specific state:
+    what to do if there is no HQ?
+        run to the alarm panel
+            do nothing if there is no alarm panel
+        how to decide who to run to alarm panel?
+    HQ might be disabled if player assaults it
+
+consequences of alarm active?
+    NPC should stop patrol, start search mode
+    strike team
+        * delay strike team spawn
+        strike team may arrive by vehicle
+        move to last seen position reported by enemy
+            or else search spot by spot?
+        reset strike team count on alarm deactivate
+        reset strike team count when one dies?
+            if you've killed everyone, more arrive?
+        squad movement
+            don't bunch up
+            don't get stuck on each other
+    so

@@ -17,6 +17,7 @@ public struct PointerData {
 public partial class GameManager : Singleton<GameManager> {
     public static Action<GameObject> OnFocusChanged;
     public GameData gameData;
+    public AudioSource audioSource;
     public GameObject playerObject;
     public GunHandler playerGunHandler;
     public ItemHandler playerItemHandler;
@@ -179,6 +180,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         toggleConsoleThisFrame = false;
         UpdateSuspicion();
+        UpdateAlarm();
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {

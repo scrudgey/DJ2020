@@ -241,7 +241,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case SpherePatrolState:
             case SearchDirectionState:
                 alertHandler.ShowAlert(useWarnMaterial: true);
-                ChangeState(new ReactToAttackState(this, damage));
+                if (GameManager.I.gameData.levelData.alarm) {
+                    ChangeState(new SearchDirectionState(this, damage, doIntro: false));
+                } else {
+                    ChangeState(new ReactToAttackState(this, damage));
+                }
                 break;
         }
         return DamageResult.NONE;
@@ -266,9 +270,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             switch (stateMachine.currentState) {
                 case SphereMoveState:
                 case SpherePatrolState:
-                case SearchDirectionState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
-                    ChangeState(new ReactToAttackState(this, noise));
+                    if (GameManager.I.gameData.levelData.alarm) {
+                        ChangeState(new SearchDirectionState(this, noise, doIntro: false));
+                    } else {
+                        ChangeState(new ReactToAttackState(this, noise));
+                    }
                     break;
             }
         } else if (noise.data.player) {

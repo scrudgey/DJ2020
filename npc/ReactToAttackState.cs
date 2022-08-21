@@ -38,7 +38,30 @@ public class ReactToAttackState : SphereControlState {
     }
 
     void SetupRootNode(float initialPause = 1f) {
-        rootTaskNode = new Sequence(
+        // TODO: write better code here
+        LevelData levelData = GameManager.I.gameData.levelData;
+        if (levelData.hasHQ && !levelData.alarm) {
+            rootTaskNode = new Sequence(
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.position,
+                    key = DAMAGE_SOURCE_KEY,
+                    useKey = true,
+                    reorient = true
+                }, initialPause),
+                new TaskMoveToKey(owner.transform, COVER_POSITION_KEY) {
+                    headBehavior = TaskMoveToKey.HeadBehavior.search,
+                    speedCoefficient = 2f
+                },
+                new TaskTimerDectorator(new TaskLookAt() {
+                    lookType = TaskLookAt.LookType.position,
+                    key = DAMAGE_SOURCE_KEY,
+                    useKey = true,
+                    reorient = true
+                }, 1f),
+                new TaskRadioHQ(owner.alertHandler)
+            );
+        } else {
+            rootTaskNode = new Sequence(
                     new TaskTimerDectorator(new TaskLookAt() {
                         lookType = TaskLookAt.LookType.position,
                         key = DAMAGE_SOURCE_KEY,
@@ -54,9 +77,10 @@ public class ReactToAttackState : SphereControlState {
                         key = DAMAGE_SOURCE_KEY,
                         useKey = true,
                         reorient = true
-                    }, 1f),
-                    new TaskRadioHQ(owner.alertHandler)
+                    }, 1f)
                 );
+        }
+
     }
 
     public override PlayerInput Update(ref PlayerInput input) {

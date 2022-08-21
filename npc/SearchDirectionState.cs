@@ -9,8 +9,6 @@ public class SearchDirectionState : SphereControlState {
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
-    int gunshotsHeard;
-    float gunshotsHeardCountdownTimer;
     TaskTimerDectorator lookAround;
     public SearchDirectionState(SphereRobotAI ai, Damage damage, bool doIntro = true) : base(ai) {
         if (damage != null) {
@@ -98,17 +96,6 @@ public class SearchDirectionState : SphereControlState {
         if (changeStateCountDown <= 0) {
             owner.StateFinished(this);
         }
-        if (gunshotsHeardCountdownTimer > 0) {
-            gunshotsHeardCountdownTimer -= Time.deltaTime;
-            if (gunshotsHeardCountdownTimer <= 0) {
-                gunshotsHeard -= 1;
-                if (gunshotsHeard > 0) {
-                    gunshotsHeardCountdownTimer = 5f;
-                }
-                gunshotsHeard = Mathf.Min(gunshotsHeard, 3);
-                gunshotsHeard = Mathf.Max(0, gunshotsHeard);
-            }
-        }
         TaskState result = rootTaskNode.Evaluate(ref input);
         if (result == TaskState.success) {
             owner.StateFinished(this);
@@ -121,8 +108,6 @@ public class SearchDirectionState : SphereControlState {
         // TODO: more detailed decision making if sound is suspicious
         if (noise.data.player) {
             if (noise.data.suspiciousness > Suspiciousness.normal) {
-                gunshotsHeard += 1;
-                gunshotsHeardCountdownTimer = 5f;
                 searchDirection = noise.transform.position;
                 changeStateCountDown = ROUTINE_TIMEOUT;
                 rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);

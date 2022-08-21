@@ -98,14 +98,6 @@ public partial class GameManager : Singleton<GameManager> {
         return reaction;
     }
 
-    public void ActivateAlarm() {
-        gameData.levelData.alarm = true;
-        OnSuspicionChange?.Invoke();
-    }
-    public void DeactivateAlarm() {
-        gameData.levelData.alarm = false;
-        OnSuspicionChange?.Invoke();
-    }
 
     public void ActivateDisguise() {
         gameData.playerData.disguise = true;
