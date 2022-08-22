@@ -12,6 +12,8 @@ public partial class GameManager : Singleton<GameManager> {
     float strikeTeamSpawnInterval = 0.5f;
     float strikeTeamSpawnTimer = 0f;
     float strikeTeamResponseTimer = 0f;
+    Vector3 locationOfLastDisturbance;
+    public GameObject lastStrikeTeamMember;
 
     public void ActivateAlarm() {
         gameData.levelData.alarm = true;
@@ -25,9 +27,10 @@ public partial class GameManager : Singleton<GameManager> {
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
     }
-    public void ReportToHQ(bool activateAlarm) {
+    public void ReportToHQ(bool activateAlarm, Vector3 disturbancePosition) {
         if (!gameData.levelData.hasHQ)
             return;
+        locationOfLastDisturbance = disturbancePosition;
         if (activateAlarm) {
             ActivateAlarm();
         } else {
@@ -49,7 +52,6 @@ public partial class GameManager : Singleton<GameManager> {
 
             alarmSoundTimer += Time.deltaTime;
             if (alarmSoundTimer > alarmSoundInterval) {
-                Debug.Log($"{alarmSoundTimer} {alarmSoundInterval}");
                 alarmSoundTimer -= alarmSoundInterval;
                 audioSource.PlayOneShot(alarmSound);
             }
@@ -79,9 +81,19 @@ public partial class GameManager : Singleton<GameManager> {
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
         KinematicCharacterMotor motor = npc.GetComponentInChildren<KinematicCharacterMotor>();
         controller.OrbitCamera = characterCamera;
+        ai.overrideDefaultState = true;
         ai.patrolRoute = patrolRoute;
         motor.SetPosition(position, bypassInterpolation: true);
 
+        if (strikeTeamCount == 0) {
+            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, doIntro: false));
+            lastStrikeTeamMember = npc;
+        } else if (strikeTeamCount == 1) {
+            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
+            lastStrikeTeamMember = npc;
+        } else if (strikeTeamCount == 2) {
+            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
+        }
         strikeTeamCount += 1;
     }
 }

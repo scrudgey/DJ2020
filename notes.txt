@@ -1097,7 +1097,19 @@ Q: what is the proper solution?
     * there may not be an HQ in some cases.
 * hearing gunshot when searching for gunshot resets the sequence
 * don't do the run away from gunshot thing if alarm is sounding (the strike team ran away)
-
+* lead strike team state
+* follow leader state
+    * watch different angles
+*first pass: 
+    * respond first to the last known position of the player
+        * this location is reported
+* radio reports site of last disturbance
+* spawn strike team in states
+* lead strike team state: navigate to last disturbance
+* follow strike team state: turn head 45 degrees relative 
+* point of last interest:
+    * gunshot -> damage -> last seen player position
+    * use the same logic in other state transitions
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1217,25 +1229,25 @@ third grid: alarm systems
 bug: aim indicator in aim mode
 bug: boxes in aim mode
 bug: outline flip x backwards
+aim mode could track camera better
 hide NPC when above 
 more thorough search
     choose a second position
     head looks around when standing in place
 NPC has better vision when they're specifically searching for you
 very easy to shoot someone when they're distracted (they don't react appropriately)
-point of last interest:
-    gunshot -> damage -> last seen player position
-    use the same logic in other state transitions
+
 show alarm countdown somewhere
+when player is shot, interrupt our ability to shoot back
 
 radio HQ behavior:
+    radio HQ when we've lost track of the player and want to downgrade the alarm
+        initiate cooldown sequence
     don't radio HQ if HQ is already being radioed
     report specific details: gunshots heard, taking fire
         text shows NPC speech
         HQ text shows response
     ? radio animation?
-    radio HQ when we've lost track of the player and want to downgrade the alarm
-        initiate cooldown sequence
     if the NPC is unable to complete the radio sequence, send a search team
 
 HQ will be level specific state:
@@ -1250,12 +1262,33 @@ consequences of alarm active?
     strike team
         * delay strike team spawn
         strike team may arrive by vehicle
-        move to last seen position reported by enemy
-            or else search spot by spot?
         reset strike team count on alarm deactivate
-        reset strike team count when one dies?
+        solution for total level wipe of NPCs
+            reset strike team count when one dies?
             if you've killed everyone, more arrive?
-        squad movement
-            don't bunch up
-            don't get stuck on each other
-    so
+
+strike team AI state
+    when one is alerted, all are alerted?
+search level systematically
+    ideally, move and clear room to room.
+        possibility 1: generate room and door mappings automatically
+        possibility 2: mark up rooms in unity editor
+    possibility 3: a patrol route that leads through the level?
+    all possibilities require some extra level work
+
+
+squad movement
+    don't bunch up
+    * don't get stuck on each other
+
+when two NPCS navigate into one another, how do we detect and resolve this?
+
+how do we streamline squad movement?
+    perhaps, navigate toward the rear of the target
+    follow-behind:
+        store positions in a stack.
+        push the new position on a delay?
+        don't push if the new position is close to the top of the stack.
+        but popping from the stack? when we arrive at the point?
+        orient in their direction? i.e. line up?
+match target speed

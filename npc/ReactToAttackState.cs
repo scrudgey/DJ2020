@@ -58,7 +58,7 @@ public class ReactToAttackState : SphereControlState {
                     useKey = true,
                     reorient = true
                 }, 1f),
-                new TaskRadioHQ(owner.alertHandler)
+                new TaskRadioHQ(owner, owner.alertHandler)
             );
         } else {
             rootTaskNode = new Sequence(

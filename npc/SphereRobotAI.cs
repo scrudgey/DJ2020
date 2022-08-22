@@ -22,7 +22,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     readonly float PERCEPTION_INTERVAL = 0.05f;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
     readonly float LOCK_ON_TIME = 0.5f;
-    public Vector3 lastSeenPlayerPosition;
     public float timeSinceLastSeen;
     public Collider playerCollider;
     public Alertness alertness = Alertness.normal;
@@ -32,12 +31,14 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public PatrolRoute patrolRoute;
     public bool skipShootAnimation;
     NoiseComponent lastGunshotHeard;
+    public Vector3 lastSeenPlayerPosition;
     Damage lastDamage;
-
-    private void OnDrawGizmos() {
-        string customName = "Relic\\MaskedSpider.png";
-        Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
-    }
+    public Vector3 lastDisturbancePosition;
+    public bool overrideDefaultState;
+    // private void OnDrawGizmos() {
+    //     string customName = "Relic\\MaskedSpider.png";
+    //     Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
+    // }
     void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
 
@@ -58,9 +59,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         alertHandler.Hide();
 
         Bind(sightCone.gameObject);
-        stateMachine = new SphereRobotBrain();
         navMeshPath = new NavMeshPath();
-        EnterDefaultState();
+        if (!overrideDefaultState) {
+            stateMachine = new SphereRobotBrain();
+            EnterDefaultState();
+        }
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
         }
@@ -85,8 +88,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 // TODO: do something different. we were just attacked
                 if (lastDamage != null) {
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
-                } else if (lastGunshotHeard != null) {
-                    ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
+                } else if (lastDisturbancePosition != null) {
+                    ChangeState(new SearchDirectionState(this, lastDisturbancePosition, doIntro: false));
                 } else {
                     EnterDefaultState();
                 }
@@ -112,17 +115,16 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 if (lastDamage != null) {
                     // TODO: we were just in combat. report to HQ?
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
-                } else if (lastGunshotHeard != null) {
-                    ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
+                } else if (lastDisturbancePosition != null) {
+                    ChangeState(new SearchDirectionState(this, lastDisturbancePosition, doIntro: false));
                 } else {
                     EnterDefaultState();
                 }
                 break;
         }
     }
-    private void ChangeState(SphereControlState routine) {
+    public void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
-        Debug.Log($"changing state {routine}");
         switch (routine) {
             case SearchDirectionState search:
                 break;
@@ -175,7 +177,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             PerceivePlayerObject(other);
         } else {
-            stateMachine.currentState.OnObjectPerceived(other);
+            if (stateMachine.currentState != null)
+                stateMachine.currentState.OnObjectPerceived(other);
         }
     }
 
@@ -184,6 +187,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (GameManager.I.IsPlayerVisible(distance)) {
             stateMachine.currentState.OnObjectPerceived(other);
             lastSeenPlayerPosition = other.bounds.center;
+            lastDisturbancePosition = lastSeenPlayerPosition;
             timeSinceLastSeen = 0f;
             playerCollider = other;
             Reaction reaction = ReactToPlayerSuspicion();
@@ -278,6 +282,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     }
                     break;
             }
+            lastDisturbancePosition = noise.transform.position;
         } else if (noise.data.player) {
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 SuspicionRecord record = new SuspicionRecord {
@@ -340,6 +345,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;
         lastSeenPlayerPosition = Vector3.zero;
+        lastDisturbancePosition = Vector3.zero;
+        lastGunshotHeard = null;
         timeSinceLastSeen = 0f;
         playerCollider = null;
         // alertness = Alertness.normal;

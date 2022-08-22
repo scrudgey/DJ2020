@@ -22,12 +22,23 @@ public class SearchDirectionState : SphereControlState {
     public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise, bool doIntro = true) : base(ai) {
         if (noise != null) {
             searchDirection = (noise.transform.position - owner.transform.position).normalized;
-            searchDirection.y = 0;
+            searchDirection.y = ai.transform.position.y;
         } else {
             RandomSearchDirection();
         }
         SetupRootNode(doIntro);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, noise.transform.position);
+
+    }
+    public SearchDirectionState(SphereRobotAI ai, Vector3 position, bool doIntro = true) : base(ai) {
+        if (position != Vector3.zero) {
+            searchDirection = (position - owner.transform.position).normalized;
+            searchDirection.y = ai.transform.position.y;
+        } else {
+            RandomSearchDirection();
+        }
+        SetupRootNode(doIntro);
+        rootTaskNode.SetData(SEARCH_POSITION_KEY, position);
     }
     void RandomSearchDirection() {
         searchDirection = Random.insideUnitSphere;
@@ -41,6 +52,7 @@ public class SearchDirectionState : SphereControlState {
     }
 
     void SetupRootNode(bool intro) {
+
         // TODO problem: changing search direction
         Vector3 leftDirection = Quaternion.Euler(0, -45, 0) * searchDirection;
         Vector3 rightDirection = Quaternion.Euler(0, 45, 0) * searchDirection;

@@ -7,12 +7,14 @@ namespace AI {
 
     public class TaskRadioHQ : TaskNode {
         AlertHandler alertHandler;
+        SphereRobotAI ai;
         bool started;
         bool stopped;
         float timer;
         float totalDuration = 4f;
-        public TaskRadioHQ(AlertHandler alertHandler) : base() {
+        public TaskRadioHQ(SphereRobotAI ai, AlertHandler alertHandler) : base() {
             this.alertHandler = alertHandler;
+            this.ai = ai;
             started = false;
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
@@ -26,7 +28,7 @@ namespace AI {
             } else {
                 if (!stopped) {
                     alertHandler.HideRadio();
-                    GameManager.I.ReportToHQ(true);
+                    GameManager.I.ReportToHQ(true, disturbancePosition: ai.lastDisturbancePosition);
                     stopped = true;
                 }
                 return TaskState.success;
