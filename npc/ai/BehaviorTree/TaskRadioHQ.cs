@@ -7,12 +7,14 @@ namespace AI {
 
     public class TaskRadioHQ : TaskNode {
         AlertHandler alertHandler;
+        SpeechTextController speechTextController;
         SphereRobotAI ai;
         bool started;
         bool stopped;
         float timer;
         float totalDuration = 4f;
-        public TaskRadioHQ(SphereRobotAI ai, AlertHandler alertHandler) : base() {
+        public TaskRadioHQ(SphereRobotAI ai, SpeechTextController speechTextController, AlertHandler alertHandler) : base() {
+            this.speechTextController = speechTextController;
             this.alertHandler = alertHandler;
             this.ai = ai;
             started = false;
@@ -21,6 +23,7 @@ namespace AI {
             if (!started) {
                 alertHandler.ShowRadio();
                 started = true;
+                speechTextController.Say("HQ respond!");
             }
             timer += Time.deltaTime;
             if (timer < totalDuration) {

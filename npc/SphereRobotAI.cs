@@ -17,6 +17,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
     public SphereRobotBrain stateMachine;
+    public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.05f;
@@ -140,6 +141,25 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         timeSinceLastSeen += Time.deltaTime;
         PlayerInput input = stateMachine.Update();
         input.preventWallPress = true;
+
+        // possibly avoid bunching here
+        float avoidFactor = 0.5f;
+        float avoidRadius = 0.5f;
+        Collider[] others = Physics.OverlapSphere(transform.position, avoidRadius, LayerUtil.GetMask(Layer.obj));
+        Vector3 closeness = Vector3.zero;
+        foreach (Collider collider in others) {
+            if (collider == null || collider.gameObject == null)
+                continue;
+            if (collider.transform.IsChildOf(transform))
+                continue;
+            SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
+            if (otherAI != null) {
+                closeness += transform.position - otherAI.transform.position;
+            }
+        }
+        closeness.y = 0;
+        input.moveDirection += avoidFactor * closeness;
+
         SetInputs(input);
         perceptionCountdown -= Time.deltaTime;
         if (perceptionCountdown <= 0) {
@@ -197,6 +217,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereMoveState:
                     case SpherePatrolState:
                     case ReactToAttackState:
+                    case FollowTheLeaderState:
                         alertHandler.ShowAlert();
                         ChangeState(new SphereAttackState(this, gunHandler));
                         break;
@@ -228,11 +249,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 if (other == hit.collider) {
                     return true;
                 } else break;
-                // return other == hit.collider;
             }
         }
-        // Vector3 direction = other.bounds.center - position;
-
         return false;
     }
 
@@ -244,11 +262,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case SphereMoveState:
             case SpherePatrolState:
             case SearchDirectionState:
+            case FollowTheLeaderState:
                 alertHandler.ShowAlert(useWarnMaterial: true);
                 if (GameManager.I.gameData.levelData.alarm) {
                     ChangeState(new SearchDirectionState(this, damage, doIntro: false));
                 } else {
-                    ChangeState(new ReactToAttackState(this, damage));
+                    ChangeState(new ReactToAttackState(this, speechTextController, damage));
                 }
                 break;
         }
@@ -274,12 +293,16 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             switch (stateMachine.currentState) {
                 case SphereMoveState:
                 case SpherePatrolState:
+                case FollowTheLeaderState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
                     if (GameManager.I.gameData.levelData.alarm) {
                         ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                     } else {
-                        ChangeState(new ReactToAttackState(this, noise));
+                        ChangeState(new ReactToAttackState(this, speechTextController, noise));
                     }
+                    break;
+                case SearchDirectionState:
+                    ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                     break;
             }
             lastDisturbancePosition = noise.transform.position;
@@ -287,22 +310,21 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 SuspicionRecord record = new SuspicionRecord {
                     content = "a suspicious noise was heard",
-                    // suspiciousness = noise.data.suspiciousness,
                     suspiciousness = Suspiciousness.suspicious,
                     lifetime = 10f,
                     maxLifetime = 10f
                 };
                 GameManager.I.AddSuspicionRecord(record);
-
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
                     case SpherePatrolState:
+                    case FollowTheLeaderState:
                         alertHandler.ShowWarn();
                         ChangeState(new SearchDirectionState(this, noise));
                         break;
                     case SearchDirectionState:
-                        if (stateMachine.timeInCurrentState > 3f)
-                            ChangeState(new SearchDirectionState(this, noise, doIntro: false));
+                        // if (stateMachine.timeInCurrentState > 3f)
+                        ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                         break;
                 }
             }
@@ -327,7 +349,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // AI: state of knowledge
         // recentHeardSuspicious;
         // recentlySawSuspicious;
-
         Suspiciousness totalSuspicion = GameManager.I.GetTotalSuspicion();
         SensitivityLevel sensitivityLevel = GameManager.I.GetCurrentSensitivity();
 

@@ -15,7 +15,7 @@ namespace AI {
         Transform transform;
         string key;
         float repathTimer;
-        float repathInterval = 1f;
+        public float repathInterval = 1f;
         int navFailures = 0;
         public float headSwivelOffset;
         public float speedCoefficient = 1f;
@@ -76,7 +76,7 @@ namespace AI {
             }
         }
 
-        void SetDestination() {
+        public void SetDestination() {
             NavMeshHit hit = new NavMeshHit();
             object keyObj = GetData(key);
             if (keyObj == null)

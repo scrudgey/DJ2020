@@ -11,8 +11,10 @@ public class ReactToAttackState : SphereControlState {
     readonly float ROUTINE_TIMEOUT = 60f;
     float changeStateCountDown;
     private TaskNode rootTaskNode;
+    private SpeechTextController speechTextController;
 
-    public ReactToAttackState(SphereRobotAI ai, Damage damage) : base(ai) {
+    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, Damage damage) : base(ai) {
+        this.speechTextController = speechTextController;
         Vector3 damageSourcePosition = ai.transform.position + -10f * damage.direction;
         Vector3 coverPosition = ai.transform.position + 10f * damage.direction;
         SetupRootNode(initialPause: 2f); // enough to time out hitstun
@@ -20,7 +22,8 @@ public class ReactToAttackState : SphereControlState {
         rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
         type = AttackType.damage;
     }
-    public ReactToAttackState(SphereRobotAI ai, NoiseComponent noise) : base(ai) {
+    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, NoiseComponent noise) : base(ai) {
+        this.speechTextController = speechTextController;
         Vector3 damageSourcePosition = noise.transform.position;
         Vector3 coverPosition = (noise.transform.position - ai.transform.position).normalized;// * -5f;
         coverPosition.y = ai.transform.position.y;
@@ -57,8 +60,8 @@ public class ReactToAttackState : SphereControlState {
                     key = DAMAGE_SOURCE_KEY,
                     useKey = true,
                     reorient = true
-                }, 1f),
-                new TaskRadioHQ(owner, owner.alertHandler)
+                }, 1.5f),
+                new TaskRadioHQ(owner, speechTextController, owner.alertHandler)
             );
         } else {
             rootTaskNode = new Sequence(
@@ -77,7 +80,7 @@ public class ReactToAttackState : SphereControlState {
                         key = DAMAGE_SOURCE_KEY,
                         useKey = true,
                         reorient = true
-                    }, 1f)
+                    }, 1.5f)
                 );
         }
 
@@ -92,7 +95,7 @@ public class ReactToAttackState : SphereControlState {
         if (result == TaskState.success) {
             owner.StateFinished(this);
         } else if (result == TaskState.failure) {
-            owner.StateFinished(this);
+            // owner.StateFinished(this);
         }
         return input;
     }

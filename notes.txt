@@ -1110,6 +1110,12 @@ Q: what is the proper solution?
 * point of last interest:
     * gunshot -> damage -> last seen player position
     * use the same logic in other state transitions
+* squad movement
+    * don't bunch up
+    * don't get stuck on each other
+    * follow-behind:
+* match target speed
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1143,6 +1149,9 @@ nice to have / future goals:
     if an NPC sees another NPC shooting at something, look / search in that direction
     NPC better take cover
         move into another room
+    strike team may arrive by vehicle
+    HQ might be disabled if player assaults it
+
 
 try to pop around a corner and aim: it doesn't work
 don't clip camera through wall
@@ -1231,37 +1240,25 @@ bug: boxes in aim mode
 bug: outline flip x backwards
 aim mode could track camera better
 hide NPC when above 
-more thorough search
+more thorough search task
     choose a second position
     head looks around when standing in place
-NPC has better vision when they're specifically searching for you
+    NPC has better vision when they're specifically searching for you
 very easy to shoot someone when they're distracted (they don't react appropriately)
-
 show alarm countdown somewhere
 when player is shot, interrupt our ability to shoot back
 
-radio HQ behavior:
-    radio HQ when we've lost track of the player and want to downgrade the alarm
-        initiate cooldown sequence
-    don't radio HQ if HQ is already being radioed
-    report specific details: gunshots heard, taking fire
-        text shows NPC speech
-        HQ text shows response
-    ? radio animation?
-    if the NPC is unable to complete the radio sequence, send a search team
 
 HQ will be level specific state:
     what to do if there is no HQ?
         run to the alarm panel
             do nothing if there is no alarm panel
         how to decide who to run to alarm panel?
-    HQ might be disabled if player assaults it
 
 consequences of alarm active?
     NPC should stop patrol, start search mode
     strike team
         * delay strike team spawn
-        strike team may arrive by vehicle
         reset strike team count on alarm deactivate
         solution for total level wipe of NPCs
             reset strike team count when one dies?
@@ -1276,19 +1273,13 @@ search level systematically
     possibility 3: a patrol route that leads through the level?
     all possibilities require some extra level work
 
+radio HQ behavior:
+    radio HQ when we've lost track of the player and want to downgrade the alarm
+        initiate cooldown sequence
+    don't radio HQ if HQ is already being radioed
+    if the NPC is unable to complete the radio sequence, send a search team
+    report specific details: gunshots heard, taking fire
+        text shows NPC speech
+        HQ text shows response
 
-squad movement
-    don't bunch up
-    * don't get stuck on each other
-
-when two NPCS navigate into one another, how do we detect and resolve this?
-
-how do we streamline squad movement?
-    perhaps, navigate toward the rear of the target
-    follow-behind:
-        store positions in a stack.
-        push the new position on a delay?
-        don't push if the new position is close to the top of the stack.
-        but popping from the stack? when we arrive at the point?
-        orient in their direction? i.e. line up?
-match target speed
+bug: NPC above fails to complete respond to attack state

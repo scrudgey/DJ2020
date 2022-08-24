@@ -1,35 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using AI;
+using KinematicCharacterController;
 using UnityEngine;
 using UnityEngine.AI;
-
 namespace AI {
 
     public class TaskFollowTarget : TaskNode {
         public static readonly string FOLLOW_TARGET_KEY = "followTargetPosition";
-
         public enum HeadBehavior { normal, left, right, rear }
-        // private static readonly float SPACING_DISTANCE = 1.5f;
-        // private static readonly float REPATH_DISTANCE = 3.5f;
         TaskMoveToKey taskMoveToKey;
         public HeadBehavior headBehavior;
         public float speedCoefficient = 1f;
+        public CharacterController targetController;
         public Transform targetTransform;
         public Transform transform;
-
+        LinkedList<Vector3> positions;
+        private static readonly float POINT_SPACING = 0.8f;
+        public override void Initialize() {
+            positions = new LinkedList<Vector3>();
+            SetFollowPoint();
+        }
         public TaskFollowTarget(Transform transform, GameObject target, HeadBehavior headBehavior = HeadBehavior.normal) : base() {
             this.targetTransform = target.transform;
             this.transform = transform;
             this.headBehavior = headBehavior;
+            this.targetController = target.GetComponent<CharacterController>();
             taskMoveToKey = new TaskMoveToKey(transform, FOLLOW_TARGET_KEY);
             taskMoveToKey.SetData(FOLLOW_TARGET_KEY, targetTransform.position);
         }
 
         public override TaskState DoEvaluate(ref PlayerInput input) {
-
-            // TODO: follow behind.
-            taskMoveToKey.SetData(FOLLOW_TARGET_KEY, targetTransform.position);
+            taskMoveToKey.speedCoefficient = targetController.Motor.Velocity.magnitude / targetController.MaxStableMoveSpeed;
+            SetFollowPoint();
             taskMoveToKey.Evaluate(ref input);
 
             // set head look direction
@@ -45,28 +48,22 @@ namespace AI {
             input.lookAtDirection = lookDirection;
 
             return TaskState.running;
+        }
 
-            // set movement
-            // Vector3 displacement = targetTransform.position - transform.position;
-            // float distance = displacement.magnitude;
-            // if (distance > REPATH_DISTANCE || Mathf.Abs(displacement.y) > 0.2f) {
-            //     taskMoveToKey.Evaluate(ref input);
-            //     return TaskState.running;
-            // } else if (distance > SPACING_DISTANCE) {
-            //     Vector3 direction = targetTransform.position - transform.position;
-            //     inputVector = direction;
-            // } else if (distance < SPACING_DISTANCE) {
-            //     Vector3 direction = targetTransform.position - transform.position;
-            //     inputVector = -1f * direction;
-            // }
-            // inputVector.y = 0;
-            // input.moveDirection = speedCoefficient * inputVector.normalized;
-
-
-            // PlayerInput dummyInput = new PlayerInput();
-            // taskMoveToKey.Evaluate(ref dummyInput);
-
-            // return TaskState.running;
+        void SetFollowPoint() {
+            if (positions.Count == 0) {
+                positions.AddFirst(targetTransform.position);
+            }
+            Vector3 topPosition = positions.First.Value;
+            if (Vector3.Distance(topPosition, targetTransform.position) > POINT_SPACING) {
+                positions.AddFirst(targetTransform.position);
+                if (positions.Count > 3) {
+                    positions.RemoveLast();
+                }
+                Vector3 lastPosition = positions.Last.Value;
+                taskMoveToKey.SetData(FOLLOW_TARGET_KEY, lastPosition);
+                taskMoveToKey.SetDestination();
+            }
         }
     }
 

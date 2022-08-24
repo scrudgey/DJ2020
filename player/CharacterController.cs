@@ -377,7 +377,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     playerInput = input,
                     activeItem = itemHandler.activeItem
                 };
-                manualHacker.SetInputs(manualHackInput);
+                if (manualHacker != null)
+                    manualHacker.SetInputs(manualHackInput);
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
