@@ -22,6 +22,7 @@ public class UIController : MonoBehaviour {
     public SuspicionIndicatorHandler suspicionIndicatorHandler;
     public HealthIndicatorController healthIndicatorController;
     public PlayerCalloutHandler playerCalloutHandler;
+    public TextMeshProUGUI caption;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -39,6 +40,8 @@ public class UIController : MonoBehaviour {
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnMenuChange += HandleMenuChange;
         GameManager.OnMenuClosed += HandleMenuClosed;
+        GameManager.OnCaptionChange += HandleCaptionChange;
+        caption.text = "";
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
     }
@@ -76,5 +79,8 @@ public class UIController : MonoBehaviour {
     }
     void HandleMenuClosed() {
         terminal.gameObject.SetActive(false);
+    }
+    void HandleCaptionChange(string newCaption) {
+        caption.text = newCaption;
     }
 }

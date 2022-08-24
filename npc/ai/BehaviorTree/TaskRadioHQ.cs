@@ -11,8 +11,6 @@ namespace AI {
         SphereRobotAI ai;
         bool started;
         bool stopped;
-        float timer;
-        float totalDuration = 4f;
         public TaskRadioHQ(SphereRobotAI ai, SpeechTextController speechTextController, AlertHandler alertHandler) : base() {
             this.speechTextController = speechTextController;
             this.alertHandler = alertHandler;
@@ -24,19 +22,23 @@ namespace AI {
                 alertHandler.ShowRadio();
                 started = true;
                 speechTextController.Say("HQ respond!");
-            }
-            timer += Time.deltaTime;
-            if (timer < totalDuration) {
+                HQReport report = new HQReport {
+                    reporter = ai.gameObject,
+                    desiredAlarmState = true,
+                    locationOfLastDisturbance = ai.lastDisturbancePosition,
+                    timeOfLastContact = Time.time,
+                    lifetime = 6f
+                };
+                GameManager.I.OpenReportTicket(ai.gameObject, report);
                 return TaskState.running;
-            } else {
-                if (!stopped) {
+            } else if (!stopped) {
+                bool complete = GameManager.I.ContactReportTicket(ai.gameObject);
+                if (complete) {
                     alertHandler.HideRadio();
-                    GameManager.I.ReportToHQ(true, disturbancePosition: ai.lastDisturbancePosition);
                     stopped = true;
                 }
-                return TaskState.success;
-            }
+                return TaskState.running;
+            } else return TaskState.success;
         }
     }
-
 }

@@ -14,6 +14,8 @@ public partial class GameManager : Singleton<GameManager> {
     float strikeTeamResponseTimer = 0f;
     Vector3 locationOfLastDisturbance;
     public GameObject lastStrikeTeamMember;
+    public Dictionary<GameObject, HQReport> reports;
+    float clearCaptionTimer;
 
     public void ActivateAlarm() {
         gameData.levelData.alarm = true;
@@ -27,15 +29,69 @@ public partial class GameManager : Singleton<GameManager> {
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
     }
-    public void ReportToHQ(bool activateAlarm, Vector3 disturbancePosition) {
+    public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (!gameData.levelData.hasHQ)
             return;
-        locationOfLastDisturbance = disturbancePosition;
-        if (activateAlarm) {
+        if (reports == null) reports = new Dictionary<GameObject, HQReport>();
+        if (reports.ContainsKey(reporter)) {
+            ContactReportTicket(reporter);
+        } else {
+            report.timeOfLastContact = Time.time;
+            reports[reporter] = report;
+        }
+
+    }
+    public bool ContactReportTicket(GameObject reporter) {
+        if (!gameData.levelData.hasHQ)
+            return false;
+        if (reports.ContainsKey(reporter)) {
+            HQReport report = reports[reporter];
+            report.timeOfLastContact = Time.time;
+            report.timer += Time.deltaTime;
+            if (report.timer > report.lifetime) {
+                CloseReport(new KeyValuePair<GameObject, HQReport>(reporter, report));
+                return true;
+            } else return false;
+        } else {
+            Debug.LogWarning("reporter contacting HQ without opening ticket");
+            return false;
+        }
+    }
+    void UpdateReportTickets() {
+        if (!gameData.levelData.hasHQ)
+            return;
+        if (reports == null) reports = new Dictionary<GameObject, HQReport>();
+        foreach (KeyValuePair<GameObject, HQReport> kvp in reports) {
+            if (Time.time - kvp.Value.timeOfLastContact > 10) {
+                TimeOutReport(kvp);
+            }
+        }
+        if (clearCaptionTimer > 0) {
+            clearCaptionTimer -= Time.deltaTime;
+            if (clearCaptionTimer <= 0) {
+                OnCaptionChange("");
+            }
+        }
+    }
+    void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
+        locationOfLastDisturbance = kvp.Value.locationOfLastDisturbance;
+        if (kvp.Value.desiredAlarmState) {
             ActivateAlarm();
+            DisplayHQResponse("HQ: Understood. Dispatching strike team.");
         } else {
             DeactivateAlarm();
+            DisplayHQResponse("HQ: Understood. Disabling alarm.");
         }
+        reports.Remove(kvp.Key);
+    }
+    void TimeOutReport(KeyValuePair<GameObject, HQReport> kvp) {
+        DisplayHQResponse("HQ: What's going on? Respond!");
+        ActivateAlarm();
+        reports.Remove(kvp.Key);
+    }
+    void DisplayHQResponse(String response) {
+        OnCaptionChange(response);
+        clearCaptionTimer = 5f;
     }
     public void UpdateAlarm() {
         if (gameData.levelData.alarmCountDown > 0) {

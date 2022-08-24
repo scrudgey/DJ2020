@@ -1283,3 +1283,20 @@ radio HQ behavior:
         HQ text shows response
 
 bug: NPC above fails to complete respond to attack state
+
+
+HQ: when we start radio, open a ticket with HQ
+    then, take time to speak.
+    then, complete the transmission, close the ticket with HQ.
+        activate alarm
+        HQ text response
+    if the ticket has been open for some time and not closed, then send a search party
+
+HQ report:
+    tied to gameobject?
+    desired alarm state
+    location of last disturbance
+    timer
+    time of last contact
+
+clear HQ state on new level

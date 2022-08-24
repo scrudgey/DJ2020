@@ -35,6 +35,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<OverlayType> OnOverlayChange;
     public static Action<InputMode, InputMode> OnInputModeChange;
     public static Action<CursorType> OnCursorTypeChange;
+    public static Action<String> OnCaptionChange;
     // UI state
     private bool toggleConsoleThisFrame;
     private bool nextOverlayThisFrame;
@@ -181,6 +182,7 @@ public partial class GameManager : Singleton<GameManager> {
         toggleConsoleThisFrame = false;
         UpdateSuspicion();
         UpdateAlarm();
+        UpdateReportTickets();
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
