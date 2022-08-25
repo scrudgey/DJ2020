@@ -6,29 +6,28 @@ using UnityEngine;
 namespace AI {
 
     public class TaskRadioHQ : TaskNode {
+        public enum RadioType { none, }
         AlertHandler alertHandler;
         SpeechTextController speechTextController;
         SphereRobotAI ai;
         bool started;
         bool stopped;
-        public TaskRadioHQ(SphereRobotAI ai, SpeechTextController speechTextController, AlertHandler alertHandler) : base() {
+        HQReport report;
+        public TaskRadioHQ(SphereRobotAI ai,
+            SpeechTextController speechTextController,
+            AlertHandler alertHandler,
+            HQReport report) : base() {
             this.speechTextController = speechTextController;
             this.alertHandler = alertHandler;
             this.ai = ai;
+            this.report = report;
             started = false;
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             if (!started) {
                 alertHandler.ShowRadio();
                 started = true;
-                speechTextController.Say("HQ respond!");
-                HQReport report = new HQReport {
-                    reporter = ai.gameObject,
-                    desiredAlarmState = true,
-                    locationOfLastDisturbance = ai.lastDisturbancePosition,
-                    timeOfLastContact = Time.time,
-                    lifetime = 6f
-                };
+                speechTextController.Say(report.speechText);
                 GameManager.I.OpenReportTicket(ai.gameObject, report);
                 return TaskState.running;
             } else if (!stopped) {

@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 
 public class ReactToAttackState : SphereControlState {
-    enum AttackType { none, damage, gunshots }
+    public enum AttackType { none, damage, gunshots }
     AttackType type;
     static readonly public string DAMAGE_SOURCE_KEY = "damageSourceKey";
     static readonly public string COVER_POSITION_KEY = "coverPositionKey";
@@ -15,15 +15,16 @@ public class ReactToAttackState : SphereControlState {
 
     public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, Damage damage) : base(ai) {
         this.speechTextController = speechTextController;
+        this.type = AttackType.damage;
         Vector3 damageSourcePosition = ai.transform.position + -10f * damage.direction;
         Vector3 coverPosition = ai.transform.position + 10f * damage.direction;
         SetupRootNode(initialPause: 2f); // enough to time out hitstun
         rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
         rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
-        type = AttackType.damage;
     }
     public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, NoiseComponent noise) : base(ai) {
         this.speechTextController = speechTextController;
+        this.type = AttackType.gunshots;
         Vector3 damageSourcePosition = noise.transform.position;
         Vector3 coverPosition = (noise.transform.position - ai.transform.position).normalized;// * -5f;
         coverPosition.y = ai.transform.position.y;
@@ -32,7 +33,6 @@ public class ReactToAttackState : SphereControlState {
         SetupRootNode(initialPause: 2f);
         rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
         rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
-        type = AttackType.gunshots;
     }
 
     public override void Enter() {
@@ -43,7 +43,23 @@ public class ReactToAttackState : SphereControlState {
     void SetupRootNode(float initialPause = 1f) {
         // TODO: write better code here
         LevelData levelData = GameManager.I.gameData.levelData;
+
+        string speechText = type switch {
+            AttackType.damage => "HQ respond! Taking fire!",
+            AttackType.gunshots => "HQ respond! Shots fired!",
+            _ => "HQ respond! Activate building alarm!"
+        };
+
         if (levelData.hasHQ && !levelData.alarm) {
+            HQReport report = new HQReport {
+                reporter = owner.gameObject,
+                desiredAlarmState = true,
+                locationOfLastDisturbance = owner.lastDisturbancePosition,
+                timeOfLastContact = Time.time,
+                lifetime = 6f,
+                speechText = speechText
+            };
+
             rootTaskNode = new Sequence(
                 new TaskTimerDectorator(new TaskLookAt() {
                     lookType = TaskLookAt.LookType.position,
@@ -61,7 +77,7 @@ public class ReactToAttackState : SphereControlState {
                     useKey = true,
                     reorient = true
                 }, 1.5f),
-                new TaskRadioHQ(owner, speechTextController, owner.alertHandler)
+                new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
             );
         } else {
             rootTaskNode = new Sequence(

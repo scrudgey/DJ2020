@@ -96,7 +96,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 }
                 break;
             case SearchDirectionState:
-
                 alertHandler.ShowGiveUp();
                 // speechTextController.HaltSpeechForTime(2f);
                 // if (recentlyInCombat) {
@@ -122,6 +121,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     EnterDefaultState();
                 }
                 break;
+            case DisableAlarmState:
+                EnterDefaultState();
+                break;
         }
     }
     public void ChangeState(SphereControlState routine) {
@@ -143,8 +145,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         input.preventWallPress = true;
 
         // possibly avoid bunching here
-        float avoidFactor = 0.5f;
-        float avoidRadius = 0.5f;
+        float avoidFactor = 0.75f;
+        float avoidRadius = 0.75f;
         Collider[] others = Physics.OverlapSphere(transform.position, avoidRadius, LayerUtil.GetMask(Layer.obj));
         Vector3 closeness = Vector3.zero;
         foreach (Collider collider in others) {
@@ -263,6 +265,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case SpherePatrolState:
             case SearchDirectionState:
             case FollowTheLeaderState:
+            case DisableAlarmState:
                 alertHandler.ShowAlert(useWarnMaterial: true);
                 if (GameManager.I.gameData.levelData.alarm) {
                     ChangeState(new SearchDirectionState(this, damage, doIntro: false));
@@ -294,6 +297,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case SphereMoveState:
                 case SpherePatrolState:
                 case FollowTheLeaderState:
+                case DisableAlarmState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
                     if (GameManager.I.gameData.levelData.alarm) {
                         ChangeState(new SearchDirectionState(this, noise, doIntro: false));
@@ -319,6 +323,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
+                    case DisableAlarmState:
                         alertHandler.ShowWarn();
                         ChangeState(new SearchDirectionState(this, noise));
                         break;

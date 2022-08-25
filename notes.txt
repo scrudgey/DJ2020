@@ -1115,7 +1115,20 @@ Q: what is the proper solution?
     * don't get stuck on each other
     * follow-behind:
 * match target speed
-
+* HQ: 
+    * when we start radio, open a ticket with HQ
+    * then, take time to speak.
+    * then, complete the transmission, close the ticket with HQ.
+        * activate alarm
+        * HQ text response
+    * if the ticket has been open for some time and not closed, then send a search party
+    * if the NPC is unable to complete the radio sequence, send a search team
+    * report specific details: gunshots heard, taking fire
+        * text shows NPC speech
+        * HQ text shows response
+        * delay strike team spawn
+* radio HQ behavior:
+* radio HQ when we've lost track of the player and want to downgrade the alarm
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1150,7 +1163,12 @@ nice to have / future goals:
     NPC better take cover
         move into another room
     strike team may arrive by vehicle
-    HQ might be disabled if player assaults it
+    HQ will be level specific state:
+        HQ might be disabled if player assaults it
+        what to do if there is no HQ?
+            run to the alarm panel if there is no HQ
+                do nothing if there is no alarm panel
+            how to decide who to run to alarm panel?
 
 
 try to pop around a corner and aim: it doesn't work
@@ -1169,6 +1187,22 @@ gibs from explosions
 corpse can be shot / exploded
 suspicion indicator highlights should reflect alarm / disguise status.
 bug: broken superjump
+more / better sequences besides alarm / no alarm; search level state.
+
+
+
+strike team
+    when one is alerted, all are alerted?
+    reset strike team count on alarm deactivate
+    solution for total level wipe of NPCs
+        reset strike team count when one dies?
+        if you've killed everyone, more arrive?
+search level systematically
+    ideally, move and clear room to room.
+        possibility 1: generate room and door mappings automatically
+        possibility 2: mark up rooms in unity editor
+    possibility 3: a patrol route that leads through the level?
+    all possibilities require some extra level work
 
 UI embellishments
     small font text near locked-on character
@@ -1235,68 +1269,25 @@ stealth:
         when there is any suspicion, stop and investigate
 
 third grid: alarm systems
+    cameras
+    laser tripwire
 bug: aim indicator in aim mode
 bug: boxes in aim mode
 bug: outline flip x backwards
+NPCs shoot each other a lot
 aim mode could track camera better
 hide NPC when above 
 more thorough search task
     choose a second position
     head looks around when standing in place
     NPC has better vision when they're specifically searching for you
+    NPC has better hearing when they're searching for you
 very easy to shoot someone when they're distracted (they don't react appropriately)
 show alarm countdown somewhere
 when player is shot, interrupt our ability to shoot back
-
-
-HQ will be level specific state:
-    what to do if there is no HQ?
-        run to the alarm panel
-            do nothing if there is no alarm panel
-        how to decide who to run to alarm panel?
-
-consequences of alarm active?
-    NPC should stop patrol, start search mode
-    strike team
-        * delay strike team spawn
-        reset strike team count on alarm deactivate
-        solution for total level wipe of NPCs
-            reset strike team count when one dies?
-            if you've killed everyone, more arrive?
-
-strike team AI state
-    when one is alerted, all are alerted?
-search level systematically
-    ideally, move and clear room to room.
-        possibility 1: generate room and door mappings automatically
-        possibility 2: mark up rooms in unity editor
-    possibility 3: a patrol route that leads through the level?
-    all possibilities require some extra level work
-
-radio HQ behavior:
-    radio HQ when we've lost track of the player and want to downgrade the alarm
-        initiate cooldown sequence
-    don't radio HQ if HQ is already being radioed
-    if the NPC is unable to complete the radio sequence, send a search team
-    report specific details: gunshots heard, taking fire
-        text shows NPC speech
-        HQ text shows response
-
-bug: NPC above fails to complete respond to attack state
-
-
-HQ: when we start radio, open a ticket with HQ
-    then, take time to speak.
-    then, complete the transmission, close the ticket with HQ.
-        activate alarm
-        HQ text response
-    if the ticket has been open for some time and not closed, then send a search party
-
-HQ report:
-    tied to gameobject?
-    desired alarm state
-    location of last disturbance
-    timer
-    time of last contact
-
+when player is shot, stop movement for a bit and react
 clear HQ state on new level
+people are shooting themselves
+another AI state to call in radio after attack if alarm is not raised
+don't radio HQ if HQ is already being radioed
+bug: NPC above fails to complete respond to attack state

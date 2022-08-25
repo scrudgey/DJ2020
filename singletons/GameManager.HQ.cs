@@ -19,7 +19,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void ActivateAlarm() {
         gameData.levelData.alarm = true;
-        gameData.levelData.alarmCountDown = 60f;
+        gameData.levelData.alarmCountDown = 10f;
         OnSuspicionChange?.Invoke();
         alarmSoundTimer = alarmSoundInterval;
     }
@@ -84,6 +84,17 @@ public partial class GameManager : Singleton<GameManager> {
         }
         reports.Remove(kvp.Key);
     }
+    void InitiateAlarmShutdown() {
+        List<SphereRobotAI> ais = new List<SphereRobotAI>(GameObject.FindObjectsOfType<SphereRobotAI>());
+        if (ais.Count == 0) {
+            DeactivateAlarm();
+        } else {
+            SphereRobotAI ai = Toolbox.RandomFromList(ais);
+            SpeechTextController speechTextController = ai.GetComponentInChildren<SpeechTextController>();
+            ai.ChangeState(new DisableAlarmState(ai, speechTextController));
+            gameData.levelData.alarmCountDown = 10f;
+        }
+    }
     void TimeOutReport(KeyValuePair<GameObject, HQReport> kvp) {
         DisplayHQResponse("HQ: What's going on? Respond!");
         ActivateAlarm();
@@ -97,7 +108,8 @@ public partial class GameManager : Singleton<GameManager> {
         if (gameData.levelData.alarmCountDown > 0) {
             gameData.levelData.alarmCountDown -= Time.deltaTime;
             if (gameData.levelData.alarmCountDown <= 0) {
-                DeactivateAlarm();
+                // DeactivateAlarm();
+                InitiateAlarmShutdown();
             }
         }
 
