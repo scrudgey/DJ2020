@@ -67,10 +67,13 @@ public class ReactToAttackState : SphereControlState {
                     useKey = true,
                     reorient = true
                 }, initialPause),
-                new TaskMoveToKey(owner.transform, COVER_POSITION_KEY) {
-                    headBehavior = TaskMoveToKey.HeadBehavior.search,
-                    speedCoefficient = 2f
-                },
+                new Selector(
+                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY) {
+                        headBehavior = TaskMoveToKey.HeadBehavior.search,
+                        speedCoefficient = 2f
+                    },
+                    new TaskSucceed()
+                ),
                 new TaskTimerDectorator(new TaskLookAt() {
                     lookType = TaskLookAt.LookType.position,
                     key = DAMAGE_SOURCE_KEY,

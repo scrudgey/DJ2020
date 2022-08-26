@@ -1187,7 +1187,7 @@ gibs from explosions
 corpse can be shot / exploded
 suspicion indicator highlights should reflect alarm / disguise status.
 bug: broken superjump
-more / better sequences besides alarm / no alarm; search level state.
+clear HQ state on new level
 
 
 
@@ -1260,6 +1260,7 @@ sound
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
 stealth:
+    more / better sequences besides alarm / no alarm; search level state.
     NPC investigate routine
     NPC reacts to corpses
     louder / better footsteps
@@ -1271,10 +1272,14 @@ stealth:
 third grid: alarm systems
     cameras
     laser tripwire
+    alarm routers
+
+
+
 bug: aim indicator in aim mode
+aim indicator in wallpress mode
 bug: boxes in aim mode
 bug: outline flip x backwards
-NPCs shoot each other a lot
 aim mode could track camera better
 hide NPC when above 
 more thorough search task
@@ -1282,12 +1287,17 @@ more thorough search task
     head looks around when standing in place
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
+don't radio HQ if HQ is already being radioed
+
+
 very easy to shoot someone when they're distracted (they don't react appropriately)
+visibility indicator 2.0
 show alarm countdown somewhere
+NPCs shoot each other a lot
+people are shooting themselves
 when player is shot, interrupt our ability to shoot back
 when player is shot, stop movement for a bit and react
-clear HQ state on new level
-people are shooting themselves
-another AI state to call in radio after attack if alarm is not raised
-don't radio HQ if HQ is already being radioed
-bug: NPC above fails to complete respond to attack state
+
+
+* bug: NPC above fails to complete respond to attack state
+* another AI state to call in radio after attack if alarm is not raised

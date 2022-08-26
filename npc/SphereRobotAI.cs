@@ -58,7 +58,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         gunHandler.SwitchToGun(1);
 
         alertHandler.Hide();
-
         Bind(sightCone.gameObject);
         navMeshPath = new NavMeshPath();
         if (!overrideDefaultState) {
@@ -97,23 +96,23 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 break;
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
-                // speechTextController.HaltSpeechForTime(2f);
-                // if (recentlyInCombat) {
-                //     
-                // } else 
-                // if (lastDamage != null) {
-                //     // TODO: we were just in combat. report to HQ?
-                //     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
-                // } else if (lastGunshotHeard != null) {
-                //     ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false));
-                // } else {
                 EnterDefaultState();
-                // }
                 break;
             case SphereAttackState:
-                // TODO: we were just in combat. report to HQ
+                if (!GameManager.I.gameData.levelData.alarm) {
+                    if (lastDamage != null) {
+                        ChangeState(new ReportToHQState(this, speechTextController, lastDamage));
+                    } else if (lastDisturbancePosition != null) {
+                        ChangeState(new ReportToHQState(this, speechTextController, lastDisturbancePosition));
+                    } else {
+                        EnterDefaultState();
+                    }
+                } else {
+                    EnterDefaultState();
+                }
+                break;
+            case ReportToHQState:
                 if (lastDamage != null) {
-                    // TODO: we were just in combat. report to HQ?
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
                 } else if (lastDisturbancePosition != null) {
                     ChangeState(new SearchDirectionState(this, lastDisturbancePosition, doIntro: false));
@@ -266,6 +265,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case SearchDirectionState:
             case FollowTheLeaderState:
             case DisableAlarmState:
+            case ReportToHQState:
                 alertHandler.ShowAlert(useWarnMaterial: true);
                 if (GameManager.I.gameData.levelData.alarm) {
                     ChangeState(new SearchDirectionState(this, damage, doIntro: false));

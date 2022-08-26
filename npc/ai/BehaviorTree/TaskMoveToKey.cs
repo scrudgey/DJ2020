@@ -32,7 +32,7 @@ namespace AI {
             SetDestination();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            if (navFailures >= 3) {
+            if (navFailures >= 2) {
                 return TaskState.failure;
             }
             if (repathTimer > repathInterval) {
@@ -87,7 +87,7 @@ namespace AI {
                 NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navMeshPath);
                 pathIndex = 1;
             } else {
-                Debug.LogError($"could not find navmeshhit for {target}");
+                Debug.LogWarning($"could not find navmeshhit for {target}");
                 navFailures += 1;
             }
         }

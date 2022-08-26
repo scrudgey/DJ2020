@@ -18,10 +18,12 @@ public partial class GameManager : Singleton<GameManager> {
     float clearCaptionTimer;
 
     public void ActivateAlarm() {
+        if (!gameData.levelData.alarm) {
+            alarmSoundTimer = alarmSoundInterval;
+        }
         gameData.levelData.alarm = true;
-        gameData.levelData.alarmCountDown = 10f;
+        gameData.levelData.alarmCountDown = 20f;
         OnSuspicionChange?.Invoke();
-        alarmSoundTimer = alarmSoundInterval;
     }
     public void DeactivateAlarm() {
         gameData.levelData.alarm = false;
