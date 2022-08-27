@@ -85,6 +85,7 @@ public partial class GameManager : Singleton<GameManager> {
                     reaction = Reaction.attack;
                 } else if (reaction == Reaction.attack) {
                     // trigger alarm again?
+                    // GameManager.I.ActivateAlarm();
                 }
             }
             if (gameData.playerData.disguise) {

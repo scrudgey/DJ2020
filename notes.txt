@@ -1299,13 +1299,13 @@ don't radio HQ if HQ is already being radioed
 * when player is shot, stop movement for a bit and react
 * bug: NPC above fails to complete respond to attack state
 * another AI state to call in radio after attack if alarm is not raised
-suspicion indicator highlights should reflect alarm / disguise status.
-people are cancelling the alarm during active firefights
-very easy to shoot someone when they're distracted (they don't react appropriately)
+* suspicion indicator highlights should reflect alarm / disguise status.
+* people are cancelling the alarm during active firefights
+* very easy to shoot someone when they're distracted (they don't react appropriately)
 visibility indicator 2.0
 show alarm countdown somewhere
 
-
+don't override location of last disturbance with our own gunshots
 
 ambient sounds
     room tone

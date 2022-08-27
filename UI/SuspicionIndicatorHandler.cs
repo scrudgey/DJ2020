@@ -224,6 +224,10 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
+                if (GameManager.I.gameData.playerData.disguise && !GameManager.I.gameData.levelData.alarm) {
+                    reactionIgnoreChevron.color = disabledColor;
+                    reactionIgnoreLight.color = lightGreenDisabled;
+                }
                 break;
             case Reaction.investigate:
                 reactionIgnoreChevron.color = disabledColor;
@@ -240,6 +244,11 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreLight.color = lightGreenDisabled;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
+
+                if (GameManager.I.gameData.levelData.alarm && !GameManager.I.gameData.playerData.disguise) {
+                    reactionAttackChevron.color = disabledColor;
+                    reactionAttackLight.color = lightRedDisabled;
+                }
                 break;
         }
         switch (GameManager.I.GetSuspicionReaction(netSuspicion, applyModifiers: false)) {
@@ -262,7 +271,6 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             alarmChevronObject.SetActive(true);
         } else {
             alarmChevronObject.SetActive(false);
-
         }
 
         if (GameManager.I.gameData.playerData.disguise) {

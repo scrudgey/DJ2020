@@ -359,6 +359,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         recentlySawSuspicious = Toolbox.Max(recentlySawSuspicious, totalSuspicion);
         Reaction reaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious);
+
+        Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious, applyModifiers: false);
+        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelData.alarm) {
+            Debug.Log("alarm");
+            GameManager.I.ActivateAlarm();
+        }
+
         if (reaction == Reaction.investigate && recentlyInCombat) {
             reaction = Reaction.attack;
         }
