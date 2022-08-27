@@ -517,6 +517,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Camera.orthographicSize = desiredOrthographicSize;
     }
     public CursorData GetTargetData(Vector2 cursorPosition) {
+        // TODO: does this work at all for 
         if (GameManager.I.inputMode == InputMode.aim) {
             return AimToTarget(cursorPosition);
         } else {

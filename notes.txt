@@ -1185,7 +1185,6 @@ prevent extreme zoom maneuvers with lerping
 reset gun instance on pool operations
 gibs from explosions
 corpse can be shot / exploded
-suspicion indicator highlights should reflect alarm / disguise status.
 bug: broken superjump
 clear HQ state on new level
 
@@ -1264,10 +1263,12 @@ stealth:
     NPC investigate routine
     NPC reacts to corpses
     louder / better footsteps
+        footstep audio volume should match noise level
         NPC footsteps should be louder
         footstep sound and volume should be significant to stealth
     better reaction to footsteps
         when there is any suspicion, stop and investigate
+    redo how footsteps work?
 
 third grid: alarm systems
     cameras
@@ -1290,14 +1291,23 @@ more thorough search task
 don't radio HQ if HQ is already being radioed
 
 
+
+
+* NPCs shoot each other a lot
+* people are shooting themselves
+* when player is shot, interrupt our ability to shoot back
+* when player is shot, stop movement for a bit and react
+* bug: NPC above fails to complete respond to attack state
+* another AI state to call in radio after attack if alarm is not raised
+suspicion indicator highlights should reflect alarm / disguise status.
+people are cancelling the alarm during active firefights
 very easy to shoot someone when they're distracted (they don't react appropriately)
 visibility indicator 2.0
 show alarm countdown somewhere
-NPCs shoot each other a lot
-people are shooting themselves
-when player is shot, interrupt our ability to shoot back
-when player is shot, stop movement for a bit and react
 
 
-* bug: NPC above fails to complete respond to attack state
-* another AI state to call in radio after attack if alarm is not raised
+
+ambient sounds
+    room tone
+first level should set the tone
+

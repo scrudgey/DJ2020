@@ -12,9 +12,11 @@ public class Bullet {
         this.ray = ray;
     }
 
-    public void DoImpacts() {
+    public void DoImpacts(Transform shooter) {
         RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            if (hit.collider.transform.IsChildOf(shooter))
+                continue;
             if (Impact(hit)) {
                 Debug.DrawLine(gunPosition, hit.point, Color.green, 5f);
                 if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {

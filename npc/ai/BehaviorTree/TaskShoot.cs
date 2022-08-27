@@ -23,18 +23,22 @@ namespace AI {
             Vector3 lastSeenPlayerPosition = (Vector3)lastSeenPlayerPositionObject;
             if (lastSeenPlayerPosition == null)
                 return PlayerInput.FireInputs.none;
-            PlayerInput.FireInputs fireInput = new PlayerInput.FireInputs() {
+            CursorData cursorData = new CursorData {
+                type = CursorData.TargetType.objectLock,
+                screenPosition = Vector2.zero,
+                screenPositionNormalized = Vector2.zero,
+                highlightableTargetData = null,
+                worldPosition = lastSeenPlayerPosition + new Vector3(0f, 0.4f, 0f),
+                mousePosition = lastSeenPlayerPosition
+            };
+            bool clearshot = gunHandler.IsClearShot(cursorData);
+
+            PlayerInput.FireInputs fireInput = clearshot ? new PlayerInput.FireInputs() {
                 FirePressed = false,
                 FireHeld = true,
-                cursorData = new CursorData {
-                    type = CursorData.TargetType.objectLock,
-                    screenPosition = Vector2.zero,
-                    screenPositionNormalized = Vector2.zero,
-                    highlightableTargetData = null,
-                    worldPosition = lastSeenPlayerPosition + new Vector3(0f, 0.4f, 0f),
-                    mousePosition = lastSeenPlayerPosition
-                }
-            };
+                cursorData = cursorData
+            } : PlayerInput.FireInputs.none;
+
             return fireInput;
         }
     }

@@ -40,7 +40,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
-
     public void ShootCallback() {
         Shoot(lastShootInput);
     }
@@ -58,6 +57,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     // used by animator
     public void EndShoot() {
         state = GunState.idle;
+        lastShootInput = null;
+        shootRequestedThisFrame = false;
     }
     // used by animator
     public void ClipIn() {
@@ -169,9 +170,27 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
             gunPosition = gunPosition
         };
 
-        bullet.DoImpacts();
+        bullet.DoImpacts(transform.root);
 
         Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
+    }
+    public bool IsClearShot(CursorData input) {
+        Vector3 targetPosition = input.worldPosition;
+        Transform root = transform.root;
+        Vector3 gunPosition = this.gunPosition();
+        Vector3 trueDirection = gunDirection(input);
+        Ray ray = new Ray(gunPosition, trueDirection);
+        RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetMask(Layer.obj));
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            if (hit.collider.transform.IsChildOf(root))
+                continue;
+            // TODO: better ally rejection here
+            SphereRobotAI otherAI = hit.collider.transform.root.GetComponentInChildren<SphereRobotAI>();
+            if (otherAI != null) {
+                return false;
+            }
+        }
+        return true;
     }
     public void ShootImmediately(CursorData input) {
         Shoot(input);

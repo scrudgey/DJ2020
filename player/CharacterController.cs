@@ -148,6 +148,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private bool inputCrouchDown;
     private Vector3 deadMoveVelocity;
     private float deadTimer;
+    private float hitstunTimer;
+    private float gunHitStunTimer;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -214,14 +216,20 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         // Assign to motor
         Motor.CharacterController = this;
         characterHurtable.OnHitStateChanged += HandleHurtableChanged;
+        characterHurtable.OnTakeDamage += HandleTakeDamage;
     }
     void OnDestroy() {
         characterHurtable.OnHitStateChanged -= HandleHurtableChanged;
+        characterHurtable.OnTakeDamage -= HandleTakeDamage;
     }
     private void HandleHurtableChanged(Destructible hurtable) {
         ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);
         if (hurtable.lastDamage != null)
             deadMoveVelocity = hurtable.lastDamage.direction;
+    }
+    private void HandleTakeDamage(Damageable damageable, Damage damage) {
+        hitstunTimer = 0.15f;
+        gunHitStunTimer = 0.5f;
     }
     public void OnHitStateEnter(HitState state, HitState fromState) {
         switch (state) {
@@ -369,16 +377,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             case CharacterState.normal:
                 wallPressRatchet = false;
 
-                // Items
-                itemHandler.SetInputs(input);
+                if (hitstunTimer <= 0) {
+                    // Items
+                    itemHandler.SetInputs(input);
 
-                // Cyberdeck
-                ManualHackInput manualHackInput = new ManualHackInput {
-                    playerInput = input,
-                    activeItem = itemHandler.activeItem
-                };
-                if (manualHacker != null)
-                    manualHacker.SetInputs(manualHackInput);
+                    // Cyberdeck
+                    ManualHackInput manualHackInput = new ManualHackInput {
+                        playerInput = input,
+                        activeItem = itemHandler.activeItem
+                    };
+                    if (manualHacker != null)
+                        manualHacker.SetInputs(manualHackInput);
+                }
+
+                if (gunHitStunTimer > 0) {
+                    input.Fire = PlayerInput.FireInputs.none;
+                }
 
                 // Fire
                 gunHandler.ProcessGunSwitch(input);
@@ -799,6 +813,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                             targetMovementVelocity = Vector3.zero;
                         }
                     }
+                    if (hitstunTimer > 0f) {
+                        targetMovementVelocity = Vector3.zero;
+                    }
                     // Smooth movement Velocity
                     currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
                 } else {
@@ -1005,9 +1022,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
 
         }
+        // tookDamageThisFrame = false;
+        if (hitstunTimer > 0f) {
+            hitstunTimer -= Time.deltaTime;
+        }
+        if (gunHitStunTimer > 0f) {
+            gunHitStunTimer -= Time.deltaTime;
+        }
         if (GameManager.I.showDebugRays)
             Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.red);
-
     }
 
     void CreateCorpse() {
@@ -1134,5 +1157,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         inputCrouchDown = false;
         deadMoveVelocity = Vector3.zero;
         deadTimer = 0f;
+        // tookDamageThisFrame = false;
+        hitstunTimer = 0f;
+        gunHitStunTimer = 0f;
     }
 }

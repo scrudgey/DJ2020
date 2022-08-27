@@ -7,6 +7,7 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
     public Gibs gibs;
     public Damage lastDamage;
     protected Collider myCollider;
+    public Action<Damageable, Damage> OnTakeDamage { get; set; }
     Dictionary<Type, Func<Damage, DamageResult>> damageHandlers = new Dictionary<Type, Func<Damage, DamageResult>>();
 
     virtual public void Awake() {
@@ -49,6 +50,7 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
         DamageResult result = result1.Add(result2);
 
         gibs?.EmitOnImpact(gameObject, result, myCollider);
+        OnTakeDamage?.Invoke(this, damage);
         return result;
     }
     DamageResult HandleDamage(Damage damage, Type type) {
