@@ -16,20 +16,23 @@ public partial class GameManager : Singleton<GameManager> {
     public GameObject lastStrikeTeamMember;
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
+    float alarmShutdownTimer;
 
     public void ActivateAlarm() {
         if (!gameData.levelData.alarm) {
             alarmSoundTimer = alarmSoundInterval;
         }
         gameData.levelData.alarm = true;
-        gameData.levelData.alarmCountDown = 20f;
+        gameData.levelData.alarmCountDown = 30f;
         OnSuspicionChange?.Invoke();
+        alarmShutdownTimer = 0f;
     }
     public void DeactivateAlarm() {
         gameData.levelData.alarm = false;
         gameData.levelData.alarmCountDown = 0f;
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
+        alarmShutdownTimer = 0f;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (!gameData.levelData.hasHQ)
@@ -87,6 +90,9 @@ public partial class GameManager : Singleton<GameManager> {
         reports.Remove(kvp.Key);
     }
     void InitiateAlarmShutdown() {
+        if (alarmShutdownTimer > 0f)
+            return;
+        alarmShutdownTimer = 5f;
         List<SphereRobotAI> ais = new List<SphereRobotAI>(GameObject.FindObjectsOfType<SphereRobotAI>());
         if (ais.Count == 0) {
             DeactivateAlarm();
@@ -94,7 +100,6 @@ public partial class GameManager : Singleton<GameManager> {
             SphereRobotAI ai = Toolbox.RandomFromList(ais);
             SpeechTextController speechTextController = ai.GetComponentInChildren<SpeechTextController>();
             ai.ChangeState(new DisableAlarmState(ai, speechTextController));
-            gameData.levelData.alarmCountDown = 10f;
         }
     }
     void TimeOutReport(KeyValuePair<GameObject, HQReport> kvp) {
@@ -110,7 +115,6 @@ public partial class GameManager : Singleton<GameManager> {
         if (gameData.levelData.alarmCountDown > 0) {
             gameData.levelData.alarmCountDown -= Time.deltaTime;
             if (gameData.levelData.alarmCountDown <= 0) {
-                // DeactivateAlarm();
                 InitiateAlarmShutdown();
             }
         }
@@ -125,6 +129,9 @@ public partial class GameManager : Singleton<GameManager> {
                 alarmSoundTimer -= alarmSoundInterval;
                 audioSource.PlayOneShot(alarmSound);
             }
+        }
+        if (alarmShutdownTimer > 0f) {
+            alarmShutdownTimer -= Time.deltaTime;
         }
     }
 

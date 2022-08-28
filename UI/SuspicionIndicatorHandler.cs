@@ -70,7 +70,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     public RectTransform bottomSpacerRect;
     public RectTransform topSpacerRect;
     public VerticalLayoutGroup rightChevronVerticalLayoutGroup;
-    public RectTransform rightChevronColumnRect;
+    public RectTransform alarmFillBarRectTransform;
     public float alarmChevronEaseTimer;
     public float disguiseChevronEaseTimer;
     public bool easeInAlarmChevron;
@@ -165,6 +165,11 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             disguiseChevronRect.sizeDelta = new Vector2(215f, factor * 33f);
             bottomSpacerRect.sizeDelta = new Vector2(215f, factor * 33f);
         }
+        if (GameManager.I.gameData.levelData.alarm) {
+            Rect fillBarRect = alarmFillBarRectTransform.rect;
+            float factor = 150f * (GameManager.I.gameData.levelData.alarmCountDown / 30f);
+            alarmFillBarRectTransform.sizeDelta = new Vector2(factor, 1f);
+        }
     }
 
     public void UpdateIndicators() {
@@ -251,6 +256,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 }
                 break;
         }
+
         switch (GameManager.I.GetSuspicionReaction(netSuspicion, applyModifiers: false)) {
             case Reaction.ignore:
                 SetRightLineTargetHeight(145);

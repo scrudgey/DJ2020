@@ -1129,6 +1129,17 @@ Q: what is the proper solution?
         * delay strike team spawn
 * radio HQ behavior:
 * radio HQ when we've lost track of the player and want to downgrade the alarm
+* NPCs shoot each other a lot
+* people are shooting themselves
+* when player is shot, interrupt our ability to shoot back
+* when player is shot, stop movement for a bit and react
+* bug: NPC above fails to complete respond to attack state
+* another AI state to call in radio after attack if alarm is not raised
+* suspicion indicator highlights should reflect alarm / disguise status.
+* people are cancelling the alarm during active firefights
+* very easy to shoot someone when they're distracted (they don't react appropriately)
+* visibility indicator 2.0
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1140,6 +1151,9 @@ uncertain:
         slow walk?
 
 nice to have / future goals:
+    ambient sounds
+        room tone
+    first level should set the tone
     aim: swing into position, then subtly zoom in to focus on reticle
         accompanied by rotating reticle element
     impact knockback
@@ -1215,6 +1229,15 @@ UI embellishments
 save system:
     allow independent level data
     allow independent NPC data: this is a little harder 
+    interface for designing multiple VR scenarios
+        prereq: set up a title menu i guess?
+        new stage: infiltration
+        danger room
+        spawning enemies
+        enemy count
+        victory conditions
+        select player loadout
+        select enemy loadout
 
 UI:
     display different UI when in aim mode
@@ -1233,16 +1256,6 @@ graph system:
         -                +
     and these are buttons you can click
 
-interface for designing multiple VR scenarios
-        prereq: set up a title menu i guess?
-        new stage: infiltration
-        danger room
-        spawning enemies
-        enemy count
-        victory conditions
-        select player loadout
-        select enemy loadout
-
 control / combat:
     better shotgun
     aim: fixed angular size
@@ -1259,9 +1272,16 @@ sound
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
 stealth:
+    silencers
+        affect sound
+        affect noise
+        affect graphic
+        affect muzzle flash
     more / better sequences besides alarm / no alarm; search level state.
     NPC investigate routine
     NPC reacts to corpses
+    NPC reacts when seeing another shot
+    NPC should see you in deep shadow when they get close
     louder / better footsteps
         footstep audio volume should match noise level
         NPC footsteps should be louder
@@ -1293,21 +1313,10 @@ don't radio HQ if HQ is already being radioed
 
 
 
-* NPCs shoot each other a lot
-* people are shooting themselves
-* when player is shot, interrupt our ability to shoot back
-* when player is shot, stop movement for a bit and react
-* bug: NPC above fails to complete respond to attack state
-* another AI state to call in radio after attack if alarm is not raised
-* suspicion indicator highlights should reflect alarm / disguise status.
-* people are cancelling the alarm during active firefights
-* very easy to shoot someone when they're distracted (they don't react appropriately)
-visibility indicator 2.0
 show alarm countdown somewhere
+    show alarm timer
+    pulse some element in color
+    ease in the countdown
 
 don't override location of last disturbance with our own gunshots
-
-ambient sounds
-    room tone
-first level should set the tone
 
