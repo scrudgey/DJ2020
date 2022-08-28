@@ -44,7 +44,7 @@ public class SuspicionStatusRecordIndicatorHandler : MonoBehaviour {
                 rectTransform.localScale = Vector3.one;
             }
         }
-        if (suspicionRecord.IsTimed()) {
+        if (suspicionRecord?.IsTimed() ?? false) {
             float totalWidth = rectTransform.rect.width;
             float fillWidth = (suspicionRecord.lifetime / suspicionRecord.maxLifetime) * totalWidth;
             lifetimeFillBarTransform.sizeDelta = new Vector2(fillWidth, 1f);

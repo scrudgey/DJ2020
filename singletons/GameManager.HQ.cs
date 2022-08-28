@@ -24,6 +24,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         gameData.levelData.alarm = true;
         gameData.levelData.alarmCountDown = 30f;
+        // gameData.levelData.alarmCountDown = 5f;
         OnSuspicionChange?.Invoke();
         alarmShutdownTimer = 0f;
     }

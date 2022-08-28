@@ -1139,7 +1139,9 @@ Q: what is the proper solution?
 * people are cancelling the alarm during active firefights
 * very easy to shoot someone when they're distracted (they don't react appropriately)
 * visibility indicator 2.0
-
+* show alarm countdown somewhere
+    * show alarm timer
+    * ease in the countdown
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1225,6 +1227,8 @@ UI embellishments
         extended mode callout on level start vs quick callout on display changes 
         text? 
             PLAYER: STATS
+    pulse some element in color in alarm timer, maybe show some bkg
+    
 
 save system:
     allow independent level data
@@ -1298,9 +1302,9 @@ third grid: alarm systems
 
 
 bug: aim indicator in aim mode
-aim indicator in wallpress mode
 bug: boxes in aim mode
 bug: outline flip x backwards
+aim indicator in wallpress mode
 aim mode could track camera better
 hide NPC when above 
 more thorough search task
@@ -1309,14 +1313,5 @@ more thorough search task
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
 don't radio HQ if HQ is already being radioed
-
-
-
-
-show alarm countdown somewhere
-    show alarm timer
-    pulse some element in color
-    ease in the countdown
-
 don't override location of last disturbance with our own gunshots
 
