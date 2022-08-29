@@ -1,5 +1,5 @@
+using AI;
 using UnityEngine;
-
 public abstract class SphereControlState : IState {
     protected SphereRobotAI owner;
     public SphereControlState(SphereRobotAI handler) {
@@ -11,4 +11,5 @@ public abstract class SphereControlState : IState {
     public virtual void OnObjectPerceived(Collider other) { }
     public virtual void OnNoiseHeard(NoiseComponent noise) { }
     public virtual void OnDamage(Damage damage) { }
+    public TaskNode rootTaskNote { get; set; }
 }

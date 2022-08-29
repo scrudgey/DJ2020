@@ -40,8 +40,6 @@ public class AlarmIndicatorHandler : MonoBehaviour {
             _ => 1f
         };
 
-        Debug.Log(scale);
-
         boxRectTransform.localScale = new Vector3(1f, scale, 1f);
     }
 

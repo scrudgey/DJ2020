@@ -11,6 +11,7 @@ namespace AI {
         public override TaskState DoEvaluate(ref PlayerInput input) {
             PlayerInput.FireInputs fireData = ShootBullet();
             input.orientTowardPoint = fireData.cursorData.worldPosition;
+            input.orientTowardPoint.y = 0;
             input.Fire = fireData;
             input.inputMode = InputMode.gun;
             input.lookAtPosition = fireData.cursorData.worldPosition;

@@ -1190,10 +1190,7 @@ nice to have / future goals:
 try to pop around a corner and aim: it doesn't work
 don't clip camera through wall
 why do gibs fall through the wall/floor?
-clearsight InvokeRepeating
-clearsight OverlapSphereNonAlloc
-clearsight don't update ceiling calculation when in the air
-ceiling clearsighter shadowsonly
+
 fog of breath
 damage result addition is weird
 prevent extreme zoom maneuvers with lerping
@@ -1205,6 +1202,12 @@ bug: broken superjump
 clear HQ state on new level
 
 
+refactor clearsighter
+    clearsight InvokeRepeating
+    clearsight OverlapSphereNonAlloc
+    clearsight don't update ceiling calculation when in the air
+    ceiling clearsighter shadowsonly
+    don't interact with NPC emotes
 
 strike team
     when one is alerted, all are alerted?
@@ -1228,6 +1231,7 @@ UI embellishments
         text? 
             PLAYER: STATS
     pulse some element in color in alarm timer, maybe show some bkg
+        blink at 00.00 and then ease out
     
 
 save system:
@@ -1285,6 +1289,7 @@ stealth:
     NPC investigate routine
     NPC reacts to corpses
     NPC reacts when seeing another shot
+    NPC reacts when seeing another shooting
     NPC should see you in deep shadow when they get close
     louder / better footsteps
         footstep audio volume should match noise level
@@ -1306,12 +1311,15 @@ bug: boxes in aim mode
 bug: outline flip x backwards
 aim indicator in wallpress mode
 aim mode could track camera better
-hide NPC when above 
 more thorough search task
     choose a second position
     head looks around when standing in place
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
-don't radio HQ if HQ is already being radioed
-don't override location of last disturbance with our own gunshots
 
+don't radio HQ if HQ is already being radioed
+    on task initialize, check all other sphereais and their currently running task?
+* NPCs orienting in weird directions
+
+don't override location of last disturbance with our own gunshots
+    track last place we saw player, last place we heard player, last place we heard something suspicious in general

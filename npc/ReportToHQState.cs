@@ -53,7 +53,7 @@ public class ReportToHQState : SphereControlState {
         HQReport report = new HQReport {
             reporter = owner.gameObject,
             desiredAlarmState = true,
-            locationOfLastDisturbance = owner.lastDisturbancePosition,
+            locationOfLastDisturbance = owner.getLocationOfInterest(),
             timeOfLastContact = Time.time,
             lifetime = 6f,
             speechText = speechText

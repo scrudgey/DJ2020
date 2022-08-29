@@ -423,6 +423,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     } else {
                         slewLookVector = _moveInputVector;
                     }
+                    slewLookVector.y = 0;
                 }
                 if (input.Fire.AimPressed) {
                     snapToDirection = lookAtDirection;

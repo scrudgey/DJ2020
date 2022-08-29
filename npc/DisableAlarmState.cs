@@ -18,7 +18,7 @@ public class DisableAlarmState : SphereControlState {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = false,
-                locationOfLastDisturbance = owner.lastDisturbancePosition,
+                locationOfLastDisturbance = owner.getLocationOfInterest(),
                 timeOfLastContact = Time.time,
                 lifetime = 6f,
                 speechText = "HQ respond. All clear."

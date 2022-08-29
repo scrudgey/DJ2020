@@ -32,14 +32,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public PatrolRoute patrolRoute;
     public bool skipShootAnimation;
     NoiseComponent lastGunshotHeard;
-    public Vector3 lastSeenPlayerPosition;
+    public SpaceTimePoint lastSeenPlayerPosition;
+    public SpaceTimePoint lastHeardPlayerPosition;
+    public SpaceTimePoint lastHeardDisturbancePosition;
     Damage lastDamage;
-    public Vector3 lastDisturbancePosition;
     public bool overrideDefaultState;
-    // private void OnDrawGizmos() {
-    //     string customName = "Relic\\MaskedSpider.png";
-    //     Gizmos.DrawIcon(lastSeenPlayerPosition, customName, true);
-    // }
+
     void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
 
@@ -81,6 +79,20 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
 
+    public Vector3 getLocationOfInterest() {
+        if (lastSeenPlayerPosition != null && lastHeardPlayerPosition != null) {
+            if (lastSeenPlayerPosition.time > lastHeardPlayerPosition.time) {
+                return lastSeenPlayerPosition.position;
+            } else return lastHeardPlayerPosition.position;
+        } else if (lastSeenPlayerPosition != null) {
+            return lastSeenPlayerPosition.position;
+        } else if (lastHeardPlayerPosition != null) {
+            return lastHeardPlayerPosition.position;
+        } else if (lastHeardDisturbancePosition != null) {
+            return lastHeardDisturbancePosition.position;
+        } else return Vector3.zero;
+    }
+
     public void StateFinished(SphereControlState routine) {
         switch (routine) {
             default:
@@ -88,8 +100,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 // TODO: do something different. we were just attacked
                 if (lastDamage != null) {
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
-                } else if (lastDisturbancePosition != null) {
-                    ChangeState(new SearchDirectionState(this, lastDisturbancePosition, doIntro: false));
+                } else if (getLocationOfInterest() != Vector3.zero) {
+                    ChangeState(new SearchDirectionState(this, getLocationOfInterest(), doIntro: false));
                 } else {
                     EnterDefaultState();
                 }
@@ -102,8 +114,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 if (!GameManager.I.gameData.levelData.alarm) {
                     if (lastDamage != null) {
                         ChangeState(new ReportToHQState(this, speechTextController, lastDamage));
-                    } else if (lastDisturbancePosition != null) {
-                        ChangeState(new ReportToHQState(this, speechTextController, lastDisturbancePosition));
+                    } else if (getLocationOfInterest() != Vector3.zero) {
+                        ChangeState(new ReportToHQState(this, speechTextController, getLocationOfInterest()));
                     } else {
                         EnterDefaultState();
                     }
@@ -114,8 +126,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case ReportToHQState:
                 if (lastDamage != null) {
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
-                } else if (lastDisturbancePosition != null) {
-                    ChangeState(new SearchDirectionState(this, lastDisturbancePosition, doIntro: false));
+                } else if (getLocationOfInterest() != Vector3.zero) {
+                    ChangeState(new SearchDirectionState(this, getLocationOfInterest(), doIntro: false));
                 } else {
                     EnterDefaultState();
                 }
@@ -207,8 +219,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (GameManager.I.IsPlayerVisible(distance)) {
             stateMachine.currentState.OnObjectPerceived(other);
-            lastSeenPlayerPosition = other.bounds.center;
-            lastDisturbancePosition = lastSeenPlayerPosition;
+            lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             timeSinceLastSeen = 0f;
             playerCollider = other;
             Reaction reaction = ReactToPlayerSuspicion();
@@ -285,6 +296,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
         if (noise.data.isGunshot) {
+            if (noise.data.player) {
+                lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
+            } else {
+                lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
+            }
             lastGunshotHeard = noise;
             SuspicionRecord record = new SuspicionRecord {
                 content = "gunshots heard",
@@ -309,8 +325,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                     break;
             }
-            lastDisturbancePosition = noise.transform.position;
         } else if (noise.data.player) {
+            lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 SuspicionRecord record = new SuspicionRecord {
                     content = "a suspicious noise was heard",
@@ -376,8 +392,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;
-        lastSeenPlayerPosition = Vector3.zero;
-        lastDisturbancePosition = Vector3.zero;
+        lastSeenPlayerPosition = null;
+        lastHeardDisturbancePosition = null;
+        lastHeardPlayerPosition = null;
+
         lastGunshotHeard = null;
         timeSinceLastSeen = 0f;
         playerCollider = null;

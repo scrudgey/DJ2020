@@ -24,7 +24,8 @@ public class MaterialController {
         this.camera = camera;
         this.gameObject = gameObject;
         this.tagSystemData = Toolbox.GetTagData(gameObject);
-        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).Where(x => !(x is SpriteRenderer)).ToList();
+        // this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).Where(x => !(x is SpriteRenderer)).ToList();
+        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).ToList();
         this.collider = gameObject.GetComponentInChildren<Collider>();
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
@@ -63,6 +64,9 @@ public class MaterialController {
             renderer.material = interloperMaterial;
             renderer.material.SetFloat("_TargetAlpha", 1);
             targetAlpha = 1;
+            if (renderer is SpriteRenderer) {
+                renderer.enabled = false;
+            }
         }
     }
     public void MakeFadeIn() {
