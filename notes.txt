@@ -1142,6 +1142,9 @@ Q: what is the proper solution?
 * show alarm countdown somewhere
     * show alarm timer
     * ease in the countdown
+* NPCs orienting in weird directions
+* don't override location of last disturbance with our own gunshots
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1305,9 +1308,9 @@ third grid: alarm systems
     alarm routers
 
 
-
 bug: aim indicator in aim mode
-bug: boxes in aim mode
+lock radius in aim mode
+* bug: boxes in aim mode
 bug: outline flip x backwards
 aim indicator in wallpress mode
 aim mode could track camera better
@@ -1316,10 +1319,7 @@ more thorough search task
     head looks around when standing in place
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
+    track direction you were moving
 
 don't radio HQ if HQ is already being radioed
     on task initialize, check all other sphereais and their currently running task?
-* NPCs orienting in weird directions
-
-don't override location of last disturbance with our own gunshots
-    track last place we saw player, last place we heard player, last place we heard something suspicious in general

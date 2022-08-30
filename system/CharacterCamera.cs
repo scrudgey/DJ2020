@@ -567,6 +567,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 targetCollider = hit.collider;
             }
         }
+        Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);
+
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
         if (prioritySet) {
@@ -626,6 +628,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector3 targetPoint = projection.GetPoint(100f);
 
         TagSystemData priorityData = null;
+        bool targetSet = false;
         bool prioritySet = false;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
@@ -634,10 +637,13 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
             }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
-            if (data == null)
+            if (data == null || data.targetPriority == -1) {
+                if (!prioritySet && !targetSet) {
+                    targetPoint = hit.point;
+                    targetSet = true;
+                }
                 continue;
-            if (data.targetPriority == -1)
-                continue;
+            }
             if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
                 priorityData = data;
                 if (data.targetPoint != null) {
@@ -648,6 +654,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 prioritySet = true;
             }
         }
+        Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);
+
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
         if (prioritySet) {

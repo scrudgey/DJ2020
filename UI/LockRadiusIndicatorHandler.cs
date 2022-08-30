@@ -68,21 +68,46 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
         }
     }
     public void SetScale(GunHandler gunHandler, CursorData data) {
-        cursorMaskRect.position = data.screenPosition;
-        float locksizeInPixels = gunHandler.gunInstance.baseGun.lockOnSize;
-        float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
-        float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
-        locksizeInPixels = (locksizeInPixels / lengthPerAngle) * (pixelsPerDegree);
-        // pix          :       m   / (m / θ)           * (pix / θ)
+        // set color
         cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
 
+        // set screen position
+        cursorMaskRect.position = data.screenPosition;
+
+        // determine scale
+        float lockSizeLength = gunHandler.gunInstance.baseGun.lockOnSize;
+        float locksizeInPixels = getLockSize(lockSizeLength, data);
+
+        // multiply by easing factor
         float targetScale = locksizeInPixels * scaleFactor;
+
+        // lerp current scale
         currentScale = Mathf.Lerp(currentScale, targetScale, 0.1f);
+
+        // set scale
         cursorRect.sizeDelta = Vector2.one * currentScale * 1.02f;
         cursorMaskRect.sizeDelta = Vector2.one * currentScale;
-        embellishRectTransform.position = data.screenPosition + currentScale * new Vector2(0.25f, -0.55f);
-        embellishDotText.Enable($"Lock: {currentScale / pixelsPerDegree * lengthPerAngle:0.00}m", blitText: false);
-        //                                  pix       /     (pix / θ)   *    (m / θ)
 
+        // set embellishment text and position
+        embellishRectTransform.position = data.screenPosition + currentScale * new Vector2(0.25f, -0.55f);
+        // embellishDotText.Enable($"Lock: {currentScale / pixelsPerDegree * lengthPerAngle:0.00}m", blitText: false);
+        embellishDotText.Enable($"Lock: {currentScale / targetScale * lockSizeLength:0.00}m", blitText: false);
+        //                                  pix       /     (pix / θ)   *    (m / θ)
     }
+
+    float getLockSize(float lockSizeLength, CursorData data) {
+        if (UICamera.orthographic) {
+            float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?
+            float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
+            return (lockSizeLength / lengthPerAngle) * (pixelsPerDegree);
+        } else {
+            // TODO: fix this, should be fixed angular radius
+            float distance = Vector3.Distance(UICamera.transform.position, data.worldPosition);
+            float lockSizeDegrees = Mathf.Atan(lockSizeLength / distance) * Mathf.Rad2Deg;
+            float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
+            return lockSizeDegrees * pixelsPerDegree / 2f;
+        }
+    }
+
+    // float 
 }

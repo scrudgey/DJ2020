@@ -29,7 +29,7 @@ namespace UI {
                     if (pulseSize > 6) {
                         pulseSize = 0;
                     }
-                    SetScale();
+                    // SetScale(CursorData.none);
                 }
             } else {
                 pulseSize = 0;
@@ -65,14 +65,14 @@ namespace UI {
                 cursor.position = targetPosition;
                 currentPosition = cursor.position;
                 state = data.type;
-                SetScale();
+                SetScale(data);
                 lastInputMode = GameManager.I.inputMode;
             } else {
                 cursorImage.enabled = false;
             }
         }
 
-        public void SetScale() {
+        public void SetScale(CursorData data) {
             float inaccuracyLength = target.inaccuracy(target.currentTargetData);
             float inaccuracyInPixels = 1f;
             if (UICamera.orthographic) {
@@ -81,14 +81,12 @@ namespace UI {
                 inaccuracyInPixels = (inaccuracyLength / lengthPerAngle) * (pixelsPerDegree);
 
             } else {
-                // TODO: fix this, should be fixed angular radius
-                float distance = Vector3.Distance(UICamera.transform.position, target.transform.position);
+                float distance = Vector3.Distance(UICamera.transform.position, data.worldPosition);
                 float inaccuracyDegree = Mathf.Atan(inaccuracyLength / distance) * Mathf.Rad2Deg;
                 float pixelsPerDegree = (UICamera.scaledPixelHeight / UICamera.fieldOfView);
-                inaccuracyInPixels = inaccuracyDegree * pixelsPerDegree / 2f;
+                inaccuracyInPixels = inaccuracyDegree * pixelsPerDegree;
             }
-            inaccuracyInPixels = Mathf.Max(25, inaccuracyInPixels);
-            cursor.sizeDelta = inaccuracyInPixels * Vector2.one;
+            cursor.sizeDelta = inaccuracyInPixels * Vector2.one * 2f;
         }
     }
     //      l

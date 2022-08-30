@@ -116,37 +116,38 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         return data.worldPosition - this.gunPosition();
     }
     public float inaccuracy(CursorData input) {
-        float accuracy = 0;
+        float inaccuracy = 0;
 
-        // returns the inaccuracy in world units at the point of the last target data
+        // returns the inaccuracy in world units at the world point of the target data
         if (gunInstance == null || gunInstance.baseGun == null || input == null)
             return 0f;
 
         // range
         // TODO: change this. use a fixed angular 
         float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
-        accuracy += gunInstance.baseGun.spread * (distance / 10f);
+        inaccuracy += gunInstance.baseGun.spread * (distance / 10f);
+        // accuracy += gunInstance.baseGun.spread * distance;
 
         // movement
-        accuracy += movementInaccuracy;
+        inaccuracy += movementInaccuracy;
 
         // crouching
-        accuracy += crouchingInaccuracy;
+        inaccuracy += crouchingInaccuracy;
 
         // shooting
-        accuracy += shootingInaccuracy;
+        inaccuracy += shootingInaccuracy;
 
         // skills
         // TODO: this doesn't work for enemies
         int skillLevel = GameManager.I.gameData.playerData.gunSkillLevel[gunInstance.baseGun.type];
         float skillBonus = (1 - skillLevel) * (0.1f);
-        accuracy += skillBonus;
+        inaccuracy += skillBonus;
 
         // TODO: weapon mods
 
-        accuracy = Math.Max(0, accuracy);
+        inaccuracy = Math.Max(0, inaccuracy);
 
-        return accuracy;
+        return inaccuracy;
     }
     public void EmitBullet(CursorData input) {
         Vector3 gunPosition = this.gunPosition();

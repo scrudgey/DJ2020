@@ -24,8 +24,8 @@ public class MaterialController {
         this.camera = camera;
         this.gameObject = gameObject;
         this.tagSystemData = Toolbox.GetTagData(gameObject);
-        // this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).Where(x => !(x is SpriteRenderer)).ToList();
-        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).ToList();
+        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).Where(x => !(x is SpriteRenderer)).ToList();
+        // this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).ToList();
         this.collider = gameObject.GetComponentInChildren<Collider>();
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
