@@ -1144,7 +1144,9 @@ Q: what is the proper solution?
     * ease in the countdown
 * NPCs orienting in weird directions
 * don't override location of last disturbance with our own gunshots
-
+* bug: aim indicator in aim mode
+* lock radius in aim mode
+* bug: boxes in aim mode
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1308,10 +1310,8 @@ third grid: alarm systems
     alarm routers
 
 
-bug: aim indicator in aim mode
-lock radius in aim mode
-* bug: boxes in aim mode
-bug: outline flip x backwards
+
+* bug: outline flip x backwards
 aim indicator in wallpress mode
 aim mode could track camera better
 more thorough search task
@@ -1323,3 +1323,10 @@ more thorough search task
 
 don't radio HQ if HQ is already being radioed
     on task initialize, check all other sphereais and their currently running task?
+
+the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
+i.e. using yellow just resolves to red? 
+
+is inputmode being used redundantly with characterstate?
+inputmode aim should just be 
+input controller needs to know if we are in aim or not 

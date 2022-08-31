@@ -218,7 +218,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
-        if (GameManager.I.inputMode == InputMode.aim) {
+        if (input.state == CharacterState.aim) {
             camState = CameraState.aim;
         } else if (input.state == CharacterState.wallPress) {
             camState = CameraState.wallPress;
@@ -442,7 +442,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // apply orthographic
         Camera.orthographic = input.orthographic;
 
-        if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim && transitionTime >= 1) {
+        if (input.state != CharacterState.wallPress && state != CameraState.aim && transitionTime >= 1) {
+            // if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim && transitionTime >= 1) {
             UpdateCameraZoom(input);
         }
 
@@ -510,15 +511,13 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
 
     void UpdateCameraZoom(CameraTargetParameters input) {
-        // TODO: this is all weird and bad
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
         float desiredOrthographicSize = input.orthographicSize * zoomCoefficient;
         float previousOrthographicSize = Camera.orthographicSize;
         Camera.orthographicSize = desiredOrthographicSize;
     }
-    public CursorData GetTargetData(Vector2 cursorPosition) {
-        // TODO: does this work at all for 
-        if (GameManager.I.inputMode == InputMode.aim) {
+    public CursorData GetTargetData(Vector2 cursorPosition, InputMode inputMode) {
+        if (inputMode == InputMode.aim) {
             return AimToTarget(cursorPosition);
         } else {
             return CursorToTarget(cursorPosition);

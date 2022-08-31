@@ -14,7 +14,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     }
     public CharacterCamera characterCamera;
     public GunState state;
-    public InputMode inputMode;
+    // public InputMode inputMode;
+    public CharacterState characterState;
     public Action<GunHandler> OnValueChanged { get; set; }
     public float height = 0.5f;
     public AudioSource audioSource;
@@ -83,7 +84,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
 
     public bool HasGun() => gunInstance != null && gunInstance.baseGun != null;
 
-    public bool CanShoot() => gunInstance.CanShoot() && (inputMode == InputMode.gun || inputMode == InputMode.aim) && (state != GunState.reloading && state != GunState.racking);
+    public bool CanShoot() => gunInstance.CanShoot() && (state != GunState.reloading && state != GunState.racking);
 
     public void Update() {
         if (gunInstance == null) {
@@ -389,7 +390,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         }
     }
     public void SetInputs(PlayerInput input) {
-        inputMode = input.inputMode;
+        // inputMode = input.inputMode;
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
 

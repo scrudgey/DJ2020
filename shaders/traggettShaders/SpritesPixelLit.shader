@@ -5,6 +5,7 @@ Shader "Sprite (Pixel Lit)"
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_Color ("Color", Color) = (1,1,1,1)
 		[MaterialToggle] _BILLBOARD ("_BILLBOARD", Float) = 0
+		[MaterialToggle] _FLIPX ("_FLIPX", Float) = 0
         
         _ScaleX ("Scale X", Float) = 1.0
         _ScaleY ("Scale Y", Float) = 1.0
@@ -80,6 +81,7 @@ Shader "Sprite (Pixel Lit)"
 				#pragma shader_feature _SPHERICAL_HARMONICS
 				#pragma shader_feature _FOG
                 #pragma shader_feature _BILLBOARD
+                #pragma shader_feature _FLIPX
 				
 				#pragma multi_compile_fwdbase
 				#pragma multi_compile_fog
@@ -115,6 +117,7 @@ Shader "Sprite (Pixel Lit)"
 				#pragma shader_feature _TEXTURE_BLEND
 				#pragma shader_feature _FOG
                 #pragma shader_feature _BILLBOARD
+                #pragma shader_feature _FLIPX
 				
 				#pragma multi_compile_fwdadd_fullshadows
 				#pragma multi_compile_fog

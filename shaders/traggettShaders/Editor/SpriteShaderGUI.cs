@@ -1,5 +1,5 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 public class SpriteShaderGUI : ShaderGUI {
     private static readonly string kShaderVertexLit = "Sprite (Vertex Lit)";
@@ -78,6 +78,7 @@ public class SpriteShaderGUI : ShaderGUI {
 
 
     private static GUIContent _billboardText = new GUIContent("Billboard", "Billboard");
+    private static GUIContent _flipText = new GUIContent("_FLIPX", "_FLIPX");
     private static GUIContent _albedoText = new GUIContent("Albedo", "Albedo (RGB) and Transparency (A)");
     private static GUIContent _altAlbedoText = new GUIContent("Secondary Albedo", "When a secondary albedo texture is set the albedo will be a blended mix of the two textures based on the blend value.");
     private static GUIContent _metallicMapText = new GUIContent("Metallic", "Metallic (R) and Smoothness (A)");
@@ -210,6 +211,12 @@ public class SpriteShaderGUI : ShaderGUI {
         {
             dataChanged |= RenderBillboardProperties();
         }
+
+        GUILayout.Label(_flipText, EditorStyles.boldLabel);
+        {
+            dataChanged |= RenderBillboardProperties();
+        }
+
 
         GUILayout.Label(_depthLabelText, EditorStyles.boldLabel);
         {
@@ -367,12 +374,15 @@ public class SpriteShaderGUI : ShaderGUI {
         EditorGUI.BeginChangeCheck();
         bool mixedValue;
         bool billboard = IsKeywordEnabled(_materialEditor, "_BILLBOARD", out mixedValue);
+        bool flipx = IsKeywordEnabled(_materialEditor, "_FLIPX", out mixedValue);
         EditorGUI.showMixedValue = mixedValue;
         billboard = BoldToggleField(_billboardText, billboard);
+        flipx = BoldToggleField(_flipText, flipx);
         EditorGUI.showMixedValue = false;
 
         if (EditorGUI.EndChangeCheck()) {
             SetKeyword(_materialEditor, "_BILLBOARD", billboard);
+            SetKeyword(_materialEditor, "_FLIPX", flipx);
             return true;
         }
         return false;

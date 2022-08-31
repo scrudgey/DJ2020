@@ -14,7 +14,8 @@ public enum CharacterState {
     landStun,
     dead,
     hitstun,
-    keelOver
+    keelOver,
+    aim
 }
 public enum ClimbingState {
     Anchoring,
@@ -163,6 +164,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         switch (state) {
             default:
                 break;
+            case CharacterState.aim:
+                GameManager.I.TransitionToInputMode(InputMode.aim);
+                break;
             case CharacterState.jumpPrep:
                 Toolbox.RandomizeOneShot(audioSource, jumpPrepSounds);
                 break;
@@ -189,12 +193,18 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
             case CharacterState.dead:
                 break;
+            case CharacterState.wallPress:
+                GameManager.I.TransitionToInputMode(InputMode.aim);
+                break;
         }
     }
 
     public void OnStateExit(CharacterState state, CharacterState toState) {
         switch (state) {
             default:
+                break;
+            case CharacterState.aim:
+                GameManager.I.TransitionToInputMode(InputMode.gun);
                 break;
             case CharacterState.landStun:
                 isCrouching = true;
@@ -310,23 +320,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
 
-        _inputTorque = input.torque;
 
         // Run input
         Motor.MaxStepHeight = stepHeight;
-        if (input.inputMode == InputMode.aim) {
-            isRunning = false;
-            isProne = false;
-
-            if (input.CrouchDown) {
-                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
-                if (!isCrouching) {
-                    isCrouching = true;
-                    Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
-                }
-                Motor.MaxStepHeight = crawlStepHeight;
-            }
-        } else if (input.runDown) {
+        if (input.runDown) {
             isRunning = true;
         } else {
             isRunning = false;
@@ -374,9 +371,38 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     _jumpRequested = true;
                 }
                 break;
-            case CharacterState.normal:
-                wallPressRatchet = false;
+            case CharacterState.aim:
+                isRunning = false;
+                isProne = false;
+                if (input.CrouchDown) {
+                    Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
+                    if (!isCrouching) {
+                        isCrouching = true;
+                        Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
+                    }
+                    Motor.MaxStepHeight = crawlStepHeight;
+                }
 
+                // Fire
+                gunHandler.ProcessGunSwitch(input);
+                gunHandler.SetInputs(input);
+
+                if (input.Fire.cursorData.screenPositionNormalized.x > 0.9) {
+                    _inputTorque = new Vector3(0f, -0.02f, 0f);
+                } else if (input.Fire.cursorData.screenPositionNormalized.x < 0.1) {
+                    _inputTorque = new Vector3(0f, 0.02f, 0f);
+                } else {
+                    _inputTorque = Vector3.zero;
+                }
+
+                if (input.Fire.AimPressed) {
+                    TransitionToState(CharacterState.normal);
+                }
+                break;
+            case CharacterState.normal:
+
+
+                wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
                     itemHandler.SetInputs(input);
@@ -411,20 +437,19 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
 
                 slewLookVector = Vector3.zero;
-                if (input.inputMode != InputMode.aim) {
-                    if (input.Fire.AimPressed || input.Fire.FireHeld || input.Fire.FirePressed) {
-                        Vector3 directionToCursor = cursorData.worldPosition - transform.position;
-                        directionToCursor.y = 0;
-                        snapToDirection = directionToCursor;
-                    } else if (input.orientTowardDirection != Vector3.zero) {
-                        slewLookVector = input.orientTowardDirection;
-                    } else if (input.orientTowardPoint != Vector3.zero) {
-                        slewLookVector = input.orientTowardPoint - transform.position;
-                    } else {
-                        slewLookVector = _moveInputVector;
-                    }
-                    slewLookVector.y = 0;
+                if (input.Fire.AimPressed || input.Fire.FireHeld || input.Fire.FirePressed) {
+                    Vector3 directionToCursor = cursorData.worldPosition - transform.position;
+                    directionToCursor.y = 0;
+                    snapToDirection = directionToCursor;
+                } else if (input.orientTowardDirection != Vector3.zero) {
+                    slewLookVector = input.orientTowardDirection;
+                } else if (input.orientTowardPoint != Vector3.zero) {
+                    slewLookVector = input.orientTowardPoint - transform.position;
+                } else {
+                    slewLookVector = _moveInputVector;
                 }
+                slewLookVector.y = 0;
+
                 if (input.Fire.AimPressed) {
                     snapToDirection = lookAtDirection;
                 }
@@ -448,10 +473,16 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     crouchMovementInputTimer = 0f;
                     crouchMovementInputTimer = 1f;
                 }
+
+                if (input.Fire.AimPressed) {
+                    TransitionToState(CharacterState.aim);
+                }
                 break;
             case CharacterState.wallPress:
                 // allow gun switch
                 gunHandler.ProcessGunSwitch(input);
+                // TODO: handle popout
+                // gunHandler.SetInputs(input);
 
                 // Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.75f);
                 if (_moveAxis != Vector2.zero) {
@@ -525,13 +556,17 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 slewLookVector = -1f * Motor.Velocity;
                 lookAtDirection = -1f * Motor.Velocity;
                 break;
+            case CharacterState.aim:
+                Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
+                currentRotation = torqueRotation * currentRotation;
+                break;
             case CharacterState.normal:
                 if (snapToDirection != Vector3.zero) {
                     Vector3 target = snapToDirection;
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
                 } else if (wallPressTimer > 0 && wallNormal != Vector3.zero) { // wall pressing
-                    // Smoothly interpolate from current to target look direction
+                                                                               // Smoothly interpolate from current to target look direction
                     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, wallNormal, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     // currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
@@ -544,8 +579,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     // Set the current rotation (which will be used by the KinematicCharacterMotor)
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 }
-                Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
-                currentRotation = torqueRotation * currentRotation;
                 break;
             case CharacterState.wallPress:
                 currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);
@@ -587,7 +620,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         return false;
     }
     bool DetectWallPress() {
-        if (_lastInput.inputMode == InputMode.aim)
+        if (state == CharacterState.aim)
             return false;
         if (wallNormal == Vector3.zero)
             return false;
@@ -753,6 +786,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     TransitionToState(CharacterState.normal);
                 }
                 break;
+            case CharacterState.aim:
             case CharacterState.normal:
                 if (Motor.GroundingStatus.IsStableOnGround) {
                     // Reorient velocity on slope
@@ -786,7 +820,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
                     targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
 
-                    if (GameManager.I.inputMode == InputMode.aim) {
+                    if (state == CharacterState.aim) {
                         if (isCrouching) {
                             targetMovementVelocity = Vector3.zero;
                         } else {
@@ -951,6 +985,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
             case CharacterState.dead:
                 break;
+            case CharacterState.aim:
             case CharacterState.normal:
                 // Handle jump-related values
                 // Handle jumping pre-ground grace period

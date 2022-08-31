@@ -18,7 +18,6 @@ namespace UI {
         public CursorData.TargetType state;
         public int pulseSize;
         Vector2 currentPosition;
-        InputMode lastInputMode;
 
         public void Update() {
             if (state == CursorData.TargetType.objectLock) {
@@ -66,7 +65,6 @@ namespace UI {
                 currentPosition = cursor.position;
                 state = data.type;
                 SetScale(data);
-                lastInputMode = GameManager.I.inputMode;
             } else {
                 cursorImage.enabled = false;
             }

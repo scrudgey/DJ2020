@@ -64,7 +64,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         scaleOffset = Vector3.zero;
     }
     void Update() {
-        // TODO: replace this with a coroutine initiated by animation input
+        // TODO: replace this with a coroutine initiated by animation input ?
         if (hitState == HitState.hitstun) {
             hitstunTimer += Time.deltaTime;
             if (hitstunTimer >= 0.01f) {
@@ -121,13 +121,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             isCrouching = input.isCrouching;
             crouchTransitionTimer = 0f;
         }
-        // if (!isCrawling && isMoving && isCrouching) {
-        //     isCrawling = true;
-        // }
-        // if (isCrawling && (!isCrouching || input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
-        //     isCrawling = false;
-        //     Debug.Log("unset isCrawling: false");
-        // }
         float scaleFactor = 1f;
         if (crouchTransitionTimer < 0.1f) {
             scaleFactor = (float)PennerDoubleAnimation.BounceEaseIn(crouchTransitionTimer, 1.1f, -0.1f, 0.1f);
@@ -156,7 +149,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
             case CharacterState.wallPress:
-                spriteRenderer.material.DisableKeyword("_BILLBOARD");
+                // spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
                     spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }
@@ -261,7 +254,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             Vector3 headPosition = headAnimation.transform.localPosition;
             headPosition.x *= -1f;
             headAnimation.transform.localPosition = headPosition;
-            headAnimation.spriteRenderer.flipX = spriteRenderer.flipX;
         }
 
         // record the rotated position

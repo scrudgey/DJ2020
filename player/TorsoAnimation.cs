@@ -83,7 +83,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
                 spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
             case CharacterState.wallPress:
-                spriteRenderer.material.DisableKeyword("_BILLBOARD");
+                // spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
                     spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }

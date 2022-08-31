@@ -8,7 +8,7 @@ public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
 public enum OverlayType { none, power, cyber }
 public enum CursorType { gun, pointer }
-public enum InputMode { none, gun, cyber, aim }
+public enum InputMode { none, gun, cyber, aim, wallpressAim }
 public struct PointerData {
     public Texture2D mouseCursor;
     public Vector2 hotSpot;
@@ -33,7 +33,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<OverlayType> OnOverlayChange;
-    public static Action<InputMode, InputMode> OnInputModeChange;
+    public static Action<InputMode, InputMode> OnInputModeChange; // TODO: legit? should be camera state change?
     public static Action<CursorType> OnCursorTypeChange;
     public static Action<String> OnCaptionChange;
     // UI state
@@ -187,7 +187,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.pointer;
-        TransitionToInputMode(InputMode.cyber);
+        TransitionToInputMode(InputMode.cyber); // TODO: ?
 
     }
     public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {

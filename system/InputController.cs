@@ -264,29 +264,12 @@ public class InputController : MonoBehaviour {
 
     private void HandleCharacterInput() {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
-
-        CursorData targetData = OrbitCamera.GetTargetData(cursorPosition);
-        Vector3 torque = Vector3.zero;
-        if (GameManager.I.inputMode == InputMode.aim) {
-            if (targetData.screenPositionNormalized.x > 0.9) {
-                torque = new Vector3(0f, -0.02f, 0f);
-            } else if (targetData.screenPositionNormalized.x < 0.1) {
-                torque = new Vector3(0f, 0.02f, 0f);
-            }
-        }
-
-        if (aimPressedThisFrame) {
-            if (GameManager.I.inputMode != InputMode.aim) {
-                GameManager.I.TransitionToInputMode(InputMode.aim);
-            } else {
-                GameManager.I.TransitionToInputMode(InputMode.gun);
-            }
-        }
+        CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
 
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
             PlayerInput characterInputs = new PlayerInput() {
-                inputMode = GameManager.I.inputMode,
+                // inputMode = GameManager.I.inputMode,
                 MoveAxisForward = inputVector.y,
                 MoveAxisRight = inputVector.x,
                 CameraRotation = OrbitCamera.isometricRotation,
@@ -309,7 +292,6 @@ public class InputController : MonoBehaviour {
                 incrementOverlay = incrementOverlayThisFrame,
                 rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
                 rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
-                torque = torque,
                 lookAtDirection = directionToCursor,
                 zoomInput = zoomInput
             };

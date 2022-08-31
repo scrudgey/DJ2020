@@ -35,9 +35,13 @@ inline float4 calculateWorldPos(float4 vertex)
 
 inline float4 calculateLocalPos(float4 vertex)  // billboard
 {
-#ifdef UNITY_INSTANCING_ENABLED
-    vertex.xy *= _Flip.xy;
-#endif
+// #ifdef UNITY_INSTANCING_ENABLED
+    // vertex.xy *= _Flip.xy;
+// #endif
+
+	#ifdef _FLIPX
+		vertex.x *= -1;
+	#endif
 
     float4 pos;
     #ifdef _BILLBOARD
