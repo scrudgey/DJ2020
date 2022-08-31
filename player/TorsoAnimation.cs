@@ -74,6 +74,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             case CharacterState.dead:
                 break;
             default:
+            case CharacterState.popout:
             case CharacterState.normal:
                 if (input.wallPressTimer > 0) {
                     spriteRenderer.material.DisableKeyword("_BILLBOARD");

@@ -140,6 +140,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 break;
             default:
             case CharacterState.normal:
+            case CharacterState.popout:
                 if (input.wallPressTimer > 0) {
                     spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 } else {

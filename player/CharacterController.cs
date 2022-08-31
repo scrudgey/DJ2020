@@ -114,19 +114,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private CharacterState _state;
     [Header("Popout")]
     private Vector3 popOutPosition;
-    private Vector3 _prePopPosition;
-    private Vector3 prePopPosition {
-        get { return _prePopPosition; }
-        set {
-            _prePopPosition = value;
-            Debug.Log($"setting prepop: {value}");
-        }
-    }
+    private Vector3 prePopPosition;
     private bool atRightEdge;
     private bool atLeftEdge;
     private Vector3 popLeftPosition;
     private Vector3 popRightPosition;
-    // private Vector3 returnToWallPressOffset;
     public CharacterState state {
         get { return _state; }
     }
@@ -473,9 +465,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 slewLookVector.y = 0;
 
-                if (input.Fire.AimPressed) {
-                    snapToDirection = lookAtDirection;
-                }
+                // if (input.Fire.AimPressed) {
+                //     snapToDirection = lookAtDirection;
+                // }
                 if (input.snapToLook) {
                     if (input.lookAtPosition != Vector3.zero) {
                         snapToDirection = input.lookAtPosition - transform.position;
@@ -509,12 +501,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 break;
             case CharacterState.wallPress:
-                // allow gun switch
-                input.Fire.FireHeld = false;
-                input.Fire.FirePressed = false;
 
-                gunHandler.ProcessGunSwitch(input);
-                gunHandler.SetInputs(input);
                 // TODO: handle popout
                 // gunHandler.SetInputs(input);
 
@@ -530,19 +517,23 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
 
                 // transition to popout
-                if (input.Fire.AimPressed) {
+                if (input.Fire.AimPressed || input.Fire.FirePressed) {
                     if (atLeftEdge) {
                         popOutPosition = popLeftPosition;
                         prePopPosition = transform.position;
-                        Debug.Log(prePopPosition);
                         TransitionToState(CharacterState.popout);
                     } else if (atRightEdge) {
                         popOutPosition = popRightPosition;
                         prePopPosition = transform.position;
-                        Debug.Log(prePopPosition);
                         TransitionToState(CharacterState.popout);
                     }
                 }
+
+                // allow gun switch
+                input.Fire.FireHeld = false;
+                input.Fire.FirePressed = false;
+                gunHandler.ProcessGunSwitch(input);
+                gunHandler.SetInputs(input);
 
                 break;
             case CharacterState.climbing:
@@ -607,6 +598,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 lookAtDirection = -1f * Motor.Velocity;
                 break;
             case CharacterState.aim:
+                if (snapToDirection != Vector3.zero) {
+                    Vector3 target = snapToDirection;
+                    target.y = 0;
+                    currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                }
                 Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
                 currentRotation = torqueRotation * currentRotation;
                 break;
@@ -1088,14 +1084,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (_moveAxis.x > 0.5f || _moveAxis.x < -0.5f) {
                     direction = Quaternion.AngleAxis(90f, transform.up) * direction * Mathf.Sign(lastWallInput.x) * -1f;
                 }
-                Debug.Log(prePopPosition);
                 if (prePopPosition != Vector3.zero) {
                     Vector3 prepopDelta = prePopPosition - transform.position;
-                    Debug.Log(prepopDelta.magnitude);
                     if (prepopDelta.magnitude > 0.01f) {
                         Vector3 returningPosition = Vector3.Lerp(transform.position, prePopPosition, 0.5f);
                         Motor.SetPosition(returningPosition);
-                        Debug.Log(returningPosition);
                     } else {
                         prePopPosition = Vector3.zero;
                     }

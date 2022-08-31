@@ -1147,6 +1147,10 @@ Q: what is the proper solution?
 * bug: aim indicator in aim mode
 * lock radius in aim mode
 * bug: boxes in aim mode
+* is inputmode being used redundantly with characterstate?
+* bug: outline flip x backwards
+* aim indicator in wallpress mode
+* bug: jump to aim orientation is using player direction, not direction to cursor
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1312,10 +1316,6 @@ third grid: alarm systems
     alarm routers
 
 
-* is inputmode being used redundantly with characterstate?
-* bug: outline flip x backwards
-* aim indicator in wallpress mode
-bug: jump to aim orientation is using player direction, not direction to cursor
 aim mode could track camera better
 more thorough search task
     choose a second position
@@ -1323,6 +1323,11 @@ more thorough search task
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
     track direction you were moving
+
+popout
+    * fix orientations
+    fix camera in position 
+    move backwards to move out of popout mode
 
 don't radio HQ if HQ is already being radioed
     on task initialize, check all other sphereais and their currently running task?
