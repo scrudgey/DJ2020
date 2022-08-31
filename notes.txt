@@ -1175,10 +1175,10 @@ nice to have / future goals:
     off-screen indicator for active threats?
     pixel perfect shaders
     apply skin graphics to corpse
-    - animation shows recoil
-    - laser pointer attachment
-    - flashlight attachment
-    - head look around if player has been idle
+    animation shows recoil
+    laser pointer attachment
+    flashlight attachment
+    head look around if player has been idle
     make elevator
     if an NPC sees another NPC shooting at something, look / search in that direction
     NPC better take cover
@@ -1190,6 +1190,8 @@ nice to have / future goals:
             run to the alarm panel if there is no HQ
                 do nothing if there is no alarm panel
             how to decide who to run to alarm panel?
+    the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
+        i.e. using yellow just resolves to red? 
 
 
 try to pop around a corner and aim: it doesn't work
@@ -1272,7 +1274,7 @@ graph system:
 control / combat:
     better shotgun
     aim: fixed angular size
-    pop out from wall
+    * pop out from wall
 
 sound
     ambience
@@ -1310,9 +1312,10 @@ third grid: alarm systems
     alarm routers
 
 
-
+* is inputmode being used redundantly with characterstate?
 * bug: outline flip x backwards
-aim indicator in wallpress mode
+* aim indicator in wallpress mode
+bug: jump to aim orientation is using player direction, not direction to cursor
 aim mode could track camera better
 more thorough search task
     choose a second position
@@ -1324,9 +1327,3 @@ more thorough search task
 don't radio HQ if HQ is already being radioed
     on task initialize, check all other sphereais and their currently running task?
 
-the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
-i.e. using yellow just resolves to red? 
-
-is inputmode being used redundantly with characterstate?
-inputmode aim should just be 
-input controller needs to know if we are in aim or not 

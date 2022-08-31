@@ -269,7 +269,6 @@ public class InputController : MonoBehaviour {
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
             PlayerInput characterInputs = new PlayerInput() {
-                // inputMode = GameManager.I.inputMode,
                 MoveAxisForward = inputVector.y,
                 MoveAxisRight = inputVector.x,
                 CameraRotation = OrbitCamera.isometricRotation,

@@ -15,7 +15,8 @@ public enum CharacterState {
     dead,
     hitstun,
     keelOver,
-    aim
+    aim,
+    popout
 }
 public enum ClimbingState {
     Anchoring,
@@ -111,6 +112,21 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public Vector3 wallNormal = Vector3.zero;
     public Vector2 lastWallInput = Vector2.zero;
     private CharacterState _state;
+    [Header("Popout")]
+    private Vector3 popOutPosition;
+    private Vector3 _prePopPosition;
+    private Vector3 prePopPosition {
+        get { return _prePopPosition; }
+        set {
+            _prePopPosition = value;
+            Debug.Log($"setting prepop: {value}");
+        }
+    }
+    private bool atRightEdge;
+    private bool atLeftEdge;
+    private Vector3 popLeftPosition;
+    private Vector3 popRightPosition;
+    // private Vector3 returnToWallPressOffset;
     public CharacterState state {
         get { return _state; }
     }
@@ -164,6 +180,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
         switch (state) {
             default:
                 break;
+            case CharacterState.popout:
             case CharacterState.aim:
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
@@ -202,6 +219,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public void OnStateExit(CharacterState state, CharacterState toState) {
         switch (state) {
             default:
+                break;
+            case CharacterState.popout:
+                // if (toState == CharacterState.wallPress) {
+                //     returnToWallPressOffset = prePopPosition - transform.position;
+                // }
+                // Motor.SetPosition(prePopPosition);
                 break;
             case CharacterState.aim:
                 GameManager.I.TransitionToInputMode(InputMode.gun);
@@ -478,9 +501,20 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     TransitionToState(CharacterState.aim);
                 }
                 break;
+            case CharacterState.popout:
+                gunHandler.ProcessGunSwitch(input);
+                gunHandler.SetInputs(input);
+                if (input.Fire.AimPressed) {
+                    TransitionToState(CharacterState.wallPress);
+                }
+                break;
             case CharacterState.wallPress:
                 // allow gun switch
+                input.Fire.FireHeld = false;
+                input.Fire.FirePressed = false;
+
                 gunHandler.ProcessGunSwitch(input);
+                gunHandler.SetInputs(input);
                 // TODO: handle popout
                 // gunHandler.SetInputs(input);
 
@@ -494,6 +528,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     _moveInputVector = Vector3.zero;
                     _moveAxis = Vector2.zero;
                 }
+
+                // transition to popout
+                if (input.Fire.AimPressed) {
+                    if (atLeftEdge) {
+                        popOutPosition = popLeftPosition;
+                        prePopPosition = transform.position;
+                        Debug.Log(prePopPosition);
+                        TransitionToState(CharacterState.popout);
+                    } else if (atRightEdge) {
+                        popOutPosition = popRightPosition;
+                        prePopPosition = transform.position;
+                        Debug.Log(prePopPosition);
+                        TransitionToState(CharacterState.popout);
+                    }
+                }
+
                 break;
             case CharacterState.climbing:
                 if (input.jumpReleased) {
@@ -580,6 +630,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Vector3.up);
                 }
                 break;
+            case CharacterState.popout:
+                currentRotation = Quaternion.LookRotation(-1f * wallNormal, Vector3.up);
+                break;
             case CharacterState.wallPress:
                 currentRotation = Quaternion.LookRotation(wallNormal, Vector3.up);
                 break;
@@ -624,17 +677,27 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             return false;
         if (wallNormal == Vector3.zero)
             return false;
+        if (prePopPosition != Vector3.zero)
+            return true;
         return ColliderRay(new Vector3(0f, wallPressHeight, 0f));
     }
     bool AtRightEdge() {
-        if (wallNormal == Vector3.zero)
+        if (wallNormal == Vector3.zero) {
+            popRightPosition = transform.position;
             return false;
-        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + 0.4f * Motor.CharacterRight);
+        }
+        Vector3 offset = new Vector3(0f, wallPressHeight, 0f) + 0.4f * Motor.CharacterRight;
+        popRightPosition = transform.position + Motor.CharacterRight;
+        return !ColliderRay(offset);
     }
     bool AtLeftEdge() {
-        if (wallNormal == Vector3.zero)
+        if (wallNormal == Vector3.zero) {
+            popLeftPosition = transform.position;
             return false;
-        return !ColliderRay(new Vector3(0f, wallPressHeight, 0f) + -0.4f * Motor.CharacterRight);
+        }
+        Vector3 offset = new Vector3(0f, wallPressHeight, 0f) - 0.4f * Motor.CharacterRight;
+        popLeftPosition = transform.position - Motor.CharacterRight;
+        return !ColliderRay(offset);
     }
 
     Ladder GetOverlappingLadder() {
@@ -741,16 +804,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     _jumpedFromLadder = false;
                 }
                 break;
+            case CharacterState.popout:
+                currentVelocity = Vector3.zero;
+                break;
             case CharacterState.wallPress:
                 currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
 
-                // wall style input is relative to the wall normal
-                if (AtRightEdge()) {
+                atLeftEdge = AtLeftEdge();
+                atRightEdge = AtRightEdge();
+                if (atRightEdge) {
                     _moveAxis.x = Mathf.Max(0, _moveAxis.x);
                 }
-                if (AtLeftEdge()) {
+                if (atLeftEdge) {
                     _moveAxis.x = Mathf.Min(0, _moveAxis.x);
                 }
+
+                // wall style input is relative to the wall normal
                 targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
 
                 // transition from wall press 
@@ -985,6 +1054,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 break;
             case CharacterState.dead:
                 break;
+            case CharacterState.popout:
+                Vector3 newPosition = Vector3.Lerp(transform.position, popOutPosition, 0.5f);
+                Motor.SetPosition(newPosition);
+                direction = Motor.CharacterForward;
+                break;
             case CharacterState.aim:
             case CharacterState.normal:
                 // Handle jump-related values
@@ -1014,6 +1088,19 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (_moveAxis.x > 0.5f || _moveAxis.x < -0.5f) {
                     direction = Quaternion.AngleAxis(90f, transform.up) * direction * Mathf.Sign(lastWallInput.x) * -1f;
                 }
+                Debug.Log(prePopPosition);
+                if (prePopPosition != Vector3.zero) {
+                    Vector3 prepopDelta = prePopPosition - transform.position;
+                    Debug.Log(prepopDelta.magnitude);
+                    if (prepopDelta.magnitude > 0.01f) {
+                        Vector3 returningPosition = Vector3.Lerp(transform.position, prePopPosition, 0.5f);
+                        Motor.SetPosition(returningPosition);
+                        Debug.Log(returningPosition);
+                    } else {
+                        prePopPosition = Vector3.zero;
+                    }
+                }
+
                 CheckUncrouch();
                 break;
             case CharacterState.jumpPrep:

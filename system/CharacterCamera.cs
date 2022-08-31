@@ -218,7 +218,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
-        if (input.state == CharacterState.aim) {
+        if (input.state == CharacterState.aim || input.state == CharacterState.popout) {
             camState = CameraState.aim;
         } else if (input.state == CharacterState.wallPress) {
             camState = CameraState.wallPress;

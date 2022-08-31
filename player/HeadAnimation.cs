@@ -36,6 +36,9 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                         direction = Direction.right;
                     }
                 }
+                if (input.playerInputs.MoveAxisRight != 0) {
+                    spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
+                }
                 break;
             case CharacterState.climbing:
             case CharacterState.superJump:
@@ -53,6 +56,8 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
                 } else {
                     spriteRenderer.material.EnableKeyword("_BILLBOARD");
                 }
+                spriteRenderer.flipX = direction == Direction.left || direction == Direction.leftUp || direction == Direction.leftDown;
+
                 break;
             default:
                 break;
@@ -60,7 +65,6 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
         if (torsoSpriteData.overrideHeadDirection) {
             direction = input.orientation;
         }
-        spriteRenderer.flipX = direction == Direction.left || direction == Direction.leftUp || direction == Direction.leftDown;
         UpdateFrame(torsoSpriteData);
     }
     public void SpawnTrail() {

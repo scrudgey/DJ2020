@@ -13,7 +13,6 @@ namespace AI {
             input.orientTowardPoint = fireData.cursorData.worldPosition;
             input.orientTowardPoint.y = 0;
             input.Fire = fireData;
-            // input.inputMode = InputMode.gun;
             input.lookAtPosition = fireData.cursorData.worldPosition;
             return TaskState.running;
         }
