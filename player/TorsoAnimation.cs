@@ -85,6 +85,8 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
                 break;
             case CharacterState.wallPress:
                 // spriteRenderer.material.DisableKeyword("_BILLBOARD");
+                transform.localRotation = Quaternion.identity;
+                spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {
                     spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }

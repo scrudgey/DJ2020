@@ -145,15 +145,18 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                     spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 } else {
                     spriteRenderer.material.EnableKeyword("_BILLBOARD");
-                    // spriteRenderer.material.IsKeywordEnabled("_BILLBOARD");
                 }
                 spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
             case CharacterState.wallPress:
                 // spriteRenderer.material.DisableKeyword("_BILLBOARD");
+                transform.localRotation = Quaternion.identity;
+                spriteRenderer.material.DisableKeyword("_BILLBOARD");
+
                 if (input.playerInputs.MoveAxisRight != 0) {
                     spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }
+                Debug.Log($"{spriteRenderer.flipX} {input.playerInputs.MoveAxisRight}");
                 break;
         }
 

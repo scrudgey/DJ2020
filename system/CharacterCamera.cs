@@ -10,18 +10,6 @@ using UnityEngine.Rendering.PostProcessing;
 // TODO: eliminate this enum
 public enum CameraState { normal, wallPress, attractor, aim }
 
-public struct CameraInput {
-    public enum RotateInput { none, left, right }
-    public float deltaTime;
-    public Vector3 wallNormal;
-    public Vector2 lastWallInput;
-    public bool crouchHeld;
-    public Vector3 playerPosition;
-    public CharacterState state;
-    public CursorData targetData;
-    public Vector3 playerDirection;
-    public Vector3 playerLookDirection;
-}
 public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private CameraState _state;
     public CameraState state {
@@ -218,9 +206,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
-        if (input.state == CharacterState.aim || input.state == CharacterState.popout) {
+        if (input.state == CharacterState.aim) {
             camState = CameraState.aim;
-        } else if (input.state == CharacterState.wallPress) {
+        } else if (input.state == CharacterState.wallPress || input.state == CharacterState.popout) {
             camState = CameraState.wallPress;
         } else {
             // check / update Attractor
@@ -237,47 +225,32 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         if (transitionTime < 1) {
             transitionTime += Time.deltaTime;
         }
-        switch (camState) {
+        transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
+
+        switch (state) {
+            case CameraState.attractor:
+                ApplyTargetParameters(AttractorParameters(input));
+                volume.profile = isometricProfile;
+                break;
             default:
             case CameraState.normal:
                 RenderSettings.skybox = isometricSkybox;
+                ApplyTargetParameters(NormalParameters(input));
+                volume.profile = isometricProfile;
                 break;
             case CameraState.wallPress:
+                RenderSettings.skybox = wallPressSkybox;
+                ApplyTargetParameters(WallPressParameters(input));
+                volume.profile = wallPressProfile;
+                break;
             case CameraState.aim:
                 RenderSettings.skybox = wallPressSkybox;
+                ApplyTargetParameters(AimParameters(input));
+                volume.profile = aimProfile;
                 break;
         }
-        transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
+    }
 
-        if (state == CameraState.attractor) {
-            ApplyTargetParameters(AttractorParameters(input));
-            volume.profile = isometricProfile;
-        } else if (state == CameraState.normal) {
-            ApplyTargetParameters(NormalParameters(input));
-            volume.profile = isometricProfile;
-        } else if (state == CameraState.wallPress) {
-            ApplyTargetParameters(WallPressParameters(input));
-            volume.profile = wallPressProfile;
-        } else if (state == CameraState.aim) {
-            ApplyTargetParameters(AimParameters(input));
-            volume.profile = aimProfile;
-        }
-    }
-    public class CameraTargetParameters {
-        public float fieldOfView;
-        public float deltaTime;
-        public Quaternion rotation;
-        public Quaternion snapToRotation;
-        public bool orthographic;
-        public float orthographicSize;
-        public float targetDistance;
-        public Vector3 targetPosition;
-        public float followingSharpness;
-        public float distanceMovementSpeed;
-        public float distanceMovementSharpness;
-        public CharacterState state; // TODO: remove this
-        public Vector3 playerDirection;
-    }
     public CameraTargetParameters NormalParameters(CameraInput input) {
         Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
 
@@ -317,7 +290,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             targetDistance = 20,
             targetPosition = targetPosition,
             orthographicSize = 6, // 8 TODO: set by attractor and/or level
-            // orthographicSize = 3, // 8 TODO: set by attractor and/or level
+                                  // orthographicSize = 3, // 8 TODO: set by attractor and/or level
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
             distanceMovementSpeed = currentDistanceMovementSpeed,
@@ -348,19 +321,29 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             heightOffset = new Vector3(0, -0.75f, 0);
         }
 
+        Vector3 horizontalOffset = Vector3.zero;
+        if (input.state == CharacterState.popout) {
+            float horizontalParity = input.popoutParity switch {
+                PopoutParity.left => 1f,
+                PopoutParity.right => -1f,
+                _ => 1f
+            };
+            horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection) * 1.5f;
+        }
+
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
         Vector3 camDirection = -1f * input.wallNormal;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
 
         return new CameraTargetParameters() {
-            fieldOfView = 70f,
+            fieldOfView = 50f,
             orthographic = false,
             rotation = planarRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
-            targetPosition = FollowTransform.position + distOffset + LROffset + heightOffset,
+            targetPosition = FollowTransform.position + distOffset + LROffset + heightOffset + horizontalOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -631,6 +614,9 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         bool prioritySet = false;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            if (hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform.root)) {
+                continue;
+            }
             Highlightable interactive = hit.collider.GetComponent<Highlightable>();
             if (interactive != null) {
                 targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));

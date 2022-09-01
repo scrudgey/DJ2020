@@ -1309,6 +1309,7 @@ stealth:
     better reaction to footsteps
         when there is any suspicion, stop and investigate
     redo how footsteps work?
+    slower patrols?
 
 third grid: alarm systems
     cameras
@@ -1326,7 +1327,7 @@ more thorough search task
 
 popout
     * fix orientations
-    fix camera in position 
+    * fix camera in position 
     move backwards to move out of popout mode
 
 don't radio HQ if HQ is already being radioed

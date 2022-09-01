@@ -23,7 +23,9 @@ public enum ClimbingState {
     Climbing,
     DeAnchoring
 }
-
+public enum PopoutParity {
+    left, right
+}
 public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber, IPoolable {
     public KinematicCharacterMotor Motor;
     public CharacterHurtable characterHurtable;
@@ -119,6 +121,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     private bool atLeftEdge;
     private Vector3 popLeftPosition;
     private Vector3 popRightPosition;
+    private PopoutParity popoutParity;
     public CharacterState state {
         get { return _state; }
     }
@@ -496,8 +499,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             case CharacterState.popout:
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
+                if (input.lookAtDirection != Vector3.zero) {
+                    lookAtDirection = input.lookAtDirection;
+                }
                 if (input.Fire.AimPressed) {
                     TransitionToState(CharacterState.wallPress);
+                }
+                if (Math.Abs(input.MoveAxis().y) > 0.1) {
+                    TransitionToState(CharacterState.normal);
                 }
                 break;
             case CharacterState.wallPress:
@@ -521,10 +530,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                     if (atLeftEdge) {
                         popOutPosition = popLeftPosition;
                         prePopPosition = transform.position;
+                        popoutParity = PopoutParity.left;
                         TransitionToState(CharacterState.popout);
                     } else if (atRightEdge) {
                         popOutPosition = popRightPosition;
                         prePopPosition = transform.position;
+                        popoutParity = PopoutParity.right;
                         TransitionToState(CharacterState.popout);
                     }
                 }
@@ -863,6 +874,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                             Toolbox.RandomizeOneShot(audioSource, wallPressSounds);
                         }
                         wallPressTimer += Time.deltaTime;
+                        prePopPosition = Vector3.zero;
+
 
                         // transition to wallpress mode
                         if (wallPressTimer > wallPressThreshold) {
@@ -1209,7 +1222,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             state = state,
             targetData = lastTargetDataInput,
             playerDirection = direction,
-            playerLookDirection = lookAtDirection
+            playerLookDirection = lookAtDirection,
+            popoutParity = popoutParity
         };
         return input;
     }

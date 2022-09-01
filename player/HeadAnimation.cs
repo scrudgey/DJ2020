@@ -15,7 +15,6 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
 
                 // TODO: should not belong to animation code
                 transform.localRotation = Quaternion.identity;
-
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.isCrouching) { // crouching
                     if (direction == Direction.right || direction == Direction.down) {
