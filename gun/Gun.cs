@@ -24,10 +24,12 @@ public class Gun : ScriptableObject {
     public float lockOnSize = 1f;
     public LoHi baseDamage;
     public Sprite image;
+    public bool silencer;
 
 
     [Header("Resources")]
     public AudioClip[] shootSounds;
+    public AudioClip[] silencedSounds;
     public AudioClip[] clipOut;
     public AudioClip[] clipIn;
     public AudioClip[] unholster;
@@ -47,11 +49,24 @@ public class Gun : ScriptableObject {
         return Random.Range(baseDamage.low, baseDamage.high);
     }
     public NoiseData shootNoise() {
-        return new NoiseData() {
-            volume = noise,
-            suspiciousness = Suspiciousness.aggressive,
-            pitch = pitch,
-            isGunshot = true
-        };
+        if (silencer) {
+            return new NoiseData() {
+                volume = noise / 10f,
+                suspiciousness = Suspiciousness.suspicious,
+                pitch = pitch,
+                isGunshot = true
+            };
+        } else {
+            return new NoiseData() {
+                volume = noise,
+                suspiciousness = Suspiciousness.aggressive,
+                pitch = pitch,
+                isGunshot = true
+            };
+        }
+
+    }
+    public AudioClip[] GetShootSounds() {
+        return silencer ? silencedSounds : shootSounds;
     }
 }

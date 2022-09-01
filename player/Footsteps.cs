@@ -5,17 +5,20 @@ using UnityEngine;
 
 public class Footsteps : MonoBehaviour {
     public AudioSource audioSource;
-    public AudioClip[] grassSounds;
-    public AudioClip[] defaultSounds;
-    public AudioClip[] metalSounds;
-    public AudioClip[] bushSounds;
+
     public float timer;
     private AudioClip leftFoot;
     private AudioClip rightFoot;
     private bool onRightFoot;
     private SurfaceType lastSurfaceType;
+    private FootstepData footstepData;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.minDistance = 2f;
+        audioSource.maxDistance = 10.42f;
+        audioSource.rolloffMode = AudioRolloffMode.Linear;
+        audioSource.spatialBlend = 1f;
+        footstepData = Resources.Load("data/footstep/default") as FootstepData;
     }
     public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {
         if (velocity.magnitude <= 0.01) {
@@ -29,12 +32,24 @@ public class Footsteps : MonoBehaviour {
             if (timer <= 0) {
                 onRightFoot = !onRightFoot;
                 timer = 1f;
-                if (onRightFoot) {
-                    Toolbox.RandomizeOneShot(audioSource, rightFoot);
-                } else {
-                    Toolbox.RandomizeOneShot(audioSource, leftFoot);
+
+                float volume = lastSurfaceType switch {
+                    SurfaceType.grass => 0.5f,
+                    SurfaceType.tile => 2.8f,
+                    SurfaceType.metal => 3f,
+                    SurfaceType.normal => 1.5f,
+                    SurfaceType.tree => 2f,
+                    _ => 1.5f
+                };
+                if (isRunning) {
+                    volume *= 3f;
                 }
-                float volume = isRunning ? 4f : 1.5f;
+
+                if (onRightFoot) {
+                    Toolbox.RandomizeOneShot(audioSource, rightFoot, volume: volume);
+                } else {
+                    Toolbox.RandomizeOneShot(audioSource, leftFoot, volume: volume);
+                }
 
                 NoiseData noise = new NoiseData {
                     player = gameObject == GameManager.I.playerObject,
@@ -57,7 +72,7 @@ public class Footsteps : MonoBehaviour {
         // TODO: use surface map.
 
         TagSystemData data = new TagSystemData();
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, -1f * transform.up, 0.5f); // get all hits
+        RaycastHit[] hits = Physics.RaycastAll(transform.position + 0.1f * Vector3.up, -1f * transform.up, 0.5f, LayerUtil.GetMask(Layer.def)); // get all hits
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found
             if (hit.collider.isTrigger)
                 continue;
@@ -71,18 +86,7 @@ public class Footsteps : MonoBehaviour {
         return data.surfaceSoundType;
     }
     public void SetFootstepSounds(SurfaceType surfaceType) {
-        AudioClip[] soundSet = defaultSounds;
-        switch (surfaceType) {
-            case SurfaceType.grass:
-                soundSet = grassSounds;
-                break;
-            case SurfaceType.metal:
-                soundSet = metalSounds;
-                break;
-            case SurfaceType.tree:
-                soundSet = bushSounds;
-                break;
-        }
+        AudioClip[] soundSet = footstepData.GetSoundSet(surfaceType);
         leftFoot = Toolbox.RandomFromList(soundSet);
         rightFoot = Toolbox.RandomFromList(soundSet);
     }

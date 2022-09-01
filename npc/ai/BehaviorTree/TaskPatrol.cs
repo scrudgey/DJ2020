@@ -32,7 +32,7 @@ namespace AI {
                 new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
                 new TaskMoveToKey(transform, NAV_POINT_KEY) {
                     headBehavior = TaskMoveToKey.HeadBehavior.casual,
-                    speedCoefficient = 0.5f
+                    speedCoefficient = 0.35f
                 }
             ));
             this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());

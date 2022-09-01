@@ -213,29 +213,38 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
         EmitBullet(input);
 
         // play sound
-        // TODO: change depending on silencer
         NoiseData noiseData = gunInstance.GetShootNoise();
         noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
-        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.shootSounds));
+        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.GetShootSounds()));
         Toolbox.Noise(gunPosition(), noiseData);
 
         // flash
-        // TODO: change depending on silencer
-        muzzleFlashLight.enabled = true;
-        StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
-            muzzleFlashLight.enabled = false;
-        }));
+        if (!gunInstance.baseGun.silencer) {
+            muzzleFlashLight.enabled = true;
+            StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
+                muzzleFlashLight.enabled = false;
+            }));
+        }
 
         // muzzleflash obj
-        // TODO: change depending on silencer
-        GameObject muzzleFlashObj = GameObject.Instantiate(
-            gunInstance.baseGun.muzzleFlash,
-            gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
-            Quaternion.LookRotation(transform.up, gunDirection(input))
-            );
-        muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one;
-        GameObject.Destroy(muzzleFlashObj, 0.05f);
+        if (gunInstance.baseGun.silencer) {
+            GameObject muzzleFlashObj = GameObject.Instantiate(
+                gunInstance.baseGun.muzzleFlash,
+                gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
+                Quaternion.LookRotation(transform.up, gunDirection(input))
+                );
+            muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one * 0.1f;
+            GameObject.Destroy(muzzleFlashObj, 0.05f);
+        } else {
+            GameObject muzzleFlashObj = GameObject.Instantiate(
+                gunInstance.baseGun.muzzleFlash,
+                gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
+                Quaternion.LookRotation(transform.up, gunDirection(input))
+                );
+            muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one;
+            GameObject.Destroy(muzzleFlashObj, 0.05f);
+        }
 
         // shell casing
         if (gunInstance.baseGun.type != GunType.shotgun) {
@@ -250,14 +259,15 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
 
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
             CharacterCamera.Shake(gunInstance.baseGun.noise / 50f, 0.1f);
-            // GameManager.I.RemoveSuspicionRecord(BrandishingWeaponRecord);
-            SuspicionRecord record = new SuspicionRecord {
-                content = "shooting gun",
-                suspiciousness = Suspiciousness.aggressive,
-                maxLifetime = 1f,
-                lifetime = 1f
-            };
-            GameManager.I.AddSuspicionRecord(record);
+            if (!gunInstance.baseGun.silencer) {
+                SuspicionRecord record = new SuspicionRecord {
+                    content = "shooting gun",
+                    suspiciousness = Suspiciousness.aggressive,
+                    maxLifetime = 1f,
+                    lifetime = 1f
+                };
+                GameManager.I.AddSuspicionRecord(record);
+            }
         }
     }
     public void EmitShell() {

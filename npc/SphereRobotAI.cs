@@ -295,7 +295,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
-        if (noise.data.isGunshot) {
+        if (noise.data.isGunshot && noise.data.suspiciousness > Suspiciousness.suspicious) {
             if (noise.data.player) {
                 lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
             } else {
@@ -327,6 +327,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
         } else if (noise.data.player) {
             lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
+
+            // TODO: handle footsteps here
+
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 SuspicionRecord record = new SuspicionRecord {
                     content = "a suspicious noise was heard",
@@ -348,6 +351,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                         break;
                 }
+            } else if (noise.data.isFootsteps) {
+
             }
         } else {
             // not player

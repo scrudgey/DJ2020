@@ -33,12 +33,16 @@ public class PlayerData {
     public bool disguise;
 
     public static PlayerData DefaultGameData() {
-        return new PlayerData() {
+        Gun gun1 = Gun.Load("smg");
+        Gun gun2 = Gun.Load("pistol");
+        Gun gun3 = Gun.Load("shotgun");
 
-            // primaryGun = new GunInstance(Gun.Load("rifle")),
-            primaryGun = new GunInstance(Gun.Load("smg")),
-            secondaryGun = new GunInstance(Gun.Load("pistol")),
-            tertiaryGun = new GunInstance(Gun.Load("shotgun")),
+        gun1.silencer = true;
+        gun2.silencer = true;
+        return new PlayerData() {
+            primaryGun = new GunInstance(gun1),
+            secondaryGun = new GunInstance(gun2),
+            tertiaryGun = new GunInstance(gun3),
             activeGun = 2,
 
             // legSkin = "generic64",

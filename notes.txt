@@ -1151,7 +1151,22 @@ Q: what is the proper solution?
 * bug: outline flip x backwards
 * aim indicator in wallpress mode
 * bug: jump to aim orientation is using player direction, not direction to cursor
+* popout
+    * fix orientations
+    * fix camera in position 
+    * move backwards to move out of popout mode
+* silencers
+    * affect sound
+    * affect noise
+    * affect muzzle flash
+* louder / better footsteps
+    * footstep audio volume should match noise level
+    * NPC footsteps should be louder
+* redo how footsteps work?
+    * slower patrols
 
+
+    
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
@@ -1290,26 +1305,18 @@ sound
 
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
+
 stealth:
-    silencers
-        affect sound
-        affect noise
-        affect graphic
-        affect muzzle flash
+    silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
     NPC investigate routine
     NPC reacts to corpses
     NPC reacts when seeing another shot
     NPC reacts when seeing another shooting
     NPC should see you in deep shadow when they get close
-    louder / better footsteps
-        footstep audio volume should match noise level
-        NPC footsteps should be louder
-        footstep sound and volume should be significant to stealth
     better reaction to footsteps
         when there is any suspicion, stop and investigate
-    redo how footsteps work?
-    slower patrols?
+    occasional pauses in patrol
 
 third grid: alarm systems
     cameras
@@ -1317,6 +1324,7 @@ third grid: alarm systems
     alarm routers
 
 
+shoot in orthographic mode isn't aiming as expected
 aim mode could track camera better
 more thorough search task
     choose a second position
@@ -1324,11 +1332,6 @@ more thorough search task
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
     track direction you were moving
-
-popout
-    * fix orientations
-    * fix camera in position 
-    move backwards to move out of popout mode
 
 don't radio HQ if HQ is already being radioed
     on task initialize, check all other sphereais and their currently running task?

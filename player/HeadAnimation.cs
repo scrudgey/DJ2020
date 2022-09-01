@@ -45,6 +45,7 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
             case CharacterState.jumpPrep:
             case CharacterState.normal:
             case CharacterState.popout:
+            case CharacterState.aim:
                 Vector3 lookDirection = input.lookAtDirection;
                 lookDirection.y = 0;
                 Vector2 headDir = new Vector2(lookDirection.x, lookDirection.z);

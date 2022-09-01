@@ -26,13 +26,13 @@ public class Toolbox {
     static public T RandomFromList<T>(IReadOnlyList<T> list) {
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
-    static public void RandomizeOneShot(AudioSource audioSource, AudioClip audioClip, float randomPitchWidth = 0.2f) {
+    static public void RandomizeOneShot(AudioSource audioSource, AudioClip audioClip, float randomPitchWidth = 0.2f, float volume = 1f) {
         if (!audioSource.isActiveAndEnabled)
             return;
         if (randomPitchWidth > 0) {
             audioSource.pitch = UnityEngine.Random.Range(1 - (randomPitchWidth / 2f), 1 + (randomPitchWidth / 2f));
         }
-        audioSource.PlayOneShot(audioClip);
+        audioSource.PlayOneShot(audioClip, volume);
     }
     static public string NameWithoutClone(GameObject gameObject) {
         return CloneRemover(gameObject.name);
