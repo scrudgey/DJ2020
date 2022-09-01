@@ -49,14 +49,14 @@ public class Gib {
     }
     void EmitParticleSystem(GameObject host, Damage damage, Collider collider) {
         Vector3 direction = (directional * damage.direction) + ((1 - directional) * Vector3.up);
-        direction = (dispersion.Random() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
+        direction = (dispersion.GetRandomInsideBound() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
         GameObject fx = PoolManager.I.GetPool(prefab).GetObject(collider.bounds.center);
         fx.transform.SetParent(host.transform, true);
         fx.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
         fx.transform.position = damage.position;
     }
     void EmitParticle(Damage damage, Collider bounds) {
-        int num = (int)number.Random();
+        int num = (int)number.GetRandomInsideBound();
         for (int i = 0; i < num; i++) {
             DoEmit(damage, bounds);
         }
@@ -71,8 +71,8 @@ public class Gib {
         Rigidbody rigidbody = bit.GetComponent<Rigidbody>();
 
         Vector3 direction = (directional * inDirection) + ((1 - directional) * Vector3.up);
-        direction = (dispersion.Random() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
-        direction = direction.normalized * velocity.Random();
+        direction = (dispersion.GetRandomInsideBound() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
+        direction = direction.normalized * velocity.GetRandomInsideBound();
 
         if (rigidbody != null)
             rigidbody.AddForce(direction, ForceMode.Force);

@@ -8,7 +8,8 @@ using UnityEngine.AI;
 namespace AI {
 
     public class TaskPatrol : TaskNode {
-        static readonly string NAV_POINT_KEY = "nav_point_key";
+        public static readonly string NAV_POINT_KEY = "nav_point_key";
+        public static readonly string WAIT_KEY = "wait_key";
         TaskNode rootNode;
         Transform transform;
         Stack<Vector3> navPoints;
@@ -29,6 +30,7 @@ namespace AI {
         void setupRootNode() {
             navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position));
             this.rootNode = new TaskUntilFailRepeater(new Sequence(
+                new TaskConditional(() => isDoneWaiting()),
                 new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
                 new TaskMoveToKey(transform, NAV_POINT_KEY) {
                     headBehavior = TaskMoveToKey.HeadBehavior.casual,
@@ -36,6 +38,14 @@ namespace AI {
                 }
             ));
             this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());
+        }
+
+        bool isDoneWaiting() {
+            object keyObj = GetData(WAIT_KEY);
+            if (keyObj == null)
+                return true;
+            bool waiting = (bool)keyObj;
+            return !waiting;
         }
     }
 

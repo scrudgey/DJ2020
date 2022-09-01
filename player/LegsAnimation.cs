@@ -175,7 +175,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
             //     spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             // }
         } else {
-            spriteRenderer.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.85f, 0f);
         }
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
         if (input.hitState == HitState.dead) {

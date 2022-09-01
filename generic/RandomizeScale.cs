@@ -8,7 +8,7 @@ public class RandomizeScale : MonoBehaviour {
         DoRandomize();
     }
     void DoRandomize() {
-        transform.localScale = scale.Random() * Vector3.one;
+        transform.localScale = scale.GetRandomInsideBound() * Vector3.one;
         Destroy(this);
     }
 }

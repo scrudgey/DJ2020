@@ -12,12 +12,8 @@ public class Footsteps : MonoBehaviour {
     private bool onRightFoot;
     private SurfaceType lastSurfaceType;
     private FootstepData footstepData;
-    void Awake() {
+    void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        audioSource.minDistance = 2f;
-        audioSource.maxDistance = 10.42f;
-        audioSource.rolloffMode = AudioRolloffMode.Linear;
-        audioSource.spatialBlend = 1f;
         footstepData = Resources.Load("data/footstep/default") as FootstepData;
     }
     public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {
@@ -31,8 +27,10 @@ public class Footsteps : MonoBehaviour {
             }
             if (timer <= 0) {
                 onRightFoot = !onRightFoot;
-                timer = 1f;
+                timer = 1f + Random.Range(-0.1f, 0.1f);
 
+
+                // TODO: adjust volume by velocity
                 float volume = lastSurfaceType switch {
                     SurfaceType.grass => 0.5f,
                     SurfaceType.tile => 2.8f,
@@ -41,9 +39,10 @@ public class Footsteps : MonoBehaviour {
                     SurfaceType.tree => 2f,
                     _ => 1.5f
                 };
-                if (isRunning) {
-                    volume *= 3f;
-                }
+                // if (isRunning) {
+                //     volume *= 3f;
+                // }
+                volume *= velocity.magnitude / 2f;
 
                 if (onRightFoot) {
                     Toolbox.RandomizeOneShot(audioSource, rightFoot, volume: volume);

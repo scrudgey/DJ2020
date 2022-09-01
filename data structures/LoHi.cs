@@ -9,7 +9,7 @@ public class LoHi {
         this.low = low;
         this.high = high;
     }
-    public float Random() {
+    public float GetRandomInsideBound() {
         // TODO: move this to LoHi
         return UnityEngine.Random.Range(low, high);
     }

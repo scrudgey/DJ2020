@@ -25,7 +25,7 @@ public class DamageEmitter : MonoBehaviour, IDamageReceiver {
             GameObject particle = pool.GetObject(impact.hit.point + 0.1f * impact.hit.normal);
             particle.transform.rotation = Random.rotation;
             Rigidbody body = particle.GetComponentInChildren<Rigidbody>();
-            body.velocity = impact.hit.normal * velocity.Random();
+            body.velocity = impact.hit.normal * velocity.GetRandomInsideBound();
             // randomize direction (how?)
         }
     }

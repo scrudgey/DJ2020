@@ -212,8 +212,8 @@ public class Toolbox {
             source.outputAudioMixerGroup = sfxMixer.FindMatchingGroups("General")[0];
         }
         source.rolloffMode = AudioRolloffMode.Logarithmic;
-        source.minDistance = 1f;
-        source.maxDistance = 5.42f;
+        source.minDistance = 3f;
+        source.maxDistance = 23f;
         source.spatialBlend = 1;
         source.spread = 0.2f;
         return source;

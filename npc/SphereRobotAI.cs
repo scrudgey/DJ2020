@@ -295,6 +295,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         if (stateMachine != null && stateMachine.currentState != null)
             stateMachine.currentState.OnNoiseHeard(noise);
+
         if (noise.data.isGunshot && noise.data.suspiciousness > Suspiciousness.suspicious) {
             if (noise.data.player) {
                 lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
@@ -327,9 +328,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
         } else if (noise.data.player) {
             lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
-
-            // TODO: handle footsteps here
-
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 SuspicionRecord record = new SuspicionRecord {
                     content = "a suspicious noise was heard",
@@ -352,21 +350,50 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             } else if (noise.data.isFootsteps) {
+                // TODO: handle footsteps here
 
             }
         } else {
             // not player
             if (noise.data.suspiciousness > Suspiciousness.normal) {
-                switch (stateMachine.currentState) {
-                    case SphereMoveState:
-                    case SpherePatrolState:
-                        alertHandler.ShowWarn();
-                        ChangeState(new SearchDirectionState(this, noise));
-                        break;
+                if (noise.data.suspiciousness == Suspiciousness.suspicious) {
+                    SuspicionRecord record = new SuspicionRecord {
+                        content = "a suspicious noise was heard",
+                        suspiciousness = Suspiciousness.suspicious,
+                        lifetime = 10f,
+                        maxLifetime = 10f
+                    };
+                    GameManager.I.AddSuspicionRecord(record);
+
+                    switch (stateMachine.currentState) {
+                        case SphereMoveState:
+                        case SpherePatrolState:
+                        case FollowTheLeaderState:
+                        case DisableAlarmState:
+                            alertHandler.ShowWarn();
+                            ChangeState(new SearchDirectionState(this, noise));
+                            break;
+                    }
+                } else if (noise.data.suspiciousness == Suspiciousness.aggressive) {
+                    SuspicionRecord record = new SuspicionRecord {
+                        content = "an explosion was heard",
+                        suspiciousness = Suspiciousness.aggressive,
+                        lifetime = 60f,
+                        maxLifetime = 60f
+                    };
+                    GameManager.I.AddSuspicionRecord(record);
+                    switch (stateMachine.currentState) {
+                        case SphereMoveState:
+                        case SpherePatrolState:
+                        case FollowTheLeaderState:
+                        case DisableAlarmState:
+                            alertHandler.ShowWarn();
+                            ChangeState(new ReportToHQState(this, speechTextController, noise));
+                            break;
+                    }
                 }
             }
         }
-
     }
 
     public Reaction ReactToPlayerSuspicion() {

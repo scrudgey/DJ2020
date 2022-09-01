@@ -9,7 +9,7 @@ namespace AI {
     public class TaskMoveToKey : TaskNode {
         public enum HeadBehavior { normal, casual, search }
         public HeadBehavior headBehavior;
-        private static readonly float CORNER_ARRIVAL_DISTANCE = 0.1f;
+        private static readonly float CORNER_ARRIVAL_DISTANCE = 0.15f;
         public NavMeshPath navMeshPath;
         int pathIndex;
         Transform transform;
