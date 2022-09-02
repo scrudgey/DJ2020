@@ -40,8 +40,6 @@ namespace AI {
                     input.orientTowardDirection.y = 0;
                 }
             }
-            // Debug.Log($"look at key: position:{input.lookAtPosition} direction:{input.lookAtDirection}");
-
             // TODO: return complete if looking in correct direction?
             return TaskState.running;
         }

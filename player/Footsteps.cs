@@ -32,10 +32,10 @@ public class Footsteps : MonoBehaviour {
 
                 // TODO: adjust volume by velocity
                 float volume = lastSurfaceType switch {
-                    SurfaceType.grass => 0.5f,
+                    SurfaceType.grass => 1f,
                     SurfaceType.tile => 2.8f,
                     SurfaceType.metal => 3f,
-                    SurfaceType.normal => 1.5f,
+                    SurfaceType.normal => 2f,
                     SurfaceType.tree => 2f,
                     _ => 1.5f
                 };
@@ -53,7 +53,8 @@ public class Footsteps : MonoBehaviour {
                 NoiseData noise = new NoiseData {
                     player = gameObject == GameManager.I.playerObject,
                     suspiciousness = Suspiciousness.normal,
-                    volume = volume
+                    volume = volume,
+                    isFootsteps = true
                 };
                 Toolbox.Noise(transform.position, noise);
             }

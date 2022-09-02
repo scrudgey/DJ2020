@@ -10,34 +10,34 @@ public class SearchDirectionState : SphereControlState {
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
     TaskTimerDectorator lookAround;
-    public SearchDirectionState(SphereRobotAI ai, Damage damage, bool doIntro = true) : base(ai) {
+    public SearchDirectionState(SphereRobotAI ai, Damage damage, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
         if (damage != null) {
             searchDirection = -1f * damage.direction;
         } else {
             RandomSearchDirection();
         }
-        SetupRootNode(doIntro);
+        SetupRootNode(doIntro, speedCoefficient);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
     }
-    public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise, bool doIntro = true) : base(ai) {
+    public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
         if (noise != null) {
             searchDirection = (noise.transform.position - owner.transform.position).normalized;
             searchDirection.y = ai.transform.position.y;
         } else {
             RandomSearchDirection();
         }
-        SetupRootNode(doIntro);
+        SetupRootNode(doIntro, speedCoefficient);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, noise.transform.position);
 
     }
-    public SearchDirectionState(SphereRobotAI ai, Vector3 position, bool doIntro = true) : base(ai) {
+    public SearchDirectionState(SphereRobotAI ai, Vector3 position, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
         if (position != Vector3.zero) {
             searchDirection = (position - owner.transform.position).normalized;
             searchDirection.y = ai.transform.position.y;
         } else {
             RandomSearchDirection();
         }
-        SetupRootNode(doIntro);
+        SetupRootNode(doIntro, speedCoefficient);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, position);
     }
     void RandomSearchDirection() {
@@ -51,7 +51,7 @@ public class SearchDirectionState : SphereControlState {
         owner.navMeshPath = new NavMeshPath();
     }
 
-    void SetupRootNode(bool intro) {
+    void SetupRootNode(bool intro, float speedCoefficient) {
 
         // TODO problem: changing search direction
         Vector3 leftDirection = Quaternion.Euler(0, -45, 0) * searchDirection;
@@ -79,7 +79,7 @@ public class SearchDirectionState : SphereControlState {
             rootTaskNode = new Sequence(lookAround,
                 new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
-                    speedCoefficient = 0.5f
+                    speedCoefficient = speedCoefficient
                 },
                 new TaskTimerDectorator(new TaskLookAt() {
                     lookType = TaskLookAt.LookType.position,
@@ -91,7 +91,7 @@ public class SearchDirectionState : SphereControlState {
             rootTaskNode = new Sequence(
                 new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
-                    speedCoefficient = 1f
+                    speedCoefficient = speedCoefficient
                 },
                 new TaskTimerDectorator(new TaskLookAt() {
                     lookType = TaskLookAt.LookType.position,
@@ -100,7 +100,6 @@ public class SearchDirectionState : SphereControlState {
                 }, 3f)
             );
         }
-
     }
 
     public override PlayerInput Update(ref PlayerInput input) {
@@ -119,7 +118,7 @@ public class SearchDirectionState : SphereControlState {
         base.OnNoiseHeard(noise);
         // TODO: more detailed decision making if sound is suspicious
         if (noise.data.player) {
-            if (noise.data.suspiciousness > Suspiciousness.normal) {
+            if (noise.data.suspiciousness > Suspiciousness.normal || noise.data.isFootsteps) {
                 searchDirection = noise.transform.position;
                 changeStateCountDown = ROUTINE_TIMEOUT;
                 rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);

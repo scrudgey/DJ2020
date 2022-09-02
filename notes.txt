@@ -1164,6 +1164,9 @@ Q: what is the proper solution?
     * NPC footsteps should be louder
 * redo how footsteps work?
     * slower patrols
+* occasional pauses in patrol
+* better reaction to footsteps
+    * when there is any suspicion, stop and investigate
 
 
 
@@ -1329,14 +1332,7 @@ more thorough search task
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
     track direction you were moving
-
 don't radio HQ if HQ is already being radioed
     on task initialize, check all other sphereais and their currently running task?
-
-
-footsteps
-* occasional pauses in patrol
-better reaction to footsteps
-    when there is any suspicion, stop and investigate
-
 reset strike team
+
