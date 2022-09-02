@@ -27,12 +27,26 @@ public partial class GameManager : Singleton<GameManager> {
         OnSuspicionChange?.Invoke();
         alarmShutdownTimer = 0f;
     }
+    public bool isAlarmRadioInProgress() {
+        foreach (HQReport report in reports.Values) {
+            if (report.desiredAlarmState) {
+                return true;
+            }
+        }
+        return false;
+    }
     public void DeactivateAlarm() {
         gameData.levelData.alarm = false;
         gameData.levelData.alarmCountDown = 0f;
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
         alarmShutdownTimer = 0f;
+
+        // reset strike team 
+        PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
+        Debug.Log($"{pool.objectsInPool.Count} {pool.objectsActiveInWorld.Count}");
+        gameData.levelData.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
+        strikeTeamCount = 0;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (!gameData.levelData.hasHQ)
@@ -163,7 +177,7 @@ public partial class GameManager : Singleton<GameManager> {
         motor.SetPosition(position, bypassInterpolation: true);
 
         if (strikeTeamCount == 0) {
-            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, doIntro: false));
+            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, doIntro: false, speedCoefficient: 1.5f));
             lastStrikeTeamMember = npc;
         } else if (strikeTeamCount == 1) {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));

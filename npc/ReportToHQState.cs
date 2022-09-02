@@ -60,7 +60,10 @@ public class ReportToHQState : SphereControlState {
         };
 
         rootTaskNode =
-            new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report);
+                new Selector(
+                    new TaskConditional(GameManager.I.isAlarmRadioInProgress),
+                    new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
+                );
     }
 
     public override PlayerInput Update(ref PlayerInput input) {

@@ -28,7 +28,7 @@ public class SphereAttackState : SphereControlState {
     }
     void SetupRootNode() {
         rootTaskNode = new Sequence(
-            new TaskTimerDectorator(new TaskLookAt() {
+            new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                 lookType = TaskLookAt.LookType.position,
                 key = LAST_SEEN_PLAYER_POSITION_KEY,
                 useKey = true

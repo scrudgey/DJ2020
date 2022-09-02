@@ -61,7 +61,7 @@ public class ReactToAttackState : SphereControlState {
             };
 
             rootTaskNode = new Sequence(
-                new TaskTimerDectorator(new TaskLookAt() {
+                new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                     lookType = TaskLookAt.LookType.position,
                     key = DAMAGE_SOURCE_KEY,
                     useKey = true,
@@ -74,17 +74,20 @@ public class ReactToAttackState : SphereControlState {
                     },
                     new TaskSucceed()
                 ),
-                new TaskTimerDectorator(new TaskLookAt() {
+                new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                     lookType = TaskLookAt.LookType.position,
                     key = DAMAGE_SOURCE_KEY,
                     useKey = true,
                     reorient = true
                 }, 1.5f),
-                new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
+                new Selector(
+                    new TaskConditional(GameManager.I.isAlarmRadioInProgress),
+                    new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
+                )
             );
         } else {
             rootTaskNode = new Sequence(
-                    new TaskTimerDectorator(new TaskLookAt() {
+                    new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                         lookType = TaskLookAt.LookType.position,
                         key = DAMAGE_SOURCE_KEY,
                         useKey = true,
@@ -94,7 +97,7 @@ public class ReactToAttackState : SphereControlState {
                         headBehavior = TaskMoveToKey.HeadBehavior.search,
                         speedCoefficient = 2f
                     },
-                    new TaskTimerDectorator(new TaskLookAt() {
+                    new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                         lookType = TaskLookAt.LookType.position,
                         key = DAMAGE_SOURCE_KEY,
                         useKey = true,

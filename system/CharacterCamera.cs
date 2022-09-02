@@ -572,7 +572,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
             Vector3 origin = Vector3.zero;
             if (GameManager.I.playerObject != null) {
-                origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f); // TODO: fix this hack!
+                origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1.35f, 0f); // TODO: fix this hack!
             }
 
             Plane plane = new Plane(Vector3.up, origin);

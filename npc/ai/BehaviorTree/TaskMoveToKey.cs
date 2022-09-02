@@ -9,7 +9,7 @@ namespace AI {
     public class TaskMoveToKey : TaskNode {
         public enum HeadBehavior { normal, casual, search }
         public HeadBehavior headBehavior;
-        private static readonly float CORNER_ARRIVAL_DISTANCE = 0.15f;
+        float CORNER_ARRIVAL_DISTANCE = 0.15f;
         public NavMeshPath navMeshPath;
         int pathIndex;
         Transform transform;
@@ -21,11 +21,12 @@ namespace AI {
         public float speedCoefficient = 1f;
         Vector3 baseLookDirection;
 
-        public TaskMoveToKey(Transform transform, string key) : base() {
+        public TaskMoveToKey(Transform transform, string key, float arrivalDistance = 0.15f) : base() {
             navMeshPath = new NavMeshPath();
             pathIndex = -1;
             this.transform = transform;
             this.key = key;
+            this.CORNER_ARRIVAL_DISTANCE = arrivalDistance;
             SetDestination();
         }
         public override void Initialize() {

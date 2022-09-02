@@ -34,7 +34,7 @@ public class Footsteps : MonoBehaviour {
                 float volume = lastSurfaceType switch {
                     SurfaceType.grass => 1f,
                     SurfaceType.tile => 2.8f,
-                    SurfaceType.metal => 3f,
+                    SurfaceType.metal => 4f,
                     SurfaceType.normal => 2f,
                     SurfaceType.tree => 2f,
                     _ => 1.5f

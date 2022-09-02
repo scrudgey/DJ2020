@@ -6,15 +6,20 @@ using UnityEngine;
 namespace AI {
 
     public class TaskLookAt : TaskNode {
+        public enum HeadBehavior { normal, casual, search }
+        public HeadBehavior headBehavior;
         public enum LookType { position, direction }
         public LookType lookType;
         public string key;
-        public Vector3 lookAt;
+        public Vector3 lookAtPoint;
         public bool useKey;
         public bool reorient;
         float repathTimer;
         float repathInterval = 1f;
-        public TaskLookAt() : base() {
+        public float headSwivelOffset;
+        private Transform transform;
+        public TaskLookAt(Transform transform) : base() {
+            this.transform = transform;
             if (useKey)
                 SetDestination();
         }
@@ -27,20 +32,34 @@ namespace AI {
                 }
             }
 
+
+            Vector3 baseLookDirection = lookType switch {
+                LookType.position => lookAtPoint - transform.position,
+                LookType.direction => lookAtPoint,
+                _ => lookAtPoint
+            };
+
+            if (headBehavior == HeadBehavior.casual) {
+                // TODO: abstract out to some equivalent of an easing function
+                headSwivelOffset = 45f * Mathf.Sin(Time.time);
+            } else if (headBehavior == HeadBehavior.search) {
+                headSwivelOffset = 45f * Mathf.Sin(Time.time * 2f);
+            }
+            Vector3 lookDirection = Quaternion.AngleAxis(headSwivelOffset, Vector3.up) * baseLookDirection;
+
             if (lookType == LookType.position) {
-                input.lookAtPosition = lookAt;
+                input.lookAtPosition = transform.position + lookDirection;
                 if (reorient) {
-                    input.orientTowardPoint = lookAt;
+                    input.orientTowardPoint = transform.position + lookDirection;
                     input.orientTowardPoint.y = 0;
                 }
             } else if (lookType == LookType.direction) {
-                input.lookAtDirection = lookAt;
+                input.lookAtDirection = lookDirection;
                 if (reorient) {
-                    input.orientTowardDirection = lookAt;
+                    input.orientTowardDirection = lookDirection;
                     input.orientTowardDirection.y = 0;
                 }
             }
-            // TODO: return complete if looking in correct direction?
             return TaskState.running;
         }
 
@@ -52,7 +71,7 @@ namespace AI {
             Vector3 target = (Vector3)keyObj;
             if (target == null)
                 return;
-            lookAt = target;
+            lookAtPoint = target;
         }
     }
 

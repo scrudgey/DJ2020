@@ -1324,15 +1324,15 @@ third grid: alarm systems
     alarm routers
 
 
-shoot in orthographic mode isn't aiming as expected
+* shoot in orthographic mode isn't aiming as expected
+* reset strike team
+
 aim mode could track camera better
 more thorough search task
-    choose a second position
-    head looks around when standing in place
+    choose a second position?
+    * head looks around when standing in place
     NPC has better vision when they're specifically searching for you
     NPC has better hearing when they're searching for you
     track direction you were moving
-don't radio HQ if HQ is already being radioed
-    on task initialize, check all other sphereais and their currently running task?
-reset strike team
-
+* don't radio HQ if HQ is already being radioed
+* change speed coefficient for strike team, some search states

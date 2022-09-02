@@ -37,8 +37,8 @@ public class PlayerData {
         Gun gun2 = Gun.Load("pistol");
         Gun gun3 = Gun.Load("shotgun");
 
-        gun1.silencer = true;
-        gun2.silencer = true;
+        // gun1.silencer = true;
+        // gun2.silencer = true;
         return new PlayerData() {
             primaryGun = new GunInstance(gun1),
             secondaryGun = new GunInstance(gun2),

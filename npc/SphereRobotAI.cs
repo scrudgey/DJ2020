@@ -163,8 +163,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         input.preventWallPress = true;
 
         // possibly avoid bunching here
-        float avoidFactor = 0.75f;
-        float avoidRadius = 0.75f;
+        float avoidFactor = 1f;
+        float avoidRadius = 0.5f;
         Collider[] others = Physics.OverlapSphere(transform.position, avoidRadius, LayerUtil.GetMask(Layer.obj));
         Vector3 closeness = Vector3.zero;
         foreach (Collider collider in others) {
@@ -424,7 +424,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void HandleFootstepNoise(NoiseComponent noise) {
         footstepImpulse += noise.data.volume * 2f;
         bool thresholded = footstepImpulse > 4f;
-        Debug.Log($"{GameManager.I.gameData.levelData.sensitivityLevel} {footstepImpulse} {thresholded} ");
         if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.publicProperty) {
             if (thresholded && recentlyInCombat) {
                 switch (stateMachine.currentState) {

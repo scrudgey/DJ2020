@@ -32,19 +32,19 @@ public class StopAndListenState : SphereControlState {
 
         rootTaskNode = new TaskTimerDectorator(new Sequence(
                    // look
-                   new TaskTimerDectorator(new TaskLookAt() {
+                   new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                        lookType = TaskLookAt.LookType.direction,
-                       lookAt = searchDirection
+                       lookAtPoint = searchDirection
                    }, 1f),
                    // look left
-                   new TaskTimerDectorator(new TaskLookAt() {
+                   new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                        lookType = TaskLookAt.LookType.direction,
-                       lookAt = leftDirection
+                       lookAtPoint = leftDirection
                    }, 1f),
                    // look right
-                   new TaskTimerDectorator(new TaskLookAt() {
+                   new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                        lookType = TaskLookAt.LookType.direction,
-                       lookAt = rightDirection
+                       lookAtPoint = rightDirection
                    }, 1f)
                ), 3f);
     }

@@ -60,43 +60,45 @@ public class SearchDirectionState : SphereControlState {
         if (intro) {
             lookAround = new TaskTimerDectorator(new Sequence(
                    // look
-                   new TaskTimerDectorator(new TaskLookAt() {
+                   new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                        lookType = TaskLookAt.LookType.direction,
-                       lookAt = searchDirection
+                       lookAtPoint = searchDirection
                    }, 1f),
                    // look left
-                   new TaskTimerDectorator(new TaskLookAt() {
+                   new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                        lookType = TaskLookAt.LookType.direction,
-                       lookAt = leftDirection
+                       lookAtPoint = leftDirection
                    }, 1f),
                    // look right
-                   new TaskTimerDectorator(new TaskLookAt() {
+                   new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                        lookType = TaskLookAt.LookType.direction,
-                       lookAt = rightDirection
+                       lookAtPoint = rightDirection
                    }, 1f)
                ), 3f);
 
             rootTaskNode = new Sequence(lookAround,
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, arrivalDistance: 1f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
-                    speedCoefficient = speedCoefficient
+                    speedCoefficient = speedCoefficient,
                 },
-                new TaskTimerDectorator(new TaskLookAt() {
+                new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                     lookType = TaskLookAt.LookType.position,
                     key = SEARCH_POSITION_KEY,
-                    useKey = true
-                }, 1f)
+                    useKey = true,
+                    headBehavior = TaskLookAt.HeadBehavior.search
+                }, 2f)
             );
         } else {
             rootTaskNode = new Sequence(
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, arrivalDistance: 1f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient
                 },
-                new TaskTimerDectorator(new TaskLookAt() {
+                new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                     lookType = TaskLookAt.LookType.position,
                     key = SEARCH_POSITION_KEY,
-                    useKey = true
+                    useKey = true,
+                    headBehavior = TaskLookAt.HeadBehavior.search
                 }, 3f)
             );
         }
