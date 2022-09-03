@@ -8,6 +8,7 @@ public enum Reaction { ignore, attack, investigate }
 
 public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHitstateSubscriber, IPoolable {
     public Destructible characterHurtable;
+    public Listener listener { get; set; }
     public HitState hitState { get; set; }
     public SightCone sightCone;
     public Transform sightOrigin;
@@ -110,10 +111,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case StopAndListenState:
                 StopAndListenState listenState = (StopAndListenState)routine;
                 ChangeState(listenState.getNextState());
+                // listener.SetListenRadius();
                 break;
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
                 EnterDefaultState();
+                // listener.SetListenRadius();
                 break;
             case SphereAttackState:
                 if (!GameManager.I.gameData.levelData.alarm) {
@@ -145,7 +148,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
         switch (routine) {
-            case SearchDirectionState search:
+            case StopAndListenState:
+            case SearchDirectionState:
+                // listener.SetListenRadius(radius: 2f);
                 break;
             case ReportToHQState:
             case ReactToAttackState:
@@ -163,8 +168,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         input.preventWallPress = true;
 
         // possibly avoid bunching here
-        float avoidFactor = 1f;
-        float avoidRadius = 0.5f;
+        float avoidFactor = 5f;
+        float avoidRadius = 1f;
         Collider[] others = Physics.OverlapSphere(transform.position, avoidRadius, LayerUtil.GetMask(Layer.obj));
         Vector3 closeness = Vector3.zero;
         foreach (Collider collider in others) {
@@ -472,7 +477,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public void OnPoolActivate() {
-
+        listener = gameObject.GetComponentInChildren<Listener>();
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;

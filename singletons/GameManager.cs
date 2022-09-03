@@ -206,21 +206,15 @@ public partial class GameManager : Singleton<GameManager> {
 
         // Toolbox.GetP
         int lightLevel = playerLightLevelProbe.GetDiscreteLightLevel();
-        // Debug.Log($"{lightLevel} {distance}");
-        switch (lightLevel) {
-            case 0:
-                return distance < 1f;
-            case 1:
-                return distance < 2f;
-            case 2:
-                return distance < 4.5f;
-            default:
-            case 3:
-                return distance < 7f;
-            case 4:
-                return distance < 13f;
-            case 5:
-                return distance < 50f;
-        }
+        bool isVisible = lightLevel switch {
+            0 => distance < 2f,
+            1 => distance < 3f,
+            2 => distance < 6f,
+            3 => distance < 8f,
+            4 => distance < 15f,
+            _ => distance < 50f
+        };
+
+        return isVisible;
     }
 }

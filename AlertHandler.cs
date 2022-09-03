@@ -11,6 +11,7 @@ public class AlertHandler : MonoBehaviour {
     public Material warnMaterial;
     private Coroutine coroutine;
     private Sprite[] alertSprites;
+    static readonly float DISPLAY_TIME = 2f;
     void Awake() {
         spriteRenderer.enabled = false;
     }
@@ -28,18 +29,18 @@ public class AlertHandler : MonoBehaviour {
         coroutine = StartCoroutine(newCoroutine);
     }
     public void ShowAlert(bool useWarnMaterial = false) {
-        alertRect.localScale = Vector3.one;
+        alertRect.localScale = Vector3.one * 2.5F;
         alertRect.localPosition = new Vector3(0f, 2f, 0f);
         ResetCoroutine(ShowAlertIcon(useWarnMaterial: useWarnMaterial));
     }
     public void ShowWarn() {
-        alertRect.localScale = Vector3.one;
+        alertRect.localScale = Vector3.one * 2.5F;
         alertRect.localPosition = new Vector3(0f, 2f, 0f);
 
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowGiveUp() {
-        alertRect.localScale = Vector3.one;
+        alertRect.localScale = Vector3.one * 2.5F;
         alertRect.localPosition = new Vector3(0f, 2f, 0f);
         // ResetCoroutine(ShowText("<sprite=9>"));
         ResetCoroutine(ShowQuestionIcon());
@@ -69,10 +70,10 @@ public class AlertHandler : MonoBehaviour {
             Vector2 sizeDelta = new Vector2();
             sizeDelta.x = 1f;
             sizeDelta.y = (float)PennerDoubleAnimation.BackEaseOut(timer, 0f, 1f, appearanceInterval);
-            alertRect.localScale = sizeDelta;
+            alertRect.localScale = sizeDelta * 2f;
             yield return null;
         }
-        while (timer < 2.5f) {
+        while (timer < DISPLAY_TIME) {
             timer += Time.deltaTime;
             yield return null;
         }
@@ -94,7 +95,7 @@ public class AlertHandler : MonoBehaviour {
             alertRect.localScale = sizeDelta;
             yield return null;
         }
-        while (timer < 2.5f) {
+        while (timer < DISPLAY_TIME) {
             timer += Time.deltaTime;
             yield return null;
         }

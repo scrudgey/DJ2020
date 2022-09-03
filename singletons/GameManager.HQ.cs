@@ -47,6 +47,7 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"{pool.objectsInPool.Count} {pool.objectsActiveInWorld.Count}");
         gameData.levelData.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         strikeTeamCount = 0;
+        Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (!gameData.levelData.hasHQ)
@@ -186,5 +187,7 @@ public partial class GameManager : Singleton<GameManager> {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
+
+        Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
     }
 }

@@ -5,8 +5,11 @@ using UnityEngine;
 public class Listener : MonoBehaviour {
     public GameObject listener;
     public IListener noiseHandler;
+    SphereCollider mySphereCollider;
     void Start() {
         noiseHandler = listener.GetComponent<IListener>();
+        noiseHandler.listener = this;
+        mySphereCollider = gameObject.GetComponent<SphereCollider>();
     }
     private void OnTriggerEnter(Collider other) {
         NoiseComponent noiseComponent = other.GetComponent<NoiseComponent>();
@@ -14,4 +17,7 @@ public class Listener : MonoBehaviour {
             noiseHandler.HearNoise(noiseComponent);
         }
     }
+    // public void SetListenRadius(float radius = 0.4f) {
+    //     mySphereCollider.radius = radius;
+    // }
 }

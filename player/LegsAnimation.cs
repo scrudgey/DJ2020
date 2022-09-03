@@ -156,7 +156,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
                 if (input.playerInputs.MoveAxisRight != 0) {
                     spriteRenderer.flipX = input.playerInputs.MoveAxisRight > 0;
                 }
-                Debug.Log($"{spriteRenderer.flipX} {input.playerInputs.MoveAxisRight}");
                 break;
         }
 
