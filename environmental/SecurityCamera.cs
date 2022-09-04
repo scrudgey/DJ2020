@@ -23,10 +23,9 @@ public class SecurityCamera : IBinder<SightCone> {
     Quaternion rotation;
     public float turnDuration;
     public float lookDuration;
-
-    readonly float PERCEPTION_INTERVAL = 0.05f;
+    // readonly float PERCEPTION_INTERVAL = 0.05f;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
-    readonly float LOCK_ON_TIME = 0.5f;
+    // readonly float LOCK_ON_TIME = 0.5f;
 
     void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);

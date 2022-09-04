@@ -1225,6 +1225,8 @@ nice to have / future goals:
             how to decide who to run to alarm panel?
     the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
         i.e. using yellow just resolves to red? 
+    laser grid don't trip when NPC walks through? disable temporarily?
+
 
 
 try to pop around a corner and aim: it doesn't work
@@ -1322,16 +1324,38 @@ stealth:
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
 third grid: alarm systems
-    cameras
-    laser tripwire
+    * cameras
+    * laser tripwire
     alarm routers
 
 aim mode could track camera better
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC investigate routine
-
 abstract out visibility and perception 
 
-better camera react
-    notify everyone of your position
+
+we need systemization of how alarms are triggered by sensors
+    notify others of location?
+    treated like being spotted?
+how does alarm grid work?
+    alarm source must connect back to HQ in order for it to work
+    alarms can be routed through a common router to be disabled
+    what is networkable about alarm systems?
+        route through switches
+        route through routers
+        alarm source: disable this, and alarm won't be broadcast to this area?
+        alarm items should be frequently connected to a router.
+
+laser grid
+    * trip when player walks through
+    * play sound
+    * laser should reach to the other wall, or to max distance
+    * visible only with special devices
+    dust / smoke shader
+    possible to leave a gap in the lasers you can crawl through
+
+
+when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
+enemies still bunching up
+npc can't seem to shoot me when close

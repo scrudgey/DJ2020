@@ -47,7 +47,7 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
             headAnimation.UpdateView(input, torsoSpriteData);
             return torsoSpriteData;
         }
-        catch (Exception e) {
+        catch (Exception) {
             Debug.LogError($"**** {sheetIndex} {spriteRenderer.sprite.name} {input.isProne || input.hitState == HitState.dead} {input.gunInput.gunType}");
             return null;
         }

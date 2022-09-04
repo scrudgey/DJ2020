@@ -9,6 +9,7 @@ namespace Items {
             ItemData baseItem = ItemData.LoadItem(baseName);
             return baseItem switch {
                 C4Data c4Data => new C4(c4Data),
+                IRGoggleData goggles => new IRGoggles(goggles),
                 ItemData itemData => itemData.shortName switch {
                     "deck" => new CyberDeck(itemData),
                     _ => new BaseItem(baseItem)

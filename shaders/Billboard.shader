@@ -18,6 +18,7 @@ Shader "Custom/Billboard"
 			"RenderType"="Transparent" 
 			"PreviewType"="Plane"
 			"CanUseSpriteAtlas"="True"
+			"DisableBatching"="True"
 		}
 
 		Cull Off

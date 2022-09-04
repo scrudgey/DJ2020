@@ -72,8 +72,13 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IIn
 
     void OnItemEnter(BaseItem item) {
         switch (item) {
-            case CyberDeck cyberDeck:
+            case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.cyber);
+                break;
+            case IRGoggles goggles:
+                GameManager.I.gameData.playerData.cyberEyesThermalBuff = true;
+                GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerData);
+                Toolbox.RandomizeOneShot(audioSource, goggles.goggleData.wearSounds);
                 break;
             default:
                 break;
@@ -81,8 +86,12 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IIn
     }
     void OnItemExit(BaseItem item) {
         switch (item) {
-            case CyberDeck cyberDeck:
+            case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.none);
+                break;
+            case IRGoggles:
+                GameManager.I.gameData.playerData.cyberEyesThermalBuff = false;
+                GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerData);
                 break;
             default:
                 break;

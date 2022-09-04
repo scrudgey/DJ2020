@@ -18,6 +18,8 @@ public class PlayerData {
 
     // stats
     public int cyberlegsLevel;
+    public bool cyberEyesThermal;
+    public bool cyberEyesThermalBuff;
     public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
         {GunType.pistol, 1},
         {GunType.smg, 1},
@@ -60,7 +62,7 @@ public class PlayerData {
 
             cyberlegsLevel = 1,
 
-            items = new List<string> { "explosive", "deck" },
+            items = new List<string> { "explosive", "deck", "goggles" },
 
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,

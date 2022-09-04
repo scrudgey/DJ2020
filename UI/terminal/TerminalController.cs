@@ -71,6 +71,7 @@ namespace UI {
             else
                 GameManager.I.ActivateDisguise();
         }
+
         public void SetValue(string[] args) {
             string fieldName = args[0];
             int value = int.Parse(args[1]);
@@ -92,6 +93,10 @@ namespace UI {
                     break;
                 case "shotgun-skill":
                     GameManager.I.gameData.playerData.gunSkillLevel[GunType.shotgun] = value;
+                    break;
+                case "eyes-laser":
+                    GameManager.I.gameData.playerData.cyberEyesThermal = value == 1;
+                    GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerData);
                     break;
                 // case "test":
                 //     TestSuite.RunToolboxTests();

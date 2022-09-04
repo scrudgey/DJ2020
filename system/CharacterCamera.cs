@@ -54,7 +54,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public Vector3 PlanarDirection { get; set; }
     public float TargetDistance { get; set; }
 
-    private bool _distanceIsObstructed;
+    // private bool _distanceIsObstructed;
     private float _currentDistance;
     private RaycastHit _obstructionHit;
     private int _obstructionCount;
@@ -106,6 +106,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     void Start() {
         GameManager.OnFocusChanged += Bind;
         GameManager.OnFocusChanged += SetFollowTransform;
+        GameManager.OnEyeVisibilityChange += HandleEyeVisibilityChange;
 
         // TODO: move into on level load
         attractors = new List<CameraAttractorZone>();
@@ -117,10 +118,18 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // IgnoredColliders.Clear();
         // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
+    void HandleEyeVisibilityChange(PlayerData playerData) {
+        if (playerData.cyberEyesThermal || playerData.cyberEyesThermalBuff) {
+            ShowLasers();
+        } else {
+            HideLasers();
+        }
+    }
     override public void OnDestroy() {
         base.OnDestroy();
         GameManager.OnFocusChanged -= Bind;
         GameManager.OnFocusChanged -= SetFollowTransform;
+        GameManager.OnEyeVisibilityChange -= HandleEyeVisibilityChange;
     }
     public void TransitionToState(CameraState toState) {
         if (toState == _state)
@@ -471,12 +480,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
             // If obstructions detecter
             if (closestHit.distance < Mathf.Infinity) {
-                _distanceIsObstructed = true;
+                // _distanceIsObstructed = true;
                 _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
             }
             // If no obstruction
             else {
-                _distanceIsObstructed = false;
+                // _distanceIsObstructed = false;
                 _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
             }
         }
@@ -688,5 +697,22 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private void OnDrawGizmos() {
         string customName = "Relic\\MaskedSpider.png";
         Gizmos.DrawIcon(lastTargetPosition, customName, true);
+    }
+
+
+
+    // Turn on the bit using an OR operation:
+    private void ShowLasers() {
+        Camera.cullingMask |= 1 << LayerMask.NameToLayer("laser");
+    }
+
+    // Turn off the bit using an AND operation with the complement of the shifted int:
+    private void HideLasers() {
+        Camera.cullingMask &= ~(1 << LayerMask.NameToLayer("laser"));
+    }
+
+    // Toggle the bit using a XOR operation:
+    private void Toggle() {
+        Camera.cullingMask ^= 1 << LayerMask.NameToLayer("laser");
     }
 }

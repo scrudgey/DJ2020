@@ -36,6 +36,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<InputMode, InputMode> OnInputModeChange; // TODO: legit? should be camera state change?
     public static Action<CursorType> OnCursorTypeChange;
     public static Action<String> OnCaptionChange;
+    public static Action<PlayerData> OnEyeVisibilityChange;
     // UI state
     private bool toggleConsoleThisFrame;
     private bool nextOverlayThisFrame;
