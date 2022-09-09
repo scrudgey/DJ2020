@@ -10,7 +10,6 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public RectTransform rectTransform;
     public Color enabledColor;
     public Color disabledColor;
-    // public LineRenderer lineRenderer;
     protected bool showSelectionIndicator;
     private float selectionIndicatorTimer;
     readonly float SELECTION_TIMEOUT = 0.05f;

@@ -125,6 +125,9 @@ public partial class GameManager : Singleton<GameManager> {
                     RefreshCyberGraph();
                     break;
                 case AlarmComponent:
+                    AlarmNode alarmNode = (AlarmNode)node;
+                    alarmNode.alarmTriggered = false;
+                    alarmNode.countdownTimer = 0f;
                     RefreshAlarmGraph();
                     break;
             };

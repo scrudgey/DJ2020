@@ -28,7 +28,7 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
 
         AlarmNode[] sources = nodes.Values.Where(node => node.alarmTriggered).ToArray();
         foreach (AlarmNode source in sources) {
-            DFS(source, new HashSet<HashSet<string>>());
+            DFS(source, new HashSet<HashSet<string>>(), new HashSet<string>());
         }
 
         bool alarmActive = anyAlarmActive();
@@ -44,13 +44,18 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
             .Where(node => GameManager.I.GetAlarmComponent(node.idn) is AlarmTerminal)
             .Any(node => node.alarmTriggered);
 
-    void DFS(AlarmNode node, HashSet<HashSet<string>> visitedEdges) {
+    void DFS(AlarmNode node, HashSet<HashSet<string>> visitedEdges, HashSet<string> visitedNodes) {
         if (edges.ContainsKey(node.idn))
             foreach (string neighborID in edges[node.idn]) {
+                if (visitedNodes.Contains(neighborID))
+                    continue;
+                visitedNodes.Add(neighborID);
                 visitedEdges.Add(new HashSet<string> { node.idn, neighborID });
                 AlarmComponent neighborComponent = GameManager.I.GetAlarmComponent(neighborID);
+                AlarmNode terminalNode = GameManager.I.GetAlarmNode(neighborID);
+                if (!terminalNode.enabled)
+                    continue;
                 if (neighborComponent is AlarmTerminal) {
-                    AlarmNode terminalNode = GameManager.I.GetAlarmNode(neighborID);
                     terminalNode.alarmTriggered = true;
                     AlarmTerminal terminal = (AlarmTerminal)neighborComponent;
                     terminal.Activate();
@@ -59,7 +64,8 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
                     }
                 } else {
                     HashSet<HashSet<string>> newEdges = visitedEdges.ToHashSet();
-                    DFS(nodes[neighborID], newEdges);
+                    HashSet<string> newNodes = visitedNodes.ToHashSet();
+                    DFS(nodes[neighborID], newEdges, newNodes);
                 }
             }
     }

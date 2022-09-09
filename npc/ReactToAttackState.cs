@@ -121,13 +121,4 @@ public class ReactToAttackState : SphereControlState {
         }
         return input;
     }
-
-    // public override void OnNoiseHeard(NoiseComponent noise) {
-    //     base.OnNoiseHeard(noise);
-    //     if (noise.data.player) {
-    //         if (noise.data.suspiciousness > Suspiciousness.normal) {
-
-    //         }
-    //     }
-    // }
 }

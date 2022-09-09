@@ -1363,11 +1363,11 @@ NPC investigate routine
 abstract out visibility and perception ?
 laser grid and security cameras require power
 
-when alarm is triggered, find route(s) to alarm terminals
+* when alarm is triggered, find route(s) to alarm terminals
     * if a route is found, highlight the path in the alarm view and activate alarm
     * highlight triggered alarm node in alarm grid
     * highlight alarm terminal in alarm grid
-    alarms can be routed through a common router to be disabled
+    * alarms can be routed through a common router to be disabled
 
 interaction of alarm grid and cyber grid
     hacking disables alarm propagation
@@ -1395,3 +1395,4 @@ obsoleted: activate alarm, deactivate alarm as presently used
 level data has hq
 
 thermal goggles icon
+DFS path finding doesn't quite work right

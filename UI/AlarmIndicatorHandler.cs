@@ -11,7 +11,7 @@ public class AlarmIndicatorHandler : MonoBehaviour {
     float easingTimer;
     readonly static float easingDuration = 0.5f;
     void Update() {
-        if (GameManager.I.alarmCountdown() > 0) {
+        if (GameManager.I.alarmCountdown() > 0 && GameManager.I.gameData.levelData.anyAlarmActive()) {
             if (state != State.easeIn && state != State.running) {
                 state = State.easeIn;
                 easingTimer = 0f;

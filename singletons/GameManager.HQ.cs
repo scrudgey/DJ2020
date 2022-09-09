@@ -201,6 +201,5 @@ public partial class GameManager : Singleton<GameManager> {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
-        // Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
     }
 }
