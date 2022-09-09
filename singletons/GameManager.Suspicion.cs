@@ -78,7 +78,7 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
         if (applyModifiers) {
-            if (gameData.levelData.alarm) {
+            if (gameData.levelData.anyAlarmActive()) {
                 if (reaction == Reaction.ignore) {
                     reaction = Reaction.investigate;
                 } else if (reaction == Reaction.investigate) {

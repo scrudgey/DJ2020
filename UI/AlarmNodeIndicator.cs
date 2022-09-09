@@ -18,12 +18,10 @@ public class AlarmNodeIndicator : NodeIndicator<AlarmNode, AlarmGraph> {
         } else {
             image.color = disabledColor;
         }
-
         if (node.countdownTimer > 0f) {
             timerObject.SetActive(true);
         } else {
             timerObject.SetActive(false);
         }
-
     }
 }

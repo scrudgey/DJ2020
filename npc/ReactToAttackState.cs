@@ -50,8 +50,7 @@ public class ReactToAttackState : SphereControlState {
             _ => "HQ respond! Activate building alarm!"
         };
 
-        // if (levelData.hasHQ && !levelData.alarm) {
-        if (GameManager.I.levelHQTerminal() != null && !levelData.alarm) {
+        if (GameManager.I.levelHQTerminal() != null && !levelData.anyAlarmActive()) {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = true,
@@ -123,12 +122,12 @@ public class ReactToAttackState : SphereControlState {
         return input;
     }
 
-    public override void OnNoiseHeard(NoiseComponent noise) {
-        base.OnNoiseHeard(noise);
-        if (noise.data.player) {
-            if (noise.data.suspiciousness > Suspiciousness.normal) {
+    // public override void OnNoiseHeard(NoiseComponent noise) {
+    //     base.OnNoiseHeard(noise);
+    //     if (noise.data.player) {
+    //         if (noise.data.suspiciousness > Suspiciousness.normal) {
 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 }

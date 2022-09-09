@@ -16,29 +16,22 @@ public partial class GameManager : Singleton<GameManager> {
     public GameObject lastStrikeTeamMember;
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
-    float alarmShutdownTimer;
 
     public void ActivateHQRadio() {
         AlarmHQTerminal terminal = levelHQTerminal();
         if (terminal != null) {
-            Debug.Log("activating hq terminal");
-
             AlarmNode node = GetAlarmNode(terminal.idn);
             node.alarmTriggered = true;
             node.countdownTimer = 30f;
             RefreshAlarmGraph();
-            // terminal.alarmTriggered = true;
-            // terminal.countdownTimer = 30f;
             SetLevelAlarmActive();
         }
     }
     public void SetLevelAlarmActive() {
-        if (!gameData.levelData.alarm) {
+        if (!gameData.levelData.anyAlarmActive()) {
             alarmSoundTimer = alarmSoundInterval;
         }
-        gameData.levelData.alarm = true;
         OnSuspicionChange?.Invoke();
-        alarmShutdownTimer = 0f;
     }
     public bool isAlarmRadioInProgress() {
         foreach (HQReport report in reports.Values) {
@@ -48,33 +41,20 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return false;
     }
-    public AlarmHQTerminal levelHQTerminal() {
-        return alarmComponents.Values
+    public AlarmHQTerminal levelHQTerminal() => alarmComponents.Values
             .Where(node => node != null && node is AlarmHQTerminal)
             .Select(component => (AlarmHQTerminal)component)
             .First();
 
-        // foreach (AlarmComponent component in alarmComponents.Values) {
-        //     if (component is AlarmHQTerminal) {
-        //         Debug.Log($"found hq terminal: {component}");
-        //         return (AlarmHQTerminal)component;
-        //     }
-        // }
-        // return null;
-    }
     public void DeactivateAlarm() {
-        gameData.levelData.alarm = false;
-        // gameData.levelData.alarmCountDown = 0f;
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
-        alarmShutdownTimer = 0f;
 
         // reset strike team 
         PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
-        Debug.Log($"{pool.objectsInPool.Count} {pool.objectsActiveInWorld.Count}");
+        Debug.Log($"NPC pool: {pool.objectsInPool.Count} {pool.objectsActiveInWorld.Count}");
         gameData.levelData.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         strikeTeamCount = 0;
-        Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (levelHQTerminal() != null) {
@@ -88,8 +68,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public bool ContactReportTicket(GameObject reporter) {
-        // if (!gameData.levelData.hasHQ)
-        //     return false;
         if (levelHQTerminal() != null) {
             if (reports.ContainsKey(reporter)) {
                 HQReport report = reports[reporter];
@@ -107,9 +85,6 @@ public partial class GameManager : Singleton<GameManager> {
         return true;
     }
     void UpdateReportTickets() {
-        // if (!gameData.levelData.hasHQ)
-        //     return;
-        // if (levelHQTerminal() != null) {
         if (reports == null) reports = new Dictionary<GameObject, HQReport>();
         List<GameObject> timedOutReports = new List<GameObject>();
         foreach (KeyValuePair<GameObject, HQReport> kvp in reports) {
@@ -127,7 +102,6 @@ public partial class GameManager : Singleton<GameManager> {
                 OnCaptionChange("");
             }
         }
-        // }
     }
 
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
@@ -142,9 +116,6 @@ public partial class GameManager : Singleton<GameManager> {
         reports.Remove(kvp.Key);
     }
     void InitiateAlarmShutdown() {
-        if (alarmShutdownTimer > 0f)
-            return;
-        alarmShutdownTimer = 5f;
         List<SphereRobotAI> ais = new List<SphereRobotAI>(GameObject.FindObjectsOfType<SphereRobotAI>());
         if (ais.Count == 0) {
             DeactivateAlarm();
@@ -156,9 +127,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void TimeOutReport(KeyValuePair<GameObject, HQReport> kvp) {
         DisplayHQResponse("HQ: What's going on? Respond!");
-        // SetLevelAlarmActive();
         ActivateHQRadio();
-        // reports.Remove(kvp.Key);
     }
     void DisplayHQResponse(String response) {
         OnCaptionChange(response);
@@ -172,7 +141,6 @@ public partial class GameManager : Singleton<GameManager> {
         return timer;
     }
     public void UpdateGraphs() {
-
         float alarmTimerOrig = alarmCountdown();
 
         gameData?.levelData?.alarmGraph?.Update();
@@ -180,22 +148,10 @@ public partial class GameManager : Singleton<GameManager> {
         float alarmTimer = alarmCountdown();
         if (alarmTimer <= 0 && alarmTimerOrig > 0) {
             InitiateAlarmShutdown();
-
         }
-
     }
     public void UpdateAlarm() {
-
-        // float
-
-        // if (gameData.levelData.alarmCountDown > 0) {
-        //     gameData.levelData.alarmCountDown -= Time.deltaTime;
-        //     if (gameData.levelData.alarmCountDown <= 0) {
-        //         InitiateAlarmShutdown();
-        //     }
-        // }
-
-        if (gameData.levelData.alarm) {
+        if (gameData.levelData.anyAlarmActive()) {
             if (strikeTeamSpawnPoint != null) { // TODO: check level data 
                 UpdateStrikeTeamSpawn();
             }
@@ -205,9 +161,6 @@ public partial class GameManager : Singleton<GameManager> {
                 alarmSoundTimer -= alarmSoundInterval;
                 audioSource.PlayOneShot(alarmSound);
             }
-        }
-        if (alarmShutdownTimer > 0f) {
-            alarmShutdownTimer -= Time.deltaTime;
         }
     }
 
@@ -248,7 +201,6 @@ public partial class GameManager : Singleton<GameManager> {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
-
-        Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
+        // Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
     }
 }

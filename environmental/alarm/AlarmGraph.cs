@@ -15,7 +15,7 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
             node.Update();
         }
     }
-    public void  Refresh() {
+    public void Refresh() {
         activeEdges = new HashSet<HashSet<string>>();
 
         // refresh alarm terminals
@@ -30,35 +30,28 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
         foreach (AlarmNode source in sources) {
             DFS(source, new HashSet<HashSet<string>>());
         }
-        Debug.Log($"sources: {sources.Length}");
 
-        // foreach(AlarmNode node in nodes.Values){
-
-        // }
-        bool alarmActive = nodes.Values
-            .Where(node => GameManager.I.GetAlarmComponent(node.idn) is AlarmTerminal)
-            .Any(node => node.alarmTriggered);
-        Debug.Log($"alarm active: {alarmActive}");
+        bool alarmActive = anyAlarmActive();
 
         if (alarmActive) {
-            Debug.Log("set level alarm active");
             GameManager.I.SetLevelAlarmActive();
         } else {
             GameManager.I.DeactivateAlarm();
         }
     }
 
+    public bool anyAlarmActive() => nodes.Values
+            .Where(node => GameManager.I.GetAlarmComponent(node.idn) is AlarmTerminal)
+            .Any(node => node.alarmTriggered);
+
     void DFS(AlarmNode node, HashSet<HashSet<string>> visitedEdges) {
-        // this logic should change.
         if (edges.ContainsKey(node.idn))
             foreach (string neighborID in edges[node.idn]) {
                 visitedEdges.Add(new HashSet<string> { node.idn, neighborID });
-
                 AlarmComponent neighborComponent = GameManager.I.GetAlarmComponent(neighborID);
                 if (neighborComponent is AlarmTerminal) {
                     AlarmNode terminalNode = GameManager.I.GetAlarmNode(neighborID);
                     terminalNode.alarmTriggered = true;
-                    // terminalNode.countdownTimer = 30f;
                     AlarmTerminal terminal = (AlarmTerminal)neighborComponent;
                     terminal.Activate();
                     foreach (HashSet<string> pair in visitedEdges) {

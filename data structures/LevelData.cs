@@ -4,7 +4,6 @@ using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
-// public enum AlarmLevel { none, alarm }
 
 [System.Serializable]
 public class LevelData {
@@ -12,12 +11,12 @@ public class LevelData {
     public CyberGraph cyberGraph;
     public AlarmGraph alarmGraph;
     public SensitivityLevel sensitivityLevel;
-    public bool alarm;
-    // public float alarmCountDown;
-    // public bool hasHQ;
     public string alarmAudioClipPath = "sounds/alarm/klaxon";
     public int strikeTeamMaxSize;
     public float strikeTeamResponseTime;
+    public bool anyAlarmActive() {
+        return alarmGraph.anyAlarmActive();
+    }
     public static LevelData LoadLevelData(string levelName) {
         PowerGraph powerGraph = Graph<PowerNode, PowerGraph>.LoadAll(levelName);
         CyberGraph cyberGraph = Graph<CyberNode, CyberGraph>.LoadAll(levelName);
@@ -32,10 +31,8 @@ public class LevelData {
             cyberGraph = cyberGraph,
             alarmGraph = alarmGraph,
             sensitivityLevel = sensitivityLevel,
-            // hasHQ = true,
             strikeTeamMaxSize = 3,
             strikeTeamResponseTime = 3f
-            // alarmLevel = AlarmLevel.none
         };
     }
 }

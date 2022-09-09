@@ -165,7 +165,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             disguiseChevronRect.sizeDelta = new Vector2(215f, factor * 33f);
             bottomSpacerRect.sizeDelta = new Vector2(215f, factor * 33f);
         }
-        if (GameManager.I.gameData.levelData.alarm) {
+        if (GameManager.I.gameData.levelData.anyAlarmActive()) {
             Rect fillBarRect = alarmFillBarRectTransform.rect;
             float factor = 150f * (GameManager.I.alarmCountdown() / 30f);
             alarmFillBarRectTransform.sizeDelta = new Vector2(factor, 1f);
@@ -229,7 +229,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
-                if (GameManager.I.gameData.playerData.disguise && !GameManager.I.gameData.levelData.alarm) {
+                if (GameManager.I.gameData.playerData.disguise && !GameManager.I.gameData.levelData.anyAlarmActive()) {
                     reactionIgnoreChevron.color = disabledColor;
                     reactionIgnoreLight.color = lightGreenDisabled;
                 }
@@ -250,7 +250,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
 
-                if (GameManager.I.gameData.levelData.alarm && !GameManager.I.gameData.playerData.disguise) {
+                if (GameManager.I.gameData.levelData.anyAlarmActive() && !GameManager.I.gameData.playerData.disguise) {
                     reactionAttackChevron.color = disabledColor;
                     reactionAttackLight.color = lightRedDisabled;
                 }
@@ -269,7 +269,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 break;
         }
 
-        if (GameManager.I.gameData.levelData.alarm) {
+        if (GameManager.I.gameData.levelData.anyAlarmActive()) {
             if (!alarmChevronObject.activeInHierarchy) {
                 easeInAlarmChevron = true;
                 alarmChevronEaseTimer = 0f;

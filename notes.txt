@@ -1397,23 +1397,4 @@ switching items graphical effect
 easing in overlay 
 "none" overlay with buttons
 
-what is the point of the alarm node countdown?
-    use alarm node countdown instead of global state?
-    what value to refresh when a guard sees you during alarm mode?
-        maybe, refresh none?
-    how to handle initiate alarm shutdown?'
-    '
-
-
-
-1. alarm graph refresh
-    do DFS, find connection to terminal
-    now, check for any active terminals
-    if so, alarm is active.
-    Activate alarm
-
-2. guard radios hq
-hq radio activates
-do DFS, find connection to terminal
-now, check for any active terminals
-if so, alarm is active
+radio HQ state is being weird, maybe because of selector

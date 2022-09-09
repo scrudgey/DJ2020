@@ -58,12 +58,10 @@ namespace UI {
             TestSuite.RunToolboxTests();
         }
         public void ToggleAlarm(string[] args) {
-            bool alarm = GameManager.I.gameData.levelData.alarm;
-            if (alarm)
+            if (GameManager.I.gameData.levelData.anyAlarmActive())
                 GameManager.I.DeactivateAlarm();
             else
                 GameManager.I.ActivateHQRadio();
-            // GameManager.I.SetLevelAlarmActive();
 
         }
         public void ToggleDisguise(string[] args) {

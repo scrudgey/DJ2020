@@ -85,11 +85,7 @@ public partial class GameManager : Singleton<GameManager> {
         // connect up cyber grids
         Debug.Log("connecting alarm grid...");
         foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
-            // if (alarmComponents.ContainsKey(component.idn)) {
-            // alarmComponents[component.idn].Add(component);
-            // } else {
             alarmComponents[component.idn] = component;
-            // }
         }
 
         // TODO: abstract this?
@@ -238,11 +234,8 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelData.alarmGraph.nodes) {
             if (alarmComponents.ContainsKey(kvp.Key)) {
                 AlarmComponent component = alarmComponents[kvp.Key];
-                // foreach (AlarmComponent component in alarmComponents[kvp.Key]) {
                 component.alarmTriggered = kvp.Value.alarmTriggered;
                 component.countdownTimer = kvp.Value.countdownTimer;
-                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
-                // }
             }
         }
     }

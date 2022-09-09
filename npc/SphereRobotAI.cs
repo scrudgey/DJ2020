@@ -119,7 +119,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 // listener.SetListenRadius();
                 break;
             case SphereAttackState:
-                if (!GameManager.I.gameData.levelData.alarm) {
+                if (!GameManager.I.gameData.levelData.anyAlarmActive()) {
                     if (lastDamage != null) {
                         ChangeState(new ReportToHQState(this, speechTextController, lastDamage));
                     } else if (getLocationOfInterest() != Vector3.zero) {
@@ -168,8 +168,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         input.preventWallPress = true;
 
         // possibly avoid bunching here
-        float avoidFactor = 5f;
-        float avoidRadius = 1f;
+        float avoidFactor = 0.1f;
+        float avoidRadius = 2f;
         Collider[] others = Physics.OverlapSphere(transform.position, avoidRadius, LayerUtil.GetMask(Layer.obj));
         Vector3 closeness = Vector3.zero;
         foreach (Collider collider in others) {
@@ -307,9 +307,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case DisableAlarmState:
             case ReportToHQState:
             case StopAndListenState:
-
                 alertHandler.ShowAlert(useWarnMaterial: true);
-                if (GameManager.I.gameData.levelData.alarm) {
+                if (GameManager.I.gameData.levelData.anyAlarmActive()) {
                     ChangeState(new SearchDirectionState(this, damage, doIntro: false));
                 } else {
                     ChangeState(new ReactToAttackState(this, speechTextController, damage));
@@ -347,7 +346,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case FollowTheLeaderState:
                 case DisableAlarmState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
-                    if (GameManager.I.gameData.levelData.alarm) {
+                    if (GameManager.I.gameData.levelData.anyAlarmActive()) {
                         ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                     } else {
                         ChangeState(new ReactToAttackState(this, speechTextController, noise));
@@ -466,9 +465,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         Reaction reaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious);
 
         Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious, applyModifiers: false);
-        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelData.alarm) {
+        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelData.anyAlarmActive()) {
             GameManager.I.ActivateHQRadio();
-            // GameManager.I.SetLevelAlarmActive();
         }
 
         if (reaction == Reaction.investigate && recentlyInCombat) {
