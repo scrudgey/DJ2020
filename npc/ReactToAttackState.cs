@@ -81,7 +81,7 @@ public class ReactToAttackState : SphereControlState {
                     reorient = true
                 }, 1.5f),
                 new Selector(
-                    new TaskConditional(GameManager.I.isAlarmRadioInProgress),
+                    new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
                     new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
                 )
             );

@@ -61,7 +61,7 @@ public class ReportToHQState : SphereControlState {
 
         rootTaskNode =
                 new Selector(
-                    new TaskConditional(GameManager.I.isAlarmRadioInProgress),
+                    new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
                     new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
                 );
     }

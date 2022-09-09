@@ -911,6 +911,22 @@ Q: what is the proper solution?
     we need a billboard & non-billboard solution?
 
 
+
+proposed alarm system
+    the way it works is, alarm objects are wired into alarm terminals.
+    when an alarm source triggers, it tries to find an alarm terminal.
+    if it finds an alarm terminal, it activates the alarm terminal.
+    when the alarm terminal activates, it starts a countdown timer of 30s (configurable)
+    the alarm terminal is active until the countdown timer reaches 0, then it deactivates.
+    if the alarm source or alarm terminal is deactivated or destroyed, the alarm terminal deactivates.
+    on alarm graph change, transfer state / refresh UI.
+    upon UI refresh, if there is an active alarm terminal, we are in alarm state.
+    show the maximum countdown timer of all active alarm terminals.
+    guards radio HQ to communicate with a special HQ alarm terminal.
+    that terminal can be disabled or destroyed just like all the others. 
+
+
+
 * redesign data structure so it can generalize to multiple skins
 * make it easier to select the next torso sprite (spritesheet parameter?)
 * sprite data: 
@@ -1188,6 +1204,11 @@ Q: what is the proper solution?
 * alarm systems
     * cameras
     * laser tripwire
+* display countdowntimer in alarm graph overlay
+* when alarm terminal is triggered, highlight in graph view
+* object pooling NPCs is working strangely
+* use "enabled" instead of alarmActivated
+* radio HQ state is being weird, maybe because of selector
 
 
 graphical issues:
@@ -1285,7 +1306,9 @@ UI embellishments
             PLAYER: STATS
     pulse some element in color in alarm timer, maybe show some bkg
         blink at 00.00 and then ease out
-    
+    switching items graphical effect
+    easing in overlay 
+        
 
 save system:
     allow independent level data
@@ -1366,35 +1389,9 @@ alarm triggering effects
 graph system:
     [<<][ELECTRICAL][>>]
     and these are buttons you can click
-
-
-
-
-proposed alarm system
-
-the way it works is, alarm objects are wired into alarm terminals.
-when an alarm source triggers, it tries to find an alarm terminal.
-if it finds an alarm terminal, it activates the alarm terminal.
-when the alarm terminal activates, it starts a countdown timer of 30s (configurable)
-the alarm terminal is active until the countdown timer reaches 0, then it deactivates.
-if the alarm source or alarm terminal is deactivated or destroyed, the alarm terminal deactivates.
-on alarm graph change, transfer state / refresh UI.
-upon UI refresh, if there is an active alarm terminal, we are in alarm state.
-show the maximum countdown timer of all active alarm terminals.
-guards radio HQ to communicate with a special HQ alarm terminal.
-that terminal can be disabled or destroyed just like all the others. 
+    "none" overlay with buttons
 
 obsoleted: activate alarm, deactivate alarm as presently used
 level data has hq
 
-* display countdowntimer in alarm graph overlay
-* when alarm terminal is triggered, highlight in graph view
-* object pooling NPCs is working strangely
-
-use "enabled" instead of alarmActivated
 thermal goggles icon
-switching items graphical effect
-easing in overlay 
-"none" overlay with buttons
-
-radio HQ state is being weird, maybe because of selector

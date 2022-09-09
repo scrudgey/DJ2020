@@ -33,9 +33,9 @@ public partial class GameManager : Singleton<GameManager> {
         }
         OnSuspicionChange?.Invoke();
     }
-    public bool isAlarmRadioInProgress() {
+    public bool isAlarmRadioInProgress(GameObject exclude) {
         foreach (HQReport report in reports.Values) {
-            if (report.desiredAlarmState) {
+            if (report.desiredAlarmState && report.reporter != exclude) {
                 return true;
             }
         }
