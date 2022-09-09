@@ -11,7 +11,7 @@ public class AlarmIndicatorHandler : MonoBehaviour {
     float easingTimer;
     readonly static float easingDuration = 0.5f;
     void Update() {
-        if (GameManager.I.gameData.levelData.alarmCountDown > 0) {
+        if (GameManager.I.alarmCountdown() > 0) {
             if (state != State.easeIn && state != State.running) {
                 state = State.easeIn;
                 easingTimer = 0f;
@@ -45,7 +45,7 @@ public class AlarmIndicatorHandler : MonoBehaviour {
 
     void SetText() {
         foreach (TextMeshProUGUI timerText in timerTexts) {
-            timerText.text = GameManager.I.gameData.levelData.alarmCountDown.ToString("00.00");
+            timerText.text = GameManager.I.alarmCountdown().ToString("00.00");
         }
     }
 }

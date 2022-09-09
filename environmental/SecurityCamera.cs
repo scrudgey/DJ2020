@@ -7,6 +7,7 @@ public class SecurityCamera : IBinder<SightCone> {
     enum State { rotateLeft, lookLeft, rotateRight, lookRight }
     State state;
     public Transform cameraTransform;
+    public AlarmComponent alarmComponent;
     public SightCone sightCone;
     public Transform sightOrigin;
     public AlertHandler alertHandler;
@@ -77,7 +78,8 @@ public class SecurityCamera : IBinder<SightCone> {
         }
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (GameManager.I.IsPlayerVisible(distance)) {
-            GameManager.I.ActivateAlarm();
+            AlarmNode alarmNode = GameManager.I.GetAlarmNode(alarmComponent.idn);
+            GameManager.I.SetAlarmNodeState(alarmNode, true);
         }
         alertHandler.ShowAlert();
         cooldown = 5f;

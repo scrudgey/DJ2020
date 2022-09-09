@@ -467,7 +467,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious, applyModifiers: false);
         if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelData.alarm) {
-            GameManager.I.ActivateAlarm();
+            GameManager.I.ActivateHQRadio();
+            // GameManager.I.SetLevelAlarmActive();
         }
 
         if (reaction == Reaction.investigate && recentlyInCombat) {

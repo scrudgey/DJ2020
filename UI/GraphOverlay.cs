@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node where V : NodeIndicator<U, T> {
     public UIColorSet colorSet;
     public Camera cam;
@@ -36,8 +36,10 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
             DisableOverlay();
             return;
         }
-
+        string sceneName = SceneManager.GetActiveScene().name;
         foreach (U node in graph.nodes.Values) {
+            if (node.sceneName != sceneName)
+                continue;
             V indicator = GetIndicator(node);
             Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
             indicator.SetScreenPosition(screenPoint);
@@ -47,12 +49,16 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         SetEdgeGraphicState();
     }
     public virtual void SetEdgeGraphicState() {
+        string sceneName = SceneManager.GetActiveScene().name;
+
         // Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count} ");
         foreach (HashSet<string> edge in graph.edgePairs) {
             LineRenderer renderer = GetLineRenderer(edge);
             string[] nodes = edge.ToArray();
             U node1 = graph.nodes[nodes[0]];
             U node2 = graph.nodes[nodes[1]];
+            if (node1.sceneName != sceneName || node2.sceneName != sceneName)
+                continue;
 
             renderer.positionCount = 2;
             renderer.SetPositions(new Vector3[2] { node1.position, node2.position });

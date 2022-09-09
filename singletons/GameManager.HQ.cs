@@ -18,12 +18,25 @@ public partial class GameManager : Singleton<GameManager> {
     float clearCaptionTimer;
     float alarmShutdownTimer;
 
-    public void ActivateAlarm() {
+    public void ActivateHQRadio() {
+        AlarmHQTerminal terminal = levelHQTerminal();
+        if (terminal != null) {
+            Debug.Log("activating hq terminal");
+
+            AlarmNode node = GetAlarmNode(terminal.idn);
+            node.alarmTriggered = true;
+            node.countdownTimer = 30f;
+            RefreshAlarmGraph();
+            // terminal.alarmTriggered = true;
+            // terminal.countdownTimer = 30f;
+            SetLevelAlarmActive();
+        }
+    }
+    public void SetLevelAlarmActive() {
         if (!gameData.levelData.alarm) {
             alarmSoundTimer = alarmSoundInterval;
         }
         gameData.levelData.alarm = true;
-        gameData.levelData.alarmCountDown = 30f;
         OnSuspicionChange?.Invoke();
         alarmShutdownTimer = 0f;
     }
@@ -35,9 +48,23 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return false;
     }
+    public AlarmHQTerminal levelHQTerminal() {
+        return alarmComponents.Values
+            .Where(node => node != null && node is AlarmHQTerminal)
+            .Select(component => (AlarmHQTerminal)component)
+            .First();
+
+        // foreach (AlarmComponent component in alarmComponents.Values) {
+        //     if (component is AlarmHQTerminal) {
+        //         Debug.Log($"found hq terminal: {component}");
+        //         return (AlarmHQTerminal)component;
+        //     }
+        // }
+        // return null;
+    }
     public void DeactivateAlarm() {
         gameData.levelData.alarm = false;
-        gameData.levelData.alarmCountDown = 0f;
+        // gameData.levelData.alarmCountDown = 0f;
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
         alarmShutdownTimer = 0f;
@@ -50,41 +77,49 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"strike team: {strikeTeamCount}/{gameData.levelData.strikeTeamMaxSize}");
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
-        if (!gameData.levelData.hasHQ)
-            return;
-        if (reports == null) reports = new Dictionary<GameObject, HQReport>();
-        if (reports.ContainsKey(reporter)) {
-            ContactReportTicket(reporter);
-        } else {
-            report.timeOfLastContact = Time.time;
-            reports[reporter] = report;
+        if (levelHQTerminal() != null) {
+            if (reports == null) reports = new Dictionary<GameObject, HQReport>();
+            if (reports.ContainsKey(reporter)) {
+                ContactReportTicket(reporter);
+            } else {
+                report.timeOfLastContact = Time.time;
+                reports[reporter] = report;
+            }
         }
-
     }
     public bool ContactReportTicket(GameObject reporter) {
-        if (!gameData.levelData.hasHQ)
-            return false;
-        if (reports.ContainsKey(reporter)) {
-            HQReport report = reports[reporter];
-            report.timeOfLastContact = Time.time;
-            report.timer += Time.deltaTime;
-            if (report.timer > report.lifetime) {
-                CloseReport(new KeyValuePair<GameObject, HQReport>(reporter, report));
-                return true;
-            } else return false;
-        } else {
-            Debug.LogWarning("reporter contacting HQ without opening ticket");
-            return false;
+        // if (!gameData.levelData.hasHQ)
+        //     return false;
+        if (levelHQTerminal() != null) {
+            if (reports.ContainsKey(reporter)) {
+                HQReport report = reports[reporter];
+                report.timeOfLastContact = Time.time;
+                report.timer += Time.deltaTime;
+                if (report.timer > report.lifetime) {
+                    CloseReport(new KeyValuePair<GameObject, HQReport>(reporter, report));
+                    return true;
+                } else return false;
+            } else {
+                Debug.LogWarning("reporter contacting HQ without opening ticket");
+                return false;
+            }
         }
+        return true;
     }
     void UpdateReportTickets() {
-        if (!gameData.levelData.hasHQ)
-            return;
+        // if (!gameData.levelData.hasHQ)
+        //     return;
+        // if (levelHQTerminal() != null) {
         if (reports == null) reports = new Dictionary<GameObject, HQReport>();
+        List<GameObject> timedOutReports = new List<GameObject>();
         foreach (KeyValuePair<GameObject, HQReport> kvp in reports) {
             if (Time.time - kvp.Value.timeOfLastContact > 10) {
                 TimeOutReport(kvp);
+                timedOutReports.Add(kvp.Key);
             }
+        }
+        foreach (GameObject key in timedOutReports) {
+            reports.Remove(key);
         }
         if (clearCaptionTimer > 0) {
             clearCaptionTimer -= Time.deltaTime;
@@ -92,11 +127,13 @@ public partial class GameManager : Singleton<GameManager> {
                 OnCaptionChange("");
             }
         }
+        // }
     }
+
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
         locationOfLastDisturbance = kvp.Value.locationOfLastDisturbance;
         if (kvp.Value.desiredAlarmState) {
-            ActivateAlarm();
+            ActivateHQRadio();
             DisplayHQResponse("HQ: Understood. Dispatching strike team.");
         } else {
             DeactivateAlarm();
@@ -119,20 +156,44 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void TimeOutReport(KeyValuePair<GameObject, HQReport> kvp) {
         DisplayHQResponse("HQ: What's going on? Respond!");
-        ActivateAlarm();
-        reports.Remove(kvp.Key);
+        // SetLevelAlarmActive();
+        ActivateHQRadio();
+        // reports.Remove(kvp.Key);
     }
     void DisplayHQResponse(String response) {
         OnCaptionChange(response);
         clearCaptionTimer = 5f;
     }
-    public void UpdateAlarm() {
-        if (gameData.levelData.alarmCountDown > 0) {
-            gameData.levelData.alarmCountDown -= Time.deltaTime;
-            if (gameData.levelData.alarmCountDown <= 0) {
-                InitiateAlarmShutdown();
-            }
+    public float alarmCountdown() {
+        float timer = 0f;
+        foreach (AlarmNode node in gameData.levelData.alarmGraph.nodes.Values) {
+            timer = Math.Max(timer, node.countdownTimer);
         }
+        return timer;
+    }
+    public void UpdateGraphs() {
+
+        float alarmTimerOrig = alarmCountdown();
+
+        gameData?.levelData?.alarmGraph?.Update();
+
+        float alarmTimer = alarmCountdown();
+        if (alarmTimer <= 0 && alarmTimerOrig > 0) {
+            InitiateAlarmShutdown();
+
+        }
+
+    }
+    public void UpdateAlarm() {
+
+        // float
+
+        // if (gameData.levelData.alarmCountDown > 0) {
+        //     gameData.levelData.alarmCountDown -= Time.deltaTime;
+        //     if (gameData.levelData.alarmCountDown <= 0) {
+        //         InitiateAlarmShutdown();
+        //     }
+        // }
 
         if (gameData.levelData.alarm) {
             if (strikeTeamSpawnPoint != null) { // TODO: check level data 

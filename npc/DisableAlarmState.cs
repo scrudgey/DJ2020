@@ -14,7 +14,7 @@ public class DisableAlarmState : SphereControlState {
 
     void SetupRootNode() {
         LevelData levelData = GameManager.I.gameData.levelData;
-        if (levelData.hasHQ && levelData.alarm) {
+        if (GameManager.I.levelHQTerminal() != null && levelData.alarm) {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = false,
@@ -24,6 +24,8 @@ public class DisableAlarmState : SphereControlState {
                 speechText = "HQ respond. All clear."
             };
             rootTaskNode = new TaskTimerDectorator(new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report), 6.5f);
+        } else {
+            rootTaskNode = new TaskSucceed();
         }
     }
 

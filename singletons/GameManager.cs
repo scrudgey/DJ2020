@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
-public enum OverlayType { none, power, cyber }
+public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { gun, pointer }
 public enum InputMode { none, gun, cyber, aim, wallpressAim }
 public struct PointerData {
@@ -32,6 +32,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<MenuType> OnMenuChange;
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
+    public static Action<AlarmGraph> OnAlarmGraphChange;
     public static Action<OverlayType> OnOverlayChange;
     public static Action<InputMode, InputMode> OnInputModeChange; // TODO: legit? should be camera state change?
     public static Action<CursorType> OnCursorTypeChange;
@@ -184,6 +185,7 @@ public partial class GameManager : Singleton<GameManager> {
         UpdateSuspicion();
         UpdateAlarm();
         UpdateReportTickets();
+        UpdateGraphs();
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {

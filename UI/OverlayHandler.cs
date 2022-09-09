@@ -17,9 +17,11 @@ public class OverlayHandler : MonoBehaviour {
     public TextMeshProUGUI titleText;
     public PowerOverlay powerOverlay;
     public CyberOverlay cyberOverlay;
+    public AlarmOverlay alarmOverlay;
     private Camera _cam;
     public UIColorSet powerOverlayColors;
     public UIColorSet cyberOverlayColors;
+    public UIColorSet alarmOverlayColors;
     public Camera cam {
         get { return _cam; }
         set {
@@ -35,16 +37,19 @@ public class OverlayHandler : MonoBehaviour {
         GameManager.OnOverlayChange += HandleOverlayChange;
         GameManager.OnPowerGraphChange += RefreshPowerGraph;
         GameManager.OnCyberGraphChange += RefreshCyberGraph;
+        GameManager.OnAlarmGraphChange += RefreshAlarmGraph;
 
         // TODO: cyber
         RefreshPowerGraph(GameManager.I.gameData.levelData.powerGraph);
         RefreshCyberGraph(GameManager.I.gameData.levelData.cyberGraph);
+        RefreshAlarmGraph(GameManager.I.gameData.levelData.alarmGraph);
         HandleOverlayChange(GameManager.I.activeOverlayType);
     }
     void OnDestroy() {
         GameManager.OnOverlayChange -= HandleOverlayChange;
         GameManager.OnPowerGraphChange -= RefreshPowerGraph;
         GameManager.OnCyberGraphChange -= RefreshCyberGraph;
+        GameManager.OnAlarmGraphChange -= RefreshAlarmGraph;
     }
 
     public void RefreshPowerGraph(PowerGraph graph) {
@@ -55,6 +60,10 @@ public class OverlayHandler : MonoBehaviour {
         cyberOverlay.cam = cam;
         cyberOverlay.Refresh(graph);
     }
+    public void RefreshAlarmGraph(AlarmGraph graph) {
+        alarmOverlay.cam = cam;
+        alarmOverlay.Refresh(graph);
+    }
     public void HandleOverlayChange(OverlayType type) {
         // Debug.Log($"handling overlay change: {type}");
         switch (type) {
@@ -62,6 +71,7 @@ public class OverlayHandler : MonoBehaviour {
             default:
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(false);
+                alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "None";
                 break;
             case OverlayType.power:
@@ -70,6 +80,7 @@ public class OverlayHandler : MonoBehaviour {
                 titleText.color = powerOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(true);
                 cyberOverlay.gameObject.SetActive(false);
+                alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Power";
                 break;
             case OverlayType.cyber:
@@ -78,7 +89,17 @@ public class OverlayHandler : MonoBehaviour {
                 titleText.color = cyberOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(true);
+                alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Network";
+                break;
+            case OverlayType.alarm:
+                outlineImage.color = alarmOverlayColors.enabledColor;
+                titleBoxImage.color = alarmOverlayColors.enabledColor;
+                titleText.color = alarmOverlayColors.enabledColor;
+                powerOverlay.gameObject.SetActive(false);
+                cyberOverlay.gameObject.SetActive(false);
+                alarmOverlay.gameObject.SetActive(true);
+                titleText.text = "Alarm";
                 break;
         }
         if (type == OverlayType.none) {

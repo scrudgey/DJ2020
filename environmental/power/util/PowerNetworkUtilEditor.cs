@@ -11,16 +11,19 @@ using UnityEngine.SceneManagement;
 public class PowerNetworkUtilEditor : Editor {
     public string levelName = "test";
     public override void OnInspectorGUI() {
+        levelName = GUILayout.TextField(levelName, 25);
         // PowerNetworkUtil networkUtil = (PowerNetworkUtil)target;
 
-        if (GUILayout.Button("Build Power Network")) {
+        if (GUILayout.Button("Build Network")) {
             string sceneName = SceneManager.GetActiveScene().name;
 
             PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
             CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
+            AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
 
             powerGraph.Write(levelName, sceneName);
             cyberGraph.Write(levelName, sceneName);
+            alarmGraph.Write(levelName, sceneName);
             AssetDatabase.Refresh();
         }
 
@@ -30,6 +33,7 @@ public class PowerNetworkUtilEditor : Editor {
         T graph = new T();
 
         V[] components = GameObject.FindObjectsOfType<V>();
+        string sceneName = SceneManager.GetActiveScene().name;
 
         foreach (var group in components.GroupBy(component => component.gameObject)) {
             Guid guid = Guid.NewGuid();
@@ -39,6 +43,7 @@ public class PowerNetworkUtilEditor : Editor {
 
             // new node with idn
             U node = new U {
+                sceneName = sceneName,
                 idn = idn,
                 position = position,
                 enabled = true,

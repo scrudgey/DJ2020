@@ -1178,7 +1178,16 @@ Q: what is the proper solution?
     * choose a second position?
     * track direction you were moving
     * NPC should see you in deep shadow when they get close
-
+* laser
+    * trip when player walks through
+    * play sound
+    * laser should reach to the other wall, or to max distance
+    * visible only with special devices
+    * possible to leave a gap in the lasers you can crawl through
+* pop out from wall
+* alarm systems
+    * cameras
+    * laser tripwire
 
 
 graphical issues:
@@ -1225,7 +1234,10 @@ nice to have / future goals:
             how to decide who to run to alarm panel?
     the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
         i.e. using yellow just resolves to red? 
-    laser grid don't trip when NPC walks through? disable temporarily?
+    laser tripwire
+        laser grid don't trip when NPC walks through? disable temporarily?laser grid
+        dust / smoke shader
+        goggles create tint
 
 
 
@@ -1300,19 +1312,14 @@ UI:
     minimap
     weapon wheel
 
-graph system:
-    [<<][ELECTRICAL][>>]
-        -                +
-    and these are buttons you can click
 
 control / combat:
     better shotgun
     aim: fixed angular size
-    * pop out from wall
 
 sound
     ambience
-        hums in internal spaces
+        room tone in internal spaces
         distant traffic sounds
 
 stealth:
@@ -1323,39 +1330,90 @@ stealth:
 
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
-third grid: alarm systems
-    * cameras
-    * laser tripwire
-    alarm routers
-
+when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
+enemies still bunching up
+npc can't seem to shoot me when close
 aim mode could track camera better
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC investigate routine
-abstract out visibility and perception 
+abstract out visibility and perception ?
+laser grid and security cameras require power
 
+when alarm is triggered, find route(s) to alarm terminals
+    * if a route is found, highlight the path in the alarm view and activate alarm
+    * highlight triggered alarm node in alarm grid
+    * highlight alarm terminal in alarm grid
+    alarms can be routed through a common router to be disabled
 
-we need systemization of how alarms are triggered by sensors
+interaction of alarm grid and cyber grid
+    hacking disables alarm propagation
+    hacking disables alarm generation
+    disabling alarm propagation in progress disables alarm
+        this distinguishes between HQ alarm, and alarm generating nodes.
+    possibly, the alarm terminal can be a physical object in the world that goes off
+
+interaction of alarm elements and power grid
+    hacking turns off cameras and laser grids
+
+alarm triggering effects
     notify others of location?
     treated like being spotted?
-how does alarm grid work?
-    alarm source must connect back to HQ in order for it to work
-    alarms can be routed through a common router to be disabled
-    what is networkable about alarm systems?
-        route through switches
-        route through routers
-        alarm source: disable this, and alarm won't be broadcast to this area?
-        alarm items should be frequently connected to a router.
+    alarm is active on a timer?
+    alarm is different from when team radios HQ?
+    alarm source can be deactivated?
 
-laser grid
-    * trip when player walks through
-    * play sound
-    * laser should reach to the other wall, or to max distance
-    * visible only with special devices
-    dust / smoke shader
-    possible to leave a gap in the lasers you can crawl through
+graph system:
+    [<<][ELECTRICAL][>>]
+    and these are buttons you can click
 
 
-when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
-enemies still bunching up
-npc can't seem to shoot me when close
+
+
+proposed alarm system
+
+the way it works is, alarm objects are wired into alarm terminals.
+when an alarm source triggers, it tries to find an alarm terminal.
+if it finds an alarm terminal, it activates the alarm terminal.
+when the alarm terminal activates, it starts a countdown timer of 30s (configurable)
+the alarm terminal is active until the countdown timer reaches 0, then it deactivates.
+if the alarm source or alarm terminal is deactivated or destroyed, the alarm terminal deactivates.
+on alarm graph change, transfer state / refresh UI.
+upon UI refresh, if there is an active alarm terminal, we are in alarm state.
+show the maximum countdown timer of all active alarm terminals.
+guards radio HQ to communicate with a special HQ alarm terminal.
+that terminal can be disabled or destroyed just like all the others. 
+
+obsoleted: activate alarm, deactivate alarm as presently used
+level data has hq
+
+* display countdowntimer in alarm graph overlay
+* when alarm terminal is triggered, highlight in graph view
+* object pooling NPCs is working strangely
+
+use "enabled" instead of alarmActivated
+thermal goggles icon
+switching items graphical effect
+easing in overlay 
+"none" overlay with buttons
+
+what is the point of the alarm node countdown?
+    use alarm node countdown instead of global state?
+    what value to refresh when a guard sees you during alarm mode?
+        maybe, refresh none?
+    how to handle initiate alarm shutdown?'
+    '
+
+
+
+1. alarm graph refresh
+    do DFS, find connection to terminal
+    now, check for any active terminals
+    if so, alarm is active.
+    Activate alarm
+
+2. guard radios hq
+hq radio activates
+do DFS, find connection to terminal
+now, check for any active terminals
+if so, alarm is active

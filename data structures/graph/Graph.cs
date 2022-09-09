@@ -16,6 +16,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         edgePairs = new HashSet<HashSet<string>>(HashSet<string>.CreateSetComparer());
         edges = new SerializableDictionary<string, HashSet<string>>();
     }
+
     public void AddEdge(Node from, Node to) {
         AddLink(from, to);
         AddLink(to, from);
@@ -77,7 +78,11 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
             W graph = null;
             foreach (string path in graphPaths) {
                 Debug.Log($"loading {path}...");
-                graph = Load(path);
+                if (graph is null) {
+                    graph = Load(path);
+                } else {
+                    graph = graph + Load(path) as W;
+                }
             }
             // TODO: combine graphs
             return graph;
@@ -89,9 +94,25 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
             return "power";
         } else if (typeof(W) == typeof(CyberGraph)) {
             return "cyber";
+        } else if (typeof(W) == typeof(AlarmGraph)) {
+            return "alarm";
         } else {
             return "generic";
         }
+    }
+
+
+    public static Graph<T, W> operator +(Graph<T, W> lhs, Graph<T, W> rhs) {
+        foreach (KeyValuePair<string, T> node in rhs.nodes) {
+            lhs.nodes[node.Key] = node.Value;
+        }
+        foreach (KeyValuePair<string, HashSet<string>> edge in rhs.edges) {
+            lhs.edges[edge.Key] = edge.Value;
+        }
+        foreach (HashSet<string> edgePair in rhs.edgePairs) {
+            lhs.edgePairs.Add(edgePair);
+        }
+        return lhs;
     }
 
 }

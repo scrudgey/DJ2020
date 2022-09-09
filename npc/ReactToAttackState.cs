@@ -50,7 +50,8 @@ public class ReactToAttackState : SphereControlState {
             _ => "HQ respond! Activate building alarm!"
         };
 
-        if (levelData.hasHQ && !levelData.alarm) {
+        // if (levelData.hasHQ && !levelData.alarm) {
+        if (GameManager.I.levelHQTerminal() != null && !levelData.alarm) {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = true,

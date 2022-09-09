@@ -167,7 +167,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         }
         if (GameManager.I.gameData.levelData.alarm) {
             Rect fillBarRect = alarmFillBarRectTransform.rect;
-            float factor = 150f * (GameManager.I.gameData.levelData.alarmCountDown / 30f);
+            float factor = 150f * (GameManager.I.alarmCountdown() / 30f);
             alarmFillBarRectTransform.sizeDelta = new Vector2(factor, 1f);
         }
     }

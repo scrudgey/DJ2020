@@ -62,7 +62,9 @@ namespace UI {
             if (alarm)
                 GameManager.I.DeactivateAlarm();
             else
-                GameManager.I.ActivateAlarm();
+                GameManager.I.ActivateHQRadio();
+            // GameManager.I.SetLevelAlarmActive();
+
         }
         public void ToggleDisguise(string[] args) {
             bool disguise = GameManager.I.gameData.playerData.disguise;

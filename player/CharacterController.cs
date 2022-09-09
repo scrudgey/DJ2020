@@ -348,7 +348,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
 
             // Crouching input
             if (input.CrouchDown || input.jumpHeld) {
-                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
+                Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 if (!isCrouching) {
                     isCrouching = true;
                     if (input.CrouchDown)
@@ -393,7 +393,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 isRunning = false;
                 isProne = false;
                 if (input.CrouchDown) {
-                    Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.75f);
+                    Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                     if (!isCrouching) {
                         isCrouching = true;
                         Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
@@ -510,11 +510,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 }
                 break;
             case CharacterState.wallPress:
-
-                // TODO: handle popout
-                // gunHandler.SetInputs(input);
-
-                // Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.75f);
                 if (_moveAxis != Vector2.zero) {
                     lastWallInput = _moveAxis;
                 } else {
@@ -557,7 +552,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
                 if (Motor.Velocity.y < 0) {
                     Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 } else {
-                    Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.75f);
+                    Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 }
                 break;
         }
@@ -1045,7 +1040,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
             _probedColliders = new Collider[8];
             if (Motor.CharacterCollisionsOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders) > 0) {
                 // If obstructions, just stick to crouching dimensions
-                Motor.SetCapsuleDimensions(defaultRadius, 1f, 0.5f);
+                Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
             } else {
                 // If no obstructions, uncrouch
                 Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);

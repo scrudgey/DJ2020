@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class PowerNodePopupBox : NodePopupBox<PowerNode, PowerGraph> {
-
     public TextMeshProUGUI poweredText;
     public Color unpoweredColor;
     protected override void SetGraphicalState(PowerNode node) {

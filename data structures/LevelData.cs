@@ -10,16 +10,19 @@ using UnityEngine;
 public class LevelData {
     public PowerGraph powerGraph;
     public CyberGraph cyberGraph;
+    public AlarmGraph alarmGraph;
     public SensitivityLevel sensitivityLevel;
     public bool alarm;
-    public float alarmCountDown;
-    public bool hasHQ;
+    // public float alarmCountDown;
+    // public bool hasHQ;
     public string alarmAudioClipPath = "sounds/alarm/klaxon";
     public int strikeTeamMaxSize;
     public float strikeTeamResponseTime;
     public static LevelData LoadLevelData(string levelName) {
         PowerGraph powerGraph = Graph<PowerNode, PowerGraph>.LoadAll(levelName);
         CyberGraph cyberGraph = Graph<CyberNode, CyberGraph>.LoadAll(levelName);
+        AlarmGraph alarmGraph = Graph<AlarmNode, AlarmGraph>.LoadAll(levelName);
+
         // SensitivityLevel sensitivityLevel = SensitivityLevel.restrictedProperty;
         SensitivityLevel sensitivityLevel = SensitivityLevel.privateProperty;
         // SensitivityLevel sensitivityLevel = SensitivityLevel.semiprivateProperty;
@@ -27,8 +30,9 @@ public class LevelData {
         return new LevelData {
             powerGraph = powerGraph,
             cyberGraph = cyberGraph,
+            alarmGraph = alarmGraph,
             sensitivityLevel = sensitivityLevel,
-            hasHQ = true,
+            // hasHQ = true,
             strikeTeamMaxSize = 3,
             strikeTeamResponseTime = 3f
             // alarmLevel = AlarmLevel.none

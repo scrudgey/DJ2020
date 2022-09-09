@@ -7,6 +7,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     static Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
     static Dictionary<string, HashSet<CyberComponent>> cyberComponents;
+    static Dictionary<string, AlarmComponent> alarmComponents;
 
     Transform strikeTeamSpawnPoint;
 
@@ -41,6 +42,7 @@ public partial class GameManager : Singleton<GameManager> {
     void ClearSceneData() {
         poweredComponents = new Dictionary<string, HashSet<PoweredComponent>>();
         cyberComponents = new Dictionary<string, HashSet<CyberComponent>>();
+        alarmComponents = new Dictionary<string, AlarmComponent>();
     }
     private void InitializeLevel(string levelName) {
         // TODO: level enum input
@@ -80,9 +82,20 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        // connect up cyber grids
+        Debug.Log("connecting alarm grid...");
+        foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
+            // if (alarmComponents.ContainsKey(component.idn)) {
+            // alarmComponents[component.idn].Add(component);
+            // } else {
+            alarmComponents[component.idn] = component;
+            // }
+        }
+
         // TODO: abstract this?
         RefreshPowerGraph();
         RefreshCyberGraph();
+        RefreshAlarmGraph();
 
 
         PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 6);
@@ -99,20 +112,24 @@ public partial class GameManager : Singleton<GameManager> {
         Node node = graphNodeComponent switch {
             PoweredComponent => GetPowerNode(idn),
             CyberComponent => GetCyberNode(idn),
+            AlarmComponent => GetAlarmNode(idn),
             GraphNodeComponent<PoweredComponent, PowerNode> => GetPowerNode(idn),
             GraphNodeComponent<CyberComponent, CyberNode> => GetCyberNode(idn),
+            GraphNodeComponent<AlarmComponent, AlarmNode> => GetAlarmNode(idn),
             _ => null
         };
 
         if (node != null) {
             node.enabled = state;
-
             switch (graphNodeComponent) {
                 case PoweredComponent:
                     RefreshPowerGraph();
                     break;
                 case CyberComponent:
                     RefreshCyberGraph();
+                    break;
+                case AlarmComponent:
+                    RefreshAlarmGraph();
                     break;
             };
         } else {
@@ -121,11 +138,21 @@ public partial class GameManager : Singleton<GameManager> {
 
 
     }
+
+    // TODO: these methods could belong to the graphs?
     public CyberNode GetCyberNode(string idn) {
         return gameData?.levelData?.cyberGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.cyberGraph.nodes[idn] : null;
     }
     public PowerNode GetPowerNode(string idn) {
         return gameData?.levelData?.powerGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.powerGraph.nodes[idn] : null;
+    }
+    public AlarmNode GetAlarmNode(string idn) {
+        return gameData?.levelData?.alarmGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.alarmGraph.nodes[idn] : null;
+    }
+    public AlarmComponent GetAlarmComponent(string idn) {
+        if (alarmComponents.ContainsKey(idn)) {
+            return alarmComponents[idn];
+        } else return null;
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         string idn = poweredComponent.idn;
@@ -145,6 +172,11 @@ public partial class GameManager : Singleton<GameManager> {
         node.compromised = state;
         RefreshCyberGraph();
     }
+    public void SetAlarmNodeState(AlarmNode node, bool state) {
+        node.alarmTriggered = state;
+        node.countdownTimer = 30f;
+        RefreshAlarmGraph();
+    }
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)
             return false;
@@ -161,6 +193,16 @@ public partial class GameManager : Singleton<GameManager> {
 
         // propagate changes to UI
         OnCyberGraphChange?.Invoke(gameData.levelData.cyberGraph);
+    }
+    public void RefreshAlarmGraph() {
+
+        // determine if any active alarm object reaches a terminal
+        gameData.levelData.alarmGraph.Refresh();
+
+        TransferAlarmState();
+
+        // propagate changes to UI
+        OnAlarmGraphChange?.Invoke(gameData.levelData.alarmGraph);
     }
     public void RefreshPowerGraph() {
         // power distribution algorithm
@@ -189,6 +231,18 @@ public partial class GameManager : Singleton<GameManager> {
                     component.compromised = kvp.Value.compromised;
                     // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
                 }
+            }
+        }
+    }
+    void TransferAlarmState() {
+        foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelData.alarmGraph.nodes) {
+            if (alarmComponents.ContainsKey(kvp.Key)) {
+                AlarmComponent component = alarmComponents[kvp.Key];
+                // foreach (AlarmComponent component in alarmComponents[kvp.Key]) {
+                component.alarmTriggered = kvp.Value.alarmTriggered;
+                component.countdownTimer = kvp.Value.countdownTimer;
+                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
+                // }
             }
         }
     }
