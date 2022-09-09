@@ -117,6 +117,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         if (node != null) {
             node.enabled = state;
+            graphNodeComponent.nodeEnabled = state;
             switch (graphNodeComponent) {
                 case PoweredComponent:
                     RefreshPowerGraph();
@@ -167,14 +168,22 @@ public partial class GameManager : Singleton<GameManager> {
             SetCyberNodeState(gameData.levelData.cyberGraph.nodes[idn], state);
         }
     }
+    public void SetAlarmNodeState(AlarmComponent alarmComponent, bool state) {
+        string idn = alarmComponent.idn;
+        if (gameData.levelData != null && gameData.levelData.alarmGraph != null && gameData.levelData.alarmGraph.nodes.ContainsKey(idn)) {
+            SetAlarmNodeState(gameData.levelData.alarmGraph.nodes[idn], state);
+        }
+    }
     public void SetCyberNodeState(CyberNode node, bool state) {
         node.compromised = state;
         RefreshCyberGraph();
     }
     public void SetAlarmNodeState(AlarmNode node, bool state) {
-        node.alarmTriggered = state;
-        node.countdownTimer = 30f;
-        RefreshAlarmGraph();
+        if (node.enabled) {
+            node.alarmTriggered = state;
+            node.countdownTimer = 30f;
+            RefreshAlarmGraph();
+        }
     }
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)
@@ -218,6 +227,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 foreach (PoweredComponent component in poweredComponents[kvp.Key]) {
                     component.power = kvp.Value.powered;
+                    component.nodeEnabled = kvp.Value.enabled;
                     // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
                 }
             }
@@ -228,6 +238,8 @@ public partial class GameManager : Singleton<GameManager> {
             if (cyberComponents.ContainsKey(kvp.Key)) {
                 foreach (CyberComponent component in cyberComponents[kvp.Key]) {
                     component.compromised = kvp.Value.compromised;
+                    component.nodeEnabled = kvp.Value.enabled;
+
                     // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
                 }
             }
@@ -239,6 +251,7 @@ public partial class GameManager : Singleton<GameManager> {
                 AlarmComponent component = alarmComponents[kvp.Key];
                 component.alarmTriggered = kvp.Value.alarmTriggered;
                 component.countdownTimer = kvp.Value.countdownTimer;
+                component.nodeEnabled = kvp.Value.enabled;
             }
         }
     }

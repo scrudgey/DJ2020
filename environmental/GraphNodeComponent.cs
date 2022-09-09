@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node {
     public string idn;
     public string nodeTitle;
+    public bool nodeEnabled;
     public NodeIcon icon;
 
     public T[] edges = new T[0];
@@ -21,9 +22,11 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
 
     public virtual void DisableSource() {
         GameManager.I?.SetNodeEnabled<T, U>((T)this, false);
+        OnStateChange?.Invoke((T)this);
     }
     public virtual void EnableSource() {
         GameManager.I?.SetNodeEnabled<T, U>((T)this, true);
+        OnStateChange?.Invoke((T)this);
     }
 
     void OnDisable() {
@@ -32,13 +35,16 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     void OnEnable() {
         EnableSource();
     }
-    void OnDestroy() {
+    virtual public void OnDestroy() {
         DisableSource();
     }
-    void Start() {
+    virtual public void Start() {
+        // TODO: is this fine? why doesn't it work via enable source?
         if (enabled) {
+            nodeEnabled = true;
             EnableSource();
         } else {
+            nodeEnabled = false;
             DisableSource();
         }
     }

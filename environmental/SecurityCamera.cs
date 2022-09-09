@@ -11,6 +11,8 @@ public class SecurityCamera : IBinder<SightCone> {
     public SightCone sightCone;
     public Transform sightOrigin;
     public AlertHandler alertHandler;
+    public SpriteRenderer spriteLight;
+    public MeshRenderer IRCone;
     [Header("Sounds")]
     public AudioSource audioSource;
     public AudioClip[] rotateSound;
@@ -27,14 +29,28 @@ public class SecurityCamera : IBinder<SightCone> {
     // readonly float PERCEPTION_INTERVAL = 0.05f;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
     // readonly float LOCK_ON_TIME = 0.5f;
+    bool nodeEnabled;
 
     void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         Bind(sightCone.gameObject);
         initialRotation = cameraTransform.rotation;
+        alarmComponent.OnStateChange += HandleAlarmStateChange;
+        nodeEnabled = alarmComponent.enabled;
+    }
+    override public void OnDestroy() {
+        base.OnDestroy();
+        alarmComponent.OnStateChange -= HandleAlarmStateChange;
+    }
+    void HandleAlarmStateChange(AlarmComponent component) {
+        nodeEnabled = component.nodeEnabled;
+        spriteLight.enabled = nodeEnabled;
+        IRCone.enabled = nodeEnabled;
     }
 
     public override void HandleValueChanged(SightCone t) {
+        if (!nodeEnabled)
+            return;
         if (t.newestAddition != null) {
             if (TargetVisible(t.newestAddition))
                 Perceive(t.newestAddition);
@@ -80,16 +96,18 @@ public class SecurityCamera : IBinder<SightCone> {
         if (GameManager.I.IsPlayerVisible(distance)) {
             AlarmNode alarmNode = GameManager.I.GetAlarmNode(alarmComponent.idn);
             GameManager.I.SetAlarmNodeState(alarmNode, true);
+            alertHandler.ShowAlert();
+            cooldown = 5f;
+            Toolbox.RandomizeOneShot(audioSource, spottedSound);
         }
-        alertHandler.ShowAlert();
-        cooldown = 5f;
-        Toolbox.RandomizeOneShot(audioSource, spottedSound);
     }
 
     void Update() {
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;
         }
+        if (!nodeEnabled)
+            return;
         timer += Time.deltaTime;
         switch (state) {
             case State.rotateLeft:

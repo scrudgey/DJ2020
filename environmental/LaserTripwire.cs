@@ -8,20 +8,24 @@ public class LaserTripwire : AlarmComponent {
     [System.Serializable]
     public class LaserData {
         public LaserBeam laser;
+        public SpriteRenderer emissionSprite;
         public bool enabled;
     }
     public LaserData[] laserData;
     public AudioClip[] spottedSound;
     float cooldown;
     AudioSource audioSource;
+    public AudioSource buzzSoundSource;
 
-    public void Start() {
+    override public void Start() {
+        base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         foreach (LaserData data in laserData) {
             data.laser.tripWire = this;
             data.laser.gameObject.SetActive(data.enabled);
         }
     }
+
 
     public void LaserTripCallback() {
         if (cooldown > 0)
@@ -37,5 +41,26 @@ public class LaserTripwire : AlarmComponent {
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;
         }
+    }
+
+    override public void DisableSource() {
+        base.DisableSource();
+        foreach (LaserData data in laserData) {
+            data.laser.gameObject.SetActive(false);
+            data.emissionSprite.enabled = false;
+        }
+        if (audioSource != null)
+            audioSource.Stop();
+        buzzSoundSource.Stop();
+    }
+    override public void EnableSource() {
+        base.EnableSource();
+        Debug.Log("enabling laser tripwire");
+
+        foreach (LaserData data in laserData) {
+            data.laser.gameObject.SetActive(data.enabled);
+        }
+        if (audioSource != null)
+            audioSource.Play();
     }
 }

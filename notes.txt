@@ -1209,7 +1209,24 @@ proposed alarm system
 * object pooling NPCs is working strangely
 * use "enabled" instead of alarmActivated
 * radio HQ state is being weird, maybe because of selector
-
+* when alarm is triggered, find route(s) to alarm terminals
+    * if a route is found, highlight the path in the alarm view and activate alarm
+    * highlight triggered alarm node in alarm grid
+    * highlight alarm terminal in alarm grid
+    * alarms can be routed through a common router to be disabled
+* interaction of alarm grid and cyber grid
+    * hacking disables alarm propagation
+    * hacking disables alarm generation
+    * disabling alarm propagation in progress disables alarm
+    * possibly, the alarm terminal can be a physical object in the world that goes off
+    * disabling camera makes it stop turning
+* interaction of alarm elements and power grid
+    * hacking turns off cameras
+* laser grid and security cameras require power
+* enemies still bunching up
+* disabling power turns off laser grid
+* disabling laser grid shuts off lasers, sounds
+* disabling power turns off camera IR cone
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1353,46 +1370,23 @@ stealth:
 
 INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
 
+
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
-enemies still bunching up
 npc can't seem to shoot me when close
 aim mode could track camera better
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC investigate routine
 abstract out visibility and perception ?
-laser grid and security cameras require power
-
-* when alarm is triggered, find route(s) to alarm terminals
-    * if a route is found, highlight the path in the alarm view and activate alarm
-    * highlight triggered alarm node in alarm grid
-    * highlight alarm terminal in alarm grid
-    * alarms can be routed through a common router to be disabled
-
-interaction of alarm grid and cyber grid
-    hacking disables alarm propagation
-    hacking disables alarm generation
-    disabling alarm propagation in progress disables alarm
-        this distinguishes between HQ alarm, and alarm generating nodes.
-    possibly, the alarm terminal can be a physical object in the world that goes off
-
-interaction of alarm elements and power grid
-    hacking turns off cameras and laser grids
+thermal goggles icon
+show thermal goggles on player head?
+DFS path finding doesn't quite work right
 
 alarm triggering effects
     notify others of location?
     treated like being spotted?
-    alarm is active on a timer?
-    alarm is different from when team radios HQ?
-    alarm source can be deactivated?
 
 graph system:
     [<<][ELECTRICAL][>>]
     and these are buttons you can click
     "none" overlay with buttons
-
-obsoleted: activate alarm, deactivate alarm as presently used
-level data has hq
-
-thermal goggles icon
-DFS path finding doesn't quite work right

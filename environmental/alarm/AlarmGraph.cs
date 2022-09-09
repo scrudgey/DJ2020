@@ -28,7 +28,8 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
 
         AlarmNode[] sources = nodes.Values.Where(node => node.alarmTriggered).ToArray();
         foreach (AlarmNode source in sources) {
-            DFS(source, new HashSet<HashSet<string>>(), new HashSet<string>());
+            if (source.enabled)
+                DFS(source, new HashSet<HashSet<string>>(), new HashSet<string>());
         }
 
         bool alarmActive = anyAlarmActive();
