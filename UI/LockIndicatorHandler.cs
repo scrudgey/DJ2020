@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
 public class LockIndicatorHandler : IBinder<GunHandler> {
     public Image cursorImage;
     public RectTransform cursorRect;
@@ -22,6 +24,12 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
         initialColor = cursorImage.color;
     }
     override public void HandleValueChanged(GunHandler gunHandler) {
+        bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        if (uiclick) {
+            DisableCursorImage();
+            return;
+        }
+
         if (gunHandler.HasGun()) {
             CursorData data = gunHandler.currentTargetData;
             if (data == null) {
@@ -43,6 +51,12 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
         }
     }
     void Update() {
+        bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        if (uiclick) {
+            DisableCursorImage();
+            return;
+        }
+
         if (cursorImage.enabled) {
             transitionTime += Time.unscaledDeltaTime;
             if (transitionTime > transitionDuration) {

@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
 public enum OverlayType { none, power, cyber, alarm }
-public enum CursorType { gun, pointer }
+public enum CursorType { none, gun, pointer }
 public enum InputMode { none, gun, cyber, aim, wallpressAim }
 public struct PointerData {
     public Texture2D mouseCursor;
@@ -48,8 +48,9 @@ public partial class GameManager : Singleton<GameManager> {
     public CursorType cursorType {
         get { return _cursorType; }
         set {
+            if (_cursorType != value)
+                SetCursor(value);
             _cursorType = value;
-            SetCursor(value);
         }
     }
     private InputMode _inputMode;
@@ -59,6 +60,7 @@ public partial class GameManager : Singleton<GameManager> {
     int numberFrames;
     public bool showDebugRays;
     public void Start() {
+        cursorType = CursorType.gun;
         showDebugRays = true;
         showConsole.action.performed += HandleShowConsleAction;
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
@@ -170,6 +172,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void SetOverlay(OverlayType newType) {
         gameData.overlayIndex = (int)newType;
+        activeOverlayType = newType;
         OnOverlayChange?.Invoke(newType);
     }
 

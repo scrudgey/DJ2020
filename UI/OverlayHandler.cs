@@ -103,9 +103,26 @@ public class OverlayHandler : MonoBehaviour {
                 break;
         }
         if (type == OverlayType.none) {
-            outline.SetActive(false);
+            outlineImage.enabled = false;
         } else {
-            outline.SetActive(true);
+            outlineImage.enabled = true;
         }
+    }
+
+    public void NextOverlayButton() {
+        int overlayIndex = (int)GameManager.I.activeOverlayType + 1;
+        if (overlayIndex > 3) {
+            overlayIndex = 0;
+        }
+        OverlayType newOverlay = (OverlayType)overlayIndex;
+        GameManager.I.SetOverlay(newOverlay);
+    }
+    public void PreviousOverlayButton() {
+        int overlayIndex = (int)GameManager.I.activeOverlayType - 1;
+        if (overlayIndex < 0) {
+            overlayIndex = 3;
+        }
+        OverlayType newOverlay = (OverlayType)overlayIndex;
+        GameManager.I.SetOverlay(newOverlay);
     }
 }

@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Easings;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
 public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     // public Image cursorImage;
     public CutoutMaskUI cursorImage;
@@ -25,6 +27,12 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
         initialColor = cursorImage.color;
     }
     override public void HandleValueChanged(GunHandler gunHandler) {
+        bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        if (uiclick) {
+            DisableCursorImage();
+            return;
+        }
+
         if (gunHandler.HasGun()) {
             cursorImage.enabled = true;
             CursorData data = gunHandler.currentTargetData;
@@ -57,6 +65,11 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
         embellishDotText.Disable();
     }
     void Update() {
+        bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        if (uiclick) {
+            DisableCursorImage();
+            return;
+        }
         if (cursorImage.enabled) {
             transitionTime += Time.unscaledDeltaTime;
             if (transitionTime > transitionDuration) {

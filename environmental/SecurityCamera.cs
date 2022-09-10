@@ -46,6 +46,9 @@ public class SecurityCamera : IBinder<SightCone> {
         nodeEnabled = component.nodeEnabled;
         spriteLight.enabled = nodeEnabled;
         IRCone.enabled = nodeEnabled;
+        if (!nodeEnabled) {
+            audioSource.Stop();
+        }
     }
 
     public override void HandleValueChanged(SightCone t) {

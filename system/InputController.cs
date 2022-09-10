@@ -5,6 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UI;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 public class InputController : MonoBehaviour {
@@ -263,6 +264,15 @@ public class InputController : MonoBehaviour {
     }
 
     private void HandleCharacterInput() {
+
+        bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        if (uiclick) {
+            GameManager.I.cursorType = CursorType.pointer;
+            firePressedThisFrame = false;
+        } else {
+            GameManager.I.cursorType = CursorType.gun;
+        }
+
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
 

@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
+
 namespace UI {
     public class AimIndicatorHandler : IBinder<GunHandler> {
         public Camera UICamera;
@@ -20,6 +23,12 @@ namespace UI {
         Vector2 currentPosition;
 
         public void Update() {
+            bool uiclick = EventSystem.current.IsPointerOverGameObject();
+            if (uiclick) {
+                cursorImage.enabled = false;
+                return;
+            }
+
             if (state == CursorData.TargetType.objectLock) {
                 timer += Time.deltaTime;
                 while (timer > pulseInterval) {
@@ -35,6 +44,12 @@ namespace UI {
             }
         }
         override public void HandleValueChanged(GunHandler gunHandler) {
+            bool uiclick = EventSystem.current.IsPointerOverGameObject();
+            if (uiclick) {
+                cursorImage.enabled = false;
+                return;
+            }
+
             if (gunHandler.HasGun()) {
                 cursorImage.enabled = true;
                 CursorData data = target.currentTargetData;

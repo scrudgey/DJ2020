@@ -1227,6 +1227,10 @@ proposed alarm system
 * disabling power turns off laser grid
 * disabling laser grid shuts off lasers, sounds
 * disabling power turns off camera IR cone
+* graph system:
+    * [<<][ELECTRICAL][>>]
+    * and these are buttons you can click
+    * "none" overlay with buttons
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1279,19 +1283,7 @@ nice to have / future goals:
 
 
 
-try to pop around a corner and aim: it doesn't work
-don't clip camera through wall
-why do gibs fall through the wall/floor?
 
-fog of breath
-damage result addition is weird
-prevent extreme zoom maneuvers with lerping
-    also, initialize camera with proper zoom?'
-reset gun instance on pool operations
-gibs from explosions
-corpse can be shot / exploded
-bug: broken superjump
-clear HQ state on new level
 
 
 refactor clearsighter
@@ -1306,12 +1298,12 @@ strike team
     solution for total level wipe of NPCs
         reset strike team count when one dies?
         if you've killed everyone, more arrive?
-search level systematically
-    ideally, move and clear room to room.
-        possibility 1: generate room and door mappings automatically
-        possibility 2: mark up rooms in unity editor
-    possibility 3: a patrol route that leads through the level?
-    all possibilities require some extra level work
+    search level systematically
+        ideally, move and clear room to room.
+            possibility 1: generate room and door mappings automatically
+            possibility 2: mark up rooms in unity editor
+        possibility 3: a patrol route that leads through the level?
+        all possibilities require some extra level work
 
 UI embellishments
     small font text near locked-on character
@@ -1325,9 +1317,17 @@ UI embellishments
         blink at 00.00 and then ease out
     switching items graphical effect
     easing in overlay 
+    more blink-style transformations
         
 
 save system:
+    placeholder objects that load an NPC at runtime
+    spawnpoints that randomize the placeholder at runtime
+    placeholder for pickups
+    spawnpoint for pickups
+    still, some static objects must be saveable.
+    
+    reset gun instance on pool operations
     allow independent level data
     allow independent NPC data: this is a little harder 
     interface for designing multiple VR scenarios
@@ -1352,10 +1352,10 @@ UI:
     minimap
     weapon wheel
 
-
 control / combat:
     better shotgun
     aim: fixed angular size
+    headshots
 
 sound
     ambience
@@ -1366,27 +1366,35 @@ stealth:
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
     NPC reacts when seeing another shooting
-
-
-INITIATIVE: test proper stealth & infiltration, alarms, cameras, tripwires, stealth kills, etc
+    stealth kill?
 
 
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
 npc can't seem to shoot me when close
 aim mode could track camera better
+try to pop around a corner and aim: it doesn't work
+
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC investigate routine
 abstract out visibility and perception ?
 thermal goggles icon
-show thermal goggles on player head?
-DFS path finding doesn't quite work right
-
-alarm triggering effects
+DFS path finding doesn't quite work right for highlighting path
+alarm terminal triggering effects
     notify others of location?
     treated like being spotted?
+don't clip camera through wall
+why do gibs fall through the wall/floor?
+damage result addition is weird
+prevent extreme zoom maneuvers with lerping
+    also, initialize camera with proper zoom?'
+gibs from explosions
+corpse can be shot / exploded
+bug: broken superjump
+clear HQ state on new level
 
-graph system:
-    [<<][ELECTRICAL][>>]
-    and these are buttons you can click
-    "none" overlay with buttons
+
+graphical embellishment
+    show thermal goggles on player head?
+    fog of breath
+    reflective puddle
