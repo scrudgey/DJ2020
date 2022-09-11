@@ -1377,8 +1377,8 @@ graphics
 
 save system:
     reset gun instance on pool operations
-    allow independent level data
-    allow independent NPC data: this is a little harder 
+    * allow independent level data
+    * allow independent NPC data: this is a little harder 
     interface for designing multiple VR scenarios
         prereq: set up a title menu i guess?
         new stage: infiltration

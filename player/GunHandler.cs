@@ -499,6 +499,5 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         secondary = state.secondaryGun;
         third = state.tertiaryGun;
         SwitchToGun(state.activeGun);
-        Debug.Log($"applying primary gun: {state.primaryGun.baseGun.name}");
     }
 }

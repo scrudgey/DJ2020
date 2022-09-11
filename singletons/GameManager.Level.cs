@@ -38,6 +38,7 @@ public partial class GameManager : Singleton<GameManager> {
         // spawn player object
         Debug.Log("spawn player object");
         GameObject playerObj = SpawnPlayer(gameData.playerData);
+        SetFocus(playerObj);
 
         // TODO: spawn clearsighter if necessary
 
@@ -80,7 +81,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         alarmSoundInterval = 2f;
         alarmSound = Resources.Load(gameData.levelData.alarmAudioClipPath) as AudioClip;
-        strikeTeamSpawnPoint = GameObject.Find("strikeTeamSpawnPoint")?.GetComponent<NPCSpawnPoint>();
+        strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
@@ -245,7 +246,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SpawnNPCs() {
-        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>()) {
+        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn)) {
             spawnPoint.SpawnNPC();
         }
     }
