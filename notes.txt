@@ -1305,7 +1305,7 @@ strike team
         possibility 3: a patrol route that leads through the level?
         all possibilities require some extra level work
 
-UI embellishments
+graphical embellishments
     small font text near locked-on character
     ? [[ LOCKED ]] text blink (this might not work very well with constant lost / reacquired lock)
     arcs swing about lock size indicator
@@ -1318,27 +1318,9 @@ UI embellishments
     switching items graphical effect
     easing in overlay 
     more blink-style transformations
-        
-
-save system:
-    placeholder objects that load an NPC at runtime
-    spawnpoints that randomize the placeholder at runtime
-    placeholder for pickups
-    spawnpoint for pickups
-    still, some static objects must be saveable.
-    
-    reset gun instance on pool operations
-    allow independent level data
-    allow independent NPC data: this is a little harder 
-    interface for designing multiple VR scenarios
-        prereq: set up a title menu i guess?
-        new stage: infiltration
-        danger room
-        spawning enemies
-        enemy count
-        victory conditions
-        select player loadout
-        select enemy loadout
+    show thermal goggles on player head?
+    fog of breath
+    reflective puddle
 
 UI:
     display different UI when in aim mode
@@ -1369,32 +1351,44 @@ stealth:
     stealth kill?
 
 
+* don't clip camera through wall
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
-npc can't seem to shoot me when close
+bug: npc can't seem to shoot me when close
+bug: broken superjump
 aim mode could track camera better
-try to pop around a corner and aim: it doesn't work
-
+    try to pop around a corner and aim: it doesn't work
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC investigate routine
-abstract out visibility and perception ?
-thermal goggles icon
 DFS path finding doesn't quite work right for highlighting path
 alarm terminal triggering effects
-    notify others of location?
-    treated like being spotted?
-don't clip camera through wall
+    notify others of location
+    add a suspicion indicator
 why do gibs fall through the wall/floor?
 damage result addition is weird
 prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
-gibs from explosions
 corpse can be shot / exploded
-bug: broken superjump
-clear HQ state on new level
+
+graphics
+    thermal goggles icon
+    gibs from explosions
 
 
-graphical embellishment
-    show thermal goggles on player head?
-    fog of breath
-    reflective puddle
+save system:
+
+    
+    reset gun instance on pool operations
+    allow independent level data
+    allow independent NPC data: this is a little harder 
+    interface for designing multiple VR scenarios
+        prereq: set up a title menu i guess?
+        new stage: infiltration
+        danger room
+        spawning enemies
+        enemy count
+        victory conditions
+        select player loadout
+        select enemy loadout
+
+    

@@ -102,6 +102,9 @@ public partial class GameManager : Singleton<GameManager> {
         switch (state) {
             case GameState.levelPlay:
                 // TODO: data-driven level load 
+                // TODO: move this somewhere else or check that we are going to levelPlay
+                InitializeLevel("test");
+
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 break;
@@ -115,8 +118,6 @@ public partial class GameManager : Singleton<GameManager> {
     public void OnStateExit(GameState state, GameState toState) {
         switch (state) {
             case GameState.none:
-                // TODO: move this somewhere else or check that we are going to levelPlay
-                InitializeLevel("test");
                 break;
             case GameState.inMenu:
                 Time.timeScale = 1f;
@@ -194,7 +195,6 @@ public partial class GameManager : Singleton<GameManager> {
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.pointer;
         TransitionToInputMode(InputMode.cyber); // TODO: ?
-
     }
     public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.gun;

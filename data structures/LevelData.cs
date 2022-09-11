@@ -4,7 +4,6 @@ using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
-
 [System.Serializable]
 public class LevelData {
     public PowerGraph powerGraph;
@@ -17,22 +16,39 @@ public class LevelData {
     public bool anyAlarmActive() {
         return alarmGraph.anyAlarmActive();
     }
-    public static LevelData LoadLevelData(string levelName) {
-        PowerGraph powerGraph = Graph<PowerNode, PowerGraph>.LoadAll(levelName);
-        CyberGraph cyberGraph = Graph<CyberNode, CyberGraph>.LoadAll(levelName);
-        AlarmGraph alarmGraph = Graph<AlarmNode, AlarmGraph>.LoadAll(levelName);
-
-        // SensitivityLevel sensitivityLevel = SensitivityLevel.restrictedProperty;
-        SensitivityLevel sensitivityLevel = SensitivityLevel.privateProperty;
-        // SensitivityLevel sensitivityLevel = SensitivityLevel.semiprivateProperty;
-        // SensitivityLevel sensitivityLevel = SensitivityLevel.publicProperty;
-        return new LevelData {
-            powerGraph = powerGraph,
-            cyberGraph = cyberGraph,
-            alarmGraph = alarmGraph,
-            sensitivityLevel = sensitivityLevel,
-            strikeTeamMaxSize = 3,
-            strikeTeamResponseTime = 3f
-        };
+    public static LevelData Load(string levelName) {
+        string path = FilePath(levelName);
+        LevelData data = LoadXML(path);
+        return data;
+    }
+    public static string FilePath(string levelName) {
+        string scenePath = LevelDataPath(levelName);
+        return Path.Combine(scenePath, $"{levelName}.xml");
+    }
+    public static string LevelDataPath(string levelName) {
+        string path = Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName);
+        if (!Directory.Exists(path)) {
+            Directory.CreateDirectory(path);
+        }
+        return path;
+    }
+    public static LevelData LoadXML(string path) {
+        XmlSerializer serializer = new XmlSerializer(typeof(LevelData));
+        if (File.Exists(path)) {
+            using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
+                return (LevelData)serializer.Deserialize(sceneStream);
+            }
+        } else {
+            Debug.LogError($"level data file not found: {path}");
+            return null;
+        }
+    }
+    public void WriteXML(string levelName) {
+        XmlSerializer serializer = new XmlSerializer(typeof(LevelData));
+        string path = FilePath(levelName);
+        using (FileStream sceneStream = File.Create(path)) {
+            serializer.Serialize(sceneStream, this);
+        }
+        Debug.Log($"serialized {levelName} {strikeTeamMaxSize}...");
     }
 }

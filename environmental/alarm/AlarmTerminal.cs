@@ -5,6 +5,5 @@ using UnityEngine;
 public class AlarmTerminal : AlarmComponent {
     public MeshRenderer meshRenderer;
     public virtual void Activate() {
-        Debug.Log("activating alarm terminal");
     }
 }

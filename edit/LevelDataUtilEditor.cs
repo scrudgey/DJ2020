@@ -7,14 +7,25 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[CustomEditor(typeof(PowerNetworkUtil))]
-public class PowerNetworkUtilEditor : Editor {
-    public string levelName = "test";
-    public override void OnInspectorGUI() {
-        levelName = GUILayout.TextField(levelName, 25);
-        // PowerNetworkUtil networkUtil = (PowerNetworkUtil)target;
 
-        if (GUILayout.Button("Build Network")) {
+[CustomEditor(typeof(LevelDataUtil))]
+[CanEditMultipleObjects]
+public class LevelDataUtilEditor : Editor {
+    // TODO: allow an audioclip in editor
+    public string levelName = "test";
+    public SerializedProperty klaxonSound;
+    private SerializedProperty levelData;
+    private void OnEnable() {
+        levelData = serializedObject.FindProperty("levelData");
+        klaxonSound = serializedObject.FindProperty("klaxonSound");
+    }
+    public override void OnInspectorGUI() {
+        levelName = EditorGUILayout.TextField("level name", levelName);
+        EditorGUILayout.PropertyField(klaxonSound);
+        EditorGUILayout.PropertyField(levelData);
+
+        if (GUILayout.Button("Write Level Data")) {
+            LevelDataUtil networkUtil = (LevelDataUtil)target;
             string sceneName = SceneManager.GetActiveScene().name;
 
             PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
@@ -24,10 +35,28 @@ public class PowerNetworkUtilEditor : Editor {
             powerGraph.Write(levelName, sceneName);
             cyberGraph.Write(levelName, sceneName);
             alarmGraph.Write(levelName, sceneName);
+
+            networkUtil.levelData.powerGraph = powerGraph;
+            networkUtil.levelData.cyberGraph = cyberGraph;
+            networkUtil.levelData.alarmGraph = alarmGraph;
+
+            String klaxonRootPath = AssetDatabase.GetAssetPath(networkUtil.klaxonSound);
+            String klaxonRelativePath = klaxonRootPath.Replace("Assets/Resources/", "");
+
+            int fileExtPos = klaxonRelativePath.LastIndexOf(".");
+            if (fileExtPos >= 0)
+                klaxonRelativePath = klaxonRelativePath.Substring(0, fileExtPos);
+            Debug.Log($"{klaxonRelativePath}");
+
+            networkUtil.levelData.alarmAudioClipPath = klaxonRelativePath;
+
+            networkUtil.levelData.WriteXML(levelName);
+
             AssetDatabase.Refresh();
         }
-
+        serializedObject.ApplyModifiedProperties();
     }
+
 
     public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node, new() where V : GraphNodeComponent<V, U> {
         T graph = new T();
@@ -86,5 +115,4 @@ public class PowerNetworkUtilEditor : Editor {
 
         return graph;
     }
-
 }

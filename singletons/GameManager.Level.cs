@@ -11,16 +11,6 @@ public partial class GameManager : Singleton<GameManager> {
 
     Transform strikeTeamSpawnPoint;
 
-    public static class Level {
-        public static string LevelDataPath(string levelName) {
-            string path = Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName);
-            if (!Directory.Exists(path)) {
-                Directory.CreateDirectory(path);
-            }
-            return path;
-        }
-    }
-
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
@@ -45,7 +35,6 @@ public partial class GameManager : Singleton<GameManager> {
         alarmComponents = new Dictionary<string, AlarmComponent>();
     }
     private void InitializeLevel(string levelName) {
-        // TODO: level enum input
         // TODO: load and set up asynchronously behind a screen
         ClearSceneData();
 
@@ -53,8 +42,9 @@ public partial class GameManager : Singleton<GameManager> {
         SetFocus(playerObj);
 
         // load global state
-        Debug.Log($"loading level data {levelName}...");
-        gameData.levelData = LevelData.LoadLevelData(levelName);
+        // Debug.Log($"loading level data {levelName}...");
+        // gameData.levelData = LevelData.LoadLevelData(levelName);
+        // gameData.levelData = 
 
         // load scene state
         // TODO: load not just player but all saveable objects
@@ -99,6 +89,7 @@ public partial class GameManager : Singleton<GameManager> {
         // initialize spawn point
         strikeTeamSpawnPoint = GameObject.Find("strikeTeamSpawnPoint")?.transform;
         alarmSound = Resources.Load(gameData.levelData.alarmAudioClipPath) as AudioClip;
+
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now

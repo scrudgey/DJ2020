@@ -8,6 +8,7 @@ using UnityEngine;
 [System.Serializable]
 public class PowerGraph : Graph<PowerNode, PowerGraph> {
     public void Refresh() {
+        // Debug.Log($"power graph with {nodes.Count} elements");
         nodes.Values.ToList().ForEach(node => node.powered = false);
 
         // run the algorithm

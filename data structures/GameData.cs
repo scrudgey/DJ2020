@@ -13,7 +13,8 @@ public class GameData {
         return new GameData() {
             state = GameState.none,
             playerData = PlayerData.DefaultGameData(),
-            levelData = LevelData.LoadLevelData("test"),
+            // levelData = LevelData.LoadLevelData("test"),
+            levelData = LevelData.Load("test"),
             overlayIndex = 0
         };
     }

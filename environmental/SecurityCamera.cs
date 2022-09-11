@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using UnityEditor;
 using UnityEngine;
 public class SecurityCamera : IBinder<SightCone> {
     enum State { rotateLeft, lookLeft, rotateRight, lookRight }
@@ -26,9 +27,7 @@ public class SecurityCamera : IBinder<SightCone> {
     Quaternion rotation;
     public float turnDuration;
     public float lookDuration;
-    // readonly float PERCEPTION_INTERVAL = 0.05f;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
-    // readonly float LOCK_ON_TIME = 0.5f;
     bool nodeEnabled;
 
     void Start() {
