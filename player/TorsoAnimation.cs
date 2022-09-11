@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
-public class TorsoAnimation : MonoBehaviour, ISaveable {
+public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     private GunHandler.GunState state;
     private CharacterState characterState;
     private int _frame;
@@ -194,7 +194,10 @@ public class TorsoAnimation : MonoBehaviour, ISaveable {
         // TODO: set direction
         // billboard.direction = _direction;
     }
-    public void LoadState(PlayerData data) {
-        skin = Skin.LoadSkin(data.bodySkin);
+    // public void LoadState(PlayerData data) {
+    //     skin = Skin.LoadSkin(data.bodySkin);
+    // }
+    public void LoadSkinState(ISkinState state) {
+        skin = Skin.LoadSkin(state.bodySkin);
     }
 }

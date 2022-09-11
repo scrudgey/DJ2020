@@ -103,7 +103,6 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
 
         // set embellishment text and position
         embellishRectTransform.position = data.screenPosition + currentScale * new Vector2(0.25f, -0.55f);
-        // embellishDotText.Enable($"Lock: {currentScale / pixelsPerDegree * lengthPerAngle:0.00}m", blitText: false);
         embellishDotText.Enable($"Lock: {currentScale / targetScale * lockSizeLength:0.00}m", blitText: false);
         //                                  pix       /     (pix / θ)   *    (m / θ)
     }

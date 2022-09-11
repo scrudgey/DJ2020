@@ -5,7 +5,7 @@ using System.Linq;
 using Easings;
 using UnityEditor;
 using UnityEngine;
-public class LegsAnimation : IBinder<CharacterController>, ISaveable {
+public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     public enum State {
         idle,
         walk,
@@ -279,8 +279,11 @@ public class LegsAnimation : IBinder<CharacterController>, ISaveable {
         }
     }
 
-    public void LoadState(PlayerData data) {
-        skin = Skin.LoadSkin(data.legSkin);
+    // public void LoadState(PlayerData data) {
+    //     skin = Skin.LoadSkin(data.legSkin);
+    // }
+    public void LoadSkinState(ISkinState state) {
+        skin = Skin.LoadSkin(state.bodySkin);
     }
 
     public void UpdateFrame(AnimationInput input) {

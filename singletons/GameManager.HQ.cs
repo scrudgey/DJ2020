@@ -178,24 +178,15 @@ public partial class GameManager : Singleton<GameManager> {
                 strikeTeamSpawnTimer += Time.deltaTime;
                 if (strikeTeamSpawnTimer > strikeTeamSpawnInterval) {
                     strikeTeamSpawnTimer -= strikeTeamSpawnInterval;
-                    SpawnStrikeTeamMember(strikeTeamSpawnPoint.position);
+                    SpawnStrikeTeamMember();
                 }
             }
         }
     }
 
-    void SpawnStrikeTeamMember(Vector3 position) {
-        GameObject npc = PoolManager.I.GetPool("prefabs/NPC").GetObject(position);
-        CharacterCamera characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
-        PatrolRoute patrolRoute = GameObject.FindObjectOfType<PatrolRoute>();
-
-        CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+    void SpawnStrikeTeamMember() {
+        GameObject npc = strikeTeamSpawnPoint.SpawnNPC();
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
-        KinematicCharacterMotor motor = npc.GetComponentInChildren<KinematicCharacterMotor>();
-        controller.OrbitCamera = characterCamera;
-        ai.overrideDefaultState = true;
-        ai.patrolRoute = patrolRoute;
-        motor.SetPosition(position, bypassInterpolation: true);
 
         if (strikeTeamCount == 0) {
             ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, doIntro: false, speedCoefficient: 1.5f));

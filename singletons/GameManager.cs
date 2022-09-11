@@ -19,9 +19,6 @@ public partial class GameManager : Singleton<GameManager> {
     public GameData gameData;
     public AudioSource audioSource;
     public GameObject playerObject;
-    public GunHandler playerGunHandler;
-    public ItemHandler playerItemHandler;
-    public Interactor playerInteractor;
     public PlayerOutlineHandler playerOutlineHandler;
     public LightLevelProbe playerLightLevelProbe;
     // UI input
@@ -37,7 +34,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<InputMode, InputMode> OnInputModeChange; // TODO: legit? should be camera state change?
     public static Action<CursorType> OnCursorTypeChange;
     public static Action<String> OnCaptionChange;
-    public static Action<PlayerData> OnEyeVisibilityChange;
+    public static Action<PlayerState> OnEyeVisibilityChange;
     // UI state
     private bool toggleConsoleThisFrame;
     private bool nextOverlayThisFrame;
@@ -101,10 +98,7 @@ public partial class GameManager : Singleton<GameManager> {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
-                // TODO: data-driven level load 
-                // TODO: move this somewhere else or check that we are going to levelPlay
-                InitializeLevel("test");
-
+                InitializeLevel();
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 break;

@@ -4,19 +4,15 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
-
     static Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
     static Dictionary<string, HashSet<CyberComponent>> cyberComponents;
     static Dictionary<string, AlarmComponent> alarmComponents;
 
-    Transform strikeTeamSpawnPoint;
+    NPCSpawnPoint strikeTeamSpawnPoint;
 
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
-        this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
-        this.playerItemHandler = focus.GetComponentInChildren<ItemHandler>();
-        this.playerInteractor = focus.GetComponentInChildren<Interactor>();
 
         if (playerOutlineHandler != null) {
             playerOutlineHandler.UnBind();
@@ -24,34 +20,34 @@ public partial class GameManager : Singleton<GameManager> {
         playerOutlineHandler = focus.GetComponentInChildren<PlayerOutlineHandler>();
         playerOutlineHandler?.Bind();
 
-        Debug.Log("setting focus...");
-        // if (OnFocusChanged != null) {
+        ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
+        if (clearSighter != null && focus != null)
+            clearSighter.followTransform = focus.transform;
+
         OnFocusChanged?.Invoke(focus);
-        // }
     }
     void ClearSceneData() {
         poweredComponents = new Dictionary<string, HashSet<PoweredComponent>>();
         cyberComponents = new Dictionary<string, HashSet<CyberComponent>>();
         alarmComponents = new Dictionary<string, AlarmComponent>();
     }
-    private void InitializeLevel(string levelName) {
+    private void InitializeLevel() {
         // TODO: load and set up asynchronously behind a screen
         ClearSceneData();
 
-        GameObject playerObj = GameObject.Find("playerCharacter");
-        SetFocus(playerObj);
+        // spawn player object
+        Debug.Log("spawn player object");
+        GameObject playerObj = SpawnPlayer(gameData.playerData);
 
-        // load global state
-        // Debug.Log($"loading level data {levelName}...");
-        // gameData.levelData = LevelData.LoadLevelData(levelName);
-        // gameData.levelData = 
+        // TODO: spawn clearsighter if necessary
 
-        // load scene state
-        // TODO: load not just player but all saveable objects
-        Debug.Log($"loading player state...");
-        LoadPlayerState(gameData.playerData);
+        // connect player object to input controller
+        InputController inputController = GameObject.FindObjectOfType<InputController>();
+        inputController.SetInputReceivers(playerObj);
 
-        // TODO: abstract this
+        // spawn NPCs
+        SpawnNPCs();
+
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
@@ -72,24 +68,19 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        // connect up cyber grids
+        // connect up alarm grids
         Debug.Log("connecting alarm grid...");
         foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
             alarmComponents[component.idn] = component;
         }
 
-        // TODO: abstract this?
         RefreshPowerGraph();
         RefreshCyberGraph();
         RefreshAlarmGraph();
 
-
-        PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 6);
         alarmSoundInterval = 2f;
-        // initialize spawn point
-        strikeTeamSpawnPoint = GameObject.Find("strikeTeamSpawnPoint")?.transform;
         alarmSound = Resources.Load(gameData.levelData.alarmAudioClipPath) as AudioClip;
-
+        strikeTeamSpawnPoint = GameObject.Find("strikeTeamSpawnPoint")?.GetComponent<NPCSpawnPoint>();
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
@@ -246,10 +237,16 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
     }
-    public void LoadPlayerState(PlayerData data) {
-        foreach (ISaveable saveable in playerObject.GetComponentsInChildren<ISaveable>()) {
-            // Debug.Log("triggering load on " + saveable);
-            saveable.LoadState(data);
+
+
+    GameObject SpawnPlayer(PlayerState state) {
+        PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
+        return spawnPoint.SpawnPlayer(state);
+    }
+
+    void SpawnNPCs() {
+        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>()) {
+            spawnPoint.SpawnNPC();
         }
     }
 }

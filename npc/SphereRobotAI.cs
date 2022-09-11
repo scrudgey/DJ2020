@@ -42,21 +42,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
-
-        // TODO: change this hack!
-        // TODO: save / load gun state
-        TorsoAnimation torsoAnimation = controllable.GetComponentInChildren<TorsoAnimation>();
-        LegsAnimation legsAnimation = controllable.GetComponentInChildren<LegsAnimation>();
-        HeadAnimation headAnimation = controllable.GetComponentInChildren<HeadAnimation>();
-        if (torsoAnimation != null) {
-            PlayerData data = PlayerData.DefaultGameData();
-            foreach (ISaveable saveable in controllable.GetComponentsInChildren<ISaveable>()) {
-                saveable.LoadState(data);
-            }
-        }
-        gunHandler.primary = new GunInstance(Gun.Load("smg"));
-        gunHandler.SwitchToGun(1);
-
         alertHandler.Hide();
         Bind(sightCone.gameObject);
         navMeshPath = new NavMeshPath();

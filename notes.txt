@@ -1376,8 +1376,6 @@ graphics
 
 
 save system:
-
-    
     reset gun instance on pool operations
     allow independent level data
     allow independent NPC data: this is a little harder 
@@ -1392,3 +1390,4 @@ save system:
         select enemy loadout
 
     
+hurtable state

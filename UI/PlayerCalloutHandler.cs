@@ -42,6 +42,8 @@ public class PlayerCalloutHandler : MonoBehaviour {
 
     // TODO: long and short player callouts
     public void ActivatePlayerCallout(GameObject playerObject) {
+        if (playerObject == null)
+            return;
         active = true;
         target = playerObject;
         cursorImage.enabled = true;

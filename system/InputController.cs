@@ -257,10 +257,10 @@ public class InputController : MonoBehaviour {
     }
 
     void Start() {
-        inputReceivers = inputTargets
-            .Select(g => g.GetComponent<IInputReceiver>())
-            .Where(component => component != null)
-            .ToList();
+        // inputReceivers = inputTargets
+        //     .Select(g => g.GetComponent<IInputReceiver>())
+        //     .Where(component => component != null)
+        //     .ToList();
     }
 
     private void HandleCharacterInput() {
@@ -325,5 +325,12 @@ public class InputController : MonoBehaviour {
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
     }
-
+    public void SetInputReceivers(GameObject playerObject) {
+        inputReceivers = new List<IInputReceiver>();
+        foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<IInputReceiver>()) {
+            inputReceivers.Add(inputReceiver);
+        }
+        CharacterCamera characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
+        inputReceivers.Add(characterCamera);
+    }
 }

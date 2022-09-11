@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInputReceiver {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver {
     public enum GunState {
         idle,
         shooting,
@@ -493,10 +493,12 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, ISaveable, IInpu
     }
 
     // TODO: save method
-    public void LoadState(PlayerData data) {
-        primary = data.primaryGun;
-        secondary = data.secondaryGun;
-        third = data.tertiaryGun;
-        SwitchToGun(data.activeGun);
+    public void LoadGunHandlerState(IGunHandlerState state) {
+        // if (state.p)
+        primary = state.primaryGun;
+        secondary = state.secondaryGun;
+        third = state.tertiaryGun;
+        SwitchToGun(state.activeGun);
+        Debug.Log($"applying primary gun: {state.primaryGun.baseGun.name}");
     }
 }

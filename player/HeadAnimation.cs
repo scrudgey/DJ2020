@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HeadAnimation : MonoBehaviour, ISaveable {
+public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
     public SpriteRenderer spriteRenderer;
     public Skin skin;
     public Direction direction;
@@ -87,8 +87,10 @@ public class HeadAnimation : MonoBehaviour, ISaveable {
         }
     }
 
-    public void LoadState(PlayerData data) {
-        skin = Skin.LoadSkin(data.bodySkin);
+    // public void (PlayerData data) {
+    //     skin = Skin.LoadSkin(data.bodySkin);
+    // }
+    public void LoadSkinState(ISkinState state) {
+        skin = Skin.LoadSkin(state.bodySkin);
     }
-
 }

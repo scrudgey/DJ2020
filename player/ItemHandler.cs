@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using Items;
 using UnityEngine;
 // TODO: enable buffs on/off
-
-public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IInputReceiver {
+public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerStateLoader, IInputReceiver {
     public Action<ItemHandler> OnValueChanged { get; set; }
 
     public List<BaseItem> items = new List<BaseItem>();
@@ -49,7 +48,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, ISaveable, IIn
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
-    public void LoadState(PlayerData data) {
+    public void LoadItemState(IItemHandlerState data) {
         items = new List<BaseItem>();
         foreach (string itemName in data.items) {
             BaseItem newItem = ItemInstance.NewInstance(itemName);

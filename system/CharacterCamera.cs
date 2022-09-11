@@ -68,7 +68,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private float currentDistanceMovementSpeed;
     private bool clampOrthographicSize;
     public Vector3 lastTargetPosition;
-    public float zoomCoefficient;
+    public float zoomCoefficient = 1f;
     private bool horizontalAimParity;
     private List<Quaternion> cardinalDirections;
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
@@ -118,7 +118,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // IgnoredColliders.Clear();
         // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
-    void HandleEyeVisibilityChange(PlayerData playerData) {
+    void HandleEyeVisibilityChange(PlayerState playerData) {
         if (playerData.cyberEyesThermal || playerData.cyberEyesThermalBuff) {
             ShowLasers();
         } else {
@@ -506,6 +506,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
         float desiredOrthographicSize = input.orthographicSize * zoomCoefficient;
         float previousOrthographicSize = Camera.orthographicSize;
+
+        if (desiredOrthographicSize == 0) {
+            Debug.Log($"{input.orthographicSize} {zoomCoefficient}");
+        }
+
+        desiredOrthographicSize = Math.Max(1, desiredOrthographicSize);
+        desiredOrthographicSize = Math.Min(10, desiredOrthographicSize);
+
         Camera.orthographicSize = desiredOrthographicSize;
     }
     public CursorData GetTargetData(Vector2 cursorPosition, InputMode inputMode) {

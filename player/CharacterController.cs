@@ -26,7 +26,7 @@ public enum ClimbingState {
 public enum PopoutParity {
     left, right
 }
-public class CharacterController : MonoBehaviour, ICharacterController, ISaveable, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber, IPoolable {
+public class CharacterController : MonoBehaviour, ICharacterController, IPlayerStateLoader, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber, IPoolable {
     public KinematicCharacterMotor Motor;
     public CharacterHurtable characterHurtable;
     public CharacterCamera OrbitCamera;
@@ -1201,7 +1201,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, ISaveabl
     public void OnDiscreteCollisionDetected(Collider hitCollider) {
     }
 
-    public void LoadState(PlayerData data) {
+    public void LoadState(PlayerState data) {
         superJumpEnabled = data.cyberlegsLevel > 0;
     }
 

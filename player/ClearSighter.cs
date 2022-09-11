@@ -198,6 +198,8 @@ public class ClearSighter : MonoBehaviour {
     }
 
     void LateUpdate() {
+        if (followTransform == null)
+            return;
         myTransform.position = followTransform.position;
 
         // TODO: invokeRepeating here
@@ -263,6 +265,8 @@ public class ClearSighter : MonoBehaviour {
         => RemoveInterloper(other);
 
     void AddInterloper(Collider other) {
+        if (followTransform == null)
+            return;
         // Debug.Log("onaddinterloper");
         if (other.transform.IsChildOf(myTransform.root) || other.transform.IsChildOf(followTransform)) {
             return;
@@ -273,6 +277,7 @@ public class ClearSighter : MonoBehaviour {
     }
     void RemoveInterloper(Collider other) {
         if (other.transform.IsChildOf(myTransform.root) || other.transform.IsChildOf(followTransform)) {
+            // if (other.transform.IsChildOf(myTransform.root)) {
             return;
         }
         MaterialController controller = controllers.get(other.gameObject);

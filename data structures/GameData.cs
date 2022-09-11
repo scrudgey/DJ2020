@@ -2,7 +2,7 @@
 public class GameData {
     // TODO static save, load method
     public GameState state;
-    public PlayerData playerData;
+    public PlayerState playerData;
     public LevelData levelData;
 
 
@@ -12,7 +12,7 @@ public class GameData {
     public static GameData TestInitialData() {
         return new GameData() {
             state = GameState.none,
-            playerData = PlayerData.DefaultGameData(),
+            playerData = PlayerState.DefaultGameData(),
             // levelData = LevelData.LoadLevelData("test"),
             levelData = LevelData.Load("test"),
             overlayIndex = 0
