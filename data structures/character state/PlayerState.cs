@@ -21,6 +21,7 @@ public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState {
     // stats
     public int cyberlegsLevel;
     public bool cyberEyesThermal;
+    public bool thirdWeaponSlot;
     public bool cyberEyesThermalBuff;
     public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
         {GunType.pistol, 1},
@@ -55,7 +56,8 @@ public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState {
             cyberlegsLevel = 1,
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,
-            hackRadius = 1.5f
+            hackRadius = 1.5f,
+            thirdWeaponSlot = false
         };
     }
 

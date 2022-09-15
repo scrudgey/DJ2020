@@ -350,6 +350,7 @@ public class Toolbox {
             if (renderer.name.ToLower().Contains("shadowcaster")) continue;
             if (renderer.name.ToLower().Contains("blood_spray")) continue;
             if (renderer.name.ToLower().Contains("cube")) continue;
+            if (renderer.name.ToLower().Contains("lightsprite")) continue;
             // Debug.Log(renderer.name);
 
             Bounds bounds = renderer.bounds;
@@ -358,7 +359,7 @@ public class Toolbox {
                 if (spriteRenderer.sprite != null) {
                     bounds = spriteRenderer.sprite.bounds;
 
-                    // weird hack. maybe because billboarding?
+                    // weird hack. maybe because billboarding? i.e. should be camera angle dependent?
                     Vector3 extents = bounds.extents;
                     extents.y *= 1.3f;
                     bounds.extents = extents;

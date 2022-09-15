@@ -7,9 +7,6 @@ public class SingletonInitializer : MonoBehaviour {
     void Awake() {
         GameManager.InitializeInstance();
         PoolManager.InitializeInstance();
-        if (!SceneManager.GetSceneByName("UI").isLoaded) {
-            SceneManager.LoadSceneAsync("UI", LoadSceneMode.Additive);
-        }
         Destroy(gameObject);
     }
 }

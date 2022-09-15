@@ -439,8 +439,8 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         Reaction reaction = GameManager.I.GetSuspicionReaction(suspiciousness);
         summaryText1.text = suspiciousness switch {
             Suspiciousness.normal => "appearance ... OK <i>!!<.i>",
-            Suspiciousness.suspicious => "appearance ... shady",
-            Suspiciousness.aggressive => "appearance ... enemy",
+            Suspiciousness.suspicious => "appearance ... suspicious",
+            Suspiciousness.aggressive => "appearance ... aggressive",
             _ => ""
         };
         summaryText2.text = reaction switch {

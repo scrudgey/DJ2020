@@ -1,0 +1,1 @@
+public enum VRMissionType { hunt, survival, steal }

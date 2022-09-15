@@ -46,7 +46,6 @@ public class LevelDataUtilEditor : Editor {
             int fileExtPos = klaxonRelativePath.LastIndexOf(".");
             if (fileExtPos >= 0)
                 klaxonRelativePath = klaxonRelativePath.Substring(0, fileExtPos);
-            Debug.Log($"{klaxonRelativePath}");
 
             networkUtil.levelData.alarmAudioClipPath = klaxonRelativePath;
 

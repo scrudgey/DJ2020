@@ -8,8 +8,8 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public CyberComponent cyberComponent;
     public PoweredComponent powerComponent;
 
-    public override void Start() {
-        base.Start();
+    public void Awake() {
+        // base.Start();
         if (cyberComponent != null) {
             cyberComponent.OnStateChange += OnCyberChange;
         }
@@ -40,12 +40,14 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public override AlarmNode GetNode() => GameManager.I.GetAlarmNode(idn);
 
     public void OnPowerChange(PoweredComponent node) {
+        // Debug.Log($"alarm component {this} on power change: {node.power}");
         if (!node.power) {
             DisableSource();
         }
     }
 
     public void OnCyberChange(CyberComponent node) {
+        // Debug.Log($"alarm component {this} on cyber change: {node.compromised}");
         if (node.compromised) {
             DisableSource();
         }

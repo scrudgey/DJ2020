@@ -1,10 +1,9 @@
 [System.Serializable]
 public class GameData {
-    // TODO static save, load method
+    // TODO: static save, load method
     public GameState state;
     public PlayerState playerData;
     public LevelData levelData;
-
 
     // UI state:
     public int overlayIndex;

@@ -1231,6 +1231,11 @@ proposed alarm system
     * [<<][ELECTRICAL][>>]
     * and these are buttons you can click
     * "none" overlay with buttons
+* enable nodes after refreshing graph
+* why guard not perceiving my footsteps?
+* player callout
+* laser grid
+* NPC with pistol shoot
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1374,20 +1379,26 @@ graphics
     thermal goggles icon
     gibs from explosions
 
-
 save system:
     reset gun instance on pool operations
     * allow independent level data
     * allow independent NPC data: this is a little harder 
     interface for designing multiple VR scenarios
-        prereq: set up a title menu i guess?
+        * prereq: set up a title menu i guess?
+        * danger room
+        * spawning enemies
+        * select player loadout
+        * select enemy loadout
         new stage: infiltration
-        danger room
-        spawning enemies
         enemy count
         victory conditions
-        select player loadout
-        select enemy loadout
 
     
 hurtable state
+time limit 
+respawn interval 
+set tab color/graphic when selected
+set weapon highlight when selected
+set weapon to none button
+why suspicion handler is weird?
+TaskShoot interval is based on gun 

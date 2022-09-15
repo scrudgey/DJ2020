@@ -5,6 +5,9 @@ using UnityEngine;
 namespace AI {
     public class TaskShoot : TaskNode {
         GunHandler gunHandler;
+        bool fireHeld;
+        float timelastshoot;
+        float shootPressedResetInterval = 0.5f;
         public TaskShoot(GunHandler gunHandler) : base() {
             this.gunHandler = gunHandler;
         }
@@ -33,8 +36,15 @@ namespace AI {
             };
             bool clearshot = gunHandler.IsClearShot(cursorData);
 
+            bool firePressed = false;
+            if (Time.time - timelastshoot > shootPressedResetInterval) {
+                timelastshoot = Time.time;
+                firePressed = true;
+            }
+
             PlayerInput.FireInputs fireInput = clearshot ? new PlayerInput.FireInputs() {
-                FirePressed = false,
+                // FirePressed = false,
+                FirePressed = firePressed,
                 FireHeld = true,
                 cursorData = cursorData
             } : PlayerInput.FireInputs.none;

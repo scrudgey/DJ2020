@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public enum GameState { none, levelPlay, inMenu }
 public enum MenuType { none, console }
@@ -67,7 +68,7 @@ public partial class GameManager : Singleton<GameManager> {
         toggleConsoleThisFrame = ctx.ReadValueAsButton();
     }
     void LateUpdate() {
-        if (numberFrames == 1) {
+        if (numberFrames == 1 && SceneManager.GetActiveScene().name != "title") {
             // TODO: set level in gamedata
             gameData = GameData.TestInitialData();
             // TODO: a better start of level method?
@@ -98,6 +99,9 @@ public partial class GameManager : Singleton<GameManager> {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
+                if (!SceneManager.GetSceneByName("UI").isLoaded) {
+                    SceneManager.LoadSceneAsync("UI", LoadSceneMode.Additive);
+                }
                 InitializeLevel();
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
@@ -172,6 +176,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void Update() {
+        // TODO: disable update if we are loading
         if (toggleConsoleThisFrame) {
             if (activeMenuType != MenuType.console) {
                 ShowMenu(MenuType.console);
@@ -180,10 +185,12 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         toggleConsoleThisFrame = false;
-        UpdateSuspicion();
-        UpdateAlarm();
-        UpdateReportTickets();
-        UpdateGraphs();
+        if (gameData.state == GameState.levelPlay) {
+            UpdateSuspicion();
+            UpdateAlarm();
+            UpdateReportTickets();
+            UpdateGraphs();
+        }
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {

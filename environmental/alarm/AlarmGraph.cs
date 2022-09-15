@@ -24,6 +24,7 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
             if (component is AlarmTerminal) {
                 node.alarmTriggered = false;
             }
+            component.nodeEnabled = node.enabled;
         }
 
         AlarmNode[] sources = nodes.Values.Where(node => node.alarmTriggered).ToArray();

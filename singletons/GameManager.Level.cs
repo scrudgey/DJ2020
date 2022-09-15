@@ -1,14 +1,45 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Easings;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
     static Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
     static Dictionary<string, HashSet<CyberComponent>> cyberComponents;
     static Dictionary<string, AlarmComponent> alarmComponents;
-
     NPCSpawnPoint strikeTeamSpawnPoint;
+
+    List<AsyncOperation> scenesLoading;
+
+    public void StartVRMission(VRMissionData data) {
+        gameData.playerData = data.playerState;
+        gameData.levelData = LevelData.Load("test");
+        gameData.levelData.sensitivityLevel = data.sensitivityLevel;
+        LoadScene(data.sceneName);
+    }
+
+    void LoadScene(string sceneName) {
+        scenesLoading = new List<AsyncOperation>();
+        Debug.Log("show loading screen");
+        scenesLoading.Add(SceneManager.LoadSceneAsync(sceneName));
+        // scenesLoading.Add(SceneManager.UnloadSceneAsync("title"));
+        StartCoroutine(GetSceneLoadProgress(sceneName));
+    }
+    public IEnumerator GetSceneLoadProgress(string targetScene) {
+        for (int i = 0; i < scenesLoading.Count; i++) {
+            while (!scenesLoading[i].isDone) {
+                yield return null;
+            }
+        }
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
+
+        Debug.Log("hide loading screen");
+        TransitionToState(GameState.levelPlay);
+    }
 
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
@@ -24,6 +55,7 @@ public partial class GameManager : Singleton<GameManager> {
         if (clearSighter != null && focus != null)
             clearSighter.followTransform = focus.transform;
 
+        Debug.Log($"on focus changed: {focus}");
         OnFocusChanged?.Invoke(focus);
     }
     void ClearSceneData() {
@@ -36,7 +68,6 @@ public partial class GameManager : Singleton<GameManager> {
         ClearSceneData();
 
         // spawn player object
-        Debug.Log("spawn player object");
         GameObject playerObj = SpawnPlayer(gameData.playerData);
         SetFocus(playerObj);
 
@@ -73,6 +104,7 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("connecting alarm grid...");
         foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
             alarmComponents[component.idn] = component;
+
         }
 
         RefreshPowerGraph();
@@ -82,6 +114,8 @@ public partial class GameManager : Singleton<GameManager> {
         alarmSoundInterval = 2f;
         alarmSound = Resources.Load(gameData.levelData.alarmAudioClipPath) as AudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
+
+        OnSuspicionChange?.Invoke();
     }
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
@@ -118,8 +152,6 @@ public partial class GameManager : Singleton<GameManager> {
         } else {
             // Debug.Log("called set node enabled with null node");
         }
-
-
     }
 
     // TODO: these methods could belong to the graphs?
@@ -133,8 +165,24 @@ public partial class GameManager : Singleton<GameManager> {
         return gameData?.levelData?.alarmGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.alarmGraph.nodes[idn] : null;
     }
     public AlarmComponent GetAlarmComponent(string idn) {
+        if (alarmComponents == null)
+            return null;
         if (alarmComponents.ContainsKey(idn)) {
             return alarmComponents[idn];
+        } else return null;
+    }
+    public PoweredComponent GetPowerComponent(string idn) {
+        if (poweredComponents == null)
+            return null;
+        if (poweredComponents.ContainsKey(idn)) {
+            return poweredComponents[idn].First();
+        } else return null;
+    }
+    public CyberComponent GetCyberComponent(string idn) {
+        if (cyberComponents == null)
+            return null;
+        if (cyberComponents.ContainsKey(idn)) {
+            return cyberComponents[idn].First();
         } else return null;
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
@@ -182,6 +230,8 @@ public partial class GameManager : Singleton<GameManager> {
     public void RefreshCyberGraph() {
         TransferCyberState();
 
+        gameData.levelData.cyberGraph.Refresh();
+
         // propagate changes to UI
         OnCyberGraphChange?.Invoke(gameData.levelData.cyberGraph);
     }
@@ -206,6 +256,8 @@ public partial class GameManager : Singleton<GameManager> {
         OnPowerGraphChange?.Invoke(gameData.levelData.powerGraph);
     }
     void TransferPowerState() {
+        if (poweredComponents == null)
+            return;
         foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelData.powerGraph.nodes) {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 foreach (PoweredComponent component in poweredComponents[kvp.Key]) {
@@ -217,6 +269,8 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     void TransferCyberState() {
+        if (cyberComponents == null)
+            return;
         foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelData.cyberGraph.nodes) {
             if (cyberComponents.ContainsKey(kvp.Key)) {
                 foreach (CyberComponent component in cyberComponents[kvp.Key]) {
@@ -229,6 +283,8 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     void TransferAlarmState() {
+        if (alarmComponents == null)
+            return;
         foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelData.alarmGraph.nodes) {
             if (alarmComponents.ContainsKey(kvp.Key)) {
                 AlarmComponent component = alarmComponents[kvp.Key];
@@ -242,11 +298,13 @@ public partial class GameManager : Singleton<GameManager> {
 
     GameObject SpawnPlayer(PlayerState state) {
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
+        Debug.Log(spawnPoint);
         return spawnPoint.SpawnPlayer(state);
     }
 
     void SpawnNPCs() {
         foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn)) {
+            Debug.Log($"spawning {spawnPoint}");
             spawnPoint.SpawnNPC();
         }
     }

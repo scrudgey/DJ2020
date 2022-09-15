@@ -26,6 +26,7 @@ public class PlayerCalloutHandler : MonoBehaviour {
     void Start() {
         GameManager.OnFocusChanged += ActivatePlayerCallout;
         GameManager.OnInputModeChange += HandleInputModeChange;
+        ActivatePlayerCallout(GameManager.I.playerObject);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= ActivatePlayerCallout;
@@ -42,6 +43,7 @@ public class PlayerCalloutHandler : MonoBehaviour {
 
     // TODO: long and short player callouts
     public void ActivatePlayerCallout(GameObject playerObject) {
+        Debug.Log($"activate player callout: {playerObject}");
         if (playerObject == null)
             return;
         active = true;

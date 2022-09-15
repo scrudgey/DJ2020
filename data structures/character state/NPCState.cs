@@ -27,21 +27,21 @@ public class NPCState : ScriptableObject, ISkinState, IGunHandlerState {
         ((ISkinState)this).ApplySkinState(npcObject);
     }
 
-    // public static NPCState DefaultNPCState() {
-    //     Gun gun1 = Gun.Load("rifle");
-    //     Gun gun2 = Gun.Load("pistol");
-    //     Gun gun3 = Gun.Load("shotgun");
+    public static NPCState DefaultNPCState() {
+        Gun gun1 = Gun.Load("rifle");
+        Gun gun2 = Gun.Load("pistol");
+        Gun gun3 = Gun.Load("shotgun");
 
-    //     return new NPCState() {
-    //         primaryGun = new GunInstance(gun1),
-    //         secondaryGun = new GunInstance(gun2),
-    //         tertiaryGun = new GunInstance(gun3),
-    //         activeGun = 1,
+        return new NPCState() {
+            primaryGun = new GunInstance(gun1),
+            secondaryGun = new GunInstance(gun2),
+            tertiaryGun = new GunInstance(gun3),
+            activeGun = 1,
 
-    //         // legSkin = "generic64",
-    //         // // legSkin = "cyber",
-    //         legSkin = "Jack",
-    //         bodySkin = "Jack",
-    //     };
-    // }
+            // legSkin = "generic64",
+            // // legSkin = "cyber",
+            legSkin = "Jack",
+            bodySkin = "Jack",
+        };
+    }
 }

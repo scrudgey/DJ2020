@@ -265,7 +265,7 @@ public class InputController : MonoBehaviour {
 
     private void HandleCharacterInput() {
 
-        bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
         if (uiclick) {
             GameManager.I.cursorType = CursorType.pointer;
             firePressedThisFrame = false;

@@ -33,6 +33,7 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         DisableSource();
     }
     void OnEnable() {
+        // TODO: move this to level initialization!
         EnableSource();
     }
     virtual public void OnDestroy() {
