@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState {
+public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICharacterHurtableState {
     public int credits;
 
     // skin
@@ -14,6 +14,11 @@ public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState {
     public GunInstance secondaryGun { get; set; }
     public GunInstance tertiaryGun { get; set; }
     public int activeGun { get; set; }
+
+    // health
+    public float health { get; set; }
+    public float fullHealthAmount { get; set; }
+    public HitState hitState { get; set; }
 
     // items
     public List<string> items { get; set; }
@@ -57,7 +62,11 @@ public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState {
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,
             hackRadius = 1.5f,
-            thirdWeaponSlot = false
+            thirdWeaponSlot = false,
+
+            health = 250f,
+            fullHealthAmount = 250f,
+
         };
     }
 
@@ -65,6 +74,7 @@ public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState {
         ((IGunHandlerState)this).ApplyGunState(playerObject);
         ((ISkinState)this).ApplySkinState(playerObject);
         ((IItemHandlerState)this).ApplyItemState(playerObject);
+        ((ICharacterHurtableState)this).ApplyHurtableState(playerObject);
         ApplyPlayerState(playerObject);
     }
     public void ApplyPlayerState(GameObject playerObject) {

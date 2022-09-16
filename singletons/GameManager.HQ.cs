@@ -52,9 +52,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         // reset strike team 
         try {
-
             PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
-            // Debug.Log($"NPC pool: {pool.objectsInPool.Count} {pool.objectsActiveInWorld.Count}");
             gameData.levelData.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         }
         finally {
@@ -161,7 +159,6 @@ public partial class GameManager : Singleton<GameManager> {
             if (strikeTeamSpawnPoint != null) { // TODO: check level data 
                 UpdateStrikeTeamSpawn();
             }
-
             alarmSoundTimer += Time.deltaTime;
             if (alarmSoundTimer > alarmSoundInterval) {
                 alarmSoundTimer -= alarmSoundInterval;

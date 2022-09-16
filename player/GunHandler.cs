@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver, IPoolable {
     public enum GunState {
         idle,
         shooting,
@@ -499,5 +499,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         secondary = state.secondaryGun;
         third = state.tertiaryGun;
         SwitchToGun(state.activeGun);
+    }
+
+    public void OnPoolActivate() {
+
+    }
+    public void OnPoolDectivate() {
+        if (gunInstance != null && gunInstance.baseGun != null)
+            gunInstance = new GunInstance(gunInstance.baseGun);
     }
 }

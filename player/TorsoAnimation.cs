@@ -39,7 +39,6 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
         try {
-
             SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
 
             Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);

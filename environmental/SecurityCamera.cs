@@ -48,7 +48,6 @@ public class SecurityCamera : IBinder<SightCone> {
         if (!nodeEnabled) {
             audioSource.Stop();
         }
-        Debug.Log($"security camera handle alarm component state change: {nodeEnabled}");
     }
 
     public override void HandleValueChanged(SightCone t) {

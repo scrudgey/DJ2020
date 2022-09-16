@@ -99,12 +99,12 @@ public partial class GameManager : Singleton<GameManager> {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
-                if (!SceneManager.GetSceneByName("UI").isLoaded) {
-                    SceneManager.LoadSceneAsync("UI", LoadSceneMode.Additive);
-                }
                 InitializeLevel();
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
+                if (!SceneManager.GetSceneByName("UI").isLoaded) {
+                    SceneManager.LoadSceneAsync("UI", LoadSceneMode.Additive);
+                }
                 break;
             case GameState.inMenu:
                 Time.timeScale = 0f;
@@ -146,11 +146,11 @@ public partial class GameManager : Singleton<GameManager> {
     public void ShowMenu(MenuType menuType) {
         activeMenuType = menuType;
         OnMenuChange(menuType);
-        TransitionToState(GameState.inMenu);
+        // TransitionToState(GameState.inMenu);
     }
     public void CloseMenu() {
         OnMenuClosed();
-        TransitionToState(GameState.levelPlay); // this isn't right either?
+        // TransitionToState(GameState.levelPlay); // this isn't right either?
         activeMenuType = MenuType.none;
     }
 

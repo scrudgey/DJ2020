@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum HitState { normal, hitstun, dead, invulnerable }
 
-public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPoolable {
+public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPoolable, ICharacterHurtableStateLoader {
     public enum HitStunType { timer, invulnerable }
     public HitStunType hitstunType;
     // private HitState _hitState;
@@ -94,5 +94,10 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
     public override void OnPoolDectivate() {
         base.OnPoolDectivate();
         hitstunCountdown = 0;
+    }
+    public void LoadCharacterState(ICharacterHurtableState state) {
+        this.health = state.health;
+        this.fullHealthAmount = state.fullHealthAmount;
+        this.hitState = state.hitState;
     }
 }

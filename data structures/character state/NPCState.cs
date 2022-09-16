@@ -4,7 +4,7 @@ using UnityEngine;
 [System.Serializable]
 
 [CreateAssetMenu(menuName = "ScriptableObjects/NPCState")]
-public class NPCState : ScriptableObject, ISkinState, IGunHandlerState {
+public class NPCState : ScriptableObject, ISkinState, IGunHandlerState, ICharacterHurtableState {
 
     // skin
     [field: SerializeField]
@@ -21,10 +21,16 @@ public class NPCState : ScriptableObject, ISkinState, IGunHandlerState {
     public GunInstance tertiaryGun { get; set; }
     [field: SerializeField]
     public int activeGun { get; set; }
+    // health
+    public float health { get; set; }
+    [field: SerializeField]
+    public float fullHealthAmount { get; set; }
+    public HitState hitState { get; set; }
 
     public void ApplyState(GameObject npcObject) {
         ((IGunHandlerState)this).ApplyGunState(npcObject);
         ((ISkinState)this).ApplySkinState(npcObject);
+        ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
     }
 
     public static NPCState DefaultNPCState() {
@@ -42,6 +48,8 @@ public class NPCState : ScriptableObject, ISkinState, IGunHandlerState {
             // // legSkin = "cyber",
             legSkin = "Jack",
             bodySkin = "Jack",
+            health = 100,
+            fullHealthAmount = 100
         };
     }
 }

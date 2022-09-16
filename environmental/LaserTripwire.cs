@@ -18,16 +18,18 @@ public class LaserTripwire : AlarmComponent {
     public AudioSource buzzSoundSource;
 
     override public void Start() {
-        base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         foreach (LaserData data in laserData) {
             data.laser.tripWire = this;
             data.laser.gameObject.SetActive(data.enabled);
         }
+        // TODO: bad hack. caused by initialization order / level load bs.
+        base.Start();
     }
 
 
     public void LaserTripCallback() {
+        Debug.Log("laser trip callback");
         if (cooldown > 0)
             return;
         // GameManager.I.ActivateAlarm();
@@ -56,7 +58,6 @@ public class LaserTripwire : AlarmComponent {
     override public void EnableSource() {
         base.EnableSource();
         Debug.Log("enabling laser tripwire");
-
         foreach (LaserData data in laserData) {
             data.laser.gameObject.SetActive(data.enabled);
         }
