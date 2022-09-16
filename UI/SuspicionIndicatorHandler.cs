@@ -82,6 +82,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     float targetRightLineHeight;
     public void Bind() {
         GameManager.OnSuspicionChange += HandleSuspicionChange;
+        HandleSuspicionChange();
     }
     void OnDestroy() {
         GameManager.OnSuspicionChange -= HandleSuspicionChange;

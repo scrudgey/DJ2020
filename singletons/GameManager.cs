@@ -16,7 +16,6 @@ public struct PointerData {
     public CursorMode cursorMode;
 }
 public partial class GameManager : Singleton<GameManager> {
-    public static Action<GameObject> OnFocusChanged;
     public GameData gameData;
     public AudioSource audioSource;
     public GameObject playerObject;
@@ -27,6 +26,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     // UI callbacks
     public static Action OnMenuClosed;
+    public static Action<GameObject> OnFocusChanged;
     public static Action<MenuType> OnMenuChange;
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;

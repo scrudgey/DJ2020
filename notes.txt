@@ -1404,8 +1404,20 @@ interface for designing multiple VR scenarios
     time limit 
     respawn interval 
 
-figure out graph load order issues once and for all
-why suspicion handler is weird?
-TaskShoot interval should be based on gun stats or else semiauto should have a cooldown timer
-victory conditions
+* why suspicion handler is weird?
+* TaskShoot interval should be based on gun stats or else semiauto should have a cooldown timer
 set weapon to none button
+victory conditions
+
+better weapon graphics
+death graphics for all skins
+figure out graph load order issues once and for all
+
+
+
+
+outline the various play styles:
+    1. defeat all the respawning enemies, stay alive
+        number of lives
+    2. survive for an amount of time
+    3. steal data from locations / some cyber objective

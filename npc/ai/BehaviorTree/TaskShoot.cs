@@ -7,7 +7,7 @@ namespace AI {
         GunHandler gunHandler;
         bool fireHeld;
         float timelastshoot;
-        float shootPressedResetInterval = 0.5f;
+        // float shootPressedResetInterval = 0.5f;
         public TaskShoot(GunHandler gunHandler) : base() {
             this.gunHandler = gunHandler;
         }
@@ -35,7 +35,7 @@ namespace AI {
                 mousePosition = lastSeenPlayerPosition
             };
             bool clearshot = gunHandler.IsClearShot(cursorData);
-
+            float shootPressedResetInterval = gunHandler.gunInstance.baseGun.shootInterval;
             bool firePressed = false;
             if (Time.time - timelastshoot > shootPressedResetInterval) {
                 timelastshoot = Time.time;
