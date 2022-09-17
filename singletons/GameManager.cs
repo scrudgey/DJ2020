@@ -99,7 +99,6 @@ public partial class GameManager : Singleton<GameManager> {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
-                InitializeLevel();
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 if (!SceneManager.GetSceneByName("UI").isLoaded) {

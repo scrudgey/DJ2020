@@ -8,6 +8,7 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     public string nodeTitle;
     public bool nodeEnabled;
     public NodeIcon icon;
+    private bool applicationIsQuitting = false;
 
     public T[] edges = new T[0];
 
@@ -30,11 +31,13 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     }
 
     void OnDisable() {
-        DisableSource();
+        if (GameManager.I != null && !GameManager.I.isLoadingLevel)
+            DisableSource();
     }
     void OnEnable() {
         // TODO: move this to level initialization!
-        EnableSource();
+        if (!GameManager.I.isLoadingLevel)
+            EnableSource();
     }
     virtual public void OnDestroy() {
         DisableSource();

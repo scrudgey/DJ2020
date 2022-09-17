@@ -114,6 +114,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         return new Vector3(transform.position.x, transform.position.y + height, transform.position.z);
     }
     public Vector3 gunDirection(CursorData data) {
+        if (data == null) return Vector3.zero;
         return data.worldPosition - this.gunPosition();
     }
     public float inaccuracy(CursorData input) {

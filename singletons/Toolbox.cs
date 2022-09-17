@@ -351,7 +351,9 @@ public class Toolbox {
             if (renderer.name.ToLower().Contains("blood_spray")) continue;
             if (renderer.name.ToLower().Contains("cube")) continue;
             if (renderer.name.ToLower().Contains("lightsprite")) continue;
-            // Debug.Log(renderer.name);
+            if (renderer.name.ToLower().Contains("damagedecal")) continue;
+            if (renderer.name.ToLower().Contains("bullethole")) continue;
+            Debug.Log(renderer.name);
 
             Bounds bounds = renderer.bounds;
             if (renderer is SpriteRenderer) {

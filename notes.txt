@@ -1408,16 +1408,20 @@ interface for designing multiple VR scenarios
 * TaskShoot interval should be based on gun stats or else semiauto should have a cooldown timer
 set weapon to none button
 victory conditions
-
 better weapon graphics
 death graphics for all skins
 figure out graph load order issues once and for all
-
-
-
 
 outline the various play styles:
     1. defeat all the respawning enemies, stay alive
         number of lives
     2. survive for an amount of time
     3. steal data from locations / some cyber objective
+
+1. ensure that number NPCs stays below the pool size
+2. cap number of live NPCs at a time.
+3. cap total number of NPCs
+
+multiple weapons
+proper weapon names
+combat arena

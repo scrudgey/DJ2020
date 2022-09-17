@@ -26,7 +26,7 @@ public class PlayerCalloutHandler : MonoBehaviour {
     void Start() {
         GameManager.OnFocusChanged += ActivatePlayerCallout;
         GameManager.OnInputModeChange += HandleInputModeChange;
-        ActivatePlayerCallout(GameManager.I.playerObject);
+        DisablePlayerCallout();
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= ActivatePlayerCallout;

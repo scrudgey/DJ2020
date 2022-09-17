@@ -8,37 +8,50 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
-    static Dictionary<string, HashSet<PoweredComponent>> poweredComponents;
-    static Dictionary<string, HashSet<CyberComponent>> cyberComponents;
+    static Dictionary<string, PoweredComponent> poweredComponents;
+    static Dictionary<string, CyberComponent> cyberComponents;
     static Dictionary<string, AlarmComponent> alarmComponents;
     NPCSpawnPoint strikeTeamSpawnPoint;
 
     List<AsyncOperation> scenesLoading;
+    public bool isLoadingLevel;
 
-    public void StartVRMission(VRMissionData data) {
+    public void LoadVRMission(VRMissionData data) {
         gameData.playerData = data.playerState;
         gameData.levelData = LevelData.Load("test");
         gameData.levelData.sensitivityLevel = data.sensitivityLevel;
-        LoadScene(data.sceneName);
+        LoadScene(data.sceneName, () => StartVRMission(data));
     }
 
-    void LoadScene(string sceneName) {
+    void StartVRMission(VRMissionData data) {
+        Debug.Log("start VR mission");
+        InitializeLevel();
+
+        TransitionToState(GameState.levelPlay);
+
+        GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
+        VRMissionController missionController = controller.GetComponent<VRMissionController>();
+        missionController.StartVRMission(data);
+    }
+
+    void LoadScene(string sceneName, Action callback) {
+        isLoadingLevel = true;
         scenesLoading = new List<AsyncOperation>();
         Debug.Log("show loading screen");
         scenesLoading.Add(SceneManager.LoadSceneAsync(sceneName));
         // scenesLoading.Add(SceneManager.UnloadSceneAsync("title"));
-        StartCoroutine(GetSceneLoadProgress(sceneName));
+        StartCoroutine(GetSceneLoadProgress(sceneName, callback));
     }
-    public IEnumerator GetSceneLoadProgress(string targetScene) {
+    public IEnumerator GetSceneLoadProgress(string targetScene, Action callback) {
         for (int i = 0; i < scenesLoading.Count; i++) {
             while (!scenesLoading[i].isDone) {
                 yield return null;
             }
         }
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
-
         Debug.Log("hide loading screen");
-        TransitionToState(GameState.levelPlay);
+        callback();
+        isLoadingLevel = false;
     }
 
     public void SetFocus(GameObject focus) {
@@ -59,12 +72,11 @@ public partial class GameManager : Singleton<GameManager> {
         OnFocusChanged?.Invoke(focus);
     }
     void ClearSceneData() {
-        poweredComponents = new Dictionary<string, HashSet<PoweredComponent>>();
-        cyberComponents = new Dictionary<string, HashSet<CyberComponent>>();
+        poweredComponents = new Dictionary<string, PoweredComponent>();
+        cyberComponents = new Dictionary<string, CyberComponent>();
         alarmComponents = new Dictionary<string, AlarmComponent>();
     }
     private void InitializeLevel() {
-        // TODO: load and set up asynchronously behind a screen
         ClearSceneData();
 
         // spawn player object
@@ -77,27 +89,17 @@ public partial class GameManager : Singleton<GameManager> {
         InputController inputController = GameObject.FindObjectOfType<InputController>();
         inputController.SetInputReceivers(playerObj);
 
-        // spawn NPCs
-        SpawnNPCs();
 
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
-            if (poweredComponents.ContainsKey(component.idn)) {
-                poweredComponents[component.idn].Add(component);
-            } else {
-                poweredComponents[component.idn] = new HashSet<PoweredComponent> { component };
-            }
+            poweredComponents[component.idn] = component;
         }
 
         // connect up cyber grids
         Debug.Log("connecting cyber grid...");
         foreach (CyberComponent component in GameObject.FindObjectsOfType<CyberComponent>()) {
-            if (cyberComponents.ContainsKey(component.idn)) {
-                cyberComponents[component.idn].Add(component);
-            } else {
-                cyberComponents[component.idn] = new HashSet<CyberComponent> { component };
-            }
+            cyberComponents[component.idn] = component;
         }
 
         // connect up alarm grids
@@ -175,14 +177,14 @@ public partial class GameManager : Singleton<GameManager> {
         if (poweredComponents == null)
             return null;
         if (poweredComponents.ContainsKey(idn)) {
-            return poweredComponents[idn].First();
+            return poweredComponents[idn];
         } else return null;
     }
     public CyberComponent GetCyberComponent(string idn) {
         if (cyberComponents == null)
             return null;
         if (cyberComponents.ContainsKey(idn)) {
-            return cyberComponents[idn].First();
+            return cyberComponents[idn];
         } else return null;
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
@@ -260,11 +262,9 @@ public partial class GameManager : Singleton<GameManager> {
             return;
         foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelData.powerGraph.nodes) {
             if (poweredComponents.ContainsKey(kvp.Key)) {
-                foreach (PoweredComponent component in poweredComponents[kvp.Key]) {
-                    component.power = kvp.Value.powered;
-                    component.nodeEnabled = kvp.Value.enabled;
-                    // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
-                }
+                poweredComponents[kvp.Key].power = kvp.Value.powered;
+                poweredComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
+                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
             }
         }
     }
@@ -273,12 +273,9 @@ public partial class GameManager : Singleton<GameManager> {
             return;
         foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelData.cyberGraph.nodes) {
             if (cyberComponents.ContainsKey(kvp.Key)) {
-                foreach (CyberComponent component in cyberComponents[kvp.Key]) {
-                    component.compromised = kvp.Value.compromised;
-                    component.nodeEnabled = kvp.Value.enabled;
-
-                    // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
-                }
+                cyberComponents[kvp.Key].compromised = kvp.Value.compromised;
+                cyberComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
+                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
             }
         }
     }
@@ -302,10 +299,5 @@ public partial class GameManager : Singleton<GameManager> {
         return spawnPoint.SpawnPlayer(state);
     }
 
-    void SpawnNPCs() {
-        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn)) {
-            Debug.Log($"spawning {spawnPoint}");
-            spawnPoint.SpawnNPC();
-        }
-    }
+
 }
