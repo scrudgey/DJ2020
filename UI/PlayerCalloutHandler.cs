@@ -43,7 +43,6 @@ public class PlayerCalloutHandler : MonoBehaviour {
 
     // TODO: long and short player callouts
     public void ActivatePlayerCallout(GameObject playerObject) {
-        Debug.Log($"activate player callout: {playerObject}");
         if (playerObject == null)
             return;
         active = true;

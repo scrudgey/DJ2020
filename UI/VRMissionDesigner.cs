@@ -139,7 +139,7 @@ public class VRMissionDesigner : MonoBehaviour {
 
         missionTypeDropdown.value = (int)data.missionType;
         sensitivityDropdown.value = (int)data.sensitivityLevel;
-        numberNPCInput.text = data.numberNPCs.ToString();
+        numberNPCInput.text = data.maxNumberNPCs.ToString();
 
 
         // TODO: change depending on selected tab
@@ -234,7 +234,7 @@ public class VRMissionDesigner : MonoBehaviour {
         OnDataChange();
     }
     public void NumberEnemiesCallback(TMP_InputField inputField) {
-        data.numberNPCs = int.Parse(inputField.text);
+        data.maxNumberNPCs = int.Parse(inputField.text);
         OnDataChange();
     }
 

@@ -37,7 +37,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public Footsteps footsteps;
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
-    public Action OnCharacterDead;
+    public Action<CharacterController> OnCharacterDead;
     public Action<CharacterController> OnValueChanged { get; set; }
 
     [Header("Stable Movement")]
@@ -162,6 +162,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float deadTimer;
     private float hitstunTimer;
     private float gunHitStunTimer;
+    // private bool isDead;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -748,10 +749,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 //     currentVelocity += Gravity * deltaTime;
                 // }
                 if (deadTimer >= 1.8f) {
-                    // TODO: use object pooling
+                    OnCharacterDead?.Invoke(this);
                     CreateCorpse();
                     PoolManager.I.RecallObject(transform.root.gameObject);
-                    OnCharacterDead?.Invoke();
                 }
                 break;
             case CharacterState.jumpPrep:
@@ -1265,7 +1265,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     public void OnPoolActivate() {
-
     }
     public void OnPoolDectivate() {
         deadTimer = 0f;

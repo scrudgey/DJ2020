@@ -3,13 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 public class VRMissionController : MonoBehaviour {
+    enum State { normal, victory, fail }
+    State state;
     VRMissionData data;
     public int numberTotalNPCs;
     public int numberLiveNPCs;
-    public float NPCspawnInterval = 1f;
+    public int numberNPCsKilled;
+    public float NPCspawnInterval = 10f;
     public float NPCspawnTimer;
     public List<CharacterController> npcControllers = new List<CharacterController>();
-
+    void TransitionToState(State newState) {
+        State tmpInitialState = state;
+        OnStateExit(tmpInitialState, newState);
+        state = newState;
+        OnStateEnter(newState, tmpInitialState);
+    }
+    void OnStateEnter(State state, State fromState) {
+        Debug.Log($"VR mission entering state {state} from {fromState}");
+        switch (state) {
+            default:
+                break;
+        }
+    }
+    void OnStateExit(State state, State toState) {
+        switch (state) {
+            default:
+                break;
+        }
+    }
     public void StartVRMission(VRMissionData data) {
         Debug.Log("start VR mission");
         this.data = data;
@@ -18,7 +39,7 @@ public class VRMissionController : MonoBehaviour {
     }
 
     void Update() {
-        if (numberTotalNPCs < data.numberNPCs && numberLiveNPCs < 3) {
+        if (numberTotalNPCs < data.maxNumberNPCs && numberLiveNPCs < data.numberConcurrentNPCs) {
             NPCspawnTimer += Time.deltaTime;
             if (NPCspawnTimer > NPCspawnInterval) {
                 NPCspawnTimer -= NPCspawnInterval;
@@ -33,26 +54,32 @@ public class VRMissionController : MonoBehaviour {
         NPCSpawnPoint[] spawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToArray();
         NPCSpawnPoint spawnPoint = Toolbox.RandomFromList(spawnPoints);
         GameObject npcObject = spawnPoint.SpawnNPC();
-
         CharacterController npcController = npcObject.GetComponentInChildren<CharacterController>();
-        npcController.OnCharacterDead += HandleNPCDead;
+
         npcControllers.Add(npcController);
+        npcController.OnCharacterDead += HandleNPCDead;
         numberTotalNPCs += 1;
         numberLiveNPCs += 1;
-        Debug.Log($"spawn npc {numberLiveNPCs} {numberTotalNPCs}");
+        Debug.Log($"spawn npc {numberLiveNPCs} {numberTotalNPCs} {numberNPCsKilled}");
     }
 
-    void HandleNPCDead() {
+    void HandleNPCDead(CharacterController npc) {
+        npc.OnCharacterDead -= HandleNPCDead;
+        npcControllers.Remove(npc);
         numberLiveNPCs -= 1;
-        Debug.Log($"NPCdead {numberLiveNPCs} {numberTotalNPCs}");
+        numberNPCsKilled += 1;
+        if (data.missionType == VRMissionType.hunt) {
+            if (numberNPCsKilled >= data.maxNumberNPCs) {
+                TransitionToState(State.victory);
+            }
+        }
     }
-    void HandlePlayerDead() {
-        Debug.Log("player dead");
+    void HandlePlayerDead(CharacterController npc) {
+        TransitionToState(State.fail);
     }
 
     void SpawnAllNPCs() {
         foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn)) {
-            Debug.Log($"spawning {spawnPoint}");
             spawnPoint.SpawnNPC();
         }
     }

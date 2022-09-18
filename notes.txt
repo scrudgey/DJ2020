@@ -1411,14 +1411,17 @@ victory conditions
 better weapon graphics
 death graphics for all skins
 figure out graph load order issues once and for all
+selectable level alarm
 
 outline the various play styles:
-    1. defeat all the respawning enemies, stay alive
+    1. defeat all the respawning enemies, stay alive: combat
         number of lives
-    2. survive for an amount of time
+        show kill count
+        disable alarm system?
+    2. survive for an amount of time with endless waves of enemies
     3. steal data from locations / some cyber objective
 
-1. ensure that number NPCs stays below the pool size
+1. ensure that number live NPCs stays below the pool size
 2. cap number of live NPCs at a time.
 3. cap total number of NPCs
 
