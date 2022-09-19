@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICharacterHurtableState {
+public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICharacterHurtableState {
     public int credits;
 
     // skin
@@ -81,6 +81,28 @@ public class PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICha
         foreach (IPlayerStateLoader loader in playerObject.GetComponentsInChildren<IPlayerStateLoader>()) {
             loader.LoadState(this);
         }
+    }
+
+    public PlayerState Refresh() {
+        GunInstance newPrimary = primaryGun;
+        GunInstance newSecondary = secondaryGun;
+        GunInstance newTertiary = tertiaryGun;
+        if (primaryGun != null && primaryGun.baseGun != null) {
+            newPrimary = new GunInstance(primaryGun.baseGun);
+        }
+        if (secondaryGun != null && secondaryGun.baseGun != null) {
+            newSecondary = new GunInstance(secondaryGun.baseGun);
+        }
+        if (tertiaryGun != null && tertiaryGun.baseGun != null) {
+            newTertiary = new GunInstance(tertiaryGun.baseGun);
+        }
+        return this with {
+            health = fullHealthAmount,
+            hitState = HitState.normal,
+            primaryGun = newPrimary,
+            secondaryGun = newSecondary,
+            tertiaryGun = newTertiary
+        };
     }
 }
 

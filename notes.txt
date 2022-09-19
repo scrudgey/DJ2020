@@ -1240,7 +1240,27 @@ proposed alarm system
 * set tab color/graphic when selected
 * set weapon highlight when selected
 * laser grid not working
-
+* save system:
+    * reset gun instance on pool operations
+    * allow independent level data
+    * allow independent NPC data: this is a little harder 
+* prereq: set up a title menu i guess?
+* danger room
+* spawning enemies
+* select player loadout
+* select enemy loadout
+* new stage: infiltration
+* enemy count
+* why suspicion handler is weird?
+* TaskShoot interval should be based on gun stats or else semiauto should have a cooldown timer
+* reset gun state between levels
+* reset hq records between levels
+* crawl with gun
+* blood spray
+* proper formatted time stat
+* show fail if fail
+* victory conditions
+* aim: fixed angular size
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1291,8 +1311,8 @@ nice to have / future goals:
         dust / smoke shader
         goggles create tint
 
-
-
+deep save system:
+    serialize the complete level state
 
 
 
@@ -1345,8 +1365,6 @@ UI:
     weapon wheel
 
 control / combat:
-    better shotgun
-    aim: fixed angular size
     headshots
 
 sound
@@ -1370,6 +1388,8 @@ aim mode could track camera better
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC investigate routine
+NPC should look in direction of last noise
+NPC speeds a little more when pursuing player.
 DFS path finding doesn't quite work right for highlighting path
 alarm terminal triggering effects
     notify others of location
@@ -1384,58 +1404,24 @@ graphics
     thermal goggles icon
     gibs from explosions
 
-* save system:
-    * reset gun instance on pool operations
-    * allow independent level data
-    * allow independent NPC data: this is a little harder 
-
-deep save system:
-    serialize the complete level state
-
 interface for designing multiple VR scenarios
-    * prereq: set up a title menu i guess?
-    * danger room
-    * spawning enemies
-    * select player loadout
-    * select enemy loadout
-    * new stage: infiltration
-    enemy count
     save / configurable VR mission
     time limit 
     respawn interval 
 
-* why suspicion handler is weird?
-* TaskShoot interval should be based on gun stats or else semiauto should have a cooldown timer
 set weapon to none button
-victory conditions
-better weapon graphics
 death graphics for all skins
-figure out graph load order issues once and for all
 selectable level alarm
-
-outline the various play styles:
-    1. defeat all the respawning enemies, stay alive: combat
-        number of lives
-        show kill count
-        disable alarm system?
-    2. survive for an amount of time with endless waves of enemies
-    3. steal data from locations / some cyber objective
-
-1. ensure that number live NPCs stays below the pool size
-2. cap number of live NPCs at a time.
-3. cap total number of NPCs
-
-multiple weapons
-proper weapon names
-combat arena
-retry mission not resetting all state properly
-graph state (gamedata? leveldata?) not resetting properly either.
-
-HQ alarm carries over from run to run!
+configurable spawn interval
+other missions
+better shotgun
 
 1. corspe graphic
 2. clearsighter
-3. crawl with gun
 4. aim mode
-5. blood spray
-6. proper formatted time stat
+figure out graph load order issues once and for all
+
+
+multiple weapons
+proper weapon names
+better weapon graphics

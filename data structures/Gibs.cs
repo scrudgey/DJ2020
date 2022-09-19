@@ -67,6 +67,7 @@ public class Gib {
         DoEmit(position, direction);
     }
     void DoEmit(Vector3 position, Vector3 inDirection) {
+        // Debug.Log($"doemit {prefab} {position} {inDirection}");
         GameObject bit = PoolManager.I.GetPool(prefab).GetObject(position);
         Rigidbody rigidbody = bit.GetComponent<Rigidbody>();
 

@@ -74,6 +74,7 @@ public class PrefabPool {
             obj.transform.position = position;
         } else {
             obj = InstantiatePrefab();
+            obj.transform.position = position;
         }
         EnableObject(obj);
         objectsActiveInWorld.Enqueue(obj);

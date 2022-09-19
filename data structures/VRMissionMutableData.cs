@@ -1,5 +1,6 @@
 public record VRMissionMutableData {
-
+    public enum Status { inProgress, victory, fail }
+    public Status status;
     // mutable state
     public int numberTotalNPCs;
     public int numberLiveNPCs;
@@ -13,7 +14,8 @@ public record VRMissionMutableData {
             numberLiveNPCs = 0,
             numberNPCsKilled = 0,
             NPCspawnInterval = 5,
-            secondsPlayed = 0f
+            secondsPlayed = 0f,
+            status = Status.inProgress
         };
     }
 }

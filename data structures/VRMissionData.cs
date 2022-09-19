@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public record VRMissionData {
+
     public string sceneName;
     public VRMissionType missionType;
     public SensitivityLevel sensitivityLevel;

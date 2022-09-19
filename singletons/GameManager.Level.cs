@@ -123,6 +123,9 @@ public partial class GameManager : Singleton<GameManager> {
         poweredComponents = new Dictionary<string, PoweredComponent>();
         cyberComponents = new Dictionary<string, CyberComponent>();
         alarmComponents = new Dictionary<string, AlarmComponent>();
+
+        reports = new Dictionary<GameObject, HQReport>();
+        lastStrikeTeamMember = null;
     }
     private void InitializeLevel() {
         ClearSceneData();

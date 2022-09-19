@@ -364,6 +364,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 isProne = false;
             }
         }
+        if (input.Fire.FirePressed || input.Fire.FireHeld) {
+            isProne = false;
+        }
 
         if (moveInputVector == Vector3.zero && input.jumpHeld && Motor.GroundingStatus.IsStableOnGround) {
             jumpHeldTimer += Time.deltaTime;

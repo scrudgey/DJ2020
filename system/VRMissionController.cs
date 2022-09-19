@@ -30,6 +30,13 @@ public class VRMissionController : MonoBehaviour {
             case State.victory:
                 data.data.secondsPlayed = Time.time - startTime;
                 GameManager.I.TransitionToState(GameState.inMenu);
+
+                data.data.status = state switch {
+                    State.victory => VRMissionMutableData.Status.victory,
+                    State.fail => VRMissionMutableData.Status.fail,
+                    _ => VRMissionMutableData.Status.inProgress
+                };
+
                 if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
                     // SceneManager.LoadScene("VRMissionFinish", LoadSceneMode.Additive);
                     GameManager.I.LoadScene("VRMissionFinish", () => {
