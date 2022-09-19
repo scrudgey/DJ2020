@@ -1428,3 +1428,14 @@ outline the various play styles:
 multiple weapons
 proper weapon names
 combat arena
+retry mission not resetting all state properly
+graph state (gamedata? leveldata?) not resetting properly either.
+
+HQ alarm carries over from run to run!
+
+1. corspe graphic
+2. clearsighter
+3. crawl with gun
+4. aim mode
+5. blood spray
+6. proper formatted time stat

@@ -2,16 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public class VRMissionController : MonoBehaviour {
     enum State { normal, victory, fail }
     State state;
     VRMissionData data;
-    public int numberTotalNPCs;
-    public int numberLiveNPCs;
-    public int numberNPCsKilled;
-    public float NPCspawnInterval = 10f;
     public float NPCspawnTimer;
     public List<CharacterController> npcControllers = new List<CharacterController>();
+    float startTime;
+    public void StartVRMission(VRMissionData data) {
+        Debug.Log("VRMissionController: start VR mission");
+        this.data = data;
+        CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
+        playerController.OnCharacterDead += HandlePlayerDead;
+        startTime = Time.time;
+    }
     void TransitionToState(State newState) {
         State tmpInitialState = state;
         OnStateExit(tmpInitialState, newState);
@@ -21,6 +26,19 @@ public class VRMissionController : MonoBehaviour {
     void OnStateEnter(State state, State fromState) {
         Debug.Log($"VR mission entering state {state} from {fromState}");
         switch (state) {
+            case State.fail:
+            case State.victory:
+                data.data.secondsPlayed = Time.time - startTime;
+                GameManager.I.TransitionToState(GameState.inMenu);
+                if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
+                    // SceneManager.LoadScene("VRMissionFinish", LoadSceneMode.Additive);
+                    GameManager.I.LoadScene("VRMissionFinish", () => {
+                        Debug.Log("loaded vr mission finish callback");
+                        VRVictoryMenuController menuController = GameObject.FindObjectOfType<VRVictoryMenuController>();
+                        menuController.Initialize(data);
+                    }, unloadAll: false);
+                }
+                break;
             default:
                 break;
         }
@@ -31,18 +49,13 @@ public class VRMissionController : MonoBehaviour {
                 break;
         }
     }
-    public void StartVRMission(VRMissionData data) {
-        Debug.Log("start VR mission");
-        this.data = data;
-        CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
-        playerController.OnCharacterDead += HandlePlayerDead;
-    }
+
 
     void Update() {
-        if (numberTotalNPCs < data.maxNumberNPCs && numberLiveNPCs < data.numberConcurrentNPCs) {
+        if (data.data.numberTotalNPCs < data.maxNumberNPCs && data.data.numberLiveNPCs < data.numberConcurrentNPCs) {
             NPCspawnTimer += Time.deltaTime;
-            if (NPCspawnTimer > NPCspawnInterval) {
-                NPCspawnTimer -= NPCspawnInterval;
+            if (NPCspawnTimer > data.data.NPCspawnInterval) {
+                NPCspawnTimer -= data.data.NPCspawnInterval;
                 SpawnNPC();
             }
         } else {
@@ -58,18 +71,18 @@ public class VRMissionController : MonoBehaviour {
 
         npcControllers.Add(npcController);
         npcController.OnCharacterDead += HandleNPCDead;
-        numberTotalNPCs += 1;
-        numberLiveNPCs += 1;
-        Debug.Log($"spawn npc {numberLiveNPCs} {numberTotalNPCs} {numberNPCsKilled}");
+        data.data.numberTotalNPCs += 1;
+        data.data.numberLiveNPCs += 1;
+        Debug.Log($"spawn npc {data.data.numberLiveNPCs} {data.data.numberTotalNPCs} {data.data.numberNPCsKilled}");
     }
 
     void HandleNPCDead(CharacterController npc) {
         npc.OnCharacterDead -= HandleNPCDead;
         npcControllers.Remove(npc);
-        numberLiveNPCs -= 1;
-        numberNPCsKilled += 1;
+        data.data.numberLiveNPCs -= 1;
+        data.data.numberNPCsKilled += 1;
         if (data.missionType == VRMissionType.hunt) {
-            if (numberNPCsKilled >= data.maxNumberNPCs) {
+            if (data.data.numberNPCsKilled >= data.maxNumberNPCs) {
                 TransitionToState(State.victory);
             }
         }
@@ -88,7 +101,9 @@ public class VRMissionController : MonoBehaviour {
         foreach (CharacterController npcController in npcControllers) {
             npcController.OnCharacterDead -= HandleNPCDead;
         }
-        CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
-        playerController.OnCharacterDead -= HandlePlayerDead;
+        if (GameManager.I.playerObject != null) {
+            CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
+            playerController.OnCharacterDead -= HandlePlayerDead;
+        }
     }
 }

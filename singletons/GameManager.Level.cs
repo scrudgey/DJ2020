@@ -17,6 +17,8 @@ public partial class GameManager : Singleton<GameManager> {
     public bool isLoadingLevel;
 
     public void LoadVRMission(VRMissionData data) {
+        Debug.Log("GameMananger: load VR mission");
+        gameData = GameData.TestInitialData();
         gameData.playerData = data.playerState;
         gameData.levelData = LevelData.Load("test");
         gameData.levelData.sensitivityLevel = data.sensitivityLevel;
@@ -24,34 +26,80 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void StartVRMission(VRMissionData data) {
-        Debug.Log("start VR mission");
+        Debug.Log("GameMananger: start VR mission");
         InitializeLevel();
-
         TransitionToState(GameState.levelPlay);
-
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(data);
     }
-
-    void LoadScene(string sceneName, Action callback) {
-        isLoadingLevel = true;
-        scenesLoading = new List<AsyncOperation>();
-        Debug.Log("show loading screen");
-        scenesLoading.Add(SceneManager.LoadSceneAsync(sceneName));
-        // scenesLoading.Add(SceneManager.UnloadSceneAsync("title"));
-        StartCoroutine(GetSceneLoadProgress(sceneName, callback));
+    public void ReturnToTitleScreen() {
+        LoadScene("title", () => Debug.Log("start title screen"));
     }
-    public IEnumerator GetSceneLoadProgress(string targetScene, Action callback) {
+
+    public void LoadScene(string targetScene, Action callback, bool unloadAll = true) {
+        isLoadingLevel = true;
+
+        List<string> scenesToUnload = new List<string>();
+        List<string> scenesToLoad = new List<string> { targetScene };
+
+        if (unloadAll) {
+            int sceneCount = SceneManager.sceneCount;
+            for (int i = 0; i < sceneCount; i++) {
+                string activeSceneName = SceneManager.GetSceneAt(i).name;
+                // if (!activeSceneName.ToLower().Contains("ui")) {
+                scenesToUnload.Add(activeSceneName);
+                // }
+            }
+        }
+
+        Debug.Log("show loading screen");
+        StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
+            isLoadingLevel = false;
+            Debug.Log("hide loading screen");
+            callback();
+        }));
+    }
+    public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback) {
+        scenesLoading = new List<AsyncOperation>();
+
+        // if target scene is in scenes to unload, then that means it must be loaded right now, so we want to reload it.
+        LoadSceneMode targetSceneLoadMode = scenesToUnload.Contains(targetScene) ? LoadSceneMode.Single : LoadSceneMode.Additive;
+
+        foreach (string sceneToLoad in scenesToLoad) {
+            if (sceneToLoad == targetScene) {
+                Debug.Log($"loading scene async {sceneToLoad} {targetSceneLoadMode}");
+                scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, targetSceneLoadMode));
+            } else {
+                Debug.Log($"loading scene async {sceneToLoad} {LoadSceneMode.Additive}");
+                scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive));
+            }
+        }
+
+        // don't unload the scene we just loaded!
+        if (scenesToUnload.Contains(targetScene)) {
+            scenesToUnload.Remove(targetScene);
+        }
         for (int i = 0; i < scenesLoading.Count; i++) {
             while (!scenesLoading[i].isDone) {
                 yield return null;
             }
         }
+
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
-        Debug.Log("hide loading screen");
+
+        foreach (string sceneToUnload in scenesToUnload) {
+            Debug.Log($"try unload scene async: {sceneToUnload} {SceneManager.GetSceneByName(sceneToUnload).isLoaded}");
+            if (SceneManager.GetSceneByName(sceneToUnload).isLoaded)
+                scenesLoading.Add(SceneManager.UnloadSceneAsync(sceneToUnload));
+        }
+        for (int i = 0; i < scenesLoading.Count; i++) {
+            while (!scenesLoading[i].isDone) {
+                yield return null;
+            }
+        }
+
         callback();
-        isLoadingLevel = false;
     }
 
     public void SetFocus(GameObject focus) {
