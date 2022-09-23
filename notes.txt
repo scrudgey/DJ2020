@@ -1261,6 +1261,9 @@ proposed alarm system
 * show fail if fail
 * victory conditions
 * aim: fixed angular size
+* multiple weapons
+* proper weapon names
+* better weapon graphics
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1310,6 +1313,8 @@ nice to have / future goals:
         laser grid don't trip when NPC walks through? disable temporarily?laser grid
         dust / smoke shader
         goggles create tint
+    digitized voice for "operation jetlag"
+
 
 deep save system:
     serialize the complete level state
@@ -1413,15 +1418,51 @@ set weapon to none button
 death graphics for all skins
 selectable level alarm
 configurable spawn interval
-other missions
+other mission types
+bigger level
 better shotgun
+interface sounds
+red screen edge flash when hit
+better shoot inaccuracy
+save VR mission between runs
 
 1. corspe graphic
 2. clearsighter
 4. aim mode
 figure out graph load order issues once and for all
+show some sort of stats in VR mission thing
 
+over the shoulder: 
+    don't swap sides (unless at the extreme edge of the screen? even still, probably not).
+    orient more tightly toward the cursor.
+    to prevent being blocked around corners, move in close to player
 
-multiple weapons
-proper weapon names
-better weapon graphics
+separating mutable state from immutable spec
+    gun
+        basegun vs. guninstance (current bullets, etc)
+        this is okay, and the model. the problem is it is instantiated in immutable state!
+    hurtable
+        fullhealth vs current health
+    playerdata
+        stats vs. state
+
+take the hurtable example.
+    character state is:
+        * the spec
+        * the mutable state 
+    when hurtable loads state, it's loading the whole shebang.
+    then when do we reset/instantiate the mutable state ?
+        on instantiationo
+    hurtable has:
+        load(characterState)
+        save(characterState)
+        does this involve serializing a ScriptableObject?
+
+possibility two:
+    state has:
+        static State createFromSpec(spec)       # reset
+        returns fully mutable version
+        transfer over all values (this is clumsy and error prone)
+    when we 
+
+    

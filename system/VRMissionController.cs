@@ -41,7 +41,7 @@ public class VRMissionController : MonoBehaviour {
                     // SceneManager.LoadScene("VRMissionFinish", LoadSceneMode.Additive);
                     GameManager.I.LoadScene("VRMissionFinish", () => {
                         Debug.Log("loaded vr mission finish callback");
-                        VRVictoryMenuController menuController = GameObject.FindObjectOfType<VRVictoryMenuController>();
+                        VRMissionVictoryMenuController menuController = GameObject.FindObjectOfType<VRMissionVictoryMenuController>();
                         menuController.Initialize(data);
                     }, unloadAll: false);
                 }

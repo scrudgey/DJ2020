@@ -14,7 +14,8 @@ public class Footsteps : MonoBehaviour {
     private FootstepData footstepData;
     void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        footstepData = Resources.Load("data/footstep/default") as FootstepData;
+        // footstepData = Resources.Load("data/footstep/default") as FootstepData;
+        footstepData = ScriptableObject.Instantiate(Resources.Load("data/footstep/default") as FootstepData);
     }
     public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {
         if (velocity.magnitude <= 0.01) {

@@ -1,6 +1,7 @@
 using AI;
 using UnityEngine;
-public abstract class SphereControlState : IState {
+
+public abstract class SphereControlState : AI.IState {
     protected SphereRobotAI owner;
     public SphereControlState(SphereRobotAI handler) {
         this.owner = handler;

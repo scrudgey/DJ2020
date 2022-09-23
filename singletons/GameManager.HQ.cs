@@ -47,6 +47,8 @@ public partial class GameManager : Singleton<GameManager> {
             .First();
 
     public void DeactivateAlarm() {
+        if (applicationIsQuitting)
+            return;
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
 

@@ -7,6 +7,7 @@ public enum CycleType { manual, semiautomatic, automatic }
 [CreateAssetMenu(menuName = "ScriptableObjects/Gun")]
 public class Gun : ScriptableObject {
     new public string name;
+    public string shortName;
 
     // TODO: separate guntype as graphics from gun functionality. allow gun to specify manual cycling, e.g.
     public GunType type;
@@ -43,7 +44,7 @@ public class Gun : ScriptableObject {
     public GameObject shellCasing;
     public GameObject magazine;
     public static Gun Load(string name) {
-        return Resources.Load($"data/guns/{name}") as Gun;
+        return ScriptableObject.Instantiate(Resources.Load($"data/guns/{name}") as Gun);
     }
     public float getBaseDamage() {
         return Random.Range(baseDamage.low, baseDamage.high);

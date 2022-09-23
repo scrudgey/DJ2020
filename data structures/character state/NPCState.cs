@@ -28,15 +28,16 @@ public class NPCState : ScriptableObject, ISkinState, IGunHandlerState, ICharact
     public HitState hitState { get; set; }
 
     public void ApplyState(GameObject npcObject) {
+        this.health = fullHealthAmount;
         ((IGunHandlerState)this).ApplyGunState(npcObject);
         ((ISkinState)this).ApplySkinState(npcObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
     }
 
     public static NPCState DefaultNPCState() {
-        Gun gun1 = Gun.Load("rifle");
-        Gun gun2 = Gun.Load("pistol");
-        Gun gun3 = Gun.Load("shotgun");
+        Gun gun1 = Gun.Load("r1");
+        Gun gun2 = Gun.Load("p1");
+        Gun gun3 = Gun.Load("sh1");
 
         return new NPCState() {
             primaryGun = new GunInstance(gun1),

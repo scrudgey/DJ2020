@@ -22,7 +22,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
 
         // TODO: remove?
 
-        gunHandler.primary = new GunInstance(Gun.Load("smg"));
+        gunHandler.primary = new GunInstance(Gun.Load("s1"));
         gunHandler.SwitchToGun(1);
         gunHandler.Reload();
         gunHandler.ClipIn();

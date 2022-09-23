@@ -43,9 +43,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public bool disguise;
 
     public static PlayerState DefaultGameData() {
-        Gun gun1 = Gun.Load("smg");
-        Gun gun2 = Gun.Load("pistol");
-        Gun gun3 = Gun.Load("shotgun");
+        Gun gun1 = Gun.Load("s1");
+        Gun gun2 = Gun.Load("p1");
+        Gun gun3 = Gun.Load("sh1");
 
         return new PlayerState() {
             legSkin = "Jack",
@@ -105,8 +105,3 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         };
     }
 }
-
-// legSkin = "generic64",
-// // legSkin = "cyber",
-// legSkin = "civ_male",
-// bodySkin = "civ_female",
