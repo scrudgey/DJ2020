@@ -495,7 +495,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
     // TODO: save method
     public void LoadGunHandlerState(IGunHandlerState state) {
-        // if (state.p)
+        // TODO: here, we would instantiate from template with mutable state applied
         primary = state.primaryGun;
         secondary = state.secondaryGun;
         third = state.tertiaryGun;

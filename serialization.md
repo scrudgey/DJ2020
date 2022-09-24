@@ -137,13 +137,10 @@ Use a handful of ad-hoc, different methods here and there on various classes wit
 
 We will still have the problem of serializing anything that contains a reference to a scriptableobject spec.
 
-Question: how does this problem present today?
-
 The real challenge is serializing state, i.e., `GunInstance`.
 `Gun` contains references to audioclips, graphics, etc. 
 This is used to define `GunInstance`. 
 But we want to serialize `GunInstance`.
-
 
 ## Reference paths to data objects
 
@@ -190,24 +187,25 @@ Everything, in this case, is defined by pure JSON or XML serialize / deserialize
 
 But is that the case? We always need some post process to create gameobjects, load assets, etc.
 
-
-
-
 # The crux of the problem
-
 
 **Problem: how are we supposed to serialize / deserialize this state?**
 
 We always run into the problem of serializing anything that contains a reference to a scriptableobject spec.
 If it doesn't reference a scriptable object, then we have the problem of serializing something with references to assets.
+The real problem is about how we handle templating, ser/de, and asset references.
 
 **Question: how does this problem present today?**
 
 Answer: So far we have avoided serializing `GameData`. But as soon as we do, we will encounter the above issue.
 
 In `LevelData`, we do resource pathing / loading to store the klaxon sound.
+In this case, we are serializing a path to a template asset.
 
 In `NPCData`, a scriptable object template, we store instances of GunInstance.
+In this case, a template asset is storing mutable data.
+
+We are mixing both concepts, causing confusion.
 
 
 The question of when and how we reset state based on spec is important, because it will affect decisions.
@@ -229,18 +227,8 @@ In Yogurt Commercial we handled this by referencing prefabs by name.
 
 # Solution
 
-`ITemplate` is a scriptable object.
-
-Depicts all the assets and base values.
-
-Defines a `string GetAssetPath()` method.
-
-`IState<T> : ITemplate where T: ITemplate`
-
-Can be instantiated from a `T`. During instantiation, we copy over all the fields.
-During instantiation, we get a reference to the template.
-
 During serialization, we store the reference to the template.
+We only save the mutable data.
 
 During deserialization, we load the template from resources from the path.
 Then we apply the saved state.
@@ -250,19 +238,19 @@ So in other words, we instantiate the object from template, and we load the obje
 Two methods:
 
 1. Instantiate(template)
+    Used when we need a fresh instance of the object.
 2. Instantiate(template, state)
-
+    Used when we want to load an object defined by state.
 
 Question: doesn't this all require special code in all cases?
-Answer: there's probably no getting around that.
-
-We already plan on writing special serialization code at all levels.
+Answer: We already plan on writing special serialization code at all levels.
 We just need to be aware of these intricacies, and have a plan.
 
 
-
-
 # The plan
+
+Separate the template and the mutable state.
+We save only the mutable state and a reference to the template.
 
 1. All instances are instantiated from templates. Either:
     a. Instantiate(template)
@@ -270,13 +258,163 @@ We just need to be aware of these intricacies, and have a plan.
 
 2. When we save, we save a reference to the template, and we save the mutable state.
 
+GunState:           Template:Gun                   Delta:GunInstance 
+NPCState:           Template:NPCTemplate           Delta:NPCDelta
+LevelState:         Template:LevelTemplate         Delta:LevelState          
+VRMissionTemplate   VRMissionData                  Delta:VRMissionDelta
+
+PlayerState?         
+
+Question: how does this interact with save and load?
+
+Answer: Clearly, the loading is done with mutable state.
+Does the loader need access to the template?
+Take GunHandler for example.
 
 # Execution
 Implement this for gun first.
 
+-------------------------------------------------------------------------
 
-Gun
-NPCState
-PlayerState
-LevelState
-VRMissionData
+GunTemplate: ScriptableObject
+    * clipsize
+    * fire rate
+    * type
+    * graphic
+
+GunDelta: 
+    * clip
+    * chamber
+    * cooldowntimer
+    * JSON Save()
+    * GunDelta Load(JSON)
+
+GunState : State<GunTemplate, GunDelta>
+    * template: GunTemplate
+    * delta: GunDelta
+    * Instantiate(GunTemplate)
+    * Instantiate(GunTemplate, GunDelta)
+    * JSON Save / Serialize
+        save template path
+        GunDelta.Save()
+    * Load(JSON)
+        template = resources.Load(JOSN.template path)
+        delta = GunDelta.Load(JSON.delta)
+
+-------------------------------------------------------------------------
+
+vv state without a template
+GunHandlerState: IGunHandlerTemplateLoader
+    * GunState primary
+    * GunState secondary
+    * GunState tertiary
+    * activegun
+    * JSON Save()
+        primary.Save
+        secondary.Save
+        save active gun
+    * GunHandlerState Load(JSON)
+        primary = GunState.Load(JSON)
+
+vv this one loads a state without having a template.
+GunHandler: Monobehavior
+    GunHandlerState state;
+    * LoadGunHandlerState(GunHandlerState delta) 
+        state = GunHandlerState.LoadGunHandlerState(template, delta)
+    * GunHandlerState SaveGunHandlerState()
+
+-------------------------------------------------------------------------
+
+
+NPCTemplate: ScriptableObject
+    * HurtableTemplate hurtable
+    * GunTemplate primary
+    * GunTemplate secondary
+    * GunTemplate tertiary
+
+Instantiate: Template -> State
+Serialize: State -> JSON
+Deserialize: JSON -> State
+
+
+
+
+
+
+VRMissionTemplate
+    NPCTemplate npc1Template
+    mission type
+    max number NPCS
+
+VRMissionDelta
+    status
+    number live NPCs
+    number NPCs killed
+    time played
+
+VRMissionState
+    VRMissionTemplate template
+    VRMissionDelta delta
+    * LoadVRMissionState(IGunHandlerTemplate template) 
+        delta = VRMissionDelta.Instantiate(template)
+    * LoadVRMissionState(IGunHandlerTemplate template, GunDelta delta ) 
+         delta = VRMissionDelta.Instantiate(template.primary)
+        secondary = GunState.Instantiate(template.secondary, delta)
+    * XML? SaveGunHandlerState()
+
+VRMissionController
+    VRMissionState
+
+
+
+
+
+
+
+
+
+
+
+vv there is no such thing.
+NPCInstance: State<NPCTemplate, NPCDelta>
+    * template: NPCTemplate : ScriptableObject
+        * fullHealthAmount
+        * Gun primary
+        * Gun secondary
+        * Gun tertiary
+    * delta: NPCState : ISkinState, IGunHandlerState, ICharacterHurtableState
+        * GunInstance primary
+        * GunInstance secondary
+        * GUnInstance tertiary
+        * activegun
+        * string legskin
+        * string torsoskin
+        * float health
+    * Instantiate(Gun)
+        this is used when creating the gun for the first time.
+    * Instantiate(Gun, state)
+        this is used when loading a gun
+    * Save / Serialize
+        this writes GunInstance:
+            template: path
+            state: serialized gunstate
+            
+i think maybe there just is no universal relation between these things.
+* template is immutable
+* delta is mutable
+* NPCInstance combines multiple templates and deltas, but corresponds to no single monobehavior
+* GunInstance can be instantiated from a GunTemplate and GunDelta
+* GunInstance can be saved
+* GunHandler has delta but no template
+
+maybe all i need to do is standardize the usages and naming conventions and move on.
+
+State is just a template + delta, that's all.
+it is saveable and loadable.
+
+
+<!-- IGunHandlerState : 
+    * GunState primary
+    * GunState secondary
+    * GunState tertiary
+    * activegun -->

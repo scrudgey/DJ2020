@@ -21,8 +21,10 @@ public class NPCState : ScriptableObject, ISkinState, IGunHandlerState, ICharact
     public GunInstance tertiaryGun { get; set; }
     [field: SerializeField]
     public int activeGun { get; set; }
+
     // health
     public float health { get; set; }
+
     [field: SerializeField]
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
