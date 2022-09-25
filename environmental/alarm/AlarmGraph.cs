@@ -21,6 +21,8 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
         // refresh alarm terminals
         foreach (AlarmNode node in nodes.Values) {
             AlarmComponent component = GameManager.I.GetAlarmComponent(node.idn);
+            if (component == null)
+                continue;
             if (component is AlarmTerminal) {
                 node.alarmTriggered = false;
             }

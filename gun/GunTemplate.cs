@@ -4,8 +4,8 @@ using UnityEngine;
 public enum GunType { unarmed, pistol, smg, shotgun, rifle, sword }
 public enum CycleType { manual, semiautomatic, automatic }
 
-[CreateAssetMenu(menuName = "ScriptableObjects/Gun")]
-public class Gun : ScriptableObject {
+[CreateAssetMenu(menuName = "ScriptableObjects/GunTemplate")]
+public class GunTemplate : ScriptableObject {
     new public string name;
     public string shortName;
 
@@ -43,8 +43,8 @@ public class Gun : ScriptableObject {
     public GameObject muzzleFlash;
     public GameObject shellCasing;
     public GameObject magazine;
-    public static Gun Load(string name) {
-        return ScriptableObject.Instantiate(Resources.Load($"data/guns/{name}") as Gun);
+    public static GunTemplate Load(string name) {
+        return ScriptableObject.Instantiate(Resources.Load($"data/guns/{name}") as GunTemplate);
     }
     public float getBaseDamage() {
         return Random.Range(baseDamage.low, baseDamage.high);

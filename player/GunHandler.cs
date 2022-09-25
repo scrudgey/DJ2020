@@ -6,14 +6,14 @@ using KinematicCharacterController;
 using UnityEngine;
 
 public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver, IPoolable {
-    public enum GunState {
+    public enum GunStateEnum {
         idle,
         shooting,
         racking,
         reloading,
     }
     public CharacterCamera characterCamera;
-    public GunState state;
+    public GunStateEnum state;
     // public InputMode inputMode;
     public CharacterState characterState;
     public Action<GunHandler> OnValueChanged { get; set; }
@@ -21,10 +21,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
-    public GunInstance gunInstance;
-    public GunInstance secondary;
-    public GunInstance primary;
-    public GunInstance third;
+    public GunState gunInstance;
+    public GunState secondary;
+    public GunState primary;
+    public GunState third;
     public bool emitShell;
     private float movementInaccuracy;
     private float crouchingInaccuracy;
@@ -53,50 +53,50 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Rack();
     }
     public void EndRack() {
-        state = GunState.idle;
+        state = GunStateEnum.idle;
     }
     // used by animator
     public void EndShoot() {
-        state = GunState.idle;
+        state = GunStateEnum.idle;
         lastShootInput = null;
         shootRequestedThisFrame = false;
     }
     // used by animator
     public void ClipIn() {
-        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipIn);
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipIn);
         gunInstance.ClipIn();
         OnValueChanged?.Invoke(this);
     }
     // used by animator
     public void ShellIn() {
-        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipIn);
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipIn);
         gunInstance.ShellIn();
         OnValueChanged?.Invoke(this);
     }
     // used by animator
     public void StopReload() {
         // TODO: change state
-        if (gunInstance.CheckRack()) {
-            state = GunState.racking;
-        } else state = GunState.idle;
+        if (gunInstance.ShouldRack()) {
+            state = GunStateEnum.racking;
+        } else state = GunStateEnum.idle;
     }
 
 
-    public bool HasGun() => gunInstance != null && gunInstance.baseGun != null;
+    public bool HasGun() => gunInstance != null && gunInstance.template != null;
 
-    public bool CanShoot() => gunInstance.CanShoot() && (state != GunState.reloading && state != GunState.racking);
+    public bool CanShoot() => gunInstance.CanShoot() && (state != GunStateEnum.reloading && state != GunStateEnum.racking);
 
     public void Update() {
         if (gunInstance == null) {
-            state = GunState.idle;
+            state = GunStateEnum.idle;
             return;
         } else {
             gunInstance.Update();
         }
 
-        if (state == GunState.idle && gunInstance.chamber == 0 && gunInstance.clip > 0) {
+        if (state == GunStateEnum.idle && gunInstance.delta.chamber == 0 && gunInstance.delta.clip > 0) {
             // Rack();
-            state = GunState.racking;
+            state = GunStateEnum.racking;
         }
 
         if (movementInaccuracy > 0) {
@@ -121,14 +121,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         float inaccuracy = 0;
 
         // returns the inaccuracy in world units at the world point of the target data
-        if (gunInstance == null || gunInstance.baseGun == null || input == null)
+        if (gunInstance == null || gunInstance.template == null || input == null)
             return 0f;
 
         // range
         // TODO: change this. use a fixed angular 
         float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
-        inaccuracy += gunInstance.baseGun.spread * (distance / 10f);
-        // accuracy += gunInstance.baseGun.spread * distance;
+        inaccuracy += gunInstance.template.spread * (distance / 10f);
+        // accuracy += gunInstance.template.spread * distance;
 
         // movement
         inaccuracy += movementInaccuracy;
@@ -141,7 +141,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // skills
         // TODO: this doesn't work for enemies
-        int skillLevel = GameManager.I.gameData.playerData.gunSkillLevel[gunInstance.baseGun.type];
+        int skillLevel = GameManager.I.gameData.playerState.gunSkillLevel[gunInstance.template.type];
         float skillBonus = (1 - skillLevel) * (0.1f);
         inaccuracy += skillBonus;
 
@@ -160,16 +160,16 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Ray sightline = new Ray(gunPosition, trueDirection);
         Vector3 aimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
 
-        // Vector3 jitter = UnityEngine.Random.insideUnitSphere * gunInstance.baseGun.spread;
+        // Vector3 jitter = UnityEngine.Random.insideUnitSphere * gunInstance.template.spread;
         Vector3 jitter = UnityEngine.Random.insideUnitSphere * inaccuracy(input);
         Vector3 jitterPoint = aimpoint + jitter;
 
         Vector3 direction = jitterPoint - gunPosition;
-        Vector3 endPosition = gunPosition + (gunInstance.baseGun.range * direction);
+        Vector3 endPosition = gunPosition + (gunInstance.template.range * direction);
 
         Bullet bullet = new Bullet(new Ray(gunPosition, direction)) {
-            damage = gunInstance.baseGun.getBaseDamage(),
-            range = gunInstance.baseGun.range,
+            damage = gunInstance.template.getBaseDamage(),
+            range = gunInstance.template.range,
             gunPosition = gunPosition
         };
 
@@ -217,11 +217,11 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         NoiseData noiseData = gunInstance.GetShootNoise();
         noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
-        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.baseGun.GetShootSounds()));
+        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.template.GetShootSounds()));
         Toolbox.Noise(gunPosition(), noiseData);
 
         // flash
-        if (!gunInstance.baseGun.silencer) {
+        if (!gunInstance.template.silencer) {
             muzzleFlashLight.enabled = true;
             StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
                 muzzleFlashLight.enabled = false;
@@ -229,38 +229,38 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         // muzzleflash obj
-        if (gunInstance.baseGun.silencer) {
+        if (gunInstance.template.silencer) {
             GameObject muzzleFlashObj = GameObject.Instantiate(
-                gunInstance.baseGun.muzzleFlash,
+                gunInstance.template.muzzleFlash,
                 gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
                 Quaternion.LookRotation(transform.up, gunDirection(input))
                 );
-            muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one * 0.1f;
+            muzzleFlashObj.transform.localScale = gunInstance.template.muzzleflashSize * Vector3.one * 0.1f;
             GameObject.Destroy(muzzleFlashObj, 0.05f);
         } else {
             GameObject muzzleFlashObj = GameObject.Instantiate(
-                gunInstance.baseGun.muzzleFlash,
+                gunInstance.template.muzzleFlash,
                 gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
                 Quaternion.LookRotation(transform.up, gunDirection(input))
                 );
-            muzzleFlashObj.transform.localScale = gunInstance.baseGun.muzzleflashSize * Vector3.one;
+            muzzleFlashObj.transform.localScale = gunInstance.template.muzzleflashSize * Vector3.one;
             GameObject.Destroy(muzzleFlashObj, 0.05f);
         }
 
         // shell casing
-        if (gunInstance.baseGun.type != GunType.shotgun) {
+        if (gunInstance.template.type != GunType.shotgun) {
             EmitShell();
         }
 
         // accuracy effect
-        shootingInaccuracy = gunInstance.baseGun.shootInaccuracy;
+        shootingInaccuracy = gunInstance.template.shootInaccuracy;
 
         // state change callbacks
         OnValueChanged?.Invoke(this);
 
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            CharacterCamera.Shake(gunInstance.baseGun.noise / 50f, 0.1f);
-            if (!gunInstance.baseGun.silencer) {
+            CharacterCamera.Shake(gunInstance.template.noise / 50f, 0.1f);
+            if (!gunInstance.template.silencer) {
                 SuspicionRecord record = new SuspicionRecord {
                     content = "shooting gun",
                     suspiciousness = Suspiciousness.aggressive,
@@ -276,7 +276,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     }
     public void DoEmitShell() {
         Vector3 targetPosition = gunPosition() + 0.2f * transform.right + 0.2f * transform.forward;
-        GameObject shell = PoolManager.I.GetPool(gunInstance.baseGun.shellCasing).GetObject();
+        GameObject shell = PoolManager.I.GetPool(gunInstance.template.shellCasing).GetObject();
         Rigidbody body = shell.GetComponent<Rigidbody>();
         if (body != null) {
             body.MovePosition(targetPosition);
@@ -299,7 +299,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     }
     public void EmitMagazine() {
         GameObject mag = GameObject.Instantiate(
-                gunInstance.baseGun.magazine,
+                gunInstance.template.magazine,
                 gunPosition() + 0.2f * transform.right + 0.2f * transform.forward - 0.2f * transform.up,
                 Quaternion.identity
             );
@@ -312,23 +312,23 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         body.AddRelativeTorque(UnityEngine.Random.Range(2f, 3f) * mag.transform.forward);
     }
     public void Aim() {
-        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.aimSounds);
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.template.aimSounds);
     }
     public void Rack() {
-        if (gunInstance == null || gunInstance.baseGun == null) {
+        if (gunInstance == null || gunInstance.template == null) {
             return;
         }
-        if (gunInstance.baseGun.cycle == CycleType.manual) {
+        if (gunInstance.template.cycle == CycleType.manual) {
             EmitShell();
         }
-        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.rackSounds);
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.template.rackSounds);
         gunInstance.Rack();
     }
     public void Reload() {
-        if (state == GunState.reloading)
+        if (state == GunStateEnum.reloading)
             return;
 
-        state = GunState.reloading;
+        state = GunStateEnum.reloading;
 
         gunInstance.ClipOut();
 
@@ -336,23 +336,23 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         EmitMagazine();
 
         // play sound
-        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.clipOut);
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipOut);
 
         OnValueChanged?.Invoke(this);
     }
     public void ReloadShell() {
-        if (state == GunState.reloading)
+        if (state == GunStateEnum.reloading)
             return;
-        state = GunState.reloading;
+        state = GunStateEnum.reloading;
     }
-    private void SwitchGun(GunInstance instance) {
+    private void SwitchGun(GunState instance) {
         if (instance == null || instance == gunInstance)
             return;
         gunInstance = instance;
 
-        Toolbox.RandomizeOneShot(audioSource, gunInstance.baseGun.unholster);
+        Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
 
-        PoolManager.I.RegisterPool(gunInstance.baseGun.shellCasing);
+        PoolManager.I.RegisterPool(gunInstance.template.shellCasing);
 
         OnValueChanged?.Invoke(this);
         if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
@@ -392,11 +392,11 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void DoReload() {
-        if (gunInstance == null || gunInstance.baseGun == null)
+        if (gunInstance == null || gunInstance.template == null)
             return;
-        if (gunInstance.baseGun.type == GunType.shotgun && gunInstance.clip < gunInstance.baseGun.clipSize) {
+        if (gunInstance.template.type == GunType.shotgun && gunInstance.delta.clip < gunInstance.template.clipSize) {
             ReloadShell();
-        } else if (gunInstance.baseGun.type != GunType.shotgun) {
+        } else if (gunInstance.template.type != GunType.shotgun) {
             Reload();
         }
     }
@@ -409,7 +409,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
 
             // if priority is not set, try lock 
-            float lockRadius = gunInstance.baseGun.lockOnSize;
+            float lockRadius = gunInstance.template.lockOnSize;
             Collider[] others = Physics.OverlapSphere(targetPoint, lockRadius, LayerUtil.GetMask(Layer.obj))
                 .Where(collider => !collider.transform.IsChildOf(GameManager.I.playerObject.transform))
                 .ToArray();
@@ -434,27 +434,27 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             }
 
             if (CanShoot()) {
-                if (gunInstance.baseGun.cycle == CycleType.automatic) {
-                    if (input.Fire.FirePressed && state != GunState.shooting) {
+                if (gunInstance.template.cycle == CycleType.automatic) {
+                    if (input.Fire.FirePressed && state != GunStateEnum.shooting) {
                         lastShootInput = input.Fire.cursorData;
-                        state = GunState.shooting;
+                        state = GunStateEnum.shooting;
                     } else if (input.Fire.FireHeld) {
-                        state = GunState.shooting;
+                        state = GunStateEnum.shooting;
                         lastShootInput = input.Fire.cursorData;
-                    } else if (state == GunState.shooting && !input.Fire.FireHeld) {
+                    } else if (state == GunStateEnum.shooting && !input.Fire.FireHeld) {
                         EndShoot();
                     }
                 } else { // semiautomatic
                     if (input.Fire.FirePressed) {//&& !shooting) {
                         lastShootInput = input.Fire.cursorData;
-                        state = GunState.shooting;
+                        state = GunStateEnum.shooting;
                         shootRequestedThisFrame = true;
                     }
                 }
             } else {
-                if (gunInstance.baseGun.cycle == CycleType.automatic) {
-                    if (state == GunState.shooting) {
-                        state = GunState.idle;
+                if (gunInstance.template.cycle == CycleType.automatic) {
+                    if (state == GunStateEnum.shooting) {
+                        state = GunStateEnum.idle;
                     }
                 }
             }
@@ -472,16 +472,16 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
         OnValueChanged?.Invoke(this);
 
-        if (input.Fire.skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.cooldownTimer <= 0)
+        if (input.Fire.skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.delta.cooldownTimer <= 0)
             ShootImmediately(input.Fire.cursorData);
     }
 
     public AnimationInput.GunAnimationInput BuildAnimationInput() {
         GunType gunType = GunType.unarmed;
-        Gun baseGun = null;
+        GunTemplate baseGun = null;
         if (HasGun()) {
-            gunType = gunInstance.baseGun.type;
-            baseGun = gunInstance.baseGun;
+            gunType = gunInstance.template.type;
+            baseGun = gunInstance.template;
         }
         return new AnimationInput.GunAnimationInput {
             gunType = gunType,
@@ -495,7 +495,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
     // TODO: save method
     public void LoadGunHandlerState(IGunHandlerState state) {
-        // if (state.p)
+        // TODO: here, we would instantiate from template with mutable state applied
         primary = state.primaryGun;
         secondary = state.secondaryGun;
         third = state.tertiaryGun;
@@ -506,7 +506,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
     }
     public void OnPoolDectivate() {
-        if (gunInstance != null && gunInstance.baseGun != null)
-            gunInstance = new GunInstance(gunInstance.baseGun);
+        if (gunInstance != null && gunInstance.template != null)
+            gunInstance = GunState.Instantiate(gunInstance.template);
     }
 }

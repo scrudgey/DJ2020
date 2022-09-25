@@ -2,10 +2,10 @@ using UnityEngine;
 public struct AnimationInput {
     public struct GunAnimationInput {
         public GunType gunType;
-        public GunHandler.GunState gunState;
+        public GunHandler.GunStateEnum gunState;
         public bool hasGun;
         public bool holstered;
-        public Gun baseGun;
+        public GunTemplate baseGun;
         public bool shootRequestedThisFrame;
     }
     public GunAnimationInput gunInput;

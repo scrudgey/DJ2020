@@ -16,7 +16,7 @@ public class VRMissionDesigner : MonoBehaviour {
         "VR_infiltration",
     };
 
-    public VRMissionData data;
+    public VRMissionTemplate data;
     public int selectedCharacter;
     public int selectedWeapon;
 
@@ -74,14 +74,14 @@ public class VRMissionDesigner : MonoBehaviour {
         }
         tabOriginalColor = tab2.colors.normalColor;
         selectedCharacter = 1;
-        data = VRMissionData.DefaultData();
+        data = VRMissionTemplate.Default();
         OnDataChange();
     }
     void InitializeWeaponPicker() {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
         }
-        Gun[] allGuns = Resources.LoadAll<Gun>("data/guns");
+        GunTemplate[] allGuns = Resources.LoadAll<GunTemplate>("data/guns");
 
         // None button
 
@@ -157,23 +157,23 @@ public class VRMissionDesigner : MonoBehaviour {
             _ => data.playerState.bodySkin
         };
 
-        Gun gun1 = selectedCharacter switch {
-            1 => data.playerState.primaryGun.baseGun,
-            2 => data.npc1State.primaryGun.baseGun,
-            3 => data.npc2State.primaryGun.baseGun,
-            _ => data.playerState.primaryGun.baseGun
+        GunTemplate gun1 = selectedCharacter switch {
+            1 => data.playerState.primaryGun,
+            2 => data.npc1State.primaryGun,
+            3 => data.npc2State.primaryGun,
+            _ => data.playerState.primaryGun
         };
-        Gun gun2 = selectedCharacter switch {
-            1 => data.playerState.secondaryGun.baseGun,
-            2 => data.npc1State.secondaryGun.baseGun,
-            3 => data.npc2State.secondaryGun.baseGun,
-            _ => data.playerState.secondaryGun.baseGun
+        GunTemplate gun2 = selectedCharacter switch {
+            1 => data.playerState.secondaryGun,
+            2 => data.npc1State.secondaryGun,
+            3 => data.npc2State.secondaryGun,
+            _ => data.playerState.secondaryGun
         };
-        Gun gun3 = selectedCharacter switch {
-            1 => data.playerState.tertiaryGun.baseGun,
-            2 => data.npc1State.tertiaryGun.baseGun,
-            3 => data.npc2State.tertiaryGun.baseGun,
-            _ => data.playerState.tertiaryGun.baseGun
+        GunTemplate gun3 = selectedCharacter switch {
+            1 => data.playerState.tertiaryGun,
+            2 => data.npc1State.tertiaryGun,
+            3 => data.npc2State.tertiaryGun,
+            _ => data.playerState.tertiaryGun
         };
 
         Skin legsSkin = Skin.LoadSkin(legSkinName);
@@ -428,7 +428,7 @@ public class VRMissionDesigner : MonoBehaviour {
     }
 
     public void WeaponPickerCallback(WeaponPickerHandler handler) {
-        IGunHandlerState state = selectedCharacter switch {
+        IGunHandlerTemplate state = selectedCharacter switch {
             1 => data.playerState,
             2 => data.npc1State,
             3 => data.npc2State,
@@ -436,13 +436,13 @@ public class VRMissionDesigner : MonoBehaviour {
         };
         switch (selectedWeapon) {
             case 1:
-                state.primaryGun = new GunInstance(handler.gun);
+                state.primaryGun = handler.gun;
                 break;
             case 2:
-                state.secondaryGun = new GunInstance(handler.gun);
+                state.secondaryGun = handler.gun;
                 break;
             case 3:
-                state.tertiaryGun = new GunInstance(handler.gun);
+                state.tertiaryGun = handler.gun;
                 break;
             default:
                 break;

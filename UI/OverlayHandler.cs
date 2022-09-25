@@ -40,9 +40,9 @@ public class OverlayHandler : MonoBehaviour {
         GameManager.OnAlarmGraphChange += RefreshAlarmGraph;
 
         // TODO: cyber
-        RefreshPowerGraph(GameManager.I.gameData.levelData.powerGraph);
-        RefreshCyberGraph(GameManager.I.gameData.levelData.cyberGraph);
-        RefreshAlarmGraph(GameManager.I.gameData.levelData.alarmGraph);
+        RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
+        RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
+        RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
         HandleOverlayChange(GameManager.I.activeOverlayType);
     }
     void OnDestroy() {

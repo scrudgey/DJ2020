@@ -58,14 +58,14 @@ namespace UI {
             TestSuite.RunToolboxTests();
         }
         public void ToggleAlarm(string[] args) {
-            if (GameManager.I.gameData.levelData.anyAlarmActive())
+            if (GameManager.I.gameData.levelState.anyAlarmActive())
                 GameManager.I.DeactivateAlarm();
             else
                 GameManager.I.ActivateHQRadio();
 
         }
         public void ToggleDisguise(string[] args) {
-            bool disguise = GameManager.I.gameData.playerData.disguise;
+            bool disguise = GameManager.I.gameData.playerState.disguise;
             if (disguise)
                 GameManager.I.DeactivateDisguise();
             else
@@ -77,26 +77,26 @@ namespace UI {
             int value = int.Parse(args[1]);
             switch (fieldName) {
                 case "cyberlegs":
-                    GameManager.I.gameData.playerData.cyberlegsLevel = value;
+                    GameManager.I.gameData.playerState.cyberlegsLevel = value;
                     break;
                 case "debug-rays":
                     GameManager.I.showDebugRays = value == 1;
                     break;
                 case "pistol-skill":
-                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.pistol] = value;
+                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.pistol] = value;
                     break;
                 case "smg-skill":
-                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.smg] = value;
+                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.smg] = value;
                     break;
                 case "rifle-skill":
-                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.rifle] = value;
+                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.rifle] = value;
                     break;
                 case "shotgun-skill":
-                    GameManager.I.gameData.playerData.gunSkillLevel[GunType.shotgun] = value;
+                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.shotgun] = value;
                     break;
                 case "eyes-laser":
-                    GameManager.I.gameData.playerData.cyberEyesThermal = value == 1;
-                    GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerData);
+                    GameManager.I.gameData.playerState.cyberEyesThermal = value == 1;
+                    GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                     break;
                 // case "test":
                 //     TestSuite.RunToolboxTests();

@@ -9,24 +9,25 @@ public class VRMissionVictoryMenuController : MonoBehaviour {
     public TextMeshProUGUI missionTypeText;
     public TextMeshProUGUI killCounText;
     public TextMeshProUGUI timeText;
-    public VRMissionData data;
+    public VRMissionState data;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
-    public void Initialize(VRMissionData data) {
+    public void Initialize(VRMissionState data) {
         this.data = data;
-        missionTypeText.text = data.missionType.ToString();
+        missionTypeText.text = data.template.missionType.ToString();
         killCounText.text = data.data.numberNPCsKilled.ToString();
         SetTimeDisplay();
         SetTitle();
     }
     public void RetryButtonCallback() {
         Debug.Log("retry");
-        VRMissionData resetData = data with {
-            data = VRMissionMutableData.Empty(),
-            playerState = data.playerState.Refresh()
-        };
-        GameManager.I.LoadVRMission(resetData);
+        // VRMissionData resetData = data with {
+        //     data = VRMissionMutableData.Empty(),
+        //     playerState = data.playerState.Refresh()
+        // };
+        // VRMissionState resetState = VRMissionState.Instantiate(data.template);
+        GameManager.I.LoadVRMission(data.template);
     }
     public void MainMenuButtonCallback() {
         Debug.Log("main menu");
@@ -43,10 +44,10 @@ public class VRMissionVictoryMenuController : MonoBehaviour {
     void SetTitle() {
         switch (data.data.status) {
             default:
-            case VRMissionMutableData.Status.victory:
+            case VRMissionDelta.Status.victory:
                 titleText.text = "VR Mission Success";
                 break;
-            case VRMissionMutableData.Status.fail:
+            case VRMissionDelta.Status.fail:
                 titleText.text = "VR Mission Failed";
                 break;
         }

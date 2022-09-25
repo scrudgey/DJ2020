@@ -4,8 +4,7 @@ using KinematicCharacterController;
 using UnityEngine;
 public class NPCSpawnPoint : MonoBehaviour {
     public bool isStrikeTeamSpawn;
-    public NPCState npcState;
-    public GameObject SpawnNPC() {
+    public GameObject SpawnNPC(NPCTemplate template) {
         PrefabPool pool = PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 6);
         GameObject npc = pool.GetObject(transform.position);
 
@@ -19,12 +18,12 @@ public class NPCSpawnPoint : MonoBehaviour {
         controller.OrbitCamera = cam;
         ai.patrolRoute = route;
         motor.SetPosition(transform.position, bypassInterpolation: true);
-        ApplyPlayerState(npc);
+        ApplyNPCState(template, npc);
 
         return npc;
     }
-    void ApplyPlayerState(GameObject npcObject) {
-
-        npcState.ApplyState(npcObject);
+    void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
+        NPCState state = NPCState.Instantiate(template);
+        state.ApplyState(npcObject);
     }
 }

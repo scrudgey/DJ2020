@@ -38,7 +38,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
         // lineRenderer.enabled = false;
     }
     public void HandleHackInput(HackInput input) {
-        if (targets.Count >= GameManager.I.gameData.playerData.maxConcurrentNetworkHacks)
+        if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)
             return;
         if (!targets.Any(t => t.node == input.targetNode)) {
             HackData data = new HackData {
@@ -63,7 +63,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
 
     void Update() {
         foreach (HackData data in targets) {
-            data.timer += Time.deltaTime * GameManager.I.gameData.playerData.hackSpeedCoefficient;
+            data.timer += Time.deltaTime * GameManager.I.gameData.playerState.hackSpeedCoefficient;
             if (data.timer > data.lifetime) {
                 GameManager.I.SetCyberNodeState(data.node, true);
                 data.done = true;
@@ -98,7 +98,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
                 };
 
         // this is weird, and indicates that state should be handled by manual hacker?
-        float radius = GameManager.I?.gameData?.playerData.hackRadius ?? 1.5f;
+        float radius = GameManager.I?.gameData?.playerState.hackRadius ?? 1.5f;
         if (Vector3.Distance(points[0], points[1]) > radius) {
             data.done = true;
         }

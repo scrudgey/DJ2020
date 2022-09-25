@@ -1,15 +1,14 @@
-public record VRMissionMutableData {
+public record VRMissionDelta {
     public enum Status { inProgress, victory, fail }
     public Status status;
-    // mutable state
     public int numberTotalNPCs;
     public int numberLiveNPCs;
     public int numberNPCsKilled;
     public float NPCspawnInterval = 5f;
     public float secondsPlayed = 0f;
 
-    public static VRMissionMutableData Empty() {
-        return new VRMissionMutableData {
+    public static VRMissionDelta Empty() {
+        return new VRMissionDelta {
             numberTotalNPCs = 0,
             numberLiveNPCs = 0,
             numberNPCsKilled = 0,

@@ -20,7 +20,8 @@ public class PowerGraph : Graph<PowerNode, PowerGraph> {
         }
         foreach (PowerNode node in nodes.Values) {
             PoweredComponent component = GameManager.I.GetPowerComponent(node.idn);
-            component.nodeEnabled = node.enabled;
+            if (component != null)
+                component.nodeEnabled = node.enabled;
         }
     }
     void DFS(PowerNode node) {

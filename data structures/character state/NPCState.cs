@@ -2,55 +2,45 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
+public class NPCState : ICharacterHurtableState, IGunHandlerState {
 
-[CreateAssetMenu(menuName = "ScriptableObjects/NPCState")]
-public class NPCState : ScriptableObject, ISkinState, IGunHandlerState, ICharacterHurtableState {
-
-    // skin
-    [field: SerializeField]
-    public string legSkin { get; set; }
-    [field: SerializeField]
-    public string bodySkin { get; set; }
-
+    public NPCTemplate template;
     // gun
-    [field: SerializeField]
-    public GunInstance primaryGun { get; set; }
-    [field: SerializeField]
-    public GunInstance secondaryGun { get; set; }
-    [field: SerializeField]
-    public GunInstance tertiaryGun { get; set; }
-    [field: SerializeField]
+    public GunState primaryGun { get; set; }
+    public GunState secondaryGun { get; set; }
+    public GunState tertiaryGun { get; set; }
     public int activeGun { get; set; }
+
     // health
     public float health { get; set; }
-    [field: SerializeField]
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
 
+    public static NPCState Instantiate(NPCTemplate template) => new NPCState {
+        template = template,
+        primaryGun = GunState.Instantiate(template.primaryGun),
+        secondaryGun = GunState.Instantiate(template.secondaryGun),
+        tertiaryGun = GunState.Instantiate(template.tertiaryGun),
+        activeGun = 1,
+        health = template.fullHealthAmount,
+        fullHealthAmount = template.fullHealthAmount,
+        hitState = template.hitState
+    };
+
     public void ApplyState(GameObject npcObject) {
-        this.health = fullHealthAmount;
+        // this.health = fullHealthAmount;
         ((IGunHandlerState)this).ApplyGunState(npcObject);
-        ((ISkinState)this).ApplySkinState(npcObject);
+        ((ISkinState)template).ApplySkinState(npcObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
     }
 
-    public static NPCState DefaultNPCState() {
-        Gun gun1 = Gun.Load("r1");
-        Gun gun2 = Gun.Load("p1");
-        Gun gun3 = Gun.Load("sh1");
-
-        return new NPCState() {
-            primaryGun = new GunInstance(gun1),
-            secondaryGun = new GunInstance(gun2),
-            tertiaryGun = new GunInstance(gun3),
-            activeGun = 1,
-
-            // legSkin = "generic64",
-            // // legSkin = "cyber",
-            legSkin = "Jack",
-            bodySkin = "Jack",
-            health = 100,
-            fullHealthAmount = 100
-        };
-    }
+    // public void Save() {
+    //  save template path
+    //  GunDelta.Save()
+    // }
+    // public static GunState Load() {
+    //     // load template
+    //     // load delta
+    //     // return instantiate
+    // }
 }

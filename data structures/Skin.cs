@@ -467,11 +467,11 @@ public class Skin {
         }
         // gun states
         switch (input.gunInput.gunState) {
-            case GunHandler.GunState.reloading:
+            case GunHandler.GunStateEnum.reloading:
                 return reloadSprites(input.gunInput.gunType);
-            case GunHandler.GunState.racking:
+            case GunHandler.GunStateEnum.racking:
                 return gunRackSprites(input.gunInput.gunType);
-            case GunHandler.GunState.shooting:
+            case GunHandler.GunStateEnum.shooting:
                 return shootSprites(input.gunInput.gunType);
             default:
                 if (input.isMoving) {

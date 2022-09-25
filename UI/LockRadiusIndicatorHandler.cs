@@ -88,7 +88,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
         cursorMaskRect.position = data.screenPosition;
 
         // determine scale
-        float lockSizeLength = gunHandler.gunInstance.baseGun.lockOnSize;
+        float lockSizeLength = gunHandler.gunInstance.template.lockOnSize;
         float locksizeInPixels = getLockSize(lockSizeLength, data);
 
         // multiply by easing factor

@@ -75,8 +75,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
                 GameManager.I.SetOverlay(OverlayType.cyber);
                 break;
             case IRGoggles goggles:
-                GameManager.I.gameData.playerData.cyberEyesThermalBuff = true;
-                GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerData);
+                GameManager.I.gameData.playerState.cyberEyesThermalBuff = true;
+                GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 Toolbox.RandomizeOneShot(audioSource, goggles.goggleData.wearSounds);
                 break;
             default:
@@ -89,8 +89,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
                 GameManager.I.SetOverlay(OverlayType.none);
                 break;
             case IRGoggles:
-                GameManager.I.gameData.playerData.cyberEyesThermalBuff = false;
-                GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerData);
+                GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;
+                GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 break;
             default:
                 break;
