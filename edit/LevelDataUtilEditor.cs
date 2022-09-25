@@ -11,10 +11,7 @@ using UnityEngine.SceneManagement;
 [CustomEditor(typeof(LevelDataUtil))]
 [CanEditMultipleObjects]
 public class LevelDataUtilEditor : Editor {
-    // TODO: allow an audioclip in editor
     public string levelName = "test";
-    // public SerializedProperty klaxonSound;
-    // private SerializedProperty levelData;
     private void OnEnable() {
         // levelData = serializedObject.FindProperty("levelData");
         // klaxonSound = serializedObject.FindProperty("klaxonSound");

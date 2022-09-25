@@ -47,7 +47,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             return torsoSpriteData;
         }
         catch (Exception) {
-            //            Debug.LogError($"**** {sheetIndex} {spriteRenderer.sprite.name} {input.isProne || input.hitState == HitState.dead} {input.gunInput.gunType}");
+            Debug.LogError($"**** index:{sheetIndex} name:{spriteRenderer.sprite.name} prone:{input.isProne} dead:{input.hitState == HitState.dead} guntype:{input.gunInput.gunType}");
             return null;
         }
     }

@@ -18,17 +18,12 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void LoadVRMission(VRMissionTemplate template) {
         Debug.Log("GameMananger: load VR mission");
-        gameData = GameData.TestInitialData();
-
-        gameData.playerData = PlayerState.Instantiate(template.playerState);
-        // levelData.strikeTeamTemplate = ScriptableObject.Instantiate(Resources.Load("data/npc/guard2") as NPCTemplate);
-        // gameData.levelData = LevelData.Load("test"); // TODO: data driven
-
-        // LevelTemplate levelTemplate = ScriptableObject.Instantiate(Resources.Load("data/levels/test") as LevelTemplate);
         LevelTemplate levelTemplate = LevelTemplate.Load("test");
-        gameData.levelData = LevelState.Instantiate(levelTemplate);
-        gameData.levelData.template.sensitivityLevel = template.sensitivityLevel;
 
+        gameData = GameData.TestInitialData() with {
+            playerState = PlayerState.Instantiate(template.playerState),
+            levelState = LevelState.Instantiate(levelTemplate),
+        };
         // instantiate state from template
         VRMissionState state = VRMissionState.Instantiate(template);
         LoadScene(template.sceneName, () => StartVRMission(state));
@@ -142,7 +137,7 @@ public partial class GameManager : Singleton<GameManager> {
         ClearSceneData();
 
         // spawn player object
-        GameObject playerObj = SpawnPlayer(gameData.playerData);
+        GameObject playerObj = SpawnPlayer(gameData.playerState);
         SetFocus(playerObj);
 
         // TODO: spawn clearsighter if necessary
@@ -177,7 +172,7 @@ public partial class GameManager : Singleton<GameManager> {
         RefreshAlarmGraph();
 
         alarmSoundInterval = 2f;
-        alarmSound = gameData.levelData.template.alarmAudioClip;
+        alarmSound = gameData.levelState.template.alarmAudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
 
         OnSuspicionChange?.Invoke();
@@ -221,13 +216,13 @@ public partial class GameManager : Singleton<GameManager> {
 
     // TODO: these methods could belong to the graphs?
     public CyberNode GetCyberNode(string idn) {
-        return gameData?.levelData?.delta.cyberGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.delta.cyberGraph.nodes[idn] : null;
+        return gameData?.levelState?.delta.cyberGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelState.delta.cyberGraph.nodes[idn] : null;
     }
     public PowerNode GetPowerNode(string idn) {
-        return gameData?.levelData?.delta.powerGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.delta.powerGraph.nodes[idn] : null;
+        return gameData?.levelState?.delta.powerGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelState.delta.powerGraph.nodes[idn] : null;
     }
     public AlarmNode GetAlarmNode(string idn) {
-        return gameData?.levelData?.delta.alarmGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelData.delta.alarmGraph.nodes[idn] : null;
+        return gameData?.levelState?.delta.alarmGraph?.nodes.ContainsKey(idn) ?? false ? gameData.levelState.delta.alarmGraph.nodes[idn] : null;
     }
     public AlarmComponent GetAlarmComponent(string idn) {
         if (alarmComponents == null)
@@ -252,22 +247,22 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         string idn = poweredComponent.idn;
-        if (gameData.levelData != null && gameData.levelData.delta.powerGraph != null && gameData.levelData.delta.powerGraph.nodes.ContainsKey(idn)) {
+        if (gameData.levelState != null && gameData.levelState.delta.powerGraph != null && gameData.levelState.delta.powerGraph.nodes.ContainsKey(idn)) {
             // Debug.Log($"setting power node power {idn} {state}");
-            gameData.levelData.delta.powerGraph.nodes[idn].powered = state;
+            gameData.levelState.delta.powerGraph.nodes[idn].powered = state;
             RefreshPowerGraph();
         }
     }
     public void SetCyberNodeState(CyberComponent cyberComponent, bool state) {
         string idn = cyberComponent.idn;
-        if (gameData.levelData != null && gameData.levelData.delta.cyberGraph != null && gameData.levelData.delta.cyberGraph.nodes.ContainsKey(idn)) {
-            SetCyberNodeState(gameData.levelData.delta.cyberGraph.nodes[idn], state);
+        if (gameData.levelState != null && gameData.levelState.delta.cyberGraph != null && gameData.levelState.delta.cyberGraph.nodes.ContainsKey(idn)) {
+            SetCyberNodeState(gameData.levelState.delta.cyberGraph.nodes[idn], state);
         }
     }
     public void SetAlarmNodeState(AlarmComponent alarmComponent, bool state) {
         string idn = alarmComponent.idn;
-        if (gameData.levelData != null && gameData.levelData.delta.alarmGraph != null && gameData.levelData.delta.alarmGraph.nodes.ContainsKey(idn)) {
-            SetAlarmNodeState(gameData.levelData.delta.alarmGraph.nodes[idn], state);
+        if (gameData.levelState != null && gameData.levelState.delta.alarmGraph != null && gameData.levelState.delta.alarmGraph.nodes.ContainsKey(idn)) {
+            SetAlarmNodeState(gameData.levelState.delta.alarmGraph.nodes[idn], state);
         }
     }
     public void SetCyberNodeState(CyberNode node, bool state) {
@@ -284,8 +279,8 @@ public partial class GameManager : Singleton<GameManager> {
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)
             return false;
-        if (gameData.levelData != null && gameData.levelData.delta.cyberGraph != null && gameData.levelData.delta.cyberGraph.nodes.ContainsKey(node.idn)) {
-            foreach (CyberNode neighbor in gameData.levelData.delta.cyberGraph.Neighbors(node)) {
+        if (gameData.levelState != null && gameData.levelState.delta.cyberGraph != null && gameData.levelState.delta.cyberGraph.nodes.ContainsKey(node.idn)) {
+            foreach (CyberNode neighbor in gameData.levelState.delta.cyberGraph.Neighbors(node)) {
                 if (neighbor.compromised) return true;
             }
             return false;
@@ -295,35 +290,35 @@ public partial class GameManager : Singleton<GameManager> {
     public void RefreshCyberGraph() {
         TransferCyberState();
 
-        gameData.levelData.delta.cyberGraph.Refresh();
+        gameData.levelState.delta.cyberGraph.Refresh();
 
         // propagate changes to UI
-        OnCyberGraphChange?.Invoke(gameData.levelData.delta.cyberGraph);
+        OnCyberGraphChange?.Invoke(gameData.levelState.delta.cyberGraph);
     }
     public void RefreshAlarmGraph() {
 
         // determine if any active alarm object reaches a terminal
-        gameData.levelData.delta.alarmGraph.Refresh();
+        gameData.levelState.delta.alarmGraph.Refresh();
 
         TransferAlarmState();
 
         // propagate changes to UI
-        OnAlarmGraphChange?.Invoke(gameData.levelData.delta.alarmGraph);
+        OnAlarmGraphChange?.Invoke(gameData.levelState.delta.alarmGraph);
     }
     public void RefreshPowerGraph() {
         // power distribution algorithm
-        gameData.levelData.delta.powerGraph.Refresh();
+        gameData.levelState.delta.powerGraph.Refresh();
 
         // propagate the changes to local state
         TransferPowerState();
 
         // propagate changes to UI
-        OnPowerGraphChange?.Invoke(gameData.levelData.delta.powerGraph);
+        OnPowerGraphChange?.Invoke(gameData.levelState.delta.powerGraph);
     }
     void TransferPowerState() {
         if (poweredComponents == null)
             return;
-        foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelData.delta.powerGraph.nodes) {
+        foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelState.delta.powerGraph.nodes) {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 poweredComponents[kvp.Key].power = kvp.Value.powered;
                 poweredComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
@@ -334,7 +329,7 @@ public partial class GameManager : Singleton<GameManager> {
     void TransferCyberState() {
         if (cyberComponents == null)
             return;
-        foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelData.delta.cyberGraph.nodes) {
+        foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelState.delta.cyberGraph.nodes) {
             if (cyberComponents.ContainsKey(kvp.Key)) {
                 cyberComponents[kvp.Key].compromised = kvp.Value.compromised;
                 cyberComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
@@ -345,7 +340,7 @@ public partial class GameManager : Singleton<GameManager> {
     void TransferAlarmState() {
         if (alarmComponents == null)
             return;
-        foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelData.delta.alarmGraph.nodes) {
+        foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelState.delta.alarmGraph.nodes) {
             if (alarmComponents.ContainsKey(kvp.Key)) {
                 AlarmComponent component = alarmComponents[kvp.Key];
                 component.alarmTriggered = kvp.Value.alarmTriggered;

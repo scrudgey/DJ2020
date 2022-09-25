@@ -104,7 +104,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 // listener.SetListenRadius();
                 break;
             case SphereAttackState:
-                if (!GameManager.I.gameData.levelData.anyAlarmActive()) {
+                if (!GameManager.I.gameData.levelState.anyAlarmActive()) {
                     if (lastDamage != null) {
                         ChangeState(new ReportToHQState(this, speechTextController, lastDamage));
                     } else if (getLocationOfInterest() != Vector3.zero) {
@@ -293,7 +293,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case ReportToHQState:
             case StopAndListenState:
                 alertHandler.ShowAlert(useWarnMaterial: true);
-                if (GameManager.I.gameData.levelData.anyAlarmActive()) {
+                if (GameManager.I.gameData.levelState.anyAlarmActive()) {
                     ChangeState(new SearchDirectionState(this, damage, doIntro: false));
                 } else {
                     ChangeState(new ReactToAttackState(this, speechTextController, damage));
@@ -331,7 +331,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case FollowTheLeaderState:
                 case DisableAlarmState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
-                    if (GameManager.I.gameData.levelData.anyAlarmActive()) {
+                    if (GameManager.I.gameData.levelState.anyAlarmActive()) {
                         ChangeState(new SearchDirectionState(this, noise, doIntro: false));
                     } else {
                         ChangeState(new ReactToAttackState(this, speechTextController, noise));
@@ -413,7 +413,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void HandleFootstepNoise(NoiseComponent noise) {
         footstepImpulse += noise.data.volume * 2f;
         bool thresholded = footstepImpulse > 4f;
-        if (GameManager.I.gameData.levelData.template.sensitivityLevel == SensitivityLevel.publicProperty) {
+        if (GameManager.I.gameData.levelState.template.sensitivityLevel == SensitivityLevel.publicProperty) {
             if (thresholded && recentlyInCombat) {
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
@@ -424,7 +424,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             }
-        } else if (GameManager.I.gameData.levelData.template.sensitivityLevel >= SensitivityLevel.privateProperty) {
+        } else if (GameManager.I.gameData.levelState.template.sensitivityLevel >= SensitivityLevel.privateProperty) {
             if (thresholded)
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
@@ -450,7 +450,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         Reaction reaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious);
 
         Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious, applyModifiers: false);
-        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelData.anyAlarmActive()) {
+        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelState.anyAlarmActive()) {
             GameManager.I.ActivateHQRadio();
         }
 

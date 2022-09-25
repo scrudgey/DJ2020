@@ -42,7 +42,7 @@ public class ReportToHQState : SphereControlState {
 
     void SetupRootNode(float initialPause = 1f) {
         // TODO: write better code here
-        LevelState levelData = GameManager.I.gameData.levelData;
+        LevelState levelData = GameManager.I.gameData.levelState;
 
         string speechText = type switch {
             AttackType.damage => "HQ respond! Taking fire!",

@@ -83,33 +83,11 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         }
     }
 
-    // public PlayerState Refresh() {
-    //     GunState newPrimary = primaryGun;
-    //     GunState newSecondary = secondaryGun;
-    //     GunState newTertiary = tertiaryGun;
-    //     if (primaryGun != null) {
-    //         newPrimary = GunState.Instantiate(primaryGun.template);
-    //     }
-    //     if (secondaryGun != null) {
-    //         newSecondary = GunState.Instantiate(secondaryGun.template);
-    //     }
-    //     if (tertiaryGun != null) {
-    //         newTertiary = GunState.Instantiate(tertiaryGun.template);
-    //     }
-    //     return this with {
-    //         health = fullHealthAmount,
-    //         hitState = HitState.normal,
-    //         primaryGun = newPrimary,
-    //         secondaryGun = newSecondary,
-    //         tertiaryGun = newTertiary
-    //     };
-    // }
-
-
     public static PlayerState Instantiate(PlayerTemplate template) => DefaultState() with {
         primaryGun = GunState.Instantiate(template.primaryGun),
         secondaryGun = GunState.Instantiate(template.secondaryGun),
         tertiaryGun = GunState.Instantiate(template.tertiaryGun),
+        health = template.fullHealthAmount
     };
     // public static GunState Instantiate(GunTemplate template, GunDelta delta) {
     //     GunState state = Instantiate(template);

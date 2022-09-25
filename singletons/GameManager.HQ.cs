@@ -28,7 +28,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void SetLevelAlarmActive() {
-        if (!gameData.levelData.anyAlarmActive()) {
+        if (!gameData.levelState.anyAlarmActive()) {
             alarmSoundTimer = alarmSoundInterval;
         }
         OnSuspicionChange?.Invoke();
@@ -55,7 +55,7 @@ public partial class GameManager : Singleton<GameManager> {
         // reset strike team 
         try {
             PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
-            gameData.levelData.template.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
+            gameData.levelState.template.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         }
         finally {
 
@@ -141,7 +141,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public float alarmCountdown() {
         float timer = 0f;
-        foreach (AlarmNode node in gameData.levelData.delta.alarmGraph.nodes.Values) {
+        foreach (AlarmNode node in gameData.levelState.delta.alarmGraph.nodes.Values) {
             timer = Math.Max(timer, node.countdownTimer);
         }
         return timer;
@@ -149,7 +149,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void UpdateGraphs() {
         float alarmTimerOrig = alarmCountdown();
 
-        gameData?.levelData?.delta.alarmGraph?.Update();
+        gameData?.levelState?.delta.alarmGraph?.Update();
 
         float alarmTimer = alarmCountdown();
         if (alarmTimer <= 0 && alarmTimerOrig > 0) {
@@ -157,7 +157,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void UpdateAlarm() {
-        if (gameData.levelData.anyAlarmActive()) {
+        if (gameData.levelState.anyAlarmActive()) {
             if (strikeTeamSpawnPoint != null) { // TODO: check level data 
                 UpdateStrikeTeamSpawn();
             }
@@ -170,8 +170,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void UpdateStrikeTeamSpawn() {
-        if (strikeTeamCount < gameData.levelData.template.strikeTeamMaxSize) {
-            if (strikeTeamResponseTimer < gameData.levelData.template.strikeTeamResponseTime) {
+        if (strikeTeamCount < gameData.levelState.template.strikeTeamMaxSize) {
+            if (strikeTeamResponseTimer < gameData.levelState.template.strikeTeamResponseTime) {
                 strikeTeamResponseTimer += Time.deltaTime;
             } else {
                 strikeTeamSpawnTimer += Time.deltaTime;
@@ -184,7 +184,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SpawnStrikeTeamMember() {
-        GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelData.template.strikeTeamTemplate);
+        GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
 
         if (strikeTeamCount == 0) {

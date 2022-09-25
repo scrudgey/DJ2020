@@ -20,23 +20,10 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     [field: SerializeField]
     public GunTemplate tertiaryGun { get; set; }
 
-
     // health
     public float health { get; set; }
 
     [field: SerializeField]
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
-
-    // public static NPCTemplate Default() => new NPCTemplate() {
-    //     primaryGun = GunTemplate.Load("r1"),
-    //     secondaryGun = GunTemplate.Load("p1"),
-    //     tertiaryGun = GunTemplate.Load("sh1"),
-    //     // legSkin = "generic64",
-    //     // // legSkin = "cyber",
-    //     legSkin = "Jack",
-    //     bodySkin = "Jack",
-    //     health = 100,
-    //     fullHealthAmount = 100
-    // };
 }

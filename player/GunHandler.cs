@@ -141,7 +141,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // skills
         // TODO: this doesn't work for enemies
-        int skillLevel = GameManager.I.gameData.playerData.gunSkillLevel[gunInstance.template.type];
+        int skillLevel = GameManager.I.gameData.playerState.gunSkillLevel[gunInstance.template.type];
         float skillBonus = (1 - skillLevel) * (0.1f);
         inaccuracy += skillBonus;
 

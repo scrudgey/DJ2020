@@ -27,8 +27,6 @@ public class LevelState {
         return delta.alarmGraph.anyAlarmActive();
     }
 
-
-
     public static LevelState Load(string levelName) {
         string path = FilePath(levelName);
         LevelState data = LoadXML(path);

@@ -44,10 +44,10 @@ public class VRMissionVictoryMenuController : MonoBehaviour {
     void SetTitle() {
         switch (data.data.status) {
             default:
-            case VRMissionMutableData.Status.victory:
+            case VRMissionDelta.Status.victory:
                 titleText.text = "VR Mission Success";
                 break;
-            case VRMissionMutableData.Status.fail:
+            case VRMissionDelta.Status.fail:
                 titleText.text = "VR Mission Failed";
                 break;
         }

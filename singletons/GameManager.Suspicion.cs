@@ -48,7 +48,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public SensitivityLevel GetCurrentSensitivity() =>
-        gameData.levelData.template.sensitivityLevel;
+        gameData.levelState.template.sensitivityLevel;
 
     public Reaction GetSuspicionReaction(Suspiciousness totalSuspicion, bool applyModifiers = true) {
         Reaction reaction = Reaction.ignore;
@@ -78,7 +78,7 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
         if (applyModifiers) {
-            if (gameData.levelData.anyAlarmActive()) {
+            if (gameData.levelState.anyAlarmActive()) {
                 if (reaction == Reaction.ignore) {
                     reaction = Reaction.investigate;
                 } else if (reaction == Reaction.investigate) {
@@ -88,7 +88,7 @@ public partial class GameManager : Singleton<GameManager> {
                     // GameManager.I.ActivateAlarm();
                 }
             }
-            if (gameData.playerData.disguise) {
+            if (gameData.playerState.disguise) {
                 if (reaction == Reaction.investigate) {
                     reaction = Reaction.ignore;
                 } else if (reaction == Reaction.attack) {
@@ -101,11 +101,11 @@ public partial class GameManager : Singleton<GameManager> {
 
 
     public void ActivateDisguise() {
-        gameData.playerData.disguise = true;
+        gameData.playerState.disguise = true;
         OnSuspicionChange?.Invoke();
     }
     public void DeactivateDisguise() {
-        gameData.playerData.disguise = false;
+        gameData.playerState.disguise = false;
         OnSuspicionChange?.Invoke();
     }
 }

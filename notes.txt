@@ -1414,23 +1414,19 @@ interface for designing multiple VR scenarios
     time limit 
     respawn interval 
 
-set weapon to none button
-death graphics for all skins
-selectable level alarm
-configurable spawn interval
-other mission types
 bigger level
+other mission types
 better shotgun
-interface sounds
-red screen edge flash when hit
 better shoot inaccuracy
-save VR mission between runs
+title screen logo
+title screen animations
 
-1. corspe graphic
+1. corspe graphic bugged
+death graphics for all skins
 2. clearsighter
 4. aim mode
 figure out graph load order issues once and for all
-show some sort of stats in VR mission thing
+show some sort of gun stats in VR mission thing
 
 over the shoulder: 
     don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
@@ -1438,6 +1434,14 @@ over the shoulder:
         camera is located over the shoulder and always looks down-barrel toward where the cursor points
     to prevent being blocked around corners, move in close to player
 
-bugged gun display
+* proper playerstate template / delta split.
+* bugged gun display
 
-proper playerstate template / delta split.
+save VR mission between runs
+configurable spawn interval
+selectable level alarm
+set weapon to none button
+
+interface sounds
+red screen edge flash when hit
+UI display something about victory conditions

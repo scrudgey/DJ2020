@@ -32,9 +32,9 @@ public class VRMissionController : MonoBehaviour {
                 GameManager.I.TransitionToState(GameState.inMenu);
 
                 data.data.status = state switch {
-                    State.victory => VRMissionMutableData.Status.victory,
-                    State.fail => VRMissionMutableData.Status.fail,
-                    _ => VRMissionMutableData.Status.inProgress
+                    State.victory => VRMissionDelta.Status.victory,
+                    State.fail => VRMissionDelta.Status.fail,
+                    _ => VRMissionDelta.Status.inProgress
                 };
 
                 if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {

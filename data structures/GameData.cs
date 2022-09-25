@@ -1,24 +1,22 @@
 using UnityEngine;
 
 [System.Serializable]
-public class GameData {
+public record GameData {
     // TODO: static save, load method
     public GameState state;
-    public PlayerState playerData;
-    public LevelState levelData;
+    public PlayerState playerState;
+    public LevelState levelState;
 
     // UI state:
     public int overlayIndex;
 
     public static GameData TestInitialData() {
-        // LevelTemplate levelTemplate = ScriptableObject.Instantiate(Resources.Load("data/levels/test/levelTemplate") as LevelTemplate);
         LevelTemplate levelTemplate = LevelTemplate.Load("test");
 
         return new GameData() {
             state = GameState.none,
-            playerData = PlayerState.DefaultState(),
-            // levelData = LevelData.LoadLevelData("test"),
-            levelData = LevelState.Instantiate(levelTemplate),
+            playerState = PlayerState.DefaultState(),
+            levelState = LevelState.Instantiate(levelTemplate),
             overlayIndex = 0
         };
     }

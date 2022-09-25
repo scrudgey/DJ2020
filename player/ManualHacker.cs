@@ -124,7 +124,7 @@ public class ManualHacker : MonoBehaviour {
             attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
-        float radius = GameManager.I?.gameData?.playerData?.hackRadius ?? 1.5f;
+        float radius = GameManager.I?.gameData?.playerState?.hackRadius ?? 1.5f;
         sphereCollider.radius = radius;
     }
     void UpdateWire(CyberNode node) {

@@ -9,21 +9,21 @@ namespace UI {
 
     public class WeaponUIHandler : IBinder<GunHandler> {
         // public GunHandler target { get; set; }
-        public TextMeshProUGUI ammoIndicator;
-        public TextMeshProUGUI ammoImageCaption;
-        public Image ammoImage;
+        public TextMeshProUGUI gunTitle;
+        public TextMeshProUGUI ammoCounter;
+        public Image gunImage;
 
         override public void HandleValueChanged(GunHandler gun) {
             if (gun.HasGun()) {
-                ammoImage.enabled = true;
-                ammoIndicator.text = gun.gunInstance.template.name;
-                ammoImageCaption.text = $"{gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
-                ammoImage.sprite = gun.gunInstance.template.image;
+                gunImage.enabled = true;
+                gunImage.sprite = gun.gunInstance.template.image;
+                gunTitle.text = gun.gunInstance.template.name;
+                ammoCounter.text = $"{gun.gunInstance.TotalAmmo()} / {gun.gunInstance.MaxAmmo()}";
             } else {
-                ammoImage.enabled = false;
-                ammoIndicator.text = $"A: -/-";
-                ammoImageCaption.text = "";
-                ammoImage.sprite = null;
+                gunImage.enabled = false;
+                gunImage.sprite = null;
+                ammoCounter.text = $"-/-";
+                gunTitle.text = "";
                 return;
             }
         }
