@@ -55,7 +55,7 @@ public partial class GameManager : Singleton<GameManager> {
         // reset strike team 
         try {
             PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
-            gameData.levelData.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
+            gameData.levelData.template.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         }
         finally {
 
@@ -141,7 +141,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public float alarmCountdown() {
         float timer = 0f;
-        foreach (AlarmNode node in gameData.levelData.alarmGraph.nodes.Values) {
+        foreach (AlarmNode node in gameData.levelData.delta.alarmGraph.nodes.Values) {
             timer = Math.Max(timer, node.countdownTimer);
         }
         return timer;
@@ -149,7 +149,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void UpdateGraphs() {
         float alarmTimerOrig = alarmCountdown();
 
-        gameData?.levelData?.alarmGraph?.Update();
+        gameData?.levelData?.delta.alarmGraph?.Update();
 
         float alarmTimer = alarmCountdown();
         if (alarmTimer <= 0 && alarmTimerOrig > 0) {
@@ -170,8 +170,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void UpdateStrikeTeamSpawn() {
-        if (strikeTeamCount < gameData.levelData.strikeTeamMaxSize) {
-            if (strikeTeamResponseTimer < gameData.levelData.strikeTeamResponseTime) {
+        if (strikeTeamCount < gameData.levelData.template.strikeTeamMaxSize) {
+            if (strikeTeamResponseTimer < gameData.levelData.template.strikeTeamResponseTime) {
                 strikeTeamResponseTimer += Time.deltaTime;
             } else {
                 strikeTeamSpawnTimer += Time.deltaTime;
@@ -184,7 +184,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SpawnStrikeTeamMember() {
-        GameObject npc = strikeTeamSpawnPoint.SpawnNPC();
+        GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelData.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
 
         if (strikeTeamCount == 0) {

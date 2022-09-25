@@ -413,7 +413,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void HandleFootstepNoise(NoiseComponent noise) {
         footstepImpulse += noise.data.volume * 2f;
         bool thresholded = footstepImpulse > 4f;
-        if (GameManager.I.gameData.levelData.sensitivityLevel == SensitivityLevel.publicProperty) {
+        if (GameManager.I.gameData.levelData.template.sensitivityLevel == SensitivityLevel.publicProperty) {
             if (thresholded && recentlyInCombat) {
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
@@ -424,7 +424,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             }
-        } else if (GameManager.I.gameData.levelData.sensitivityLevel >= SensitivityLevel.privateProperty) {
+        } else if (GameManager.I.gameData.levelData.template.sensitivityLevel >= SensitivityLevel.privateProperty) {
             if (thresholded)
                 switch (stateMachine.currentState) {
                     case SphereMoveState:

@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
-    private GunHandler.GunState state;
+    private GunHandler.GunStateEnum state;
     private CharacterState characterState;
     private int _frame;
     private Direction direction;
@@ -51,7 +51,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             return null;
         }
     }
-    void SetState(GunHandler.GunState newState) {
+    void SetState(GunHandler.GunStateEnum newState) {
         state = newState;
         // Debug.Log("set gunstate: " + state);
     }
@@ -118,13 +118,13 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             animator.Stop();
         } else if (input.gunInput.hasGun) {
             switch (state) {
-                case GunHandler.GunState.shooting:
+                case GunHandler.GunStateEnum.shooting:
                     SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
                     break;
-                case GunHandler.GunState.reloading:
+                case GunHandler.GunStateEnum.reloading:
                     SetAnimation(input.gunInput.baseGun.reloadAnimation);
                     break;
-                case GunHandler.GunState.racking:
+                case GunHandler.GunStateEnum.racking:
                     SetAnimation(input.gunInput.baseGun.rackAnimation);
                     break;
                 default:

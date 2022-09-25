@@ -13,16 +13,14 @@ using UnityEngine.SceneManagement;
 public class LevelDataUtilEditor : Editor {
     // TODO: allow an audioclip in editor
     public string levelName = "test";
-    public SerializedProperty klaxonSound;
-    private SerializedProperty levelData;
+    // public SerializedProperty klaxonSound;
+    // private SerializedProperty levelData;
     private void OnEnable() {
-        levelData = serializedObject.FindProperty("levelData");
-        klaxonSound = serializedObject.FindProperty("klaxonSound");
+        // levelData = serializedObject.FindProperty("levelData");
+        // klaxonSound = serializedObject.FindProperty("klaxonSound");
     }
     public override void OnInspectorGUI() {
         levelName = EditorGUILayout.TextField("level name", levelName);
-        EditorGUILayout.PropertyField(klaxonSound);
-        EditorGUILayout.PropertyField(levelData);
 
         if (GUILayout.Button("Write Level Data")) {
             LevelDataUtil networkUtil = (LevelDataUtil)target;
@@ -32,24 +30,26 @@ public class LevelDataUtilEditor : Editor {
             CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
             AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
 
+            foreach (Node node in powerGraph.nodes.Values) {
+                Debug.Log($"writing power graph: {node.idn} {levelName}");
+            }
+
             powerGraph.Write(levelName, sceneName);
             cyberGraph.Write(levelName, sceneName);
             alarmGraph.Write(levelName, sceneName);
 
-            networkUtil.levelData.powerGraph = powerGraph;
-            networkUtil.levelData.cyberGraph = cyberGraph;
-            networkUtil.levelData.alarmGraph = alarmGraph;
 
-            String klaxonRootPath = AssetDatabase.GetAssetPath(networkUtil.klaxonSound);
-            String klaxonRelativePath = klaxonRootPath.Replace("Assets/Resources/", "");
+            // String klaxonRootPath = AssetDatabase.GetAssetPath(networkUtil.klaxonSound);
+            // String klaxonRelativePath = klaxonRootPath.Replace("Assets/Resources/", "");
+            // int fileExtPos = klaxonRelativePath.LastIndexOf(".");
+            // if (fileExtPos >= 0)
+            //     klaxonRelativePath = klaxonRelativePath.Substring(0, fileExtPos);
 
-            int fileExtPos = klaxonRelativePath.LastIndexOf(".");
-            if (fileExtPos >= 0)
-                klaxonRelativePath = klaxonRelativePath.Substring(0, fileExtPos);
-
-            networkUtil.levelData.alarmAudioClipPath = klaxonRelativePath;
-
-            networkUtil.levelData.WriteXML(levelName);
+            // networkUtil.levelData.powerGraph = powerGraph;
+            // networkUtil.levelData.cyberGraph = cyberGraph;
+            // networkUtil.levelData.alarmGraph = alarmGraph;
+            // networkUtil.levelData.alarmAudioClipPath = klaxonRelativePath;
+            // networkUtil.levelData.WriteXML(levelName);
 
             AssetDatabase.Refresh();
         }

@@ -21,8 +21,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
         Motor.CharacterController = this;
 
         // TODO: remove?
-
-        gunHandler.primary = new GunInstance(Gun.Load("s1"));
+        gunHandler.primary = GunState.Instantiate(GunTemplate.Load("s1"));
         gunHandler.SwitchToGun(1);
         gunHandler.Reload();
         gunHandler.ClipIn();

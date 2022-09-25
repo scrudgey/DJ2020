@@ -10,9 +10,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public string bodySkin { get; set; }
 
     // gun
-    public GunInstance primaryGun { get; set; }
-    public GunInstance secondaryGun { get; set; }
-    public GunInstance tertiaryGun { get; set; }
+    public GunState primaryGun { get; set; }
+    public GunState secondaryGun { get; set; }
+    public GunState tertiaryGun { get; set; }
     public int activeGun { get; set; }
 
     // health
@@ -42,18 +42,18 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
 
     public bool disguise;
 
-    public static PlayerState DefaultGameData() {
-        Gun gun1 = Gun.Load("s1");
-        Gun gun2 = Gun.Load("p1");
-        Gun gun3 = Gun.Load("sh1");
+    public static PlayerState DefaultState() {
+        GunTemplate gun1 = GunTemplate.Load("s1");
+        GunTemplate gun2 = GunTemplate.Load("p1");
+        GunTemplate gun3 = GunTemplate.Load("sh1");
 
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
 
-            primaryGun = new GunInstance(gun1),
-            secondaryGun = new GunInstance(gun2),
-            tertiaryGun = new GunInstance(gun3),
+            primaryGun = GunState.Instantiate(gun1),
+            secondaryGun = GunState.Instantiate(gun2),
+            tertiaryGun = GunState.Instantiate(gun3),
             activeGun = 2,
 
             items = new List<string> { "explosive", "deck", "goggles" },
@@ -83,25 +83,37 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         }
     }
 
-    public PlayerState Refresh() {
-        GunInstance newPrimary = primaryGun;
-        GunInstance newSecondary = secondaryGun;
-        GunInstance newTertiary = tertiaryGun;
-        if (primaryGun != null && primaryGun.baseGun != null) {
-            newPrimary = new GunInstance(primaryGun.baseGun);
-        }
-        if (secondaryGun != null && secondaryGun.baseGun != null) {
-            newSecondary = new GunInstance(secondaryGun.baseGun);
-        }
-        if (tertiaryGun != null && tertiaryGun.baseGun != null) {
-            newTertiary = new GunInstance(tertiaryGun.baseGun);
-        }
-        return this with {
-            health = fullHealthAmount,
-            hitState = HitState.normal,
-            primaryGun = newPrimary,
-            secondaryGun = newSecondary,
-            tertiaryGun = newTertiary
-        };
-    }
+    // public PlayerState Refresh() {
+    //     GunState newPrimary = primaryGun;
+    //     GunState newSecondary = secondaryGun;
+    //     GunState newTertiary = tertiaryGun;
+    //     if (primaryGun != null) {
+    //         newPrimary = GunState.Instantiate(primaryGun.template);
+    //     }
+    //     if (secondaryGun != null) {
+    //         newSecondary = GunState.Instantiate(secondaryGun.template);
+    //     }
+    //     if (tertiaryGun != null) {
+    //         newTertiary = GunState.Instantiate(tertiaryGun.template);
+    //     }
+    //     return this with {
+    //         health = fullHealthAmount,
+    //         hitState = HitState.normal,
+    //         primaryGun = newPrimary,
+    //         secondaryGun = newSecondary,
+    //         tertiaryGun = newTertiary
+    //     };
+    // }
+
+
+    public static PlayerState Instantiate(PlayerTemplate template) => DefaultState() with {
+        primaryGun = GunState.Instantiate(template.primaryGun),
+        secondaryGun = GunState.Instantiate(template.secondaryGun),
+        tertiaryGun = GunState.Instantiate(template.tertiaryGun),
+    };
+    // public static GunState Instantiate(GunTemplate template, GunDelta delta) {
+    //     GunState state = Instantiate(template);
+    //     state.ApplyDelta(delta);
+    //     return state;
+    // }
 }

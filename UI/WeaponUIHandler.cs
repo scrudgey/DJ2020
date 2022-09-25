@@ -16,9 +16,9 @@ namespace UI {
         override public void HandleValueChanged(GunHandler gun) {
             if (gun.HasGun()) {
                 ammoImage.enabled = true;
-                ammoIndicator.text = gun.gunInstance.baseGun.name;
+                ammoIndicator.text = gun.gunInstance.template.name;
                 ammoImageCaption.text = $"{gun.gunInstance.TotalAmmo()}/{gun.gunInstance.MaxAmmo()}";
-                ammoImage.sprite = gun.gunInstance.baseGun.image;
+                ammoImage.sprite = gun.gunInstance.template.image;
             } else {
                 ammoImage.enabled = false;
                 ammoIndicator.text = $"A: -/-";

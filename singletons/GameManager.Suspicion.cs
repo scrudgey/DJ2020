@@ -48,7 +48,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public SensitivityLevel GetCurrentSensitivity() =>
-        gameData.levelData.sensitivityLevel;
+        gameData.levelData.template.sensitivityLevel;
 
     public Reaction GetSuspicionReaction(Suspiciousness totalSuspicion, bool applyModifiers = true) {
         Reaction reaction = Reaction.ignore;

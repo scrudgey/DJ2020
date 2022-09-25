@@ -1437,3 +1437,7 @@ over the shoulder:
     orient more tightly toward the cursor.
         camera is located over the shoulder and always looks down-barrel toward where the cursor points
     to prevent being blocked around corners, move in close to player
+
+bugged gun display
+
+proper playerstate template / delta split.

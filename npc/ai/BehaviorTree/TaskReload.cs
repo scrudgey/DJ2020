@@ -9,7 +9,7 @@ namespace AI {
             this.gunHandler = gunHandler;
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            input.reload = gunHandler.gunInstance.clip <= 0 && gunHandler.state != GunHandler.GunState.reloading && gunHandler.state != GunHandler.GunState.racking;
+            input.reload = gunHandler.gunInstance.delta.clip <= 0 && gunHandler.state != GunHandler.GunStateEnum.reloading && gunHandler.state != GunHandler.GunStateEnum.racking;
             return TaskState.running;
         }
     }

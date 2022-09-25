@@ -6,13 +6,13 @@ using UnityEngine.SceneManagement;
 public class VRMissionController : MonoBehaviour {
     enum State { normal, victory, fail }
     State state;
-    VRMissionData data;
+    VRMissionState data;
     public float NPCspawnTimer;
     public List<CharacterController> npcControllers = new List<CharacterController>();
     float startTime;
-    public void StartVRMission(VRMissionData data) {
+    public void StartVRMission(VRMissionState state) {
         Debug.Log("VRMissionController: start VR mission");
-        this.data = data;
+        this.data = state;
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
         startTime = Time.time;
@@ -59,7 +59,7 @@ public class VRMissionController : MonoBehaviour {
 
 
     void Update() {
-        if (data.data.numberTotalNPCs < data.maxNumberNPCs && data.data.numberLiveNPCs < data.numberConcurrentNPCs) {
+        if (data.data.numberTotalNPCs < data.template.maxNumberNPCs && data.data.numberLiveNPCs < data.template.numberConcurrentNPCs) {
             NPCspawnTimer += Time.deltaTime;
             if (NPCspawnTimer > data.data.NPCspawnInterval) {
                 NPCspawnTimer -= data.data.NPCspawnInterval;
@@ -73,7 +73,8 @@ public class VRMissionController : MonoBehaviour {
     void SpawnNPC() {
         NPCSpawnPoint[] spawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToArray();
         NPCSpawnPoint spawnPoint = Toolbox.RandomFromList(spawnPoints);
-        GameObject npcObject = spawnPoint.SpawnNPC();
+
+        GameObject npcObject = spawnPoint.SpawnNPC(data.template.npc1State);
         CharacterController npcController = npcObject.GetComponentInChildren<CharacterController>();
 
         npcControllers.Add(npcController);
@@ -88,8 +89,8 @@ public class VRMissionController : MonoBehaviour {
         npcControllers.Remove(npc);
         data.data.numberLiveNPCs -= 1;
         data.data.numberNPCsKilled += 1;
-        if (data.missionType == VRMissionType.hunt) {
-            if (data.data.numberNPCsKilled >= data.maxNumberNPCs) {
+        if (data.template.missionType == VRMissionType.hunt) {
+            if (data.data.numberNPCsKilled >= data.template.maxNumberNPCs) {
                 TransitionToState(State.victory);
             }
         }
@@ -100,7 +101,7 @@ public class VRMissionController : MonoBehaviour {
 
     void SpawnAllNPCs() {
         foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn)) {
-            spawnPoint.SpawnNPC();
+            spawnPoint.SpawnNPC(data.template.npc1State);
         }
     }
 

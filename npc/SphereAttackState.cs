@@ -34,7 +34,7 @@ public class SphereAttackState : SphereControlState {
                 useKey = true
             }, 0.5f),
             new Selector(
-                new TaskConditional(() => gunHandler.gunInstance.clip > 0),
+                new TaskConditional(() => gunHandler.gunInstance.delta.clip > 0),
                 new TaskReload(gunHandler)
             ),
             new Selector(

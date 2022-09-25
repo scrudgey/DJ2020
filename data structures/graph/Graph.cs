@@ -61,14 +61,14 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     }
 
     private string FilePath(string levelName, string sceneName) {
-        string scenePath = LevelData.LevelDataPath(levelName);
+        string scenePath = LevelState.LevelDataPath(levelName);
         string prefix = PowerGraphPrefix();
         return Path.Combine(scenePath, $"graph_{prefix}_{sceneName}.xml");
     }
 
     public static W LoadAll(string levelName) {
         // public static PowerGraph LoadAll(string levelName) {
-        string levelPath = LevelData.LevelDataPath(levelName);
+        string levelPath = LevelState.LevelDataPath(levelName);
         Debug.Log($"loading all graphs at {levelPath}...");
         string prefix = PowerGraphPrefix();
         string[] graphPaths = Directory.GetFiles(levelPath, $"*{prefix}*xml"); // TODO: fix this
