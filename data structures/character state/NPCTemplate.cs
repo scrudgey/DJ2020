@@ -1,6 +1,9 @@
-using System.Collections.Generic;
+using System;
+using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
 using UnityEngine;
-
 [System.Serializable]
 
 [CreateAssetMenu(menuName = "ScriptableObjects/NPCTemplate")]

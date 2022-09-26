@@ -83,15 +83,11 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         }
     }
 
+    // TODO: apply more state from template
     public static PlayerState Instantiate(PlayerTemplate template) => DefaultState() with {
         primaryGun = GunState.Instantiate(template.primaryGun),
         secondaryGun = GunState.Instantiate(template.secondaryGun),
         tertiaryGun = GunState.Instantiate(template.tertiaryGun),
         health = template.fullHealthAmount
     };
-    // public static GunState Instantiate(GunTemplate template, GunDelta delta) {
-    //     GunState state = Instantiate(template);
-    //     state.ApplyDelta(delta);
-    //     return state;
-    // }
 }

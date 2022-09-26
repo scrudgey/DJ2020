@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [System.Serializable]
@@ -10,8 +11,13 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
     public string bodySkin { get; set; }
 
     // gun
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate primaryGun { get; set; }
+
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate secondaryGun { get; set; }
+
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate tertiaryGun { get; set; }
     public int activeGun { get; set; }
 
@@ -61,41 +67,5 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
 
         health = 250f,
         fullHealthAmount = 250f,
-
     };
-
-    // public void ApplyState(GameObject playerObject) {
-    //     ((IGunHandlerState)this).ApplyGunState(playerObject);
-    //     ((ISkinState)this).ApplySkinState(playerObject);
-    //     ((IItemHandlerState)this).ApplyItemState(playerObject);
-    //     ((ICharacterHurtableState)this).ApplyHurtableState(playerObject);
-    //     ApplyPlayerState(playerObject);
-    // }
-    // public void ApplyPlayerState(GameObject playerObject) {
-    //     foreach (IPlayerStateLoader loader in playerObject.GetComponentsInChildren<IPlayerStateLoader>()) {
-    //         loader.LoadState(this);
-    //     }
-    // }
-
-    // public PlayerState Refresh() {
-    //     GunState newPrimary = primaryGun;
-    //     GunState newSecondary = secondaryGun;
-    //     GunState newTertiary = tertiaryGun;
-    //     if (primaryGun != null) {
-    //         newPrimary = GunState.Instantiate(primaryGun.template);
-    //     }
-    //     if (secondaryGun != null) {
-    //         newSecondary = GunState.Instantiate(secondaryGun.template);
-    //     }
-    //     if (tertiaryGun != null) {
-    //         newTertiary = GunState.Instantiate(tertiaryGun.template);
-    //     }
-    //     return this with {
-    //         health = fullHealthAmount,
-    //         hitState = HitState.normal,
-    //         primaryGun = newPrimary,
-    //         secondaryGun = newSecondary,
-    //         tertiaryGun = newTertiary
-    //     };
-    // }
 }

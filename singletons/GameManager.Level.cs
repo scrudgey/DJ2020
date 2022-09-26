@@ -18,14 +18,18 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void LoadVRMission(VRMissionTemplate template) {
         Debug.Log("GameMananger: load VR mission");
-        LevelTemplate levelTemplate = LevelTemplate.Load("test");
+        LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
+        levelTemplate.strikeTeamTemplate = template.npc2State;
 
+        // instantiate gamedata
         gameData = GameData.TestInitialData() with {
             playerState = PlayerState.Instantiate(template.playerState),
             levelState = LevelState.Instantiate(levelTemplate),
         };
-        // instantiate state from template
+
+        // instantiate mission state from template
         VRMissionState state = VRMissionState.Instantiate(template);
+
         LoadScene(template.sceneName, () => StartVRMission(state));
     }
 
@@ -145,7 +149,6 @@ public partial class GameManager : Singleton<GameManager> {
         // connect player object to input controller
         InputController inputController = GameObject.FindObjectOfType<InputController>();
         inputController.SetInputReceivers(playerObj);
-
 
         // connect up power grids
         Debug.Log("connecting power grid...");
@@ -322,7 +325,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 poweredComponents[kvp.Key].power = kvp.Value.powered;
                 poweredComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
-                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
+                Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
             }
         }
     }
@@ -333,7 +336,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (cyberComponents.ContainsKey(kvp.Key)) {
                 cyberComponents[kvp.Key].compromised = kvp.Value.compromised;
                 cyberComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
-                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.power}");
+                Debug.Log($"transfer cyber to {kvp.Key}: {kvp.Value.enabled}");
             }
         }
     }

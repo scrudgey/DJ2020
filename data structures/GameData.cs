@@ -11,7 +11,7 @@ public record GameData {
     public int overlayIndex;
 
     public static GameData TestInitialData() {
-        LevelTemplate levelTemplate = LevelTemplate.Load("test");
+        LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
 
         return new GameData() {
             state = GameState.none,

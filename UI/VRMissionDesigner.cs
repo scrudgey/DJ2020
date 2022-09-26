@@ -1,10 +1,13 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class VRMissionDesigner : MonoBehaviour {
     static readonly List<string> SPRITESHEETS = new List<string>{
         "Jack",
@@ -16,7 +19,7 @@ public class VRMissionDesigner : MonoBehaviour {
         "VR_infiltration",
     };
 
-    public VRMissionTemplate data;
+    public VRMissionTemplate template;
     public int selectedCharacter;
     public int selectedWeapon;
 
@@ -74,9 +77,42 @@ public class VRMissionDesigner : MonoBehaviour {
         }
         tabOriginalColor = tab2.colors.normalColor;
         selectedCharacter = 1;
-        data = VRMissionTemplate.Default();
+        template = VRMissionTemplate.Default();
+        LoadVRMissionTemplate();
         OnDataChange();
     }
+    void SaveVRMissionTemplate() {
+        string path = VRMissionPath();
+        try {
+            using (FileStream fs = File.Open(path, FileMode.Create))
+            using (StreamWriter sw = new StreamWriter(fs))
+            using (JsonWriter jw = new JsonTextWriter(sw)) {
+                JsonSerializer serializer = JsonSerializer.Create();
+                serializer.Serialize(jw, template);
+            }
+            Debug.Log($"wrote to {path}");
+        }
+        catch {
+            Debug.LogError($"error writing to file: {path}");
+        }
+    }
+    void LoadVRMissionTemplate() {
+        string path = VRMissionPath();
+        Debug.Log($"loading from {path}...");
+        try {
+            // deserialize JSON directly from a file
+            using (StreamReader file = File.OpenText(path)) {
+                JsonSerializer serializer = new JsonSerializer();
+                template = (VRMissionTemplate)serializer.Deserialize(file, typeof(VRMissionTemplate));
+                Debug.Log(template.maxNumberNPCs);
+            }
+        }
+        catch {
+            Debug.LogError($"error reading file: {path}");
+        }
+    }
+
+    static public string VRMissionPath() => System.IO.Path.Join(Application.persistentDataPath, "vrmission.json");
     void InitializeWeaponPicker() {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
@@ -131,49 +167,45 @@ public class VRMissionDesigner : MonoBehaviour {
     }
 
     void OnDataChange() {
-        string sceneImagePath = $"data/scenegraphics/{data.sceneName}";
-        // string sceneImagePath = $"data/scenegraphics/VR_infiltration";
+        string sceneImagePath = $"data/scenegraphics/{template.sceneName}";
         Sprite sceneSprite = Resources.Load<Sprite>(sceneImagePath) as Sprite;
         sceneImage.sprite = sceneSprite;
-        sceneNameText.text = data.sceneName;
+        sceneNameText.text = template.sceneName;
 
-        missionTypeDropdown.value = (int)data.missionType;
-        sensitivityDropdown.value = (int)data.sensitivityLevel;
-        numberNPCInput.text = data.maxNumberNPCs.ToString();
-
-
-        // TODO: change depending on selected tab
+        missionTypeDropdown.value = (int)template.missionType;
+        sensitivityDropdown.value = (int)template.sensitivityLevel;
+        numberNPCInput.text = template.maxNumberNPCs.ToString();
 
         string legSkinName = selectedCharacter switch {
-            1 => data.playerState.legSkin,
-            2 => data.npc1State.legSkin,
-            3 => data.npc2State.legSkin,
-            _ => data.playerState.legSkin
+            1 => template.playerState.legSkin,
+            2 => template.npc1State.legSkin,
+            3 => template.npc2State.legSkin,
+            _ => template.playerState.legSkin
         };
         string torsoSkinName = selectedCharacter switch {
-            1 => data.playerState.bodySkin,
-            2 => data.npc1State.bodySkin,
-            3 => data.npc2State.bodySkin,
-            _ => data.playerState.bodySkin
+            1 => template.playerState.bodySkin,
+            2 => template.npc1State.bodySkin,
+            3 => template.npc2State.bodySkin,
+            _ => template.playerState.bodySkin
         };
 
         GunTemplate gun1 = selectedCharacter switch {
-            1 => data.playerState.primaryGun,
-            2 => data.npc1State.primaryGun,
-            3 => data.npc2State.primaryGun,
-            _ => data.playerState.primaryGun
+            1 => template.playerState.primaryGun,
+            2 => template.npc1State.primaryGun,
+            3 => template.npc2State.primaryGun,
+            _ => template.playerState.primaryGun
         };
         GunTemplate gun2 = selectedCharacter switch {
-            1 => data.playerState.secondaryGun,
-            2 => data.npc1State.secondaryGun,
-            3 => data.npc2State.secondaryGun,
-            _ => data.playerState.secondaryGun
+            1 => template.playerState.secondaryGun,
+            2 => template.npc1State.secondaryGun,
+            3 => template.npc2State.secondaryGun,
+            _ => template.playerState.secondaryGun
         };
         GunTemplate gun3 = selectedCharacter switch {
-            1 => data.playerState.tertiaryGun,
-            2 => data.npc1State.tertiaryGun,
-            3 => data.npc2State.tertiaryGun,
-            _ => data.playerState.tertiaryGun
+            1 => template.playerState.tertiaryGun,
+            2 => template.npc1State.tertiaryGun,
+            3 => template.npc2State.tertiaryGun,
+            _ => template.playerState.tertiaryGun
         };
 
         Skin legsSkin = Skin.LoadSkin(legSkinName);
@@ -183,21 +215,21 @@ public class VRMissionDesigner : MonoBehaviour {
         legsImage.sprite = legsSkin.legsIdle[Direction.down][0];
 
         healthInput.text = selectedCharacter switch {
-            1 => data.playerState.fullHealthAmount.ToString(),
-            2 => data.npc1State.fullHealthAmount.ToString(),
-            3 => data.npc2State.fullHealthAmount.ToString(),
-            _ => data.playerState.fullHealthAmount.ToString()
+            1 => template.playerState.fullHealthAmount.ToString(),
+            2 => template.npc1State.fullHealthAmount.ToString(),
+            3 => template.npc2State.fullHealthAmount.ToString(),
+            _ => template.playerState.fullHealthAmount.ToString()
         };
 
         if (selectedCharacter == 1) {
             cyberLegsSelector.SetActive(true);
             cyberEyesSelector.SetActive(true);
             tertiataryWeaponSlotSelector.SetActive(true);
-            tertiaryWeaponSelector.SetActive(data.playerState.thirdWeaponSlot);
+            tertiaryWeaponSelector.SetActive(template.playerState.thirdWeaponSlot);
 
-            cyberLegsToggle.isOn = data.playerState.cyberlegsLevel > 0;
-            cyberEyesToggle.isOn = data.playerState.cyberEyesThermal;
-            extraWeaponToggle.isOn = data.playerState.thirdWeaponSlot;
+            cyberLegsToggle.isOn = template.playerState.cyberlegsLevel > 0;
+            cyberEyesToggle.isOn = template.playerState.cyberEyesThermal;
+            extraWeaponToggle.isOn = template.playerState.thirdWeaponSlot;
 
 
             tertiaryWeaponImage.sprite = gun3.image;
@@ -214,27 +246,29 @@ public class VRMissionDesigner : MonoBehaviour {
 
         secondaryWeaponImage.sprite = gun2.image;
         secondaryWeaponCaption.text = gun2.name;
+
+        SaveVRMissionTemplate();
     }
 
     // scene controls
     public void ScenePreviousCallback() {
-        data.sceneName = PreviousInList(SCENES, data.sceneName);
+        template.sceneName = PreviousInList(SCENES, template.sceneName);
         OnDataChange();
     }
     public void SceneNextCallback() {
-        data.sceneName = NextInList(SCENES, data.sceneName);
+        template.sceneName = NextInList(SCENES, template.sceneName);
         OnDataChange();
     }
     public void MissionTypeCallback(TMP_Dropdown dropdown) {
-        data.missionType = (VRMissionType)dropdown.value;
+        template.missionType = (VRMissionType)dropdown.value;
         OnDataChange();
     }
     public void SensitivityCallback(TMP_Dropdown dropdown) {
-        data.sensitivityLevel = (SensitivityLevel)dropdown.value;
+        template.sensitivityLevel = (SensitivityLevel)dropdown.value;
         OnDataChange();
     }
     public void NumberEnemiesCallback(TMP_InputField inputField) {
-        data.maxNumberNPCs = int.Parse(inputField.text);
+        template.maxNumberNPCs = int.Parse(inputField.text);
         OnDataChange();
     }
 
@@ -328,51 +362,51 @@ public class VRMissionDesigner : MonoBehaviour {
     // skin controls
     public void SkinHeadPrevious() {
         // TODO: handle separate head sheet
-        data.playerState.bodySkin = PreviousInList(SPRITESHEETS, data.playerState.bodySkin);
+        template.playerState.bodySkin = PreviousInList(SPRITESHEETS, template.playerState.bodySkin);
         OnDataChange();
     }
     public void SkinHeadNext() {
         // TODO: handle separate head sheet
-        data.playerState.bodySkin = NextInList(SPRITESHEETS, data.playerState.bodySkin);
+        template.playerState.bodySkin = NextInList(SPRITESHEETS, template.playerState.bodySkin);
         OnDataChange();
     }
     public void SkinTorsoPrevious() {
-        data.playerState.bodySkin = PreviousInList(SPRITESHEETS, data.playerState.bodySkin);
+        template.playerState.bodySkin = PreviousInList(SPRITESHEETS, template.playerState.bodySkin);
         OnDataChange();
     }
     public void SkinTorsoNext() {
-        data.playerState.bodySkin = NextInList(SPRITESHEETS, data.playerState.bodySkin);
+        template.playerState.bodySkin = NextInList(SPRITESHEETS, template.playerState.bodySkin);
         OnDataChange();
     }
     public void SkinLegsPrevious() {
-        data.playerState.legSkin = PreviousInList(SPRITESHEETS, data.playerState.legSkin);
+        template.playerState.legSkin = PreviousInList(SPRITESHEETS, template.playerState.legSkin);
         OnDataChange();
     }
     public void SkinLegsNext() {
-        data.playerState.legSkin = NextInList(SPRITESHEETS, data.playerState.legSkin);
+        template.playerState.legSkin = NextInList(SPRITESHEETS, template.playerState.legSkin);
         OnDataChange();
     }
 
     // stat callbacks
     public void HealthCallback(TMP_InputField inputField) {
         if (selectedCharacter == 1) {
-            data.playerState.fullHealthAmount = float.Parse(inputField.text);
+            template.playerState.fullHealthAmount = float.Parse(inputField.text);
         } else if (selectedCharacter == 2) {
-            data.npc1State.fullHealthAmount = float.Parse(inputField.text);
+            template.npc1State.fullHealthAmount = float.Parse(inputField.text);
         } else if (selectedCharacter == 3) {
-            data.npc2State.fullHealthAmount = float.Parse(inputField.text);
+            template.npc2State.fullHealthAmount = float.Parse(inputField.text);
         }
     }
     public void CyberLegsCallback(Toggle toggle) {
-        data.playerState.cyberlegsLevel = toggle.isOn ? 1 : 0;
+        template.playerState.cyberlegsLevel = toggle.isOn ? 1 : 0;
         OnDataChange();
     }
     public void CyberEyesCallback(Toggle toggle) {
-        data.playerState.cyberEyesThermal = toggle.isOn;
+        template.playerState.cyberEyesThermal = toggle.isOn;
         OnDataChange();
     }
     public void WeaponSlotCallback(Toggle toggle) {
-        data.playerState.thirdWeaponSlot = toggle.isOn;
+        template.playerState.thirdWeaponSlot = toggle.isOn;
         OnDataChange();
     }
 
@@ -429,10 +463,10 @@ public class VRMissionDesigner : MonoBehaviour {
 
     public void WeaponPickerCallback(WeaponPickerHandler handler) {
         IGunHandlerTemplate state = selectedCharacter switch {
-            1 => data.playerState,
-            2 => data.npc1State,
-            3 => data.npc2State,
-            _ => data.playerState
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
         };
         switch (selectedWeapon) {
             case 1:
@@ -451,9 +485,6 @@ public class VRMissionDesigner : MonoBehaviour {
     }
 
     public void StartMissionCallback() {
-        data.playerState.health = data.playerState.fullHealthAmount;
-        data.npc1State.health = data.npc1State.fullHealthAmount;
-        data.npc2State.health = data.npc2State.fullHealthAmount;
-        GameManager.I.LoadVRMission(data);
+        GameManager.I.LoadVRMission(template);
     }
 }

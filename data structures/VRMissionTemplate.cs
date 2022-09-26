@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using UnityEngine;
 
 [System.Serializable]
@@ -8,8 +9,13 @@ public record VRMissionTemplate {
     public int maxNumberNPCs;
     public int numberConcurrentNPCs;
     public PlayerTemplate playerState;
+
+    [JsonConverter(typeof(NPCTemplateJsonConverter))]
     public NPCTemplate npc1State;
+
+    [JsonConverter(typeof(NPCTemplateJsonConverter))]
     public NPCTemplate npc2State;
+
     public static VRMissionTemplate Default() => new VRMissionTemplate {
         sceneName = "VR_infiltration",
         missionType = VRMissionType.hunt,

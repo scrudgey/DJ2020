@@ -44,7 +44,7 @@ public class GunTemplate : ScriptableObject {
     public GameObject shellCasing;
     public GameObject magazine;
     public static GunTemplate Load(string name) {
-        return ScriptableObject.Instantiate(Resources.Load($"data/guns/{name}") as GunTemplate);
+        return Resources.Load($"data/guns/{name}") as GunTemplate;
     }
     public float getBaseDamage() {
         return Random.Range(baseDamage.low, baseDamage.high);

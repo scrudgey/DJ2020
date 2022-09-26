@@ -927,6 +927,18 @@ proposed alarm system
 
 
 
+
+moral of the story: use ScriptableObject.Instantiate very sparingly, because it will break references when 
+serializing / deserializing.
+use it only when you are sure you will not serialize!
+if you will serialize, then write a custom JsonConverter.
+if you want to make changes to the template, then you should be using a State class with a delta.
+
+        // StringBuilder sb = new StringBuilder();
+        // StringWriter sw = new StringWriter(sb);
+        // JsonTextReader reader = new JsonTextReader(new StringReader(jsonOut));
+
+
 * redesign data structure so it can generalize to multiple skins
 * make it easier to select the next torso sprite (spritesheet parameter?)
 * sprite data: 
@@ -1264,6 +1276,10 @@ proposed alarm system
 * multiple weapons
 * proper weapon names
 * better weapon graphics
+* proper playerstate template / delta split.
+* bugged gun display
+* save VR mission between runs
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1420,6 +1436,8 @@ better shotgun
 better shoot inaccuracy
 title screen logo
 title screen animations
+playertemplate / playerstate is still a little weird.
+VRmissionTemplate -> LevelTemplate is incomplete.
 
 1. corspe graphic bugged
 death graphics for all skins
@@ -1434,10 +1452,7 @@ over the shoulder:
         camera is located over the shoulder and always looks down-barrel toward where the cursor points
     to prevent being blocked around corners, move in close to player
 
-* proper playerstate template / delta split.
-* bugged gun display
 
-save VR mission between runs
 configurable spawn interval
 selectable level alarm
 set weapon to none button
@@ -1445,3 +1460,6 @@ set weapon to none button
 interface sounds
 red screen edge flash when hit
 UI display something about victory conditions
+strike team numbers not resetting on retry?
+
+gun HUD
