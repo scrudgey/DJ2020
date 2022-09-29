@@ -94,7 +94,7 @@ public class VRMissionDesigner : MonoBehaviour {
                 JsonSerializer serializer = JsonSerializer.Create();
                 serializer.Serialize(jw, template);
             }
-            Debug.Log($"wrote to {path}");
+            // Debug.Log($"wrote to {path}");
         }
         catch {
             Debug.LogError($"error writing to file: {path}");
@@ -237,9 +237,14 @@ public class VRMissionDesigner : MonoBehaviour {
             cyberEyesToggle.isOn = template.playerState.cyberEyesThermal;
             extraWeaponToggle.isOn = template.playerState.thirdWeaponSlot;
 
+            if (gun3 != null) {
 
-            tertiaryWeaponImage.sprite = gun3.image;
-            tertiaryWeaponCaption.text = gun3.name;
+                tertiaryWeaponImage.sprite = gun3.image;
+                tertiaryWeaponCaption.text = gun3.name;
+            } else {
+                tertiaryWeaponImage.sprite = null;
+                tertiaryWeaponCaption.text = "None";
+            }
         } else {
             tertiaryWeaponSelector.SetActive(false);
             cyberLegsSelector.SetActive(false);
@@ -247,11 +252,21 @@ public class VRMissionDesigner : MonoBehaviour {
             tertiataryWeaponSlotSelector.SetActive(false);
         }
 
-        primaryWeaponImage.sprite = gun1.image;
-        primaryWeaponCaption.text = gun1.name;
+        if (gun1 != null) {
+            primaryWeaponImage.sprite = gun1.image;
+            primaryWeaponCaption.text = gun1.name;
+        } else {
+            primaryWeaponImage.sprite = null;
+            primaryWeaponCaption.text = "None";
+        }
 
-        secondaryWeaponImage.sprite = gun2.image;
-        secondaryWeaponCaption.text = gun2.name;
+        if (gun2 != null) {
+            secondaryWeaponImage.sprite = gun2.image;
+            secondaryWeaponCaption.text = gun2.name;
+        } else {
+            secondaryWeaponImage.sprite = null;
+            secondaryWeaponCaption.text = "None";
+        }
 
         SaveVRMissionTemplate();
     }
@@ -476,6 +491,26 @@ public class VRMissionDesigner : MonoBehaviour {
         ColorBlock cb3 = weapon3Button.colors;
         cb3.normalColor = weaponHighlightColor;
         weapon3Button.colors = cb3;
+    }
+    public void WeaponClearCallback(int weaponIndex) {
+        IGunHandlerTemplate state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        switch (weaponIndex) {
+            case 1:
+                state.primaryGun = null;
+                break;
+            case 2:
+                state.secondaryGun = null;
+                break;
+            case 3:
+                state.tertiaryGun = null;
+                break;
+        }
+        OnDataChange();
     }
 
     public void WeaponPickerCallback(WeaponPickerHandler handler) {

@@ -43,9 +43,7 @@ public class GunState {
 
     public static GunState Instantiate(GunTemplate template) => new GunState {
         template = template,
-        delta = GunDelta.Empty() with {
-            clip = template.clipSize
-        }
+        delta = GunDelta.From(template)
     };
     public static GunState Instantiate(GunTemplate template, GunDelta delta) {
         GunState state = Instantiate(template);

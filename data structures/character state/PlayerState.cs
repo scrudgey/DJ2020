@@ -88,6 +88,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         primaryGun = GunState.Instantiate(template.primaryGun),
         secondaryGun = GunState.Instantiate(template.secondaryGun),
         tertiaryGun = GunState.Instantiate(template.tertiaryGun),
-        health = template.fullHealthAmount
+        health = template.fullHealthAmount,
+        cyberEyesThermal = template.cyberEyesThermal,
+        cyberlegsLevel = template.cyberlegsLevel,
+        thirdWeaponSlot = template.thirdWeaponSlot
     };
 }

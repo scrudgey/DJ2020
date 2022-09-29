@@ -1434,6 +1434,7 @@ damage result addition is weird
 prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
 corpse can be shot / exploded
+VRmissionTemplate -> LevelTemplate is incomplete.
 
 
 * corspe graphic bugged
@@ -1441,26 +1442,27 @@ corpse can be shot / exploded
 
 
 bigger level
-better shotgun
 better shoot inaccuracy
 title screen logo
 title screen animations
 playertemplate / playerstate is still a little weird.
-VRmissionTemplate -> LevelTemplate is incomplete.
 
 show some sort of gun stats in VR mission thing
 * selectable level alarm
-set weapon to none button
+* set weapon to none button
 interface sounds
 red screen edge flash when hit
-UI display something about victory conditions
 NPC pool too small or something.
 broken cybereyes
 spawn effect
+when alarm is disabled, don't let laser thing trigger it?
+    or least, alarm can trigger, but no reinforcements
+save data with null weapon
 
 new missions
     a mission mode about stealth
     kill x in y time, continual respawning
+    UI display something about victory conditions
 
 graphics
     thermal goggles icon
@@ -1474,6 +1476,7 @@ aim mode
 make sure the overlays are working as intended.
 figure out graph load order issues once and for all
 cursor on title screen
+better shotgun
 
 over the shoulder: 
     don't swap sides (unless at the extreme edge of the screen? even still, probably not?).

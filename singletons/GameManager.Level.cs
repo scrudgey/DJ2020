@@ -126,6 +126,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         Debug.Log($"on focus changed: {focus}");
         OnFocusChanged?.Invoke(focus);
+        OnEyeVisibilityChange?.Invoke(gameData.playerState);
     }
     void ClearSceneData() {
         poweredComponents = new Dictionary<string, PoweredComponent>();
@@ -143,6 +144,7 @@ public partial class GameManager : Singleton<GameManager> {
         // spawn player object
         GameObject playerObj = SpawnPlayer(gameData.playerState);
         SetFocus(playerObj);
+
 
         // TODO: spawn clearsighter if necessary
 

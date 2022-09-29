@@ -6,7 +6,15 @@ public record GunDelta {
     public int chamber;
     public float cooldownTimer;
 
-
+    public static GunDelta From(GunTemplate template) {
+        if (template != null) {
+            return GunDelta.Empty() with {
+                clip = template.clipSize
+            };
+        } else {
+            return GunDelta.Empty();
+        }
+    }
     public bool CanShoot() {
         // check cooldown, clip, chamber
         return chamber > 0;
