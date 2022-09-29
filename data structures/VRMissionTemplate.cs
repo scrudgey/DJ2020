@@ -7,9 +7,10 @@ public record VRMissionTemplate {
     public VRMissionType missionType;
     public SensitivityLevel sensitivityLevel;
     public int maxNumberNPCs;
+    public float NPCspawnInterval = 5f;
     public int numberConcurrentNPCs;
     public PlayerTemplate playerState;
-
+    public bool alarmHQEnabled;
     [JsonConverter(typeof(NPCTemplateJsonConverter))]
     public NPCTemplate npc1State;
 
@@ -21,6 +22,7 @@ public record VRMissionTemplate {
         missionType = VRMissionType.hunt,
         sensitivityLevel = SensitivityLevel.restrictedProperty,
         maxNumberNPCs = 10,
+        NPCspawnInterval = 5,
         numberConcurrentNPCs = 3,
         playerState = PlayerTemplate.Default(),
         npc1State = ScriptableObject.Instantiate(Resources.Load("data/npc/guard1") as NPCTemplate),

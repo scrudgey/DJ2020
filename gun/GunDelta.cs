@@ -16,7 +16,7 @@ public record GunDelta {
     }
 
     public bool CanRack() {
-        return clip > 0;
+        return clip > 0 && chamber == 0;
     }
     public void Update() {
         if (cooldownTimer > 0) {

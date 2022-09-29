@@ -34,6 +34,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public CursorData currentTargetData;
     public Collider lockedOnCollider;
     public Vector3 lockedOnPoint;
+    public bool isShooting;
+    public bool isSwitchingWeapon;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious
@@ -206,6 +208,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             // EndShoot(); maybe?
             return;
         }
+        isShooting = true;
 
         // update state
         gunInstance.Shoot();
@@ -296,6 +299,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             emitShell = false;
             DoEmitShell();
         }
+        isShooting = false;
+        isSwitchingWeapon = false;
     }
     public void EmitMagazine() {
         GameObject mag = GameObject.Instantiate(
@@ -348,6 +353,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     private void SwitchGun(GunState instance) {
         if (instance == null || instance == gunInstance)
             return;
+        isSwitchingWeapon = true;
+
         gunInstance = instance;
 
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
@@ -360,6 +367,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void Holster() {
+        isSwitchingWeapon = true;
         gunInstance = null;
         OnValueChanged?.Invoke(this);
         if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {

@@ -1279,7 +1279,23 @@ if you want to make changes to the template, then you should be using a State cl
 * proper playerstate template / delta split.
 * bugged gun display
 * save VR mission between runs
-
+* gun HUD
+    * ammo display
+        * it's a must that bullets slide into place.
+        * also, spent casings fly off
+* should be emptying from chamber
+* lcd background 88/88 when pistol is 7/8
+* bottom row zombie ammo? disabling the bottom row stops all the coroutines on the thing
+* lerp out the leftmost ammo, lerp in the chambered ammo
+* if on bottom rack, lerp out far right of bottom rack;
+* configurable spawn interval
+* don't eject shell when just racking gun
+* don't eject shell when changing gun
+* eject shell casing, not bullet
+* display different ammo types
+* interface for designing multiple VR scenarios
+    * save / configurable VR mission
+    * respawn interval 
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1335,8 +1351,6 @@ nice to have / future goals:
 deep save system:
     serialize the complete level state
 
-
-
 refactor clearsighter
     clearsight InvokeRepeating
     clearsight OverlapSphereNonAlloc
@@ -1374,7 +1388,7 @@ graphical embellishments
     reflective puddle
 
 UI:
-    display different UI when in aim mode
+    display different UI when in aim mode?
     UI: gun wireframe in lower-right corner.
     blink cursor when reaching maximum aim
     larger mouse cursor, with color
@@ -1421,17 +1435,12 @@ prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
 corpse can be shot / exploded
 
-graphics
-    thermal goggles icon
-    gibs from explosions
 
-interface for designing multiple VR scenarios
-    save / configurable VR mission
-    time limit 
-    respawn interval 
+* corspe graphic bugged
+* change ammo pip image when switching guns
+
 
 bigger level
-other mission types
 better shotgun
 better shoot inaccuracy
 title screen logo
@@ -1439,27 +1448,35 @@ title screen animations
 playertemplate / playerstate is still a little weird.
 VRmissionTemplate -> LevelTemplate is incomplete.
 
-1. corspe graphic bugged
-death graphics for all skins
-2. clearsighter
-4. aim mode
-figure out graph load order issues once and for all
 show some sort of gun stats in VR mission thing
+selectable level alarm
+set weapon to none button
+interface sounds
+red screen edge flash when hit
+UI display something about victory conditions
+NPC pool too small or something.
+broken cybereyes
+spawn effect
+
+new missions
+    a mission mode about stealth
+    kill x in y time, continual respawning
+
+graphics
+    thermal goggles icon
+    gibs from explosions
+    death graphics for all skins
+    redraw item graphics
+
+essentials for distributable demo:
+clearsighter
+aim mode
+make sure the overlays are working as intended.
+figure out graph load order issues once and for all
 
 over the shoulder: 
     don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
     orient more tightly toward the cursor.
         camera is located over the shoulder and always looks down-barrel toward where the cursor points
     to prevent being blocked around corners, move in close to player
-
-
-configurable spawn interval
-selectable level alarm
-set weapon to none button
-
-interface sounds
-red screen edge flash when hit
-UI display something about victory conditions
-strike team numbers not resetting on retry?
-
-gun HUD
+    screen scroll and screen flip both happen at the same time, making it hard to control

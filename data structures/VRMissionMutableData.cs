@@ -4,7 +4,6 @@ public record VRMissionDelta {
     public int numberTotalNPCs;
     public int numberLiveNPCs;
     public int numberNPCsKilled;
-    public float NPCspawnInterval = 5f;
     public float secondsPlayed = 0f;
 
     public static VRMissionDelta Empty() {
@@ -12,7 +11,6 @@ public record VRMissionDelta {
             numberTotalNPCs = 0,
             numberLiveNPCs = 0,
             numberNPCsKilled = 0,
-            NPCspawnInterval = 5,
             secondsPlayed = 0f,
             status = Status.inProgress
         };

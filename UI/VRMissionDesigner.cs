@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using TMPro;
@@ -29,6 +30,9 @@ public class VRMissionDesigner : MonoBehaviour {
     public TMP_Dropdown missionTypeDropdown;
     public TMP_Dropdown sensitivityDropdown;
     public TMP_InputField numberNPCInput;
+    public TMP_InputField spawnIntervalInput;
+    public Toggle alarmHQSelector;
+
     [Header("character controls")]
     public TextMeshProUGUI characterTitle;
     public Image headImage;
@@ -175,6 +179,8 @@ public class VRMissionDesigner : MonoBehaviour {
         missionTypeDropdown.value = (int)template.missionType;
         sensitivityDropdown.value = (int)template.sensitivityLevel;
         numberNPCInput.text = template.maxNumberNPCs.ToString();
+        spawnIntervalInput.text = template.NPCspawnInterval.ToString();
+        alarmHQSelector.isOn = template.alarmHQEnabled;
 
         string legSkinName = selectedCharacter switch {
             1 => template.playerState.legSkin,
@@ -268,9 +274,16 @@ public class VRMissionDesigner : MonoBehaviour {
         OnDataChange();
     }
     public void NumberEnemiesCallback(TMP_InputField inputField) {
+        inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
         template.maxNumberNPCs = int.Parse(inputField.text);
         OnDataChange();
     }
+    public void SpawnIntervalCallback(TMP_InputField inputField) {
+        inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
+        template.NPCspawnInterval = float.Parse(inputField.text);
+        OnDataChange();
+    }
+
 
     // tab controls
     public void TabPlayerCallback() {
@@ -396,6 +409,10 @@ public class VRMissionDesigner : MonoBehaviour {
         } else if (selectedCharacter == 3) {
             template.npc2State.fullHealthAmount = float.Parse(inputField.text);
         }
+    }
+    public void AlarmHQCallback(Toggle toggle) {
+        template.alarmHQEnabled = toggle.isOn;
+        OnDataChange();
     }
     public void CyberLegsCallback(Toggle toggle) {
         template.playerState.cyberlegsLevel = toggle.isOn ? 1 : 0;

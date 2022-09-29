@@ -15,6 +15,10 @@ public class VRMissionController : MonoBehaviour {
         this.data = state;
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
+
+        if (!state.template.alarmHQEnabled) {
+
+        }
         startTime = Time.time;
     }
     void TransitionToState(State newState) {
@@ -61,8 +65,8 @@ public class VRMissionController : MonoBehaviour {
     void Update() {
         if (data.data.numberTotalNPCs < data.template.maxNumberNPCs && data.data.numberLiveNPCs < data.template.numberConcurrentNPCs) {
             NPCspawnTimer += Time.deltaTime;
-            if (NPCspawnTimer > data.data.NPCspawnInterval) {
-                NPCspawnTimer -= data.data.NPCspawnInterval;
+            if (NPCspawnTimer > data.template.NPCspawnInterval) {
+                NPCspawnTimer -= data.template.NPCspawnInterval;
                 SpawnNPC();
             }
         } else {
@@ -81,7 +85,6 @@ public class VRMissionController : MonoBehaviour {
         npcController.OnCharacterDead += HandleNPCDead;
         data.data.numberTotalNPCs += 1;
         data.data.numberLiveNPCs += 1;
-        Debug.Log($"spawn npc {data.data.numberLiveNPCs} {data.data.numberTotalNPCs} {data.data.numberNPCsKilled}");
     }
 
     void HandleNPCDead(CharacterController npc) {
