@@ -167,7 +167,6 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("connecting alarm grid...");
         foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
             alarmComponents[component.idn] = component;
-
         }
 
         RefreshPowerGraph();

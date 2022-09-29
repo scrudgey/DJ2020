@@ -42,9 +42,16 @@ public partial class GameManager : Singleton<GameManager> {
         return false;
     }
     public AlarmHQTerminal levelHQTerminal() => alarmComponents.Values
-            .Where(node => node != null && node is AlarmHQTerminal)
-            .Select(component => (AlarmHQTerminal)component)
-            .First();
+                    .Where(node => node != null & node is AlarmHQTerminal)
+                    .Select(component => (AlarmHQTerminal)component)
+                    .FirstOrDefault();
+
+    public void RemoveAlarmNode(string idn) {
+        AlarmComponent component = GetAlarmComponent(idn);
+        alarmComponents.Remove(idn);
+        Destroy(component.gameObject);
+        Debug.Log($"removing alarm node {idn}");
+    }
 
     public void DeactivateAlarm() {
         if (applicationIsQuitting)

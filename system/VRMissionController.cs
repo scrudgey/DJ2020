@@ -17,7 +17,10 @@ public class VRMissionController : MonoBehaviour {
         playerController.OnCharacterDead += HandlePlayerDead;
 
         if (!state.template.alarmHQEnabled) {
-
+            AlarmHQTerminal levelHQTerminal = GameManager.I.levelHQTerminal();
+            if (levelHQTerminal != null) {
+                GameManager.I.RemoveAlarmNode(levelHQTerminal.idn);
+            }
         }
         startTime = Time.time;
     }

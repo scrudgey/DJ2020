@@ -42,7 +42,6 @@ namespace UI {
                     Destroy(child.gameObject);
                 }
             if (chamberPipContainer != null) {
-                Debug.Log("clearing pip chamber container)");
                 foreach (Transform child in chamberPipContainer) {
                     Destroy(child.gameObject);
                 }
@@ -79,10 +78,7 @@ namespace UI {
         }
 
         void RectifyPips(int clip, int chamber, bool createSpentPip) {
-            Debug.Log($"{chamberPipContainer.childCount} {chamber}");
             while (chamberPipContainer.childCount > chamber && chamberPipContainer.childCount > 0) {
-                Debug.Log("removing chamber pip");
-
                 Transform child = chamberPipContainer.GetChild(0);
                 Destroy(child.gameObject);
                 child.SetParent(null, true);
@@ -90,9 +86,7 @@ namespace UI {
                 if (createSpentPip)
                     CreateSpentPip();
             }
-            Debug.Log($"{chamberPipContainer.childCount} {chamber}");
             while (chamberPipContainer.childCount < chamber) {
-                Debug.Log("creating chamber pip");
                 GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
                 AmmoPip pip = newPip.GetComponent<AmmoPip>();
                 pip.SetSprite(target.gunInstance.template.type);

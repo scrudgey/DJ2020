@@ -1449,7 +1449,7 @@ playertemplate / playerstate is still a little weird.
 VRmissionTemplate -> LevelTemplate is incomplete.
 
 show some sort of gun stats in VR mission thing
-selectable level alarm
+* selectable level alarm
 set weapon to none button
 interface sounds
 red screen edge flash when hit
@@ -1473,6 +1473,7 @@ clearsighter
 aim mode
 make sure the overlays are working as intended.
 figure out graph load order issues once and for all
+cursor on title screen
 
 over the shoulder: 
     don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
