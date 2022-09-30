@@ -4,9 +4,16 @@ using KinematicCharacterController;
 using UnityEngine;
 public class NPCSpawnPoint : MonoBehaviour {
     public bool isStrikeTeamSpawn;
+    public GameObject spawnEffect;
+    PrefabPool effectPool;
+    PrefabPool NPCPool;
+    void Start() {
+        NPCPool = PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 10);
+        effectPool = PoolManager.I.RegisterPool(spawnEffect, poolSize: 5);
+    }
     public GameObject SpawnNPC(NPCTemplate template) {
-        PrefabPool pool = PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 6);
-        GameObject npc = pool.GetObject(transform.position);
+        effectPool.GetObject(transform.position);
+        GameObject npc = NPCPool.GetObject(transform.position);
 
         PatrolRoute route = GameObject.FindObjectOfType<PatrolRoute>();
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();

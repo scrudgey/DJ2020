@@ -58,7 +58,7 @@ public partial class GameManager : Singleton<GameManager> {
     int numberFrames;
     public bool showDebugRays;
     public void Start() {
-        cursorType = CursorType.gun;
+        cursorType = CursorType.pointer;
         showDebugRays = true;
         showConsole.action.performed += HandleShowConsleAction;
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;

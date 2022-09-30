@@ -22,6 +22,8 @@ public class OverlayHandler : MonoBehaviour {
     public UIColorSet powerOverlayColors;
     public UIColorSet cyberOverlayColors;
     public UIColorSet alarmOverlayColors;
+    public AudioClip[] overlayButtonSounds;
+    public AudioSource audioSource;
     public Camera cam {
         get { return _cam; }
         set {
@@ -116,6 +118,7 @@ public class OverlayHandler : MonoBehaviour {
         }
         OverlayType newOverlay = (OverlayType)overlayIndex;
         GameManager.I.SetOverlay(newOverlay);
+        Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds);
     }
     public void PreviousOverlayButton() {
         int overlayIndex = (int)GameManager.I.activeOverlayType - 1;
@@ -124,5 +127,6 @@ public class OverlayHandler : MonoBehaviour {
         }
         OverlayType newOverlay = (OverlayType)overlayIndex;
         GameManager.I.SetOverlay(newOverlay);
+        Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds, randomPitchWidth: 0.05f);
     }
 }

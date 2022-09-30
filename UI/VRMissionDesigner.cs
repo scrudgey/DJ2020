@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -74,6 +75,11 @@ public class VRMissionDesigner : MonoBehaviour {
     public Color weaponHighlightColor;
     public Color weaponDefaultColor;
     Color tabOriginalColor;
+    [Header("sounds")]
+    public AudioSource audioSource;
+    public AudioClip[] tabSounds;
+    public AudioClip[] pickerCallbackSounds;
+    public AudioClip[] weaponSelectorSounds;
 
     void Start() {
         foreach (Transform child in pickerContainer) {
@@ -96,23 +102,22 @@ public class VRMissionDesigner : MonoBehaviour {
             }
             // Debug.Log($"wrote to {path}");
         }
-        catch {
-            Debug.LogError($"error writing to file: {path}");
+        catch (Exception e) {
+            Debug.LogError($"error writing to file: {path} {e}");
         }
     }
     void LoadVRMissionTemplate() {
         string path = VRMissionPath();
-        Debug.Log($"loading from {path}...");
         try {
             // deserialize JSON directly from a file
             using (StreamReader file = File.OpenText(path)) {
                 JsonSerializer serializer = new JsonSerializer();
                 template = (VRMissionTemplate)serializer.Deserialize(file, typeof(VRMissionTemplate));
-                Debug.Log(template.maxNumberNPCs);
+                Debug.Log($"successfully loaded VR mission template from {path}");
             }
         }
-        catch {
-            Debug.LogError($"error reading file: {path}");
+        catch (Exception e) {
+            Debug.LogError($"error reading VR template file: {path} {e}");
         }
     }
 
@@ -324,6 +329,7 @@ public class VRMissionDesigner : MonoBehaviour {
         cb3.normalColor = tabOriginalColor;
         cb3.highlightedColor = tabOriginalColor;
         tab3.colors = cb3;
+        Toolbox.RandomizeOneShot(audioSource, tabSounds, randomPitchWidth: 0.05f);
     }
     public void TabNPC1Callback() {
         selectedCharacter = 2;
@@ -347,6 +353,8 @@ public class VRMissionDesigner : MonoBehaviour {
         cb3.normalColor = tabOriginalColor;
         cb3.highlightedColor = tabOriginalColor;
         tab3.colors = cb3;
+        Toolbox.RandomizeOneShot(audioSource, tabSounds, randomPitchWidth: 0.05f);
+
     }
     public void TabNPC2Callback() {
         selectedCharacter = 3;
@@ -370,6 +378,7 @@ public class VRMissionDesigner : MonoBehaviour {
         cb3.normalColor = bodyMainColor;
         cb3.highlightedColor = bodyMainColor;
         tab3.colors = cb3;
+        Toolbox.RandomizeOneShot(audioSource, tabSounds, randomPitchWidth: 0.05f);
     }
 
 
@@ -459,6 +468,8 @@ public class VRMissionDesigner : MonoBehaviour {
         ColorBlock cb3 = weapon3Button.colors;
         cb3.normalColor = weaponDefaultColor;
         weapon3Button.colors = cb3;
+        Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds, randomPitchWidth: 0.05f);
+
     }
     public void Weapon2Callback() {
         selectedWeapon = 2;
@@ -475,6 +486,8 @@ public class VRMissionDesigner : MonoBehaviour {
         ColorBlock cb3 = weapon3Button.colors;
         cb3.normalColor = weaponDefaultColor;
         weapon3Button.colors = cb3;
+        Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds, randomPitchWidth: 0.05f);
+
     }
     public void Weapon3Callback() {
         selectedWeapon = 3;
@@ -491,6 +504,7 @@ public class VRMissionDesigner : MonoBehaviour {
         ColorBlock cb3 = weapon3Button.colors;
         cb3.normalColor = weaponHighlightColor;
         weapon3Button.colors = cb3;
+        Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds, randomPitchWidth: 0.05f);
     }
     public void WeaponClearCallback(int weaponIndex) {
         IGunHandlerTemplate state = selectedCharacter switch {
@@ -533,6 +547,7 @@ public class VRMissionDesigner : MonoBehaviour {
             default:
                 break;
         }
+        Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds, randomPitchWidth: 0.05f);
         OnDataChange();
     }
 

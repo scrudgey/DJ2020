@@ -1296,6 +1296,13 @@ if you want to make changes to the template, then you should be using a State cl
 * interface for designing multiple VR scenarios
     * save / configurable VR mission
     * respawn interval 
+* corspe graphic bugged
+* change ammo pip image when switching guns
+* selectable level alarm
+* set weapon to none button
+* broken cybereyes
+* when alarm is disabled, don't let laser thing trigger it?
+* save data with null weapon
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1435,48 +1442,32 @@ prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
 corpse can be shot / exploded
 VRmissionTemplate -> LevelTemplate is incomplete.
+playertemplate / playerstate is still a little weird.
 
-
-* corspe graphic bugged
-* change ammo pip image when switching guns
+* interface sounds
+* cursor on title screen
+* don't mouseover text
+* spawn effect
 
 
 bigger level
-better shoot inaccuracy
 title screen logo
 title screen animations
-playertemplate / playerstate is still a little weird.
 
 show some sort of gun stats in VR mission thing
-* selectable level alarm
-* set weapon to none button
-interface sounds
-red screen edge flash when hit
-NPC pool too small or something.
-broken cybereyes
-spawn effect
-when alarm is disabled, don't let laser thing trigger it?
-    or least, alarm can trigger, but no reinforcements
-save data with null weapon
-
-new missions
-    a mission mode about stealth
-    kill x in y time, continual respawning
-    UI display something about victory conditions
-
-graphics
-    thermal goggles icon
-    gibs from explosions
-    death graphics for all skins
-    redraw item graphics
-
-essentials for distributable demo:
+    player stats
 clearsighter
-aim mode
 make sure the overlays are working as intended.
 figure out graph load order issues once and for all
-cursor on title screen
+
+NPC pool too small or something
+    PoolManager.I.RegisterPool
+configurable number concurrent npcs
 better shotgun
+better shoot inaccuracy
+    right now it jumps to max as soon as you shoot?
+red screen edge flash when hit
+overlay colors
 
 over the shoulder: 
     don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
@@ -1484,3 +1475,15 @@ over the shoulder:
         camera is located over the shoulder and always looks down-barrel toward where the cursor points
     to prevent being blocked around corners, move in close to player
     screen scroll and screen flip both happen at the same time, making it hard to control
+
+new missions
+    a mission mode about stealth
+    kill x in y time, continual respawning
+    UI display something about victory conditions
+        kill count, timer
+
+graphics
+    thermal goggles icon
+    gibs from explosions
+    death graphics for all skins
+    redraw item graphics

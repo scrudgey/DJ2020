@@ -165,7 +165,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void UpdateAlarm() {
         if (gameData.levelState.anyAlarmActive()) {
-            if (strikeTeamSpawnPoint != null) { // TODO: check level data 
+            if (strikeTeamSpawnPoint != null && levelHQTerminal() != null) { // TODO: check level data 
                 UpdateStrikeTeamSpawn();
             }
             alarmSoundTimer += Time.deltaTime;
