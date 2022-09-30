@@ -31,6 +31,7 @@ public class VRMissionDesigner : MonoBehaviour {
     public TMP_Dropdown missionTypeDropdown;
     public TMP_Dropdown sensitivityDropdown;
     public TMP_InputField numberNPCInput;
+    public TMP_InputField concurrentNPCInput;
     public TMP_InputField spawnIntervalInput;
     public Toggle alarmHQSelector;
 
@@ -184,6 +185,7 @@ public class VRMissionDesigner : MonoBehaviour {
         missionTypeDropdown.value = (int)template.missionType;
         sensitivityDropdown.value = (int)template.sensitivityLevel;
         numberNPCInput.text = template.maxNumberNPCs.ToString();
+        concurrentNPCInput.text = template.numberConcurrentNPCs.ToString();
         spawnIntervalInput.text = template.NPCspawnInterval.ToString();
         alarmHQSelector.isOn = template.alarmHQEnabled;
 
@@ -296,6 +298,11 @@ public class VRMissionDesigner : MonoBehaviour {
     public void NumberEnemiesCallback(TMP_InputField inputField) {
         inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
         template.maxNumberNPCs = int.Parse(inputField.text);
+        OnDataChange();
+    }
+    public void NumberConcurrentEnemiesCallback(TMP_InputField inputField) {
+        inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
+        template.numberConcurrentNPCs = int.Parse(inputField.text);
         OnDataChange();
     }
     public void SpawnIntervalCallback(TMP_InputField inputField) {

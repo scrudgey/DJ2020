@@ -19,6 +19,11 @@ public partial class GameManager : Singleton<GameManager> {
     public void LoadVRMission(VRMissionTemplate template) {
         Debug.Log("GameMananger: load VR mission");
         LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
+
+        // we are modifying an instance here, not the asset on disk.
+        // we should perhaps do more to modify the level template based on the vr mission template.
+        // this means that the gamedata is not serializable.
+        // instead, NPC templates should be top level fields of levelState, and thus serializable.
         levelTemplate.strikeTeamTemplate = template.npc2State;
 
         // instantiate gamedata

@@ -16,6 +16,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
     private float hitstunCountdown;
     public float hitstunAmount = 0.1f;
     public Action<CharacterHurtable> OnValueChanged { get; set; }
+    public Action<Damage> OnDamageTaken;
     public override void Awake() {
         base.Awake();
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
@@ -27,6 +28,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             result = base.TakeDamage(damage);
         }
         OnValueChanged?.Invoke(this);
+        OnDamageTaken?.Invoke(damage);
         return result;
     }
     public DamageResult TakeBulletDamage(BulletDamage damage) {

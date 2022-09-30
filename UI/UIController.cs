@@ -23,6 +23,7 @@ public class UIController : MonoBehaviour {
     public HealthIndicatorController healthIndicatorController;
     public PlayerCalloutHandler playerCalloutHandler;
     public TextMeshProUGUI caption;
+    public HitIndicatorController hitIndicatorController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -70,6 +71,7 @@ public class UIController : MonoBehaviour {
         actionLogHandler.Bind(target);
 
         healthIndicatorController.Bind(target);
+        hitIndicatorController.Bind(target);
     }
 
     void HandleMenuChange(MenuType type) {

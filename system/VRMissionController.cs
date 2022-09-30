@@ -15,6 +15,10 @@ public class VRMissionController : MonoBehaviour {
         this.data = state;
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
+        int NPCPoolSize = state.template.numberConcurrentNPCs + GameManager.I.gameData.levelState.delta.strikeTeamMaxSize;
+        Debug.Log($"initiating NPC pool {NPCPoolSize}");
+        PoolManager.I.RegisterPool("prefabs/NPC", poolSize: NPCPoolSize);
+
 
         if (!state.template.alarmHQEnabled) {
             AlarmHQTerminal levelHQTerminal = GameManager.I.levelHQTerminal();

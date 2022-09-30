@@ -1303,6 +1303,14 @@ if you want to make changes to the template, then you should be using a State cl
 * broken cybereyes
 * when alarm is disabled, don't let laser thing trigger it?
 * save data with null weapon
+* interface sounds
+* cursor on title screen
+* don't mouseover text
+* spawn effect
+* red screen edge flash when hit
+* NPC pool too small or something
+* configurable number concurrent npcs
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1420,6 +1428,9 @@ stealth:
     NPC reacts when seeing another shooting
     stealth kill?
 
+overhauled VR mission designer
+    show some sort of gun stats
+    player stats
 
 don't clip camera through wall
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
@@ -1429,9 +1440,12 @@ aim mode could track camera better
     try to pop around a corner and aim: it doesn't work
 NPC reacts to corpses
 NPC reacts when seeing another shot
+NPC reacts to seeing another shooting
 NPC investigate routine
 NPC should look in direction of last noise
 NPC speeds a little more when pursuing player.
+NPC when an aggressive noise is heard, do a quick visibility check.
+
 DFS path finding doesn't quite work right for highlighting path
 alarm terminal triggering effects
     notify others of location
@@ -1444,30 +1458,20 @@ corpse can be shot / exploded
 VRmissionTemplate -> LevelTemplate is incomplete.
 playertemplate / playerstate is still a little weird.
 
-* interface sounds
-* cursor on title screen
-* don't mouseover text
-* spawn effect
-
-
+use RaycastCommand
+    write a custom system where all things (guns, character senses, etc) that need a lot of raycasts will queue up their casts in LateUpdate, 
+    by the next Update they will have all completed computing in the background
 bigger level
 title screen logo
 title screen animations
-
-show some sort of gun stats in VR mission thing
-    player stats
 clearsighter
 make sure the overlays are working as intended.
 figure out graph load order issues once and for all
 
-NPC pool too small or something
-    PoolManager.I.RegisterPool
-configurable number concurrent npcs
-better shotgun
 better shoot inaccuracy
     right now it jumps to max as soon as you shoot?
-red screen edge flash when hit
 overlay colors
+
 
 over the shoulder: 
     don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
@@ -1487,3 +1491,16 @@ graphics
     gibs from explosions
     death graphics for all skins
     redraw item graphics
+
+NPC pool size is max concurrent NPCS + strike team size (3)
+
+
+
+
+
+better shotgun
+    1. use a cone instead of a raycast
+        in this case, create a blast cone, and everything in it takes damage
+        damage decreases with off-axis distance
+        damage decreases with distance in general
+    2. use multiple raycasts?

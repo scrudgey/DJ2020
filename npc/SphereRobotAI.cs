@@ -37,18 +37,18 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SpaceTimePoint lastHeardPlayerPosition;
     public SpaceTimePoint lastHeardDisturbancePosition;
     Damage lastDamage;
-    public bool overrideDefaultState;
+    // public bool overrideDefaultState;
     private float footstepImpulse;
 
-    void Start() {
+    public void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
         alertHandler.Hide();
         Bind(sightCone.gameObject);
         navMeshPath = new NavMeshPath();
-        if (!overrideDefaultState) {
-            stateMachine = new SphereRobotBrain();
-            EnterDefaultState();
-        }
+        // if (!overrideDefaultState) {
+        stateMachine = new SphereRobotBrain();
+        EnterDefaultState();
+        // }
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
         }
@@ -461,6 +461,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public void OnPoolActivate() {
+        Start();
         listener = gameObject.GetComponentInChildren<Listener>();
     }
     public void OnPoolDectivate() {
@@ -478,6 +479,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         recentlySawSuspicious = Suspiciousness.normal;
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
+        characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;
 
         // TODO: reset gun state...?!?
     }

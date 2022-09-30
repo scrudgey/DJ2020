@@ -8,7 +8,6 @@ public class LevelTemplate : ScriptableObject {
     public string levelName;
     public SensitivityLevel sensitivityLevel;
     public AudioClip alarmAudioClip;
-    public int strikeTeamMaxSize;
     public float strikeTeamResponseTime;
     public NPCTemplate strikeTeamTemplate;
     public static LevelTemplate LoadAsInstance(string name) {

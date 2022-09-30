@@ -14,6 +14,7 @@ public partial class GameManager : Singleton<GameManager> {
     float strikeTeamResponseTimer = 0f;
     Vector3 locationOfLastDisturbance;
     public GameObject lastStrikeTeamMember;
+    // this should be part of level state.
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
 
@@ -62,11 +63,12 @@ public partial class GameManager : Singleton<GameManager> {
         // reset strike team 
         try {
             PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
-            gameData.levelState.template.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
+            gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         }
         finally {
 
         }
+        Debug.Log("deactivating alarm, strikeTeamCount = 0");
         strikeTeamCount = 0;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
@@ -177,7 +179,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void UpdateStrikeTeamSpawn() {
-        if (strikeTeamCount < gameData.levelState.template.strikeTeamMaxSize) {
+        if (strikeTeamCount < gameData.levelState.delta.strikeTeamMaxSize) {
             if (strikeTeamResponseTimer < gameData.levelState.template.strikeTeamResponseTime) {
                 strikeTeamResponseTimer += Time.deltaTime;
             } else {

@@ -109,7 +109,6 @@ namespace UI {
             spent.SetSprite(target.gunInstance.template.type);
             spentPip.transform.SetParent(transform, true);
         }
-        // 20 bullets per row
         void RemoveBulletPip(bool createSpentPip) {
             if (totalAmmoPips() > 15) {
                 AmmoPip pip1 = liveAmmoPipsTop[0];

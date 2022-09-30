@@ -15,6 +15,7 @@ public class LevelState {
             powerGraph = PowerGraph.LoadAll(template.levelName),
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
+            strikeTeamMaxSize = 3
         }
     };
 
