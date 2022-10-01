@@ -60,6 +60,7 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
+    bool resetMouseControl;
 
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -273,7 +274,20 @@ public class InputController : MonoBehaviour {
             GameManager.I.cursorType = CursorType.gun;
         }
 
+        if (GameManager.I.inputMode == InputMode.aim) {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            resetMouseControl = true;
+        } else {
+            if (resetMouseControl) {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                resetMouseControl = false;
+            }
+        }
+
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
 
         foreach (IInputReceiver i in inputReceivers) {
@@ -281,6 +295,7 @@ public class InputController : MonoBehaviour {
             PlayerInput characterInputs = new PlayerInput() {
                 MoveAxisForward = inputVector.y,
                 MoveAxisRight = inputVector.x,
+                mouseDelta = mouseDelta,
                 CameraRotation = OrbitCamera.isometricRotation,
                 JumpDown = jumpPressedThisFrame,
                 jumpHeld = jumpHeld,

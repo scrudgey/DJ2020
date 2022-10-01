@@ -68,7 +68,6 @@ public partial class GameManager : Singleton<GameManager> {
         finally {
 
         }
-        Debug.Log("deactivating alarm, strikeTeamCount = 0");
         strikeTeamCount = 0;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {

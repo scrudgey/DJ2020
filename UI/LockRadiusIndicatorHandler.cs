@@ -28,6 +28,10 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
     }
     override public void HandleValueChanged(GunHandler gunHandler) {
         bool uiclick = EventSystem.current.IsPointerOverGameObject();
+        // if (GameManager.I.inputMode == InputMode.aim) {
+        //     DisableCursorImage();
+        //     return;
+        // }
         if (uiclick) {
             DisableCursorImage();
             return;
@@ -85,7 +89,12 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
         cursorImage.color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
 
         // set screen position
-        cursorMaskRect.position = data.screenPosition;
+        // TODO: clean up hack
+        if (GameManager.I.inputMode == InputMode.aim) {
+            cursorMaskRect.position = data.screenPixelDimension / 2f;
+        } else {
+            cursorMaskRect.position = data.screenPosition;
+        }
 
         // determine scale
         float lockSizeLength = gunHandler.gunInstance.template.lockOnSize;

@@ -938,6 +938,14 @@ if you want to make changes to the template, then you should be using a State cl
         // StringWriter sw = new StringWriter(sb);
         // JsonTextReader reader = new JsonTextReader(new StringReader(jsonOut));
 
+shoot interval:
+    pistols should be 0.1 or lower
+    smg high: 0.15
+    limit for automatic: 0.19
+
+
+
+
 
 * redesign data structure so it can generalize to multiple skins
 * make it easier to select the next torso sprite (spritesheet parameter?)
@@ -1462,7 +1470,9 @@ use RaycastCommand
 
 * level restriction not working
 * make sure the overlays are working as intended.
-
+* gun shooting interval
+* clear suspicion data between runs
+* better shoot and move inaccuracy
 
 bigger level
 title screen logo
@@ -1472,11 +1482,18 @@ figure out graph load order issues once and for all
 
 
 over the shoulder: 
-    don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
-    orient more tightly toward the cursor.
-        camera is located over the shoulder and always looks down-barrel toward where the cursor points
-    to prevent being blocked around corners, move in close to player
-    screen scroll and screen flip both happen at the same time, making it hard to control
+    ? don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
+    ? to prevent being blocked around corners, move in close to player
+    * orient more tightly toward the cursor.
+    * hide cursor when in aim mode
+        * possibly, always reorient cursor to middle of screen
+    * fix some cursor issue around wallpress
+    don't use lock when in aim mode
+    character going all wonky during aim mode
+    leave aim mode cursor lock when victory screen
+    recoil knocks screen up
+    sway
+
 
 new missions
     a mission mode about stealth
@@ -1491,10 +1508,8 @@ graphics
     redraw item graphics
 
 
-
-* clear suspicion data between runs
-* better shoot and move inaccuracy
 when alarm is disabled, guards stand around?
 bug: npc can't seem to shoot me when close
 bug: broken superjump
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
+faster shotgun

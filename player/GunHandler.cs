@@ -32,8 +32,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public CursorData lastShootInput;
     public bool shootRequestedThisFrame;
     public CursorData currentTargetData;
-    public Collider lockedOnCollider;
-    public Vector3 lockedOnPoint;
+    // public Collider lockedOnCollider;
+    // public Vector3 lockedOnPoint;
     public bool isShooting;
     public bool isSwitchingWeapon;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
@@ -422,8 +422,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         if (HasGun()) {
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
-
-            // if priority is not set, try lock 
+            // TODO: if priority is not set, try lock 
             float lockRadius = gunInstance.template.lockOnSize;
             Collider[] others = Physics.OverlapSphere(targetPoint, lockRadius, LayerUtil.GetMask(Layer.obj))
                 .Where(collider => !collider.transform.IsChildOf(GameManager.I.playerObject.transform))
@@ -436,16 +435,11 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 if (tagData != null && tagData.targetPoint != null) {
                     targetPoint = tagData.targetPoint.position;
                 }
-                lockedOnCollider = nearestOther;
-                lockedOnPoint = targetPoint;
                 Vector2 pointPosition = characterCamera.Camera.WorldToScreenPoint(targetPoint);
                 input.Fire.cursorData.type = CursorData.TargetType.objectLock;
                 input.Fire.cursorData.screenPosition = pointPosition;
                 input.Fire.cursorData.worldPosition = targetPoint;
                 input.Fire.cursorData.targetCollider = nearestOther;
-            } else {
-                lockedOnCollider = null;
-                lockedOnPoint = Vector3.zero;
             }
 
             if (CanShoot()) {
@@ -484,7 +478,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             // inaccuracy increases faster for heavy weapons, decreases faster for lighter weapons
         }
         if (input.CrouchDown) {
-            crouchingInaccuracy = -0.5f;
+            crouchingInaccuracy = -0.15f;
         } else {
             crouchingInaccuracy = 0f;
         }

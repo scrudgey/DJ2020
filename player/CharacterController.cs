@@ -176,7 +176,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         switch (state) {
             default:
                 break;
+            case CharacterState.wallPress:
+                GameManager.I.TransitionToInputMode(InputMode.wallpressAim);
+                break;
             case CharacterState.popout:
+                GameManager.I.TransitionToInputMode(InputMode.wallpressAim);
+                break;
             case CharacterState.aim:
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
@@ -206,9 +211,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.dead:
                 break;
-            case CharacterState.wallPress:
-                GameManager.I.TransitionToInputMode(InputMode.aim);
-                break;
+
         }
     }
 
@@ -217,13 +220,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             default:
                 break;
             case CharacterState.popout:
-                // if (toState == CharacterState.wallPress) {
-                //     returnToWallPressOffset = prePopPosition - transform.position;
-                // }
-                // Motor.SetPosition(prePopPosition);
-                break;
             case CharacterState.aim:
-                GameManager.I.TransitionToInputMode(InputMode.gun);
+                if (toState != CharacterState.popout && toState != CharacterState.aim && toState != CharacterState.wallPress)
+                    GameManager.I.TransitionToInputMode(InputMode.gun);
                 break;
             case CharacterState.landStun:
                 isCrouching = true;
@@ -409,13 +408,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
 
-                if (input.Fire.cursorData.screenPositionNormalized.x > 0.9) {
-                    _inputTorque = new Vector3(0f, -0.02f, 0f);
-                } else if (input.Fire.cursorData.screenPositionNormalized.x < 0.1) {
-                    _inputTorque = new Vector3(0f, 0.02f, 0f);
-                } else {
-                    _inputTorque = Vector3.zero;
-                }
+                _inputTorque = input.mouseDelta * Time.deltaTime * 100f;
 
                 if (input.Fire.AimPressed) {
                     TransitionToState(CharacterState.normal);
@@ -613,8 +606,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
                 }
-                Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
-                currentRotation = torqueRotation * currentRotation;
+
+                Quaternion pitch = Quaternion.AngleAxis(-1f * _inputTorque.y, Motor.CharacterRight);
+                Quaternion yaw = Quaternion.AngleAxis(_inputTorque.x, Motor.CharacterUp);
+
+                // Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
+                // Quaternion torqueRotation = Quaternion.FromToRotation(Motor.CharacterForward, Motor.CharacterForward + Motor.CharacterUp * _inputTorque.y + Motor.CharacterRight * _inputTorque.x);
+                // currentRotation = torqueRotation * currentRotation;
+                currentRotation = pitch * yaw * currentRotation;
                 break;
             case CharacterState.normal:
                 if (snapToDirection != Vector3.zero) {

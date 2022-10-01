@@ -76,6 +76,10 @@ namespace UI {
                         targetPosition = Vector2.Lerp(currentPosition, targetPosition, 0.15f);
                         break;
                 }
+                // TODO: clean up this hack
+                if (GameManager.I.inputMode == InputMode.aim) {
+                    targetPosition = data.screenPixelDimension / 2f;
+                }
                 cursor.position = targetPosition;
                 currentPosition = cursor.position;
                 state = data.type;

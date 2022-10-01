@@ -367,39 +367,39 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
         Vector3 distOffset = Vector3.zero;
-        // Debug.Log($"{cursorPosition} {cursorPositionNormalized}");
-
-        input.playerDirection.y = 0f;
 
         Vector3 heightOffset = new Vector3(0, 0.25f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
 
-        if (cursorPositionNormalized.x > 0.9f) {
-            horizontalAimParity = true;
-        }
-        if (cursorPositionNormalized.x < 0.1f) {
-            horizontalAimParity = false;
-        }
+        // if (cursorPositionNormalized.x > 0.9f) {
+        //     horizontalAimParity = true;
+        // }
+        // if (cursorPositionNormalized.x < 0.1f) {
+        //     horizontalAimParity = false;
+        // }
 
         float horizontalParity = horizontalAimParity ? 1f : -1f;
         Vector3 horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection) * 0.65f;
 
         Vector3 camDirectionPoint = Vector3.zero;
-        camDirectionPoint += input.playerDirection * 7;
-        camDirectionPoint += Vector3.up * cursorPositionNormalized.y;// + new Vector3(0f, -0.5f, 0f);
-        camDirectionPoint += Vector3.Cross(Vector3.up, input.playerDirection) * cursorPositionNormalized.x;
+        if (GameManager.I.inputMode == InputMode.aim) {
+            camDirectionPoint = input.playerDirection;
+        } else {
+            input.playerDirection.y = 0f;
+            camDirectionPoint = Vector3.zero;
+            camDirectionPoint += input.playerDirection * 7;
+            camDirectionPoint += Vector3.up * cursorPositionNormalized.y;// + new Vector3(0f, -0.5f, 0f);
+            camDirectionPoint += Vector3.Cross(Vector3.up, input.playerDirection) * cursorPositionNormalized.x;
+        }
+
         Quaternion cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
 
         // update PlanarDirection to snap to nearest of 4 quadrants
         Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
         PlanarDirection = closestCardinal * Vector3.forward;
 
-        // Debug.DrawRay(input.playerPosition + Vector3.up, input.playerDirection, Color.green);
-        // Debug.DrawRay(input.playerPosition + Vector3.up, horizontalOffset, Color.green);
-        // Debug.DrawLine(input.playerPosition + Vector3.up, FollowTransform.position + horizontalOffset + heightOffset, Color.red);
-        // Debug.DrawRay(FollowTransform.position + horizontalOffset + heightOffset, camDirectionPoint, Color.magenta);
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
@@ -517,7 +517,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Camera.orthographicSize = desiredOrthographicSize;
     }
     public CursorData GetTargetData(Vector2 cursorPosition, InputMode inputMode) {
-        if (inputMode == InputMode.aim) {
+        if (inputMode == InputMode.aim || inputMode == InputMode.wallpressAim) {
             return AimToTarget(cursorPosition);
         } else {
             return CursorToTarget(cursorPosition);
@@ -578,6 +578,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 // clickRay = clickRay,
                 screenPosition = pointPosition,
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
+                screenPixelDimension = new Vector2(Camera.pixelWidth, Camera.pixelHeight),
                 highlightableTargetData = interactorData,
                 worldPosition = targetPoint,
                 targetCollider = targetCollider,
@@ -600,6 +601,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             return new CursorData {
                 type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,
+                screenPixelDimension = new Vector2(Camera.pixelWidth, Camera.pixelHeight),
                 screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
@@ -618,10 +620,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
 
     private CursorData AimToTarget(Vector2 cursorPosition) {
-
-        Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
+        Vector3 cursorPoint = Vector3.zero;
+        if (GameManager.I.inputMode == InputMode.aim) {
+            cursorPoint = new Vector3(Camera.pixelWidth / 2f, Camera.pixelHeight / 2f, Camera.nearClipPlane);
+        } else {
+            cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
+        }
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
-        Vector3 direction = transform.forward;
+        // Vector3 direction = transform.forward;
 
         RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         Vector3 targetPoint = projection.GetPoint(100f);
@@ -666,6 +672,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 type = CursorData.TargetType.objectLock,
                 // clickRay = clickRay,
                 screenPosition = pointPosition,
+                screenPixelDimension = new Vector2(Camera.pixelWidth, Camera.pixelHeight),
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 highlightableTargetData = interactorData,
                 worldPosition = targetPoint
@@ -677,6 +684,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             return new CursorData {
                 type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,
+                screenPixelDimension = new Vector2(Camera.pixelWidth, Camera.pixelHeight),
                 screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = null,
                 worldPosition = targetPoint

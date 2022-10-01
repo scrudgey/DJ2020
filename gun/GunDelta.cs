@@ -17,7 +17,7 @@ public record GunDelta {
     }
     public bool CanShoot() {
         // check cooldown, clip, chamber
-        return chamber > 0;
+        return chamber > 0 && cooldownTimer <= 0;
     }
     public int TotalAmmo() {
         return clip + chamber;
