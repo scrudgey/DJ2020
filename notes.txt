@@ -1310,6 +1310,9 @@ if you want to make changes to the template, then you should be using a State cl
 * red screen edge flash when hit
 * NPC pool too small or something
 * configurable number concurrent npcs
+* better shotgun
+* NPC pool size is max concurrent NPCS + strike team size (3)
+* overlay colors
 
 
 graphical issues:
@@ -1433,11 +1436,6 @@ overhauled VR mission designer
     player stats
 
 don't clip camera through wall
-when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
-bug: npc can't seem to shoot me when close
-bug: broken superjump
-aim mode could track camera better
-    try to pop around a corner and aim: it doesn't work
 NPC reacts to corpses
 NPC reacts when seeing another shot
 NPC reacts to seeing another shooting
@@ -1457,20 +1455,20 @@ prevent extreme zoom maneuvers with lerping
 corpse can be shot / exploded
 VRmissionTemplate -> LevelTemplate is incomplete.
 playertemplate / playerstate is still a little weird.
-
 use RaycastCommand
     write a custom system where all things (guns, character senses, etc) that need a lot of raycasts will queue up their casts in LateUpdate, 
     by the next Update they will have all completed computing in the background
+
+
+* level restriction not working
+* make sure the overlays are working as intended.
+
+
 bigger level
 title screen logo
 title screen animations
 clearsighter
-make sure the overlays are working as intended.
 figure out graph load order issues once and for all
-
-better shoot inaccuracy
-    right now it jumps to max as soon as you shoot?
-overlay colors
 
 
 over the shoulder: 
@@ -1492,15 +1490,11 @@ graphics
     death graphics for all skins
     redraw item graphics
 
-NPC pool size is max concurrent NPCS + strike team size (3)
 
 
-
-
-
-better shotgun
-    1. use a cone instead of a raycast
-        in this case, create a blast cone, and everything in it takes damage
-        damage decreases with off-axis distance
-        damage decreases with distance in general
-    2. use multiple raycasts?
+* clear suspicion data between runs
+* better shoot and move inaccuracy
+when alarm is disabled, guards stand around?
+bug: npc can't seem to shoot me when close
+bug: broken superjump
+when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor

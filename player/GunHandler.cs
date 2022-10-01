@@ -101,13 +101,18 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             state = GunStateEnum.racking;
         }
 
+        // TODO: inaccuracy decrease based on weapon weight and skill
+        float weightCoefficient = 10f / gunInstance.template.weight;
+
         if (movementInaccuracy > 0) {
-            // TODO: inaccuracy decrease based on weapon weight
-            movementInaccuracy -= Time.deltaTime;
+            // lighter weapons recover accuracy faster
+            // weight = 1: handgun
+            // weight = 10: rifle
+            movementInaccuracy -= Time.deltaTime * weightCoefficient;
             movementInaccuracy = Math.Max(0, movementInaccuracy);
         }
         if (shootingInaccuracy > 0) {
-            shootingInaccuracy -= Time.deltaTime;
+            shootingInaccuracy -= Time.deltaTime * weightCoefficient;
             shootingInaccuracy = Math.Max(0, shootingInaccuracy);
         }
     }
@@ -149,7 +154,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // TODO: weapon mods
 
-        inaccuracy = Math.Max(0, inaccuracy);
+        inaccuracy = Math.Max(0.05f, inaccuracy);
 
         return inaccuracy;
     }
@@ -205,7 +210,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             return;
         }
         if (!gunInstance.CanShoot()) {
-            // EndShoot(); maybe?
             return;
         }
         isShooting = true;
@@ -214,7 +218,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         gunInstance.Shoot();
 
         // shoot bullet
-        EmitBullet(input);
+        int numberBullets = gunInstance.template.type == GunType.shotgun ? 5 : 1;
+        for (int i = 0; i < numberBullets; i++) {
+            EmitBullet(input);
+        }
 
         // play sound
         NoiseData noiseData = gunInstance.GetShootNoise();
@@ -256,7 +263,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         // accuracy effect
-        shootingInaccuracy = gunInstance.template.shootInaccuracy;
+        shootingInaccuracy += gunInstance.template.shootInaccuracy / 2f;
 
         // state change callbacks
         OnValueChanged?.Invoke(this);
@@ -469,9 +476,12 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {
-            // TODO: inaccuracy based on weapon weight
-            float movement = 1;
-            movementInaccuracy = Math.Max(movement, movementInaccuracy);
+            // TODO: move inaccuracy based on weapon weight and skill
+            // float movement = 1;
+            // movementInaccuracy = Math.Max(movement, movementInaccuracy);
+            movementInaccuracy += motor.Velocity.magnitude * Time.deltaTime;
+            movementInaccuracy = Math.Min(1f, movementInaccuracy);
+            // inaccuracy increases faster for heavy weapons, decreases faster for lighter weapons
         }
         if (input.CrouchDown) {
             crouchingInaccuracy = -0.5f;

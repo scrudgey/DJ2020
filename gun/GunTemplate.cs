@@ -26,6 +26,7 @@ public class GunTemplate : ScriptableObject {
     public LoHi baseDamage;
     public Sprite image;
     public bool silencer;
+    public float weight;
 
 
     [Header("Resources")]

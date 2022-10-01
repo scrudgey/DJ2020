@@ -25,6 +25,7 @@ public partial class GameManager : Singleton<GameManager> {
         // this means that the gamedata is not serializable.
         // instead, NPC templates should be top level fields of levelState, and thus serializable.
         levelTemplate.strikeTeamTemplate = template.npc2State;
+        levelTemplate.sensitivityLevel = template.sensitivityLevel;
 
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
@@ -137,11 +138,13 @@ public partial class GameManager : Singleton<GameManager> {
         poweredComponents = new Dictionary<string, PoweredComponent>();
         cyberComponents = new Dictionary<string, CyberComponent>();
         alarmComponents = new Dictionary<string, AlarmComponent>();
-
-        reports = new Dictionary<GameObject, HQReport>();
         lastStrikeTeamMember = null;
 
-        Debug.Log($"initialized poweredComponents {poweredComponents} {poweredComponents.Count}");
+        // TODO: this stuff should belong to level state
+        reports = new Dictionary<GameObject, HQReport>();
+        suspicionRecords = new Dictionary<string, SuspicionRecord>();
+
+        // Debug.Log($"initialized poweredComponents {poweredComponents} {poweredComponents.Count}");
     }
     private void InitializeLevel() {
         ClearSceneData();

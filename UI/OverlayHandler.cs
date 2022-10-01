@@ -78,7 +78,7 @@ public class OverlayHandler : MonoBehaviour {
                 break;
             case OverlayType.power:
                 outlineImage.color = powerOverlayColors.enabledColor;
-                titleBoxImage.color = powerOverlayColors.enabledColor;
+                // titleBoxImage.color = powerOverlayColors.enabledColor;
                 titleText.color = powerOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(true);
                 cyberOverlay.gameObject.SetActive(false);
@@ -87,7 +87,7 @@ public class OverlayHandler : MonoBehaviour {
                 break;
             case OverlayType.cyber:
                 outlineImage.color = cyberOverlayColors.enabledColor;
-                titleBoxImage.color = cyberOverlayColors.enabledColor;
+                // titleBoxImage.color = cyberOverlayColors.enabledColor;
                 titleText.color = cyberOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(true);
@@ -96,7 +96,7 @@ public class OverlayHandler : MonoBehaviour {
                 break;
             case OverlayType.alarm:
                 outlineImage.color = alarmOverlayColors.enabledColor;
-                titleBoxImage.color = alarmOverlayColors.enabledColor;
+                // titleBoxImage.color = alarmOverlayColors.enabledColor;
                 titleText.color = alarmOverlayColors.enabledColor;
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(false);
