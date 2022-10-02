@@ -39,6 +39,7 @@ public class VRMissionController : MonoBehaviour {
         switch (state) {
             case State.fail:
             case State.victory:
+                // GameManager.I.TransitionToInputMode(InputMode.none);
                 data.data.secondsPlayed = Time.time - startTime;
                 GameManager.I.TransitionToState(GameState.inMenu);
 

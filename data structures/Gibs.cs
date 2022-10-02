@@ -62,7 +62,8 @@ public class Gib {
         }
     }
     void DoEmit(Damage damage, Collider bounds) {
-        Vector3 position = Toolbox.RandomInsideBounds(bounds);
+        // Vector3 position = Toolbox.RandomInsideBounds(bounds);
+        Vector3 position = damage.position;
         Vector3 direction = damage.direction;
         DoEmit(position, direction);
     }

@@ -108,6 +108,7 @@ public partial class GameManager : Singleton<GameManager> {
                 }
                 break;
             case GameState.inMenu:
+                TransitionToInputMode(InputMode.none);
                 Time.timeScale = 0f;
                 break;
             default:

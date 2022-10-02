@@ -943,6 +943,31 @@ shoot interval:
     smg high: 0.15
     limit for automatic: 0.19
 
+aiming wonkiness:
+    in aim mode, mouse delta is converted to inputtorque
+    in update character rotation, input torque is applied to character rotation, rotating off of y vertical.
+    in character camera, in aim mode, now the camera turns to face character direction.
+        thus, mouse input torque directly controls the camera.
+solution: we want to decouple player direction and camera direction.
+    torque should still directly control the camera direction.
+    player will slew to face the camera direction while maintaining verticality.
+        currentRotation rotates to face cameraRotation while keeping y fixed.
+    when entering aim mode, camera direction is player direction.
+
+new problem: camera quickly rotates off-kilter.
+    why didn't we have this problem with currentRotation?
+    probably because kinematic character controller is smarter than this.
+desired properties of solution:
+    camera up should be Vector3.up, or at least character up.
+how do we define this?
+    the quaternion right should be coplanar with character forward and character right.
+
+    quaternion right: camera quaternion * Vector3.right
+    project quaternion right into plane:
+    public static Vector3 ProjectOnPlane(Vector3 vector, Vector3 planeNormal);
+    now rotate camera by Quaternion.FromTo(quaternion right, projected right);
+
+
 
 
 
@@ -1321,7 +1346,23 @@ shoot interval:
 * better shotgun
 * NPC pool size is max concurrent NPCS + strike team size (3)
 * overlay colors
-
+* over the shoulder: 
+    * orient more tightly toward the cursor.
+    * hide cursor when in aim mode
+        * possibly, always reorient cursor to middle of screen
+    * fix some cursor issue around wallpress
+    * don't use lock when in aim mode
+    * character going all wonky during aim mode
+    * leave aim mode cursor lock when victory screen
+    * next: rotate player to look towards camera.
+    * prevent looking too far down
+    * recoil knocks screen up
+    * sway
+* level restriction not working
+* make sure the overlays are working as intended.
+* gun shooting interval
+* clear suspicion data between runs
+* better shoot and move inaccuracy
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1427,6 +1468,8 @@ UI:
 
 control / combat:
     headshots
+    shoulder switch is a control
+    aim sway responds to movement and gun skill
 
 sound
     ambience
@@ -1437,21 +1480,22 @@ stealth:
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
     NPC reacts when seeing another shooting
+    NPC reacts to corpses
+    NPC reacts when seeing another shot
+    NPC investigate routine
+    NPC should look in direction of last noise
+    NPC speeds a little more when pursuing player.
+    NPC when an aggressive noise is heard, do a quick visibility check.
+        when being shot by a noisy opponent, we should know where they are immediately
     stealth kill?
 
 overhauled VR mission designer
     show some sort of gun stats
     player stats
 
-don't clip camera through wall
-NPC reacts to corpses
-NPC reacts when seeing another shot
-NPC reacts to seeing another shooting
-NPC investigate routine
-NPC should look in direction of last noise
-NPC speeds a little more when pursuing player.
-NPC when an aggressive noise is heard, do a quick visibility check.
+---------------
 
+don't clip camera through wall
 DFS path finding doesn't quite work right for highlighting path
 alarm terminal triggering effects
     notify others of location
@@ -1467,33 +1511,11 @@ use RaycastCommand
     write a custom system where all things (guns, character senses, etc) that need a lot of raycasts will queue up their casts in LateUpdate, 
     by the next Update they will have all completed computing in the background
 
-
-* level restriction not working
-* make sure the overlays are working as intended.
-* gun shooting interval
-* clear suspicion data between runs
-* better shoot and move inaccuracy
-
 bigger level
 title screen logo
 title screen animations
 clearsighter
 figure out graph load order issues once and for all
-
-
-over the shoulder: 
-    ? don't swap sides (unless at the extreme edge of the screen? even still, probably not?).
-    ? to prevent being blocked around corners, move in close to player
-    * orient more tightly toward the cursor.
-    * hide cursor when in aim mode
-        * possibly, always reorient cursor to middle of screen
-    * fix some cursor issue around wallpress
-    don't use lock when in aim mode
-    character going all wonky during aim mode
-    leave aim mode cursor lock when victory screen
-    recoil knocks screen up
-    sway
-
 
 new missions
     a mission mode about stealth
@@ -1507,9 +1529,11 @@ graphics
     death graphics for all skins
     redraw item graphics
 
-
 when alarm is disabled, guards stand around?
+    overall, guards are not forming a coherent counterattack
 bug: npc can't seem to shoot me when close
 bug: broken superjump
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
 faster shotgun
+    click to rack faster?
+

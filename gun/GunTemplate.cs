@@ -27,6 +27,7 @@ public class GunTemplate : ScriptableObject {
     public Sprite image;
     public bool silencer;
     public float weight;
+    public LoHi recoil;
 
 
     [Header("Resources")]

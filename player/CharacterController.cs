@@ -163,6 +163,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float hitstunTimer;
     private float gunHitStunTimer;
     // private bool isDead;
+    private Quaternion aimCameraRotation;
+    private Vector3 recoil;
+    private float aimSwayTimer;
+    private float aimSwayFrequencyConstant = 0.5f;
+    private float aimSwayMagnitude = 0.01f;
+
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -183,6 +189,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 GameManager.I.TransitionToInputMode(InputMode.wallpressAim);
                 break;
             case CharacterState.aim:
+                aimCameraRotation = Quaternion.FromToRotation(Vector3.forward, Motor.CharacterForward);
+                lookAtDirection = Motor.CharacterForward;
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
             case CharacterState.jumpPrep:
@@ -241,14 +249,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         gunHandler.characterCamera = OrbitCamera;
+        gunHandler.OnShoot += HandleOnShoot;
         // Assign to motor
         Motor.CharacterController = this;
         characterHurtable.OnHitStateChanged += HandleHurtableChanged;
         characterHurtable.OnTakeDamage += HandleTakeDamage;
     }
+
     void OnDestroy() {
         characterHurtable.OnHitStateChanged -= HandleHurtableChanged;
         characterHurtable.OnTakeDamage -= HandleTakeDamage;
+        gunHandler.OnShoot -= HandleOnShoot;
+    }
+    void HandleOnShoot(GunHandler target) {
+        float recoilMagnitudeY = target.gunInstance.template.recoil.GetRandomInsideBound();
+        float recoilMagnitudeX = target.gunInstance.template.recoil.GetRandomInsideBound() * UnityEngine.Random.Range(-0.5f, 0.5f);
+        recoil = new Vector3(recoilMagnitudeX, recoilMagnitudeY, 0f);
     }
     private void HandleHurtableChanged(Destructible hurtable) {
         ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);
@@ -409,6 +425,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 gunHandler.SetInputs(input);
 
                 _inputTorque = input.mouseDelta * Time.deltaTime * 100f;
+
+                aimSwayTimer += Time.deltaTime;
+
+                float aimSwayX = Mathf.Cos(aimSwayTimer * aimSwayFrequencyConstant);
+                float aimSwayY = Mathf.Cos(aimSwayTimer * aimSwayFrequencyConstant * 2f);
+                Vector3 aimSway = new Vector3(aimSwayX, aimSwayY, 0f) * aimSwayMagnitude;
+                _inputTorque += aimSway;
 
                 if (input.Fire.AimPressed) {
                     TransitionToState(CharacterState.normal);
@@ -605,15 +628,37 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     Vector3 target = snapToDirection;
                     target.y = 0;
                     currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                    aimCameraRotation = currentRotation;
+                } else {
+                    // apply input torque from mouse delta
+                    Vector3 targetRight = aimCameraRotation * Vector3.right;
+                    Vector3 targetUp = Vector3.up;
+                    Quaternion pitch = Quaternion.AngleAxis(-1f * (_inputTorque.y + recoil.y), targetRight);
+                    Quaternion yaw = Quaternion.AngleAxis(_inputTorque.x + recoil.x, targetUp);
+                    aimCameraRotation = pitch * yaw * aimCameraRotation;
+
+                    // reorient camera to be level with horizontal
+                    Vector3 aimCameraRight = aimCameraRotation * Vector3.right;
+                    Vector3 projectedAimCamerRight = Vector3.ProjectOnPlane(aimCameraRight, Vector3.up);
+                    Quaternion roll = Quaternion.FromToRotation(aimCameraRight, projectedAimCamerRight);
+                    aimCameraRotation = roll * aimCameraRotation;
+
+                    // lerp character orientation toward the aim point
+                    Vector3 projectedCameraForward = Vector3.ProjectOnPlane(aimCameraRotation * Vector3.forward, Vector3.up);
+                    Quaternion levelRotation = Quaternion.LookRotation(projectedCameraForward, Vector3.up);
+                    currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
+
+                    // clamp pitch [0, 45] , [365, 315]
+                    Vector3 currentRotationEulerAngles = aimCameraRotation.eulerAngles;
+                    if (currentRotationEulerAngles.x > 180) {
+                        currentRotationEulerAngles.x = Mathf.Max(currentRotationEulerAngles.x, 315f);
+                    } else {
+                        currentRotationEulerAngles.x = Mathf.Min(currentRotationEulerAngles.x, 45f);
+                    }
+                    aimCameraRotation = Quaternion.Euler(currentRotationEulerAngles);
+
+                    lookAtDirection = Vector3.Lerp(lookAtDirection, aimCameraRotation * Vector3.forward, 0.05f);
                 }
-
-                Quaternion pitch = Quaternion.AngleAxis(-1f * _inputTorque.y, Motor.CharacterRight);
-                Quaternion yaw = Quaternion.AngleAxis(_inputTorque.x, Motor.CharacterUp);
-
-                // Quaternion torqueRotation = Quaternion.FromToRotation(new Vector3(1f, 0f, 0f), new Vector3(Mathf.Cos(_inputTorque.y), 0f, Mathf.Sin(_inputTorque.y)));
-                // Quaternion torqueRotation = Quaternion.FromToRotation(Motor.CharacterForward, Motor.CharacterForward + Motor.CharacterUp * _inputTorque.y + Motor.CharacterRight * _inputTorque.x);
-                // currentRotation = torqueRotation * currentRotation;
-                currentRotation = pitch * yaw * currentRotation;
                 break;
             case CharacterState.normal:
                 if (snapToDirection != Vector3.zero) {
@@ -1158,6 +1203,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
         if (GameManager.I.showDebugRays)
             Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.red);
+        recoil = Vector3.zero;
     }
 
     void CreateCorpse() {
@@ -1221,7 +1267,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             targetData = lastTargetDataInput,
             playerDirection = direction,
             playerLookDirection = lookAtDirection,
-            popoutParity = popoutParity
+            popoutParity = popoutParity,
+            aimCameraRotation = aimCameraRotation
         };
         return input;
     }

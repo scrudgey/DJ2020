@@ -383,18 +383,17 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float horizontalParity = horizontalAimParity ? 1f : -1f;
         Vector3 horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection) * 0.65f;
 
-        Vector3 camDirectionPoint = Vector3.zero;
+        Quaternion cameraRotation = Quaternion.identity;
         if (GameManager.I.inputMode == InputMode.aim) {
-            camDirectionPoint = input.playerDirection;
+            cameraRotation = input.aimCameraRotation;
         } else {
             input.playerDirection.y = 0f;
-            camDirectionPoint = Vector3.zero;
+            Vector3 camDirectionPoint = Vector3.zero;
             camDirectionPoint += input.playerDirection * 7;
             camDirectionPoint += Vector3.up * cursorPositionNormalized.y;// + new Vector3(0f, -0.5f, 0f);
             camDirectionPoint += Vector3.Cross(Vector3.up, input.playerDirection) * cursorPositionNormalized.x;
+            cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
         }
-
-        Quaternion cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
 
         // update PlanarDirection to snap to nearest of 4 quadrants
         Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);

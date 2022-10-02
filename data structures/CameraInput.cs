@@ -19,4 +19,5 @@ public struct CameraInput {
     public Vector3 playerDirection;
     public Vector3 playerLookDirection;
     public PopoutParity popoutParity;
+    public Quaternion aimCameraRotation;
 }

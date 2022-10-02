@@ -36,6 +36,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     // public Vector3 lockedOnPoint;
     public bool isShooting;
     public bool isSwitchingWeapon;
+    public Action<GunHandler> OnShoot;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious
@@ -280,6 +281,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 GameManager.I.AddSuspicionRecord(record);
             }
         }
+
+        // callback
+        OnShoot?.Invoke(this);
     }
     public void EmitShell() {
         emitShell = true;
@@ -438,8 +442,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 Vector2 pointPosition = characterCamera.Camera.WorldToScreenPoint(targetPoint);
                 input.Fire.cursorData.type = CursorData.TargetType.objectLock;
                 input.Fire.cursorData.screenPosition = pointPosition;
-                input.Fire.cursorData.worldPosition = targetPoint;
                 input.Fire.cursorData.targetCollider = nearestOther;
+
+                // TODO: is this a hack?
+                if (GameManager.I.inputMode == InputMode.aim) {
+
+                } else {
+                    input.Fire.cursorData.worldPosition = targetPoint;
+                }
             }
 
             if (CanShoot()) {
