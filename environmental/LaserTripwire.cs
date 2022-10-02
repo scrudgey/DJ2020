@@ -17,14 +17,12 @@ public class LaserTripwire : AlarmComponent {
     AudioSource audioSource;
     public AudioSource buzzSoundSource;
 
-    override public void Start() {
+    public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         foreach (LaserData data in laserData) {
             data.laser.tripWire = this;
             data.laser.gameObject.SetActive(data.enabled);
         }
-        // TODO: bad hack. caused by initialization order / level load bs.
-        base.Start();
     }
 
 

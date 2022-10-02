@@ -61,13 +61,9 @@ public partial class GameManager : Singleton<GameManager> {
         OnSuspicionChange?.Invoke();
 
         // reset strike team 
-        try {
-            PrefabPool pool = PoolManager.I.GetPool("prefabs/NPC");
+        PrefabPool pool = PoolManager.I?.GetPool("prefabs/NPC");
+        if (pool != null)
             gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
-        }
-        finally {
-
-        }
         strikeTeamCount = 0;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {

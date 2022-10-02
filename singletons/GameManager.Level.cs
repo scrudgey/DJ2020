@@ -22,8 +22,10 @@ public partial class GameManager : Singleton<GameManager> {
 
         // we are modifying an instance here, not the asset on disk.
         // we should perhaps do more to modify the level template based on the vr mission template.
-        // this means that the gamedata is not serializable.
+        // this means that the gamedata is not serializable!
         // instead, NPC templates should be top level fields of levelState, and thus serializable.
+        // but, we edit it from the VR mission editor.
+        // so, there should be a serializable NPC template (from editor) as well as a scriptable object NPC template?
         levelTemplate.strikeTeamTemplate = template.npc2State;
         levelTemplate.sensitivityLevel = template.sensitivityLevel;
 
@@ -130,7 +132,6 @@ public partial class GameManager : Singleton<GameManager> {
         if (clearSighter != null && focus != null)
             clearSighter.followTransform = focus.transform;
 
-        Debug.Log($"on focus changed: {focus}");
         OnFocusChanged?.Invoke(focus);
         OnEyeVisibilityChange?.Invoke(gameData.playerState);
     }
@@ -222,7 +223,7 @@ public partial class GameManager : Singleton<GameManager> {
                     break;
             };
         } else {
-            // Debug.Log("called set node enabled with null node");
+            Debug.Log($"called set node enabled with null node {graphNodeComponent} {idn}");
         }
     }
 
@@ -300,15 +301,14 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void RefreshCyberGraph() {
-        TransferCyberState();
-
         gameData.levelState.delta.cyberGraph.Refresh();
+
+        TransferCyberState();
 
         // propagate changes to UI
         OnCyberGraphChange?.Invoke(gameData.levelState.delta.cyberGraph);
     }
     public void RefreshAlarmGraph() {
-
         // determine if any active alarm object reaches a terminal
         gameData.levelState.delta.alarmGraph.Refresh();
 
@@ -362,12 +362,8 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
-
     GameObject SpawnPlayer(PlayerState state) {
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
-        Debug.Log(spawnPoint);
         return spawnPoint.SpawnPlayer(state);
     }
-
-
 }

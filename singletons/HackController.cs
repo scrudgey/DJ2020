@@ -26,16 +26,9 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     public List<HackData> targets = new List<HackData>();
     public List<CyberNode> vulnerableManualNodes = new List<CyberNode>();
     public CyberNode vulnerableNetworkNode = null;
-    // public LineRenderer lineRenderer;
-    // public Material wireUnfurlMaterial;
-    // public Material wireAttachedMaterial;
-
-    // private readonly AnimationCurve fatWidth = AnimationCurve.Constant(0f, 1f, 1f);
-    // private readonly AnimationCurve thinWidth = AnimationCurve.Constant(0f, 1f, 0.1f);
 
     void Awake() {
         vulnerableNetworkNode = null;
-        // lineRenderer.enabled = false;
     }
     public void HandleHackInput(HackInput input) {
         if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)

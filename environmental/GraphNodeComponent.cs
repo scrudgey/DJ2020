@@ -40,16 +40,6 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     virtual public void OnDestroy() {
         DisableSource();
     }
-    virtual public void Start() {
-        // TODO: is this fine? why doesn't it work via enable source?
-        if (enabled) {
-            nodeEnabled = true;
-            EnableSource();
-        } else {
-            nodeEnabled = false;
-            DisableSource();
-        }
-    }
     public virtual void ConfigureNode(U node) {
 
     }

@@ -7,9 +7,11 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public float countdownTimer;
     public CyberComponent cyberComponent;
     public PoweredComponent powerComponent;
-
+    bool cyberCompromised;
+    bool powerPowered;
     public void Awake() {
-        // base.Start();
+        powerPowered = true;
+        cyberCompromised = false;
         if (cyberComponent != null) {
             cyberComponent.OnStateChange += OnCyberChange;
         }
@@ -40,16 +42,22 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public override AlarmNode GetNode() => GameManager.I.GetAlarmNode(idn);
 
     public void OnPowerChange(PoweredComponent node) {
-        // Debug.Log($"alarm component {this} on power change: {node.power}");
-        if (!node.power) {
-            DisableSource();
-        }
+        Debug.Log($"alarm component {this} on power change powered: {node.power}");
+        powerPowered = node.power;
+        ApplyCyberPowerState();
     }
 
     public void OnCyberChange(CyberComponent node) {
-        // Debug.Log($"alarm component {this} on cyber change: {node.compromised}");
-        if (node.compromised) {
+        Debug.Log($"alarm component {this} on cyber change compromised: {node.compromised}");
+        cyberCompromised = node.compromised;
+        ApplyCyberPowerState();
+    }
+
+    void ApplyCyberPowerState() {
+        if (cyberCompromised || !powerPowered) {
             DisableSource();
+        } else {
+            EnableSource();
         }
     }
 }

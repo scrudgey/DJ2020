@@ -967,6 +967,18 @@ how do we define this?
     public static Vector3 ProjectOnPlane(Vector3 vector, Vector3 planeNormal);
     now rotate camera by Quaternion.FromTo(quaternion right, projected right);
 
+figure out graph load order issues once and for all
+    now the basic idea here is that state is held in the graph nodes.
+    when we perform actions in the game like hacking a node, we set the node state:
+        GameManager.I.SetCyberNodeState(data.node, true);
+    this sets the graph state and refreshes the graph:
+        node.compromised = state;
+        RefreshCyberGraph();
+
+    the complications comes from the fact that we also sometimes need to transfer state from components to graph.
+    finally, there are interdependencies. 
+        disabling a cyber node activates OnStateChange
+    note that setting node enabled / disabled on level load potentially conflicts with setting node enabled when power or cyber changes.
 
 
 
@@ -1466,6 +1478,10 @@ UI:
         small health bar 
     minimap
     weapon wheel
+    better clarity around alarm logic
+        indicate alarm terminal more clearly!
+        indicate when alarm teminal is active!
+        fix edge coloration from active node to alarm terminal
 
 control / combat:
     headshots
@@ -1488,6 +1504,8 @@ stealth:
     NPC speeds a little more when pursuing player.
     NPC when an aggressive noise is heard, do a quick visibility check.
         when being shot by a noisy opponent, we should know where they are immediately
+    NPC can't see me when i'm standing behind low cover?
+        could it be the shadows?
     stealth kill?
 
 overhauled VR mission designer
@@ -1532,19 +1550,30 @@ graphics
     thermal goggles icon
     gibs from explosions
     death graphics for all skins
-    redraw item graphics
+    redraw cyberdeck
+    redraw c4
+
 
 when alarm is disabled, guards stand around?
-    overall, guards are not forming a coherent counterattack
+    overall, guards are not forming a coherent counterattack?
+    they should be running toward the firefight and seeing the player more readily.
 bug: broken superjump
 faster shotgun
     click to rack faster?
     raise - shoot - pump
+    animator speed can be adjusted
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
     blend attractor position and focus position with parameter controlled by zoom
 
 
 
-figure out graph load order issues once and for all
-    now the basic idea here is that state is held in the graph nodes.
-    when we perform actions in the game
+single gunshot heard:
+    it wasn't directed at me:
+        investigate
+    it was directed at me:
+        run away
+multiple gunshots:
+    it was directed at me:
+        take cover
+    it wasn't directed at me:
+        run toward the gunfight

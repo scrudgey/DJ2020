@@ -28,30 +28,33 @@ public class SecurityCamera : IBinder<SightCone> {
     public float turnDuration;
     public float lookDuration;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
-    bool nodeEnabled;
+    bool alarmNodeEnabled;
 
-    void Start() {
+    void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        alarmComponent.OnStateChange += HandleAlarmStateChange;
+    }
+    void Start() {
         Bind(sightCone.gameObject);
         initialRotation = cameraTransform.rotation;
-        alarmComponent.OnStateChange += HandleAlarmStateChange;
-        nodeEnabled = alarmComponent.enabled;
+        alarmNodeEnabled = alarmComponent.enabled;
     }
     override public void OnDestroy() {
         base.OnDestroy();
         alarmComponent.OnStateChange -= HandleAlarmStateChange;
     }
     void HandleAlarmStateChange(AlarmComponent component) {
-        nodeEnabled = component.nodeEnabled;
-        spriteLight.enabled = nodeEnabled;
-        IRCone.enabled = nodeEnabled;
-        if (!nodeEnabled) {
+        alarmNodeEnabled = component.nodeEnabled;
+        spriteLight.enabled = alarmNodeEnabled;
+        IRCone.enabled = alarmNodeEnabled;
+        if (!alarmNodeEnabled) {
             audioSource.Stop();
         }
+        Debug.Log($"security camera setting alarm state change enabled: {component.nodeEnabled}");
     }
 
     public override void HandleValueChanged(SightCone t) {
-        if (!nodeEnabled)
+        if (!alarmNodeEnabled)
             return;
         if (t.newestAddition != null) {
             if (TargetVisible(t.newestAddition))
@@ -108,7 +111,7 @@ public class SecurityCamera : IBinder<SightCone> {
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;
         }
-        if (!nodeEnabled)
+        if (!alarmNodeEnabled)
             return;
         timer += Time.deltaTime;
         switch (state) {
