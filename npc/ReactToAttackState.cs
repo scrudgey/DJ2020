@@ -49,7 +49,6 @@ public class ReactToAttackState : SphereControlState {
             AttackType.gunshots => "HQ respond! Shots fired!",
             _ => "HQ respond! Activate building alarm!"
         };
-
         if (GameManager.I.levelHQTerminal() != null && !levelData.anyAlarmActive()) {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
@@ -82,6 +81,7 @@ public class ReactToAttackState : SphereControlState {
                 }, 1.5f),
                 new Selector(
                     new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
+                    new TaskConditional(() => GameManager.I.levelHQTerminal() == null),
                     new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
                 )
             );
@@ -117,7 +117,7 @@ public class ReactToAttackState : SphereControlState {
         if (result == TaskState.success) {
             owner.StateFinished(this);
         } else if (result == TaskState.failure) {
-            // owner.StateFinished(this);
+            owner.StateFinished(this);
         }
         return input;
     }

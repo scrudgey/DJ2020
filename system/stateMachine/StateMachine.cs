@@ -10,11 +10,13 @@ namespace AI {
     public class StateMachine<T> where T : IState {
         public T currentState;
         public float timeInCurrentState;
+        public string currentStateName;
         public void ChangeState(T newState) {
             if (currentState != null)
                 currentState.Exit();
             timeInCurrentState = 0f;
             currentState = newState;
+            currentStateName = newState.ToString();
             currentState.Enter();
         }
 

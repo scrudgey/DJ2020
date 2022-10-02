@@ -42,13 +42,13 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public override AlarmNode GetNode() => GameManager.I.GetAlarmNode(idn);
 
     public void OnPowerChange(PoweredComponent node) {
-        Debug.Log($"alarm component {this} on power change powered: {node.power}");
+        // Debug.Log($"alarm component {this} on power change powered: {node.power}");
         powerPowered = node.power;
         ApplyCyberPowerState();
     }
 
     public void OnCyberChange(CyberComponent node) {
-        Debug.Log($"alarm component {this} on cyber change compromised: {node.compromised}");
+        // Debug.Log($"alarm component {this} on cyber change compromised: {node.compromised}");
         cyberCompromised = node.compromised;
         ApplyCyberPowerState();
     }

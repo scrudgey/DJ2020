@@ -27,7 +27,6 @@ public class LaserTripwire : AlarmComponent {
 
 
     public void LaserTripCallback() {
-        Debug.Log("laser trip callback");
         if (cooldown > 0)
             return;
         // GameManager.I.ActivateAlarm();
@@ -55,7 +54,6 @@ public class LaserTripwire : AlarmComponent {
     }
     override public void EnableSource() {
         base.EnableSource();
-        Debug.Log("enabling laser tripwire");
         foreach (LaserData data in laserData) {
             data.laser.gameObject.SetActive(data.enabled);
         }

@@ -117,6 +117,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 }
                 break;
             case ReportToHQState:
+                Debug.Log("leaving report to HQ state");
                 if (lastDamage != null) {
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
                 } else if (getLocationOfInterest() != Vector3.zero) {

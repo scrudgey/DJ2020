@@ -334,7 +334,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 poweredComponents[kvp.Key].power = kvp.Value.powered;
                 poweredComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
-                Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
+                // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
             }
         }
     }
@@ -345,7 +345,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (cyberComponents.ContainsKey(kvp.Key)) {
                 cyberComponents[kvp.Key].compromised = kvp.Value.compromised;
                 cyberComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
-                Debug.Log($"transfer cyber to {kvp.Key}: {kvp.Value.enabled}");
+                // Debug.Log($"transfer cyber to {kvp.Key}: {kvp.Value.enabled}");
             }
         }
     }

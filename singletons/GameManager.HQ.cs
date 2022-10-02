@@ -55,12 +55,13 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void DeactivateAlarm() {
-        if (applicationIsQuitting)
+        if (applicationIsQuitting || isLoadingLevel)
             return;
         strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
 
         // reset strike team 
+
         PrefabPool pool = PoolManager.I?.GetPool("prefabs/NPC");
         if (pool != null)
             gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);

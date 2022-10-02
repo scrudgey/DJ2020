@@ -1554,9 +1554,12 @@ graphics
     redraw c4
 
 
-when alarm is disabled, guards stand around?
-    overall, guards are not forming a coherent counterattack?
+* when alarm is disabled, guards stand around
+overall, guards are not forming a coherent counterattack
     they should be running toward the firefight and seeing the player more readily.
+        see more readily: high visibility is sticky.
+        running: adjust speed in appropriate conditional.
+
 bug: broken superjump
 faster shotgun
     click to rack faster?
@@ -1565,15 +1568,3 @@ faster shotgun
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
     blend attractor position and focus position with parameter controlled by zoom
 
-
-
-single gunshot heard:
-    it wasn't directed at me:
-        investigate
-    it was directed at me:
-        run away
-multiple gunshots:
-    it was directed at me:
-        take cover
-    it wasn't directed at me:
-        run toward the gunfight

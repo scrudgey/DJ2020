@@ -87,6 +87,10 @@ namespace AI {
                 Vector3 destination = hit.position;
                 NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navMeshPath);
                 pathIndex = 1;
+            } else if (NavMesh.SamplePosition(target, out hit, 100f, NavMesh.AllAreas)) {
+                Vector3 destination = hit.position;
+                NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navMeshPath);
+                pathIndex = 1;
             } else {
                 Debug.LogWarning($"could not find navmeshhit for {target}");
                 navFailures += 1;
