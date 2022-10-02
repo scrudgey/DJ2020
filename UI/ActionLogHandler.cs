@@ -47,6 +47,9 @@ public class ActionLogHandler : IBinder<Interactor> {
     void HandleActionDone(InteractorTargetData data) {
         CreateLogEntry($"{prefix}{data.target.actionPrompt}\n{data.target.ResponseString()}");
     }
+    public void ShowMessage(string entry) {
+        CreateLogEntry($"{prefix}{entry}");
+    }
     void CreateLogEntry(string entry) {
         GameObject logEntry = GameObject.Instantiate(logTextEntryPrefab);
         TextMeshProUGUI logText = logEntry.GetComponent<TextMeshProUGUI>();

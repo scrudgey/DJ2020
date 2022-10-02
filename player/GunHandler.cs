@@ -429,7 +429,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             // TODO: if priority is not set, try lock 
             float lockRadius = gunInstance.template.lockOnSize;
             Collider[] others = Physics.OverlapSphere(targetPoint, lockRadius, LayerUtil.GetMask(Layer.obj))
-                .Where(collider => !collider.transform.IsChildOf(GameManager.I.playerObject.transform))
+                .Where(collider => !collider.transform.IsChildOf(transform.root))
                 .ToArray();
             if (others.Length > 0) {
                 Collider nearestOther = others.Aggregate((curMin, x) => (curMin == null || (Vector3.Distance(targetPoint, x.bounds.center)) < Vector3.Distance(targetPoint, curMin.bounds.center) ? x : curMin));

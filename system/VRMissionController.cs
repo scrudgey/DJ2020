@@ -10,6 +10,7 @@ public class VRMissionController : MonoBehaviour {
     public float NPCspawnTimer;
     public List<CharacterController> npcControllers = new List<CharacterController>();
     float startTime;
+    ActionLogHandler actionLogHandler;
     public void StartVRMission(VRMissionState state) {
         Debug.Log("VRMissionController: start VR mission");
         this.data = state;
@@ -27,6 +28,12 @@ public class VRMissionController : MonoBehaviour {
             }
         }
         startTime = Time.time;
+
+    }
+    void SendLogMessage(string message) {
+        if (actionLogHandler == null)
+            actionLogHandler = GameObject.FindObjectOfType<ActionLogHandler>();
+        actionLogHandler.ShowMessage(message);
     }
     void TransitionToState(State newState) {
         State tmpInitialState = state;
@@ -101,6 +108,7 @@ public class VRMissionController : MonoBehaviour {
         data.data.numberLiveNPCs -= 1;
         data.data.numberNPCsKilled += 1;
         if (data.template.missionType == VRMissionType.hunt) {
+            SendLogMessage($"Kill count: {data.data.numberNPCsKilled} / {data.template.maxNumberNPCs}");
             if (data.data.numberNPCsKilled >= data.template.maxNumberNPCs) {
                 TransitionToState(State.victory);
             }

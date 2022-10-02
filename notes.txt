@@ -1363,6 +1363,7 @@ how do we define this?
 * gun shooting interval
 * clear suspicion data between runs
 * better shoot and move inaccuracy
+* bug: npc can't seem to shoot me when close
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1493,13 +1494,16 @@ overhauled VR mission designer
     show some sort of gun stats
     player stats
 
+better action log
+    blit the text
+    font?
+
 ---------------
 
 don't clip camera through wall
 DFS path finding doesn't quite work right for highlighting path
 alarm terminal triggering effects
     notify others of location
-    add a suspicion indicator
 why do gibs fall through the wall/floor?
 damage result addition is weird
 prevent extreme zoom maneuvers with lerping
@@ -1510,17 +1514,18 @@ playertemplate / playerstate is still a little weird.
 use RaycastCommand
     write a custom system where all things (guns, character senses, etc) that need a lot of raycasts will queue up their casts in LateUpdate, 
     by the next Update they will have all completed computing in the background
-
+    https://docs.unity3d.com/ScriptReference/RaycastCommand.html
+    https://www.jacksondunstan.com/articles/4913
 bigger level
 title screen logo
 title screen animations
+
 clearsighter
-figure out graph load order issues once and for all
 
 new missions
     a mission mode about stealth
     kill x in y time, continual respawning
-    UI display something about victory conditions
+    * UI display something about victory conditions
         kill count, timer
 
 graphics
@@ -1531,9 +1536,15 @@ graphics
 
 when alarm is disabled, guards stand around?
     overall, guards are not forming a coherent counterattack
-bug: npc can't seem to shoot me when close
 bug: broken superjump
-when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
 faster shotgun
     click to rack faster?
+    raise - shoot - pump
+when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
+    blend attractor position and focus position with parameter controlled by zoom
 
+
+
+figure out graph load order issues once and for all
+    now the basic idea here is that state is held in the graph nodes.
+    when we perform actions in the game

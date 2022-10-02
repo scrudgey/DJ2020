@@ -424,7 +424,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
 
-                _inputTorque = input.mouseDelta * Time.deltaTime * 100f;
+                _inputTorque = input.mouseDelta;
 
                 aimSwayTimer += Time.deltaTime;
 
