@@ -474,7 +474,9 @@ public class Skin {
             case GunHandler.GunStateEnum.shooting:
                 return shootSprites(input.gunInput.gunType);
             default:
-                if (input.isMoving) {
+                if (input.state == CharacterState.superJump) {
+                    return unarmedJump;
+                } else if (input.isMoving) {
                     if (input.isCrouching) {
                         // crawl
                         return unarmedCrawl;

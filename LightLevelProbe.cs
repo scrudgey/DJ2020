@@ -13,16 +13,17 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     public Color targetSpriteColor;
     public Color currentSpriteColor;
     void Update() {
-        lightLevel = 0;
+        float targetLightLevel = 0;
         if (concealment.Count > 0) {
-            lightLevel = 13f;
+            targetLightLevel = 13f;
         } else {
             foreach (RenderTexture texture in lightTextures) {
                 float faceLevel = TextureToLightLevel(texture);
-                lightLevel = Math.Max(faceLevel, lightLevel);
-
+                targetLightLevel = Math.Max(faceLevel, targetLightLevel);
             }
         }
+        float lerpfactor = targetLightLevel > lightLevel ? 2f : 0.01f;
+        lightLevel = Mathf.Lerp(lightLevel, targetLightLevel, lerpfactor);
 
         int discreteLightLevel = Toolbox.DiscreteLightLevel(lightLevel, controller.isCrouching, controller.isMoving());
 

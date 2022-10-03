@@ -179,6 +179,10 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
         if (input.hitState == HitState.dead) {
             animator.Stop();
+        } else if (input.state == CharacterState.superJump) {
+            state = State.jump;
+            spriteRenderer.sprite = skin.legsJump[direction][0];
+
         } else if (input.isMoving) {
             if (input.isJumping) {
                 state = State.jump;
@@ -289,6 +293,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     public void UpdateFrame(AnimationInput input) {
         // TODO: handle this in the same way as torso animation. and / or put the logic in Skin.
         Octet<Sprite[]> octet = null;
+        // Debug.Log($"legs: {input.state} {input.isJumping}");
         octet = skin.GetCurrentLegsOctet(state);
 
         if (hitState == HitState.dead) {
@@ -296,7 +301,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         }
         if (input.state == CharacterState.keelOver) {
             octet = skin.legsKeelOver;
-        } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
+        } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress) && input.state != CharacterState.superJump) {
             octet = skin.legsCrawl;
         }
         Sprite[] sprites = octet[direction];

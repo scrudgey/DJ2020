@@ -113,7 +113,6 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             input.isProne = false;
         }
         gunType = input.gunInput.gunType;
-        // Debug.Log($"hasgun: {input.gunInput.hasGun}");
         if (input.hitState == HitState.dead) {
             animator.Stop();
         } else if (input.gunInput.hasGun) {
@@ -165,9 +164,11 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         if (skin == null)
             return;
 
+        // TODO: handle superjump
+        // Debug.Log($"torso: {input.state} {input.isJumping}");
         Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(lastInput);
         // TODO: why is this logic not part of getCurrentTorsoOctet?
-        if (input.isProne) {
+        if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress) && input.state != CharacterState.superJump) {
             _sprites = skin.unarmedCrawl;
         }
         if (input.hitState == HitState.dead) {

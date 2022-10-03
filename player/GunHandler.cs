@@ -90,7 +90,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool CanShoot() => gunInstance.CanShoot() && (state != GunStateEnum.reloading && state != GunStateEnum.racking);
 
     public void Update() {
-        if (gunInstance == null) {
+        if (gunInstance == null || gunInstance.template == null) {
             state = GunStateEnum.idle;
             return;
         } else {
@@ -436,20 +436,23 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 nearestOther = nearestOther.transform.root.GetComponentInChildren<Collider>();
                 targetPoint = nearestOther.bounds.center;
                 TagSystemData tagData = Toolbox.GetTagData(nearestOther.gameObject);
-                if (tagData != null && tagData.targetPoint != null) {
-                    targetPoint = tagData.targetPoint.position;
-                }
-                Vector2 pointPosition = characterCamera.Camera.WorldToScreenPoint(targetPoint);
-                input.Fire.cursorData.type = CursorData.TargetType.objectLock;
-                input.Fire.cursorData.screenPosition = pointPosition;
-                input.Fire.cursorData.targetCollider = nearestOther;
+                if (tagData.targetPriority > -1) {
+                    if (tagData != null && tagData.targetPoint != null && tagData.targetPriority > -1) {
+                        targetPoint = tagData.targetPoint.position;
+                    }
+                    Vector2 pointPosition = characterCamera.Camera.WorldToScreenPoint(targetPoint);
+                    input.Fire.cursorData.type = CursorData.TargetType.objectLock;
+                    input.Fire.cursorData.screenPosition = pointPosition;
+                    input.Fire.cursorData.targetCollider = nearestOther;
 
-                // TODO: is this a hack?
-                if (GameManager.I.inputMode == InputMode.aim) {
+                    // TODO: is this a hack? what about NPCs?
+                    if (GameManager.I.inputMode == InputMode.aim) {
 
-                } else {
-                    input.Fire.cursorData.worldPosition = targetPoint;
+                    } else {
+                        input.Fire.cursorData.worldPosition = targetPoint;
+                    }
                 }
+
             }
 
             if (CanShoot()) {

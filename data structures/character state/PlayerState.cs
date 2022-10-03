@@ -91,6 +91,8 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         health = template.fullHealthAmount,
         cyberEyesThermal = template.cyberEyesThermal,
         cyberlegsLevel = template.cyberlegsLevel,
-        thirdWeaponSlot = template.thirdWeaponSlot
+        thirdWeaponSlot = template.thirdWeaponSlot,
+        legSkin = template.legSkin,
+        bodySkin = template.bodySkin
     };
 }

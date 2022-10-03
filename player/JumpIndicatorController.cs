@@ -6,13 +6,10 @@ using UnityEngine;
 
 public class JumpIndicatorController : MonoBehaviour, IInputReceiver {
     public Transform indicator;
-    public float moveRatio = 0.01f;
+    public float moveRatio = 1f;
     public float superJumpSpeed;
     public Vector3 gravity;
     public void SetInputs(PlayerInput inputs) {
-        // if (inputs.state != CharacterState.jumpPrep)
-        //     return;
-
         // Clamp input
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
         if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -27,7 +24,7 @@ public class JumpIndicatorController : MonoBehaviour, IInputReceiver {
         Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
 
         // Move and look inputs
-        moveInputVector = cameraPlanarRotation * moveInputVector;
+        moveInputVector = cameraPlanarRotation * moveInputVector * Time.deltaTime;
         if (inputs.MoveAxisRight != 0 && inputs.MoveAxisForward != 0) {
             moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * moveInputVector;
         }

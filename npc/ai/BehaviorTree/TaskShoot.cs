@@ -35,12 +35,15 @@ namespace AI {
                 mousePosition = lastSeenPlayerPosition
             };
             bool clearshot = gunHandler.IsClearShot(cursorData);
-            float shootPressedResetInterval = gunHandler.gunInstance.template.shootInterval / 2f;
+            float shootPressedResetInterval = gunHandler.gunInstance.template.shootInterval * 2f;
             bool firePressed = false;
+            // Debug.Log($"{Time.time - timelastshoot} {Time.time - timelastshoot > shootPressedResetInterval}");
             if (Time.time - timelastshoot > shootPressedResetInterval) {
                 timelastshoot = Time.time;
                 firePressed = true;
             }
+            // Debug.Log($"{firePressed}");
+
 
             PlayerInput.FireInputs fireInput = clearshot ? new PlayerInput.FireInputs() {
                 // FirePressed = false,

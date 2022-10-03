@@ -1376,6 +1376,8 @@ figure out graph load order issues once and for all
 * clear suspicion data between runs
 * better shoot and move inaccuracy
 * bug: npc can't seem to shoot me when close
+* bug: broken superjump
+* when alarm is disabled, guards stand around
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1487,6 +1489,8 @@ control / combat:
     headshots
     shoulder switch is a control
     aim sway responds to movement and gun skill
+    bullets that can pass through targets
+    armor & armor piercing
 
 sound
     ambience
@@ -1518,6 +1522,19 @@ better action log
 
 ---------------
 
+faster shotgun
+    click to rack faster?
+    raise - shoot - pump
+    animator speed can be adjusted
+
+should be able to shoot camera
+impact effects on superjump
+press esc to bring up vr mission menu
+    overall, menus should be a little more stylized
+adjustable NPC difficulty
+    how quickly acquire target
+    shooting behavior
+        quickness, bursts
 don't clip camera through wall
 DFS path finding doesn't quite work right for highlighting path
 alarm terminal triggering effects
@@ -1553,18 +1570,11 @@ graphics
     redraw cyberdeck
     redraw c4
 
-
-* when alarm is disabled, guards stand around
 overall, guards are not forming a coherent counterattack
     they should be running toward the firefight and seeing the player more readily.
-        see more readily: high visibility is sticky.
+        * see more readily: high visibility is sticky.
         running: adjust speed in appropriate conditional.
 
-bug: broken superjump
-faster shotgun
-    click to rack faster?
-    raise - shoot - pump
-    animator speed can be adjusted
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
     blend attractor position and focus position with parameter controlled by zoom
 

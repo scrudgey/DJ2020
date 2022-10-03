@@ -821,7 +821,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                         _jumpedThisFrame = true;
 
                         _jumpedFromLadder = GetOverlappingLadder() != null;
-
                         TransitionToState(CharacterState.superJump);
                     }
                 } else {
