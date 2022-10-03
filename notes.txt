@@ -1378,6 +1378,10 @@ figure out graph load order issues once and for all
 * bug: npc can't seem to shoot me when close
 * bug: broken superjump
 * when alarm is disabled, guards stand around
+* overall, guards are not forming a coherent counterattack
+    * they should be running toward the firefight and seeing the player more readily.
+        * see more readily: high visibility is sticky.
+        * running: adjust speed in appropriate conditional.
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1543,7 +1547,6 @@ why do gibs fall through the wall/floor?
 damage result addition is weird
 prevent extreme zoom maneuvers with lerping
     also, initialize camera with proper zoom?'
-corpse can be shot / exploded
 VRmissionTemplate -> LevelTemplate is incomplete.
 playertemplate / playerstate is still a little weird.
 use RaycastCommand
@@ -1558,6 +1561,7 @@ title screen animations
 clearsighter
 
 new missions
+    * fix mission modes for VR level
     a mission mode about stealth
     kill x in y time, continual respawning
     * UI display something about victory conditions
@@ -1569,12 +1573,10 @@ graphics
     death graphics for all skins
     redraw cyberdeck
     redraw c4
-
-overall, guards are not forming a coherent counterattack
-    they should be running toward the firefight and seeing the player more readily.
-        * see more readily: high visibility is sticky.
-        running: adjust speed in appropriate conditional.
+corpse can be shot / exploded
 
 when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
     blend attractor position and focus position with parameter controlled by zoom
 
+UI sound for checkboxes
+saved prefab VR mission templates

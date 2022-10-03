@@ -86,6 +86,9 @@ public class ReactToAttackState : SphereControlState {
                 )
             );
         } else {
+
+            // TODO: smarter behavior here. sometimes we want to run toward the firefight.
+
             rootTaskNode = new Sequence(
                     new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                         lookType = TaskLookAt.LookType.position,

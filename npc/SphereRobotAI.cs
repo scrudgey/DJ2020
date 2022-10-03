@@ -86,9 +86,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case ReactToAttackState:
                 // TODO: do something different. we were just attacked
                 if (lastDamage != null) {
-                    ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
+                    ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false, speedCoefficient: 2f));
                 } else if (getLocationOfInterest() != Vector3.zero) {
-                    ChangeState(new SearchDirectionState(this, getLocationOfInterest(), doIntro: false));
+                    ChangeState(new SearchDirectionState(this, getLocationOfInterest(), doIntro: false, speedCoefficient: 2f));
                 } else {
                     EnterDefaultState();
                 }
@@ -117,7 +117,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 }
                 break;
             case ReportToHQState:
-                Debug.Log("leaving report to HQ state");
                 if (lastDamage != null) {
                     ChangeState(new SearchDirectionState(this, lastDamage, doIntro: false));
                 } else if (getLocationOfInterest() != Vector3.zero) {

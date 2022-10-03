@@ -370,7 +370,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         if (gunInstance != null && gunInstance.template != null) {
             Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
-            PoolManager.I.RegisterPool(gunInstance.template.shellCasing);
+            PoolManager.I?.RegisterPool(gunInstance.template.shellCasing);
             if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
                 GameManager.I.AddSuspicionRecord(BrandishingWeaponRecord);
             }

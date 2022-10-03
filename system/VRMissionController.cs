@@ -17,7 +17,7 @@ public class VRMissionController : MonoBehaviour {
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
         int NPCPoolSize = state.template.numberConcurrentNPCs + GameManager.I.gameData.levelState.delta.strikeTeamMaxSize;
-        Debug.Log($"initiating NPC pool {NPCPoolSize}");
+        Debug.Log($"initializing NPC pool with size {NPCPoolSize}");
         PoolManager.I.RegisterPool("prefabs/NPC", poolSize: NPCPoolSize);
 
 
@@ -107,7 +107,7 @@ public class VRMissionController : MonoBehaviour {
         npcControllers.Remove(npc);
         data.data.numberLiveNPCs -= 1;
         data.data.numberNPCsKilled += 1;
-        if (data.template.missionType == VRMissionType.hunt) {
+        if (data.template.missionType == VRMissionType.combat) {
             SendLogMessage($"Kill count: {data.data.numberNPCsKilled} / {data.template.maxNumberNPCs}");
             if (data.data.numberNPCsKilled >= data.template.maxNumberNPCs) {
                 TransitionToState(State.victory);

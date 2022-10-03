@@ -8,10 +8,17 @@ public class NPCSpawnPoint : MonoBehaviour {
     PrefabPool effectPool;
     PrefabPool NPCPool;
     void Start() {
-        NPCPool = PoolManager.I.RegisterPool("prefabs/NPC", poolSize: 10);
-        effectPool = PoolManager.I.RegisterPool(spawnEffect, poolSize: 5);
+        InitializePools();
+    }
+    void InitializePools() {
+        Debug.Log(PoolManager.I);
+        NPCPool = PoolManager.I?.RegisterPool("prefabs/NPC", poolSize: 10);
+        effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
     public GameObject SpawnNPC(NPCTemplate template) {
+        if (effectPool == null) {
+            InitializePools();
+        }
         effectPool.GetObject(transform.position);
         GameObject npc = NPCPool.GetObject(transform.position);
 

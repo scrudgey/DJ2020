@@ -19,7 +19,7 @@ public record VRMissionTemplate {
 
     public static VRMissionTemplate Default() => new VRMissionTemplate {
         sceneName = "VR_infiltration",
-        missionType = VRMissionType.hunt,
+        missionType = VRMissionType.combat,
         sensitivityLevel = SensitivityLevel.restrictedProperty,
         maxNumberNPCs = 10,
         NPCspawnInterval = 5,

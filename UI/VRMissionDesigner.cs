@@ -20,6 +20,10 @@ public class VRMissionDesigner : MonoBehaviour {
         "VR",
         "VR_infiltration",
     };
+    static readonly Dictionary<string, string> SCENE_NAMES = new Dictionary<string, string>{
+        {"VR", "Meat Grinder"},
+        {"VR_infiltration", "Infiltration"},
+    };
 
     public VRMissionTemplate template;
     public int selectedCharacter;
@@ -65,6 +69,7 @@ public class VRMissionDesigner : MonoBehaviour {
     public Transform pickerContainer;
     public GameObject weaponPickerPrefab;
     public GameObject pickerDivider;
+    public GunStatHandler gunStatHandler;
     [Header("tabs")]
     public Button tab1;
     public Button tab2;
@@ -87,9 +92,11 @@ public class VRMissionDesigner : MonoBehaviour {
             Destroy(child.gameObject);
         }
         tabOriginalColor = tab2.colors.normalColor;
+        selectedWeapon = 1;
         selectedCharacter = 1;
         template = VRMissionTemplate.Default();
         LoadVRMissionTemplate();
+        gunStatHandler.DisplayGunTemplate(template.playerState.primaryGun);
         OnDataChange();
     }
     void SaveVRMissionTemplate() {
@@ -180,7 +187,7 @@ public class VRMissionDesigner : MonoBehaviour {
         string sceneImagePath = $"data/scenegraphics/{template.sceneName}";
         Sprite sceneSprite = Resources.Load<Sprite>(sceneImagePath) as Sprite;
         sceneImage.sprite = sceneSprite;
-        sceneNameText.text = template.sceneName;
+        sceneNameText.text = SCENE_NAMES[template.sceneName];
 
         missionTypeDropdown.value = (int)template.missionType;
         sensitivityDropdown.value = (int)template.sensitivityLevel;
@@ -337,6 +344,15 @@ public class VRMissionDesigner : MonoBehaviour {
         cb3.highlightedColor = tabOriginalColor;
         tab3.colors = cb3;
         Toolbox.RandomizeOneShot(audioSource, tabSounds, randomPitchWidth: 0.05f);
+
+
+        if (selectedWeapon == 1) {
+            gunStatHandler.DisplayGunTemplate(template.playerState.primaryGun);
+        } else if (selectedWeapon == 2) {
+            gunStatHandler.DisplayGunTemplate(template.playerState.secondaryGun);
+        } else if (selectedWeapon == 3) {
+            gunStatHandler.DisplayGunTemplate(template.playerState.tertiaryGun);
+        }
     }
     public void TabNPC1Callback() {
         selectedCharacter = 2;
@@ -362,6 +378,13 @@ public class VRMissionDesigner : MonoBehaviour {
         tab3.colors = cb3;
         Toolbox.RandomizeOneShot(audioSource, tabSounds, randomPitchWidth: 0.05f);
 
+        if (selectedWeapon == 1) {
+            gunStatHandler.DisplayGunTemplate(template.npc1State.primaryGun);
+        } else if (selectedWeapon == 2) {
+            gunStatHandler.DisplayGunTemplate(template.npc1State.secondaryGun);
+        } else if (selectedWeapon == 3) {
+            gunStatHandler.DisplayGunTemplate(template.npc1State.tertiaryGun);
+        }
     }
     public void TabNPC2Callback() {
         selectedCharacter = 3;
@@ -386,6 +409,14 @@ public class VRMissionDesigner : MonoBehaviour {
         cb3.highlightedColor = bodyMainColor;
         tab3.colors = cb3;
         Toolbox.RandomizeOneShot(audioSource, tabSounds, randomPitchWidth: 0.05f);
+
+        if (selectedWeapon == 1) {
+            gunStatHandler.DisplayGunTemplate(template.npc2State.primaryGun);
+        } else if (selectedWeapon == 2) {
+            gunStatHandler.DisplayGunTemplate(template.npc2State.secondaryGun);
+        } else if (selectedWeapon == 3) {
+            gunStatHandler.DisplayGunTemplate(template.npc2State.tertiaryGun);
+        }
     }
 
 
@@ -477,6 +508,14 @@ public class VRMissionDesigner : MonoBehaviour {
         weapon3Button.colors = cb3;
         Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds, randomPitchWidth: 0.05f);
 
+        if (selectedCharacter == 1) {
+            gunStatHandler.DisplayGunTemplate(template.playerState.primaryGun);
+        } else if (selectedCharacter == 2) {
+            gunStatHandler.DisplayGunTemplate(template.npc1State.primaryGun);
+        } else if (selectedCharacter == 3) {
+            gunStatHandler.DisplayGunTemplate(template.npc2State.primaryGun);
+        }
+
     }
     public void Weapon2Callback() {
         selectedWeapon = 2;
@@ -495,6 +534,13 @@ public class VRMissionDesigner : MonoBehaviour {
         weapon3Button.colors = cb3;
         Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds, randomPitchWidth: 0.05f);
 
+        if (selectedCharacter == 1) {
+            gunStatHandler.DisplayGunTemplate(template.playerState.secondaryGun);
+        } else if (selectedCharacter == 2) {
+            gunStatHandler.DisplayGunTemplate(template.npc1State.secondaryGun);
+        } else if (selectedCharacter == 3) {
+            gunStatHandler.DisplayGunTemplate(template.npc2State.secondaryGun);
+        }
     }
     public void Weapon3Callback() {
         selectedWeapon = 3;
@@ -512,6 +558,14 @@ public class VRMissionDesigner : MonoBehaviour {
         cb3.normalColor = weaponHighlightColor;
         weapon3Button.colors = cb3;
         Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds, randomPitchWidth: 0.05f);
+
+        if (selectedCharacter == 1) {
+            gunStatHandler.DisplayGunTemplate(template.playerState.tertiaryGun);
+        } else if (selectedCharacter == 2) {
+            gunStatHandler.DisplayGunTemplate(template.npc1State.tertiaryGun);
+        } else if (selectedCharacter == 3) {
+            gunStatHandler.DisplayGunTemplate(template.npc2State.tertiaryGun);
+        }
     }
     public void WeaponClearCallback(int weaponIndex) {
         IGunHandlerTemplate state = selectedCharacter switch {
@@ -555,6 +609,7 @@ public class VRMissionDesigner : MonoBehaviour {
                 break;
         }
         Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds, randomPitchWidth: 0.05f);
+        gunStatHandler.DisplayGunTemplate(handler.gun);
         OnDataChange();
     }
 

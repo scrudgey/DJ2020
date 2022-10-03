@@ -368,7 +368,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
         Vector3 distOffset = Vector3.zero;
 
-        Vector3 heightOffset = new Vector3(0, 0.25f, 0);
+        Vector3 heightOffset = Vector3.zero;
+        // Vector3 heightOffset = new Vector3(0, 0.25f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }

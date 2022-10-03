@@ -287,7 +287,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     //     skin = Skin.LoadSkin(data.legSkin);
     // }
     public void LoadSkinState(ISkinState state) {
-        skin = Skin.LoadSkin(state.bodySkin);
+        skin = Skin.LoadSkin(state.legSkin);
     }
 
     public void UpdateFrame(AnimationInput input) {

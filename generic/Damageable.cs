@@ -14,7 +14,7 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
         myCollider = GetComponentInChildren<Collider>();
         if (gibs != null)
             foreach (Gib gib in gibs.gibs) {
-                PoolManager.I.RegisterPool(gib.prefab);
+                PoolManager.I?.RegisterPool(gib.prefab);
             }
     }
     protected void RegisterDamageCallback<T>(Func<T, DamageResult> handler) where T : Damage {
