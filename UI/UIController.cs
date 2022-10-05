@@ -24,6 +24,7 @@ public class UIController : MonoBehaviour {
     public PlayerCalloutHandler playerCalloutHandler;
     public TextMeshProUGUI caption;
     public HitIndicatorController hitIndicatorController;
+    public VRStatHandler vRStatHandler;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -45,6 +46,7 @@ public class UIController : MonoBehaviour {
         caption.text = "";
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
+        HideVRStats();
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
@@ -84,5 +86,12 @@ public class UIController : MonoBehaviour {
     }
     void HandleCaptionChange(string newCaption) {
         caption.text = newCaption;
+    }
+
+    public void ShowVRStats() {
+        vRStatHandler.gameObject.SetActive(true);
+    }
+    public void HideVRStats() {
+        vRStatHandler.gameObject.SetActive(true);
     }
 }

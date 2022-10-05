@@ -1,1 +1,1 @@
-public enum VRMissionType { combat, steal, time }
+public enum VRMissionType { combat, steal, time, survival }

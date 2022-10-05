@@ -16,6 +16,8 @@ public record VRMissionTemplate {
 
     [JsonConverter(typeof(NPCTemplateJsonConverter))]
     public NPCTemplate npc2State;
+    public int targetDataCount;
+    public float timeLimit;
 
     public static VRMissionTemplate Default() => new VRMissionTemplate {
         sceneName = "VR_infiltration",

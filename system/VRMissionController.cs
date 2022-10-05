@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +12,18 @@ public class VRMissionController : MonoBehaviour {
     public List<CharacterController> npcControllers = new List<CharacterController>();
     float startTime;
     ActionLogHandler actionLogHandler;
+    List<VRDataStore> dataStores;
+    VRDataStore targetDatastore;
+    Stack<VRDataStore> datastoreStack;
+    VRStatHandler vRStatHandler;
     public void StartVRMission(VRMissionState state) {
         Debug.Log("VRMissionController: start VR mission");
         this.data = state;
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
         int NPCPoolSize = state.template.numberConcurrentNPCs + GameManager.I.gameData.levelState.delta.strikeTeamMaxSize;
-        Debug.Log($"initializing NPC pool with size {NPCPoolSize}");
+        // Debug.Log($"initializing NPC pool with size {NPCPoolSize}");
         PoolManager.I.RegisterPool("prefabs/NPC", poolSize: NPCPoolSize);
-
-
         if (!state.template.alarmHQEnabled) {
             AlarmHQTerminal levelHQTerminal = GameManager.I.levelHQTerminal();
             if (levelHQTerminal != null) {
@@ -28,7 +31,44 @@ public class VRMissionController : MonoBehaviour {
             }
         }
         startTime = Time.time;
+        if (state.template.missionType == VRMissionType.steal) {
+            InitializeStealDataMission();
+        }
 
+    }
+    void InitializeStealDataMission() {
+        Debug.Log("initialize steal data mission");
+        dataStores = new List<VRDataStore>();
+        foreach (VRDataStore dataStore in GameObject.FindObjectsOfType<VRDataStore>()) {
+            Debug.Log(dataStore);
+            dataStores.Add(dataStore);
+            dataStore.OnDataStoreOpened += HandleVRDataStoreOpened;
+        }
+        datastoreStack = new Stack<VRDataStore>();
+        GameObject.FindObjectsOfType<VRDataStore>().OrderBy(a => Guid.NewGuid()).ToList().ForEach(datastoreStack.Push);
+        SetTargetDataStore();
+    }
+    void SetTargetDataStore() {
+        if (datastoreStack.Count <= 0) {
+            datastoreStack = new Stack<VRDataStore>();
+            GameObject.FindObjectsOfType<VRDataStore>().OrderBy(a => Guid.NewGuid()).ToList().ForEach(datastoreStack.Push);
+        }
+        targetDatastore = datastoreStack.Pop();
+        targetDatastore.ActivateCallout();
+        // Debug.Log($"new target datastore: {targetDatastore}");
+    }
+    void HandleVRDataStoreOpened(VRDataStore target) {
+        if (target == targetDatastore) {
+            target.PlayParticles();
+            target.DeactivateCallout();
+            data.data.numberDataStoresOpened += 1;
+            SendLogMessage($"Data stolen: {data.data.numberDataStoresOpened} / {data.template.targetDataCount}");
+            if (data.data.numberDataStoresOpened >= data.template.targetDataCount) {
+                TransitionToState(State.victory);
+            }
+            SetTargetDataStore();
+            // Debug.Log($"datastores opened: {numberDataStoresOpened}");
+        }
     }
     void SendLogMessage(string message) {
         if (actionLogHandler == null)
@@ -78,14 +118,36 @@ public class VRMissionController : MonoBehaviour {
 
 
     void Update() {
-        if (data.data.numberTotalNPCs < data.template.maxNumberNPCs && data.data.numberLiveNPCs < data.template.numberConcurrentNPCs) {
-            NPCspawnTimer += Time.deltaTime;
-            if (NPCspawnTimer > data.template.NPCspawnInterval) {
-                NPCspawnTimer -= data.template.NPCspawnInterval;
-                SpawnNPC();
+        data.data.secondsPlayed = Time.time - startTime;
+        if (data.template.missionType == VRMissionType.time) {
+            if (data.data.secondsPlayed > data.template.timeLimit && state != State.fail) {
+                SendLogMessage($"Time limit!");
+                TransitionToState(State.fail);
+            }
+        }
+        if (data.data.numberLiveNPCs < data.template.numberConcurrentNPCs) {
+            if ((data.template.missionType == VRMissionType.combat && data.data.numberTotalNPCs < data.template.maxNumberNPCs) ||
+                (data.template.missionType == VRMissionType.steal) ||
+                (data.template.missionType == VRMissionType.time)) {
+                NPCspawnTimer += Time.deltaTime;
+                if (NPCspawnTimer > data.template.NPCspawnInterval) {
+                    NPCspawnTimer -= data.template.NPCspawnInterval;
+                    SpawnNPC();
+                }
+            } else {
+                NPCspawnTimer = 0f;
+            }
+        }
+
+        // TODO: fix  this ugly hack!!
+        if (vRStatHandler == null) {
+            UIController uiController = GameObject.FindObjectOfType<UIController>();
+            if (uiController != null) {
+                uiController.ShowVRStats();
+                vRStatHandler = uiController.vRStatHandler;
             }
         } else {
-            NPCspawnTimer = 0f;
+            vRStatHandler.SetDisplay(data);
         }
     }
 
@@ -107,12 +169,13 @@ public class VRMissionController : MonoBehaviour {
         npcControllers.Remove(npc);
         data.data.numberLiveNPCs -= 1;
         data.data.numberNPCsKilled += 1;
-        if (data.template.missionType == VRMissionType.combat) {
+        if (data.template.missionType == VRMissionType.combat || data.template.missionType == VRMissionType.time) {
             SendLogMessage($"Kill count: {data.data.numberNPCsKilled} / {data.template.maxNumberNPCs}");
             if (data.data.numberNPCsKilled >= data.template.maxNumberNPCs) {
                 TransitionToState(State.victory);
             }
         }
+
     }
     void HandlePlayerDead(CharacterController npc) {
         TransitionToState(State.fail);
@@ -127,6 +190,9 @@ public class VRMissionController : MonoBehaviour {
     void OnDestroy() {
         foreach (CharacterController npcController in npcControllers) {
             npcController.OnCharacterDead -= HandleNPCDead;
+        }
+        foreach (VRDataStore dataStore in dataStores) {
+            dataStore.OnDataStoreOpened -= HandleVRDataStoreOpened;
         }
         if (GameManager.I.playerObject != null) {
             CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();

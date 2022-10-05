@@ -5,6 +5,7 @@ public record VRMissionDelta {
     public int numberLiveNPCs;
     public int numberNPCsKilled;
     public float secondsPlayed = 0f;
+    public int numberDataStoresOpened;
 
     public static VRMissionDelta Empty() {
         return new VRMissionDelta {

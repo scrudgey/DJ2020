@@ -35,8 +35,15 @@ public class VRMissionDesigner : MonoBehaviour {
     public TMP_Dropdown missionTypeDropdown;
     public TMP_Dropdown sensitivityDropdown;
     public TMP_InputField numberNPCInput;
+    public GameObject numberNPCGameObject;
+
     public TMP_InputField concurrentNPCInput;
     public TMP_InputField spawnIntervalInput;
+    public TMP_InputField targetDataCountInput;
+    public GameObject targetDataCountGameobject;
+
+    public TMP_InputField timeLimitInput;
+    public GameObject timeLimitGameObject;
     public Toggle alarmHQSelector;
 
     [Header("character controls")]
@@ -86,6 +93,7 @@ public class VRMissionDesigner : MonoBehaviour {
     public AudioClip[] tabSounds;
     public AudioClip[] pickerCallbackSounds;
     public AudioClip[] weaponSelectorSounds;
+    public AudioClip[] toggleSounds;
 
     void Start() {
         foreach (Transform child in pickerContainer) {
@@ -194,6 +202,8 @@ public class VRMissionDesigner : MonoBehaviour {
         numberNPCInput.text = template.maxNumberNPCs.ToString();
         concurrentNPCInput.text = template.numberConcurrentNPCs.ToString();
         spawnIntervalInput.text = template.NPCspawnInterval.ToString();
+        targetDataCountInput.text = template.targetDataCount.ToString();
+        timeLimitInput.text = template.timeLimit.ToString();
         alarmHQSelector.isOn = template.alarmHQEnabled;
 
         string legSkinName = selectedCharacter switch {
@@ -282,6 +292,25 @@ public class VRMissionDesigner : MonoBehaviour {
             secondaryWeaponCaption.text = "None";
         }
 
+        switch (template.missionType) {
+            default:
+                targetDataCountGameobject.SetActive(false);
+                numberNPCGameObject.SetActive(true);
+                timeLimitGameObject.SetActive(false);
+                break;
+            case VRMissionType.steal:
+                numberNPCGameObject.SetActive(false);
+                targetDataCountGameobject.SetActive(true);
+                timeLimitGameObject.SetActive(false);
+
+                break;
+            case VRMissionType.time:
+                numberNPCGameObject.SetActive(true);
+                targetDataCountGameobject.SetActive(false);
+                timeLimitGameObject.SetActive(true);
+                break;
+        }
+
         SaveVRMissionTemplate();
     }
 
@@ -315,6 +344,16 @@ public class VRMissionDesigner : MonoBehaviour {
     public void SpawnIntervalCallback(TMP_InputField inputField) {
         inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
         template.NPCspawnInterval = float.Parse(inputField.text);
+        OnDataChange();
+    }
+    public void TargetDataCountCallback(TMP_InputField inputField) {
+        inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
+        template.targetDataCount = int.Parse(inputField.text);
+        OnDataChange();
+    }
+    public void TimeLimitCallback(TMP_InputField inputField) {
+        inputField.text = Regex.Replace(inputField.text, @"[^a-zA-Z0-9 ]", "");
+        template.timeLimit = float.Parse(inputField.text);
         OnDataChange();
     }
 
@@ -474,18 +513,22 @@ public class VRMissionDesigner : MonoBehaviour {
     }
     public void AlarmHQCallback(Toggle toggle) {
         template.alarmHQEnabled = toggle.isOn;
+        Toolbox.RandomizeOneShot(audioSource, toggleSounds);
         OnDataChange();
     }
     public void CyberLegsCallback(Toggle toggle) {
         template.playerState.cyberlegsLevel = toggle.isOn ? 1 : 0;
+        Toolbox.RandomizeOneShot(audioSource, toggleSounds);
         OnDataChange();
     }
     public void CyberEyesCallback(Toggle toggle) {
         template.playerState.cyberEyesThermal = toggle.isOn;
+        Toolbox.RandomizeOneShot(audioSource, toggleSounds);
         OnDataChange();
     }
     public void WeaponSlotCallback(Toggle toggle) {
         template.playerState.thirdWeaponSlot = toggle.isOn;
+        Toolbox.RandomizeOneShot(audioSource, toggleSounds);
         OnDataChange();
     }
 

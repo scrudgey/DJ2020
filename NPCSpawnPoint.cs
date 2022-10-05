@@ -22,7 +22,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         effectPool.GetObject(transform.position);
         GameObject npc = NPCPool.GetObject(transform.position);
 
-        PatrolRoute route = GameObject.FindObjectOfType<PatrolRoute>();
+        PatrolRoute route = Toolbox.RandomFromList(GameObject.FindObjectsOfType<PatrolRoute>());
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
 
         CharacterController controller = npc.GetComponentInChildren<CharacterController>();
