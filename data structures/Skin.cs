@@ -441,7 +441,20 @@ public class Skin {
         return skin;
     }
 
-    public Octet<Sprite[]> GetCurrentLegsOctet(LegsAnimation.State state) {
+    public Octet<Sprite[]> GetCurrentLegsOctet(LegsAnimation.State state, AnimationInput input) {
+
+        if (input.hitState == HitState.dead) {
+            return legsDead;
+        } else if (input.state == CharacterState.keelOver) {
+            return legsKeelOver;
+        } else if (input.state == CharacterState.jumpPrep || input.state == CharacterState.landStun) {
+            return legsCrouch;
+        } else if (input.state == CharacterState.superJump || state == LegsAnimation.State.jump) {
+            return legsJump;
+        } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
+            return legsCrawl;
+        }
+
         switch (state) {
             case LegsAnimation.State.walk:
                 return legsWalk;
@@ -451,8 +464,8 @@ public class Skin {
                 return legsCrouch;
             case LegsAnimation.State.run:
                 return legsRun;
-            case LegsAnimation.State.jump:
-                return legsJump;
+            // case LegsAnimation.State.jump:
+            //     return legsJump;
             case LegsAnimation.State.climb:
                 return legsClimb;
             default:
@@ -462,8 +475,18 @@ public class Skin {
     }
 
     public Octet<Sprite[]> GetCurrentTorsoOctet(AnimationInput input) {
-        if (input.isClimbing) {
+        if (input.hitState == HitState.dead) {
+            return unarmedDead;
+        } else if (input.state == CharacterState.keelOver) {
+            return unarmedKeelOver;
+        } else if (input.isClimbing) {
             return unarmedClimb;
+        } else if (input.state == CharacterState.superJump) {
+            return unarmedJump;
+        } else if (input.state == CharacterState.landStun || input.state == CharacterState.jumpPrep) {
+            return gunCrouchSprites(input.gunInput.gunType);
+        } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
+            return unarmedCrawl;
         }
         // gun states
         switch (input.gunInput.gunState) {
@@ -474,9 +497,7 @@ public class Skin {
             case GunHandler.GunStateEnum.shooting:
                 return shootSprites(input.gunInput.gunType);
             default:
-                if (input.state == CharacterState.superJump) {
-                    return unarmedJump;
-                } else if (input.isMoving) {
+                if (input.isMoving) {
                     if (input.isCrouching) {
                         // crawl
                         return unarmedCrawl;
@@ -493,6 +514,7 @@ public class Skin {
                     } else return gunIdleSprites(input.gunInput.gunType);
                 }
         }
+
     }
 
     public static void SaveSpriteData(string skinName, List<SpriteData> spriteData, string sheetType) {

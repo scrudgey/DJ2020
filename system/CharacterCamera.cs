@@ -69,12 +69,15 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     private bool clampOrthographicSize;
     public Vector3 lastTargetPosition;
     public float zoomCoefficient = 1f;
+    public float zoomCoefficientTarget = 1f;
+    float zoomVelocity = 0.0f;
     private bool horizontalAimParity;
     private List<Quaternion> cardinalDirections;
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
     CameraAttractorZone currentAttractor = null;
     private static float shakeJitter = 0f;
+    private float currentOrthographicSize;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
@@ -86,9 +89,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         } else if (input.rotateCameraLeftPressedThisFrame) {
             currentRotationInput = CameraInput.RotateInput.left;
         }
-        zoomCoefficient -= input.zoomInput.y / 50f;
-        zoomCoefficient = Math.Max(0.5f, zoomCoefficient);
-        zoomCoefficient = Math.Min(1.5f, zoomCoefficient);
+        zoomCoefficientTarget -= input.zoomInput.y * Time.unscaledDeltaTime * 0.1f;
+        zoomCoefficientTarget = Math.Max(0.25f, zoomCoefficientTarget);
+        zoomCoefficientTarget = Math.Min(1.0f, zoomCoefficientTarget);
+        // zoomCoefficient = Mathf.Lerp(zoomCoefficient, zoomCoefficientTarget, 0.1f);
+        zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f);
     }
     void Awake() {
         Transform = this.transform;
@@ -261,8 +266,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
 
     public CameraTargetParameters NormalParameters(CameraInput input) {
-        Vector3 targetPosition = FollowTransform?.position ?? Vector3.zero;
-
         // Process rotation input
         float rotationInputDegrees = 0f;
         switch (currentRotationInput) {
@@ -282,13 +285,20 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
 
-        if (transitionTime >= 0.1f && input.targetData != null) {
+        Vector3 targetPosition = lastTargetPosition;
+        if (input.state == CharacterState.superJump || input.state == CharacterState.landStun) {
+            zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
+        } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
             Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y);
-            // TODO: configurable scale, possibly involve aspect ratio
             targetPosition = FollowTransform.position + worldOffset;
             lastTargetPosition = targetPosition;
         }
+
+        float desiredOrthographicSize = 9 * zoomCoefficient;
+        desiredOrthographicSize = Math.Max(1, desiredOrthographicSize);
+        desiredOrthographicSize = Math.Min(10, desiredOrthographicSize);
+        currentOrthographicSize = desiredOrthographicSize;
 
         return new CameraTargetParameters() {
             fieldOfView = 70f,
@@ -298,8 +308,8 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             deltaTime = input.deltaTime,
             targetDistance = 20,
             targetPosition = targetPosition,
-            orthographicSize = 6, // 8 TODO: set by attractor and/or level
-                                  // orthographicSize = 3, // 8 TODO: set by attractor and/or level
+            orthographicSize = currentOrthographicSize, // 8 TODO: set by attractor and/or level
+                                                        // orthographicSize = 3, // 8 TODO: set by attractor and/or level
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
             distanceMovementSpeed = currentDistanceMovementSpeed,
@@ -312,11 +322,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         if (currentAttractor != null) {
             parameters.followingSharpness = currentAttractor.movementSharpness;
             Vector3 delta = FollowTransform?.position - currentAttractor.sphereCollider.bounds.center ?? Vector3.zero;
-            if (currentAttractor.useInnerFocus && delta.magnitude < currentAttractor.innerFocusRadius) {
-                parameters.orthographicSize = currentAttractor.innerFocusOrthographicSize;
-            } else {
-                parameters.targetPosition = currentAttractor.sphereCollider.bounds.center;
-            }
+            parameters.targetPosition = (currentAttractor.sphereCollider.bounds.center * (zoomCoefficient - 0.25f)) + (parameters.targetPosition * (1.25f - zoomCoefficient));
         }
         return parameters;
     }
@@ -434,10 +440,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // apply orthographic
         Camera.orthographic = input.orthographic;
 
-        if (input.state != CharacterState.wallPress && state != CameraState.aim && transitionTime >= 1) {
-            // if (input.state != CharacterState.wallPress && GameManager.I.inputMode != InputMode.aim && transitionTime >= 1) {
-            UpdateCameraZoom(input);
-        }
+        Camera.orthographicSize = input.orthographicSize;
 
         // apply rotation
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
@@ -502,20 +505,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         isometricRotation = Transform.rotation;
     }
 
-    void UpdateCameraZoom(CameraTargetParameters input) {
-        Vector3 screenPoint = Camera.main.WorldToViewportPoint(FollowTransform.position);
-        float desiredOrthographicSize = input.orthographicSize * zoomCoefficient;
-        float previousOrthographicSize = Camera.orthographicSize;
-
-        if (desiredOrthographicSize == 0) {
-            Debug.Log($"{input.orthographicSize} {zoomCoefficient}");
-        }
-
-        desiredOrthographicSize = Math.Max(1, desiredOrthographicSize);
-        desiredOrthographicSize = Math.Min(10, desiredOrthographicSize);
-
-        Camera.orthographicSize = desiredOrthographicSize;
-    }
     public CursorData GetTargetData(Vector2 cursorPosition, InputMode inputMode) {
         if (inputMode == InputMode.aim || inputMode == InputMode.wallpressAim) {
             return AimToTarget(cursorPosition);

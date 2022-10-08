@@ -99,11 +99,12 @@ public class PrefabPool {
 public class PoolManager : Singleton<PoolManager> {
     private Dictionary<string, PrefabPool> prefabPools = new Dictionary<string, PrefabPool>();
 
-    public enum DecalType { normal, glass, blood }
+    public enum DecalType { normal, glass, blood, explosiveScar }
     public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
         {DecalType.normal, "sprites/particles/bulletholes_normal"},
         {DecalType.glass, "sprites/particles/bulletholes_glass"},
-        {DecalType.blood, "sprites/particles/blood_decal"}
+        {DecalType.blood, "sprites/particles/blood_decal"},
+        {DecalType.explosiveScar, "sprites/particles/Explosive scar"}
     };
     private static readonly Dictionary<DecalType, Sprite[]> decalSprites = new Dictionary<DecalType, Sprite[]>();
     void Awake() {

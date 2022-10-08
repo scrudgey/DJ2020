@@ -75,8 +75,14 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         base.ApplyDamageResult(result);
     }
     protected override void DoDestruct(Damage damage) {
-        // TODO: destroy on different damage conditions
         hitState = HitState.dead;
+
+        // TODO: this is all pretty much a bad hack
+        if (damage is ExplosionDamage) {
+            PoolManager.I.GetPool(gameObject).RecallObject(transform.parent.gameObject);
+            CharacterController controller = transform.root.GetComponentInChildren<CharacterController>();
+            controller.OnCharacterDead?.Invoke(controller);
+        }
     }
 
     public void CheckWallDecal(BulletDamage damage) {

@@ -8,10 +8,17 @@ public class Spawner : MonoBehaviour {
     public float delay;
     public bool repeating;
     public bool useObjectPool;
+    public bool stopOnGround;
+    Rigidbody myRigidBody;
+    void Start() {
+        myRigidBody = GetComponent<Rigidbody>();
+    }
 
-    // Update is called once per frame
     void Update() {
         timer += Time.deltaTime;
+        if (stopOnGround && Mathf.Abs(myRigidBody.velocity.y) < 0.1f) {
+            return;
+        }
         if (timer > delay) {
             if (useObjectPool) {
                 PoolManager.I.GetPool(prefab).GetObject(transform.position);

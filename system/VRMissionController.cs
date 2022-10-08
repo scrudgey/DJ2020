@@ -181,12 +181,6 @@ public class VRMissionController : MonoBehaviour {
         TransitionToState(State.fail);
     }
 
-    void SpawnAllNPCs() {
-        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn)) {
-            spawnPoint.SpawnNPC(data.template.npc1State);
-        }
-    }
-
     void OnDestroy() {
         foreach (CharacterController npcController in npcControllers) {
             npcController.OnCharacterDead -= HandleNPCDead;

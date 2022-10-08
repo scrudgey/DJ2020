@@ -22,6 +22,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     public Transform shadowCaster;
     public GameObject torso;
     public Animation animator;
+    AnimationInput lastInput;
     public AnimationClip idleAnimation;
     public AnimationClip walkAnimation;
     public AnimationClip walkSlowAnimation;
@@ -99,7 +100,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     private void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
         DirectionalBillboard billboard = trail.GetComponentInChildren<DirectionalBillboard>();
-        billboard.skin = skin.GetCurrentLegsOctet(state);
+        billboard.skin = skin.GetCurrentLegsOctet(state, lastInput);
         torsoAnimation?.SpawnTrail();
         headAnimation?.SpawnTrail();
     }
@@ -111,6 +112,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             return;
         if (input.movementSticking)
             return;
+        lastInput = input;
         crouchTransitionTimer += Time.deltaTime;
         hitState = input.hitState;
 
@@ -160,19 +162,11 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         }
 
         // set mode and animation
-        if (input.isCrouching) {
+        if (input.isCrouching || input.state == CharacterState.landStun) {
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
             if (input.isProne && !(input.state == CharacterState.wallPress || input.wallPressTimer > 0)) {
                 spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
-            } else {
-                spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
             }
-            // TODO: fix this
-            // if (input.state == CharacterState.wallPress || input.wallPressTimer > 0) {
-            //     Debug.Log("wallpress crawl");
-            //     spriteRenderer.transform.localPosition = new Vector3(0f, 0.95f, 0f);
-            // } else {
-            //     spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
-            // }
         } else {
             spriteRenderer.transform.localPosition = new Vector3(0f, 0.85f, 0f);
         }
@@ -182,7 +176,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         } else if (input.state == CharacterState.superJump) {
             state = State.jump;
             spriteRenderer.sprite = skin.legsJump[direction][0];
-
+        } else if (input.state == CharacterState.landStun) {
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+            shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
         } else if (input.isMoving) {
             if (input.isJumping) {
                 state = State.jump;
@@ -224,7 +220,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             } else if (input.isClimbing) {
                 state = State.climb;
                 spriteRenderer.sprite = skin.legsClimb[Direction.up][0];
-            } else if (input.isCrouching) { // crouching or crawling
+            } else if (input.isCrouching || input.state == CharacterState.landStun) { // crouching or crawling
                 state = State.crouch;
                 if (!input.isProne) { // crouching
                     shadowCaster.localScale = new Vector3(0.5f, 0.4f, 0.5f);
@@ -283,27 +279,14 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         }
     }
 
-    // public void LoadState(PlayerData data) {
-    //     skin = Skin.LoadSkin(data.legSkin);
-    // }
     public void LoadSkinState(ISkinState state) {
         skin = Skin.LoadSkin(state.legSkin);
     }
 
     public void UpdateFrame(AnimationInput input) {
-        // TODO: handle this in the same way as torso animation. and / or put the logic in Skin.
         Octet<Sprite[]> octet = null;
-        // Debug.Log($"legs: {input.state} {input.isJumping}");
-        octet = skin.GetCurrentLegsOctet(state);
+        octet = skin.GetCurrentLegsOctet(state, input);
 
-        if (hitState == HitState.dead) {
-            octet = skin.legsDead;
-        }
-        if (input.state == CharacterState.keelOver) {
-            octet = skin.legsKeelOver;
-        } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress) && input.state != CharacterState.superJump) {
-            octet = skin.legsCrawl;
-        }
         Sprite[] sprites = octet[direction];
         frame = Math.Min(frame, sprites.Length - 1);
         spriteRenderer.sprite = sprites[frame];

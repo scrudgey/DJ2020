@@ -204,6 +204,18 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 landStunTimer = 0.5f;
                 Toolbox.RandomizeOneShot(audioSource, landingSounds);
                 isCrouching = true;
+                PoolManager.I.GetPool("prefabs/fx/landImpactFx").GetObject(transform.position);
+                Ray ray = new Ray(transform.position + new Vector3(0f, 0.1f, 0f), Vector3.down);
+                RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
+                foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+                    if (hit.collider.transform.IsChildOf(transform.root))
+                        continue;
+                    // if (!tagData.bulletPassthrough) {
+                    // if (!tagData.noDecal) {
+                    // }
+                    GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.explosiveScar);
+                    decalObject.transform.SetParent(hit.collider.transform, true);
+                }
                 break;
             case CharacterState.climbing:
                 _rotationBeforeClimbing = Motor.TransientRotation;
@@ -247,6 +259,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
     }
     private void Start() {
+        PoolManager.I.RegisterPool("prefabs/fx/landImpactFx", poolSize: 2);
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         gunHandler.characterCamera = OrbitCamera;
         gunHandler.OnShoot += HandleOnShoot;
@@ -284,6 +297,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case HitState.dead:
                 TransitionToState(CharacterState.dead);
+
                 break;
         }
         OnValueChanged?.Invoke(this);
@@ -363,8 +377,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             isRunning = false;
 
             // Crouching input
-            if (input.CrouchDown || input.jumpHeld) {
-                Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+            if (input.CrouchDown || input.jumpHeld || state == CharacterState.landStun || state == CharacterState.jumpPrep) {
+                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 if (!isCrouching) {
                     isCrouching = true;
                     if (input.CrouchDown)
@@ -403,6 +417,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 jumpIndicatorController.superJumpSpeed = superJumpSpeed;
                 jumpIndicatorController.gravity = Gravity;
                 jumpIndicatorController.SetInputs(input);
+                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
@@ -412,7 +427,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 isRunning = false;
                 isProne = false;
                 if (input.CrouchDown) {
-                    Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                    SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                     if (!isCrouching) {
                         isCrouching = true;
                         Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
@@ -570,10 +585,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.superJump:
                 if (Motor.Velocity.y < 0) {
-                    Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                    SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 } else {
-                    Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                    SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 }
+                break;
+            case CharacterState.landStun:
+                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 break;
         }
 
@@ -788,6 +806,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 if (deadTimer >= 1.1f) {
                     TransitionToState(CharacterState.keelOver);
                 }
+                // if (damag)
                 break;
             case CharacterState.keelOver:
                 deadTimer += Time.deltaTime;
@@ -884,8 +903,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.landStun:
                 if (Motor.GroundingStatus.IsStableOnGround) {
+                    SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                     currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
-                    currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, 1 - Mathf.Exp(-StableMovementSharpness * deltaTime));
+                    currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, 0.2f);
                 } else {
                     if (_moveInputVector.sqrMagnitude > 0f) {
                         targetMovementVelocity = Vector3.zero;
@@ -1081,19 +1101,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     void CheckUncrouch() {
-        if (isCrouching && !inputCrouchDown) {
+        if (isCrouching && !inputCrouchDown && state != CharacterState.landStun && state != CharacterState.jumpPrep) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
-            Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+            SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
             _probedColliders = new Collider[8];
             if (Motor.CharacterCollisionsOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders) > 0) {
                 // If obstructions, just stick to crouching dimensions
-                Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
             } else {
                 // If no obstructions, uncrouch
-                Motor.SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
+                SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 isCrouching = false;
             }
         }
+    }
+    void SetCapsuleDimensions(float radius, float height, float yOffset) {
+        Motor.SetCapsuleDimensions(radius, height, yOffset);
     }
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
@@ -1154,6 +1177,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.jumpPrep:
                 jumpIndicatorController.transform.rotation = Quaternion.identity;
                 direction = Motor.CharacterForward;
+                Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
                 break;
             case CharacterState.climbing:
                 switch (_climbingState) {

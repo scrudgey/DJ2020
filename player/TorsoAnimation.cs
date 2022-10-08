@@ -164,19 +164,8 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         if (skin == null)
             return;
 
-        // TODO: handle superjump
-        // Debug.Log($"torso: {input.state} {input.isJumping}");
-        Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(lastInput);
-        // TODO: why is this logic not part of getCurrentTorsoOctet?
-        if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress) && input.state != CharacterState.superJump) {
-            _sprites = skin.unarmedCrawl;
-        }
-        if (input.hitState == HitState.dead) {
-            _sprites = skin.unarmedDead;
-        }
-        if (input.state == CharacterState.keelOver) {
-            _sprites = skin.unarmedKeelOver;
-        }
+        Octet<Sprite[]> _sprites = skin.GetCurrentTorsoOctet(input);
+
         if (_sprites == null)
             return;
         if (_sprites[direction] == null)
@@ -194,9 +183,6 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         // TODO: set direction
         // billboard.direction = _direction;
     }
-    // public void LoadState(PlayerData data) {
-    //     skin = Skin.LoadSkin(data.bodySkin);
-    // }
     public void LoadSkinState(ISkinState state) {
         skin = Skin.LoadSkin(state.bodySkin);
     }

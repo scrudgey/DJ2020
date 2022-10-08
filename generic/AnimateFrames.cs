@@ -10,7 +10,11 @@ public class AnimateFrames : MonoBehaviour {
     AudioSource audioSource;
     public AudioClip flipSound;
     public bool destroyOnFinished;
+    public bool stopOnGround;
+    Rigidbody myRigidBody;
+
     void Start() {
+        myRigidBody = GetComponent<Rigidbody>();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) {
@@ -21,6 +25,9 @@ public class AnimateFrames : MonoBehaviour {
     }
     void Update() {
         animationTimer += Time.deltaTime;
+        if (stopOnGround && Mathf.Abs(myRigidBody.velocity.y) < 0.1f) {
+            return;
+        }
         if (animationTimer > frameTime) {
             frameIndex += 1;
             if (frameIndex == frames.Count) {

@@ -1407,6 +1407,19 @@ in general, why will missions be a challenge?
 * display some feedback about victory conditions
 * more patrol routes
 * UI sound for checkboxes
+* when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
+* display game mode info underneath mission type selector
+* display information underneath sensitivity selector
+* slow the zoom maneuver
+* superjump:
+    * jumpprep: kneel
+    * land: kneel
+    * land: change collider size
+    * faster jump control
+    * trail is behind player?
+    * don't move camera during superjump
+    * impact effect
+    * impact decal
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1583,26 +1596,24 @@ use RaycastCommand
 bigger level
 title screen logo
 title screen animations
+doors
+colt 2037 sped up sounds great
 
 clearsighter
-
-graphics
-    thermal goggles icon
-    gibs from explosions
-    death graphics for all skins
-    redraw cyberdeck
-    redraw c4
-corpse can be shot / exploded
-when you zoom *all* the way out, camera shifts from being centered on you to being centered on the attractor
-    blend attractor position and focus position with parameter controlled by zoom
-    
-superjump:
-    jumpprep: kneel
-    faster jump control
-    land: kneel
+investigate routine
 
 saved prefab VR mission templates
 better UI for hack feedback
 NPC reacts when seeing another shooting
 NPC reacts to corpses
 NPC reacts when seeing another shot
+
+camera move speed when switching views
+thermal goggles icon
+redraw cyberdeck
+redraw c4
+corpse can be shot / exploded
+add cyber support to VR level
+more, bigger levels
+spawned NPCs should count
+    use static GameManager action

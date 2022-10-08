@@ -46,6 +46,9 @@ public class VRMissionDesigner : MonoBehaviour {
     public GameObject timeLimitGameObject;
     public Toggle alarmHQSelector;
 
+    public TextMeshProUGUI missionTypeDescriptionText;
+    public TextMeshProUGUI sensitivityDescriptionText;
+
     [Header("character controls")]
     public TextMeshProUGUI characterTitle;
     public Image headImage;
@@ -294,20 +297,41 @@ public class VRMissionDesigner : MonoBehaviour {
 
         switch (template.missionType) {
             default:
+            case VRMissionType.combat:
                 targetDataCountGameobject.SetActive(false);
                 numberNPCGameObject.SetActive(true);
                 timeLimitGameObject.SetActive(false);
+                missionTypeDescriptionText.text = "Defeat all enemies to win.";
                 break;
             case VRMissionType.steal:
                 numberNPCGameObject.SetActive(false);
                 targetDataCountGameobject.SetActive(true);
                 timeLimitGameObject.SetActive(false);
-
+                missionTypeDescriptionText.text = "Steal data from the marked terminals. Steal all the data to win.";
                 break;
             case VRMissionType.time:
                 numberNPCGameObject.SetActive(true);
                 targetDataCountGameobject.SetActive(false);
                 timeLimitGameObject.SetActive(true);
+                missionTypeDescriptionText.text = "Race to kill x enemies in y seconds.";
+                break;
+        }
+        switch (template.sensitivityLevel) {
+            default:
+                sensitivityDescriptionText.text = "text1";
+                break;
+            case SensitivityLevel.publicProperty:
+                sensitivityDescriptionText.text = "Property that is open to the public. Streets, parks, marketplaces. Guards will only react to open hostility.";
+                break;
+            case SensitivityLevel.semiprivateProperty:
+                sensitivityDescriptionText.text = "Property that is protected but open to some of the public. Businesses, office buildings, malls. Guards are on the lookout for suspicious behavior.";
+
+                break;
+            case SensitivityLevel.privateProperty:
+                sensitivityDescriptionText.text = "Sensitive areas of private property. Only authorized people are allowed. Guards are on the lookout for suspicious individuals.";
+                break;
+            case SensitivityLevel.restrictedProperty:
+                sensitivityDescriptionText.text = "Restricted property. Guards will shoot on sight";
                 break;
         }
 
