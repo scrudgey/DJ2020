@@ -1632,18 +1632,18 @@ spawned NPCs should count
 manual hack securit camera
 shoot security camera
 
-
-
 clearsighter
-    apply shadows to interloper shader
     * allow interloper shader to be cutout shader
-    we could subsidise the calculation across many frames.
-    is there a better system?
+    * we could subsidise the calculation across many frames.
+    apply shadows to interloper shader
+    a better system?
         everything below the plane centered on camera and below player is visible
-
     control over hierarchy, sub-renderers, which renderers to do in a consistent way.
         * hide NPCs
         we want to disable shells when they're newly produced, but hide them when they're static.
         don't mess with radio indicators
-        
-        aa
+
+major complication:
+    unity Job system requires structs and value types.
+    it might be possible to convert this system over but it will take time.
+    bullet can pretty easily be scheduled.
