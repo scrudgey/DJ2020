@@ -130,6 +130,9 @@ public partial class GameManager : Singleton<GameManager> {
         playerOutlineHandler?.Bind();
 
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
+        if (clearSighter == null) {
+            // instantiate clearsighter
+        }
         if (clearSighter != null && focus != null)
             clearSighter.followTransform = focus.transform;
 
@@ -154,9 +157,6 @@ public partial class GameManager : Singleton<GameManager> {
         // spawn player object
         GameObject playerObj = SpawnPlayer(gameData.playerState);
         SetFocus(playerObj);
-
-
-        // TODO: spawn clearsighter if necessary
 
         // connect player object to input controller
         InputController inputController = GameObject.FindObjectOfType<InputController>();

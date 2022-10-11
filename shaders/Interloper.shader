@@ -46,16 +46,16 @@ Shader "Custom/Interloper"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             // c.a = clamp( (0.5 - IN.screenPos.a) * -0.5, 0, 1);
-
             float camDistance = distance(IN.worldPos, _WorldSpaceCameraPos);
 
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = _TargetAlpha;
-            // o.Alpha = clamp((camDistance-15)*0.1, 0, 1);
-            // o.Alpha = lerp(o.Alpha, a, clamp(_SinTime.w, 0, 1));
+            if (c.a > 0.5)
+                o.Alpha = _TargetAlpha;
+            else
+                o.Alpha = 0;
         }
         ENDCG
     }

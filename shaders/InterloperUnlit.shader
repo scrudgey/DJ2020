@@ -146,6 +146,11 @@ SubShader {
                 float a = clamp( (i.screenPos.a - 0.0) * 0.5 , 0, 1);
                 col.a = a;
                 UNITY_APPLY_FOG(i.fogCoord, col);
+
+                float attenuation = LIGHT_ATTENUATION(i);
+                return fixed4(0,0,0,(1-attenuation)*_ShadowIntensity);
+
+
                 return col;
             }
         ENDCG
