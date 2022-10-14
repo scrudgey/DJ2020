@@ -989,6 +989,14 @@ in general, why will missions be a challenge?
         get in to the base to steal the data, get back out
     navigating automated defenses and alarm systems
 
+optimizing canvases:
+CanvasUpdate.Layout
+    - Disable pixel perfect
+    - Watch out for outline (I have noticed it has a significant effect on execution time, but none on GC alloc)
+    - Set fonts to not be dynamic
+    - Watch out for tiled ui sprites
+
+
 
 
 * redesign data structure so it can generalize to multiple skins
@@ -1432,7 +1440,29 @@ in general, why will missions be a challenge?
     * floor height dont hide anything below this height
     * allow "rooftop zones", like attractor, makes solid all renderers    
     * better object height cutoffs, don't hide things below or the lamppost.
-
+* impact effects on superjump
+* optimize:
+    * sightcone on trigger enter
+    * lightlevelprobe
+        * run periodically
+        * read async
+    * bullets: use object pooling for spark fx!
+    * allow interloper shader to be cutout shader
+    * we could subsidise the calculation across many frames.
+    * control over hierarchy, sub-renderers, which renderers to do in a consistent way.
+        * hide NPCs
+        * particle systems don't need to be affected
+        * don't mess with radio indicators
+        * texmeshpro
+* refactor clearsighter
+    * clearsight InvokeRepeating
+    * clearsight OverlapSphereNonAlloc
+    * clearsight don't update ceiling calculation when in the air
+    * ceiling clearsighter shadowsonly
+    * don't interact with NPC emotes
+* add cyber support to VR level
+* manual hack security camera
+* shoot security camera
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1487,13 +1517,6 @@ nice to have / future goals:
 
 deep save system:
     serialize the complete level state
-
-refactor clearsighter
-    clearsight InvokeRepeating
-    clearsight OverlapSphereNonAlloc
-    clearsight don't update ceiling calculation when in the air
-    ceiling clearsighter shadowsonly
-    don't interact with NPC emotes
 
 strike team
     when one is alerted, all are alerted?
@@ -1568,7 +1591,7 @@ stealth:
     stealth kill?
 
 overhauled VR mission designer
-    show some sort of gun stats
+    * show some sort of gun stats
     player stats
 
 better action log
@@ -1583,7 +1606,6 @@ faster shotgun
     animator speed can be adjusted
 
 survive x waves of y NPCs
-* impact effects on superjump
 press esc to bring up vr mission menu
     overall, menus should be a little more stylized
 adjustable NPC difficulty
@@ -1597,22 +1619,13 @@ alarm terminal triggering effects
     notify others of location
 why do gibs fall through the wall/floor?
 damage result addition is weird
-prevent extreme zoom maneuvers with lerping
-    also, initialize camera with proper zoom?'
+* prevent extreme zoom maneuvers with lerping
 VRmissionTemplate -> LevelTemplate is incomplete.
 playertemplate / playerstate is still a little weird.
-use RaycastCommand
-    write a custom system where all things (guns, character senses, etc) that need a lot of raycasts will queue up their casts in LateUpdate, 
-    by the next Update they will have all completed computing in the background
-    https://docs.unity3d.com/ScriptReference/RaycastCommand.html
-    https://www.jacksondunstan.com/articles/4913
-bigger level
 title screen logo
 title screen animations
 doors
 colt 2037 sped up sounds great
-
-investigate routine
 
 saved prefab VR mission templates
 better UI for hack feedback
@@ -1620,30 +1633,30 @@ NPC reacts when seeing another shooting
 NPC reacts to corpses
 NPC reacts when seeing another shot
 
-camera move speed when switching views
-thermal goggles icon
-redraw cyberdeck
-redraw c4
 corpse can be shot / exploded
-add cyber support to VR level
+
 more, bigger levels
+    rooms
+    wide, long level
 spawned NPCs should count
     use static GameManager action
-manual hack securit camera
-shoot security camera
 
 clearsighter
-    * allow interloper shader to be cutout shader
-    * we could subsidise the calculation across many frames.
+    we want to disable shells when they're newly produced, but hide them when they're static.
+    this could be a lot more efficient if things are addressable by position in space.
     apply shadows to interloper shader
     a better system?
         everything below the plane centered on camera and below player is visible
-    control over hierarchy, sub-renderers, which renderers to do in a consistent way.
-        * hide NPCs
-        we want to disable shells when they're newly produced, but hide them when they're static.
-        don't mess with radio indicators
+    hiding corspe interlopers
+        not interloper, but hide above.
 
-major complication:
-    unity Job system requires structs and value types.
-    it might be possible to convert this system over but it will take time.
-    bullet can pretty easily be scheduled.
+camera move speed when switching views
+armatek smg could have a more appropriate sound
+
+new graphics
+    thermal goggles icon
+    redraw cyberdeck
+    redraw c4
+    investigate graphics
+
+investigate routine

@@ -87,12 +87,11 @@ public class Bullet {
             }
 
             // spawn sparks by default
-            if (result.Equals(DamageResult.NONE))
-                GameObject.Instantiate(
-                    Resources.Load("prefabs/fx/impactSpark"),
-                    hit.point + (hit.normal * 0.025f),
-                    Quaternion.LookRotation(hit.normal)
-                    );
+            if (result.Equals(DamageResult.NONE)) {
+                PrefabPool pool = PoolManager.I.GetPool("prefabs/fx/impactSpark");
+                GameObject sparkObject = pool.GetObject(hit.point + (hit.normal * 0.025f));
+                sparkObject.transform.rotation = Quaternion.LookRotation(hit.normal);
+            }
 
             return true;
         }

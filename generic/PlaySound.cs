@@ -16,11 +16,17 @@ public class PlaySound : MonoBehaviour {
     public float cooldownTimer = 0f;
     public float randomPitchWidth = 0.2f;
     private int currentNumberOfParticles;
+    public bool jukebox;
     private void Play() {
         if (cooldownTimer > 0)
             return;
         if (Random.Range(0, 1f) < probability) {
-            Toolbox.RandomizeOneShot(audioSource, sounds, randomPitchWidth: randomPitchWidth);
+            if (jukebox) {
+                Toolbox.AudioSpeaker(transform.position, sounds);
+            } else {
+                Toolbox.RandomizeOneShot(audioSource, sounds, randomPitchWidth: randomPitchWidth);
+
+            }
             if (repeat == RepeatType.once) {
                 Destroy(this);
             } else if (repeat == RepeatType.cooldown) {

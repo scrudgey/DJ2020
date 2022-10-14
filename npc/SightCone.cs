@@ -17,6 +17,7 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
         // Debug.Log($"FOV enter: {other}");
         if (other.transform.root.IsChildOf(myRootTransform))
             return;
+        // Debug.Log($"adding to field of view: {other}");
         newestAddition = other;
         fieldOfView.Add(other);
         PruneFieldOfView();

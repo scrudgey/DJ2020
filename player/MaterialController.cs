@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class MaterialController {
@@ -23,16 +24,22 @@ public class MaterialController {
         this.camera = camera;
         this.gameObject = collider.gameObject;
         this.tagSystemData = Toolbox.GetTagData(collider.gameObject);
-        // this.childRenderers = new List<Renderer>(gameObject.transform.root.GetComponentsInChildren<Renderer>(true)).Where(x => !(x is SpriteRenderer)).ToList();
-        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>()).ToList();
+        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>())
+                                    .Where(x => !(x is ParticleSystemRenderer) &&
+                                                !(x is LineRenderer)
+                                                // !(x is SpriteRenderer) &&
+                                                )
+                                    .ToList();
         this.collider = collider;
-
         this.state = State.opaque;
         this.disableBecauseAbove = false;
         this.disableBecauseInterloper = false;
         this.timer = 0f;
         this.targetAlpha = 1f;
         foreach (Renderer renderer in childRenderers) {
+            // if (renderer is SpriteRenderer) {
+            //     Debug.Log($"sprite renderer found: {renderer.gameObject}");
+            // }
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             normalMaterials[renderer] = renderer.material;
             if (renderer.material != null) {
@@ -65,10 +72,7 @@ public class MaterialController {
         if (state == State.transparent || state == State.fadeOut)
             return;
         state = State.fadeOut;
-        foreach (Renderer renderer in childRenderers) {
-            // TODO: check on renderer tag
-            if (renderer == null || interloperMaterials[renderer] == null)
-                continue;
+        foreach (Renderer renderer in childRenderers.Where(renderer => renderer != null && interloperMaterials[renderer] != null && renderer.tag != "donthide")) {
             renderer.material = interloperMaterials[renderer];
             renderer.material.SetFloat("_TargetAlpha", 1);
             targetAlpha = 1;
@@ -135,12 +139,12 @@ public class MaterialController {
         if (state == State.fadeIn || state == State.fadeOut) {
             foreach (Renderer renderer in childRenderers.Where(renderer =>
                                                                 renderer != null &&
-                                                                renderer.enabled)) {
+                                                                renderer.enabled &&
+                                                                renderer.tag != "donthide")) {
                 renderer.material.SetFloat("_TargetAlpha", targetAlpha);
                 renderer.shadowCastingMode = targetAlpha == 0 ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];
             }
         }
-
     }
 
     public bool active() => (disableBecauseInterloper && !tagSystemData.bulletPassthrough && !tagSystemData.dontHideInterloper) ||

@@ -11,7 +11,6 @@ public class NPCSpawnPoint : MonoBehaviour {
         InitializePools();
     }
     void InitializePools() {
-        Debug.Log(PoolManager.I);
         NPCPool = PoolManager.I?.RegisterPool("prefabs/NPC", poolSize: 10);
         effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }

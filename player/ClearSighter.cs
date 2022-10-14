@@ -9,13 +9,9 @@ using UnityEngine.Rendering;
 public class ClearSighter : MonoBehaviour {
     public MaterialControllerCache controllers;
     public CharacterCamera myCamera;
-    // public Shader normalShader;
-    // public Shader interloperShader;
-    // public Collider cylinderCollider;
     public float floorHeight;
     Transform myTransform;
     public List<MaterialController> interlopers = new List<MaterialController>();
-    // List<(MaterialController, Vector3)> staticGeometry = new List<(MaterialController, Vector3)>();
     Dictionary<MaterialController, Vector3> staticGeometry = new Dictionary<MaterialController, Vector3>();
     public Transform followTransform;
     private List<Collider> rooftopZones = new List<Collider>();
@@ -49,7 +45,7 @@ public class ClearSighter : MonoBehaviour {
             myTransform.rotation = Quaternion.LookRotation(directionToCamera);
 
             // non-static colliders above me
-            Collider[] others = Physics.OverlapSphere(myTransform.position, 20f, LayerUtil.GetMask(Layer.obj, Layer.bulletPassThrough))//, Layer.shell))
+            Collider[] others = Physics.OverlapSphere(myTransform.position, 20f, LayerUtil.GetMask(Layer.obj, Layer.bulletPassThrough, Layer.shell))
                 .GroupBy(collider => collider.transform.root)
                 .Select(g => g.First())
                 .Where(collider =>
@@ -57,7 +53,6 @@ public class ClearSighter : MonoBehaviour {
                     collider.gameObject != null &&
                     !collider.transform.IsChildOf(myTransform) &&
                     !collider.transform.IsChildOf(followTransform))
-                // collider.tag != "shell")
                 .ToArray();
             foreach (Collider collider in others) {
                 i += 1;
@@ -67,7 +62,6 @@ public class ClearSighter : MonoBehaviour {
                 }
                 MaterialController controller = controllers.get(collider);
                 if (controller != null) {
-                    // controller.CeilingCheck(myTransform.position);
                     if (inRooftopZone) {
                         controller.disableBecauseAbove = false;
                     } else {
@@ -80,8 +74,7 @@ public class ClearSighter : MonoBehaviour {
             // Debug.Log($"interlopers: {interlopers.Count}");
             foreach (MaterialController interloper in interlopers.Where(interloper =>
                                                                         interloper != null &&
-                                                                        interloper.gameObject != null
-                                                                        )) {
+                                                                        interloper.gameObject != null)) {
                 i += 1;
                 if (i > 500) {
                     i = 0;
@@ -146,11 +139,9 @@ public class ClearSighter : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider other)
-        => AddInterloper(other);
+    void OnTriggerEnter(Collider other) => AddInterloper(other);
 
-    void OnTriggerExit(Collider other)
-        => RemoveInterloper(other);
+    void OnTriggerExit(Collider other) => RemoveInterloper(other);
 
     void AddInterloper(Collider other) {
         if (followTransform == null)

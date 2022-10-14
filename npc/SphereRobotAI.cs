@@ -21,7 +21,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
-    readonly float PERCEPTION_INTERVAL = 0.05f;
+    readonly float PERCEPTION_INTERVAL = 0.1f;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
     readonly float LOCK_ON_TIME = 0.5f;
     public float timeSinceLastSeen;

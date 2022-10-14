@@ -9,21 +9,27 @@ public class VRMissionController : MonoBehaviour {
     State state;
     VRMissionState data;
     public float NPCspawnTimer;
-    public List<CharacterController> npcControllers = new List<CharacterController>();
+    public List<CharacterController> npcControllers;
     float startTime;
     ActionLogHandler actionLogHandler;
     List<VRDataStore> dataStores;
     VRDataStore targetDatastore;
     Stack<VRDataStore> datastoreStack;
     VRStatHandler vRStatHandler;
+    NPCSpawnPoint[] spawnPoints;
     public void StartVRMission(VRMissionState state) {
         Debug.Log("VRMissionController: start VR mission");
         this.data = state;
+        npcControllers = new List<CharacterController>();
+        dataStores = new List<VRDataStore>();
+        datastoreStack = new Stack<VRDataStore>();
+
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
         int NPCPoolSize = state.template.numberConcurrentNPCs + GameManager.I.gameData.levelState.delta.strikeTeamMaxSize;
         // Debug.Log($"initializing NPC pool with size {NPCPoolSize}");
         PoolManager.I.RegisterPool("prefabs/NPC", poolSize: NPCPoolSize);
+        spawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToArray();
         if (!state.template.alarmHQEnabled) {
             AlarmHQTerminal levelHQTerminal = GameManager.I.levelHQTerminal();
             if (levelHQTerminal != null) {
@@ -38,13 +44,11 @@ public class VRMissionController : MonoBehaviour {
     }
     void InitializeStealDataMission() {
         Debug.Log("initialize steal data mission");
-        dataStores = new List<VRDataStore>();
         foreach (VRDataStore dataStore in GameObject.FindObjectsOfType<VRDataStore>()) {
             Debug.Log(dataStore);
             dataStores.Add(dataStore);
             dataStore.OnDataStoreOpened += HandleVRDataStoreOpened;
         }
-        datastoreStack = new Stack<VRDataStore>();
         GameObject.FindObjectsOfType<VRDataStore>().OrderBy(a => Guid.NewGuid()).ToList().ForEach(datastoreStack.Push);
         SetTargetDataStore();
     }
@@ -55,7 +59,6 @@ public class VRMissionController : MonoBehaviour {
         }
         targetDatastore = datastoreStack.Pop();
         targetDatastore.ActivateCallout();
-        // Debug.Log($"new target datastore: {targetDatastore}");
     }
     void HandleVRDataStoreOpened(VRDataStore target) {
         if (target == targetDatastore) {
@@ -67,7 +70,6 @@ public class VRMissionController : MonoBehaviour {
                 TransitionToState(State.victory);
             }
             SetTargetDataStore();
-            // Debug.Log($"datastores opened: {numberDataStoresOpened}");
         }
     }
     void SendLogMessage(string message) {
@@ -152,12 +154,9 @@ public class VRMissionController : MonoBehaviour {
     }
 
     void SpawnNPC() {
-        NPCSpawnPoint[] spawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToArray();
         NPCSpawnPoint spawnPoint = Toolbox.RandomFromList(spawnPoints);
-
         GameObject npcObject = spawnPoint.SpawnNPC(data.template.npc1State);
         CharacterController npcController = npcObject.GetComponentInChildren<CharacterController>();
-
         npcControllers.Add(npcController);
         npcController.OnCharacterDead += HandleNPCDead;
         data.data.numberTotalNPCs += 1;

@@ -75,6 +75,8 @@ public class LockIndicatorHandler : IBinder<GunHandler> {
         // todo: check to reset transition time?
     }
     void EnableCursorImage(CursorData data) {
+        if (data == null || data.targetCollider == null)
+            return;
         Transform root = data.targetCollider.transform.root;
         Rect bounds = Toolbox.GetTotalRenderBoundingBox(root, UICamera);
         cursorImage.enabled = true;
