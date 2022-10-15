@@ -109,6 +109,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
 
     void Start() {
+        _currentDistance = 20f;
         GameManager.OnFocusChanged += Bind;
         GameManager.OnFocusChanged += SetFollowTransform;
         GameManager.OnEyeVisibilityChange += HandleEyeVisibilityChange;
@@ -149,6 +150,12 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         // Debug.Log($"entering state {state} from {fromState}");
         Camera.clearFlags = CameraClearFlags.SolidColor;
         switch (state) {
+            case CameraState.normal:
+                if (fromState == CameraState.aim || fromState == CameraState.wallPress) {
+                    // kind of hacky but w/e
+                    _currentDistance = 20f;
+                }
+                break;
             case CameraState.aim:
                 Camera.clearFlags = CameraClearFlags.Skybox;
                 currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
@@ -162,6 +169,10 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
                 currentDistanceMovementSpeed = distanceMovementSpeedDefault * 3f;
                 break;
             case CameraState.attractor:
+                if (fromState == CameraState.aim || fromState == CameraState.wallPress) {
+                    // kind of hacky but w/e
+                    _currentDistance = 20f;
+                }
                 if (fromState == CameraState.wallPress) {
                     currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
                     currentFollowingSharpness = followingSharpnessDefault;

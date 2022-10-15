@@ -45,7 +45,11 @@ public class Destructible : Damageable, IPoolable {
         DoDestruct(damage);
     }
     virtual protected void DoDestruct(Damage damage) {
-        Destroy(transform.parent.gameObject, destructionTimer);
+        if (transform.parent != null) {
+            Destroy(transform.parent.gameObject, destructionTimer);
+        } else {
+            Destroy(gameObject, destructionTimer);
+        }
     }
     protected void EmitGibs(Damage damage) {
         gibs?.EmitOnDamage(gameObject, damage, myCollider);

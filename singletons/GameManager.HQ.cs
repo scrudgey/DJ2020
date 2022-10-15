@@ -17,6 +17,7 @@ public partial class GameManager : Singleton<GameManager> {
     // this should be part of level state.
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
+    public Action<GameObject> OnNPCSpawn;
 
     public void ActivateHQRadio() {
         AlarmHQTerminal terminal = levelHQTerminal();
@@ -202,5 +203,6 @@ public partial class GameManager : Singleton<GameManager> {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
+        OnNPCSpawn?.Invoke(npc);
     }
 }

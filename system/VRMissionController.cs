@@ -40,7 +40,7 @@ public class VRMissionController : MonoBehaviour {
         if (state.template.missionType == VRMissionType.steal) {
             InitializeStealDataMission();
         }
-
+        GameManager.I.OnNPCSpawn += HandleStrikeTeamSpawn;
     }
     void InitializeStealDataMission() {
         Debug.Log("initialize steal data mission");
@@ -152,7 +152,11 @@ public class VRMissionController : MonoBehaviour {
             vRStatHandler.SetDisplay(data);
         }
     }
-
+    void HandleStrikeTeamSpawn(GameObject npc) {
+        CharacterController npcController = npc.GetComponentInChildren<CharacterController>();
+        npcControllers.Add(npcController);
+        npcController.OnCharacterDead += HandleNPCDead;
+    }
     void SpawnNPC() {
         NPCSpawnPoint spawnPoint = Toolbox.RandomFromList(spawnPoints);
         GameObject npcObject = spawnPoint.SpawnNPC(data.template.npc1State);
@@ -181,6 +185,7 @@ public class VRMissionController : MonoBehaviour {
     }
 
     void OnDestroy() {
+        GameManager.I.OnNPCSpawn -= HandleStrikeTeamSpawn;
         foreach (CharacterController npcController in npcControllers) {
             npcController.OnCharacterDead -= HandleNPCDead;
         }

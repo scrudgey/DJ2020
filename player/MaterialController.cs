@@ -37,9 +37,6 @@ public class MaterialController {
         this.timer = 0f;
         this.targetAlpha = 1f;
         foreach (Renderer renderer in childRenderers) {
-            // if (renderer is SpriteRenderer) {
-            //     Debug.Log($"sprite renderer found: {renderer.gameObject}");
-            // }
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             normalMaterials[renderer] = renderer.material;
             if (renderer.material != null) {
