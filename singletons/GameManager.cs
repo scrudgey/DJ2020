@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GameState { none, levelPlay, inMenu }
-public enum MenuType { none, console }
+public enum MenuType { none, console, dialogue }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer }
 public enum InputMode { none, gun, cyber, aim, wallpressAim }
@@ -147,11 +147,17 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void ShowMenu(MenuType menuType) {
         activeMenuType = menuType;
-        OnMenuChange(menuType);
+        if (menuType == MenuType.dialogue) {
+            Time.timeScale = 0f;
+        } else {
+
+        }
+        OnMenuChange?.Invoke(menuType);
         // TransitionToState(GameState.inMenu);
     }
     public void CloseMenu() {
-        OnMenuClosed();
+        OnMenuClosed?.Invoke();
+        Time.timeScale = 1f;
         // TransitionToState(GameState.levelPlay); // this isn't right either?
         activeMenuType = MenuType.none;
     }

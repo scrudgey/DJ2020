@@ -21,9 +21,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SpeechTextController speechTextController;
     float perceptionCountdown;
     public SphereCollider patrolZone;
-    readonly float PERCEPTION_INTERVAL = 0.1f;
+    readonly float PERCEPTION_INTERVAL = 0.025f;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
     readonly float LOCK_ON_TIME = 0.5f;
+    float timeSinceInvestigatedFootsteps;
     public float timeSinceLastSeen;
     public Collider playerCollider;
     public Alertness alertness = Alertness.normal;
@@ -83,6 +84,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void StateFinished(SphereControlState routine) {
         switch (routine) {
             default:
+                EnterDefaultState();
+                break;
+            case PauseState:
+                Debug.Log("end pause");
+                PauseState pauser = (PauseState)routine;
+                ChangeState(pauser.nextState);
+                break;
             case ReactToAttackState:
                 // TODO: do something different. we were just attacked
                 if (lastDamage != null) {
@@ -95,7 +103,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 break;
             case StopAndListenState:
                 StopAndListenState listenState = (StopAndListenState)routine;
-                ChangeState(listenState.getNextState());
+                SphereControlState nextState = listenState.getNextState();
+                // if (!listenState.FoundSomethingSuspicious()) {
+                // }
+                ChangeState(nextState);
                 // listener.SetListenRadius();
                 break;
             case SearchDirectionState:
@@ -185,6 +196,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (footstepImpulse > 0f) {
             footstepImpulse -= Time.deltaTime;
         }
+        if (timeSinceInvestigatedFootsteps > 0f) {
+            timeSinceInvestigatedFootsteps -= Time.deltaTime;
+        }
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
         }
@@ -223,7 +237,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             timeSinceLastSeen = 0f;
             playerCollider = other;
             Reaction reaction = ReactToPlayerSuspicion();
-            if (reaction == Reaction.attack || reaction == Reaction.investigate) { // TODO: investigate routine
+            if (reaction == Reaction.attack) { // TODO: investigate routine
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
                     case SphereMoveState:
@@ -236,13 +250,22 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             } else if (reaction == Reaction.investigate) {
-                alertHandler.ShowWarn();
+                switch (stateMachine.currentState) {
+                    case SearchDirectionState:
+                    case SphereMoveState:
+                    case SpherePatrolState:
+                    case ReactToAttackState:
+                    case FollowTheLeaderState:
+                    case StopAndListenState:
+                        alertHandler.ShowWarn();
+                        ChangeState(new PauseState(this, new SphereInvestigateState(this), 1f));
+                        break;
+                }
             } else if (reaction == Reaction.ignore) {
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
-                        // TODO: pause for a minute here
                         alertHandler.ShowGiveUp();
-                        EnterDefaultState();
+                        ChangeState(new PauseState(this, new SpherePatrolState(this, patrolRoute), 1f));
                         break;
                     case StopAndListenState:
                         alertHandler.ShowGiveUp();
@@ -412,24 +435,27 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     void HandleFootstepNoise(NoiseComponent noise) {
         footstepImpulse += noise.data.volume * 2f;
-        bool thresholded = footstepImpulse > 4f;
+        bool reachedFootstepThreshold = footstepImpulse > 4f;
+        bool notBoredOfFootsteps = timeSinceInvestigatedFootsteps <= 0;
         if (GameManager.I.gameData.levelState.template.sensitivityLevel == SensitivityLevel.publicProperty) {
-            if (thresholded && recentlyInCombat) {
+            if (reachedFootstepThreshold && recentlyInCombat && notBoredOfFootsteps) {
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
+                        timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController));
                         break;
                 }
             }
         } else if (GameManager.I.gameData.levelState.template.sensitivityLevel >= SensitivityLevel.privateProperty) {
-            if (thresholded)
+            if (reachedFootstepThreshold && notBoredOfFootsteps)
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
+                        timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController));
                         break;

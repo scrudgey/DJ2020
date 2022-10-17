@@ -16,8 +16,8 @@ public class SphereRobotSpeaker : MonoBehaviour {
         idleSpeakTimer = Random.Range(5f, 10f);
     }
     void DoIdleSpeak() {
-        Toolbox.RandomizeOneShot(audioSource, idleSpeakSounds);
-        speechTextController.Say("memcache-88xdd*");
+        // Toolbox.RandomizeOneShot(audioSource, idleSpeakSounds);
+        // speechTextController.Say("memcache-88xdd*");
     }
     void Update() {
         if (idleSpeakTimer > 0) {
@@ -32,6 +32,11 @@ public class SphereRobotSpeaker : MonoBehaviour {
 
     public void DoAttackSpeak() {
         Toolbox.RandomizeOneShot(audioSource, angrySpeakSounds);
-        speechTextController.Say("enemy sighted");
+        speechTextController.Say("Enemy sighted");
+    }
+
+    public void DoInvestigateSpeak() {
+        Toolbox.RandomizeOneShot(audioSource, angrySpeakSounds);
+        speechTextController.Say("Stop right there!");
     }
 }

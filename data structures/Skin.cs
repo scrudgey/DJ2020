@@ -443,10 +443,11 @@ public class Skin {
 
     public Octet<Sprite[]> GetCurrentLegsOctet(LegsAnimation.State state, AnimationInput input) {
 
-        if (input.hitState == HitState.dead) {
-            return legsDead;
-        } else if (input.state == CharacterState.keelOver) {
+
+        if (input.state == CharacterState.keelOver) {
             return legsKeelOver;
+        } else if (input.hitState == HitState.dead) {
+            return legsDead;
         } else if (input.state == CharacterState.jumpPrep || input.state == CharacterState.landStun) {
             return legsCrouch;
         } else if (input.state == CharacterState.superJump || state == LegsAnimation.State.jump) {
@@ -475,10 +476,10 @@ public class Skin {
     }
 
     public Octet<Sprite[]> GetCurrentTorsoOctet(AnimationInput input) {
-        if (input.hitState == HitState.dead) {
-            return unarmedDead;
-        } else if (input.state == CharacterState.keelOver) {
+        if (input.state == CharacterState.keelOver) {
             return unarmedKeelOver;
+        } else if (input.hitState == HitState.dead) {
+            return unarmedDead;
         } else if (input.isClimbing) {
             return unarmedClimb;
         } else if (input.state == CharacterState.superJump) {

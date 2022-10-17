@@ -48,7 +48,6 @@ public class ManualHacker : MonoBehaviour {
     }
     public void AddInteractive(Collider other) {
         CyberComponent component = other.GetComponent<CyberComponent>();
-        Debug.Log($"manual hacker add interactive? {other} {component}");
         if (component) {
             cyberComponents[other] = component;
         }
@@ -56,7 +55,6 @@ public class ManualHacker : MonoBehaviour {
         HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
     public void RemoveInteractive(Collider other) {
-        Debug.Log($"manual hacker remove interactive? {other}");
         if (cyberComponents.ContainsKey(other)) {
             cyberComponents.Remove(other);
         }

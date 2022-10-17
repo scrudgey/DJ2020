@@ -13,10 +13,9 @@ public class SphereAttackState : SphereControlState {
     public GunHandler gunHandler;
     Vector3 lastSeenPlayerPosition;
 
-    public SphereAttackState(SphereRobotAI ai,
-                               GunHandler gunHandler) : base(ai) {
+    public SphereAttackState(SphereRobotAI ai, GunHandler gunHandler) : base(ai) {
         this.gunHandler = gunHandler;
-        speaker = owner.GetComponent<SphereRobotSpeaker>();
+        speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
         if (speaker != null) {
             speaker.DoAttackSpeak();
         }

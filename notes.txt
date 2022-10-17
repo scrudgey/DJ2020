@@ -1654,12 +1654,22 @@ more, bigger levels
     rooms
     wide, long level
     bright / brutalist concrete level
+allow 7-11 to be a level
+    add proper boundary
+    add intermediate skybox
 
 new graphics
     thermal goggles icon
-    redraw cyberdeck
-    redraw c4
+    * redraw cyberdeck
+    * redraw c4
     investigate graphics
         portrait for player, woman, man
 
 investigate routine
+
+* fix "guess it was nothing"
+
+i ran away from a guy in investigate mode, and he went into "what is that?" mode
+running away from questioning should provoke combat
+    either a suspicion indicator is added, or jump into attack state?
+
