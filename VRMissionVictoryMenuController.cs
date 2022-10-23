@@ -22,17 +22,11 @@ public class VRMissionVictoryMenuController : MonoBehaviour {
     }
     public void RetryButtonCallback() {
         Debug.Log("retry");
-        // VRMissionData resetData = data with {
-        //     data = VRMissionMutableData.Empty(),
-        //     playerState = data.playerState.Refresh()
-        // };
-        // VRMissionState resetState = VRMissionState.Instantiate(data.template);
         GameManager.I.LoadVRMission(data.template);
     }
     public void MainMenuButtonCallback() {
         Debug.Log("main menu");
         GameManager.I.ReturnToTitleScreen();
-
     }
 
     void SetTimeDisplay() {

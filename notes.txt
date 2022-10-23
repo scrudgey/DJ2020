@@ -1665,11 +1665,11 @@ new graphics
     investigate graphics
         portrait for player, woman, man
 
-investigate routine
-
 * fix "guess it was nothing"
-
+investigate routine
+something to emphasize to player that they are spotted, and should play it cool
 i ran away from a guy in investigate mode, and he went into "what is that?" mode
 running away from questioning should provoke combat
     either a suspicion indicator is added, or jump into attack state?
 
+overall, there's something fucky going on with opening menus, async loading scenes, grabbing references to UIController

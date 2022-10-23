@@ -32,7 +32,7 @@ public class SphereInvestigateState : SphereControlState {
     void SetupRootNode() {
         HQReport report = new HQReport {
             reporter = owner.gameObject,
-            desiredAlarmState = false,
+            desiredAlarmState = true,
             locationOfLastDisturbance = owner.getLocationOfInterest(),
             timeOfLastContact = Time.time,
             lifetime = 6f,
@@ -48,9 +48,8 @@ public class SphereInvestigateState : SphereControlState {
             new Selector(
                 new Sequence(
                     new TaskConditional(() => isPlayerVisible()),
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 0.25f),
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 1.25f),
                     new TaskOpenDialogue()
-                // TODO: open dialogue, determine response
                 ),
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
@@ -66,6 +65,7 @@ public class SphereInvestigateState : SphereControlState {
                         }, 3f)
                     )
                 ),
+                // TODO: conditional: standing in front of player
                 new Selector(
                     new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
                     new TaskConditional(() => GameManager.I.levelHQTerminal() == null),
