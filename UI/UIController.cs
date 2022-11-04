@@ -83,10 +83,11 @@ public class UIController : MonoBehaviour {
         terminal.gameObject.SetActive(false);
         if (type == MenuType.console) {
             terminal.gameObject.SetActive(true);
-        } else if (type == MenuType.dialogue) {
-            dialogueController.gameObject.SetActive(true);
-            dialogueController.Initialize();
         }
+        // else if (type == MenuType.dialogue) {
+        //     dialogueController.gameObject.SetActive(true);
+        //     dialogueController.Initialize();
+        // }
     }
     void HandleMenuClosed() {
         terminal.gameObject.SetActive(false);

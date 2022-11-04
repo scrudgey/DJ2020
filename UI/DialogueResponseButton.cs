@@ -1,18 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 public class DialogueResponseButton : MonoBehaviour {
-    public DialogueController dialogueController;
     public string response;
     public TextMeshProUGUI text;
-    public bool continueButton;
-    public void Initialize(DialogueController dialogueController, string response) {
-        this.dialogueController = dialogueController;
+    public Action<DialogueResponseButton> responseCallback;
+    public void Initialize(Action<DialogueResponseButton> responseCallback, string response) {
+        this.responseCallback = responseCallback;
         this.response = response;
         text.text = response;
     }
     public void OnClick() {
-        dialogueController.DialogueResponseCallback(this);
+        responseCallback(this);
     }
 }

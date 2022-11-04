@@ -25,6 +25,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
     readonly float LOCK_ON_TIME = 0.5f;
     float timeSinceInvestigatedFootsteps;
+    float timeSinceInterrogatedStrager;
     public float timeSinceLastSeen;
     public Collider playerCollider;
     public Alertness alertness = Alertness.normal;
@@ -144,7 +145,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void ChangeState(SphereControlState routine) {
         stateMachine.ChangeState(routine);
         switch (routine) {
+            case SphereInvestigateState:
+                timeSinceInterrogatedStrager = 120f;
+                break;
             case StopAndListenState:
+                timeSinceInvestigatedFootsteps = 10f;
+                break;
             case SearchDirectionState:
                 // listener.SetListenRadius(radius: 2f);
                 break;
@@ -198,6 +204,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
         if (timeSinceInvestigatedFootsteps > 0f) {
             timeSinceInvestigatedFootsteps -= Time.deltaTime;
+        }
+        if (timeSinceInterrogatedStrager > 0f) {
+            timeSinceInterrogatedStrager -= Time.deltaTime;
         }
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
@@ -257,8 +266,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case ReactToAttackState:
                     case FollowTheLeaderState:
                     case StopAndListenState:
-                        alertHandler.ShowWarn();
-                        ChangeState(new PauseState(this, new SphereInvestigateState(this), 1f));
+                        Debug.Log(timeSinceInterrogatedStrager);
+                        if (timeSinceInterrogatedStrager <= 0) {
+                            alertHandler.ShowWarn();
+                            ChangeState(new PauseState(this, new SphereInvestigateState(this), 1f));
+                        }
                         break;
                 }
             } else if (reaction == Reaction.ignore) {
@@ -443,7 +455,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
-                        timeSinceInvestigatedFootsteps = 10f;
+                        // timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController));
                         break;
@@ -455,7 +467,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
-                        timeSinceInvestigatedFootsteps = 10f;
+                        // timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController));
                         break;
@@ -506,7 +518,19 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;
-
         // TODO: reset gun state...?!?
     }
+
+    public DialogueInput GetDialogueInput() => new DialogueInput() {
+        NPCAI = this,
+        playerObject = GameManager.I.playerObject,
+        npcObject = this.gameObject,
+        playerState = GameManager.I.gameData.playerState,
+        levelState = GameManager.I.gameData.levelState,
+        suspicionRecords = GameManager.I.suspicionRecords,
+        playerSuspiciousness = GameManager.I.GetTotalSuspicion(),
+        alarmActive = GameManager.I.gameData.levelState.delta.alarmGraph.anyAlarmActive(),
+        playerInDisguise = GameManager.I.gameData.playerState.disguise,
+        playerSpeechSkill = GameManager.I.gameData.playerState.speechSkillLevel
+    };
 }

@@ -120,6 +120,41 @@ i like the idea:
 if we are showing both portraits, we need a way to distinguish who is talking.
     |-> |  text  | <-|
 
-
-
 maybe, dynamically add / remove points on both sides with successful dialogue checks?
+handle initializing the dialogue box:
+
+1. set portraits
+2. set status effects
+    sensitivity
+    records
+    guard status
+    player skill
+    player etiquette
+3. set text options
+
+input: 
+    npc state
+    player state
+    level state
+
+
+* use alarm status
+* use disguise status
+* summarize appearance
+* use dice roll skill check
+
+* blink-emphasize result
+* fix success size
+* pulse-color doubt
+* hang on result a bit
+* progres
+* progres...
+* upon opening:
+    * lerp percentage up from 0 -> target
+    * move arrow indicator accordingly
+    * blink percentage
+    * start skill check bar
+* apply results
+* repeated dialogues from NPC
+* turn to face each other
+* adjust speed / lerping

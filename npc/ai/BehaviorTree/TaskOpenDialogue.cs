@@ -5,19 +5,21 @@ using UnityEngine.SceneManagement;
 
 namespace AI {
     public class TaskOpenDialogue : TaskNode {
-        bool concluded = false;
+        public bool isConcluded = false;
         UIController uiController;
-        public TaskOpenDialogue() : base() {
+        SphereRobotAI ai;
+        public TaskOpenDialogue(SphereRobotAI ai) : base() {
+            this.ai = ai;
         }
         public override void Initialize() {
             base.Initialize();
             // Yikesaroo! Hacky BS!
             if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
+                DialogueInput input = ai.GetDialogueInput();
                 GameManager.I.LoadScene("DialogueMenu", () => {
                     DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
                     uiController = GameObject.FindObjectOfType<UIController>();
-                    Time.timeScale = 0f;
-                    menuController.Initialize();
+                    menuController.Initialize(input);
                     uiController.HideUI();
                     menuController.OnDialogueConclude += HandleDialogueResult;
                     Debug.Log($"loaded dialogue menu finish callback {menuController}");
@@ -25,7 +27,7 @@ namespace AI {
             }
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            if (concluded) {
+            if (isConcluded) {
                 return TaskState.success;
             } else {
                 return TaskState.running;
@@ -33,11 +35,17 @@ namespace AI {
         }
 
         public void HandleDialogueResult(DialogueController.DialogueResult result) {
-            concluded = true;
+            isConcluded = true;
             Time.timeScale = 1f;
             uiController.ShowUI();
             Scene sceneToUnload = SceneManager.GetSceneByName("DialogueMenu");
             SceneManager.UnloadSceneAsync(sceneToUnload);
+
+        }
+
+        public override void Reset() {
+            base.Reset();
+            isConcluded = false;
         }
     }
 }

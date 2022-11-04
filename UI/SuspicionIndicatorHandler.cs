@@ -100,19 +100,19 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     public void UpdateSensitivity() {
         switch (GameManager.I.GetCurrentSensitivity()) {
             case SensitivityLevel.publicProperty:
-                sensitivityText.text = ">> public <<";
+                sensitivityText.text = ">> public property <<";
                 sensitivityText.color = green;
                 break;
             case SensitivityLevel.semiprivateProperty:
-                sensitivityText.text = ">> protected <<";
+                sensitivityText.text = ">> protected property <<";
                 sensitivityText.color = yellow;
                 break;
             case SensitivityLevel.privateProperty:
-                sensitivityText.text = ">> private <<";
+                sensitivityText.text = ">> private property <<";
                 sensitivityText.color = yellow;
                 break;
             case SensitivityLevel.restrictedProperty:
-                sensitivityText.text = ">> restricted <<";
+                sensitivityText.text = ">> restricted area <<";
                 sensitivityText.color = red;
                 break;
         }

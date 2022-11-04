@@ -36,6 +36,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         {GunType.sword, 1},
     };
 
+    public int speechSkillLevel;
+    public HashSet<string> speechEtiquettes = new HashSet<string>();
+
     public int maxConcurrentNetworkHacks;
     public float hackSpeedCoefficient;
     public float hackRadius;
@@ -67,6 +70,8 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             health = 250f,
             fullHealthAmount = 250f,
 
+            speechSkillLevel = 3,
+            speechEtiquettes = new HashSet<string> { "runner" }
         };
     }
 

@@ -8,6 +8,8 @@ namespace AI {
         TaskNode wrapped;
         public TaskUntilFailRepeater(TaskNode wrapped) : base(wrapped) {
             this.wrapped = wrapped;
+            this.children = new List<TaskNode> { wrapped };
+
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             TaskState wrapState = wrapped.DoEvaluate(ref input);

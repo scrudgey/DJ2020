@@ -2,21 +2,18 @@ using AI;
 using UnityEngine;
 using UnityEngine.AI;
 public class SphereInvestigateState : SphereControlState {
-
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
     static readonly public string LAST_SEEN_PLAYER_POSITION_KEY = "lastSeenPlayerPosition";
     private TaskNode rootTaskNode;
     public SphereRobotSpeaker speaker;
     public SpeechTextController speechTextController;
     float timeSinceSawPlayer;
-    // public GunHandler gunHandler;
     Vector3 lastSeenPlayerPosition;
+    TaskOpenDialogue dialogueTask;
 
     public SphereInvestigateState(SphereRobotAI ai) : base(ai) {
-        // this.gunHandler = gunHandler;
         speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
-        Debug.Log($"i'm going to do investigate speak: {speaker}");
         if (speaker != null) {
             speaker.DoInvestigateSpeak();
         }
@@ -39,6 +36,8 @@ public class SphereInvestigateState : SphereControlState {
             speechText = "HQ respond. Intruder spotted. Raise the alarm."
         };
 
+        dialogueTask = new TaskOpenDialogue(owner);
+
         rootTaskNode = new Sequence(
             new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                 lookType = TaskLookAt.LookType.position,
@@ -49,7 +48,7 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => isPlayerVisible()),
                     new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 1.25f),
-                    new TaskOpenDialogue()
+                    dialogueTask
                 ),
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
@@ -90,6 +89,8 @@ public class SphereInvestigateState : SphereControlState {
         //  player moves out of sight
         //      run to last position, look around, radio HQ
         //      if visual reacquired, repeat announce, move quicker, x2
+        // player moves about too much
+        // player takes out gun
         //  player does anything suspicious
         //      enter combat mode
 
@@ -98,7 +99,9 @@ public class SphereInvestigateState : SphereControlState {
     public override PlayerInput Update(ref PlayerInput input) {
         timeSinceSawPlayer += Time.deltaTime;
         TaskState result = rootTaskNode.Evaluate(ref input);
-        if (result == TaskState.failure || result == TaskState.success) {
+        if (dialogueTask.isConcluded) {
+            owner.StateFinished(this);
+        } else if (result == TaskState.failure || result == TaskState.success) {
             owner.StateFinished(this);
         }
         // TODO: set look position

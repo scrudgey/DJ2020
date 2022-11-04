@@ -996,6 +996,7 @@ CanvasUpdate.Layout
     - Set fonts to not be dynamic
     - Watch out for tiled ui sprites
 
+increase final texture resolution, and padding potentially for better outline.
 
 
 
@@ -1673,3 +1674,45 @@ running away from questioning should provoke combat
     either a suspicion indicator is added, or jump into attack state?
 
 overall, there's something fucky going on with opening menus, async loading scenes, grabbing references to UIController
+overall menu system is incomplete.
+
+
+1. music
+2. preset scenarios
+
+weird gibs situation with bullet impact
+head / aim when time is stopped
+npc notices bodies
+time out suspicion record
+make alerted guard text red
+    indicate when the player is the target of suspicion
+a third mode between "stop right there" and blasting
+    point gun and high alert
+
+3. dialogue
+better detection / tracking when stop right there
+ensure that NPC is close to player before opening dialogue
+sfx
+
+hide UI -> hide alarm indicator
+    maybe disable canvas?
+dialogue options lerp in
+etiquette
+text scrolls up
+bluff:
+    iconography for information
+when a skill check is required:
+    move the player dialogue to the center of the screen, or focus on it in some way
+    show the guard's skeptical face,
+    show the required skill check threshold
+    show the skill check happen
+    show the result
+ease the transition into dialogue menu
+    slow time quickly
+indicate what is about to happen
+    highlight player? player feet? draw dotted line?
+
+implement bluff
+set up lie object with corresponding retort
+multiple attempts:
+    1. fail: show me a work order (pair lie / accept / reject / next )

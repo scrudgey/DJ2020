@@ -5,8 +5,6 @@ using System.Linq;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
     public static Action OnSuspicionChange;
-
-    // TODO: move this state to playerdata
     public Dictionary<String, SuspicionRecord> suspicionRecords = new Dictionary<string, SuspicionRecord>();
     void UpdateSuspicion() {
         List<SuspicionRecord> timedOutRecords = new List<SuspicionRecord>();

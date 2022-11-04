@@ -96,10 +96,10 @@ namespace AI {
                 navFailures += 1;
             }
         }
-        public override void Reset() {
-            base.Reset();
-            SetDestination();
-        }
+    public override void Reset() {
+        base.Reset();
+        SetDestination();
+    }
     }
 
 }

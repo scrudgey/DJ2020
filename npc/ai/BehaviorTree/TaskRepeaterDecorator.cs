@@ -8,6 +8,7 @@ namespace AI {
         TaskNode wrapped;
         public TaskRepeaterDecorator(TaskNode wrapped) : base(wrapped) {
             this.wrapped = wrapped;
+            this.children = new List<TaskNode> { wrapped };
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             TaskState wrapState = wrapped.DoEvaluate(ref input);
