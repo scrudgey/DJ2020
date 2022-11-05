@@ -132,17 +132,11 @@ handle initializing the dialogue box:
     player etiquette
 3. set text options
 
-input: 
-    npc state
-    player state
-    level state
-
-
+* input: 
 * use alarm status
 * use disguise status
 * summarize appearance
 * use dice roll skill check
-
 * blink-emphasize result
 * fix success size
 * pulse-color doubt

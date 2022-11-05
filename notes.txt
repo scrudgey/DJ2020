@@ -1471,7 +1471,14 @@ increase final texture resolution, and padding potentially for better outline.
 * check on why certain objects have really large bounding lock box
 * exclude sparks from bounding box
 * corpse can be shot / exploded
-
+* fix "guess it was nothing"
+* investigate routine
+* time out suspicion record
+* when a skill check is required:
+    * show the guard's skeptical face,
+    * show the required skill check threshold
+    * show the skill check happen
+    * show the result
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1631,7 +1638,6 @@ adjustable NPC difficulty
     accuracy
     shooting behavior
         quickness, bursts
-don't clip camera through wall
 DFS path finding doesn't quite work right for highlighting alarm path
 alarm terminal triggering effects
     notify others of location
@@ -1666,53 +1672,69 @@ new graphics
     investigate graphics
         portrait for player, woman, man
 
-* fix "guess it was nothing"
-investigate routine
-something to emphasize to player that they are spotted, and should play it cool
-i ran away from a guy in investigate mode, and he went into "what is that?" mode
-running away from questioning should provoke combat
-    either a suspicion indicator is added, or jump into attack state?
-
-overall, there's something fucky going on with opening menus, async loading scenes, grabbing references to UIController
-overall menu system is incomplete.
+* spottedhighlight:
+    * pulse the indicator
+    * set line position accordingly
+    * pulse material x offset?
 
 
+
+MVP:
 1. music
 2. preset scenarios
+3. dialogue
+4. new level + 711 level
 
 weird gibs situation with bullet impact
 head / aim when time is stopped
 npc notices bodies
-time out suspicion record
 make alerted guard text red
     indicate when the player is the target of suspicion
-a third mode between "stop right there" and blasting
+holdup mode between "stop right there" and blasting
     point gun and high alert
+camera clips through wall in wallpress, in aim
 
-3. dialogue
+
 better detection / tracking when stop right there
+    moving around too much
 ensure that NPC is close to player before opening dialogue
+* indicate being spotted / commanded / interrogated
+    * highlight player? player feet? draw dotted line?
+    zoom in to bound the two of you
+        pause time, flash information?
+        zoom back out?
+        indicate a movement radius?
+    a wiggling bar indicates growing suspicion: -cool- / play it cool / danger blinking text
+    moving too much, moving too quickly, can trigger guard entering holdup mode
 sfx
-
+portraits
 hide UI -> hide alarm indicator
     maybe disable canvas?
 dialogue options lerp in
 etiquette
 text scrolls up
-bluff:
-    iconography for information
-when a skill check is required:
-    move the player dialogue to the center of the screen, or focus on it in some way
-    show the guard's skeptical face,
-    show the required skill check threshold
-    show the skill check happen
-    show the result
 ease the transition into dialogue menu
-    slow time quickly
-indicate what is about to happen
-    highlight player? player feet? draw dotted line?
+    slow time quickly?
 
+
+
+ID check:
+    enable / disable ID card check based on inventory
+    how does ID check work?
+        ID class: stolen, fake
+    does ID cancel out some negatives, i.e.?
+    perhaps, apply information, ID card, and see target threshold decrease in real time?
 implement bluff
-set up lie object with corresponding retort
-multiple attempts:
-    1. fail: show me a work order (pair lie / accept / reject / next )
+    iconography for information: person, place, event
+    bluff information exploit:
+        description: "shareholder meeting happening tomorrow"
+            bluff content: "I'm working on slides for the shareholder meeting"
+            type: event (person, location)
+data / config:
+    probably, skill check input / results should be something like their own data structure, nodes, defined in configuration
+    data-driven difficulty threshold
+    failure leads to a secondary check
+automatic retry x2, x3
+
+
+"what does it look like I'm doing?"

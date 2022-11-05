@@ -72,31 +72,6 @@ public class DialogueController : MonoBehaviour {
     }
     public void Initialize(DialogueInput input) {
         StartCoroutine(DoInitialize(input));
-        // CharacterContro  ller playerController = input.playerObject.GetComponentInChildren<CharacterController>();
-        // CharacterController npcController = input.npcObject.GetComponentInChildren<CharacterController>();
-
-        // Vector3 playerPosition = input.playerObject.transform.position;
-        // Vector3 npcPosition = input.npcObject.transform.position;
-        // // Vector3 npcToPlayer = playerPosition - npcPosition;
-
-        // PlayerInput playerInput = new PlayerInput {
-        //     lookAtPosition = npcPosition,
-        //     snapToLook = true,
-        //     Fire = PlayerInput.FireInputs.none
-        // };
-        // PlayerInput npcInput = new PlayerInput {
-        //     lookAtPosition = playerPosition,
-        //     snapToLook = true,
-        //     Fire = PlayerInput.FireInputs.none
-        // };
-        // playerController.SetInputs(playerInput);
-        // npcController.SetInputs(npcInput);
-        // this.input = input;
-        // SetStatusContainers(input);
-        // SetInitialDialogueResponses(input);
-        // SetInitialNPCDialogue(input);
-        // SetPortraits(input);
-        // force directions
     }
     public IEnumerator DoInitialize(DialogueInput input) {
         CharacterController playerController = input.playerObject.GetComponentInChildren<CharacterController>();
@@ -149,7 +124,7 @@ public class DialogueController : MonoBehaviour {
 
         switch (input.NPCAI.alertness) {
             case Alertness.normal:
-                CreateStatusElement("normal awareness", 0, true);
+                CreateStatusElement("normal posture", 0, true);
                 break;
             case Alertness.alert:
                 CreateStatusElement("on alert", 2, true);
@@ -176,9 +151,10 @@ public class DialogueController : MonoBehaviour {
 
     public void SetInitialDialogueResponses(DialogueInput input) {
         ClearResponseContainer();
+        // TODO: data driven.
         CreateDialogueResponse("[ESCAPE] Excuse me, I think I left my identification in my car.", EscapeDialogueResponseCallback);
         CreateDialogueResponse("[LIE] I am P.J. Pennypacker, security inspector.", LieDialogueResponseCallback);
-        CreateDialogueResponse("[BLUFF] Rockwell isn't going to be very happy if you delay our meeting!", EndDialogueResponseCallback);
+        CreateDialogueResponse("[BLUFF] Rockwell isn't going to be very happy if you delay our meeting!", BluffDialogueResponseCallback);
         CreateDialogueResponse("[ITEM] Sure, check my ID card.", EndDialogueResponseCallback);
     }
     public void SetInitialNPCDialogue(DialogueInput input) {
@@ -198,15 +174,30 @@ public class DialogueController : MonoBehaviour {
     public void LieDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
         SetRightDialogueText(dialogueResponseButton.response);
         ClearResponseContainer();
-        Action<DialogueResponseButton> x = (DialogueResponseButton button) => {
-            ProduceLieOutcome();
+        var input = new SkillCheckDialogue.SkillCheckInput {
+            checkType = "Lie",
+            successResponse = "Yes, that sounds right. Ok then.",
+            failResponse = "I don't think so.",
+            suspicion = "identity discovered"
         };
-        CreateDialogueResponse("[CONTINUE]", x);
+        Action<DialogueResponseButton> callback = (DialogueResponseButton button) => {
+            ActivateSkillCheck(input);
+        };
+        CreateDialogueResponse("[CONTINUE]", callback);
     }
-    public void ProduceLieOutcome() {
-        Debug.Log("lie outcome");
-        // SetLeftDialogueText("[considering...]");
-        ActivateSkillCheck();
+    public void BluffDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
+        SetRightDialogueText(dialogueResponseButton.response);
+        ClearResponseContainer();
+        var input = new SkillCheckDialogue.SkillCheckInput {
+            checkType = "Bluff",
+            successResponse = "I'm sorry, I didn't mean to intrude. Carry on.",
+            failResponse = "Rockwell, eh? Let's see what he has to say about it.",
+            suspicion = "bluff called"
+        };
+        Action<DialogueResponseButton> callback = (DialogueResponseButton button) => {
+            ActivateSkillCheck(input);
+        };
+        CreateDialogueResponse("[CONTINUE]", callback);
     }
     public void EndDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
         SetRightDialogueText(dialogueResponseButton.response);
@@ -271,10 +262,10 @@ public class DialogueController : MonoBehaviour {
     }
 
 
-    public void ActivateSkillCheck() {
+    public void ActivateSkillCheck(SkillCheckDialogue.SkillCheckInput input) {
         skillCheckDialogue.gameObject.SetActive(true);
         responsesContainer.gameObject.SetActive(false);
-        skillCheckDialogue.Initialize(HandleSkillCheckResult);
+        skillCheckDialogue.Initialize(HandleSkillCheckResult, input);
         StartCoroutine(PulseDoubterColor());
     }
     void HandleSkillCheckResult(SkillCheckDialogue.SkillCheckResult result) {
@@ -284,15 +275,17 @@ public class DialogueController : MonoBehaviour {
         doubterText.enabled = false;
         switch (result.type) {
             case SkillCheckDialogue.SkillCheckResult.ResultType.fail:
-                SetLeftDialogueText("[FAIL] I don't think so.");
+                SetLeftDialogueText($"[FAIL] {result.input.failResponse}");
                 SuspicionRecord lieFailedRecord = new SuspicionRecord {
-                    content = "identity discovered",
-                    suspiciousness = Suspiciousness.aggressive
+                    content = result.input.suspicion,
+                    suspiciousness = Suspiciousness.aggressive,
+                    lifetime = 120f,
+                    maxLifetime = 120f
                 };
                 GameManager.I.AddSuspicionRecord(lieFailedRecord);
                 break;
             case SkillCheckDialogue.SkillCheckResult.ResultType.success:
-                SetLeftDialogueText("[SUCCESS] Yes, that sounds right. Ok then.");
+                SetLeftDialogueText($"[SUCCESS] {result.input.successResponse}");
                 break;
         }
         ClearResponseContainer();

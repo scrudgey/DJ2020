@@ -266,6 +266,9 @@ public class InputController : MonoBehaviour {
 
     private void HandleCharacterInput() {
 
+        if (Time.timeScale == 0)
+            return;
+
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
         if (uiclick) {
             GameManager.I.cursorType = CursorType.pointer;

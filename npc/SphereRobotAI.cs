@@ -41,6 +41,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     Damage lastDamage;
     // public bool overrideDefaultState;
     private float footstepImpulse;
+    public SpottedHighlight highlight;
 
     public void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
@@ -269,7 +270,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         Debug.Log(timeSinceInterrogatedStrager);
                         if (timeSinceInterrogatedStrager <= 0) {
                             alertHandler.ShowWarn();
-                            ChangeState(new PauseState(this, new SphereInvestigateState(this), 1f));
+                            ChangeState(new PauseState(this, new SphereInvestigateState(this, highlight), 1f));
                         }
                         break;
                 }

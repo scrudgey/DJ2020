@@ -10,24 +10,14 @@ public class SphereInvestigateState : SphereControlState {
     float timeSinceSawPlayer;
     Vector3 lastSeenPlayerPosition;
     TaskOpenDialogue dialogueTask;
+    HQReport report;
+    SpottedHighlight highlight;
 
-    public SphereInvestigateState(SphereRobotAI ai) : base(ai) {
+    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight) : base(ai) {
+        this.highlight = highlight;
         speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
-        if (speaker != null) {
-            speaker.DoInvestigateSpeak();
-        }
-    }
-    public override void Enter() {
-        base.Enter();
-        SetupRootNode();
-    }
-    public bool isPlayerVisible() {
-        return timeSinceSawPlayer < 0.1f;
-    }
-    public bool seenPlayerRecently() => timeSinceSawPlayer < 5f;
-    void SetupRootNode() {
-        HQReport report = new HQReport {
+        report = new HQReport {
             reporter = owner.gameObject,
             desiredAlarmState = true,
             locationOfLastDisturbance = owner.getLocationOfInterest(),
@@ -36,6 +26,25 @@ public class SphereInvestigateState : SphereControlState {
             speechText = "HQ respond. Intruder spotted. Raise the alarm."
         };
 
+        if (speaker != null) {
+            speaker.DoInvestigateSpeak();
+        }
+
+    }
+    public override void Enter() {
+        base.Enter();
+        SetupRootNode();
+        highlight.target = GameManager.I.playerObject.transform;
+
+    }
+    public override void Exit() {
+        highlight.target = null;
+    }
+    public bool isPlayerVisible() {
+        return timeSinceSawPlayer < 0.1f;
+    }
+    public bool seenPlayerRecently() => timeSinceSawPlayer < 5f;
+    void SetupRootNode() {
         dialogueTask = new TaskOpenDialogue(owner);
 
         rootTaskNode = new Sequence(
@@ -47,7 +56,9 @@ public class SphereInvestigateState : SphereControlState {
             new Selector(
                 new Sequence(
                     new TaskConditional(() => isPlayerVisible()),
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 1.25f),
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 1.25f) {
+                        speedCoefficient = 0.5f
+                    },
                     dialogueTask
                 ),
                 new Sequence(
