@@ -408,5 +408,8 @@ public class Toolbox {
             relativePath = relativePath.Substring(0, fileExtPos);
         return relativePath;
     }
+    public static float Sigmoid(float value) {
+        return 1.0f / (1.0f + (float)Math.Exp(-value));
+    }
 }
 

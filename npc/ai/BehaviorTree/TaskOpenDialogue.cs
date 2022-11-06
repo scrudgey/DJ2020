@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 namespace AI {
     public class TaskOpenDialogue : TaskNode {
         public bool isConcluded = false;
-        UIController uiController;
         SphereRobotAI ai;
         public TaskOpenDialogue(SphereRobotAI ai) : base() {
             this.ai = ai;
@@ -18,9 +17,8 @@ namespace AI {
                 DialogueInput input = ai.GetDialogueInput();
                 GameManager.I.LoadScene("DialogueMenu", () => {
                     DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
-                    uiController = GameObject.FindObjectOfType<UIController>();
                     menuController.Initialize(input);
-                    uiController.HideUI();
+                    GameManager.I.uiController.HideUI();
                     menuController.OnDialogueConclude += HandleDialogueResult;
                     Debug.Log($"loaded dialogue menu finish callback {menuController}");
                 }, unloadAll: false);
@@ -37,7 +35,7 @@ namespace AI {
         public void HandleDialogueResult(DialogueController.DialogueResult result) {
             isConcluded = true;
             Time.timeScale = 1f;
-            uiController.ShowUI();
+            GameManager.I.uiController.ShowUI();
             Scene sceneToUnload = SceneManager.GetSceneByName("DialogueMenu");
             SceneManager.UnloadSceneAsync(sceneToUnload);
 

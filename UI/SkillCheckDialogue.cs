@@ -70,8 +70,7 @@ public class SkillCheckDialogue : MonoBehaviour {
             yield return null;
         }
         SetBarLevel((int)(roll / 10f));
-        Debug.Log(roll);
-
+        Debug.Log($"skill check: {roll} / {threshold}");
 
         // TODO: set response
         SkillCheckResult result = new SkillCheckResult {

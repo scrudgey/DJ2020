@@ -43,6 +43,7 @@ public partial class GameManager : Singleton<GameManager> {
     public MenuType activeMenuType;
     public OverlayType activeOverlayType = OverlayType.none;
     private CursorType _cursorType;
+
     public CursorType cursorType {
         get { return _cursorType; }
         set {
@@ -57,6 +58,10 @@ public partial class GameManager : Singleton<GameManager> {
     }
     int numberFrames;
     public bool showDebugRays;
+    public InputController inputController;
+    public UIController uiController;
+    public CharacterCamera characterCamera;
+    public CharacterController playerCharacterController;
     public void Start() {
         cursorType = CursorType.pointer;
         showDebugRays = true;
@@ -104,7 +109,7 @@ public partial class GameManager : Singleton<GameManager> {
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 if (!SceneManager.GetSceneByName("UI").isLoaded) {
-                    SceneManager.LoadSceneAsync("UI", LoadSceneMode.Additive);
+                    LoadScene("UI", () => { uiController = GameObject.FindObjectOfType<UIController>(); }, unloadAll: false);
                 }
                 break;
             case GameState.inMenu:
@@ -198,6 +203,15 @@ public partial class GameManager : Singleton<GameManager> {
             UpdateAlarm();
             UpdateReportTickets();
             UpdateGraphs();
+
+            if (cutsceneIsRunning) {
+                playerCharacterController.ResetInput();
+            } else {
+                inputController.HandleCharacterInput();
+                // still not 100% clean here
+                CameraInput input = playerCharacterController.BuildCameraInput();
+                characterCamera.UpdateWithInput(input);
+            }
         }
     }
 

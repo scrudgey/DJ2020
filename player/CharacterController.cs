@@ -168,7 +168,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float aimSwayTimer;
     private float aimSwayFrequencyConstant = 0.5f;
     private float aimSwayMagnitude = 0.01f;
-
+    Transform cameraFollowTransform;
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -267,6 +267,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         Motor.CharacterController = this;
         characterHurtable.OnHitStateChanged += HandleHurtableChanged;
         characterHurtable.OnTakeDamage += HandleTakeDamage;
+        cameraFollowTransform = transform.Find("cameraFollowPoint");
     }
 
     void OnDestroy() {
@@ -313,6 +314,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         OnValueChanged?.Invoke(this);
     }
 
+    public void ResetInput() {
+        SetInputs(PlayerInput.none);
+    }
     /// <summary>
     /// This is called every frame by MyPlayer in order to tell the character what its inputs are
     /// </summary>
@@ -1291,7 +1295,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             playerDirection = direction,
             playerLookDirection = lookAtDirection,
             popoutParity = popoutParity,
-            aimCameraRotation = aimCameraRotation
+            aimCameraRotation = aimCameraRotation,
+            targetTransform = cameraFollowTransform,
+            targetPosition = cameraFollowTransform.position
         };
         return input;
     }

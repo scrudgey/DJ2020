@@ -253,18 +253,7 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled -= HandleJumpActionCanceled;
     }
 
-    private void Update() {
-        HandleCharacterInput();
-    }
-
-    void Start() {
-        // inputReceivers = inputTargets
-        //     .Select(g => g.GetComponent<IInputReceiver>())
-        //     .Where(component => component != null)
-        //     .ToList();
-    }
-
-    private void HandleCharacterInput() {
+    public void HandleCharacterInput() {
 
         if (Time.timeScale == 0)
             return;
@@ -348,7 +337,7 @@ public class InputController : MonoBehaviour {
         foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<IInputReceiver>()) {
             inputReceivers.Add(inputReceiver);
         }
-        CharacterCamera characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
-        inputReceivers.Add(characterCamera);
+
+        inputReceivers.Add(GameManager.I.characterCamera);
     }
 }

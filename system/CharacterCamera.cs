@@ -10,7 +10,7 @@ using UnityEngine.Rendering.PostProcessing;
 // TODO: eliminate this enum
 public enum CameraState { normal, wallPress, attractor, aim }
 
-public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
+public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
     private CameraState _state;
     public CameraState state {
         get { return _state; }
@@ -50,7 +50,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     public List<Collider> IgnoredColliders = new List<Collider>();
 
     public Transform Transform { get; private set; }
-    public Transform FollowTransform { get; private set; }
+    // public Transform FollowTransform { get; private set; }
     public Vector3 PlanarDirection { get; set; }
     public float TargetDistance { get; set; }
 
@@ -110,7 +110,6 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
     void Start() {
         _currentDistance = 20f;
-        GameManager.OnFocusChanged += Bind;
         GameManager.OnFocusChanged += SetFollowTransform;
         GameManager.OnEyeVisibilityChange += HandleEyeVisibilityChange;
 
@@ -131,9 +130,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             HideLasers();
         }
     }
-    override public void OnDestroy() {
-        base.OnDestroy();
-        GameManager.OnFocusChanged -= Bind;
+    public void OnDestroy() {
         GameManager.OnFocusChanged -= SetFollowTransform;
         GameManager.OnEyeVisibilityChange -= HandleEyeVisibilityChange;
     }
@@ -198,11 +195,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
     }
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(GameObject g) {
-        Transform t = g.transform;
-        Transform follow = t.Find("cameraFollowPoint");
-        if (follow != null) t = follow;
-        FollowTransform = t;
-        _currentFollowPosition = FollowTransform.position;
+        // Transform t = g.transform;
+        // Transform follow = t.Find("cameraFollowPoint");
+        // if (follow != null) t = follow;
+        // FollowTransform = t;
+        // _currentFollowPosition = FollowTransform.position;
 
         // initial planar
         // the initial rotation here will be an offset to all subsequent rotations
@@ -218,16 +215,16 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
 
         IgnoredColliders.Clear();
-        IgnoredColliders.AddRange(t.gameObject.GetComponentsInChildren<Collider>());
+        IgnoredColliders.AddRange(g.GetComponentsInChildren<Collider>());
     }
 
-    override public void HandleValueChanged(CharacterController controller) {
-        CameraInput input = controller.BuildCameraInput();
-        UpdateWithInput(input);
-    }
+    // override public void HandleValueChanged(CharacterController controller) {
+    //     CameraInput input = controller.BuildCameraInput();
+    //     UpdateWithInput(input);
+    // }
     public void UpdateWithInput(CameraInput input) {
-        if (FollowTransform == null)
-            return;
+        // if (FollowTransform == null)
+        // return;
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
@@ -248,7 +245,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
 
         TransitionToState(camState);
         if (transitionTime < 1) {
-            transitionTime += Time.deltaTime;
+            transitionTime += Time.unscaledDeltaTime;
         }
         transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
 
@@ -302,7 +299,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
             Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y);
-            targetPosition = FollowTransform.position + worldOffset;
+            targetPosition = input.targetPosition + worldOffset;
             lastTargetPosition = targetPosition;
         }
 
@@ -332,14 +329,14 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         CameraTargetParameters parameters = NormalParameters(input);
         if (currentAttractor != null) {
             parameters.followingSharpness = currentAttractor.movementSharpness;
-            Vector3 delta = FollowTransform?.position - currentAttractor.sphereCollider.bounds.center ?? Vector3.zero;
+            Vector3 delta = input.targetPosition - currentAttractor.sphereCollider.bounds.center;
             parameters.targetPosition = (currentAttractor.sphereCollider.bounds.center * (zoomCoefficient - 0.25f)) + (parameters.targetPosition * (1.25f - zoomCoefficient));
         }
         return parameters;
     }
     public CameraTargetParameters WallPressParameters(CameraInput input) {
         // Find the smoothed follow position
-        Vector3 LROffset = FollowTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
+        Vector3 LROffset = input.targetTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         Vector3 distOffset = input.wallNormal * TargetDistance;
         Vector3 heightOffset = new Vector3(0, -0.5f, 0);
 
@@ -369,7 +366,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
-            targetPosition = FollowTransform.position + distOffset + LROffset + heightOffset + horizontalOffset,
+            targetPosition = input.targetPosition + distOffset + LROffset + heightOffset + horizontalOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -424,7 +421,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
             snapToRotation = cameraRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0.5f,
-            targetPosition = FollowTransform.position + horizontalOffset + heightOffset,
+            targetPosition = input.targetPosition + horizontalOffset + heightOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -438,14 +435,11 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         return screenPoint.x > 0.1 && screenPoint.y > 0.1 && screenPoint.x < 0.9 && screenPoint.y < 0.9;
     }
     public void ApplyTargetParameters(CameraTargetParameters input) {
-        if (FollowTransform == null)
-            return;
         // Process distance input
         TargetDistance = input.targetDistance;
         TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
 
         // apply FOV
-        // TODO: lerp it
         Camera.fieldOfView = input.fieldOfView;
 
         // apply orthographic
@@ -697,7 +691,7 @@ public class CharacterCamera : IBinder<CharacterController>, IInputReceiver {
         float timer = 0;
         shakeJitter = intensity;
         while (timer < lifetime) {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             shakeJitter = (float)PennerDoubleAnimation.CircEaseOut(timer, intensity, -intensity, lifetime);
             yield return null;
         }

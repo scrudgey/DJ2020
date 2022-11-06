@@ -56,7 +56,7 @@ public class SpeechTextController : MonoBehaviour {
         textMesh.enabled = true;
         SetRectPositions();
     }
-    void HideText() {
+    public void HideText() {
         textMesh.enabled = false;
     }
     // void SetRectPosition() {

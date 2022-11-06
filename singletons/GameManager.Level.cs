@@ -122,6 +122,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void SetFocus(GameObject focus) {
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
+        this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
 
         if (playerOutlineHandler != null) {
             playerOutlineHandler.UnBind();
@@ -153,13 +154,14 @@ public partial class GameManager : Singleton<GameManager> {
     }
     private void InitializeLevel() {
         ClearSceneData();
+        inputController = GameObject.FindObjectOfType<InputController>();
+        characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
 
         // spawn player object
         GameObject playerObj = SpawnPlayer(gameData.playerState);
         SetFocus(playerObj);
 
         // connect player object to input controller
-        InputController inputController = GameObject.FindObjectOfType<InputController>();
         inputController.SetInputReceivers(playerObj);
 
         // connect up power grids

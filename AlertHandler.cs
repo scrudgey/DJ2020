@@ -66,7 +66,7 @@ public class AlertHandler : MonoBehaviour {
         spriteRenderer.sprite = alertSprites[1];
         spriteRenderer.material = useWarnMaterial ? warnMaterial : alertMaterial;
         while (timer < appearanceInterval) {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             Vector2 sizeDelta = new Vector2();
             sizeDelta.x = 1f;
             sizeDelta.y = (float)PennerDoubleAnimation.BackEaseOut(timer, 0f, 1f, appearanceInterval);
@@ -74,7 +74,7 @@ public class AlertHandler : MonoBehaviour {
             yield return null;
         }
         while (timer < DISPLAY_TIME) {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             yield return null;
         }
         alertRect.sizeDelta = Vector2.one;
@@ -88,7 +88,7 @@ public class AlertHandler : MonoBehaviour {
         spriteRenderer.sprite = alertSprites[5];
         spriteRenderer.material = warnMaterial;
         while (timer < appearanceInterval) {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             Vector2 sizeDelta = new Vector2();
             sizeDelta.x = 1f;
             sizeDelta.y = (float)PennerDoubleAnimation.BackEaseOut(timer, 0f, 1f, appearanceInterval);
@@ -96,7 +96,7 @@ public class AlertHandler : MonoBehaviour {
             yield return null;
         }
         while (timer < DISPLAY_TIME) {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             yield return null;
         }
         alertRect.sizeDelta = Vector2.one;
@@ -114,7 +114,7 @@ public class AlertHandler : MonoBehaviour {
         float totalDuration = 10f;
         float intervalDuration = 0.2f;
         while (totalTimer < totalDuration) {
-            totalTimer += Time.deltaTime;
+            totalTimer += Time.unscaledDeltaTime;
             intervalTimer += Time.unscaledDeltaTime;
             if (intervalTimer > intervalDuration) {
                 intervalTimer -= intervalDuration;

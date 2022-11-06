@@ -1696,16 +1696,12 @@ camera clips through wall in wallpress, in aim
 
 
 better detection / tracking when stop right there
-    moving around too much
+    moving around too much raises suspicion
+    moving too much, moving too quickly, can trigger guard entering holdup mode
 ensure that NPC is close to player before opening dialogue
 * indicate being spotted / commanded / interrogated
     * highlight player? player feet? draw dotted line?
-    zoom in to bound the two of you
-        pause time, flash information?
-        zoom back out?
-        indicate a movement radius?
-    a wiggling bar indicates growing suspicion: -cool- / play it cool / danger blinking text
-    moving too much, moving too quickly, can trigger guard entering holdup mode
+
 sfx
 portraits
 hide UI -> hide alarm indicator
@@ -1730,11 +1726,39 @@ implement bluff
         description: "shareholder meeting happening tomorrow"
             bluff content: "I'm working on slides for the shareholder meeting"
             type: event (person, location)
+[CHALLENGE] what does it look like I'm doing?
 data / config:
     probably, skill check input / results should be something like their own data structure, nodes, defined in configuration
     data-driven difficulty threshold
     failure leads to a secondary check
-automatic retry x2, x3
+    automatic retry x2, x3
 
 
-"what does it look like I'm doing?"
+
+how is a cutscene going to work?
+    interrupt player control
+    interrupt NPC control (could just set timescale to 0 for this one?)
+    take control of camera as well
+    right now, camera is bound to charactercontroller and updates that way.
+
+    zoom in to bound the two of you
+        or, pan camera over to the guy, pop up his dialogue with portrait
+        will this be annoying if done all the time? no, we must properly control when it happens. not in gunfight, not multiple times at once
+        pause time, flash information?
+        zoom back out?
+        indicate a movement radius?
+        a wiggling bar indicates growing suspicion: -cool- / play it cool / danger blinking text
+to prevent triggering twice, make a check against alert state
+    normal - suspicion aroused - gunfight - alarm
+    then, use this state to control music
+
+
+when player runs out of sight:
+    momentary hey!
+        then start radio to HQ
+        if player comes back into view, resume walking forward
+when player is moving around:
+    
+if in radio to HQ mode and we see the player, drop the call and engage the player.
+
+interaction between dialogue menu and aim mode.

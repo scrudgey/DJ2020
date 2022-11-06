@@ -5,7 +5,6 @@ public class SphereInvestigateState : SphereControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
     static readonly public string LAST_SEEN_PLAYER_POSITION_KEY = "lastSeenPlayerPosition";
     private TaskNode rootTaskNode;
-    public SphereRobotSpeaker speaker;
     public SpeechTextController speechTextController;
     float timeSinceSawPlayer;
     Vector3 lastSeenPlayerPosition;
@@ -15,7 +14,6 @@ public class SphereInvestigateState : SphereControlState {
 
     public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight) : base(ai) {
         this.highlight = highlight;
-        speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
         report = new HQReport {
             reporter = owner.gameObject,
@@ -25,17 +23,11 @@ public class SphereInvestigateState : SphereControlState {
             lifetime = 6f,
             speechText = "HQ respond. Intruder spotted. Raise the alarm."
         };
-
-        if (speaker != null) {
-            speaker.DoInvestigateSpeak();
-        }
-
     }
     public override void Enter() {
         base.Enter();
         SetupRootNode();
         highlight.target = GameManager.I.playerObject.transform;
-
     }
     public override void Exit() {
         highlight.target = null;
@@ -114,8 +106,12 @@ public class SphereInvestigateState : SphereControlState {
             owner.StateFinished(this);
         } else if (result == TaskState.failure || result == TaskState.success) {
             owner.StateFinished(this);
+        } else if (!seenPlayerRecently()) {
+            highlight.target = null;
+        } else {
+            highlight.target = GameManager.I.playerObject.transform;
         }
-        // TODO: set look position
+        input.lookAtPosition = lastSeenPlayerPosition;
         object keyObj = rootTaskNode.GetData(LAST_SEEN_PLAYER_POSITION_KEY);
         if (keyObj != null) {
             Vector3 target = (Vector3)keyObj;

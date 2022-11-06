@@ -143,10 +143,9 @@ public class VRMissionController : MonoBehaviour {
 
         // TODO: fix  this ugly hack!!
         if (vRStatHandler == null) {
-            UIController uiController = GameObject.FindObjectOfType<UIController>();
-            if (uiController != null) {
-                uiController.ShowVRStats();
-                vRStatHandler = uiController.vRStatHandler;
+            if (GameManager.I.uiController != null) {
+                GameManager.I.uiController.ShowVRStats();
+                vRStatHandler = GameManager.I.uiController.vRStatHandler;
             }
         } else {
             vRStatHandler.SetDisplay(data);
