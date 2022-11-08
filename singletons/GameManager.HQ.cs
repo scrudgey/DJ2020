@@ -125,6 +125,9 @@ public partial class GameManager : Singleton<GameManager> {
             DeactivateAlarm();
             DisplayHQResponse("HQ: Understood. Disabling alarm.");
         }
+        if (kvp.Value.suspicionRecord != null) {
+            GameManager.I.AddSuspicionRecord(kvp.Value.suspicionRecord);
+        }
         reports.Remove(kvp.Key);
     }
     void InitiateAlarmShutdown() {

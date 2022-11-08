@@ -37,6 +37,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool isShooting;
     public bool isSwitchingWeapon;
     public Action<GunHandler> OnShoot;
+    public bool isAimingWeapon;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious
@@ -423,6 +424,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         // inputMode = input.inputMode;
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
+        isAimingWeapon = input.aimWeapon;
 
         if (HasGun()) {
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
@@ -514,7 +516,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             hasGun = gunInstance != null && HasGun(),
             holstered = gunInstance == null,
             baseGun = baseGun,
-            shootRequestedThisFrame = shootRequestedThisFrame
+            shootRequestedThisFrame = shootRequestedThisFrame,
+            aimWeapon = isAimingWeapon
         };
     }
 

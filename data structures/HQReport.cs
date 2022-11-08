@@ -7,4 +7,5 @@ public class HQReport {
     public float timeOfLastContact;
     public float lifetime;
     public string speechText;
+    public SuspicionRecord suspicionRecord;
 }

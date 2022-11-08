@@ -16,7 +16,8 @@ namespace AI {
         public TaskRadioHQ(SphereRobotAI ai,
             SpeechTextController speechTextController,
             AlertHandler alertHandler,
-            HQReport report) : base() {
+            HQReport report,
+            SuspicionRecord suspicionRecord = null) : base() {
             this.speechTextController = speechTextController;
             this.alertHandler = alertHandler;
             this.ai = ai;
@@ -35,6 +36,7 @@ namespace AI {
                 if (complete) {
                     alertHandler.HideRadio();
                     stopped = true;
+
                 }
                 return TaskState.running;
             } else return TaskState.success;

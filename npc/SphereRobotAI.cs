@@ -88,8 +88,19 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             default:
                 EnterDefaultState();
                 break;
+            case SphereHoldAtGunpointState:
+                SphereHoldAtGunpointState holdAtGunpointState = (SphereHoldAtGunpointState)routine;
+                if (holdAtGunpointState.isPlayerSuspicious()) {
+                    ChangeState(new SphereAttackState(this, gunHandler));
+                } else ChangeState(new SphereInvestigateState(this, highlight));
+                break;
+            case SphereInvestigateState:
+                SphereInvestigateState investigateState = (SphereInvestigateState)routine;
+                if (investigateState.isPlayerAggressive()) {
+                    ChangeState(new SphereHoldAtGunpointState(this));
+                } else goto default;
+                break;
             case PauseState:
-                Debug.Log("end pause");
                 PauseState pauser = (PauseState)routine;
                 ChangeState(pauser.nextState);
                 break;

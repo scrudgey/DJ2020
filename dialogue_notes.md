@@ -152,3 +152,32 @@ handle initializing the dialogue box:
 * repeated dialogues from NPC
 * turn to face each other
 * adjust speed / lerping
+
+
+
+
+ID check:
+    enable / disable ID card check based on inventory
+    how does ID check work?
+        ID class: stolen, fake
+    does ID cancel out some negatives, i.e.?
+    perhaps, apply information, ID card, and see target threshold decrease in real time?
+implement bluff
+    iconography for information: person, place, event
+    bluff information exploit:
+        description: "shareholder meeting happening tomorrow"
+            bluff content: "I'm working on slides for the shareholder meeting"
+            type: event (person, location)
+data / config:
+    probably, skill check input / results should be something like their own data structure, nodes, defined in configuration
+    data-driven difficulty threshold
+    failure leads to a secondary check
+    automatic retry x2, x3
+
+prevent kiting
+
+
+
+[CHALLENGE] what does it look like I'm doing?
+Hi, I'm looking for my dog, have you seen him?
+I'm with NE&T, could you point me to your main trunk router?

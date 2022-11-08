@@ -37,6 +37,6 @@ public class SphereRobotSpeaker : MonoBehaviour {
 
     public void DoInvestigateSpeak() {
         Toolbox.RandomizeOneShot(audioSource, angrySpeakSounds);
-        speechTextController.Say("Hey! You there!");
+        speechTextController.Say("<color=#ffa502>Hey! You there!</color>");
     }
 }

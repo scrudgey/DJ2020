@@ -411,5 +411,6 @@ public class Toolbox {
     public static float Sigmoid(float value) {
         return 1.0f / (1.0f + (float)Math.Exp(-value));
     }
+
 }
 

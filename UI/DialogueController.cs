@@ -38,6 +38,8 @@ public class DialogueController : MonoBehaviour {
     DialogueInput input;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
+        ClearResponseContainer();
+        ClearDialogueContainer();
     }
     public void Start() {
         // Initialize();
@@ -152,9 +154,16 @@ public class DialogueController : MonoBehaviour {
     public void SetInitialDialogueResponses(DialogueInput input) {
         ClearResponseContainer();
         // TODO: data driven.
+        StartCoroutine(CreateMultipleDialogues());
+    }
+    public IEnumerator CreateMultipleDialogues() {
+        float interval = 0.1f;
         CreateDialogueResponse("[ESCAPE] Excuse me, I think I left my identification in my car.", EscapeDialogueResponseCallback);
+        yield return new WaitForSecondsRealtime(interval);
         CreateDialogueResponse("[LIE] I am P.J. Pennypacker, security inspector.", LieDialogueResponseCallback);
+        yield return new WaitForSecondsRealtime(interval);
         CreateDialogueResponse("[BLUFF] Rockwell isn't going to be very happy if you delay our meeting!", BluffDialogueResponseCallback);
+        yield return new WaitForSecondsRealtime(interval);
         CreateDialogueResponse("[ITEM] Sure, check my ID card.", EndDialogueResponseCallback);
     }
     public void SetInitialNPCDialogue(DialogueInput input) {
@@ -168,7 +177,7 @@ public class DialogueController : MonoBehaviour {
         GameObject responseObj = GameObject.Instantiate(responsePrefab);
         responseObj.transform.SetParent(responsesContainer, false);
         DialogueResponseButton button = responseObj.GetComponent<DialogueResponseButton>();
-        button.Initialize(responseCallback, response);
+        button.Initialize(responseCallback, response, 0f);
     }
     public void EscapeDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) => EndDialogueResponseCallback(dialogueResponseButton);
     public void LieDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
@@ -213,21 +222,31 @@ public class DialogueController : MonoBehaviour {
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
         dialogue.Initialize(content, true);
+        if (dialogueContainer.childCount > 3) {
+            Transform earliest = dialogueContainer.GetChild(1);
+            DialogueTextPackage targetDialogue = earliest.GetComponent<DialogueTextPackage>();
+            targetDialogue.Remove();
+        }
     }
     public void SetRightDialogueText(string content) {
         GameObject newDialogue = GameObject.Instantiate(dialoguePrefab);
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
         dialogue.Initialize(content, false);
+        if (dialogueContainer.childCount > 3) {
+            Transform earliest = dialogueContainer.GetChild(1);
+            DialogueTextPackage targetDialogue = earliest.GetComponent<DialogueTextPackage>();
+            targetDialogue.Remove();
+        }
     }
     void Conclude() {
         OnDialogueConclude?.Invoke(DialogueResult.success);
     }
 
-    IEnumerator WrapCoroutine(IEnumerator enumerator, Action callback) {
-        yield return StartCoroutine(enumerator); ;
-        callback();
-    }
+    // IEnumerator WrapCoroutine(IEnumerator enumerator, Action callback) {
+    //     yield return StartCoroutine(enumerator); ;
+    //     callback();
+    // }
 
     IEnumerator EaseInDialogueBox(RectTransform rect) {
         float timer = 0f;

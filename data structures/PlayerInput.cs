@@ -38,6 +38,7 @@ public struct PlayerInput {
     public bool snapToLook;
     public bool preventWallPress;
     public Vector2 zoomInput;
+    public bool aimWeapon;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };

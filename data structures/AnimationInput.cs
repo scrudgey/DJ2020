@@ -7,6 +7,7 @@ public struct AnimationInput {
         public bool holstered;
         public GunTemplate baseGun;
         public bool shootRequestedThisFrame;
+        public bool aimWeapon;
     }
     public GunAnimationInput gunInput;
     public Direction orientation;

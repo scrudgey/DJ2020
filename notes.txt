@@ -1479,6 +1479,40 @@ increase final texture resolution, and padding potentially for better outline.
     * show the required skill check threshold
     * show the skill check happen
     * show the result
+* how is a cutscene going to work?
+    * interrupt player control
+    * interrupt NPC control (could just set timescale to 0 for this one?)
+    * take control of camera as well
+    * zoom in to bound the two of you
+        * or, pan camera over to the guy, pop up his dialogue with portrait
+        pause time, flash information?
+        a wiggling bar indicates growing suspicion: -cool- / play it cool / danger blinking text?
+* spottedhighlight:
+    * pulse the indicator
+    * set line position accordingly
+    * pulse material x offset?
+* when player runs out of sight:
+    * momentary hey!
+        * if player comes back into view, resume walking forward
+        * then start radio to HQ
+* when player is moving around:
+    * growing suspicion 
+* indicate being spotted / commanded / interrogated
+    * highlight player? player feet? draw dotted line?
+* better detection / tracking when stop right there
+    * moving around too much raises suspicion
+    * moving too much, moving too quickly, can trigger guard entering holdup mode
+* holdup mode between "stop right there" and blasting
+    * point gun and high alert
+* head / aim when time is stopped
+* intruder spotted record -> suspicious persons reported
+* hold gun up
+* make alerted guard text red
+    * indicate when the player is the target of suspicion
+* ease the transition into dialogue menu
+    * slow time quickly?
+* dialogue options lerp in
+* text scrolls up
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1672,12 +1706,6 @@ new graphics
     investigate graphics
         portrait for player, woman, man
 
-* spottedhighlight:
-    * pulse the indicator
-    * set line position accordingly
-    * pulse material x offset?
-
-
 
 MVP:
 1. music
@@ -1686,79 +1714,19 @@ MVP:
 4. new level + 711 level
 
 weird gibs situation with bullet impact
-head / aim when time is stopped
 npc notices bodies
-make alerted guard text red
-    indicate when the player is the target of suspicion
-holdup mode between "stop right there" and blasting
-    point gun and high alert
 camera clips through wall in wallpress, in aim
-
-
-better detection / tracking when stop right there
-    moving around too much raises suspicion
-    moving too much, moving too quickly, can trigger guard entering holdup mode
 ensure that NPC is close to player before opening dialogue
-* indicate being spotted / commanded / interrogated
-    * highlight player? player feet? draw dotted line?
 
 sfx
 portraits
 hide UI -> hide alarm indicator
     maybe disable canvas?
-dialogue options lerp in
 etiquette
-text scrolls up
-ease the transition into dialogue menu
-    slow time quickly?
 
-
-
-ID check:
-    enable / disable ID card check based on inventory
-    how does ID check work?
-        ID class: stolen, fake
-    does ID cancel out some negatives, i.e.?
-    perhaps, apply information, ID card, and see target threshold decrease in real time?
-implement bluff
-    iconography for information: person, place, event
-    bluff information exploit:
-        description: "shareholder meeting happening tomorrow"
-            bluff content: "I'm working on slides for the shareholder meeting"
-            type: event (person, location)
-[CHALLENGE] what does it look like I'm doing?
-data / config:
-    probably, skill check input / results should be something like their own data structure, nodes, defined in configuration
-    data-driven difficulty threshold
-    failure leads to a secondary check
-    automatic retry x2, x3
-
-
-
-how is a cutscene going to work?
-    interrupt player control
-    interrupt NPC control (could just set timescale to 0 for this one?)
-    take control of camera as well
-    right now, camera is bound to charactercontroller and updates that way.
-
-    zoom in to bound the two of you
-        or, pan camera over to the guy, pop up his dialogue with portrait
-        will this be annoying if done all the time? no, we must properly control when it happens. not in gunfight, not multiple times at once
-        pause time, flash information?
-        zoom back out?
-        indicate a movement radius?
-        a wiggling bar indicates growing suspicion: -cool- / play it cool / danger blinking text
 to prevent triggering twice, make a check against alert state
     normal - suspicion aroused - gunfight - alarm
-    then, use this state to control music
-
-
-when player runs out of sight:
-    momentary hey!
-        then start radio to HQ
-        if player comes back into view, resume walking forward
-when player is moving around:
-    
-if in radio to HQ mode and we see the player, drop the call and engage the player.
-
+    then, ue this state to control music
+if in radio to HQ mode and we see the player, drop the call 
+    if player is suspicious, attack. otherwise, cancel call.
 interaction between dialogue menu and aim mode.

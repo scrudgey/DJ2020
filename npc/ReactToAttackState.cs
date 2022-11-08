@@ -50,13 +50,20 @@ public class ReactToAttackState : SphereControlState {
             _ => "HQ respond! Activate building alarm!"
         };
         if (GameManager.I.levelHQTerminal() != null && !levelData.anyAlarmActive()) {
+            SuspicionRecord intruderRecord = new SuspicionRecord {
+                content = "gunshots reported",
+                maxLifetime = 120,
+                lifetime = 120,
+                suspiciousness = Suspiciousness.suspicious
+            };
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = true,
                 locationOfLastDisturbance = owner.getLocationOfInterest(),
                 timeOfLastContact = Time.time,
                 lifetime = 6f,
-                speechText = speechText
+                speechText = speechText,
+                suspicionRecord = intruderRecord
             };
 
             rootTaskNode = new Sequence(

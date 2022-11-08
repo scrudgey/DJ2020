@@ -40,6 +40,7 @@ public class SpeechTextController : MonoBehaviour {
     }
 
     public void Say(string phrase) {
+        // textMesh.color = textColor.GetValueOrDefault(Color.white);
         textMesh.text = phrase;
         visibilityTimer = 5f;
         ShowText();

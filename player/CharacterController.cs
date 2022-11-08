@@ -162,7 +162,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float deadTimer;
     private float hitstunTimer;
     private float gunHitStunTimer;
-    // private bool isDead;
     private Quaternion aimCameraRotation;
     private Vector3 recoil;
     private float aimSwayTimer;
@@ -1346,10 +1345,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     public void OnPoolDectivate() {
         deadTimer = 0f;
-        // state = CharacterState.normal;
         TransitionToState(CharacterState.normal);
         hitState = HitState.normal;
-
         landStunTimer = 0f;
         _lastInput = PlayerInput.none;
         lastTargetDataInput = CursorData.none;
@@ -1360,7 +1357,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         inputCrouchDown = false;
         deadMoveVelocity = Vector3.zero;
         deadTimer = 0f;
-        // tookDamageThisFrame = false;
         hitstunTimer = 0f;
         gunHitStunTimer = 0f;
     }
