@@ -42,7 +42,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     // public bool overrideDefaultState;
     private float footstepImpulse;
     public SpottedHighlight highlight;
-
+    public SpeechEtiquette[] etiquettes;
     public void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
         alertHandler.Hide();

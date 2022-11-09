@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -13,6 +15,7 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
         public static readonly string HEALTH = "health";
         public static readonly string FULL_HEALTH = "fullhealth";
         public static readonly string HITSTATE = "hitstate";
+        public static readonly string ETIQUETTES = "etiquettes";
     }
 
     public override NPCTemplate ReadJson(JsonReader reader, Type objectType, NPCTemplate existingValue, bool hasExistingValue, JsonSerializer serializer) {
@@ -38,6 +41,13 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
         result.secondaryGun = gun2;
         result.tertiaryGun = gun3;
 
+        JArray etiquetteJArray = (JArray)jo[Constants.ETIQUETTES];
+        List<SpeechEtiquette> etiquetteList = new List<SpeechEtiquette>();
+        for (int i = 0; i < etiquetteJArray.Count; i++) {
+            etiquetteList.Add((SpeechEtiquette)(int)etiquetteJArray[i]);
+        }
+        result.etiquettes = etiquetteList.ToArray();
+
         return result;
     }
     public override void WriteJson(JsonWriter writer, NPCTemplate value, JsonSerializer serializer) {
@@ -61,6 +71,15 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
             writer.WriteValue(value.fullHealthAmount);
             writer.WritePropertyName(Constants.HITSTATE);
             writer.WriteValue((int)value.hitState);
+
+
+            writer.WritePropertyName(Constants.ETIQUETTES);
+            writer.WriteStartArray();
+            for (int i = 0; i < value.etiquettes.Length; i++) {
+                writer.WriteValue((int)value.etiquettes[i]);
+            }
+            writer.WriteEndArray();
+
         }
         writer.WriteEndObject();
     }

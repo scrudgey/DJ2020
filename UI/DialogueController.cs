@@ -111,12 +111,18 @@ public class DialogueController : MonoBehaviour {
     }
     public void SetStatusContainers(DialogueInput input) {
         ClearStatusContainers();
+
+        // player side
         foreach (KeyValuePair<String, SuspicionRecord> kvp in input.suspicionRecords) {
             SuspicionRecord record = kvp.Value;
             CreateStatusElement(record.content, (int)record.suspiciousness, false);
         }
         CreateStatusElement($"speech skill {input.playerSpeechSkill}", -1 * input.playerSpeechSkill, false);
+        foreach (SpeechEtiquette etiquette in input.playerState.etiquettes) {
+            CreateStatusElement($"etiquette: {etiquette}", 0, false);
+        }
 
+        // npc side
         if (input.alarmActive) {
             CreateStatusElement("alarm is active", 1, true);
         }
@@ -147,6 +153,9 @@ public class DialogueController : MonoBehaviour {
             case SensitivityLevel.restrictedProperty:
                 CreateStatusElement("in restricted area", 2, true);
                 break;
+        }
+        foreach (SpeechEtiquette etiquette in input.NPCAI.etiquettes) {
+            CreateStatusElement($"etiquette: {etiquette}", 0, true);
         }
         SetAppearance(input);
     }

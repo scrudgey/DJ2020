@@ -37,13 +37,13 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     };
 
     public int speechSkillLevel;
-    public HashSet<string> speechEtiquettes = new HashSet<string>();
-
     public int maxConcurrentNetworkHacks;
     public float hackSpeedCoefficient;
     public float hackRadius;
 
     public bool disguise;
+
+    public SpeechEtiquette[] etiquettes;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("s1");
@@ -71,7 +71,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             fullHealthAmount = 250f,
 
             speechSkillLevel = 3,
-            speechEtiquettes = new HashSet<string> { "runner" }
+            etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street }
         };
     }
 
@@ -98,6 +98,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         cyberlegsLevel = template.cyberlegsLevel,
         thirdWeaponSlot = template.thirdWeaponSlot,
         legSkin = template.legSkin,
-        bodySkin = template.bodySkin
+        bodySkin = template.bodySkin,
+        etiquettes = template.etiquettes
     };
 }

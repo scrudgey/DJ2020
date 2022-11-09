@@ -48,6 +48,8 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
 
     public bool disguise;
 
+    public SpeechEtiquette[] etiquettes;
+
     public static PlayerTemplate Default() => new PlayerTemplate() {
         legSkin = "Jack",
         bodySkin = "Jack",
@@ -67,5 +69,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
 
         health = 250f,
         fullHealthAmount = 250f,
+
+        etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street }
     };
 }
