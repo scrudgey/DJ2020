@@ -32,6 +32,12 @@ public class SkillCheckDialogue : MonoBehaviour {
     Coroutine descriptionPulseCoroutine;
     public RectTransform arrowIndicator;
     public RectTransform arrowIndicatorParent;
+    public AudioSource audioSource;
+    public AudioClip[] beepSound;
+    public AudioClip[] initializeSound;
+    public AudioClip[] lockInSound;
+    public AudioClip[] successSound;
+    public AudioClip[] failSound;
     public void Initialize(Action<SkillCheckResult> resultCallback, SkillCheckInput input) {
         this.resultCallback = resultCallback;
         resultText.enabled = false;
@@ -60,7 +66,8 @@ public class SkillCheckDialogue : MonoBehaviour {
             if (blinkTimer > blinkInterval) {
                 noise = UnityEngine.Random.Range(-10f, 10f);
                 blinkTimer -= blinkInterval;
-                blinkInterval = UnityEngine.Random.Range(0.02f, 0.05f);
+                blinkInterval = UnityEngine.Random.Range(0.02f, 0.05f) + (timer / 3f);
+                Toolbox.RandomizeOneShot(audioSource, beepSound);
             }
             float rollQuantity = (float)PennerDoubleAnimation.CircEaseOut(timer, 0f, roll + noise, totalInterval);
             rollQuantity = Math.Max(0f, rollQuantity);
@@ -77,16 +84,18 @@ public class SkillCheckDialogue : MonoBehaviour {
             type = roll > threshold ? SkillCheckResult.ResultType.success : SkillCheckResult.ResultType.fail,
             input = input,
         };
-        // resultText.enabled = true;
         thresholdText.color = disabled;
         switch (result.type) {
             case SkillCheckResult.ResultType.success:
+                Toolbox.RandomizeOneShot(audioSource, successSound, randomPitchWidth: 0.05f);
                 resultText.text = "[success]";
                 resultText.color = green;
                 descriptionText.text = $"{input.checkType} check success!";
                 StartCoroutine(BlinkEmphasis(resultText));
                 break;
             case SkillCheckResult.ResultType.fail:
+                Toolbox.RandomizeOneShot(audioSource, failSound, randomPitchWidth: 0.05f);
+
                 resultText.text = "[fail]";
                 resultText.color = red;
                 descriptionText.text = $"{input.checkType} check failed!";
@@ -113,8 +122,8 @@ public class SkillCheckDialogue : MonoBehaviour {
         // change lerp mode
 
         yield return new WaitForSecondsRealtime(0.2f);
-        // StartCoroutine(BlinkEmphasis(titleText, pulses: 6));
         float xPosition = arrowIndicator.anchoredPosition.x;
+        Toolbox.RandomizeOneShot(audioSource, initializeSound, randomPitchWidth: 0f);
         while (timer < interval) {
             timer += Time.unscaledDeltaTime;
 
@@ -126,6 +135,8 @@ public class SkillCheckDialogue : MonoBehaviour {
             thresholdText.text = $"{(int)threshold}%";
             yield return null;
         }
+        Toolbox.RandomizeOneShot(audioSource, lockInSound, randomPitchWidth: 0f);
+
         yield return BlinkEmphasis(thresholdText, pulses: 6);
         yield return new WaitForSecondsRealtime(0.2f);
         if (descriptionPulseCoroutine == null) {
@@ -179,16 +190,5 @@ public class SkillCheckDialogue : MonoBehaviour {
             text.color = i < value ? red : blue;
             i += 1;
         }
-
-        // for (int i = 0; i < value; i++) {
-        //     Transform bar = barsContainer.GetChild(i);
-        //     TextMeshProUGUI text = bar.GetComponent<TextMeshProUGUI>();
-        //     text.color = blue;
-        // }
-        // for (int i = value; i < 10; i++) {
-        //     Transform bar = barsContainer.GetChild(i);
-        //     TextMeshProUGUI text = bar.GetComponent<TextMeshProUGUI>();
-        //     text.color = red;
-        // }
     }
 }

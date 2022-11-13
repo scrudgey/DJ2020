@@ -21,11 +21,11 @@ public class VRMissionVictoryMenuController : MonoBehaviour {
         SetTitle();
     }
     public void RetryButtonCallback() {
-        Debug.Log("retry");
+        GameManager.I.CloseMenu();
         GameManager.I.LoadVRMission(data.template);
     }
     public void MainMenuButtonCallback() {
-        Debug.Log("main menu");
+        GameManager.I.CloseMenu();
         GameManager.I.ReturnToTitleScreen();
     }
 

@@ -1522,7 +1522,11 @@ increase final texture resolution, and padding potentially for better outline.
 * if player is suspicious, stop and yell.
 * if player is not visible, yell and run to last position.
 * fix radio to hq now
-
+* sfx
+* color [success] [fail]
+* portraits
+    * configurable head
+* if in radio to HQ mode and we see the player, drop the call ....?
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1727,15 +1731,17 @@ weird gibs situation with bullet impact
 npc notices bodies
 camera clips through wall in wallpress, in aim
 
-sfx
-portraits
-    * configurable head
-* if in radio to HQ mode and we see the player, drop the call ....?
 interaction between dialogue menu and aim mode.
-* color [success] [fail]
 make handgun interval more sporadic
 make player suspicious throughout manual hack process
-better player spotted highlight dashed line art
+* better player spotted highlight dashed line art
+ID card?
+
+
+
+
+
+
 
 
 NOTE 
@@ -1752,3 +1758,4 @@ three distinct approaches to serializing state
 modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
 NPCSpawnPoint and what is IPlayerStateLoader ??
 in summary, it is a gnarly mess
+

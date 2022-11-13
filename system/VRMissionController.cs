@@ -88,23 +88,19 @@ public class VRMissionController : MonoBehaviour {
         switch (state) {
             case State.fail:
             case State.victory:
-                // GameManager.I.TransitionToInputMode(InputMode.none);
                 data.data.secondsPlayed = Time.time - startTime;
-                GameManager.I.TransitionToState(GameState.inMenu);
-
                 data.data.status = state switch {
                     State.victory => VRMissionDelta.Status.victory,
                     State.fail => VRMissionDelta.Status.fail,
                     _ => VRMissionDelta.Status.inProgress
                 };
 
-                if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
-                    // SceneManager.LoadScene("VRMissionFinish", LoadSceneMode.Additive);
-                    GameManager.I.LoadScene("VRMissionFinish", () => {
+                if (GameManager.I.activeMenuType != MenuType.VRMissionFinish) {
+                    GameManager.I.ShowMenu(MenuType.VRMissionFinish, () => {
                         Debug.Log("loaded vr mission finish callback");
                         VRMissionVictoryMenuController menuController = GameObject.FindObjectOfType<VRMissionVictoryMenuController>();
                         menuController.Initialize(data);
-                    }, unloadAll: false);
+                    });
                 }
                 break;
             default:

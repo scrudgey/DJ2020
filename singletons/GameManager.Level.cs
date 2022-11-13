@@ -50,7 +50,10 @@ public partial class GameManager : Singleton<GameManager> {
         missionController.StartVRMission(state);
     }
     public void ReturnToTitleScreen() {
-        LoadScene("title", () => Debug.Log("start title screen"));
+        LoadScene("title", () => {
+            Debug.Log("start title screen");
+            activeMenuType = MenuType.none;
+        });
     }
 
     public void LoadScene(string targetScene, Action callback, bool unloadAll = true) {

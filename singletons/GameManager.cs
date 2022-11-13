@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public enum GameState { none, levelPlay, inMenu }
-public enum MenuType { none, console, dialogue }
+public enum GameState { none, levelPlay, mainMenu }
+public enum MenuType { none, console, dialogue, VRMissionFinish }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer }
 public enum InputMode { none, gun, cyber, aim, wallpressAim }
@@ -25,9 +26,9 @@ public partial class GameManager : Singleton<GameManager> {
     public InputActionReference showConsole;
 
     // UI callbacks
-    public static Action OnMenuClosed;
+    // public static Action OnMenuClosed;
     public static Action<GameObject> OnFocusChanged;
-    public static Action<MenuType> OnMenuChange;
+    // public static Action<MenuType> OnMenuChange;
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<AlarmGraph> OnAlarmGraphChange;
@@ -43,6 +44,8 @@ public partial class GameManager : Singleton<GameManager> {
     public MenuType activeMenuType;
     public OverlayType activeOverlayType = OverlayType.none;
     private CursorType _cursorType;
+    bool resetMouseControl;
+
 
     public CursorType cursorType {
         get { return _cursorType; }
@@ -73,6 +76,8 @@ public partial class GameManager : Singleton<GameManager> {
         toggleConsoleThisFrame = ctx.ReadValueAsButton();
     }
     void LateUpdate() {
+
+        // A hack to initialize a level from unity editor? doesn't currently work. 
         if (numberFrames == 1 && SceneManager.GetActiveScene().name != "title") {
             // TODO: set level in gamedata
             gameData = GameData.TestInitialData();
@@ -112,10 +117,6 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("UI", () => { uiController = GameObject.FindObjectOfType<UIController>(); }, unloadAll: false);
                 }
                 break;
-            case GameState.inMenu:
-                TransitionToInputMode(InputMode.none);
-                Time.timeScale = 0f;
-                break;
             default:
                 break;
         }
@@ -123,9 +124,6 @@ public partial class GameManager : Singleton<GameManager> {
     public void OnStateExit(GameState state, GameState toState) {
         switch (state) {
             case GameState.none:
-                break;
-            case GameState.inMenu:
-                Time.timeScale = 1f;
                 break;
             default:
                 break;
@@ -150,20 +148,45 @@ public partial class GameManager : Singleton<GameManager> {
         };
         Cursor.SetCursor(data.mouseCursor, data.hotSpot, data.cursorMode);
     }
-    public void ShowMenu(MenuType menuType) {
-        activeMenuType = menuType;
-        if (menuType == MenuType.dialogue) {
-            Time.timeScale = 0f;
-        } else {
-
+    public void ShowMenu(MenuType menuType, Action callback = null) {
+        if (activeMenuType != MenuType.none) {
+            CloseMenu();
         }
-        OnMenuChange?.Invoke(menuType);
-        // TransitionToState(GameState.inMenu);
+        activeMenuType = menuType;
+        Time.timeScale = 0f;
+        switch (menuType) {
+            default:
+                break;
+            case MenuType.dialogue:
+                if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
+                    LoadScene("DialogueMenu", callback, unloadAll: false);
+                }
+                break;
+            case MenuType.VRMissionFinish:
+                if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
+                    LoadScene("VRMissionFinish", callback, unloadAll: false);
+                }
+                break;
+            case MenuType.console:
+                uiController.ShowTerminal();
+                callback?.Invoke();
+                break;
+        }
     }
     public void CloseMenu() {
-        OnMenuClosed?.Invoke();
+        switch (activeMenuType) {
+            default:
+                break;
+            case MenuType.console:
+                uiController.HideTerminal();
+                break;
+            case MenuType.dialogue:
+                uiController.ShowUI();
+                Scene sceneToUnload = SceneManager.GetSceneByName("DialogueMenu");
+                SceneManager.UnloadSceneAsync(sceneToUnload);
+                break;
+        }
         Time.timeScale = 1f;
-        // TransitionToState(GameState.levelPlay); // this isn't right either?
         activeMenuType = MenuType.none;
     }
 
@@ -207,10 +230,38 @@ public partial class GameManager : Singleton<GameManager> {
             if (cutsceneIsRunning) {
                 playerCharacterController.ResetInput();
             } else {
-                inputController.HandleCharacterInput();
+                bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
+                if (uiclick) {
+                    cursorType = CursorType.pointer;
+                } else {
+                    cursorType = CursorType.gun;
+                }
+
+                if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                    resetMouseControl = true;
+                } else {
+                    if (resetMouseControl) {
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                        resetMouseControl = false;
+                    }
+                }
+
+                if (Time.timeScale > 0) {
+                    inputController.HandleCharacterInput(uiclick);
+                }
+
                 // still not 100% clean here
                 CameraInput input = playerCharacterController.BuildCameraInput();
                 characterCamera.UpdateWithInput(input);
+            }
+        } else {
+            if (resetMouseControl) {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                resetMouseControl = false;
             }
         }
     }

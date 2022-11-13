@@ -25,7 +25,7 @@ public class UIController : MonoBehaviour {
     public TextMeshProUGUI caption;
     public HitIndicatorController hitIndicatorController;
     public VRStatHandler vRStatHandler;
-    public DialogueController dialogueController;
+    // public DialogueController dialogueController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -41,19 +41,19 @@ public class UIController : MonoBehaviour {
         hackDisplay.cam = Camera.main;
 
         GameManager.OnFocusChanged += BindToNewTarget;
-        GameManager.OnMenuChange += HandleMenuChange;
-        GameManager.OnMenuClosed += HandleMenuClosed;
+        // GameManager.OnMenuChange += HandleMenuChange;
+        // GameManager.OnMenuClosed += HandleMenuClosed;
         GameManager.OnCaptionChange += HandleCaptionChange;
         caption.text = "";
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
         HideVRStats();
-        dialogueController.gameObject.SetActive(false);
+        // dialogueController.gameObject.SetActive(false);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
-        GameManager.OnMenuChange -= HandleMenuChange;
-        GameManager.OnMenuClosed -= HandleMenuClosed;
+        // GameManager.OnMenuChange -= HandleMenuChange;
+        // GameManager.OnMenuClosed -= HandleMenuClosed;
     }
 
     void BindToNewTarget(GameObject target) {
@@ -77,19 +77,21 @@ public class UIController : MonoBehaviour {
         healthIndicatorController.Bind(target);
         hitIndicatorController.Bind(target);
     }
-
-    void HandleMenuChange(MenuType type) {
-        dialogueController.gameObject.SetActive(false);
-        terminal.gameObject.SetActive(false);
-        if (type == MenuType.console) {
-            terminal.gameObject.SetActive(true);
-        }
-        // else if (type == MenuType.dialogue) {
-        //     dialogueController.gameObject.SetActive(true);
-        //     dialogueController.Initialize();
-        // }
+    public void ShowTerminal() {
+        terminal.gameObject.SetActive(true);
     }
-    void HandleMenuClosed() {
+    // void HandleMenuChange(MenuType type) {
+    //     dialogueController.gameObject.SetActive(false);
+    //     terminal.gameObject.SetActive(false);
+    //     if (type == MenuType.console) {
+    //         terminal.gameObject.SetActive(true);
+    //     }
+    //     // else if (type == MenuType.dialogue) {
+    //     //     dialogueController.gameObject.SetActive(true);
+    //     //     dialogueController.Initialize();
+    //     // }
+    // }
+    public void HideTerminal() {
         terminal.gameObject.SetActive(false);
     }
     void HandleCaptionChange(string newCaption) {

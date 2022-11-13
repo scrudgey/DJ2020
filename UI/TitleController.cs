@@ -8,6 +8,7 @@ public class TitleController : MonoBehaviour {
     void Start() {
         mainMenu.SetActive(true);
         VRDesignMenu.SetActive(false);
+        GameManager.I.TransitionToState(GameState.mainMenu);
     }
     public void NewVRMissionCallback() {
         mainMenu.SetActive(false);

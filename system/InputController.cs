@@ -60,7 +60,6 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
-    bool resetMouseControl;
 
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -253,29 +252,9 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled -= HandleJumpActionCanceled;
     }
 
-    public void HandleCharacterInput() {
-
-        if (Time.timeScale == 0)
-            return;
-
-        bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
-        if (uiclick) {
-            GameManager.I.cursorType = CursorType.pointer;
+    public void HandleCharacterInput(bool pointerOverUIElement) {
+        if (pointerOverUIElement) {
             firePressedThisFrame = false;
-        } else {
-            GameManager.I.cursorType = CursorType.gun;
-        }
-
-        if (GameManager.I.inputMode == InputMode.aim) {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            resetMouseControl = true;
-        } else {
-            if (resetMouseControl) {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-                resetMouseControl = false;
-            }
         }
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();

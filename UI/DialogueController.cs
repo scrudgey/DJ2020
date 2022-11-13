@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class DialogueController : MonoBehaviour {
     public enum DialogueResult { success, fail }
 
-    private const string V = "";
     static public Action<DialogueResult> OnDialogueConclude;
 
     public GameObject UIEditorCamera;
@@ -35,6 +34,10 @@ public class DialogueController : MonoBehaviour {
     public SkillCheckDialogue skillCheckDialogue;
     public TextMeshProUGUI doubterText;
     public Color red;
+    [Header("audio")]
+    public AudioSource audioSource;
+    public AudioClip[] nextDialogueSound;
+    public AudioClip[] openSkillCheckSound;
     DialogueInput input;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -81,7 +84,6 @@ public class DialogueController : MonoBehaviour {
 
         Vector3 playerPosition = input.playerObject.transform.position;
         Vector3 npcPosition = input.npcObject.transform.position;
-        // Vector3 npcToPlayer = playerPosition - npcPosition;
 
         PlayerInput playerInput = new PlayerInput {
             lookAtPosition = npcPosition,
@@ -103,7 +105,6 @@ public class DialogueController : MonoBehaviour {
         SetInitialDialogueResponses(input);
         SetInitialNPCDialogue(input);
         SetPortraits(input);
-        Time.timeScale = 0f;
         yield return null;
     }
     public void SetPortraits(DialogueInput input) {
@@ -232,6 +233,7 @@ public class DialogueController : MonoBehaviour {
         Conclude();
     }
     public void SetLeftDialogueText(string content) {
+        Toolbox.RandomizeOneShot(audioSource, nextDialogueSound, randomPitchWidth: 0.05f);
         GameObject newDialogue = GameObject.Instantiate(dialoguePrefab);
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
@@ -243,6 +245,7 @@ public class DialogueController : MonoBehaviour {
         }
     }
     public void SetRightDialogueText(string content) {
+        Toolbox.RandomizeOneShot(audioSource, nextDialogueSound, randomPitchWidth: 0.05f);
         GameObject newDialogue = GameObject.Instantiate(dialoguePrefab);
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
@@ -255,12 +258,8 @@ public class DialogueController : MonoBehaviour {
     }
     void Conclude() {
         OnDialogueConclude?.Invoke(DialogueResult.success);
+        GameManager.I.CloseMenu();
     }
-
-    // IEnumerator WrapCoroutine(IEnumerator enumerator, Action callback) {
-    //     yield return StartCoroutine(enumerator); ;
-    //     callback();
-    // }
 
     IEnumerator EaseInDialogueBox(RectTransform rect) {
         float timer = 0f;
@@ -296,6 +295,7 @@ public class DialogueController : MonoBehaviour {
 
 
     public void ActivateSkillCheck(SkillCheckDialogue.SkillCheckInput input) {
+        Toolbox.RandomizeOneShot(audioSource, openSkillCheckSound, randomPitchWidth: 0.05f);
         skillCheckDialogue.gameObject.SetActive(true);
         responsesContainer.gameObject.SetActive(false);
         skillCheckDialogue.Initialize(HandleSkillCheckResult, input);

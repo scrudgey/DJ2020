@@ -510,13 +510,11 @@ public class VRMissionDesigner : MonoBehaviour {
     public void SkinHeadPrevious() {
         template.playerState.headSkin = PreviousInList(SPRITESHEETS, template.playerState.headSkin);
         template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
-        Debug.Log(template.playerState.portrait);
         OnDataChange();
     }
     public void SkinHeadNext() {
         template.playerState.headSkin = NextInList(SPRITESHEETS, template.playerState.headSkin);
         template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
-        Debug.Log(template.playerState.portrait);
         OnDataChange();
     }
     public void SkinTorsoPrevious() {

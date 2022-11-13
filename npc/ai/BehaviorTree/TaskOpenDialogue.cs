@@ -8,25 +8,19 @@ namespace AI {
     public class TaskOpenDialogue : TaskNode {
         bool isConcluded = false;
         SphereRobotAI ai;
-        // Action<DialogueController.DialogueResult> callback;
         public TaskOpenDialogue(SphereRobotAI ai) : base() {
             this.ai = ai;
-            // this.callback = callback;
         }
         public override void Initialize() {
             base.Initialize();
-            // Yikesaroo! Hacky BS!
-            if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
+            if (GameManager.I.activeMenuType != MenuType.dialogue) {
                 DialogueInput input = ai.GetDialogueInput();
-                GameManager.I.LoadScene("DialogueMenu", () => {
+                GameManager.I.ShowMenu(MenuType.dialogue, () => {
                     DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
                     menuController.Initialize(input);
                     GameManager.I.uiController.HideUI();
                     DialogueController.OnDialogueConclude += HandleDialogueResult;
-                    // if (callback != null)
-                    // menuController.OnDialogueConclude += callback;
-                    Debug.Log($"loaded dialogue menu finish callback {menuController}");
-                }, unloadAll: false);
+                });
             }
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
@@ -40,10 +34,6 @@ namespace AI {
         public void HandleDialogueResult(DialogueController.DialogueResult result) {
             DialogueController.OnDialogueConclude -= HandleDialogueResult;
             isConcluded = true;
-            Time.timeScale = 1f;
-            GameManager.I.uiController.ShowUI();
-            Scene sceneToUnload = SceneManager.GetSceneByName("DialogueMenu");
-            SceneManager.UnloadSceneAsync(sceneToUnload);
         }
 
         public override void Reset() {
