@@ -17,6 +17,7 @@ public class SphereInvestigateState : SphereControlState {
     SpottedHighlight highlight;
     float integratedPlayerMovement;
     float totalPlayerMovement;
+    float saidHeyTimeout;
 
     public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight) : base(ai) {
         this.highlight = highlight;
@@ -36,19 +37,27 @@ public class SphereInvestigateState : SphereControlState {
             speechText = "HQ respond. Intruder spotted. Raise the alarm.",
             // suspicionRecord = intruderRecord
         };
+        DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
     public override void Enter() {
         base.Enter();
         SetupRootNode();
         lastSeenPlayerPosition = Vector3.zero;
+        rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, GameManager.I.playerObject.transform.position);
+        alertTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, GameManager.I.playerObject.transform.position);
         highlight.target = GameManager.I.playerObject.transform;
         integratedPlayerMovement = 0f;
     }
     public override void Exit() {
         highlight.target = null;
     }
-    public bool isPlayerVisible() {
+    public bool lookingAtPlayer() {
         return timeSinceSawPlayer < 0.1f;
+    }
+    public bool seenPlayerRecently() => timeSinceSawPlayer < 2f;
+
+    public bool isPlayerNear() {
+        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 1.25f;
     }
     public bool isPlayerSuspicious() {
         return integratedPlayerMovement > WARN_THRESHOLD;
@@ -56,11 +65,20 @@ public class SphereInvestigateState : SphereControlState {
     public bool isPlayerAggressive() {
         return integratedPlayerMovement > AGGRESSION_THRESHOLD;
     }
-    public bool seenPlayerRecently() => timeSinceSawPlayer < 5f;
     void SetupRootNode() {
         dialogueTask = new TaskOpenDialogue(owner);
 
-        alertTaskNode = new TaskRepeaterDecorator(new TaskSucceed());
+        alertTaskNode = new Sequence(
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 0.5f) {
+                headBehavior = TaskMoveToKey.HeadBehavior.search,
+                speedCoefficient = 1.2f
+            },
+            new Selector(
+                    new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
+                    new TaskConditional(() => GameManager.I.levelHQTerminal() == null),
+                    new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
+                )
+        );
 
         rootTaskNode = new Sequence(
             new TaskTimerDectorator(new TaskLookAt(owner.transform) {
@@ -70,10 +88,10 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskConditional(() => isPlayerVisible()),
                     new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 1.25f) {
                         speedCoefficient = 0.5f
                     },
+                    new TaskConditional(() => isPlayerNear()),
                     dialogueTask
                 ),
                 new Sequence(
@@ -87,48 +105,51 @@ public class SphereInvestigateState : SphereControlState {
                             key = SEARCH_POSITION_KEY,
                             useKey = true,
                             headBehavior = TaskLookAt.HeadBehavior.search
-                        }, 3f)
+                        }, 0.5f)
                     )
-                ),
-                // TODO: conditional: standing in front of player
-                new Selector(
-                    new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
-                    new TaskConditional(() => GameManager.I.levelHQTerminal() == null),
-                    new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
                 )
             )
         );
     }
 
     public override PlayerInput Update(ref PlayerInput input) {
-        timeSinceSawPlayer += Time.deltaTime;
         TaskState result = TaskState.running;
-        // Debug.Log($"investigate: {timeSinceSawPlayer} {integratedPlayerMovement}");
-        if (isPlayerVisible()) {
+        if (lookingAtPlayer()) {
             if (integratedPlayerMovement > 0) {
                 integratedPlayerMovement -= Time.deltaTime * 0.5f;
             }
-        } else {
-            integratedPlayerMovement += Time.deltaTime;
         }
-        if (isPlayerAggressive()) {
-            owner.StateFinished(this);
-        } else if (isPlayerSuspicious()) {
-            speechTextController.Say("<color=#ff4757>Hey! Hold it!</color>");
-            result = alertTaskNode.Evaluate(ref input);
-        } else {
-            result = rootTaskNode.Evaluate(ref input);
+        timeSinceSawPlayer += Time.deltaTime;
+        if (saidHeyTimeout > 0) {
+            saidHeyTimeout -= Time.deltaTime;
         }
 
-        if (dialogueTask.isConcluded) {
+        if (isPlayerAggressive()) {
             owner.StateFinished(this);
-        } else if (result == TaskState.failure || result == TaskState.success) {
-            owner.StateFinished(this);
-        } else if (!seenPlayerRecently()) {
-            highlight.target = null;
-        } else {
-            highlight.target = GameManager.I.playerObject.transform;
         }
+
+        if (!isPlayerSuspicious() && lookingAtPlayer()) {
+            result = rootTaskNode.Evaluate(ref input);
+            if (result == TaskState.failure || result == TaskState.success) {
+                owner.StateFinished(this);
+            }
+        } else {
+            if (saidHeyTimeout <= 0) {
+                speechTextController.Say("<color=#ff4757>Hey! Hold it!</color>");
+                saidHeyTimeout = 60f;
+            }
+            if (!lookingAtPlayer()) {
+                result = alertTaskNode.Evaluate(ref input);
+                if (result == TaskState.success) {
+                    owner.StateFinished(this);
+                }
+            }
+        }
+
+        if (!seenPlayerRecently()) {
+            highlight.target = null;
+        }
+
         input.lookAtPosition = lastSeenPlayerPosition;
         input.snapToLook = true;
         object keyObj = rootTaskNode.GetData(LAST_SEEN_PLAYER_POSITION_KEY);
@@ -139,6 +160,11 @@ public class SphereInvestigateState : SphereControlState {
         return input;
     }
 
+    public void HandleDialogueResult(DialogueController.DialogueResult result) {
+        DialogueController.OnDialogueConclude -= HandleDialogueResult;
+        owner.StateFinished(this);
+    }
+
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             if (lastSeenPlayerPosition != Vector3.zero) {
@@ -146,23 +172,20 @@ public class SphereInvestigateState : SphereControlState {
                 integratedPlayerMovement += amountOfMotion;
                 totalPlayerMovement += amountOfMotion;
             }
-            // Debug.Log($"investigate: {integratedPlayerMovement}");
             timeSinceSawPlayer = 0;
             lastSeenPlayerPosition = other.bounds.center;
             rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
+            alertTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
+            rootTaskNode.SetData(SEARCH_POSITION_KEY, lastSeenPlayerPosition);
         }
     }
     public override void OnNoiseHeard(NoiseComponent noise) {
         base.OnNoiseHeard(noise);
-        // TODO: more detailed decision making if sound is suspicious
         if (noise.data.player) {
-            if (timeSinceSawPlayer > 0.1f) {
-                timeSinceSawPlayer = 100f;
-                rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, noise.transform.position);
-            }
             if (noise.data.suspiciousness > Suspiciousness.normal || noise.data.isFootsteps) {
                 Vector3 searchDirection = noise.transform.position;
                 rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
+                alertTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
             }
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,10 +6,12 @@ using UnityEngine.SceneManagement;
 
 namespace AI {
     public class TaskOpenDialogue : TaskNode {
-        public bool isConcluded = false;
+        bool isConcluded = false;
         SphereRobotAI ai;
+        // Action<DialogueController.DialogueResult> callback;
         public TaskOpenDialogue(SphereRobotAI ai) : base() {
             this.ai = ai;
+            // this.callback = callback;
         }
         public override void Initialize() {
             base.Initialize();
@@ -19,7 +22,9 @@ namespace AI {
                     DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
                     menuController.Initialize(input);
                     GameManager.I.uiController.HideUI();
-                    menuController.OnDialogueConclude += HandleDialogueResult;
+                    DialogueController.OnDialogueConclude += HandleDialogueResult;
+                    // if (callback != null)
+                    // menuController.OnDialogueConclude += callback;
                     Debug.Log($"loaded dialogue menu finish callback {menuController}");
                 }, unloadAll: false);
             }
@@ -33,12 +38,12 @@ namespace AI {
         }
 
         public void HandleDialogueResult(DialogueController.DialogueResult result) {
+            DialogueController.OnDialogueConclude -= HandleDialogueResult;
             isConcluded = true;
             Time.timeScale = 1f;
             GameManager.I.uiController.ShowUI();
             Scene sceneToUnload = SceneManager.GetSceneByName("DialogueMenu");
             SceneManager.UnloadSceneAsync(sceneToUnload);
-
         }
 
         public override void Reset() {

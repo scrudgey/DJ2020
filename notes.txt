@@ -1513,6 +1513,16 @@ increase final texture resolution, and padding potentially for better outline.
     * slow time quickly?
 * dialogue options lerp in
 * text scrolls up
+* hide UI -> hide alarm indicator
+    * maybe disable canvas?
+* etiquette
+* ensure that NPC is close to player before opening dialogue
+* two interrogations at once:
+* if the player is not visible, run to last location
+* if player is suspicious, stop and yell.
+* if player is not visible, yell and run to last position.
+* fix radio to hq now
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1716,17 +1726,26 @@ MVP:
 weird gibs situation with bullet impact
 npc notices bodies
 camera clips through wall in wallpress, in aim
-ensure that NPC is close to player before opening dialogue
 
 sfx
 portraits
-hide UI -> hide alarm indicator
-    maybe disable canvas?
-etiquette
-
-to prevent triggering twice, make a check against alert state
-    normal - suspicion aroused - gunfight - alarm
-    then, ue this state to control music
-if in radio to HQ mode and we see the player, drop the call 
-    if player is suspicious, attack. otherwise, cancel call.
+    * configurable head
+* if in radio to HQ mode and we see the player, drop the call ....?
 interaction between dialogue menu and aim mode.
+* color [success] [fail]
+make handgun interval more sporadic
+make player suspicious throughout manual hack process
+
+NOTE 
+adding etiquette was not easy.
+even after setting default player state, it didn't work for player
+because we were loading from the saved VR template.
+then getting NPC to work was difficult.
+i had to modify NPCTemplateJSONConverter, even after modifying the scriptable objects
+
+three distinct approaches to serializing state
+1. player state duplicates fields in template and in state. instantiating player state involves a lot of copying.
+2. a state object with a template, and mutable fields
+3. a state object with a template and a delta. i like this, keeps all cleanly separate.
+modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
+NPCSpawnPoint and what is IPlayerStateLoader ??

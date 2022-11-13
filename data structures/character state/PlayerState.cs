@@ -44,6 +44,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public bool disguise;
 
     public SpeechEtiquette[] etiquettes;
+    public Sprite portrait;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("s1");
@@ -71,7 +72,8 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             fullHealthAmount = 250f,
 
             speechSkillLevel = 3,
-            etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street }
+            etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
+            portrait = Resources.Load("sprites/portraits/Jack") as Sprite
         };
     }
 
@@ -99,6 +101,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         thirdWeaponSlot = template.thirdWeaponSlot,
         legSkin = template.legSkin,
         bodySkin = template.bodySkin,
-        etiquettes = template.etiquettes
+        etiquettes = template.etiquettes,
+        portrait = template.portrait
     };
 }

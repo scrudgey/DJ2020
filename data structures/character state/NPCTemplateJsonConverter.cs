@@ -16,6 +16,7 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
         public static readonly string FULL_HEALTH = "fullhealth";
         public static readonly string HITSTATE = "hitstate";
         public static readonly string ETIQUETTES = "etiquettes";
+        public static readonly string PORTRAIT = "portrait";
     }
 
     public override NPCTemplate ReadJson(JsonReader reader, Type objectType, NPCTemplate existingValue, bool hasExistingValue, JsonSerializer serializer) {
@@ -48,6 +49,9 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
         }
         result.etiquettes = etiquetteList.ToArray();
 
+        string portraitPath = (string)jo[Constants.PORTRAIT];
+        result.portrait = Resources.Load<Sprite>(portraitPath) as Sprite;
+
         return result;
     }
     public override void WriteJson(JsonWriter writer, NPCTemplate value, JsonSerializer serializer) {
@@ -79,6 +83,9 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
                 writer.WriteValue((int)value.etiquettes[i]);
             }
             writer.WriteEndArray();
+
+            writer.WritePropertyName(Constants.PORTRAIT);
+            writer.WriteValue(Toolbox.AssetRelativePath(value.portrait));
 
         }
         writer.WriteEndObject();

@@ -35,7 +35,6 @@ public partial class GameManager : Singleton<GameManager> {
             levelState = LevelState.Instantiate(levelTemplate),
         };
 
-        Debug.Log("about to load scene with skin state " + gameData.playerState.legSkin);
         // instantiate mission state from template
         VRMissionState state = VRMissionState.Instantiate(template);
 

@@ -104,33 +104,38 @@ public class UIController : MonoBehaviour {
     public void HideUI() {
         Debug.Log("hide UI");
         HideVRStats();
-        weaponUIHandler.gameObject.SetActive(false);
-        itemUIHandler.gameObject.SetActive(false);
-        aimIndicatorHandler.gameObject.SetActive(false);
-        lockRadiusIndicatorHandler.gameObject.SetActive(false);
-        lockIndicatorHandler.gameObject.SetActive(false);
-        interactiveHighlightHandler.gameObject.SetActive(false);
-        visibilityUIHandler.gameObject.SetActive(false);
-        suspicionIndicatorHandler.gameObject.SetActive(false);
-        overlayHandler.gameObject.SetActive(false);
-        actionLogHandler.gameObject.SetActive(false);
-        healthIndicatorController.gameObject.SetActive(false);
-        hitIndicatorController.gameObject.SetActive(false);
+        // weaponUIHandler.gameObject.SetActive(false);
+        // itemUIHandler.gameObject.SetActive(false);
+        // aimIndicatorHandler.gameObject.SetActive(false);
+        // lockRadiusIndicatorHandler.gameObject.SetActive(false);
+        // lockIndicatorHandler.gameObject.SetActive(false);
+        // interactiveHighlightHandler.gameObject.SetActive(false);
+        // visibilityUIHandler.gameObject.SetActive(false);
+        // suspicionIndicatorHandler.gameObject.SetActive(false);
+        // overlayHandler.gameObject.SetActive(false);
+        // actionLogHandler.gameObject.SetActive(false);
+        // healthIndicatorController.gameObject.SetActive(false);
+        // hitIndicatorController.gameObject.SetActive(false);
+        // t
+        canvas.enabled = false;
     }
     public void ShowUI() {
         Debug.Log("show UI");
         ShowVRStats();
-        weaponUIHandler.gameObject.SetActive(true);
-        itemUIHandler.gameObject.SetActive(true);
-        aimIndicatorHandler.gameObject.SetActive(true);
-        lockRadiusIndicatorHandler.gameObject.SetActive(true);
-        lockIndicatorHandler.gameObject.SetActive(true);
-        interactiveHighlightHandler.gameObject.SetActive(true);
-        visibilityUIHandler.gameObject.SetActive(true);
-        suspicionIndicatorHandler.gameObject.SetActive(true);
-        overlayHandler.gameObject.SetActive(true);
-        actionLogHandler.gameObject.SetActive(true);
-        healthIndicatorController.gameObject.SetActive(true);
-        hitIndicatorController.gameObject.SetActive(true);
+        // weaponUIHandler.gameObject.SetActive(true);
+        // itemUIHandler.gameObject.SetActive(true);
+        // aimIndicatorHandler.gameObject.SetActive(true);
+        // lockRadiusIndicatorHandler.gameObject.SetActive(true);
+        // lockIndicatorHandler.gameObject.SetActive(true);
+        // interactiveHighlightHandler.gameObject.SetActive(true);
+        // visibilityUIHandler.gameObject.SetActive(true);
+        // suspicionIndicatorHandler.gameObject.SetActive(true);
+        // overlayHandler.gameObject.SetActive(true);
+        // actionLogHandler.gameObject.SetActive(true);
+        // healthIndicatorController.gameObject.SetActive(true);
+        // hitIndicatorController.gameObject.SetActive(true);
+
+        canvas.enabled = true;
+
     }
 }

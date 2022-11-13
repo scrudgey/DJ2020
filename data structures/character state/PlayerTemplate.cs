@@ -48,28 +48,38 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
 
     public bool disguise;
 
+    // speech
     public SpeechEtiquette[] etiquettes;
 
-    public static PlayerTemplate Default() => new PlayerTemplate() {
-        legSkin = "Jack",
-        bodySkin = "Jack",
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
+    public Sprite portrait;
 
-        primaryGun = GunTemplate.Load("s1"),
-        secondaryGun = GunTemplate.Load("p1"),
-        tertiaryGun = GunTemplate.Load("sh1"),
-        activeGun = 2,
+    public static PlayerTemplate Default() {
+        Sprite jackPortrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite;
 
-        items = new List<string> { "explosive", "deck", "goggles" },
+        return new PlayerTemplate() {
+            legSkin = "Jack",
+            bodySkin = "Jack",
 
-        cyberlegsLevel = 1,
-        maxConcurrentNetworkHacks = 1,
-        hackSpeedCoefficient = 1f,
-        hackRadius = 1.5f,
-        thirdWeaponSlot = false,
+            primaryGun = GunTemplate.Load("s1"),
+            secondaryGun = GunTemplate.Load("p1"),
+            tertiaryGun = GunTemplate.Load("sh1"),
+            activeGun = 2,
 
-        health = 250f,
-        fullHealthAmount = 250f,
+            items = new List<string> { "explosive", "deck", "goggles" },
 
-        etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street }
-    };
+            cyberlegsLevel = 1,
+            maxConcurrentNetworkHacks = 1,
+            hackSpeedCoefficient = 1f,
+            hackRadius = 1.5f,
+            thirdWeaponSlot = false,
+
+            health = 250f,
+            fullHealthAmount = 250f,
+
+            etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
+
+            portrait = jackPortrait
+        };
+    }
 }

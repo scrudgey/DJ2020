@@ -30,7 +30,10 @@ public class NPCSpawnPoint : MonoBehaviour {
 
         controller.OrbitCamera = cam;
         ai.patrolRoute = route;
+
+        // should be part of apply state?
         ai.etiquettes = template.etiquettes;
+        ai.portrait = template.portrait;
         motor.SetPosition(transform.position, bypassInterpolation: true);
         ApplyNPCState(template, npc);
 

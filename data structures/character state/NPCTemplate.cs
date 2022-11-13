@@ -30,6 +30,9 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
 
-    // etiquettes
+    // speech
+    [field: SerializeField]
     public SpeechEtiquette[] etiquettes;
+    [field: SerializeField]
+    public Sprite portrait;
 }

@@ -10,7 +10,7 @@ public class DialogueController : MonoBehaviour {
     public enum DialogueResult { success, fail }
 
     private const string V = "";
-    public Action<DialogueResult> OnDialogueConclude;
+    static public Action<DialogueResult> OnDialogueConclude;
 
     public GameObject UIEditorCamera;
     public Transform responsesContainer;
@@ -107,7 +107,8 @@ public class DialogueController : MonoBehaviour {
         yield return null;
     }
     public void SetPortraits(DialogueInput input) {
-
+        leftPortrait.sprite = input.NPCAI.portrait;
+        rightPortrait.sprite = input.playerState.portrait;
     }
     public void SetStatusContainers(DialogueInput input) {
         ClearStatusContainers();
@@ -167,21 +168,18 @@ public class DialogueController : MonoBehaviour {
     }
     public IEnumerator CreateMultipleDialogues() {
         float interval = 0.1f;
-        CreateDialogueResponse("[ESCAPE] Excuse me, I think I left my identification in my car.", EscapeDialogueResponseCallback);
+        CreateDialogueResponse("<color=#ff4757>[ESCAPE]</color> Excuse me, I think I left my identification in my car.", EscapeDialogueResponseCallback);
         yield return new WaitForSecondsRealtime(interval);
-        CreateDialogueResponse("[LIE] I am P.J. Pennypacker, security inspector.", LieDialogueResponseCallback);
+        CreateDialogueResponse("<color=#ffa502>[LIE]</color> I am P.J. Pennypacker, security inspector.", LieDialogueResponseCallback);
         yield return new WaitForSecondsRealtime(interval);
-        CreateDialogueResponse("[BLUFF] Rockwell isn't going to be very happy if you delay our meeting!", BluffDialogueResponseCallback);
+        CreateDialogueResponse("<color=#ffa502>[BLUFF]</color> Rockwell isn't going to be very happy if you delay our meeting!", BluffDialogueResponseCallback);
         yield return new WaitForSecondsRealtime(interval);
-        CreateDialogueResponse("[ITEM] Sure, check my ID card.", EndDialogueResponseCallback);
+        CreateDialogueResponse("<color=#ffa502>[ITEM]</color> Sure, check my ID card.", EndDialogueResponseCallback);
     }
     public void SetInitialNPCDialogue(DialogueInput input) {
         ClearDialogueContainer();
         SetLeftDialogueText("You there, stop! You're not authorized to be in this area! Show me your identification!");
     }
-
-
-
     public void CreateDialogueResponse(string response, Action<DialogueResponseButton> responseCallback) {
         GameObject responseObj = GameObject.Instantiate(responsePrefab);
         responseObj.transform.SetParent(responsesContainer, false);
@@ -218,6 +216,13 @@ public class DialogueController : MonoBehaviour {
         CreateDialogueResponse("[CONTINUE]", callback);
     }
     public void EndDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
+        SuspicionRecord record = new SuspicionRecord() {
+            content = "fled from questioning",
+            suspiciousness = Suspiciousness.aggressive,
+            lifetime = 60f,
+            maxLifetime = 60f
+        };
+        GameManager.I.AddSuspicionRecord(record);
         SetRightDialogueText(dialogueResponseButton.response);
         ClearResponseContainer();
         CreateDialogueResponse("[CONTINUE]", DialogueEndCallback);
@@ -303,7 +308,7 @@ public class DialogueController : MonoBehaviour {
         doubterText.enabled = false;
         switch (result.type) {
             case SkillCheckDialogue.SkillCheckResult.ResultType.fail:
-                SetLeftDialogueText($"[FAIL] {result.input.failResponse}");
+                SetLeftDialogueText($"<color=#ff4757>[FAIL]</color> {result.input.failResponse}");
                 SuspicionRecord lieFailedRecord = new SuspicionRecord {
                     content = result.input.suspicion,
                     suspiciousness = Suspiciousness.aggressive,
@@ -313,7 +318,7 @@ public class DialogueController : MonoBehaviour {
                 GameManager.I.AddSuspicionRecord(lieFailedRecord);
                 break;
             case SkillCheckDialogue.SkillCheckResult.ResultType.success:
-                SetLeftDialogueText($"[SUCCESS] {result.input.successResponse}");
+                SetLeftDialogueText($"<color=#2ed573>[SUCCESS]</color> {result.input.successResponse}");
                 break;
         }
         ClearResponseContainer();

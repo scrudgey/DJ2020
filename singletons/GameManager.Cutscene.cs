@@ -25,7 +25,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartSpottedCutscene(GameObject NPC) {
-        Debug.Log("start spotted cutscene");
         StartCutsceneCoroutine(SpottedCutscene(NPC));
     }
     public IEnumerator SpottedCutscene(GameObject NPC) {

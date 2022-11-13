@@ -25,7 +25,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
     readonly float LOCK_ON_TIME = 0.5f;
     float timeSinceInvestigatedFootsteps;
-    float timeSinceInterrogatedStrager;
+    float timeSinceInterrogatedStranger;
     public float timeSinceLastSeen;
     public Collider playerCollider;
     public Alertness alertness = Alertness.normal;
@@ -43,6 +43,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     private float footstepImpulse;
     public SpottedHighlight highlight;
     public SpeechEtiquette[] etiquettes;
+    public Sprite portrait;
     public void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
         alertHandler.Hide();
@@ -95,6 +96,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 } else ChangeState(new SphereInvestigateState(this, highlight));
                 break;
             case SphereInvestigateState:
+                Debug.Log("leaving investigate state");
+                timeSinceInterrogatedStranger = 120f;
+                highlight.target = null;
                 SphereInvestigateState investigateState = (SphereInvestigateState)routine;
                 if (investigateState.isPlayerAggressive()) {
                     ChangeState(new SphereHoldAtGunpointState(this));
@@ -155,10 +159,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
     public void ChangeState(SphereControlState routine) {
+
         stateMachine.ChangeState(routine);
         switch (routine) {
             case SphereInvestigateState:
-                timeSinceInterrogatedStrager = 120f;
+                timeSinceInterrogatedStranger = 120f;
                 // TODO: initiate spotted cutscene
                 break;
             case StopAndListenState:
@@ -218,8 +223,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (timeSinceInvestigatedFootsteps > 0f) {
             timeSinceInvestigatedFootsteps -= Time.deltaTime;
         }
-        if (timeSinceInterrogatedStrager > 0f) {
-            timeSinceInterrogatedStrager -= Time.deltaTime;
+        if (timeSinceInterrogatedStranger > 0f) {
+            timeSinceInterrogatedStranger -= Time.deltaTime;
         }
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
@@ -279,7 +284,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case ReactToAttackState:
                     case FollowTheLeaderState:
                     case StopAndListenState:
-                        if (timeSinceInterrogatedStrager <= 0) {
+                        if (timeSinceInterrogatedStranger <= 0) {
                             alertHandler.ShowWarn();
                             GameManager.I.StartSpottedCutscene(gameObject);
                             ChangeState(new PauseState(this, new SphereInvestigateState(this, highlight), 1f));
@@ -461,7 +466,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void HandleFootstepNoise(NoiseComponent noise) {
         footstepImpulse += noise.data.volume * 2f;
         bool reachedFootstepThreshold = footstepImpulse > 4f;
-        bool notBoredOfFootsteps = timeSinceInvestigatedFootsteps <= 0 && timeSinceInterrogatedStrager <= 0;
+        bool notBoredOfFootsteps = timeSinceInvestigatedFootsteps <= 0 && timeSinceInterrogatedStranger <= 0;
         if (GameManager.I.gameData.levelState.template.sensitivityLevel == SensitivityLevel.publicProperty) {
             if (reachedFootstepThreshold && recentlyInCombat && notBoredOfFootsteps) {
                 switch (stateMachine.currentState) {
