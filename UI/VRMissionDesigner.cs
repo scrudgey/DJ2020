@@ -221,6 +221,13 @@ public class VRMissionDesigner : MonoBehaviour {
             3 => template.npc2State.bodySkin,
             _ => template.playerState.bodySkin
         };
+        string headSkinName = selectedCharacter switch {
+            1 => template.playerState.headSkin,
+            2 => template.npc1State.headSkin,
+            3 => template.npc2State.headSkin,
+            _ => template.playerState.headSkin
+        };
+
 
         GunTemplate gun1 = selectedCharacter switch {
             1 => template.playerState.primaryGun,
@@ -241,9 +248,11 @@ public class VRMissionDesigner : MonoBehaviour {
             _ => template.playerState.tertiaryGun
         };
 
+
         Skin legsSkin = Skin.LoadSkin(legSkinName);
         Skin bodySkin = Skin.LoadSkin(torsoSkinName);
-        headImage.sprite = bodySkin.headIdle[Direction.down][0];
+        Skin headSkin = Skin.LoadSkin(headSkinName);
+        headImage.sprite = headSkin.headIdle[Direction.down][0];
         torsoImage.sprite = bodySkin.unarmedIdle[Direction.down][0];
         legsImage.sprite = legsSkin.legsIdle[Direction.down][0];
 
@@ -499,13 +508,15 @@ public class VRMissionDesigner : MonoBehaviour {
     }
     // skin controls
     public void SkinHeadPrevious() {
-        // TODO: handle separate head sheet
-        template.playerState.bodySkin = PreviousInList(SPRITESHEETS, template.playerState.bodySkin);
+        template.playerState.headSkin = PreviousInList(SPRITESHEETS, template.playerState.headSkin);
+        template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        Debug.Log(template.playerState.portrait);
         OnDataChange();
     }
     public void SkinHeadNext() {
-        // TODO: handle separate head sheet
-        template.playerState.bodySkin = NextInList(SPRITESHEETS, template.playerState.bodySkin);
+        template.playerState.headSkin = NextInList(SPRITESHEETS, template.playerState.headSkin);
+        template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        Debug.Log(template.playerState.portrait);
         OnDataChange();
     }
     public void SkinTorsoPrevious() {

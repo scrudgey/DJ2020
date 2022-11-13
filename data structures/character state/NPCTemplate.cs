@@ -14,6 +14,8 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public string legSkin { get; set; }
     [field: SerializeField]
     public string bodySkin { get; set; }
+    [field: SerializeField]
+    public string headSkin { get; set; }
 
     // gun
     [field: SerializeField]

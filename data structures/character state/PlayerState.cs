@@ -8,6 +8,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     // skin
     public string legSkin { get; set; }
     public string bodySkin { get; set; }
+    public string headSkin { get; set; }
 
     // gun
     public GunState primaryGun { get; set; }
@@ -54,6 +55,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
+            headSkin = "Jack",
 
             primaryGun = GunState.Instantiate(gun1),
             secondaryGun = GunState.Instantiate(gun2),
@@ -101,6 +103,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
         thirdWeaponSlot = template.thirdWeaponSlot,
         legSkin = template.legSkin,
         bodySkin = template.bodySkin,
+        headSkin = template.headSkin,
         etiquettes = template.etiquettes,
         portrait = template.portrait
     };

@@ -8,7 +8,8 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
     // required because NPCTemplate is a scriptableObject used as an instance, it cannot always be loaded from asset path
     public static class Constants {
         public static readonly string LEGSKIN = "legSkin";
-        public static readonly string BODYSKIN = "bodySKin";
+        public static readonly string BODYSKIN = "bodySkin";
+        public static readonly string HEADSKIN = "headSkin";
         public static readonly string PRIMARY_GUN = "primary";
         public static readonly string SECONDARY_GUN = "secondary";
         public static readonly string TERTIARY_GUN = "tertiary";
@@ -27,6 +28,7 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
 
         result.legSkin = (string)jo[Constants.LEGSKIN];
         result.bodySkin = (string)jo[Constants.BODYSKIN];
+        result.headSkin = (string)jo[Constants.HEADSKIN];
         result.health = (float)jo[Constants.HEALTH];
         result.fullHealthAmount = (float)jo[Constants.FULL_HEALTH];
         result.hitState = (HitState)((int)jo[Constants.HITSTATE]);
@@ -61,6 +63,8 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
             writer.WriteValue(value.legSkin);
             writer.WritePropertyName(Constants.BODYSKIN);
             writer.WriteValue(value.bodySkin);
+            writer.WritePropertyName(Constants.HEADSKIN);
+            writer.WriteValue(value.headSkin);
 
             writer.WritePropertyName(Constants.PRIMARY_GUN);
             writer.WriteValue(Toolbox.AssetRelativePath(value.primaryGun));

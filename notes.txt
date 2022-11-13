@@ -1735,6 +1735,8 @@ interaction between dialogue menu and aim mode.
 * color [success] [fail]
 make handgun interval more sporadic
 make player suspicious throughout manual hack process
+better player spotted highlight dashed line art
+
 
 NOTE 
 adding etiquette was not easy.
@@ -1749,3 +1751,4 @@ three distinct approaches to serializing state
 3. a state object with a template and a delta. i like this, keeps all cleanly separate.
 modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
 NPCSpawnPoint and what is IPlayerStateLoader ??
+in summary, it is a gnarly mess

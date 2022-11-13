@@ -86,11 +86,7 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
             }
         }
     }
-
-    // public void (PlayerData data) {
-    //     skin = Skin.LoadSkin(data.bodySkin);
-    // }
     public void LoadSkinState(ISkinState state) {
-        skin = Skin.LoadSkin(state.bodySkin);
+        skin = Skin.LoadSkin(state.headSkin);
     }
 }

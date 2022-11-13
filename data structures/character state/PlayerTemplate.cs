@@ -9,6 +9,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
     // skin
     public string legSkin { get; set; }
     public string bodySkin { get; set; }
+    public string headSkin { get; set; }
 
     // gun
     [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
@@ -60,6 +61,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
         return new PlayerTemplate() {
             legSkin = "Jack",
             bodySkin = "Jack",
+            headSkin = "Jack",
 
             primaryGun = GunTemplate.Load("s1"),
             secondaryGun = GunTemplate.Load("p1"),
