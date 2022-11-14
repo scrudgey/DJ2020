@@ -26,7 +26,11 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     public List<HackData> targets = new List<HackData>();
     public List<CyberNode> vulnerableManualNodes = new List<CyberNode>();
     public CyberNode vulnerableNetworkNode = null;
-
+    SuspicionRecord suspicionTamper = new SuspicionRecord {
+        content = "tampering with equipment",
+        suspiciousness = Suspiciousness.suspicious,
+        maxLifetime = 0f
+    };
     void Awake() {
         vulnerableNetworkNode = null;
     }
@@ -41,6 +45,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
                 type = input.type
             };
             targets.Add(data);
+            UpdateSuspicion();
             OnValueChanged?.Invoke(this);
             audioSource.PlayOneShot(hackStarted);
         }
@@ -70,6 +75,9 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
         List<HackData> done = targets.Where(x => x.done).ToList();
         if (targets.Count > 0) {
             targets = targets.Except(done).ToList();
+            if (done.Count > 0) {
+                UpdateSuspicion();
+            }
             hackInProgressTimer += Time.deltaTime;
             if (hackInProgressTimer > 1f) {
                 audioSource.PlayOneShot(hackInProgress);
@@ -80,7 +88,13 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             hackInProgressTimer = 0f;
         }
     }
-
+    void UpdateSuspicion() {
+        if (targets.Count > 0) {
+            GameManager.I.AddSuspicionRecord(suspicionTamper);
+        } else {
+            GameManager.I.RemoveSuspicionRecord(suspicionTamper);
+        }
+    }
     void UpdateManualHack(HackData data) {
         // really ugly
         Vector3 playerPos = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f);

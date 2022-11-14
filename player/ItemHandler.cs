@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Items;
 using UnityEngine;
-// TODO: enable buffs on/off
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerStateLoader, IInputReceiver {
     public Action<ItemHandler> OnValueChanged { get; set; }
 
@@ -19,15 +18,6 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
         OnItemEnter(activeItem);
     }
 
-    public void SetSuspicion(Suspiciousness target, float timeout) {
-        SuspicionRecord record = new SuspicionRecord {
-            content = "a suspicious item was used",
-            suspiciousness = target,
-            lifetime = timeout,
-            maxLifetime = timeout
-        };
-        GameManager.I.AddSuspicionRecord(record);
-    }
     public void SetInputs(PlayerInput input) {
         if (input.incrementItem != 0) {
             index += input.incrementItem;

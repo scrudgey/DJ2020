@@ -412,5 +412,20 @@ public class Toolbox {
         return 1.0f / (1.0f + (float)Math.Exp(-value));
     }
 
+    // public static double Factorial(int number) {
+    //     // please do not calculate facorials of large numbers
+    //     if (number == 1)
+    //         return 1;
+    //     else
+    //         return number * Factorial(number - 1);
+    // }
+    // public static float PossionCDF(int k, float lambda) {
+    //     double result = 0;
+    //     for (int j = 0; j < k; j++) {
+    //         result += Mathf.Pow(lambda, j) / Factorial(j);
+    //     }
+    //     result *= Mathf.Exp(-1f * lambda);
+    //     return (float)result;
+    // }
 }
 

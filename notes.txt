@@ -1527,6 +1527,11 @@ increase final texture resolution, and padding potentially for better outline.
 * portraits
     * configurable head
 * if in radio to HQ mode and we see the player, drop the call ....?
+* interaction between dialogue menu and aim mode.
+* better player spotted highlight dashed line art
+* make handgun interval more sporadic
+* make player suspicious throughout manual hack process
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1714,12 +1719,12 @@ allow 7-11 to be a level
     add intermediate skybox
 
 new graphics
-    thermal goggles icon
     * redraw cyberdeck
     * redraw c4
-    investigate graphics
-        portrait for player, woman, man
-
+    * investigate graphics
+        *portrait for player, woman, man
+    ID card
+    thermal goggles icon
 
 MVP:
 1. music
@@ -1731,15 +1736,8 @@ weird gibs situation with bullet impact
 npc notices bodies
 camera clips through wall in wallpress, in aim
 
-interaction between dialogue menu and aim mode.
-make handgun interval more sporadic
-make player suspicious throughout manual hack process
-* better player spotted highlight dashed line art
 ID card?
-
-
-
-
+stun when escape
 
 
 

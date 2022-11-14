@@ -7,7 +7,8 @@ namespace AI {
         GunHandler gunHandler;
         bool fireHeld;
         float timelastshoot;
-        // float shootPressedResetInterval = 0.5f;
+        float shootPressedResetInterval;
+        int volley;
         public TaskShoot(GunHandler gunHandler) : base() {
             this.gunHandler = gunHandler;
         }
@@ -35,18 +36,20 @@ namespace AI {
                 mousePosition = lastSeenPlayerPosition
             };
             bool clearshot = gunHandler.IsClearShot(cursorData);
-            float shootPressedResetInterval = gunHandler.gunInstance.template.shootInterval * 2f;
             bool firePressed = false;
-            // Debug.Log($"{Time.time - timelastshoot} {Time.time - timelastshoot > shootPressedResetInterval}");
             if (Time.time - timelastshoot > shootPressedResetInterval) {
                 timelastshoot = Time.time;
                 firePressed = true;
+
+                // TODO: skill based
+                volley += 1;
+                shootPressedResetInterval = Random.Range(gunHandler.gunInstance.template.shootInterval * 4f, gunHandler.gunInstance.template.shootInterval * 5f);
+                if (Random.Range(0f, 1f) < 0.35f) {
+                    volley = 0;
+                    shootPressedResetInterval = Random.Range(1f, 2f);
+                }
             }
-            // Debug.Log($"{firePressed}");
-
-
             PlayerInput.FireInputs fireInput = clearshot ? new PlayerInput.FireInputs() {
-                // FirePressed = false,
                 FirePressed = firePressed,
                 FireHeld = true,
                 cursorData = cursorData

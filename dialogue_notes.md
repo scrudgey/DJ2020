@@ -181,3 +181,5 @@ prevent kiting
 [CHALLENGE] what does it look like I'm doing?
 Hi, I'm looking for my dog, have you seen him?
 I'm with NE&T, could you point me to your main trunk router?
+
+ninja vanish!
