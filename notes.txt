@@ -1727,7 +1727,7 @@ new graphics
     thermal goggles icon
 
 MVP:
-1. music
+* music
 2. preset scenarios
 3. dialogue
 4. new level + 711 level
@@ -1736,8 +1736,10 @@ weird gibs situation with bullet impact
 npc notices bodies
 camera clips through wall in wallpress, in aim
 
-ID card?
+ID card
 stun when escape
+
+silenced pistol
 
 
 
@@ -1756,4 +1758,7 @@ three distinct approaches to serializing state
 modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
 NPCSpawnPoint and what is IPlayerStateLoader ??
 in summary, it is a gnarly mess
+
+
+
 

@@ -50,6 +50,7 @@ public partial class GameManager : Singleton<GameManager> {
         missionController.StartVRMission(state);
     }
     public void ReturnToTitleScreen() {
+        MusicController.I.Stop();
         LoadScene("title", () => {
             Debug.Log("start title screen");
             activeMenuType = MenuType.none;
@@ -192,6 +193,8 @@ public partial class GameManager : Singleton<GameManager> {
         alarmSoundInterval = 2f;
         alarmSound = gameData.levelState.template.alarmAudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
+
+        MusicController.I.LoadTrack(MusicTrack.layercake);
 
         OnSuspicionChange?.Invoke();
     }
