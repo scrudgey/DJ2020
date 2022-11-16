@@ -26,6 +26,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
             } else if (index >= items.Count) {
                 index = 0;
             }
+            Debug.Log($"{index} {items.Count} {items[index]}");
             SwitchToItem(items[index]);
         }
         if (input.useItem) {
@@ -44,6 +45,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
             BaseItem newItem = ItemInstance.NewInstance(itemName);
             if (newItem != null) {
                 items.Add(newItem);
+                // Debug.Log(newItem);
             } else {
                 Debug.LogError($"unable to load saved item {itemName}");
             }

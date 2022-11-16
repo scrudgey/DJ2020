@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 public class LaserBeam : MonoBehaviour {
     public Transform beam;
@@ -34,7 +33,6 @@ public class LaserBeam : MonoBehaviour {
             if (hit.collider.isTrigger)
                 continue;
             maxLaserLength = hit.distance;
-            EditorGUIUtility.PingObject(hit.collider.gameObject);
             break;
         }
     }

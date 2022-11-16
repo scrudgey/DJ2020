@@ -20,6 +20,7 @@ public struct PlayerInput {
     public bool jumpHeld;
     public bool jumpReleased;
     public bool CrouchDown;
+    public bool unCrawl;
     public bool runDown;
     public FireInputs Fire;
     public bool reload;

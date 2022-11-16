@@ -77,6 +77,10 @@ namespace AI {
             }
         }
 
+        public bool AtDestination() {
+            return pathIndex == navMeshPath.corners.Length;
+        }
+
         public void SetDestination() {
             NavMeshHit hit = new NavMeshHit();
             object keyObj = GetData(key);

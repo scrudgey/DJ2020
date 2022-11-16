@@ -44,6 +44,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SpottedHighlight highlight;
     public SpeechEtiquette[] etiquettes;
     public Sprite portrait;
+    bool awareOfCorpse;
     public void Start() {
         sphereController = controllable.GetComponent<IInputReceiver>();
         alertHandler.Hide();
@@ -175,6 +176,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case ReportToHQState:
             case ReactToAttackState:
             case SphereAttackState attack:
+            case InvestigateCorpseState:
+                awareOfCorpse = true;
                 recentlyInCombat = true;
                 break;
         }
@@ -251,6 +254,25 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             PerceivePlayerObject(other);
         } else {
+            if (!awareOfCorpse) {
+                // TODO: use tag instead
+                Corpse corpse = other.GetComponent<Corpse>();
+                if (corpse != null) {
+                    awareOfCorpse = true;
+                    if (!corpse.reported) {
+                        alertHandler.ShowWarn();
+                        switch (stateMachine.currentState) {
+                            case SearchDirectionState:
+                            case SphereMoveState:
+                            case SpherePatrolState:
+                            case FollowTheLeaderState:
+                            case StopAndListenState:
+                                ChangeState(new InvestigateCorpseState(this, corpse, speechTextController));
+                                break;
+                        }
+                    }
+                }
+            }
             if (stateMachine.currentState != null)
                 stateMachine.currentState.OnObjectPerceived(other);
         }
@@ -383,6 +405,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case SpherePatrolState:
                 case FollowTheLeaderState:
                 case DisableAlarmState:
+                case InvestigateCorpseState:
+                case SphereInvestigateState:
+                case StopAndListenState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
                     if (GameManager.I.gameData.levelState.anyAlarmActive()) {
                         ChangeState(new SearchDirectionState(this, noise, doIntro: false));

@@ -87,6 +87,23 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     void OnDestroy() {
         GameManager.OnSuspicionChange -= HandleSuspicionChange;
     }
+    void Start() {
+
+        foreach (Transform child in statusRecordsContainer) {
+            Destroy(child.gameObject);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            GameObject obj = GameObject.Instantiate(statusRecordPrefab);
+            obj.transform.SetParent(statusRecordsContainer, worldPositionStays: false);
+            obj.SetActive(false);
+            // SuspicionRecord record = records[i];
+            // Transform obj = statusRecordsContainer.GetChild(i);
+            // obj.gameObject.SetActive(true);
+            // SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
+            // handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
+        }
+    }
 
     public void HandleSuspicionChange() {
         UpdateSensitivity();
@@ -118,19 +135,23 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         }
     }
     public void UpdateStatusFeed() {
-        // List<string> activeRecords = GameManager.I.suspicionRecords.Keys.ToList();
         List<string> activeRecords = new List<string>();
 
         foreach (Transform child in statusRecordsContainer) {
             SuspicionStatusRecordIndicatorHandler handler = child.GetComponent<SuspicionStatusRecordIndicatorHandler>();
             if (handler != null && handler.suspicionRecord != null)
                 activeRecords.Add(handler.suspicionRecord.content);
-            Destroy(child.gameObject);
+            child.gameObject.SetActive(false);
         }
 
-        foreach (SuspicionRecord record in GameManager.I.suspicionRecords.Values) {
-            GameObject obj = GameObject.Instantiate(statusRecordPrefab);
-            obj.transform.SetParent(statusRecordsContainer, worldPositionStays: false);
+        // foreach (SuspicionRecord record in GameManager.I.suspicionRecords.Values) {
+        List<SuspicionRecord> records = GameManager.I.suspicionRecords.Values.ToList();
+        for (int i = 0; i < records.Count; i++) {
+            // obj.SetParent(statusRecordsContainer, worldPositionStays: false);
+            // GameObject obj = GameObject.Instantiate(statusRecordPrefab);
+            SuspicionRecord record = records[i];
+            Transform obj = statusRecordsContainer.GetChild(i);
+            obj.gameObject.SetActive(true);
             SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
             handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
         }

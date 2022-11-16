@@ -1,5 +1,6 @@
-using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine;
 
 public class SpriteDiffuseShaderGUI : SpriteShaderGUI {
     private MaterialProperty _dissolve = null;
@@ -57,3 +58,4 @@ public class SpriteDiffuseShaderGUI : SpriteShaderGUI {
     }
     #endregion
 }
+#endif

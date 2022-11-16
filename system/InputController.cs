@@ -313,7 +313,7 @@ public class InputController : MonoBehaviour {
     }
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();
-        foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<IInputReceiver>()) {
+        foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<CharacterController>()) {
             inputReceivers.Add(inputReceiver);
         }
 

@@ -241,23 +241,17 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         // muzzleflash obj
+        GameObject muzzleFlashObj = PoolManager.I
+            .GetPool(gunInstance.template.muzzleFlash)
+            .GetObject(gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0));
         if (gunInstance.template.silencer) {
-            GameObject muzzleFlashObj = GameObject.Instantiate(
-                gunInstance.template.muzzleFlash,
-                gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
-                Quaternion.LookRotation(transform.up, gunDirection(input))
-                );
             muzzleFlashObj.transform.localScale = gunInstance.template.muzzleflashSize * Vector3.one * 0.1f;
-            GameObject.Destroy(muzzleFlashObj, 0.05f);
         } else {
-            GameObject muzzleFlashObj = GameObject.Instantiate(
-                gunInstance.template.muzzleFlash,
-                gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0),
-                Quaternion.LookRotation(transform.up, gunDirection(input))
-                );
             muzzleFlashObj.transform.localScale = gunInstance.template.muzzleflashSize * Vector3.one;
-            GameObject.Destroy(muzzleFlashObj, 0.05f);
         }
+        muzzleFlashObj.transform.rotation = Quaternion.LookRotation(transform.up, gunDirection(input));
+        GameObject.Destroy(muzzleFlashObj, 0.05f);
+
 
         // shell casing
         if (gunInstance.template.type != GunType.shotgun) {
@@ -372,6 +366,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (gunInstance != null && gunInstance.template != null) {
             Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
             PoolManager.I?.RegisterPool(gunInstance.template.shellCasing);
+            PoolManager.I?.RegisterPool(gunInstance.template.muzzleFlash);
             if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
                 GameManager.I.AddSuspicionRecord(BrandishingWeaponRecord);
             }

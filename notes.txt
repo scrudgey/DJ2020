@@ -1531,7 +1531,14 @@ increase final texture resolution, and padding potentially for better outline.
 * better player spotted highlight dashed line art
 * make handgun interval more sporadic
 * make player suspicious throughout manual hack process
-
+* color of highlight line
+* new graphics
+    * redraw cyberdeck
+    * redraw c4
+    * investigate graphics
+        *portrait for player, woman, man
+    * ID card
+    * thermal goggles icon
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1718,31 +1725,32 @@ allow 7-11 to be a level
     add proper boundary
     add intermediate skybox
 
-new graphics
-    * redraw cyberdeck
-    * redraw c4
-    * investigate graphics
-        *portrait for player, woman, man
-    ID card
-    thermal goggles icon
+
 
 MVP:
 * music
 2. preset scenarios
 3. dialogue
 4. new level + 711 level
+NEXT:
+5. doors
+6. attack surfaces
 
 weird gibs situation with bullet impact
 npc notices bodies
 camera clips through wall in wallpress, in aim
 
-ID card
+* ID card
+* npc notices bodies
 stun when escape
-
 silenced pistol
+guard HQ potentially notices disabled cameras and sensors
+after passing a lie check, npc discovers body: reconsiders player status
+* firefight performance: lots of instantiate?
+leave corpse state if gunshots heard etc.
+rocket launcher
 
-
-
+ammopips and suspicion handler?
 
 NOTE 
 adding etiquette was not easy.
@@ -1758,6 +1766,13 @@ three distinct approaches to serializing state
 modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
 NPCSpawnPoint and what is IPlayerStateLoader ??
 in summary, it is a gnarly mess
+
+
+IF it is safe to be spotted except when we are doing suspicious stuff, how can I make a level challenging?
+    more sensors to trip
+    activity builds up into suspicious footprint, ideally by the time you are deep in the building like a trap
+    deeper area becomes higher security
+    goal involves doing something that will necessarily attract attention (planting explosives, etc)
 
 
 

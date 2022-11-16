@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,10 +14,6 @@ using UnityEngine.SceneManagement;
 [CanEditMultipleObjects]
 public class LevelDataUtilEditor : Editor {
     public string levelName = "test";
-    private void OnEnable() {
-        // levelData = serializedObject.FindProperty("levelData");
-        // klaxonSound = serializedObject.FindProperty("klaxonSound");
-    }
     public override void OnInspectorGUI() {
         levelName = EditorGUILayout.TextField("level name", levelName);
 
@@ -112,3 +110,4 @@ public class LevelDataUtilEditor : Editor {
         return graph;
     }
 }
+#endif

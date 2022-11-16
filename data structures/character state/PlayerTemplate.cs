@@ -68,7 +68,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
             tertiaryGun = GunTemplate.Load("sh1"),
             activeGun = 2,
 
-            items = new List<string> { "explosive", "deck", "goggles" },
+            items = new List<string> { "explosive", "deck", "goggles", "ID" },
 
             cyberlegsLevel = 1,
             maxConcurrentNetworkHacks = 1,

@@ -33,6 +33,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
     public ItemHandler itemHandler;
+    public Interactor interactor;
     public ManualHacker manualHacker;
     public Footsteps footsteps;
     public AudioSource audioSource;
@@ -391,6 +392,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             }
             if (!isProne && isMoving() && isCrouching) {
                 isProne = true;
+            } else if (isProne && !isMoving() && input.unCrawl) {
+                isProne = false;
             }
             if (isProne && !isCrouching) {
                 isProne = false;
@@ -461,6 +464,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
+                    Debug.Log(input.useItem);
                     itemHandler.SetInputs(input);
 
                     // Cyberdeck
@@ -470,6 +474,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     };
                     if (manualHacker != null)
                         manualHacker.SetInputs(manualHackInput);
+
+                    if (interactor != null) {
+                        interactor.SetInputs(input);
+                    }
                 }
 
                 if (gunHitStunTimer > 0) {

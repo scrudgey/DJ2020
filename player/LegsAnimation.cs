@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
-using UnityEditor;
 using UnityEngine;
 public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     public enum State {
