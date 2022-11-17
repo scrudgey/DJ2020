@@ -169,7 +169,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float aimSwayFrequencyConstant = 0.5f;
     private float aimSwayMagnitude = 0.01f;
     Transform cameraFollowTransform;
-
+    RaycastHit[] rayCastHits;
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
         OnStateExit(tmpInitialState, newState);
@@ -259,6 +259,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
     }
     private void Start() {
+        rayCastHits = new RaycastHit[32];
         PoolManager.I.RegisterPool("prefabs/fx/landImpactFx", poolSize: 2);
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         gunHandler.characterCamera = OrbitCamera;
@@ -459,12 +460,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 break;
             case CharacterState.normal:
-
-
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
-                    Debug.Log(input.useItem);
                     itemHandler.SetInputs(input);
 
                     // Cyberdeck
@@ -738,18 +736,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         snapToDirection = Vector3.zero;
     }
     bool ColliderRay(Vector3 offset) {
-        // TODO: filter on layer
         Vector3 start = transform.position + offset;
         Vector3 dir = -1f * wallNormal;
         float length = 0.4f;
         Debug.DrawRay(start, length * dir, new Color(162, 142, 149));
-        foreach (RaycastHit hit in Physics.RaycastAll(start, dir, length).OrderBy(x => x.distance)) {
-            if (hit.collider.transform.IsChildOf(transform)) {
-                continue;
-            }
-            return true;
-        }
-        return false;
+        int numberHit = Physics.RaycastNonAlloc(start, dir, rayCastHits, length, LayerUtil.GetMask(Layer.def), QueryTriggerInteraction.Ignore);
+        // for (int i = 0; i < numberHit; i++) {
+        //     Debug.Log(rayCastHits[i].collider);
+        // }
+        return numberHit > 0;
     }
     bool DetectWallPress() {
         if (state == CharacterState.aim)

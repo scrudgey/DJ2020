@@ -532,6 +532,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
+        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
         Vector3 targetPoint = Vector3.zero;
 
@@ -623,6 +624,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         // Vector3 direction = transform.forward;
 
+        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         Vector3 targetPoint = projection.GetPoint(100f);
 

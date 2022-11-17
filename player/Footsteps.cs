@@ -12,7 +12,9 @@ public class Footsteps : MonoBehaviour {
     private bool onRightFoot;
     private SurfaceType lastSurfaceType;
     private FootstepData footstepData;
+    RaycastHit[] raycastHits;
     void Start() {
+        raycastHits = new RaycastHit[1];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         footstepData = Resources.Load("data/footstep/default") as FootstepData;
     }
@@ -69,19 +71,13 @@ public class Footsteps : MonoBehaviour {
         lastSurfaceType = surfaceBelowMe;
     }
     private SurfaceType GetCurrentSurfaceType() {
-        // TODO: use surface map.
+        // TODO: use surface map...?
 
         TagSystemData data = new TagSystemData();
-        RaycastHit[] hits = Physics.RaycastAll(transform.position + 0.1f * Vector3.up, -1f * transform.up, 0.5f, LayerUtil.GetMask(Layer.def)); // get all hits
-        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) { // check hits until a valid one is found
-            if (hit.collider.isTrigger)
-                continue;
-            if (hit.collider.transform.IsChildOf(transform.root))
-                continue;
-            if (hit.collider.gameObject == null)
-                continue;
+        int numberHit = Physics.RaycastNonAlloc(transform.position + 0.1f * Vector3.up, -1f * transform.up, raycastHits, 0.5f, LayerUtil.GetMask(Layer.def), QueryTriggerInteraction.Ignore);
+        if (numberHit > 0) {
+            RaycastHit hit = raycastHits[0];
             data = Toolbox.GetTagData(hit.collider.gameObject);
-            break;
         }
         return data.surfaceSoundType;
     }

@@ -38,11 +38,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool isSwitchingWeapon;
     public Action<GunHandler> OnShoot;
     public bool isAimingWeapon;
+    Collider[] lockOnColliders;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious
     };
     void Awake() {
+        lockOnColliders = new Collider[32];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
     public void ShootCallback() {
@@ -192,6 +194,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Vector3 gunPosition = this.gunPosition();
         Vector3 trueDirection = gunDirection(input);
         Ray ray = new Ray(gunPosition, trueDirection);
+        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetMask(Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.collider.transform.IsChildOf(root))
@@ -425,11 +428,18 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
             // TODO: if priority is not set, try lock 
             float lockRadius = gunInstance.template.lockOnSize;
-            Collider[] others = Physics.OverlapSphere(targetPoint, lockRadius, LayerUtil.GetMask(Layer.obj))
-                .Where(collider => !collider.transform.IsChildOf(transform.root))
-                .ToArray();
-            if (others.Length > 0) {
-                Collider nearestOther = others.Aggregate((curMin, x) => (curMin == null || (Vector3.Distance(targetPoint, x.bounds.center)) < Vector3.Distance(targetPoint, curMin.bounds.center) ? x : curMin));
+            int numColliders = Physics.OverlapSphereNonAlloc(targetPoint, lockRadius, lockOnColliders, LayerUtil.GetMask(Layer.obj));
+            Collider nearestOther = null;
+            for (int i = 0; i < numColliders; i++) {
+                Collider collider = lockOnColliders[i];
+                if (collider.transform.IsChildOf(transform.root)) {
+                    continue;
+                }
+                if (nearestOther == null || (Vector3.Distance(targetPoint, collider.bounds.center)) < Vector3.Distance(targetPoint, nearestOther.bounds.center)) {
+                    nearestOther = collider;
+                }
+            }
+            if (nearestOther != null) {
                 nearestOther = nearestOther.transform.root.GetComponentInChildren<Collider>();
                 targetPoint = nearestOther.bounds.center;
                 TagSystemData tagData = Toolbox.GetTagData(nearestOther.gameObject);
@@ -449,7 +459,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                         input.Fire.cursorData.worldPosition = targetPoint;
                     }
                 }
-
             }
 
             if (CanShoot()) {

@@ -1539,6 +1539,13 @@ increase final texture resolution, and padding potentially for better outline.
         *portrait for player, woman, man
     * ID card
     * thermal goggles icon
+* performance tuning:
+    * ammopips and 
+    * suspicion handler
+    * raycast vs. raycastall in sightcone
+    * Physics.OverlapSphereNonAlloc vs OverlapSphere
+    * RaycastNonAlloc vs. raycastall
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1589,6 +1596,8 @@ nice to have / future goals:
         dust / smoke shader
         goggles create tint
     digitized voice for "operation jetlag"
+    highlight item container when item is switched
+    after passing a lie check, npc discovers body: reconsiders player status
 
 
 deep save system:
@@ -1742,15 +1751,19 @@ camera clips through wall in wallpress, in aim
 
 * ID card
 * npc notices bodies
-stun when escape
-silenced pistol
-guard HQ potentially notices disabled cameras and sensors
-after passing a lie check, npc discovers body: reconsiders player status
 * firefight performance: lots of instantiate?
-leave corpse state if gunshots heard etc.
-rocket launcher
+stun when escape
 
-ammopips and suspicion handler?
+silenced pistol
+rocket launcher
+grenade
+
+guard HQ potentially notices disabled cameras and sensors
+leave corpse state if gunshots heard etc.
+ammo pips are broken!
+
+
+
 
 NOTE 
 adding etiquette was not easy.
@@ -1773,7 +1786,6 @@ IF it is safe to be spotted except when we are doing suspicious stuff, how can I
     activity builds up into suspicious footprint, ideally by the time you are deep in the building like a trap
     deeper area becomes higher security
     goal involves doing something that will necessarily attract attention (planting explosives, etc)
-
 
 
 

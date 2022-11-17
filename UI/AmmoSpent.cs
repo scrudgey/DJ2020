@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class AmmoSpent : MonoBehaviour {
+public class AmmoSpent : MonoBehaviour, IPoolable {
     public RectTransform myRect;
     public Image image;
-
+    public PrefabPool pool;
     public Sprite spritePistol;
     public Sprite spriteRifle;
     public Sprite spriteShotgun;
@@ -23,7 +23,6 @@ public class AmmoSpent : MonoBehaviour {
         lifetime = Random.Range(0.25f, 0.4f);
     }
     void Update() {
-        // Rect rect = myRect.rect;
         Vector3 position = myRect.anchoredPosition;
         position += velocity * Time.unscaledDeltaTime;
         velocity += gravity * Time.unscaledDeltaTime;
@@ -32,7 +31,7 @@ public class AmmoSpent : MonoBehaviour {
         myRect.anchoredPosition = position;
         myRect.rotation = rotation;
         if (lifetime <= 0) {
-            Destroy(gameObject);
+            pool.RecallObject(gameObject);
         }
     }
     public void SetSprite(GunType type) =>
@@ -43,4 +42,11 @@ public class AmmoSpent : MonoBehaviour {
         GunType.shotgun => spriteShotgun,
         _ => spritePistol
     };
+
+    public void OnPoolActivate() {
+        Start();
+    }
+    public void OnPoolDectivate() {
+
+    }
 }

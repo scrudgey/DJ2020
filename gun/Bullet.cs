@@ -14,6 +14,7 @@ public class Bullet {
     }
 
     public void DoImpacts(Transform shooter) {
+        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.collider.transform.IsChildOf(shooter))

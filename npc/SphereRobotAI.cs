@@ -45,7 +45,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SpeechEtiquette[] etiquettes;
     public Sprite portrait;
     bool awareOfCorpse;
+    Collider[] nearbyOthers;
+    RaycastHit[] raycastHits;
     public void Start() {
+        raycastHits = new RaycastHit[1];
+        nearbyOthers = new Collider[32];
         sphereController = controllable.GetComponent<IInputReceiver>();
         alertHandler.Hide();
         Bind(sightCone.gameObject);
@@ -190,12 +194,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         PlayerInput input = stateMachine.Update();
         input.preventWallPress = true;
 
-        // possibly avoid bunching here
+        // avoid bunching with boids algorithm
         float avoidFactor = 0.1f;
         float avoidRadius = 2f;
-        Collider[] others = Physics.OverlapSphere(transform.position, avoidRadius, LayerUtil.GetMask(Layer.obj));
+        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetMask(Layer.obj));
         Vector3 closeness = Vector3.zero;
-        foreach (Collider collider in others) {
+        for (int i = 0; i < numColliders; i++) {
+            Collider collider = nearbyOthers[i];
             if (collider == null || collider.gameObject == null)
                 continue;
             if (collider.transform.IsChildOf(transform))
@@ -336,15 +341,15 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             (other.bounds.center + other.bounds.extents) - position,
             (other.bounds.center - other.bounds.extents) - position,
         };
+        float distance = Vector3.Distance(other.bounds.center, transform.position);
         foreach (Vector3 direction in directions) {
             Ray ray = new Ray(position, direction);
-            RaycastHit[] hits = Physics.RaycastAll(ray, MAXIMUM_SIGHT_RANGE, LayerUtil.GetMask(Layer.def, Layer.obj));
-            foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-                if (hit.transform.IsChildOf(transform.root))
-                    continue;
-                TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
-                if (tagData.bulletPassthrough) continue;
-
+            // TODO: nonalloc
+            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
+            if (numberHits > 0) {
+                RaycastHit hit = raycastHits[0];
+                // TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
+                // if (tagData.bulletPassthrough) continue;
                 Color color = other == hit.collider ? Color.yellow : Color.red;
                 Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
                 if (other == hit.collider) {

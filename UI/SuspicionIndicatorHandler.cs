@@ -80,6 +80,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     public float alarmChevronEaseDuration = 1f;
     float targetLeftLineHeight;
     float targetRightLineHeight;
+    bool doUpdate;
     public void Bind() {
         GameManager.OnSuspicionChange += HandleSuspicionChange;
         HandleSuspicionChange();
@@ -106,13 +107,20 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     }
 
     public void HandleSuspicionChange() {
-        UpdateSensitivity();
+        doUpdate = true;
+    }
 
-        UpdateStatusFeed();
+    void LateUpdate() {
+        if (doUpdate) {
+            UpdateSensitivity();
 
-        UpdateIndicators();
+            UpdateStatusFeed();
 
-        SetSummaryText();
+            UpdateIndicators();
+
+            SetSummaryText();
+        }
+        doUpdate = false;
     }
     public void UpdateSensitivity() {
         switch (GameManager.I.GetCurrentSensitivity()) {
@@ -141,7 +149,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             SuspicionStatusRecordIndicatorHandler handler = child.GetComponent<SuspicionStatusRecordIndicatorHandler>();
             if (handler != null && handler.suspicionRecord != null)
                 activeRecords.Add(handler.suspicionRecord.content);
-            child.gameObject.SetActive(false);
+            // child.gameObject.SetActive(false);
         }
 
         // foreach (SuspicionRecord record in GameManager.I.suspicionRecords.Values) {
@@ -151,9 +159,15 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             // GameObject obj = GameObject.Instantiate(statusRecordPrefab);
             SuspicionRecord record = records[i];
             Transform obj = statusRecordsContainer.GetChild(i);
-            obj.gameObject.SetActive(true);
+            if (!obj.gameObject.activeInHierarchy)
+                obj.gameObject.SetActive(true);
             SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
             handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
+        }
+        for (int i = 0; i < statusRecordsContainer.childCount; i++) {
+            Transform child = statusRecordsContainer.GetChild(i);
+            if (child.gameObject.activeInHierarchy)
+                child.gameObject.SetActive(false);
         }
     }
 

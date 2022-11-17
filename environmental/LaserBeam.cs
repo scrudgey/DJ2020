@@ -39,6 +39,7 @@ public class LaserBeam : MonoBehaviour {
     void SetLaserLength(Transform laser) {
         Vector3 direction = laser.up;
         Ray ray = new Ray(transform.position, direction);
+        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(ray, maxLaserLength, LayerUtil.GetMask(Layer.def, Layer.obj));
         float length = maxLaserLength / 2f;
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {

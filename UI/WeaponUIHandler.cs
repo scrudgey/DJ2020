@@ -26,16 +26,18 @@ namespace UI {
         List<AmmoPip> liveAmmoPipsTop = new List<AmmoPip>();
         List<AmmoPip> liveAmmoPipsBottom = new List<AmmoPip>();
         int clipsize;
+        PrefabPool ammoSpentPool;
+        PrefabPool ammoPipPool;
         void Start() {
-            ClearAllPips();
-        }
-        void ClearAllPips() {
+            // GameObject spentPip = GameObject.Instantiate(ammoSpentPrefab, chamberPipContainer.position, Quaternion.identity);
+            ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);
+            ammoPipPool = PoolManager.I.RegisterPool(ammoPipPrefab, 50);
+
+
             liveAmmoPipsTop = new List<AmmoPip>();
             liveAmmoPipsBottom = new List<AmmoPip>();
-            if (ammoPipContainer != null) {
-                foreach (Transform child in ammoPipContainer) {
-                    Destroy(child.gameObject);
-                }
+            foreach (Transform child in ammoPipContainer) {
+                Destroy(child.gameObject);
             }
             if (lowerAmmoPipContainer != null)
                 foreach (Transform child in lowerAmmoPipContainer) {
@@ -44,6 +46,30 @@ namespace UI {
             if (chamberPipContainer != null) {
                 foreach (Transform child in chamberPipContainer) {
                     Destroy(child.gameObject);
+                }
+            }
+
+
+            // ClearAllPips();
+        }
+        void ClearAllPips() {
+            liveAmmoPipsTop = new List<AmmoPip>();
+            liveAmmoPipsBottom = new List<AmmoPip>();
+            if (ammoPipContainer != null) {
+                foreach (Transform child in ammoPipContainer) {
+                    // Destroy(child.gameObject);
+                    ammoPipPool.RecallObject(child.gameObject);
+                }
+            }
+            if (lowerAmmoPipContainer != null)
+                foreach (Transform child in lowerAmmoPipContainer) {
+                    // Destroy(child.gameObject);
+                    ammoPipPool.RecallObject(child.gameObject);
+                }
+            if (chamberPipContainer != null) {
+                foreach (Transform child in chamberPipContainer) {
+                    // Destroy(child.gameObject);
+                    ammoPipPool.RecallObject(child.gameObject);
                 }
             }
         }
@@ -70,24 +96,26 @@ namespace UI {
             }
 
             lowerAmmoRowObject.SetActive(clipsize > 15);
-            if (!lowerAmmoRowObject.activeInHierarchy && lowerAmmoPipContainer.childCount > 0) {
+            if (!lowerAmmoRowObject.activeInHierarchy) {
                 foreach (Transform child in lowerAmmoPipContainer) {
-                    Destroy(child.gameObject);
+                    // Destroy(child.gameObject);
+                    ammoPipPool.RecallObject(child.gameObject);
                 }
             }
         }
 
         void RectifyPips(int clip, int chamber, bool createSpentPip) {
-            while (chamberPipContainer.childCount > chamber && chamberPipContainer.childCount > 0) {
-                Transform child = chamberPipContainer.GetChild(0);
-                Destroy(child.gameObject);
-                child.SetParent(null, true);
 
+            // int activeChamberPips = chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy);
+            while (chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) > chamber && chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) > 0) {
+                Transform child = chamberPipContainer.GetChild(0);
+                ammoPipPool.RecallObject(child.gameObject);
                 if (createSpentPip)
                     CreateSpentPip();
             }
-            while (chamberPipContainer.childCount < chamber) {
-                GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
+            while (chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) < chamber) {
+                // GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
+                GameObject newPip = ammoPipPool.GetObject(chamberPipContainer.position);
                 AmmoPip pip = newPip.GetComponent<AmmoPip>();
                 pip.SetSprite(target.gunInstance.template.type);
                 newPip.transform.SetParent(chamberPipContainer, false);
@@ -104,8 +132,11 @@ namespace UI {
 
         int totalAmmoPips() => liveAmmoPipsTop.Count + liveAmmoPipsBottom.Count;
         void CreateSpentPip() {
-            GameObject spentPip = GameObject.Instantiate(ammoSpentPrefab, chamberPipContainer.position, Quaternion.identity);
+            // GameObject spentPip = GameObject.Instantiate(ammoSpentPrefab, chamberPipContainer.position, Quaternion.identity);
+            GameObject spentPip = ammoSpentPool.GetObject(chamberPipContainer.position);
+            // spentPip.anch
             AmmoSpent spent = spentPip.GetComponent<AmmoSpent>();
+            spent.pool = ammoSpentPool;
             spent.SetSprite(target.gunInstance.template.type);
             spentPip.transform.SetParent(transform, true);
         }
@@ -113,15 +144,16 @@ namespace UI {
             if (totalAmmoPips() > 15) {
                 AmmoPip pip1 = liveAmmoPipsTop[0];
                 liveAmmoPipsTop.Remove(pip1);
-                pip1.Disappear();
+                pip1.Disappear(ammoPipPool);
 
                 // if (liveAmmoPipsBottom.Count > 0) {
                 AmmoPip pip2 = liveAmmoPipsBottom[0];
                 liveAmmoPipsBottom.Remove(pip2);
-                pip2.Disappear();
+                pip2.Disappear(ammoPipPool);
                 // }
 
-                GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
+                // GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
+                GameObject newPip = ammoPipPool.GetObject(ammoPipContainer.transform.position);
                 AmmoPip pip = newPip.GetComponent<AmmoPip>();
                 pip.SetSprite(target.gunInstance.template.type);
                 newPip.transform.SetParent(ammoPipContainer, false);
@@ -130,7 +162,7 @@ namespace UI {
             } else {
                 AmmoPip pip = liveAmmoPipsTop[0];
                 liveAmmoPipsTop.Remove(pip);
-                pip.Disappear();
+                pip.Disappear(ammoPipPool);
             }
             if (createSpentPip)
                 CreateSpentPip();
@@ -150,7 +182,8 @@ namespace UI {
                 ammoList = liveAmmoPipsTop;
             }
 
-            GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
+            // GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
+            GameObject newPip = ammoPipPool.GetObject(container.transform.position);
             AmmoPip pip = newPip.GetComponent<AmmoPip>();
             pip.SetSprite(target.gunInstance.template.type);
 

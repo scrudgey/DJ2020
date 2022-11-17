@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Easings;
 using UnityEngine;
 using UnityEngine.UI;
-public class AmmoPip : MonoBehaviour {
+public class AmmoPip : MonoBehaviour, IPoolable {
     public RectTransform myRect;
     public RectTransform imageRect;
     public RectTransform layoutRect;
@@ -15,8 +15,10 @@ public class AmmoPip : MonoBehaviour {
     float initialImageWidth;
     Coroutine coroutine;
     void Awake() {
-        initialWidth = myRect.rect.width;
-        initialImageWidth = imageRect.rect.width;
+        // initialWidth = myRect.rect.width;
+        // initialImageWidth = imageRect.rect.width;
+        initialWidth = 12;
+        initialImageWidth = 32;
     }
     void ResetCoroutine(IEnumerator newCoroutine) {
         if (coroutine != null) {
@@ -33,24 +35,38 @@ public class AmmoPip : MonoBehaviour {
             _ => spritePistol
         };
 
-    public void Disappear() {
-        ResetCoroutine(SqueezeOut());
+    public void Disappear(PrefabPool pool) {
+        ResetCoroutine(SqueezeOut(pool));
     }
-    IEnumerator SqueezeOut() {
+    IEnumerator SqueezeOut(PrefabPool pool) {
         float appearanceInterval = 0.25f;
         float timer = 0f;
+        float framerateTimer = 0f;
         while (timer < appearanceInterval) {
             timer += Time.unscaledDeltaTime;
+            framerateTimer += Time.unscaledDeltaTime;
+
 
             float imageWidth = (float)PennerDoubleAnimation.BackEaseOut(timer, initialImageWidth, -1f * initialImageWidth, appearanceInterval);
             float rectWidth = (float)PennerDoubleAnimation.BackEaseOut(timer, initialWidth, -1f * initialWidth, appearanceInterval);
 
             imageRect.sizeDelta = new Vector2(imageWidth, imageRect.rect.height);
             myRect.sizeDelta = new Vector2(rectWidth, myRect.rect.height);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRect);
-
+            if (framerateTimer > 0.1f) {
+                framerateTimer -= 0.1f;
+                LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRect);
+            }
             yield return null;
         }
-        Destroy(gameObject);
+        pool.RecallObject(gameObject);
+    }
+
+
+    public void OnPoolActivate() {
+        imageRect.sizeDelta = new Vector2(initialImageWidth, 64);
+        myRect.sizeDelta = new Vector2(initialWidth, 32);
+    }
+    public void OnPoolDectivate() {
+
     }
 }
