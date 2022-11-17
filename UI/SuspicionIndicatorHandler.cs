@@ -164,7 +164,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
             handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
         }
-        for (int i = 0; i < statusRecordsContainer.childCount; i++) {
+        for (int i = records.Count; i < statusRecordsContainer.childCount; i++) {
             Transform child = statusRecordsContainer.GetChild(i);
             if (child.gameObject.activeInHierarchy)
                 child.gameObject.SetActive(false);

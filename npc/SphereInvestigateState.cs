@@ -10,6 +10,7 @@ public class SphereInvestigateState : SphereControlState {
     private TaskNode rootTaskNode;
     private TaskNode alertTaskNode;
     public SpeechTextController speechTextController;
+    public DialogueController.DialogueResult dialogueResult;
     float timeSinceSawPlayer;
     Vector3 lastSeenPlayerPosition;
     TaskOpenDialogue dialogueTask;
@@ -162,6 +163,7 @@ public class SphereInvestigateState : SphereControlState {
 
     public void HandleDialogueResult(DialogueController.DialogueResult result) {
         DialogueController.OnDialogueConclude -= HandleDialogueResult;
+        dialogueResult = result;
         owner.StateFinished(this);
     }
 

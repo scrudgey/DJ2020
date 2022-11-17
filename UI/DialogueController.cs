@@ -7,8 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class DialogueController : MonoBehaviour {
-    public enum DialogueResult { success, fail }
-
+    public enum DialogueResult { success, fail, stun }
+    DialogueResult dialogueResult;
     static public Action<DialogueResult> OnDialogueConclude;
 
     public GameObject UIEditorCamera;
@@ -187,7 +187,10 @@ public class DialogueController : MonoBehaviour {
         DialogueResponseButton button = responseObj.GetComponent<DialogueResponseButton>();
         button.Initialize(responseCallback, response, 0f);
     }
-    public void EscapeDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) => EndDialogueResponseCallback(dialogueResponseButton);
+    public void EscapeDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
+        dialogueResult = DialogueResult.stun;
+        EndDialogueResponseCallback(dialogueResponseButton);
+    }
     public void LieDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
         SetRightDialogueText(dialogueResponseButton.response);
         ClearResponseContainer();
@@ -257,7 +260,7 @@ public class DialogueController : MonoBehaviour {
         }
     }
     void Conclude() {
-        OnDialogueConclude?.Invoke(DialogueResult.success);
+        OnDialogueConclude?.Invoke(dialogueResult);
         GameManager.I.CloseMenu();
     }
 
@@ -316,9 +319,11 @@ public class DialogueController : MonoBehaviour {
                     maxLifetime = 120f
                 };
                 GameManager.I.AddSuspicionRecord(lieFailedRecord);
+                dialogueResult = DialogueResult.fail;
                 break;
             case SkillCheckDialogue.SkillCheckResult.ResultType.success:
                 SetLeftDialogueText($"<color=#2ed573>[SUCCESS]</color> {result.input.successResponse}");
+                dialogueResult = DialogueResult.success;
                 break;
         }
         ClearResponseContainer();

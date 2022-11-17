@@ -1000,6 +1000,32 @@ increase final texture resolution, and padding potentially for better outline.
 
 
 
+
+NOTE 
+adding etiquette was not easy.
+even after setting default player state, it didn't work for player
+because we were loading from the saved VR template.
+then getting NPC to work was difficult.
+i had to modify NPCTemplateJSONConverter, even after modifying the scriptable objects
+
+three distinct approaches to serializing state
+1. player state duplicates fields in template and in state. instantiating player state involves a lot of copying.
+2. a state object with a template, and mutable fields
+3. a state object with a template and a delta. i like this, keeps all cleanly separate.
+modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
+NPCSpawnPoint and what is IPlayerStateLoader ??
+in summary, it is a gnarly mess
+
+
+IF it is safe to be spotted except when we are doing suspicious stuff, how can I make a level challenging?
+    more sensors to trip
+    activity builds up into suspicious footprint, ideally by the time you are deep in the building like a trap
+    deeper area becomes higher security
+    goal involves doing something that will necessarily attract attention (planting explosives, etc)
+
+
+
+
 * redesign data structure so it can generalize to multiple skins
 * make it easier to select the next torso sprite (spritesheet parameter?)
 * sprite data: 
@@ -1739,53 +1765,31 @@ allow 7-11 to be a level
 MVP:
 * music
 2. preset scenarios
-3. dialogue
+* dialogue
 4. new level + 711 level
+5. save state overhaul
 NEXT:
 5. doors
 6. attack surfaces
 
 weird gibs situation with bullet impact
+ammo pips are broken!
+
+
 npc notices bodies
 camera clips through wall in wallpress, in aim
 
 * ID card
 * npc notices bodies
 * firefight performance: lots of instantiate?
-stun when escape
+* stun when escape
+* leave corpse state if gunshots heard etc.
 
 silenced pistol
 rocket launcher
 grenade
 
 guard HQ potentially notices disabled cameras and sensors
-leave corpse state if gunshots heard etc.
-ammo pips are broken!
-
-
-
-
-NOTE 
-adding etiquette was not easy.
-even after setting default player state, it didn't work for player
-because we were loading from the saved VR template.
-then getting NPC to work was difficult.
-i had to modify NPCTemplateJSONConverter, even after modifying the scriptable objects
-
-three distinct approaches to serializing state
-1. player state duplicates fields in template and in state. instantiating player state involves a lot of copying.
-2. a state object with a template, and mutable fields
-3. a state object with a template and a delta. i like this, keeps all cleanly separate.
-modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
-NPCSpawnPoint and what is IPlayerStateLoader ??
-in summary, it is a gnarly mess
-
-
-IF it is safe to be spotted except when we are doing suspicious stuff, how can I make a level challenging?
-    more sensors to trip
-    activity builds up into suspicious footprint, ideally by the time you are deep in the building like a trap
-    deeper area becomes higher security
-    goal involves doing something that will necessarily attract attention (planting explosives, etc)
 
 
 

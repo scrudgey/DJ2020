@@ -105,8 +105,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 timeSinceInterrogatedStranger = 120f;
                 highlight.target = null;
                 SphereInvestigateState investigateState = (SphereInvestigateState)routine;
-                if (investigateState.isPlayerAggressive()) {
+                if (investigateState.dialogueResult == DialogueController.DialogueResult.fail) {
                     ChangeState(new SphereHoldAtGunpointState(this));
+                } else if (investigateState.dialogueResult == DialogueController.DialogueResult.stun) {
+                    alertHandler.ShowWarn();
+                    ChangeState(new StunState(this));
                 } else goto default;
                 break;
             case PauseState:

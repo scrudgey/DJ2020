@@ -20,6 +20,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public PostProcessProfile isometricProfile;
     public PostProcessProfile wallPressProfile;
     public PostProcessProfile aimProfile;
+    public PostProcessProfile thermalProfile;
     public Material isometricSkybox;
     public Material wallPressSkybox;
     public Transform maskCylinder;
@@ -78,6 +79,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     CameraAttractorZone currentAttractor = null;
     private static float shakeJitter = 0f;
     private float currentOrthographicSize;
+    bool thermalGogglesActive;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
@@ -126,7 +128,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     void HandleEyeVisibilityChange(PlayerState playerData) {
         if (playerData.cyberEyesThermal || playerData.cyberEyesThermalBuff) {
             ShowLasers();
+            thermalGogglesActive = true;
         } else {
+            thermalGogglesActive = false;
             HideLasers();
         }
     }
@@ -270,6 +274,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 ApplyTargetParameters(AimParameters(input));
                 volume.profile = aimProfile;
                 break;
+        }
+        if (thermalGogglesActive) {
+            volume.profile = thermalProfile;
         }
     }
 
