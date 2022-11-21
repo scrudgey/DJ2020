@@ -97,6 +97,8 @@ public class VRMissionDesigner : MonoBehaviour {
     public AudioClip[] pickerCallbackSounds;
     public AudioClip[] weaponSelectorSounds;
     public AudioClip[] toggleSounds;
+    [Header("Save / load")]
+    public VRScenarioPicker scenarioPicker;
 
     void Start() {
         foreach (Transform child in pickerContainer) {
@@ -105,42 +107,11 @@ public class VRMissionDesigner : MonoBehaviour {
         tabOriginalColor = tab2.colors.normalColor;
         selectedWeapon = 1;
         selectedCharacter = 1;
-        template = VRMissionTemplate.Default();
-        LoadVRMissionTemplate();
+        template = VRMissionTemplate.LoadVRMissionTemplate(VRMissionTemplate.DEFAULT_FILENAME);
         gunStatHandler.DisplayGunTemplate(template.playerState.primaryGun);
         OnDataChange();
     }
-    void SaveVRMissionTemplate() {
-        string path = VRMissionPath();
-        try {
-            using (FileStream fs = File.Open(path, FileMode.Create))
-            using (StreamWriter sw = new StreamWriter(fs))
-            using (JsonWriter jw = new JsonTextWriter(sw)) {
-                JsonSerializer serializer = JsonSerializer.Create();
-                serializer.Serialize(jw, template);
-            }
-            // Debug.Log($"wrote to {path}");
-        }
-        catch (Exception e) {
-            Debug.LogError($"error writing to file: {path} {e}");
-        }
-    }
-    void LoadVRMissionTemplate() {
-        string path = VRMissionPath();
-        try {
-            // deserialize JSON directly from a file
-            using (StreamReader file = File.OpenText(path)) {
-                JsonSerializer serializer = new JsonSerializer();
-                template = (VRMissionTemplate)serializer.Deserialize(file, typeof(VRMissionTemplate));
-                Debug.Log($"successfully loaded VR mission template from {path}");
-            }
-        }
-        catch (Exception e) {
-            Debug.LogError($"error reading VR template file: {path} {e}");
-        }
-    }
 
-    static public string VRMissionPath() => System.IO.Path.Join(Application.persistentDataPath, "vrmission.json");
     void InitializeWeaponPicker() {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
@@ -194,7 +165,7 @@ public class VRMissionDesigner : MonoBehaviour {
         return text;
     }
 
-    void OnDataChange() {
+    public void OnDataChange() {
         string sceneImagePath = $"data/scenegraphics/{template.sceneName}";
         Sprite sceneSprite = Resources.Load<Sprite>(sceneImagePath) as Sprite;
         sceneImage.sprite = sceneSprite;
@@ -334,7 +305,6 @@ public class VRMissionDesigner : MonoBehaviour {
                 break;
             case SensitivityLevel.semiprivateProperty:
                 sensitivityDescriptionText.text = "Property that is protected but open to some of the public. Businesses, office buildings, malls. Guards are on the lookout for suspicious behavior.";
-
                 break;
             case SensitivityLevel.privateProperty:
                 sensitivityDescriptionText.text = "Sensitive areas of private property. Only authorized people are allowed. Guards are on the lookout for suspicious individuals.";
@@ -343,8 +313,8 @@ public class VRMissionDesigner : MonoBehaviour {
                 sensitivityDescriptionText.text = "Restricted property. Guards will shoot on sight";
                 break;
         }
-
-        SaveVRMissionTemplate();
+        VRMissionTemplate.SaveVRMissionTemplate(template, VRMissionTemplate.DEFAULT_FILENAME);
+        scenarioPicker.RefreshScenarioPicker();
     }
 
     // scene controls

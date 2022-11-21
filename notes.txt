@@ -1571,7 +1571,16 @@ IF it is safe to be spotted except when we are doing suspicious stuff, how can I
     * raycast vs. raycastall in sightcone
     * Physics.OverlapSphereNonAlloc vs OverlapSphere
     * RaycastNonAlloc vs. raycastall
-
+* npc notices bodies
+* ID card
+* npc notices bodies
+* firefight performance: lots of instantiate?
+* stun when escape
+* leave corpse state if gunshots heard etc.
+* preset scenarios
+    * support save and load
+    * seoarate dialogue for that? or inline in a drop down?
+    * create several presets
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1764,32 +1773,28 @@ allow 7-11 to be a level
 
 MVP:
 * music
-2. preset scenarios
+* preset scenarios
 * dialogue
-4. new level + 711 level
+4. new level
 5. save state overhaul
 NEXT:
 5. doors
 6. attack surfaces
 
 weird gibs situation with bullet impact
-ammo pips are broken!
-
-
-npc notices bodies
 camera clips through wall in wallpress, in aim
 
-* ID card
-* npc notices bodies
-* firefight performance: lots of instantiate?
-* stun when escape
-* leave corpse state if gunshots heard etc.
-
-silenced pistol
-rocket launcher
-grenade
-
+create good templates
 guard HQ potentially notices disabled cameras and sensors
+* line of sight detection: using RayCastHit[1] might yield false positives because it does not detect the first hit.
+allow change npc outfit
+711 level
+office level
 
+ammo pips are broken!
 
-
+graphics:
+    silenced pistol
+    rocket launcher
+    grenade
+    patrol guard

@@ -339,28 +339,36 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     bool TargetVisible(Collider other) {
         Vector3 position = sightOrigin.position; // TODO: configurable
+
+        // Vector3[] directions = new Vector3[]{
+        //     other.bounds.center - position,
+        //     (other.bounds.center + other.bounds.extents) - position,
+        //     (other.bounds.center - other.bounds.extents) - position,
+        // };
+        // float distance = Vector3.Distance(other.bounds.center, transform.position);
         Vector3[] directions = new Vector3[]{
-            other.bounds.center - position,
-            (other.bounds.center + other.bounds.extents) - position,
-            (other.bounds.center - other.bounds.extents) - position,
+            other.ClosestPoint(position) - position
         };
-        float distance = Vector3.Distance(other.bounds.center, transform.position);
+        float distance = Vector3.Distance(other.ClosestPoint(position), position);
+        bool clearLineOfSight = false;
         foreach (Vector3 direction in directions) {
             Ray ray = new Ray(position, direction);
             // TODO: nonalloc
-            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
-            if (numberHits > 0) {
-                RaycastHit hit = raycastHits[0];
-                // TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
-                // if (tagData.bulletPassthrough) continue;
-                Color color = other == hit.collider ? Color.yellow : Color.red;
-                Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
-                if (other == hit.collider) {
-                    return true;
-                } else break;
-            }
+            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
+            clearLineOfSight |= numberHits == 0;
+            // return numberHits == 0;
+            // if (numberHits  0) {
+            //     RaycastHit hit = raycastHits[0];
+            //     // TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
+            //     // if (tagData.bulletPassthrough) continue;
+            //     Color color = other == hit.collider ? Color.yellow : Color.red;
+            //     Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
+            //     if (other == hit.collider) {
+            //         return true;
+            //     } else break;
+            // }
         }
-        return false;
+        return clearLineOfSight;
     }
 
     public DamageResult TakeDamage(Damage damage) {

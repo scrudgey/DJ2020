@@ -5,9 +5,11 @@ using UnityEngine;
 public class TitleController : MonoBehaviour {
     public GameObject mainMenu;
     public GameObject VRDesignMenu;
+    public Canvas saveDialogCanvas;
     void Start() {
         mainMenu.SetActive(true);
         VRDesignMenu.SetActive(false);
+        saveDialogCanvas.enabled = false;
         GameManager.I.TransitionToState(GameState.mainMenu);
     }
     public void NewVRMissionCallback() {

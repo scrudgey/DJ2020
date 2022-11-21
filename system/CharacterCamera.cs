@@ -126,11 +126,13 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
     void HandleEyeVisibilityChange(PlayerState playerData) {
+        thermalGogglesActive = playerData.cyberEyesThermalBuff;
+
         if (playerData.cyberEyesThermal || playerData.cyberEyesThermalBuff) {
             ShowLasers();
-            thermalGogglesActive = true;
+            // thermalGogglesActive = true;
         } else {
-            thermalGogglesActive = false;
+            // thermalGogglesActive = false;
             HideLasers();
         }
     }
