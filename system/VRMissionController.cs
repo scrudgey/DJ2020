@@ -45,7 +45,7 @@ public class VRMissionController : MonoBehaviour {
     void InitializeStealDataMission() {
         Debug.Log("initialize steal data mission");
         foreach (VRDataStore dataStore in GameObject.FindObjectsOfType<VRDataStore>()) {
-            Debug.Log(dataStore);
+            // Debug.Log(dataStore);
             dataStores.Add(dataStore);
             dataStore.OnDataStoreOpened += HandleVRDataStoreOpened;
         }

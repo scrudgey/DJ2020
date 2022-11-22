@@ -21,6 +21,7 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
         coroutine = StartCoroutine(RunJobRepeatedly());
     }
     void OnDestroy() {
+        // if (textureData.)
         textureData.Dispose();
         StopCoroutine(coroutine);
     }

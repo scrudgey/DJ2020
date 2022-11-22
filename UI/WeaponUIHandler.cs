@@ -28,49 +28,42 @@ namespace UI {
         int clipsize;
         PrefabPool ammoSpentPool;
         PrefabPool ammoPipPool;
-        void Start() {
-            // GameObject spentPip = GameObject.Instantiate(ammoSpentPrefab, chamberPipContainer.position, Quaternion.identity);
+        void Awake() {
             ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);
             ammoPipPool = PoolManager.I.RegisterPool(ammoPipPrefab, 50);
-
-
             liveAmmoPipsTop = new List<AmmoPip>();
             liveAmmoPipsBottom = new List<AmmoPip>();
             foreach (Transform child in ammoPipContainer) {
                 Destroy(child.gameObject);
             }
-            if (lowerAmmoPipContainer != null)
-                foreach (Transform child in lowerAmmoPipContainer) {
-                    Destroy(child.gameObject);
-                }
-            if (chamberPipContainer != null) {
-                foreach (Transform child in chamberPipContainer) {
-                    Destroy(child.gameObject);
-                }
+            foreach (Transform child in lowerAmmoPipContainer) {
+                Destroy(child.gameObject);
             }
-
-
-            // ClearAllPips();
+            foreach (Transform child in chamberPipContainer) {
+                Destroy(child.gameObject);
+            }
         }
         void ClearAllPips() {
             liveAmmoPipsTop = new List<AmmoPip>();
             liveAmmoPipsBottom = new List<AmmoPip>();
+            List<GameObject> recallMe = new List<GameObject>();
             if (ammoPipContainer != null) {
                 foreach (Transform child in ammoPipContainer) {
-                    // Destroy(child.gameObject);
-                    ammoPipPool.RecallObject(child.gameObject);
+                    recallMe.Add(child.gameObject);
                 }
             }
             if (lowerAmmoPipContainer != null)
                 foreach (Transform child in lowerAmmoPipContainer) {
-                    // Destroy(child.gameObject);
-                    ammoPipPool.RecallObject(child.gameObject);
+                    recallMe.Add(child.gameObject);
                 }
             if (chamberPipContainer != null) {
                 foreach (Transform child in chamberPipContainer) {
-                    // Destroy(child.gameObject);
-                    ammoPipPool.RecallObject(child.gameObject);
+                    recallMe.Add(child.gameObject);
+
                 }
+            }
+            foreach (GameObject obj in recallMe) {
+                ammoPipPool.RecallObject(obj);
             }
         }
         override public void HandleValueChanged(GunHandler gun) {
@@ -98,23 +91,19 @@ namespace UI {
             lowerAmmoRowObject.SetActive(clipsize > 15);
             if (!lowerAmmoRowObject.activeInHierarchy) {
                 foreach (Transform child in lowerAmmoPipContainer) {
-                    // Destroy(child.gameObject);
                     ammoPipPool.RecallObject(child.gameObject);
                 }
             }
         }
 
         void RectifyPips(int clip, int chamber, bool createSpentPip) {
-
-            // int activeChamberPips = chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy);
-            while (chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) > chamber && chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) > 0) {
+            while (chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) > chamber) {
                 Transform child = chamberPipContainer.GetChild(0);
                 ammoPipPool.RecallObject(child.gameObject);
                 if (createSpentPip)
                     CreateSpentPip();
             }
             while (chamberPipContainer.Cast<Transform>().Count(child => child.gameObject.activeInHierarchy) < chamber) {
-                // GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
                 GameObject newPip = ammoPipPool.GetObject(chamberPipContainer.position);
                 AmmoPip pip = newPip.GetComponent<AmmoPip>();
                 pip.SetSprite(target.gunInstance.template.type);
@@ -132,9 +121,7 @@ namespace UI {
 
         int totalAmmoPips() => liveAmmoPipsTop.Count + liveAmmoPipsBottom.Count;
         void CreateSpentPip() {
-            // GameObject spentPip = GameObject.Instantiate(ammoSpentPrefab, chamberPipContainer.position, Quaternion.identity);
             GameObject spentPip = ammoSpentPool.GetObject(chamberPipContainer.position);
-            // spentPip.anch
             AmmoSpent spent = spentPip.GetComponent<AmmoSpent>();
             spent.pool = ammoSpentPool;
             spent.SetSprite(target.gunInstance.template.type);
@@ -146,13 +133,12 @@ namespace UI {
                 liveAmmoPipsTop.Remove(pip1);
                 pip1.Disappear(ammoPipPool);
 
-                // if (liveAmmoPipsBottom.Count > 0) {
-                AmmoPip pip2 = liveAmmoPipsBottom[0];
-                liveAmmoPipsBottom.Remove(pip2);
-                pip2.Disappear(ammoPipPool);
-                // }
+                if (liveAmmoPipsBottom.Count > 0) {
+                    AmmoPip pip2 = liveAmmoPipsBottom[0];
+                    liveAmmoPipsBottom.Remove(pip2);
+                    pip2.Disappear(ammoPipPool);
+                }
 
-                // GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
                 GameObject newPip = ammoPipPool.GetObject(ammoPipContainer.transform.position);
                 AmmoPip pip = newPip.GetComponent<AmmoPip>();
                 pip.SetSprite(target.gunInstance.template.type);
@@ -182,14 +168,11 @@ namespace UI {
                 ammoList = liveAmmoPipsTop;
             }
 
-            // GameObject newPip = GameObject.Instantiate(ammoPipPrefab);
             GameObject newPip = ammoPipPool.GetObject(container.transform.position);
             AmmoPip pip = newPip.GetComponent<AmmoPip>();
             pip.SetSprite(target.gunInstance.template.type);
-
             newPip.transform.SetParent(container, false);
             pip.layoutRect = containerRect;
-
             ammoList.Add(pip);
         }
     }
