@@ -33,19 +33,6 @@ public class LevelDataUtilEditor : Editor {
             cyberGraph.Write(levelName, sceneName);
             alarmGraph.Write(levelName, sceneName);
 
-
-            // String klaxonRootPath = AssetDatabase.GetAssetPath(networkUtil.klaxonSound);
-            // String klaxonRelativePath = klaxonRootPath.Replace("Assets/Resources/", "");
-            // int fileExtPos = klaxonRelativePath.LastIndexOf(".");
-            // if (fileExtPos >= 0)
-            //     klaxonRelativePath = klaxonRelativePath.Substring(0, fileExtPos);
-
-            // networkUtil.levelData.powerGraph = powerGraph;
-            // networkUtil.levelData.cyberGraph = cyberGraph;
-            // networkUtil.levelData.alarmGraph = alarmGraph;
-            // networkUtil.levelData.alarmAudioClipPath = klaxonRelativePath;
-            // networkUtil.levelData.WriteXML(levelName);
-
             AssetDatabase.Refresh();
         }
         serializedObject.ApplyModifiedProperties();

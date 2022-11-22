@@ -1001,20 +1001,6 @@ increase final texture resolution, and padding potentially for better outline.
 
 
 
-NOTE 
-adding etiquette was not easy.
-even after setting default player state, it didn't work for player
-because we were loading from the saved VR template.
-then getting NPC to work was difficult.
-i had to modify NPCTemplateJSONConverter, even after modifying the scriptable objects
-
-three distinct approaches to serializing state
-1. player state duplicates fields in template and in state. instantiating player state involves a lot of copying.
-2. a state object with a template, and mutable fields
-3. a state object with a template and a delta. i like this, keeps all cleanly separate.
-modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
-NPCSpawnPoint and what is IPlayerStateLoader ??
-in summary, it is a gnarly mess
 
 
 IF it is safe to be spotted except when we are doing suspicious stuff, how can I make a level challenging?

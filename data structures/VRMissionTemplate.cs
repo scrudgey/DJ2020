@@ -14,6 +14,7 @@ public record VRMissionTemplate {
     public int maxNumberNPCs;
     public float NPCspawnInterval = 5f;
     public int numberConcurrentNPCs;
+    // [JsonConverter(typeof(PlayerTemplateJsonConverter))]
     public PlayerTemplate playerState;
     public bool alarmHQEnabled;
     [JsonConverter(typeof(NPCTemplateJsonConverter))]

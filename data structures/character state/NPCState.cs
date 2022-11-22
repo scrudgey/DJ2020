@@ -3,7 +3,6 @@ using UnityEngine;
 
 [System.Serializable]
 public class NPCState : ICharacterHurtableState, IGunHandlerState {
-
     public NPCTemplate template;
     // gun
     public GunState primaryGun { get; set; }

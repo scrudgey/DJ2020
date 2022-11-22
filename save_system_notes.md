@@ -162,3 +162,59 @@ VR mission data
     do not find player object on initialize. spawn player object according to playerdata.
 3. NPC spawn point
 4. async loading and loading screen
+
+
+
+
+
+
+
+
+
+# fixing the save system
+
+## problem statement 
+Save system uses AssetDatabase, which is UnityEditor only.
+Therefore we cannot build a standalone app.
+
+Secondly, there are at least three separate ways that we are handling state:
+
+three distinct approaches to serializing state
+1. player state duplicates fields in template and in state. instantiating player state involves a lot of copying.
+2. a state object with a template, and mutable fields
+3. a state object with a template and a delta. i like this, keeps all cleanly separate.
+modify playerstate, playertemplate, Default() player template, PlayerState Instantiate(PlayerTemplate template), PlayerState DefaultState(),
+NPCSpawnPoint and what is IPlayerStateLoader ??
+
+adding etiquette was not easy.
+even after setting default player state, it didn't work for player
+because we were loading from the saved VR template.
+then getting NPC to work was difficult.
+i had to modify NPCTemplateJSONConverter, even after modifying the scriptable objects.
+
+1. take a principled stance on how to handle state
+    ideal:
+    State
+        Delta
+        Template
+    
+2. enumerate all current save related systems
+
+it is okay to use asset serializer in templates that are scriptable objects! right?
+NPCTemplateJsonConverter
+    this one is good! it manually stores resource references as strings without using AssetDatabase!
+ScriptableObjectJsonConverter
+    is this the problem? only used in player template
+
+problem: 
+NPCTemplateJsonConverter uses Toolbox.AssetRelativePath on write.
+PlayerTemplate uses ScriptableObjectJsonConverter on read/write.
+therefore it can't write in runtime.
+we need a different system.
+
+the system needs to be able to resolve a Resources/ path given an asset.
+
+
+
+how could we do something like AssetDatabase.GetAssetPath at runtime?
+we would need to enumerate 
