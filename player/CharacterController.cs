@@ -740,7 +740,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         Vector3 dir = -1f * wallNormal;
         float length = 0.4f;
         Debug.DrawRay(start, length * dir, new Color(162, 142, 149));
-        int numberHit = Physics.RaycastNonAlloc(start, dir, rayCastHits, length, LayerUtil.GetMask(Layer.def), QueryTriggerInteraction.Ignore);
+        int numberHit = Physics.RaycastNonAlloc(start, dir, rayCastHits, length, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
         // for (int i = 0; i < numberHit; i++) {
         //     Debug.Log(rayCastHits[i].collider);
         // }

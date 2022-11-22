@@ -98,7 +98,6 @@ public record VRMissionTemplate {
             Debug.LogError("no templates found!");
         }
 
-        // Add each result to the worldList
         foreach (UnityEngine.Object world in worlds) {
             TextAsset w = (TextAsset)world;
             string filename = System.IO.Path.Join(targetDirectoryPath, w.name);

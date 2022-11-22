@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -348,7 +349,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // float distance = Vector3.Distance(other.bounds.center, transform.position);
         Vector3[] directions = new Vector3[]{
             other.ClosestPoint(position) - position
-        };
+            };
+        // Debug.Log($"{other}");
+        // Debug.Log($"{other.transform.parent}");
+        // Debug.Log($"{other.transform.parent.gameObject}");
         float distance = Vector3.Distance(other.ClosestPoint(position), position);
         bool clearLineOfSight = false;
         foreach (Vector3 direction in directions) {

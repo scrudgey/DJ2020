@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 // random from list
@@ -401,12 +400,13 @@ public class Toolbox {
         return totalRect;
     }
     public static string AssetRelativePath(UnityEngine.Object asset) {
-        String rootPath = AssetDatabase.GetAssetPath(asset);
-        String relativePath = rootPath.Replace("Assets/Resources/", "");
-        int fileExtPos = relativePath.LastIndexOf(".");
-        if (fileExtPos >= 0)
-            relativePath = relativePath.Substring(0, fileExtPos);
-        return relativePath;
+        // String rootPath = AssetDatabase.GetAssetPath(asset);
+        return ResourceReference.GetPath(asset);
+        // String relativePath = rootPath.Replace("Assets/Resources/", "");
+        // int fileExtPos = relativePath.LastIndexOf(".");
+        // if (fileExtPos >= 0)
+        //     relativePath = relativePath.Substring(0, fileExtPos);
+        // return relativePath;
     }
     public static float Sigmoid(float value) {
         return 1.0f / (1.0f + (float)Math.Exp(-value));

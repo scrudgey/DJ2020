@@ -197,6 +197,10 @@ i had to modify NPCTemplateJSONConverter, even after modifying the scriptable ob
     State
         Delta
         Template
+    template contains references to resources. delta contains mutable primitives.
+    on save, save state: reference the template by string.
+    this works when templates can be scriptable objects.
+    but VR mission template wants to 
     
 2. enumerate all current save related systems
 
@@ -217,4 +221,4 @@ the system needs to be able to resolve a Resources/ path given an asset.
 
 
 how could we do something like AssetDatabase.GetAssetPath at runtime?
-we would need to enumerate 
+we would need to enumerate all resources on start, and build a dictionary.

@@ -1765,7 +1765,7 @@ MVP:
 * preset scenarios
 * dialogue
 4. new level
-5. save state overhaul
+* save state overhaul
 allow change npc outfit
 NEXT:
 5. doors
@@ -1789,3 +1789,9 @@ graphics:
     rocket launcher
     grenade
     patrol guard
+
+1. scenario pickers don't scale
+2. clearsighter doesn't work
+3. ammo pips grow out of control
+4. we need an escape - quit menu.
+5. player is corrupting defaultMission.json

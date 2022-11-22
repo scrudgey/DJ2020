@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 using UnityEditor;
 using UnityEngine;
 
@@ -176,6 +177,8 @@ public class SpriteDataSystemEditor : Editor {
     }
     void Save(string skin, List<SpriteData> spriteData, string sheetTypeString) {
         Skin.SaveSpriteData(skin, spriteData, sheetTypeString);
+        AssetDatabase.Refresh();
+
     }
     List<SpriteData> Load(string skin, string sheetTypeString) {
         return Skin.LoadSpriteData(skin, sheetTypeString);

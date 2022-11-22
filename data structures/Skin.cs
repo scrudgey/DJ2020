@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using UnityEditor;
 using UnityEngine;
 
 [System.Serializable]
@@ -520,27 +519,38 @@ public class Skin {
 
     }
 
+
     public static void SaveSpriteData(string skinName, List<SpriteData> spriteData, string sheetType) {
         XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
-        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
+        string path = Path.Combine(Application.dataPath, "Resources", Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
         if (File.Exists(path)) {
             File.Delete(path);
         }
         using (FileStream sceneStream = File.Create(path)) {
             serializer.Serialize(sceneStream, spriteData);
         }
-        AssetDatabase.Refresh();
     }
     public static List<SpriteData> LoadSpriteData(string skinName, string sheetType) {
         XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
-        string path = Path.Combine(Application.dataPath, "Resources", PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
-        if (File.Exists(path)) {
-            using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-                return (List<SpriteData>)serializer.Deserialize(sceneStream);
+        // string path = Path.Combine(Application.dataPath, "Resources", Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
+        string path = Path.Combine(Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData");
+        TextAsset textAsset = Resources.Load<TextAsset>(path) as TextAsset;
+        if (textAsset != null) {
+            using (var reader = new System.IO.StringReader(textAsset.text)) {
+                return serializer.Deserialize(reader) as List<SpriteData>;
             }
         } else {
             Debug.LogError($"sprite data file not found: {path}");
             return null;
         }
+
+        // if (File.Exists(path)) {
+        //     using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
+        //         return (List<SpriteData>)serializer.Deserialize(sceneStream);
+        //     }
+        // } else {
+        //     Debug.LogError($"sprite data file not found: {path}");
+        //     return null;
+        // }
     }
 }
