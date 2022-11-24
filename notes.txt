@@ -1764,8 +1764,9 @@ MVP:
 * music
 * preset scenarios
 * dialogue
-4. new level
 * save state overhaul
+
+4. new level
 allow change npc outfit
 NEXT:
 5. doors
@@ -1779,9 +1780,6 @@ create good templates
     steal the data in infiltration
 guard HQ potentially notices disabled cameras and sensors
 
-enable 711 level
-enable office level
-shooting at crouching guard
 
 
 graphics:
@@ -1790,8 +1788,17 @@ graphics:
     grenade
     patrol guard
 
-1. scenario pickers don't scale
-2. clearsighter doesn't work
-3. ammo pips grow out of control
-4. we need an escape - quit menu.
-5. player is corrupting defaultMission.json
+
+player bugs:
+    * player is corrupting defaultMission.json
+    1. scenario pickers don't scale
+    2. clearsighter doesn't work
+        ShadowCastingMode.ShadowsOnly?
+    3. ammo pips grow out of control
+    4. we need an escape - quit menu.
+    6. standalone is much brighter
+
+
+enable 711 level
+enable office level
+shooting at crouching guard

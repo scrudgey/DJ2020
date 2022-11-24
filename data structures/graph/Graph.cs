@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-// using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [System.Serializable]
@@ -40,23 +39,9 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     }
 
 
-    // public static W Load(string path) {
-    //     XmlSerializer serializer = new XmlSerializer(typeof(W));
-    //     if (File.Exists(path)) {
-    //         using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-    //             return (W)serializer.Deserialize(sceneStream);
-    //         }
-    //     } else {
-    //         Debug.LogError($"power graph file not found: {path}");
-    //         return null;
-    //     }
-    // }
     public static W Load(TextAsset textAsset) {
         XmlSerializer serializer = new XmlSerializer(typeof(W));
         if (textAsset != null) {
-            // using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-            //     return (W)serializer.Deserialize(sceneStream);
-            // }
             using (var reader = new System.IO.StringReader(textAsset.text)) {
                 return serializer.Deserialize(reader) as W;
             }
@@ -81,15 +66,10 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     }
 
     public static W LoadAll(string levelName) {
-        // public static PowerGraph LoadAll(string levelName) {
-        // string levelPath = LevelState.LevelDataPath(levelName);
         string levelPath = Path.Combine("data", "levels", levelName);
         Debug.Log($"loading all graphs at {levelPath}...");
         string prefix = PowerGraphPrefix();
 
-
-        // TODO: use resources.load here!
-        // TextAsset[] graphTextAssets = Resources.LoadAll<TextAsset>(levelPath) as TextAsset[];
         UnityEngine.Object[] graphTextAssets = Resources.LoadAll(levelPath, typeof(TextAsset));
         int graphCount = 0;
         W graph = null;
@@ -106,31 +86,10 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
             }
 
         }
-        // TODO: combine graphs
         if (graphCount == 0) {
             Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");
-            return null;
         }
         return graph;
-
-
-        // string[] graphPaths = Directory.GetFiles(levelPath, $"*{prefix}*xml"); // TODO: fix this
-        // if (graphPaths.Length == 0) {
-        //     Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");
-        //     return null;
-        // } else {
-        //     W graph = null;
-        //     foreach (string path in graphPaths) {
-        //         Debug.Log($"loading {path}...");
-        //         if (graph is null) {
-        //             graph = Load(path);
-        //         } else {
-        //             graph = graph + Load(path) as W;
-        //         }
-        //     }
-        //     // TODO: combine graphs
-        //     return graph;
-        // }
     }
 
     public static string PowerGraphPrefix() {

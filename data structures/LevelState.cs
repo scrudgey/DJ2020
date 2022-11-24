@@ -28,15 +28,6 @@ public class LevelState {
         return delta.alarmGraph.anyAlarmActive();
     }
 
-    // public static LevelState Load(string levelName) {
-    //     string path = FilePath(levelName);
-    //     LevelState data = LoadXML(path);
-    //     return data;
-    // }
-    // public static string FilePath(string levelName) {
-    //     string scenePath = LevelDataPath(levelName);
-    //     return Path.Combine(scenePath, $"{levelName}.xml");
-    // }
     public static string LevelDataPath(string levelName) {
         string path = Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName);
         if (!Directory.Exists(path)) {
@@ -44,23 +35,4 @@ public class LevelState {
         }
         return path;
     }
-    // public static LevelState LoadXML(string path) {
-    //     XmlSerializer serializer = new XmlSerializer(typeof(LevelState));
-    //     if (File.Exists(path)) {
-    //         using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-    //             LevelState levelData = (LevelState)serializer.Deserialize(sceneStream);
-    //             return levelData;
-    //         }
-    //     } else {
-    //         Debug.LogError($"level data file not found: {path}");
-    //         return null;
-    //     }
-    // }
-    // public void WriteXML(string levelName) {
-    //     XmlSerializer serializer = new XmlSerializer(typeof(LevelState));
-    //     string path = FilePath(levelName);
-    //     using (FileStream sceneStream = File.Create(path)) {
-    //         serializer.Serialize(sceneStream, this);
-    //     }
-    // }
 }

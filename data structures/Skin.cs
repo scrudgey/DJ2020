@@ -543,14 +543,5 @@ public class Skin {
             Debug.LogError($"sprite data file not found: {path}");
             return null;
         }
-
-        // if (File.Exists(path)) {
-        //     using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-        //         return (List<SpriteData>)serializer.Deserialize(sceneStream);
-        //     }
-        // } else {
-        //     Debug.LogError($"sprite data file not found: {path}");
-        //     return null;
-        // }
     }
 }

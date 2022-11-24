@@ -401,7 +401,7 @@ public class Toolbox {
     }
     public static string AssetRelativePath(UnityEngine.Object asset) {
         // String rootPath = AssetDatabase.GetAssetPath(asset);
-        return ResourceReference.GetPath(asset);
+        return ResourceReference.I.GetPath(asset);
         // String relativePath = rootPath.Replace("Assets/Resources/", "");
         // int fileExtPos = relativePath.LastIndexOf(".");
         // if (fileExtPos >= 0)

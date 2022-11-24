@@ -42,6 +42,7 @@ public class MaterialController {
             if (renderer.material != null) {
                 Material interloperMaterial = new Material(renderer.material);
                 interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
+                Debug.Log("loaded interloper material " + interloperMaterial);
                 interloperMaterials[renderer] = interloperMaterial;
             }
         }
@@ -69,6 +70,7 @@ public class MaterialController {
         if (state == State.transparent || state == State.fadeOut)
             return;
         state = State.fadeOut;
+        // TODO: not working?
         foreach (Renderer renderer in childRenderers.Where(renderer => renderer != null && interloperMaterials[renderer] != null && renderer.tag != "donthide")) {
             renderer.material = interloperMaterials[renderer];
             renderer.material.SetFloat("_TargetAlpha", 1);
@@ -97,7 +99,7 @@ public class MaterialController {
         if (childRenderers.Count == 0)
             return;
 
-        float minimumAlpha = disableBecauseAbove ? 0f : (1f * (offAxisLength / 2f));
+        float minimumAlpha = disableBecauseAbove ? 0.01f : (1f * (offAxisLength / 2f));
 
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {
@@ -139,7 +141,8 @@ public class MaterialController {
                                                                 renderer.enabled &&
                                                                 renderer.tag != "donthide")) {
                 renderer.material.SetFloat("_TargetAlpha", targetAlpha);
-                renderer.shadowCastingMode = targetAlpha == 0 ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];
+                Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableBecauseAbove} targetAlpha: {targetAlpha}");
+                renderer.shadowCastingMode = targetAlpha <= 0.01 ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];
             }
         }
     }

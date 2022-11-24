@@ -360,17 +360,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             // TODO: nonalloc
             int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
             clearLineOfSight |= numberHits == 0;
-            // return numberHits == 0;
-            // if (numberHits  0) {
-            //     RaycastHit hit = raycastHits[0];
-            //     // TagSystemData tagData = Toolbox.GetTagData(hit.collider.gameObject);
-            //     // if (tagData.bulletPassthrough) continue;
-            //     Color color = other == hit.collider ? Color.yellow : Color.red;
-            //     Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
-            //     if (other == hit.collider) {
-            //         return true;
-            //     } else break;
-            // }
         }
         return clearLineOfSight;
     }

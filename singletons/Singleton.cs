@@ -48,10 +48,9 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
             foreach (GameObject prefab in singletonPrefabs) {
                 if (prefab.GetComponent<T>() != null) {
                     prefabPath = "singletons/" + prefab.name;
+                    Debug.Log($"using singleton prefab {prefab.name}");
                 }
             }
-
-            // Debug.Log("instantiating " + prefabPath + " ...");
 
             GameObject singleton = GameObject.Instantiate(Resources.Load(prefabPath)) as GameObject;
 

@@ -159,6 +159,7 @@ fixed4 calculateSpecularLightAdditive(SpecularCommonData s, float3 viewDir, floa
 VertexOutput vert(VertexInput v)
 {
 	VertexOutput output;
+	UNITY_INITIALIZE_OUTPUT(VertexOutput, output);
 	
 	UNITY_SETUP_INSTANCE_ID(v);
     UNITY_TRANSFER_INSTANCE_ID(v, output);

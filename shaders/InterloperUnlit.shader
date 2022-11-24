@@ -84,6 +84,10 @@ Properties {
     _MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
 }
 
+CGINCLUDE
+#include "UnityStandardCore.cginc"
+ENDCG
+
 SubShader {
     Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
     LOD 100
@@ -124,8 +128,8 @@ SubShader {
                 float4 screenPos:TEXCOORD2;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            // sampler2D _MainTex;
+            // float4 _MainTex_ST;
 
             v2f vert (appdata_t v)
             {
@@ -147,7 +151,9 @@ SubShader {
                 col.a = a;
                 UNITY_APPLY_FOG(i.fogCoord, col);
 
-                float attenuation = LIGHT_ATTENUATION(i);
+                // float attenuation = UNITY_LIGHT_ATTENUATION(i);
+                UNITY_LIGHT_ATTENUATION(attenuation, i, i.pos.xyz);
+                float _ShadowIntensity = 0.5f;
                 return fixed4(0,0,0,(1-attenuation)*_ShadowIntensity);
 
 
