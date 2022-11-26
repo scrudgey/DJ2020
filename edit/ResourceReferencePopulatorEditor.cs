@@ -15,59 +15,78 @@ public class ResourceReferencePopulatorEditor : Editor {
 
     ResourceReferencePopulator t;
     SerializedObject GetTarget;
-    SerializedProperty ThisList;
+    SerializedProperty keyList;
+    SerializedProperty valueList;
     int ListSize;
 
     void OnEnable() {
         t = (ResourceReferencePopulator)target;
         GetTarget = new SerializedObject(t);
-        ThisList = GetTarget.FindProperty("entries"); // Find the List in our script and create a refrence of it
+        // ThisList = GetTarget.FindProperty("entries"); // Find the List in our script and create a refrence of it
+        keyList = GetTarget.FindProperty("keys"); // Find the List in our script and create a refrence of it
+        valueList = GetTarget.FindProperty("values"); // Find the List in our script and create a refrence of it
     }
 
     public override void OnInspectorGUI() {
         GetTarget.Update();
         if (GUILayout.Button("Populate resource list")) {
             Debug.Log("populating resource list...");
-            EnumerateAllResources(t);
+            List<ResourceEntry> entries = EnumerateAllResources();
+            keyList.ClearArray();
+            valueList.ClearArray();
+            int i = 0;
+            foreach (ResourceEntry entry in entries) {
+                keyList.InsertArrayElementAtIndex(i);
+                valueList.InsertArrayElementAtIndex(i);
+
+                keyList.GetArrayElementAtIndex(i).objectReferenceValue = entry.key;
+                valueList.GetArrayElementAtIndex(i).stringValue = entry.value;
+                i++;
+            }
+            // populate list
         }
 
         //Resize our list
-        ListSize = ThisList.arraySize;
+        ListSize = keyList.arraySize;
         ListSize = EditorGUILayout.IntField("size", ListSize);
 
-        if (ListSize != ThisList.arraySize) {
-            while (ListSize > ThisList.arraySize) {
-                ThisList.InsertArrayElementAtIndex(ThisList.arraySize);
+        if (ListSize != keyList.arraySize) {
+            while (ListSize > keyList.arraySize) {
+                keyList.InsertArrayElementAtIndex(keyList.arraySize);
+                valueList.InsertArrayElementAtIndex(keyList.arraySize);
             }
-            while (ListSize < ThisList.arraySize) {
-                ThisList.DeleteArrayElementAtIndex(ThisList.arraySize - 1);
+            while (ListSize < keyList.arraySize) {
+                keyList.DeleteArrayElementAtIndex(keyList.arraySize - 1);
+                valueList.DeleteArrayElementAtIndex(keyList.arraySize - 1);
             }
         }
-        EditorGUILayout.PropertyField(GetTarget.FindProperty("target"));
-        EditorGUILayout.Space();
-        if (GUILayout.Button("Add New")) {
-            t.entries.Add(new ResourceEntry());
-        }
+        // EditorGUILayout.PropertyField(GetTarget.FindProperty("target"));
+        // EditorGUILayout.Space();
+        // if (GUILayout.Button("Add New")) {
+        //     t.entries.Add(new ResourceEntry());
+        // }
 
-        EditorGUILayout.Space();
+        // EditorGUILayout.Space();
 
-        for (int i = 0; i < ThisList.arraySize; i++) {
-            SerializedProperty MyListRef = ThisList.GetArrayElementAtIndex(i);
-            SerializedProperty Key = MyListRef.FindPropertyRelative("key");
-            SerializedProperty Value = MyListRef.FindPropertyRelative("value");
-            EditorGUILayout.PropertyField(Key);
-            EditorGUILayout.PropertyField(Value);
-            if (GUILayout.Button($"remove {i}")) {
-                ThisList.DeleteArrayElementAtIndex(i);
-            }
+        for (int i = 0; i < keyList.arraySize; i++) {
+            SerializedProperty keyRef = keyList.GetArrayElementAtIndex(i);
+            SerializedProperty valueRef = valueList.GetArrayElementAtIndex(i);
+            // SerializedProperty Key = MyListRef.FindPropertyRelative("key");
+            // SerializedProperty Value = MyListRef.FindPropertyRelative("value");
+            EditorGUILayout.PropertyField(keyRef);
+            EditorGUILayout.PropertyField(valueRef);
+            // if (GUILayout.Button($"remove {i}")) {
+            //     ThisList.DeleteArrayElementAtIndex(i);
+            // }
             EditorGUILayout.Space();
         }
 
         GetTarget.ApplyModifiedProperties();
     }
 
-    public void EnumerateAllResources(ResourceReferencePopulator populator) {
-        populator.entries = new List<ResourceEntry>();
+    public List<ResourceEntry> EnumerateAllResources() {
+        List<ResourceEntry> entries = new List<ResourceEntry>();
+        // populator.entries = new List<ResourceEntry>();
         DirectoryInfo levelDirectoryPath = new DirectoryInfo(Application.dataPath);
         FileInfo[] fileInfo = levelDirectoryPath.GetFiles("*.*", SearchOption.AllDirectories);
         foreach (FileInfo file in fileInfo) {
@@ -89,12 +108,16 @@ public class ResourceReferencePopulatorEditor : Editor {
                         key = obj,
                         value = finalpath
                     };
-                    populator.entries.Add(entry);
+                    // populator.entries.Add(entry);
+                    // ThisList.InsertArrayElementAtIndex(ThisList.arraySize);
+                    // ThisList.GetArrayElementAtIndex(ThisList.arraySize).objectReferenceValue = entry;
+                    entries.Add(entry);
                 } else {
                     Debug.LogError("Failed to load resource");
                 }
             }
         }
+        return entries;
     }
 }
 #endif

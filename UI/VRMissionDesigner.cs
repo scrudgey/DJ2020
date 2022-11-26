@@ -19,10 +19,14 @@ public class VRMissionDesigner : MonoBehaviour {
     static readonly List<string> SCENES = new List<string>{
         "VR",
         "VR_infiltration",
+        "711",
+        "office"
     };
     static readonly Dictionary<string, string> SCENE_NAMES = new Dictionary<string, string>{
         {"VR", "Meat Grinder"},
         {"VR_infiltration", "Infiltration"},
+        {"711", "711"},
+        {"office", "office"},
     };
 
     public VRMissionTemplate template;

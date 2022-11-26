@@ -106,7 +106,9 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
+        // TODO: more?
+        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish")
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
 
         foreach (string sceneToUnload in scenesToUnload) {
             Debug.Log($"try unload scene async: {sceneToUnload} {SceneManager.GetSceneByName(sceneToUnload).isLoaded}");

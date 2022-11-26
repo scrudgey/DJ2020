@@ -50,6 +50,7 @@ public class ClearSighter : MonoBehaviour {
 
             // non-static colliders above me
             int numberHits = Physics.OverlapSphereNonAlloc(myTransform.position, 20f, colliderHits, LayerUtil.GetMask(Layer.obj, Layer.bulletPassThrough, Layer.shell), QueryTriggerInteraction.Ignore);
+            // Debug.Log($"ovelap hits: {numberHits}");
             for (int k = 0; k < numberHits; k++) {
                 Collider collider = colliderHits[k];
                 if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
@@ -57,7 +58,7 @@ public class ClearSighter : MonoBehaviour {
                 j += 1;
                 if (j > 500) {
                     j = 0;
-                    yield return new WaitForEndOfFrame();
+                    // yield return new WaitForEndOfFrame();
                 }
                 MaterialController controller = controllers.get(collider);
                 if (controller != null) {
@@ -77,7 +78,7 @@ public class ClearSighter : MonoBehaviour {
                 j += 1;
                 if (j > 500) {
                     j = 0;
-                    yield return new WaitForEndOfFrame();
+                    // yield return new WaitForEndOfFrame();
                 }
                 Vector3 directionToInterloper = interloper.collider.bounds.center - myTransform.position;
                 if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > -0.01f)
@@ -91,11 +92,12 @@ public class ClearSighter : MonoBehaviour {
                 interloper.Update();
             }
             var nonInterlopers = controllers.controllers.Values.Where(controller => controller != null && !interlopers.Contains(controller)).ToList();
+            // Debug.Log($"nonInterlopers: {nonInterlopers.Count}");
             foreach (MaterialController controller in nonInterlopers) {
                 j += 1;
                 if (j > 500) {
                     j = 0;
-                    yield return new WaitForEndOfFrame();
+                    // yield return new WaitForEndOfFrame();
                 }
                 controller.UpdateTargetAlpha(0);
                 controller.Update();
@@ -117,15 +119,16 @@ public class ClearSighter : MonoBehaviour {
             if (collider.transform.IsChildOf(myTransform))
                 continue;
             MaterialController controller = controllers.get(collider);
-            if (collider.gameObject.isStatic) {
+            if (controller != null && controller.childRenderers.Any(renderer => renderer != null && renderer.isPartOfStaticBatch)) {
                 staticGeometry[controller] = collider.transform.position;
             }
         }
-        Debug.Log($"[ClearSighter] initialized material controller cache with {controllers.controllers.Count}");
+        Debug.Log($"[ClearSighter] initialized material controller cache with {controllers.controllers.Count}, static: {staticGeometry.Count}");
     }
 
     void HandleStaticGeometry() {
         Vector3 myPosition = myTransform.position;
+        // Debug.Log($"static geometry: {inRooftopZone} {staticGeometry.Count}");
         foreach ((MaterialController controller, Vector3 position) in staticGeometry) {
             if (controller == null || controller.gameObject == null || controller.collider == null || !controller.gameObject.activeInHierarchy)
                 continue;

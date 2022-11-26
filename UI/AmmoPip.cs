@@ -50,8 +50,10 @@ public class AmmoPip : MonoBehaviour, IPoolable {
             float imageWidth = (float)PennerDoubleAnimation.BackEaseOut(timer, initialImageWidth, -1f * initialImageWidth, appearanceInterval);
             float rectWidth = (float)PennerDoubleAnimation.BackEaseOut(timer, initialWidth, -1f * initialWidth, appearanceInterval);
 
-            imageRect.sizeDelta = new Vector2(imageWidth, imageRect.rect.height);
-            myRect.sizeDelta = new Vector2(rectWidth, myRect.rect.height);
+            imageRect.localScale = Vector3.one;
+            myRect.localScale = Vector3.one;
+            imageRect.sizeDelta = new Vector2(imageWidth, 64);
+            myRect.sizeDelta = new Vector2(rectWidth, 32);
             if (framerateTimer > 0.1f) {
                 framerateTimer -= 0.1f;
                 LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRect);
@@ -63,6 +65,8 @@ public class AmmoPip : MonoBehaviour, IPoolable {
 
 
     public void OnPoolActivate() {
+        imageRect.localScale = Vector3.one;
+        myRect.localScale = Vector3.one;
         imageRect.sizeDelta = new Vector2(initialImageWidth, 64);
         myRect.sizeDelta = new Vector2(initialWidth, 32);
     }

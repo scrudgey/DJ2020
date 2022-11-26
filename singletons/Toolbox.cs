@@ -35,6 +35,8 @@ public class Toolbox {
         audioSource.PlayOneShot(audioClip, volume);
     }
     static public string NameWithoutClone(GameObject gameObject) {
+        if (gameObject == null)
+            return "";
         return CloneRemover(gameObject.name);
     }
     public static string CloneRemover(string input) {

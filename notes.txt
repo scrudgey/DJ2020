@@ -1765,9 +1765,21 @@ MVP:
 * preset scenarios
 * dialogue
 * save state overhaul
+* enable 711 level
+* enable office level
 
-4. new level
+finish up 7-11 level
+    enclose level
+    finish skybox
+    remove doors for now
+    visibility through windows?
+    fix sphere robot
+    destructible wall destruction timer
+enlarge office level
+new level
 allow change npc outfit
+nimrod for texts
+
 NEXT:
 5. doors
 6. attack surfaces
@@ -1779,8 +1791,14 @@ create good templates
     basic combat in infiltration
     steal the data in infiltration
 guard HQ potentially notices disabled cameras and sensors
-
-
+guard sees destroyed cameras
+discovering a body should register suspicion record even if no HQ present
+shooting at crouching guard
+disable lock-on in aim mode?
+reenable focus zone in 7-11 map
+more lights in interiors
+tune NPC AI
+smg / rifle shoot animation
 
 graphics:
     silenced pistol
@@ -1791,14 +1809,12 @@ graphics:
 
 player bugs:
     * player is corrupting defaultMission.json
+    * standalone is much brighter
+    * clearsighter doesn't work
+    * ammo pips grow out of control
     1. scenario pickers don't scale
-    2. clearsighter doesn't work
-        ShadowCastingMode.ShadowsOnly?
-    3. ammo pips grow out of control
     4. we need an escape - quit menu.
-    6. standalone is much brighter
 
-
-enable 711 level
-enable office level
-shooting at crouching guard
+clearsighter optimization
+    1. restrict computation to only the visible
+    2. space partitioning
