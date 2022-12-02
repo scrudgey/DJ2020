@@ -42,8 +42,14 @@ public class MaterialController {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             normalMaterials[renderer] = renderer.material;
             if (renderer.material != null) {
+                Texture albedo = renderer.material.mainTexture;
                 Material interloperMaterial = new Material(renderer.material);
-                interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
+                // interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
+                interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
+                interloperMaterial.SetTexture("_Texture", albedo);
+                // interloperMaterial.SetFloat("_Smoothness", 0);
+                // interloperMaterial.SetFloat("_Glossiness", 0);
+                // interloperMaterial
                 // Debug.Log("loaded interloper material " + interloperMaterial);
                 interloperMaterials[renderer] = interloperMaterial;
             }
@@ -59,10 +65,10 @@ public class MaterialController {
             return;
         }
 
-        Vector3 otherFloor = collider.bounds.center - new Vector3(0f, collider.bounds.extents.y, 0f);
-        Vector3 direction = otherFloor - playerPosition;
+        float otherFloorY = collider.bounds.center.y - collider.bounds.extents.y;
+        float directionY = otherFloorY - playerPosition.y;
         // Debug.Log($"[MaterialController] {gameObject} {direction} {direction.y > ceilingHeight} {collider.bounds.center} {collider.bounds.extents.y} {collider.bounds.center.y < playerPosition.y} ");
-        if (direction.y > ceilingHeight) {
+        if (directionY > ceilingHeight) {
             disableBecauseAbove = true;
         } else {
             disableBecauseAbove = false;
@@ -73,7 +79,9 @@ public class MaterialController {
             return;
         state = State.fadeOut;
         // TODO: not working?
-        foreach (Renderer renderer in childRenderers.Where(renderer => renderer != null && interloperMaterials[renderer] != null && renderer.tag != "donthide")) {
+        foreach (Renderer renderer in childRenderers) {
+            if (renderer == null || interloperMaterials[renderer] == null || renderer.CompareTag("donthide"))
+                continue;
             renderer.material = interloperMaterials[renderer];
             renderer.material.SetFloat("_TargetAlpha", 1);
             targetAlpha = 1;
@@ -100,9 +108,6 @@ public class MaterialController {
     public void UpdateTargetAlpha(float offAxisLength = 0f) {
         if (childRenderers.Count == 0)
             return;
-
-        float minimumAlpha = disableBecauseAbove ? 0f : (1f * (offAxisLength / 2f));
-
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {
                 targetAlpha += Time.unscaledDeltaTime * 3f;
@@ -110,6 +115,8 @@ public class MaterialController {
                 MakeOpaque();
             }
         } else if (state == State.fadeOut) {
+            float minimumAlpha = disableBecauseAbove ? 0f : (1f * (offAxisLength / 2f));
+
             if (targetAlpha > minimumAlpha) {
                 targetAlpha -= Time.unscaledDeltaTime * 3f;
                 targetAlpha = Mathf.Max(targetAlpha, minimumAlpha);
@@ -138,10 +145,13 @@ public class MaterialController {
             MakeFadeIn();
         }
         if (state == State.fadeIn || state == State.fadeOut) {
-            foreach (Renderer renderer in childRenderers.Where(renderer =>
-                                                                renderer != null &&
-                                                                renderer.enabled &&
-                                                                renderer.tag != "donthide")) {
+            // .Where(renderer =>
+            //             renderer != null &&
+            //             renderer.enabled &&
+            //             renderer.tag != "donthide")
+            foreach (Renderer renderer in childRenderers) {
+                if (renderer == null || !renderer.enabled || renderer.CompareTag("donthide"))
+                    continue;
                 renderer.material.SetFloat("_TargetAlpha", targetAlpha);
                 // Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableBecauseAbove} targetAlpha: {targetAlpha}");
                 renderer.shadowCastingMode = targetAlpha <= 0.01 ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];

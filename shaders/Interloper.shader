@@ -4,9 +4,10 @@ Shader "Custom/Interloper"
     {
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0,1)) = 0.5
+        _Glossiness ("Smoothness", Range(0,1)) = 0.0
         _Metallic ("Metallic", Range(0,1)) = 0.0
         _TargetAlpha ("TargetAlpha", Range(0,1)) = 1.0
+        [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 0.0
     }
     SubShader
     {
@@ -34,8 +35,6 @@ Shader "Custom/Interloper"
         fixed4 _Color;
         float _TargetAlpha;
 
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
         // #pragma instancing_options assumeuniformscaling
         UNITY_INSTANCING_BUFFER_START(Props)
             // put more per-instance properties here
@@ -43,13 +42,11 @@ Shader "Custom/Interloper"
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             // c.a = clamp( (0.5 - IN.screenPos.a) * -0.5, 0, 1);
-            float camDistance = distance(IN.worldPos, _WorldSpaceCameraPos);
+            // float camDistance = distance(IN.worldPos, _WorldSpaceCameraPos);
 
             o.Albedo = c.rgb;
-            // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
             if (c.a > 0.5)
@@ -57,6 +54,41 @@ Shader "Custom/Interloper"
             else
                 o.Alpha = 0;
         }
+
+
+        half4 LightingStandard (SurfaceOutputStandard s, half3 lightDir, half atten) {
+                half NdotL = dot (s.Normal, lightDir);
+                half4 c; c.rgb = s.Albedo * _LightColor0.rgb * (NdotL * atten);
+                c.a = s.Alpha;
+                return c;
+        }
+
+        inline fixed4 LightingStandard_SingleLightmap (SurfaceOutputStandard s, fixed4 color) {
+            half3 lm = DecodeLightmap (color);
+            return fixed4(lm, 0);
+        }
+
+        inline fixed4 LightingStandard_DualLightmap (SurfaceOutputStandard s, fixed4 totalColor, fixed4 indirectOnlyColor, half indirectFade) {
+            half3 lm = lerp (DecodeLightmap (indirectOnlyColor), DecodeLightmap (totalColor), indirectFade);
+            return fixed4(lm, 0);
+        }
+
+        inline fixed4 LightingStandard_StandardLightmap (SurfaceOutputStandard s, fixed4 color, fixed4 scale, bool surfFuncWritesNormal) {
+            UNITY_DIRBASIS
+
+            half3 lm = DecodeLightmap (color);
+            half3 scalePerBasisVector = DecodeLightmap (scale);
+
+            if (surfFuncWritesNormal)
+            {
+                half3 normalInRnmBasis = saturate (mul (unity_DirBasis, s.Normal));
+                lm *= dot (normalInRnmBasis, scalePerBasisVector);
+            }
+
+            return fixed4(lm, 0);
+        }
+
+
         ENDCG
     }
     FallBack "Diffuse"

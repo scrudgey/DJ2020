@@ -1569,6 +1569,37 @@ IF it is safe to be spotted except when we are doing suspicious stuff, how can I
     * create several presets
 * line of sight detection: using RayCastHit[1] might yield false positives because it does not detect the first hit.
 * ammo pips are broken!
+* music
+* preset scenarios
+* dialogue
+* save state overhaul
+* enable 711 level
+* enable office level
+* player bugs:
+    * player is corrupting defaultMission.json
+    * standalone is much brighter
+    * clearsighter doesn't work
+    * ammo pips grow out of control
+    * scenario pickers don't scale
+* model:
+    * nystreet wall: roll shutters, graffiti, etc
+    * large wall
+    * tall fence with barbed wire
+    * inverted cylinder for skybox
+    * buildings for skybox
+* adjust patrol routes, make a scenario with fewer guards
+* broken interrogate
+* broken cyber hack objects
+* adjust destruction timer on all walls
+* 7/11 mission
+* assault -> timer
+* remove jack that data
+* adjust names
+* shotgun rampage
+* garbage collection in clearsighter routine?
+* wallpress, aim messes up clearsighter
+* 7/11 rooftop is being weird
+* 7/11 has some things outside normal clearsighter
 
 
 graphical issues:
@@ -1734,87 +1765,94 @@ adjustable NPC difficulty
 DFS path finding doesn't quite work right for highlighting alarm path
 alarm terminal triggering effects
     notify others of location
-why do gibs fall through the wall/floor?
+why do gibs fall through the wall/floor? (probably because they are childed to parent?)
 damage result addition is weird
 VRmissionTemplate -> LevelTemplate is incomplete.
 playertemplate / playerstate is still a little weird.
 title screen logo
 title screen animations
-doors
 colt 2037 sped up sounds great
 don't shoot corpse away
 
-saved prefab VR mission templates
-better UI for hack feedback
-NPC reacts when seeing another shooting
-NPC reacts to corpses
-NPC reacts when seeing another shot
-
+* saved prefab VR mission templates
+* NPC reacts to corpses
 more, bigger levels
     rooms
     wide, long level
     bright / brutalist concrete level
-allow 7-11 to be a level
-    add proper boundary
-    add intermediate skybox
-
-
-
-MVP:
-* music
-* preset scenarios
-* dialogue
-* save state overhaul
-* enable 711 level
-* enable office level
-
-finish up 7-11 level
-    enclose level
-    finish skybox
-    remove doors for now
-    visibility through windows?
-    fix sphere robot
-    destructible wall destruction timer
-enlarge office level
-new level
-allow change npc outfit
-nimrod for texts
 
 NEXT:
 5. doors
 6. attack surfaces
+clearsighter optimization
+    1. restrict computation to only the visible
+    2. octree
+
+
+finish up 7-11 level
+    * enclose level
+    * finish skybox
+    remove doors for now
+    visibility through windows?
+    fix sphere robot
+    destructible wall destruction timer
+
+enlarge office level
+new level
+nimrod for texts
+
 
 weird gibs situation with bullet impact
+allow change npc outfit
+smg / rifle shoot animation
 camera clips through wall in wallpress, in aim
 create good templates
     shotgun rampage
     basic combat in infiltration
     steal the data in infiltration
-guard HQ potentially notices disabled cameras and sensors
-guard sees destroyed cameras
-discovering a body should register suspicion record even if no HQ present
 shooting at crouching guard
 disable lock-on in aim mode?
 reenable focus zone in 7-11 map
-more lights in interiors
-tune NPC AI
-smg / rifle shoot animation
+poolmanager is unloaded?
+4. we need an escape - quit menu.
+better UI for hack feedback
+separate out weapon canvas, suspicion canvas
+lots of garbage collection in clearsighter
+better clearsighter culling
+
+NPC tuning:
+    guard HQ potentially notices disabled cameras and sensors
+    guard sees destroyed cameras
+    lots of "i guess it was nothing"
+    unable to detect shooting player, on rooftop
+        player can hide in shadows and murder repeatedly
+            use alertness levels
+            if several gunshots have come from one area, the player is exposed?
+    light levels generally low
+    discovering a body should register suspicion record even if no HQ present
+    more lights in interiors
+    the crawling around a body effect comes from boids avoidance
+    NPC reacts when seeing another shooting
+    NPC reacts when seeing another shot
+    NPC reacts when seeing bullet impacts
 
 graphics:
     silenced pistol
     rocket launcher
     grenade
+    some building textures
     patrol guard
+model:
+    cones
+    sawhorse
 
+fix sphere AI 
+    big / misaligned alert handler
+restarting missions is broken
+7/11 hack support
+allow saving null for gun slots
 
-player bugs:
-    * player is corrupting defaultMission.json
-    * standalone is much brighter
-    * clearsighter doesn't work
-    * ammo pips grow out of control
-    1. scenario pickers don't scale
-    4. we need an escape - quit menu.
-
-clearsighter optimization
-    1. restrict computation to only the visible
-    2. space partitioning
+clearsighter:
+    fade in behavior
+    apply shadows better?
+    better ground exclusion?

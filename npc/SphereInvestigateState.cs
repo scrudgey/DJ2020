@@ -170,12 +170,12 @@ public class SphereInvestigateState : SphereControlState {
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             if (lastSeenPlayerPosition != Vector3.zero) {
-                float amountOfMotion = (other.bounds.center - lastSeenPlayerPosition).magnitude;
+                float amountOfMotion = (other.transform.root.position - lastSeenPlayerPosition).magnitude;
                 integratedPlayerMovement += amountOfMotion;
                 totalPlayerMovement += amountOfMotion;
             }
             timeSinceSawPlayer = 0;
-            lastSeenPlayerPosition = other.bounds.center;
+            lastSeenPlayerPosition = other.transform.root.position;
             rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
             alertTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
             rootTaskNode.SetData(SEARCH_POSITION_KEY, lastSeenPlayerPosition);

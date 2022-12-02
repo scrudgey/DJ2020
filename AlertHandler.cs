@@ -29,25 +29,25 @@ public class AlertHandler : MonoBehaviour {
         coroutine = StartCoroutine(newCoroutine);
     }
     public void ShowAlert(bool useWarnMaterial = false) {
-        alertRect.localScale = Vector3.one * 2.5F;
-        alertRect.localPosition = new Vector3(0f, 2f, 0f);
+        // alertRect.localScale = Vector3.one * 2.5F;
+        // alertRect.localPosition = new Vector3(0f, 2f, 0f);
         ResetCoroutine(ShowAlertIcon(useWarnMaterial: useWarnMaterial));
     }
     public void ShowWarn() {
-        alertRect.localScale = Vector3.one * 2.5F;
-        alertRect.localPosition = new Vector3(0f, 2f, 0f);
+        // alertRect.localScale = Vector3.one * 2.5F;
+        // alertRect.localPosition = new Vector3(0f, 2f, 0f);
 
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowGiveUp() {
-        alertRect.localScale = Vector3.one * 2.5F;
-        alertRect.localPosition = new Vector3(0f, 2f, 0f);
+        // alertRect.localScale = Vector3.one * 2.5F;
+        // alertRect.localPosition = new Vector3(0f, 2f, 0f);
         // ResetCoroutine(ShowText("<sprite=9>"));
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowRadio() {
-        alertRect.localScale = Vector3.one * 2f;
-        alertRect.localPosition = new Vector3(0f, 1.45f, 0f);
+        // alertRect.localScale = Vector3.one * 2f;
+        // alertRect.localPosition = new Vector3(0f, 1.45f, 0f);
         ResetCoroutine(ShowRadioIcon());
     }
     public void HideRadio() {
@@ -55,8 +55,8 @@ public class AlertHandler : MonoBehaviour {
             StopCoroutine(coroutine);
         }
         spriteRenderer.enabled = false;
-        alertRect.localScale = Vector3.one;
-        alertRect.localPosition = Vector3.one * 2f;
+        // alertRect.localScale = Vector3.one;
+        // alertRect.localPosition = Vector3.one * 2f;
     }
 
     IEnumerator ShowAlertIcon(bool useWarnMaterial = false) {

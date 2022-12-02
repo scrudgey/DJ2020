@@ -96,7 +96,8 @@ public class DialogueController : MonoBehaviour {
             Fire = PlayerInput.FireInputs.none
         };
         playerController.SetInputs(playerInput);
-        npcController.SetInputs(npcInput);
+        if (npcController != null)
+            npcController.SetInputs(npcInput);
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
 

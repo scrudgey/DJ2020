@@ -34,7 +34,8 @@ public class VRScenarioPicker : MonoBehaviour {
                 continue;
             VRMissionTemplate template = VRMissionTemplate.LoadVRMissionTemplate(f.Name);
             GameObject entryObj = GameObject.Instantiate(scenarioPickerEntryPrefab);
-            entryObj.transform.SetParent(scenarioPickerContainer);
+            entryObj.transform.SetParent(scenarioPickerContainer, false);
+            entryObj.transform.localScale = Vector3.one;
             VRScenarioPickerEntry pickerEntry = entryObj.GetComponent<VRScenarioPickerEntry>();
             pickerEntry.Initialize(this, template);
         }

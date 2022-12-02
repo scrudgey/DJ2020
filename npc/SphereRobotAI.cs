@@ -111,6 +111,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 } else if (investigateState.dialogueResult == DialogueController.DialogueResult.stun) {
                     alertHandler.ShowWarn();
                     ChangeState(new StunState(this));
+                } else if (investigateState.isPlayerAggressive()) {
+                    alertHandler.ShowWarn();
+                    ChangeState(new SphereHoldAtGunpointState(this));
+                } else if (investigateState.isPlayerSuspicious()) {
+                    alertHandler.ShowWarn();
+                    ChangeState(new SphereHoldAtGunpointState(this));
                 } else goto default;
                 break;
             case PauseState:

@@ -28,6 +28,7 @@ public class ClearSighter : MonoBehaviour {
         coroutine = StartCoroutine(RunJobRepeatedly());
     }
     IEnumerator RunJobRepeatedly() {
+        WaitForEndOfFrame waitForFrame = new WaitForEndOfFrame();
         while (true) {
             if (followTransform == null) {
                 yield return null;
@@ -56,10 +57,10 @@ public class ClearSighter : MonoBehaviour {
                 if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                     continue;
                 j += 1;
-                if (j > 500) {
-                    j = 0;
-                    // yield return new WaitForEndOfFrame();
-                }
+                // if (j > 500) {
+                //     j = 0;
+                //     yield return waitForFrame;
+                // }
                 MaterialController controller = controllers.get(collider);
                 if (controller != null) {
                     if (inRooftopZone) {
@@ -72,16 +73,16 @@ public class ClearSighter : MonoBehaviour {
 
             // interloper colliders
             // Debug.Log($"interlopers: {interlopers.Count}");
-            foreach (MaterialController interloper in interlopers.Where(interloper =>
-                                                                        interloper != null &&
-                                                                        interloper.gameObject != null)) {
+            foreach (MaterialController interloper in interlopers) {
+                if (interloper == null || interloper.gameObject == null)
+                    continue;
                 j += 1;
-                if (j > 500) {
-                    j = 0;
-                    // yield return new WaitForEndOfFrame();
-                }
+                // if (j > 500) {
+                //     j = 0;
+                //     yield return waitForFrame;
+                // }
                 Vector3 directionToInterloper = interloper.collider.bounds.center - myTransform.position;
-                if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > -0.01f)
+                if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > 0f)
                     interloper.InterloperStart();
 
                 Vector3 directionToMesh = interloper.collider.bounds.center - myTransform.position;
@@ -91,15 +92,17 @@ public class ClearSighter : MonoBehaviour {
                 interloper.UpdateTargetAlpha(offAxisLength: offAxisLength);
                 interloper.Update();
             }
-            var nonInterlopers = controllers.controllers.Values.Where(controller => controller != null && !interlopers.Contains(controller)).ToList();
+            // var nonInterlopers = controllers.controllers.Values.Where(controller => controller != null && !interlopers.Contains(controller)).ToList();
             // Debug.Log($"nonInterlopers: {nonInterlopers.Count}");
-            foreach (MaterialController controller in nonInterlopers) {
+            foreach (MaterialController controller in controllers.controllers.Values) {
+                if (controller == null || interlopers.Contains(controller))
+                    continue;
                 j += 1;
-                if (j > 500) {
-                    j = 0;
-                    // yield return new WaitForEndOfFrame();
-                }
-                controller.UpdateTargetAlpha(0);
+                // if (j > 500) {
+                //     j = 0;
+                //     yield return waitForFrame;
+                // }
+                controller.UpdateTargetAlpha(2);
                 controller.Update();
             }
             yield return null;
@@ -148,7 +151,6 @@ public class ClearSighter : MonoBehaviour {
     void AddInterloper(Collider other) {
         if (followTransform == null)
             return;
-        // Debug.Log("onaddinterloper");
         if (other.transform.IsChildOf(myTransform.root) || other.transform.IsChildOf(followTransform)) {
             return;
         }
@@ -166,7 +168,7 @@ public class ClearSighter : MonoBehaviour {
     }
     void RemoveNullInterlopers() {
         interlopers = interlopers
-            .Where(f => f != null)
+            .Where(f => f != null && f.gameObject != null)
             .ToList();
     }
 
