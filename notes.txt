@@ -1819,6 +1819,7 @@ better UI for hack feedback
 separate out weapon canvas, suspicion canvas
 lots of garbage collection in clearsighter
 better clearsighter culling
+strike team spawning screws up NPC spawning
 
 NPC tuning:
     guard HQ potentially notices disabled cameras and sensors
@@ -1828,6 +1829,8 @@ NPC tuning:
         player can hide in shadows and murder repeatedly
             use alertness levels
             if several gunshots have come from one area, the player is exposed?
+        player can stand at distance and shoot approaching NPCs with impunity
+            do a sight check immediately on shoot, bypass visibility.
     light levels generally low
     discovering a body should register suspicion record even if no HQ present
     more lights in interiors
@@ -1848,11 +1851,14 @@ model:
 
 fix sphere AI 
     big / misaligned alert handler
+    can sphere robot reload?   
+    sphere robot might not investigate?
 restarting missions is broken
 7/11 hack support
 allow saving null for gun slots
 
 clearsighter:
-    fade in behavior
-    apply shadows better?
+    * fade in behavior
+    * apply shadows better?
     better ground exclusion?
+fix up sphere and NPC alert sizing and positioning.

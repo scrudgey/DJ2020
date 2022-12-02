@@ -70,7 +70,7 @@ public class AlertHandler : MonoBehaviour {
             Vector2 sizeDelta = new Vector2();
             sizeDelta.x = 1f;
             sizeDelta.y = (float)PennerDoubleAnimation.BackEaseOut(timer, 0f, 1f, appearanceInterval);
-            alertRect.localScale = sizeDelta * 2f;
+            alertRect.localScale = sizeDelta;// * 2f;
             yield return null;
         }
         while (timer < DISPLAY_TIME) {

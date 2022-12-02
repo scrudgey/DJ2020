@@ -1,5 +1,3 @@
-// Made with Amplify Shader Editor
-// Available at the Unity Asset Store - http://u3d.as/y3X 
 Shader "Custom/InterloperShadow"
 {
 	Properties
@@ -56,8 +54,8 @@ Shader "Custom/InterloperShadow"
 			ZWrite On
 			AlphaToMask Off
 			CGPROGRAM
-// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members _TargetAlpha)
-#pragma exclude_renderers d3d11
+            // Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members _TargetAlpha)
+            #pragma exclude_renderers d3d11
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0

@@ -34,8 +34,9 @@ public class ClearSighter : MonoBehaviour {
                 yield return null;
                 continue;
             }
-            // int i = 0;
             int j = 0;
+            int interloperCount = interlopers.Count;
+            int allControllerCount = controllers.controllers.Count;
 
             myTransform.position = followTransform.position;
 
@@ -57,10 +58,10 @@ public class ClearSighter : MonoBehaviour {
                 if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                     continue;
                 j += 1;
-                // if (j > 500) {
-                //     j = 0;
-                //     yield return waitForFrame;
-                // }
+                if (j > 500) {
+                    j = 0;
+                    yield return waitForFrame;
+                }
                 MaterialController controller = controllers.get(collider);
                 if (controller != null) {
                     if (inRooftopZone) {
@@ -73,16 +74,21 @@ public class ClearSighter : MonoBehaviour {
 
             // interloper colliders
             // Debug.Log($"interlopers: {interlopers.Count}");
-            foreach (MaterialController interloper in interlopers) {
+            for (int k = 0; k < interloperCount; k++) {
+                // in case the collection was modified in the interim
+                if (k >= interlopers.Count)
+                    break;
+                MaterialController interloper = interlopers[k];
                 if (interloper == null || interloper.gameObject == null)
                     continue;
+                interloper.updatedThisLoop = true;
                 j += 1;
-                // if (j > 500) {
-                //     j = 0;
-                //     yield return waitForFrame;
-                // }
+                if (j > 500) {
+                    j = 0;
+                    yield return waitForFrame;
+                }
                 Vector3 directionToInterloper = interloper.collider.bounds.center - myTransform.position;
-                if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > 0f)
+                if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > 0.1f)
                     interloper.InterloperStart();
 
                 Vector3 directionToMesh = interloper.collider.bounds.center - myTransform.position;
@@ -95,15 +101,21 @@ public class ClearSighter : MonoBehaviour {
             // var nonInterlopers = controllers.controllers.Values.Where(controller => controller != null && !interlopers.Contains(controller)).ToList();
             // Debug.Log($"nonInterlopers: {nonInterlopers.Count}");
             foreach (MaterialController controller in controllers.controllers.Values) {
-                if (controller == null || interlopers.Contains(controller))
+                if (controller == null)
                     continue;
-                j += 1;
+                if (controller.updatedThisLoop) {
+                    controller.updatedThisLoop = false;
+                    continue;
+                }
+                // j += 1;
                 // if (j > 500) {
                 //     j = 0;
                 //     yield return waitForFrame;
                 // }
+                // Debug.Log("updating alpha");
                 controller.UpdateTargetAlpha(2);
                 controller.Update();
+                controller.updatedThisLoop = false;
             }
             yield return null;
         }
