@@ -482,29 +482,95 @@ public class VRMissionDesigner : MonoBehaviour {
     }
     // skin controls
     public void SkinHeadPrevious() {
-        template.playerState.headSkin = PreviousInList(SPRITESHEETS, template.playerState.headSkin);
-        template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        ISkinState state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        state.headSkin = PreviousInList(SPRITESHEETS, state.headSkin);
+        Sprite portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        switch (selectedCharacter) {
+            case 1:
+                template.playerState.portrait = portrait;
+                break;
+            case 2:
+                template.npc1State.portrait = portrait;
+                break;
+            case 3:
+                template.npc2State.portrait = portrait;
+                break;
+        }
         OnDataChange();
     }
     public void SkinHeadNext() {
-        template.playerState.headSkin = NextInList(SPRITESHEETS, template.playerState.headSkin);
-        template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        // template.playerState.headSkin = NextInList(SPRITESHEETS, template.playerState.headSkin);
+        // template.playerState.portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        ISkinState state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        state.headSkin = NextInList(SPRITESHEETS, state.headSkin);
+        Sprite portrait = Resources.Load<Sprite>($"sprites/portraits/{template.playerState.headSkin}") as Sprite;
+        switch (selectedCharacter) {
+            case 1:
+                template.playerState.portrait = portrait;
+                break;
+            case 2:
+                template.npc1State.portrait = portrait;
+                break;
+            case 3:
+                template.npc2State.portrait = portrait;
+                break;
+        }
+        OnDataChange();
         OnDataChange();
     }
     public void SkinTorsoPrevious() {
-        template.playerState.bodySkin = PreviousInList(SPRITESHEETS, template.playerState.bodySkin);
+        // template.playerState.bodySkin = PreviousInList(SPRITESHEETS, template.playerState.bodySkin);
+        ISkinState state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        state.bodySkin = PreviousInList(SPRITESHEETS, state.bodySkin);
         OnDataChange();
     }
     public void SkinTorsoNext() {
-        template.playerState.bodySkin = NextInList(SPRITESHEETS, template.playerState.bodySkin);
+        // template.playerState.bodySkin = NextInList(SPRITESHEETS, template.playerState.bodySkin);
+        // OnDataChange();
+        ISkinState state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        state.bodySkin = NextInList(SPRITESHEETS, state.bodySkin);
         OnDataChange();
     }
     public void SkinLegsPrevious() {
-        template.playerState.legSkin = PreviousInList(SPRITESHEETS, template.playerState.legSkin);
+        // template.playerState.legSkin = PreviousInList(SPRITESHEETS, template.playerState.legSkin);
+        ISkinState state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        state.legSkin = PreviousInList(SPRITESHEETS, state.legSkin);
         OnDataChange();
     }
     public void SkinLegsNext() {
-        template.playerState.legSkin = NextInList(SPRITESHEETS, template.playerState.legSkin);
+        // template.playerState.legSkin = NextInList(SPRITESHEETS, template.playerState.legSkin);
+        ISkinState state = selectedCharacter switch {
+            1 => template.playerState,
+            2 => template.npc1State,
+            3 => template.npc2State,
+            _ => template.playerState
+        };
+        state.legSkin = NextInList(SPRITESHEETS, state.legSkin);
         OnDataChange();
     }
 

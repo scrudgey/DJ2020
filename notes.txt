@@ -998,17 +998,13 @@ CanvasUpdate.Layout
 
 increase final texture resolution, and padding potentially for better outline.
 
-
-
-
-
-
 IF it is safe to be spotted except when we are doing suspicious stuff, how can I make a level challenging?
     more sensors to trip
     activity builds up into suspicious footprint, ideally by the time you are deep in the building like a trap
     deeper area becomes higher security
     goal involves doing something that will necessarily attract attention (planting explosives, etc)
 
+note: layer "interactive"
 
 
 
@@ -1600,6 +1596,35 @@ IF it is safe to be spotted except when we are doing suspicious stuff, how can I
 * wallpress, aim messes up clearsighter
 * 7/11 rooftop is being weird
 * 7/11 has some things outside normal clearsighter
+* clearsighter:
+    * fade in behavior
+    * apply shadows better
+    * better ground exclusion
+* 7/11 hack support
+* allow saving null for gun slots
+* fix up sphere and NPC alert sizing and positioning.
+* fix sphere AI 
+    * big / misaligned alert handler
+    * can sphere robot reload?   
+* restarting missions is broken
+* enlarge office level
+* finish up 7-11 level
+    * enclose level
+    * finish skybox
+    * destructible wall destruction timer
+    * fix sphere robot
+    * remove doors for now
+    * visibility through windows?
+* saved prefab VR mission templates
+* NPC reacts to corpses
+    * show some sort of gun stats
+* reenable focus zone in 7-11 map
+* poolmanager is unloaded?
+* lots of garbage collection in clearsighter
+* create good templates
+    * shotgun rampage
+    * basic combat in infiltration
+    * steal the data in infiltration
 
 
 graphical issues:
@@ -1654,6 +1679,7 @@ nice to have / future goals:
     highlight item container when item is switched
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
+    performance tuning: separate canvases, implement octree or smth
 
 
 deep save system:
@@ -1673,7 +1699,6 @@ strike team
 
 graphical embellishments
     small font text near locked-on character
-    ? [[ LOCKED ]] text blink (this might not work very well with constant lost / reacquired lock)
     arcs swing about lock size indicator
     callout:
         extended mode callout on level start vs quick callout on display changes 
@@ -1732,7 +1757,6 @@ stealth:
     stealth kill?
 
 overhauled VR mission designer
-    * show some sort of gun stats
     player stats
 
 better action log
@@ -1755,9 +1779,8 @@ faster shotgun
     raise - shoot - pump
     animator speed can be adjusted
 
-survive x waves of y NPCs
-press esc to bring up vr mission menu
-    overall, menus should be a little more stylized
+
+survive x waves of y NPCS
 adjustable NPC difficulty
     how quickly acquire target
     accuracy
@@ -1766,75 +1789,26 @@ adjustable NPC difficulty
 DFS path finding doesn't quite work right for highlighting alarm path
 alarm terminal triggering effects
     notify others of location
-why do gibs fall through the wall/floor? (probably because they are childed to parent?)
 damage result addition is weird
-VRmissionTemplate -> LevelTemplate is incomplete.
-playertemplate / playerstate is still a little weird.
 title screen logo
 title screen animations
 colt 2037 sped up sounds great
 don't shoot corpse away
 
-* saved prefab VR mission templates
-* NPC reacts to corpses
-more, bigger levels
-    rooms
-    wide, long level
-    bright / brutalist concrete level
-
-NEXT:
-5. doors
-6. attack surfaces
-clearsighter optimization
-    1. restrict computation to only the visible
-    2. octree
-
-
-
-* clearsighter:
-    * fade in behavior
-    * apply shadows better
-    * better ground exclusion
-* 7/11 hack support
-* allow saving null for gun slots
-* fix up sphere and NPC alert sizing and positioning.
-* fix sphere AI 
-    * big / misaligned alert handler
-    * can sphere robot reload?   
-* restarting missions is broken
-* enlarge office level
-
-
-finish up 7-11 level
-    * enclose level
-    * finish skybox
-    * destructible wall destruction timer
-    * fix sphere robot
-    remove doors for now
-    visibility through windows?
-
-new level?
-nimrod for texts
-
-
+why do gibs fall through the wall/floor? (probably because they are childed to parent?)
 weird gibs situation with bullet impact
+
+shooting at crouching guard
+4. we need an escape - quit menu.
+better UI for hack feedback
+better clearsighter culling
+
 allow change npc outfit
 smg / rifle shoot animation
 camera clips through wall in wallpress, in aim
-create good templates
-    shotgun rampage
-    basic combat in infiltration
-    steal the data in infiltration
-shooting at crouching guard
 disable lock-on in aim mode?
-reenable focus zone in 7-11 map
-poolmanager is unloaded?
-4. we need an escape - quit menu.
-better UI for hack feedback
-separate out weapon canvas, suspicion canvas
-lots of garbage collection in clearsighter
-better clearsighter culling
 strike team spawning screws up NPC spawning
+
 
 NPC tuning:
     guard HQ potentially notices disabled cameras and sensors
@@ -1854,6 +1828,12 @@ NPC tuning:
     NPC reacts when seeing another shot
     NPC reacts when seeing bullet impacts
 
+
+
+
+
+
+
 graphics:
     silenced pistol
     rocket launcher
@@ -1865,4 +1845,15 @@ model:
     sawhorse
 
 
-performance tuning: separate canvases, implement octree or smth
+NEXT:
+more, bigger levels
+    rooms
+    wide, long level
+    bright / brutalist concrete level
+new level?
+nimrod for texts
+5. doors
+6. attack surfaces
+clearsighter optimization
+    1. restrict computation to only the visible
+    2. octree
