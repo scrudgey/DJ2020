@@ -1653,6 +1653,7 @@ nice to have / future goals:
     digitized voice for "operation jetlag"
     highlight item container when item is switched
     after passing a lie check, npc discovers body: reconsiders player status
+    sphere robot might not investigate?
 
 
 deep save system:
@@ -1789,16 +1790,30 @@ clearsighter optimization
     2. octree
 
 
+
+* clearsighter:
+    * fade in behavior
+    * apply shadows better
+    * better ground exclusion
+* 7/11 hack support
+* allow saving null for gun slots
+* fix up sphere and NPC alert sizing and positioning.
+* fix sphere AI 
+    * big / misaligned alert handler
+    * can sphere robot reload?   
+* restarting missions is broken
+* enlarge office level
+
+
 finish up 7-11 level
     * enclose level
     * finish skybox
+    * destructible wall destruction timer
+    * fix sphere robot
     remove doors for now
     visibility through windows?
-    fix sphere robot
-    destructible wall destruction timer
 
-enlarge office level
-new level
+new level?
 nimrod for texts
 
 
@@ -1849,16 +1864,5 @@ model:
     cones
     sawhorse
 
-fix sphere AI 
-    big / misaligned alert handler
-    can sphere robot reload?   
-    sphere robot might not investigate?
-restarting missions is broken
-7/11 hack support
-allow saving null for gun slots
 
-clearsighter:
-    * fade in behavior
-    * apply shadows better?
-    better ground exclusion?
-fix up sphere and NPC alert sizing and positioning.
+performance tuning: separate canvases, implement octree or smth

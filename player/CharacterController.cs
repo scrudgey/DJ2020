@@ -210,9 +210,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
                     if (hit.collider.transform.IsChildOf(transform.root))
                         continue;
-                    // if (!tagData.bulletPassthrough) {
-                    // if (!tagData.noDecal) {
-                    // }
                     GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.explosiveScar);
                     decalObject.transform.SetParent(hit.collider.transform, true);
                 }

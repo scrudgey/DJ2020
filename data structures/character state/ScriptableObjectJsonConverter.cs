@@ -9,6 +9,7 @@ public class ScriptableObjectJsonConverter<T> : JsonConverter<T> where T : Unity
     }
 
     public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer) {
+        if (reader.TokenType == JsonToken.Null) return null;
         JObject jo = JObject.Load(reader);
         string path = (string)jo[Constants.PATH];
         var result = Resources.Load<T>(path) as T;

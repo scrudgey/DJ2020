@@ -39,6 +39,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public Action<GunHandler> OnShoot;
     public bool isAimingWeapon;
     Collider[] lockOnColliders;
+    public bool nonAnimatedReload;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious
@@ -351,6 +352,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // play sound
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipOut);
+
+        if (nonAnimatedReload) {
+            ClipIn();
+            StopReload();
+            // state = GunStateEnum.idle;
+            Rack();
+            EndRack();
+        }
 
         OnValueChanged?.Invoke(this);
     }

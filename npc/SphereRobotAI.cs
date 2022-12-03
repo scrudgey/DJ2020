@@ -55,10 +55,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         alertHandler.Hide();
         Bind(sightCone.gameObject);
         navMeshPath = new NavMeshPath();
-        // if (!overrideDefaultState) {
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
-        // }
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
         }
