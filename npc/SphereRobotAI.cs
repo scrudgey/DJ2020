@@ -134,15 +134,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case StopAndListenState:
                 StopAndListenState listenState = (StopAndListenState)routine;
                 SphereControlState nextState = listenState.getNextState();
-                // if (!listenState.FoundSomethingSuspicious()) {
-                // }
                 ChangeState(nextState);
-                // listener.SetListenRadius();
                 break;
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
                 EnterDefaultState();
-                // listener.SetListenRadius();
                 break;
             case SphereAttackState:
                 if (!GameManager.I.gameData.levelState.anyAlarmActive()) {
@@ -351,15 +347,22 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         //     (other.bounds.center - other.bounds.extents) - position,
         // };
         // float distance = Vector3.Distance(other.bounds.center, transform.position);
-        Vector3[] directions = new Vector3[]{
-            other.ClosestPoint(position) - position
+
+        // Physics.ClosestPoint can only be used with a BoxCollider, SphereCollider, CapsuleCollider and a convex MeshCollider.
+        Vector3[] directions = new Vector3[0];
+        float distance = 0;
+        if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
+            directions = new Vector3[]{
+                other.ClosestPoint(position) - position
             };
-        // Debug.Log($"{other}");
-        // Debug.Log($"{other.transform.parent}");
-        // Debug.Log($"{other.transform.parent.gameObject}");
-        float distance = Vector3.Distance(other.ClosestPoint(position), position);
+        } else {
+            directions = new Vector3[]{
+                other.bounds.center - position
+            };
+        }
         bool clearLineOfSight = false;
         foreach (Vector3 direction in directions) {
+            distance = direction.magnitude;
             Ray ray = new Ray(position, direction);
             // TODO: nonalloc
             int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);

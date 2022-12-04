@@ -83,7 +83,6 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
                 spriteRenderer.flipX = input.orientation == Direction.left || input.orientation == Direction.leftUp || input.orientation == Direction.leftDown;
                 break;
             case CharacterState.wallPress:
-                // spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 transform.localRotation = Quaternion.identity;
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
                 if (input.playerInputs.MoveAxisRight != 0) {

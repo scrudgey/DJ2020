@@ -152,7 +152,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private Quaternion _rotationBeforeClimbing = Quaternion.identity;
 
     private float landStunTimer;
-    private PlayerInput _lastInput;
+    private PlayerInput _lastInput = PlayerInput.none;
     private CursorData lastTargetDataInput;
     private Vector3 lookAtDirection;
     private float inputDirectionHeldTimer;
@@ -170,6 +170,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float aimSwayMagnitude = 0.01f;
     Transform cameraFollowTransform;
     RaycastHit[] rayCastHits;
+
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
         OnStateExit(tmpInitialState, newState);

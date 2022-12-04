@@ -32,8 +32,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public CursorData lastShootInput;
     public bool shootRequestedThisFrame;
     public CursorData currentTargetData;
-    // public Collider lockedOnCollider;
-    // public Vector3 lockedOnPoint;
     public bool isShooting;
     public bool isSwitchingWeapon;
     public Action<GunHandler> OnShoot;
@@ -461,6 +459,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                     input.Fire.cursorData.screenPosition = pointPosition;
                     input.Fire.cursorData.targetCollider = nearestOther;
 
+
                     // TODO: is this a hack? what about NPCs?
                     if (GameManager.I.inputMode == InputMode.aim) {
 
@@ -489,7 +488,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                     }
                 }
             } else {
-                if (gunInstance.template.cycle == CycleType.automatic) {
+                if (gunInstance.template.cycle == CycleType.automatic && gunInstance.IsEmpty()) {
                     if (state == GunStateEnum.shooting) {
                         state = GunStateEnum.idle;
                     }

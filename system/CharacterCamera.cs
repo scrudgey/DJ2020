@@ -474,7 +474,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         if (input.state == CharacterState.wallPress || state == CameraState.aim) {
             RaycastHit closestHit = new RaycastHit();
             closestHit.distance = Mathf.Infinity;
-            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, ObstructionLayers, QueryTriggerInteraction.Ignore);
+            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
             for (int i = 0; i < _obstructionCount; i++) {
                 bool isIgnored = false;
                 for (int j = 0; j < IgnoredColliders.Count; j++) {
@@ -483,26 +483,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                         break;
                     }
                 }
-                for (int j = 0; j < IgnoredColliders.Count; j++) {
-                    if (IgnoredColliders[j] == _obstructions[i].collider) {
-                        isIgnored = true;
-                        break;
-                    }
-                }
 
-                if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance > 0) {
+                if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance >= 0) {
                     closestHit = _obstructions[i];
                 }
             }
-
-            // If obstructions detecter
             if (closestHit.distance < Mathf.Infinity) {
-                // _distanceIsObstructed = true;
                 _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
-            }
-            // If no obstruction
-            else {
-                // _distanceIsObstructed = false;
+            } else {
                 _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
             }
         }
@@ -633,7 +621,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         // Vector3 direction = transform.forward;
 
-        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         Vector3 targetPoint = projection.GetPoint(100f);
 
@@ -650,22 +637,23 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
             }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
-            if (data == null || data.targetPriority == -1) {
-                if (!prioritySet && !targetSet) {
-                    targetPoint = hit.point;
-                    targetSet = true;
-                }
-                continue;
-            }
-            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
-                priorityData = data;
-                if (data.targetPoint != null) {
-                    targetPoint = data.targetPoint.position;
-                } else {
-                    targetPoint = hit.collider.bounds.center;
-                }
-                prioritySet = true;
-            }
+            // if (data == null || data.targetPriority == -1) {
+            //     if (!prioritySet && !targetSet) {
+            //         targetPoint = hit.point;
+            //         targetSet = true;
+            //     }
+            //     continue;
+            // }
+            // if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
+            //     priorityData = data;
+            //     if (data.targetPoint != null) {
+            //         targetPoint = data.targetPoint.position;
+            //     } else {
+            //         targetPoint = hit.collider.bounds.center;
+            //     }
+            //     prioritySet = true;
+            // }
+            targetPoint = hit.point;
         }
         Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);
 

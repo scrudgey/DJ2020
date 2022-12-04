@@ -58,7 +58,7 @@ public record VRMissionTemplate {
     public static VRMissionTemplate LoadVRMissionTemplate(string filename) {
         CreateScenarioFolderIfMissing(VRMissionRootDirectory());
         string path = VRMissionPath(filename);
-        Debug.Log($"loading {path}...");
+        // Debug.Log($"loading {path}...");
         try {
             // deserialize JSON directly from a file
             using (StreamReader file = File.OpenText(path)) {

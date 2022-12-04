@@ -22,6 +22,8 @@ public class GunState {
 
     public void Update() => delta.Update();
 
+    public bool IsEmpty() => delta.clip <= 0 && delta.chamber <= 0;
+
     public bool ShouldRack() {
         if (template.cycle == CycleType.semiautomatic || template.cycle == CycleType.automatic)
             return delta.CanRack();

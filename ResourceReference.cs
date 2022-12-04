@@ -56,11 +56,11 @@ public class ResourceReference : Singleton<ResourceReference> {
     public string GetPath(UnityEngine.Object obj) {
         if (obj is Sprite) {
             Sprite s = (Sprite)obj;
-            if (resourcePaths.ContainsKey(s)) {
-                Debug.Log($"sprite found: {s}");
-            }
+            // if (resourcePaths.ContainsKey(s)) {
+            // Debug.Log($"sprite found: {s}");
+            // }
             if (resourcePaths.ContainsKey(s.texture)) {
-                Debug.Log($"found sprite texture: {s.texture}");
+                // Debug.Log($"found sprite texture: {s.texture}");
             } else {
                 foreach (UnityEngine.Object key in resourcePaths.Keys) {
                     Debug.Log(key);

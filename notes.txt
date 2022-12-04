@@ -1779,38 +1779,17 @@ faster shotgun
     raise - shoot - pump
     animator speed can be adjusted
 
-
 survive x waves of y NPCS
-adjustable NPC difficulty
-    how quickly acquire target
-    accuracy
-    shooting behavior
-        quickness, bursts
 DFS path finding doesn't quite work right for highlighting alarm path
-alarm terminal triggering effects
-    notify others of location
 damage result addition is weird
 title screen logo
 title screen animations
 colt 2037 sped up sounds great
 don't shoot corpse away
 
-why do gibs fall through the wall/floor? (probably because they are childed to parent?)
-weird gibs situation with bullet impact
-
-shooting at crouching guard
-4. we need an escape - quit menu.
-better UI for hack feedback
-better clearsighter culling
-
-allow change npc outfit
-smg / rifle shoot animation
-camera clips through wall in wallpress, in aim
-disable lock-on in aim mode?
-strike team spawning screws up NPC spawning
-
-
 NPC tuning:
+    alarm terminal triggering effects
+        notify others of location
     guard HQ potentially notices disabled cameras and sensors
     guard sees destroyed cameras
     lots of "i guess it was nothing"
@@ -1827,10 +1806,28 @@ NPC tuning:
     NPC reacts when seeing another shooting
     NPC reacts when seeing another shot
     NPC reacts when seeing bullet impacts
+    adjustable NPC difficulty
+        how quickly acquire target
+        accuracy
+        shooting behavior
+            quickness, bursts
 
 
 
+* allow change npc outfit
+* smg / rifle shoot animation
+* why do gibs fall through the wall/floor? (probably because they are childed to parent?)
+* weird gibs situation with bullet impact
+* disable lock-on in aim mode?
+* why do gibs fall through floor?
+* camera clips through wall in wallpress, in aim
 
+automatic shooting is weird
+shooting at crouching guard
+escape - quit menu.
+better UI for hack feedback
+better clearsighter culling
+strike team spawning screws up NPC spawning
 
 
 
@@ -1843,7 +1840,6 @@ graphics:
 model:
     cones
     sawhorse
-
 
 NEXT:
 more, bigger levels
