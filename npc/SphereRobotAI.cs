@@ -199,23 +199,26 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         input.preventWallPress = true;
 
         // avoid bunching with boids algorithm
-        float avoidFactor = 0.1f;
-        float avoidRadius = 2f;
-        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetMask(Layer.obj));
-        Vector3 closeness = Vector3.zero;
-        for (int i = 0; i < numColliders; i++) {
-            Collider collider = nearbyOthers[i];
-            if (collider == null || collider.gameObject == null)
-                continue;
-            if (collider.transform.IsChildOf(transform))
-                continue;
-            SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
-            if (otherAI != null) {
-                closeness += transform.position - otherAI.transform.position;
+        if (!input.CrouchDown) {
+            float avoidFactor = 0.1f;
+            float avoidRadius = 2f;
+            int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetMask(Layer.obj));
+            Vector3 closeness = Vector3.zero;
+            for (int i = 0; i < numColliders; i++) {
+                Collider collider = nearbyOthers[i];
+                if (collider == null || collider.gameObject == null)
+                    continue;
+                if (collider.transform.IsChildOf(transform))
+                    continue;
+                SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
+                if (otherAI != null) {
+                    closeness += transform.position - otherAI.transform.position;
+                }
             }
+            closeness.y = 0;
+            input.moveDirection += avoidFactor * closeness;
         }
-        closeness.y = 0;
-        input.moveDirection += avoidFactor * closeness;
+
 
         SetInputs(input);
         perceptionCountdown -= Time.deltaTime;

@@ -15,7 +15,7 @@ public class ClearSighter : MonoBehaviour {
     Dictionary<MaterialController, Vector3> staticGeometry = new Dictionary<MaterialController, Vector3>();
     public Transform followTransform;
     private List<Collider> rooftopZones = new List<Collider>();
-
+    Plane cullingPlane;
     Coroutine coroutine;
     bool inRooftopZone;
     Collider[] colliderHits;
@@ -67,7 +67,7 @@ public class ClearSighter : MonoBehaviour {
                     if (inRooftopZone) {
                         controller.disableBecauseAbove = false;
                     } else {
-                        controller.CeilingCheck(myTransform.position);
+                        controller.CeilingCheck(myTransform.position, cullingPlane);
                     }
                 }
             }
@@ -144,13 +144,14 @@ public class ClearSighter : MonoBehaviour {
     void HandleStaticGeometry() {
         Vector3 myPosition = myTransform.position;
         // Debug.Log($"static geometry: {inRooftopZone} {staticGeometry.Count}");
+        cullingPlane.Set3Points(myTransform.position, myTransform.right, myTransform.up);
         foreach ((MaterialController controller, Vector3 position) in staticGeometry) {
             if (controller == null || controller.gameObject == null || controller.collider == null || !controller.gameObject.activeInHierarchy)
                 continue;
             if (inRooftopZone) {
                 controller.disableBecauseAbove = false;
             } else {
-                controller.CeilingCheck(myPosition);
+                controller.CeilingCheck(myPosition, cullingPlane);
             }
             controller.Update();
         }

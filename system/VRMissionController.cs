@@ -150,7 +150,7 @@ public class VRMissionController : MonoBehaviour {
     void HandleStrikeTeamSpawn(GameObject npc) {
         CharacterController npcController = npc.GetComponentInChildren<CharacterController>();
         npcControllers.Add(npcController);
-        npcController.OnCharacterDead += HandleNPCDead;
+        npcController.OnCharacterDead += HandleStrikeTeamMemberDead;
     }
     void SpawnNPC() {
         NPCSpawnPoint spawnPoint = Toolbox.RandomFromList(spawnPoints);
@@ -162,6 +162,17 @@ public class VRMissionController : MonoBehaviour {
         data.data.numberLiveNPCs += 1;
     }
 
+    void HandleStrikeTeamMemberDead(CharacterController npc) {
+        npc.OnCharacterDead -= HandleStrikeTeamMemberDead;
+        npcControllers.Remove(npc);
+        data.data.numberNPCsKilled += 1;
+        if (data.template.missionType == VRMissionType.combat || data.template.missionType == VRMissionType.time) {
+            SendLogMessage($"Kill count: {data.data.numberNPCsKilled} / {data.template.maxNumberNPCs}");
+            if (data.data.numberNPCsKilled >= data.template.maxNumberNPCs) {
+                TransitionToState(State.victory);
+            }
+        }
+    }
     void HandleNPCDead(CharacterController npc) {
         npc.OnCharacterDead -= HandleNPCDead;
         npcControllers.Remove(npc);
@@ -173,7 +184,6 @@ public class VRMissionController : MonoBehaviour {
                 TransitionToState(State.victory);
             }
         }
-
     }
     void HandlePlayerDead(CharacterController npc) {
         TransitionToState(State.fail);

@@ -38,6 +38,7 @@ public class Gib {
     public LoHi dispersion;
     public float directional = 1f;
     public float probability = 1f;
+    public bool orientTowardImpact;
     public void Emit(GameObject host, Damage damage, Collider collider) {
         if (probability == 1f || Random.Range(0f, 1f) <= probability) {
             if (type == GibType.normal) {
@@ -52,7 +53,8 @@ public class Gib {
         direction = (dispersion.GetRandomInsideBound() * Toolbox.RandomPointOnPlane(Vector3.zero, direction, 1f)) + direction.normalized;
         GameObject fx = PoolManager.I.GetPool(prefab).GetObject(collider.bounds.center);
         // fx.transform.SetParent(host.transform, true);
-        fx.transform.rotation = Quaternion.FromToRotation(Vector3.down, direction);
+        Vector3 orientationForward = orientTowardImpact ? Vector3.up : Vector3.down;
+        fx.transform.rotation = Quaternion.FromToRotation(orientationForward, direction);
         fx.transform.position = damage.position;
     }
     void EmitParticle(Damage damage, Collider bounds) {

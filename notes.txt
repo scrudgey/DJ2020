@@ -1821,14 +1821,15 @@ NPC tuning:
 * disable lock-on in aim mode?
 * why do gibs fall through floor?
 * camera clips through wall in wallpress, in aim
+* strike team spawning screws up NPC spawning
+* blood particle impact vs sparks particle impact
+* better clearsighter culling
+    test all levels
 
 automatic shooting is weird
 shooting at crouching guard
 escape - quit menu.
 better UI for hack feedback
-better clearsighter culling
-strike team spawning screws up NPC spawning
-
 
 
 graphics:
