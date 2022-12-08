@@ -29,6 +29,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
     public float followingSharpnessDefault = 10000f;
     public Quaternion isometricRotation;
+    public float followCursorCoefficient = 5f;
 
     [Header("Distance")]
     public float DefaultDistance = 6f;
@@ -307,7 +308,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
-            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y);
+            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y) * followCursorCoefficient;
             targetPosition = input.targetPosition + worldOffset;
             lastTargetPosition = targetPosition;
         }
@@ -529,7 +530,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
-        // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
         Vector3 targetPoint = Vector3.zero;
 

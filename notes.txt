@@ -1653,7 +1653,7 @@ nice to have / future goals:
         or: off-screen lock indicator?
     off-screen indicator for active threats?
     pixel perfect shaders
-    apply skin graphics to corpse
+    apply skin graphics to corpse?
     animation shows recoil
     laser pointer attachment
     flashlight attachment
@@ -1671,16 +1671,15 @@ nice to have / future goals:
             how to decide who to run to alarm panel?
     the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
         i.e. using yellow just resolves to red? 
-    laser tripwire
-        laser grid don't trip when NPC walks through? disable temporarily?laser grid
+    * laser tripwire
+        * laser grid don't trip when NPC walks through? disable temporarily?laser grid
         dust / smoke shader
-        goggles create tint
+        * goggles create tint
     digitized voice for "operation jetlag"
     highlight item container when item is switched
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
     performance tuning: separate canvases, implement octree or smth
-
 
 deep save system:
     serialize the complete level state
@@ -1725,8 +1724,8 @@ UI:
     minimap
     weapon wheel
     better clarity around alarm logic
-        indicate alarm terminal more clearly!
-        indicate when alarm teminal is active!
+        * indicate alarm terminal more clearly!
+        * indicate when alarm teminal is active!
         fix edge coloration from active node to alarm terminal
 
 control / combat:
@@ -1745,18 +1744,19 @@ stealth:
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
     NPC reacts when seeing another shooting
-    NPC reacts to corpses
+    * NPC reacts to corpses
     NPC reacts when seeing another shot
-    NPC investigate routine
+    * NPC investigate routine
     NPC should look in direction of last noise
-    NPC speeds a little more when pursuing player.
+    * NPC speeds a little more when pursuing player.
     NPC when an aggressive noise is heard, do a quick visibility check.
         when being shot by a noisy opponent, we should know where they are immediately
-    NPC can't see me when i'm standing behind low cover?
-        could it be the shadows?
+    * NPC can't see me when i'm standing behind low cover?
+        * could it be the shadows?
     stealth kill?
+    be able to shoot out lights
 
-overhauled VR mission designer
+VR mission designer
     player stats
 
 better action log
@@ -1765,12 +1765,17 @@ better action log
 
 clearsighter
     we want to disable shells when they're newly produced, but hide them when they're static.
-    could be a lot more efficient if things are addressable by position in space.
-    apply shadows to interloper shader
+    * could be a lot more efficient if things are addressable by position in space.
+    * apply shadows to interloper shader
     a better system?
         everything below the plane centered on camera and below player is visible
-    hiding corspe interlopers
+    * hiding corspe interlopers
         not interloper, but hide above.
+    clearsighter optimization
+        1. restrict computation to only the visible
+        2. octree
+
+
 
 ---------------
 
@@ -1825,11 +1830,16 @@ NPC tuning:
 * blood particle impact vs sparks particle impact
 * better clearsighter culling
     test all levels
+* crouching is slightly above ground.
+* escape - quit menu.
 
-automatic shooting is weird
+
+automatic shooting is weird for seburo smg
 shooting at crouching guard
-escape - quit menu.
 better UI for hack feedback
+pop-out should not move camera as much
+
+
 
 
 graphics:
@@ -1851,6 +1861,3 @@ new level?
 nimrod for texts
 5. doors
 6. attack surfaces
-clearsighter optimization
-    1. restrict computation to only the visible
-    2. octree

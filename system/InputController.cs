@@ -18,6 +18,7 @@ public class InputController : MonoBehaviour {
     public List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
 
     [Header("Inputs")]
+    public InputActionReference escapeAction;
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
     public InputActionReference AimAction;
@@ -60,6 +61,7 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
+    private bool escapePressedThisFrame;
 
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -67,6 +69,9 @@ public class InputController : MonoBehaviour {
     public void HandleFireAction(InputAction.CallbackContext ctx) {
         firePressedThisFrame = ctx.ReadValueAsButton();
         firePressedHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleEscapeAction(InputAction.CallbackContext ctx) {
+        escapePressedThisFrame = ctx.ReadValueAsButton();
     }
     public void HandleAimAction(InputAction.CallbackContext ctx) {
         aimPressedThisFrame = ctx.ReadValueAsButton();
@@ -170,6 +175,8 @@ public class InputController : MonoBehaviour {
     }
 
     void RegisterCallbacks() {
+        // Escape
+        escapeAction.action.performed += HandleEscapeAction;
         // Move
         MoveAction.action.performed += HandleMoveAction;
         // Fire
@@ -211,6 +218,8 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled += HandleJumpActionCanceled;
     }
     void DeregisterCallbacks() {
+        // Escape
+        escapeAction.action.performed -= HandleEscapeAction;
         // Move
         MoveAction.action.performed -= HandleMoveAction;
         // Fire
@@ -253,6 +262,10 @@ public class InputController : MonoBehaviour {
     }
 
     public void HandleCharacterInput(bool pointerOverUIElement) {
+        if (escapePressedThisFrame) {
+            escapePressedThisFrame = false;
+            GameManager.I.ShowMenu(MenuType.escapeMenu);
+        }
         if (pointerOverUIElement) {
             firePressedThisFrame = false;
         }
@@ -310,6 +323,7 @@ public class InputController : MonoBehaviour {
         rotateCameraLeftPressedThisFrame = false;
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
+        escapePressedThisFrame = false;
     }
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();

@@ -70,9 +70,6 @@ public class MaterialController {
         float otherFloorY = collider.bounds.center.y - collider.bounds.extents.y;
         float directionY = otherFloorY - playerPosition.y;
         // Debug.Log($"[MaterialController] {gameObject} {direction} {direction.y > ceilingHeight} {collider.bounds.center} {collider.bounds.extents.y} {collider.bounds.center.y < playerPosition.y} ");
-        if (gameObject.name.ToLower().Contains("cube")) {
-            Debug.Log($"[MaterialController] {gameObject} {directionY} {directionY} > {ceilingHeight} = {directionY > ceilingHeight}, {collider.bounds.center} {collider.bounds.extents.y} {collider.bounds.center.y < playerPosition.y} ");
-        }
         if (cullingPlane.GetSide(collider.bounds.center) && (collider.bounds.center.y - playerPosition.y > ceilingHeight * 1.5)) {
             disableBecauseAbove = true;
         } else if (directionY > ceilingHeight) {
@@ -158,7 +155,7 @@ public class MaterialController {
                     continue;
                 renderer.material.SetFloat("_TargetAlpha", targetAlpha);
                 // Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableBecauseAbove} targetAlpha: {targetAlpha}");
-                renderer.shadowCastingMode = (targetAlpha <= 0.01) || disableBecauseAbove ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];
+                renderer.shadowCastingMode = (targetAlpha <= 0.01) ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];
             }
         }
     }

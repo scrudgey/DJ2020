@@ -106,8 +106,8 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        // TODO: more?
-        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish")
+        // TODO: better system here
+        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "EscapeMenu")
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
 
         foreach (string sceneToUnload in scenesToUnload) {

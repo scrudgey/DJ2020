@@ -87,12 +87,10 @@ public class UIController : MonoBehaviour {
         vRStatHandler.gameObject.SetActive(false);
     }
     public void HideUI() {
-        Debug.Log("hide UI");
         HideVRStats();
         canvas.enabled = false;
     }
     public void ShowUI() {
-        Debug.Log("show UI");
         ShowVRStats();
         canvas.enabled = true;
     }

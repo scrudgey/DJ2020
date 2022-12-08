@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GameState { none, levelPlay, mainMenu }
-public enum MenuType { none, console, dialogue, VRMissionFinish }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer }
 public enum InputMode { none, gun, cyber, aim, wallpressAim }
@@ -154,6 +154,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         activeMenuType = menuType;
         Time.timeScale = 0f;
+        GameManager.I.uiController.HideUI();
         switch (menuType) {
             default:
                 break;
@@ -165,6 +166,11 @@ public partial class GameManager : Singleton<GameManager> {
             case MenuType.VRMissionFinish:
                 if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
                     LoadScene("VRMissionFinish", callback, unloadAll: false);
+                }
+                break;
+            case MenuType.escapeMenu:
+                if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
+                    LoadScene("EscapeMenu", callback, unloadAll: false);
                 }
                 break;
             case MenuType.console:
@@ -182,8 +188,11 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.dialogue:
                 uiController.ShowUI();
-                Scene sceneToUnload = SceneManager.GetSceneByName("DialogueMenu");
-                SceneManager.UnloadSceneAsync(sceneToUnload);
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("DialogueMenu"));
+                break;
+            case MenuType.escapeMenu:
+                uiController.ShowUI();
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscapeMenu"));
                 break;
         }
         Time.timeScale = 1f;
