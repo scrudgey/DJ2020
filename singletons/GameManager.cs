@@ -20,6 +20,7 @@ public partial class GameManager : Singleton<GameManager> {
     public GameData gameData;
     public AudioSource audioSource;
     public GameObject playerObject;
+    public Collider playerCollider;
     public PlayerOutlineHandler playerOutlineHandler;
     public LightLevelProbe playerLightLevelProbe;
     // UI input

@@ -347,6 +347,13 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public CameraTargetParameters WallPressParameters(CameraInput input) {
         // Find the smoothed follow position
         Vector3 LROffset = input.targetTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
+        // if we are at wall edge?
+        if (input.atLeftEdge) {
+            LROffset += -0.9f * input.targetTransform.right;
+        } else if (input.atRightEdge) {
+            LROffset += 0.9f * input.targetTransform.right;
+        }
+
         Vector3 distOffset = input.wallNormal * TargetDistance;
         Vector3 heightOffset = new Vector3(0, -0.5f, 0);
 
@@ -624,8 +631,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
         Vector3 targetPoint = projection.GetPoint(100f);
 
-        TagSystemData priorityData = null;
-        bool targetSet = false;
         bool prioritySet = false;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
@@ -637,22 +642,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
             }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
-            // if (data == null || data.targetPriority == -1) {
-            //     if (!prioritySet && !targetSet) {
-            //         targetPoint = hit.point;
-            //         targetSet = true;
-            //     }
-            //     continue;
-            // }
-            // if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
-            //     priorityData = data;
-            //     if (data.targetPoint != null) {
-            //         targetPoint = data.targetPoint.position;
-            //     } else {
-            //         targetPoint = hit.collider.bounds.center;
-            //     }
-            //     prioritySet = true;
-            // }
             targetPoint = hit.point;
         }
         Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);

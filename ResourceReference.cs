@@ -54,6 +54,9 @@ public class ResourceReference : Singleton<ResourceReference> {
     // }
 
     public string GetPath(UnityEngine.Object obj) {
+        if (obj == null) {
+            return "null";
+        }
         if (obj is Sprite) {
             Sprite s = (Sprite)obj;
             // if (resourcePaths.ContainsKey(s)) {

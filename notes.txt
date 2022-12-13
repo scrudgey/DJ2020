@@ -1625,6 +1625,36 @@ note: layer "interactive"
     * shotgun rampage
     * basic combat in infiltration
     * steal the data in infiltration
+* allow change npc outfit
+* smg / rifle shoot animation
+* why do gibs fall through the wall/floor? (probably because they are childed to parent?)
+* weird gibs situation with bullet impact
+* disable lock-on in aim mode?
+* why do gibs fall through floor?
+* camera clips through wall in wallpress, in aim
+* strike team spawning screws up NPC spawning
+* blood particle impact vs sparks particle impact
+* better clearsighter culling
+    test all levels
+* crouching is slightly above ground.
+* escape - quit menu.
+* NPC can't see me when i'm standing behind low cover?
+    * could it be the shadows?
+* NPC investigate routine
+* NPC reacts to corpses
+* NPC speeds a little more when pursuing player.
+* shooting at crouching guard
+* pop-out should not move camera as much
+* fix VR mission tabs
+* hide third tab if HQ alarm is not enabled
+* don't allow third weapon if third weapon slot is disabled
+* create VR mission title display
+* unable to detect shooting player, on rooftop
+    * player can stand at distance and shoot approaching NPCs with impunity
+        * do a sight check immediately on shoot, bypass visibility.
+* light levels generally low
+* more lights in interiors
+* the crawling around a body effect comes from boids avoidance
 
 
 graphical issues:
@@ -1741,23 +1771,22 @@ sound
         distant traffic sounds
 
 stealth:
+
+
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
     NPC reacts when seeing another shooting
-    * NPC reacts to corpses
     NPC reacts when seeing another shot
-    * NPC investigate routine
     NPC should look in direction of last noise
-    * NPC speeds a little more when pursuing player.
     NPC when an aggressive noise is heard, do a quick visibility check.
         when being shot by a noisy opponent, we should know where they are immediately
-    * NPC can't see me when i'm standing behind low cover?
-        * could it be the shadows?
     stealth kill?
     be able to shoot out lights
 
 VR mission designer
     player stats
+    survive x waves of y NPCS
+    inventory management
 
 better action log
     blit the text
@@ -1775,72 +1804,23 @@ clearsighter
         1. restrict computation to only the visible
         2. octree
 
-
-
----------------
-
 faster shotgun
     click to rack faster?
     raise - shoot - pump
     animator speed can be adjusted
 
-survive x waves of y NPCS
-DFS path finding doesn't quite work right for highlighting alarm path
-damage result addition is weird
-title screen logo
-title screen animations
-colt 2037 sped up sounds great
-don't shoot corpse away
 
-NPC tuning:
-    alarm terminal triggering effects
-        notify others of location
-    guard HQ potentially notices disabled cameras and sensors
-    guard sees destroyed cameras
-    lots of "i guess it was nothing"
-    unable to detect shooting player, on rooftop
-        player can hide in shadows and murder repeatedly
-            use alertness levels
-            if several gunshots have come from one area, the player is exposed?
-        player can stand at distance and shoot approaching NPCs with impunity
-            do a sight check immediately on shoot, bypass visibility.
-    light levels generally low
-    discovering a body should register suspicion record even if no HQ present
-    more lights in interiors
-    the crawling around a body effect comes from boids avoidance
-    NPC reacts when seeing another shooting
-    NPC reacts when seeing another shot
-    NPC reacts when seeing bullet impacts
-    adjustable NPC difficulty
-        how quickly acquire target
-        accuracy
-        shooting behavior
-            quickness, bursts
+---------------
 
-
-
-* allow change npc outfit
-* smg / rifle shoot animation
-* why do gibs fall through the wall/floor? (probably because they are childed to parent?)
-* weird gibs situation with bullet impact
-* disable lock-on in aim mode?
-* why do gibs fall through floor?
-* camera clips through wall in wallpress, in aim
-* strike team spawning screws up NPC spawning
-* blood particle impact vs sparks particle impact
-* better clearsighter culling
-    test all levels
-* crouching is slightly above ground.
-* escape - quit menu.
-
-
-automatic shooting is weird for seburo smg
-shooting at crouching guard
-better UI for hack feedback
-pop-out should not move camera as much
-
-
-
+NEXT:
+more, bigger levels
+    rooms
+    wide, long level
+    bright / brutalist concrete level
+new level?
+nimrod for texts
+5. doors
+6. attack surfaces
 
 graphics:
     silenced pistol
@@ -1852,12 +1832,70 @@ model:
     cones
     sawhorse
 
-NEXT:
-more, bigger levels
-    rooms
-    wide, long level
-    bright / brutalist concrete level
-new level?
-nimrod for texts
-5. doors
-6. attack surfaces
+
+DFS path finding doesn't quite work right for highlighting alarm path
+damage result addition is weird
+title screen logo
+title screen animations
+colt 2037 sped up sounds great
+don't shoot corpse away
+automatic shooting is weird for seburo smg
+better UI for hack feedback
+    bigger, keep with overall style
+NPC portraits not being set properly
+civ_female portrait could use some work
+
+
+NPC tuning:
+    lots of "i guess it was nothing"
+    discovering a body should register suspicion record even if no HQ present
+    NPC reacts when seeing another shooting
+    NPC reacts when seeing another shot
+    NPC reacts when seeing bullet impacts
+    NPC sees destroyed cameras
+    adjustable NPC difficulty
+        how quickly acquire target
+        accuracy
+        shooting behavior
+            quickness, bursts
+    alarm terminal triggering effects
+        notify others of location
+    guard HQ potentially notices disabled cameras and sensors
+
+
+they should run toward the gunshots.
+    they do, eventually!
+    they walk slowly when investigating
+    distinguish between: 
+        taking fire (run for cover)
+        a shot landed in my area (run for cover)
+        i hear gunshots, somewhere distant (run towards the gunshots and locate the disturbance)
+        fellow NPC is shooting (look for what they are shooting at)
+        fellow NPC is taking fire (look for who is shooting them)
+
+use alertness levels
+    bored / nonalert: narrower field of view
+    suspicion raised: broader field of view, ...?
+
+
+player can hide in shadows and murder repeatedly
+    if several gunshots have come from one area, the player is exposed?
+here is the issue: you stand in the shadows and kill someone.
+you stay still so nobody sees you.
+a guard finds the body.
+kill the guard, repeat.
+even with a non silenced gun, they hear the gunshot and react, but then what?
+
+1. with a silenced weapon and from a distance, there is nothing to be done.
+    guards seeing bullet impacts could intuit the player's location.
+2. with an unsilenced gun:
+    guard hears a gunshot, runs to investigate, finds a body.
+    player, hiding in the shadows or behind a desk, is unseen
+    when the guard is distracted with the body, the player pops up and shoots them, now two guards down
+    now: something needs to change or else this repeats forever.
+    how do the NPCS break the deadlock?
+
+    a. if gun is unsilenced
+        NPCs will hear the gunshots repeatedly from the same location
+    b. if gun is silenced
+        player is in shadows, gunshots are inaudible: there's not much to go on, besides the pile of bodies.

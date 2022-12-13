@@ -36,9 +36,9 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
         string gun1Path = (string)jo[Constants.PRIMARY_GUN];
         string gun2Path = (string)jo[Constants.SECONDARY_GUN];
         string gun3Path = (string)jo[Constants.TERTIARY_GUN];
-        GunTemplate gun1 = Resources.Load(gun1Path) as GunTemplate;
-        GunTemplate gun2 = Resources.Load(gun2Path) as GunTemplate;
-        GunTemplate gun3 = Resources.Load(gun3Path) as GunTemplate;
+        GunTemplate gun1 = gun1Path == "null" ? null : Resources.Load(gun1Path) as GunTemplate;
+        GunTemplate gun2 = gun2Path == "null" ? null : Resources.Load(gun2Path) as GunTemplate;
+        GunTemplate gun3 = gun3Path == "null" ? null : Resources.Load(gun3Path) as GunTemplate;
 
         result.primaryGun = gun1;
         result.secondaryGun = gun2;

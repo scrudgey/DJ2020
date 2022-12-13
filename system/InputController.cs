@@ -62,6 +62,7 @@ public class InputController : MonoBehaviour {
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
     private bool escapePressedThisFrame;
+    private bool escapePressConsumed;
 
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -262,9 +263,13 @@ public class InputController : MonoBehaviour {
     }
 
     public void HandleCharacterInput(bool pointerOverUIElement) {
-        if (escapePressedThisFrame) {
+        if (!escapePressedThisFrame && escapePressConsumed) {
+            escapePressConsumed = false;
+        }
+        if (escapePressedThisFrame && !escapePressConsumed) {
             escapePressedThisFrame = false;
             GameManager.I.ShowMenu(MenuType.escapeMenu);
+            escapePressConsumed = true;
         }
         if (pointerOverUIElement) {
             firePressedThisFrame = false;

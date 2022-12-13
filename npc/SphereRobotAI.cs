@@ -23,7 +23,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.025f;
-    readonly float MAXIMUM_SIGHT_RANGE = 50f;
+    readonly float MAXIMUM_SIGHT_RANGE = 25f;
     readonly float LOCK_ON_TIME = 0.5f;
     float timeSinceInvestigatedFootsteps;
     float timeSinceInterrogatedStranger;
@@ -227,10 +227,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             PerceiveFieldOfView();
         }
         if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
-            if (Vector3.Dot(target.transform.up, playerCollider.transform.position - transform.position) < 0) {
-                if (TargetVisible(playerCollider))
-                    Perceive(playerCollider);
-            }
+            SightCheckPlayer();
         }
         if (footstepImpulse > 0f) {
             footstepImpulse -= Time.deltaTime;
@@ -245,12 +242,20 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
         }
     }
+
+    void SightCheckPlayer() {
+        Collider player = GameManager.I.playerCollider;
+        if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
+            if (ClearLineOfSight(player))
+                Perceive(player, byPassVisibilityCheck: true);
+        }
+    }
     void SetInputs(PlayerInput input) {
         sphereController.SetInputs(input);
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
-            if (TargetVisible(t.newestAddition))
+            if (ClearLineOfSight(t.newestAddition))
                 Perceive(t.newestAddition);
         }
     }
@@ -258,13 +263,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         foreach (Collider collider in target.fieldOfView) {
             if (collider == null)
                 continue;
-            if (TargetVisible(collider))
+            if (ClearLineOfSight(collider))
                 Perceive(collider);
         }
     }
-    void Perceive(Collider other) {
+    void Perceive(Collider other, bool byPassVisibilityCheck = false) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            PerceivePlayerObject(other);
+            PerceivePlayerObject(other, byPassVisibilityCheck: byPassVisibilityCheck);
         } else {
             if (!awareOfCorpse) {
                 // TODO: use tag instead
@@ -290,9 +295,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
 
-    void PerceivePlayerObject(Collider other) {
+    void PerceivePlayerObject(Collider other, bool byPassVisibilityCheck = false) {
         float distance = Vector3.Distance(transform.position, other.bounds.center);
-        if (GameManager.I.IsPlayerVisible(distance)) {
+        if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance)) {
             stateMachine.currentState.OnObjectPerceived(other);
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             timeSinceLastSeen = 0f;
@@ -341,7 +346,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
 
-    bool TargetVisible(Collider other) {
+    bool ClearLineOfSight(Collider other) {
         Vector3 position = sightOrigin.position; // TODO: configurable
 
         // Vector3[] directions = new Vector3[]{
@@ -365,7 +370,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
         bool clearLineOfSight = false;
         foreach (Vector3 direction in directions) {
+            // distance = Math.Min(direction.magnitude, MAXIMUM_SIGHT_RANGE);
             distance = direction.magnitude;
+            if (distance > MAXIMUM_SIGHT_RANGE)
+                return false;
             Ray ray = new Ray(position, direction);
             // TODO: nonalloc
             int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
@@ -408,6 +416,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (noise.data.isGunshot && noise.data.suspiciousness > Suspiciousness.suspicious) {
             if (noise.data.player) {
                 lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
+                SightCheckPlayer();
             } else {
                 lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
             }

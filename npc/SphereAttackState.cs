@@ -7,7 +7,7 @@ public class SphereAttackState : SphereControlState {
     public SphereRobotSpeaker speaker;
     readonly float ATTACK_TIMEOUT = 3f;
     readonly float ROUTINE_TIMEOUT = 10f;
-    readonly float MAX_SHOOT_RANGE = 10f;
+    readonly float MAX_SHOOT_RANGE = 20f;
     float timeSinceSawPlayer;
     float changeStateCountDown;
     public GunHandler gunHandler;

@@ -30,6 +30,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public KinematicCharacterMotor Motor;
     public CharacterHurtable characterHurtable;
     public CharacterCamera OrbitCamera;
+    public Transform targetPoint;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
     public ItemHandler itemHandler;
@@ -75,6 +76,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public AudioClip[] crouchingSounds;
     public AudioClip[] crawlSounds;
     public bool superJumpEnabled;
+    public bool thirdGunSlotEnabled;
 
     [Header("Ladder Climbing")]
     public float ClimbingSpeed = 4f;
@@ -413,6 +415,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
         inputCrouchDown = input.CrouchDown;
         CursorData cursorData = input.Fire.cursorData;
+        if (input.selectgun == 3 && !thirdGunSlotEnabled)
+            input.selectgun = 0;
         switch (state) {
             case CharacterState.hitstun:
             case CharacterState.dead:
@@ -441,6 +445,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
 
                 // Fire
+
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
 
@@ -1121,6 +1126,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     void SetCapsuleDimensions(float radius, float height, float yOffset) {
         Motor.SetCapsuleDimensions(radius, height, yOffset);
+        if (targetPoint != null) {
+            if (height > 1f) {
+                targetPoint.localPosition = new Vector3(0f, 1f, 0f);
+            } else {
+                targetPoint.localPosition = new Vector3(0f, 0.5f, 0f);
+            }
+        }
     }
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
@@ -1279,6 +1291,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
     public void LoadState(PlayerState data) {
         superJumpEnabled = data.cyberlegsLevel > 0;
+        thirdGunSlotEnabled = data.thirdWeaponSlot;
     }
 
     public CameraInput BuildCameraInput() {
@@ -1297,7 +1310,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             popoutParity = popoutParity,
             aimCameraRotation = aimCameraRotation,
             targetTransform = cameraFollowTransform,
-            targetPosition = cameraFollowTransform.position
+            targetPosition = cameraFollowTransform.position,
+            atLeftEdge = atLeftEdge,
+            atRightEdge = atRightEdge
         };
         return input;
     }
