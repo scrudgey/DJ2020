@@ -28,7 +28,7 @@ namespace UI {
         int clipsize;
         PrefabPool ammoSpentPool;
         PrefabPool ammoPipPool;
-        void Awake() {
+        void Start() {
             ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);
             ammoPipPool = PoolManager.I.RegisterPool(ammoPipPrefab, 50);
             liveAmmoPipsTop = new List<AmmoPip>();

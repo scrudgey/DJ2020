@@ -49,6 +49,22 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             hitState = Toolbox.Max(hitState, HitState.invulnerable);
         }
 
+        if (!transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            GameObject impactPrefab = Resources.Load("prefabs/bulletImpact") as GameObject;
+            GameObject obj = GameObject.Instantiate(impactPrefab, damage.position, Quaternion.identity);
+            BulletImpact impact = obj.GetComponent<BulletImpact>();
+            impact.damage = damage;
+            Destroy(obj, 0.1f);
+
+            NoiseData noise = new NoiseData {
+                player = false,
+                suspiciousness = Suspiciousness.suspicious,
+                volume = 5,
+                isFootsteps = false
+            };
+            Toolbox.Noise(transform.position, noise, transform.root.gameObject);
+        }
+
         return new DamageResult {
             damageAmount = damage.amount,
             damage = damage

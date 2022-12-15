@@ -1655,7 +1655,8 @@ note: layer "interactive"
 * light levels generally low
 * more lights in interiors
 * the crawling around a body effect comes from boids avoidance
-
+* NPC reacts when seeing another shot
+* discovering a body should register suspicion record even if no HQ present
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1848,10 +1849,6 @@ civ_female portrait could use some work
 
 NPC tuning:
     lots of "i guess it was nothing"
-    discovering a body should register suspicion record even if no HQ present
-    NPC reacts when seeing another shooting
-    NPC reacts when seeing another shot
-    NPC reacts when seeing bullet impacts
     NPC sees destroyed cameras
     adjustable NPC difficulty
         how quickly acquire target
@@ -1862,40 +1859,23 @@ NPC tuning:
         notify others of location
     guard HQ potentially notices disabled cameras and sensors
 
+NPC reacts when seeing bullet impacts
+NPC reacts when seeing another shooting
 
-they should run toward the gunshots.
-    they do, eventually!
-    they walk slowly when investigating
-    distinguish between: 
-        taking fire (run for cover)
-        a shot landed in my area (run for cover)
-        i hear gunshots, somewhere distant (run towards the gunshots and locate the disturbance)
-        fellow NPC is shooting (look for what they are shooting at)
-        fellow NPC is taking fire (look for who is shooting them)
+silenced gun is still OP
+anti-camping visibility boost
+    guards are aware of your aggression 
+    haven't moved in a while
+    have shot more than once or twice?
 
-use alertness levels
-    bored / nonalert: narrower field of view
-    suspicion raised: broader field of view, ...?
+* wallpress breaks normal aiming
+* popout aim through player
+* shooting at guys in 7-11 is broken?
+* wallpress aim at player
 
+* rifle / smg shoots weird
+* NPCs have sticky gun
+* shell bounce
 
-player can hide in shadows and murder repeatedly
-    if several gunshots have come from one area, the player is exposed?
-here is the issue: you stand in the shadows and kill someone.
-you stay still so nobody sees you.
-a guard finds the body.
-kill the guard, repeat.
-even with a non silenced gun, they hear the gunshot and react, but then what?
-
-1. with a silenced weapon and from a distance, there is nothing to be done.
-    guards seeing bullet impacts could intuit the player's location.
-2. with an unsilenced gun:
-    guard hears a gunshot, runs to investigate, finds a body.
-    player, hiding in the shadows or behind a desk, is unseen
-    when the guard is distracted with the body, the player pops up and shoots them, now two guards down
-    now: something needs to change or else this repeats forever.
-    how do the NPCS break the deadlock?
-
-    a. if gun is unsilenced
-        NPCs will hear the gunshots repeatedly from the same location
-    b. if gun is silenced
-        player is in shadows, gunshots are inaudible: there's not much to go on, besides the pile of bodies.
+aim mode fixed angular inaccuracy
+billboard interloper shader should be cutout

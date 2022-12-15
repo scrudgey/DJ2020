@@ -165,10 +165,12 @@ public class Toolbox {
         }
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
     }
-    public static NoiseComponent Noise(Vector3 position, NoiseData data) {
+    public static NoiseComponent Noise(Vector3 position, NoiseData data, GameObject source) {
         GameObject noiseObject = PoolManager.I.GetPool("prefabs/noise").GetObject(position);
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
-        component.data = data;
+        component.data = data with {
+            source = source
+        };
         component.sphereCollider.radius = data.volume;
         return component;
     }

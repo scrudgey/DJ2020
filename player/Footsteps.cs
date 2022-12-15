@@ -31,8 +31,6 @@ public class Footsteps : MonoBehaviour {
                 onRightFoot = !onRightFoot;
                 timer = 1f + Random.Range(-0.1f, 0.1f);
 
-
-                // TODO: adjust volume by velocity
                 float volume = lastSurfaceType switch {
                     SurfaceType.grass => 1f,
                     SurfaceType.tile => 2.8f,
@@ -58,7 +56,7 @@ public class Footsteps : MonoBehaviour {
                     volume = volume,
                     isFootsteps = true
                 };
-                Toolbox.Noise(transform.position, noise);
+                Toolbox.Noise(transform.position, noise, transform.root.gameObject);
             }
         }
 

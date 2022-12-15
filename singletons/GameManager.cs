@@ -103,7 +103,6 @@ public partial class GameManager : Singleton<GameManager> {
     public void TransitionToInputMode(InputMode newInputMode) {
         if (newInputMode == inputMode)
             return;
-        // Debug.Log($"transition to {newInputMode}");
         OnInputModeChange?.Invoke(inputMode, newInputMode);
         _inputMode = newInputMode;
     }

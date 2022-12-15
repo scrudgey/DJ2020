@@ -136,9 +136,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // range
         // TODO: change this. use a fixed angular 
+        // to do that, inaccuracy must be fixed; when we want to show accuracy at a given distance, apply scale there.
+        // inaccuracy should be a quantity that then is applied to a distance.
+        // when shooting, it is applied at a fixed distance
+        // when displaying, it is shown at that distance
         float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
-        inaccuracy += gunInstance.template.spread * (distance / 10f);
-        // accuracy += gunInstance.template.spread * distance;
+        // inaccuracy += gunInstance.template.spread * (distance / 10f);
+        inaccuracy += gunInstance.template.spread;
 
         // movement
         inaccuracy += movementInaccuracy;
@@ -161,7 +165,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         return inaccuracy;
     }
-    public void EmitBullet(CursorData input) {
+    public Bullet EmitBullet(CursorData input) {
         Vector3 gunPosition = this.gunPosition();
 
         Vector3 trueDirection = gunDirection(input);
@@ -180,12 +184,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Bullet bullet = new Bullet(new Ray(gunPosition, direction)) {
             damage = gunInstance.template.getBaseDamage(),
             range = gunInstance.template.range,
-            gunPosition = gunPosition
+            gunPosition = gunPosition,
+            source = transform.position
         };
 
         bullet.DoImpacts(transform.root);
 
         Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
+        return bullet;
     }
     public bool IsClearShot(CursorData input) {
         Vector3 targetPosition = input.worldPosition;
@@ -223,16 +229,19 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // shoot bullet
         int numberBullets = gunInstance.template.type == GunType.shotgun ? 5 : 1;
+        Bullet bullet = null;
         for (int i = 0; i < numberBullets; i++) {
-            EmitBullet(input);
+            bullet = EmitBullet(input);
         }
 
         // play sound
-        NoiseData noiseData = gunInstance.GetShootNoise();
+        NoiseData noiseData = gunInstance.GetShootNoise() with {
+            ray = bullet.ray
+        };
         noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.template.GetShootSounds()));
-        Toolbox.Noise(gunPosition(), noiseData);
+        Toolbox.Noise(gunPosition(), noiseData, transform.root.gameObject);
 
         // flash
         if (!gunInstance.template.silencer) {
@@ -488,7 +497,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                     }
                 }
             } else {
-                if (gunInstance.template.cycle == CycleType.automatic && gunInstance.IsEmpty()) {
+                if (gunInstance.template.cycle == CycleType.automatic) {
                     if (state == GunStateEnum.shooting) {
                         state = GunStateEnum.idle;
                     }

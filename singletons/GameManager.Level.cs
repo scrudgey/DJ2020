@@ -77,7 +77,8 @@ public partial class GameManager : Singleton<GameManager> {
         StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
             isLoadingLevel = false;
             Debug.Log("hide loading screen");
-            callback();
+            if (callback != null)
+                callback();
         }));
     }
     public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback) {

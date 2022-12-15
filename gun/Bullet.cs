@@ -9,6 +9,7 @@ public class Bullet {
     public float range;
     public Vector3 gunPosition;
     public Ray ray;
+    public Vector3 source;
     public Bullet(Ray ray) {
         this.ray = ray;
     }

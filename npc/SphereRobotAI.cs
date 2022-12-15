@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using KinematicCharacterController;
 using UnityEngine;
 using UnityEngine.AI;
 public enum Reaction { ignore, attack, investigate }
@@ -15,6 +16,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public Transform sightOrigin;
     public NavMeshPath navMeshPath; // TODO: remove this
     public GameObject controllable;
+    public KinematicCharacterMotor motor;
     public IInputReceiver sphereController;
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
@@ -56,6 +58,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         Bind(sightCone.gameObject);
         navMeshPath = new NavMeshPath();
         stateMachine = new SphereRobotBrain();
+        motor = GetComponent<KinematicCharacterMotor>();
         EnterDefaultState();
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
@@ -92,6 +95,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         switch (routine) {
             default:
                 EnterDefaultState();
+                break;
+            case ReportGunshotsState:
+                ChangeState(new SearchDirectionState(this, lastGunshotHeard, doIntro: false, speedCoefficient: 2f));
                 break;
             case SphereHoldAtGunpointState:
                 SphereHoldAtGunpointState holdAtGunpointState = (SphereHoldAtGunpointState)routine;
@@ -290,6 +296,30 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     }
                 }
             }
+            if (other.CompareTag("bulletImpact")) {
+                BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
+                switch (stateMachine.currentState) {
+                    case SphereMoveState:
+                    case SpherePatrolState:
+                    case FollowTheLeaderState:
+                    case PauseState:
+                    case DisableAlarmState:
+                    case InvestigateCorpseState:
+                    case SphereInvestigateState:
+                    case SphereHoldAtGunpointState:
+                    case StopAndListenState:
+                        alertHandler.ShowAlert(useWarnMaterial: true);
+                        SuspicionRecord record = new SuspicionRecord {
+                            content = "someone was shot",
+                            suspiciousness = Suspiciousness.aggressive,
+                            lifetime = 120f,
+                            maxLifetime = 120f
+                        };
+                        GameManager.I.AddSuspicionRecord(record);
+                        ChangeState(new ReactToAttackState(this, speechTextController, bulletImpact.damage, initialPause: 0f));
+                        break;
+                }
+            }
             if (stateMachine.currentState != null)
                 stateMachine.currentState.OnObjectPerceived(other);
         }
@@ -375,7 +405,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (distance > MAXIMUM_SIGHT_RANGE)
                 return false;
             Ray ray = new Ray(position, direction);
-            // TODO: nonalloc
             int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
             clearLineOfSight |= numberHits == 0;
         }
@@ -394,12 +423,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case DisableAlarmState:
             case ReportToHQState:
             case StopAndListenState:
+                // TODO: better logic here?
                 alertHandler.ShowAlert(useWarnMaterial: true);
-                if (GameManager.I.gameData.levelState.anyAlarmActive()) {
-                    ChangeState(new SearchDirectionState(this, damage, doIntro: false));
-                } else {
-                    ChangeState(new ReactToAttackState(this, speechTextController, damage));
-                }
+                // if (GameManager.I.gameData.levelState.anyAlarmActive()) {
+                //     ChangeState(new SearchDirectionState(this, damage, doIntro: false, speedCoefficient: ));
+                // } else {
+                ChangeState(new ReactToAttackState(this, speechTextController, damage));
+                // }
                 break;
         }
         return DamageResult.NONE;
@@ -407,6 +437,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     public void HearNoise(NoiseComponent noise) {
         if (noise == null)
+            return;
+        if (noise.data.source != null && noise.data.source == transform.root.gameObject)
             return;
         recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
 
@@ -417,6 +449,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (noise.data.player) {
                 lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
                 SightCheckPlayer();
+
             } else {
                 lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
             }
@@ -428,19 +461,42 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 maxLifetime = 60f
             };
             GameManager.I.AddSuspicionRecord(record);
+
+
+            Ray ray = noise.data.ray;
+            Vector3 rayDirection = ray.direction;
+            Vector3 directionToNoise = transform.position - noise.transform.position;
+            rayDirection.y = 0;
+            directionToNoise.y = 0;
+            float dotFactor = Vector3.Dot(rayDirection, directionToNoise);
+
+            // ReportToHQState
             switch (stateMachine.currentState) {
                 case SphereMoveState:
                 case SpherePatrolState:
                 case FollowTheLeaderState:
+                case PauseState:
                 case DisableAlarmState:
                 case InvestigateCorpseState:
                 case SphereInvestigateState:
+                case SphereHoldAtGunpointState:
                 case StopAndListenState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
                     if (GameManager.I.gameData.levelState.anyAlarmActive()) {
-                        ChangeState(new SearchDirectionState(this, noise, doIntro: false));
+                        // alarm is already active; no need to handle reporting to HQ. run to firefight.
+                        ChangeState(new SearchDirectionState(this, noise, doIntro: false, speedCoefficient: 2f));
                     } else {
-                        ChangeState(new ReactToAttackState(this, speechTextController, noise));
+                        if (dotFactor < 1f) {
+                            // gunshots not directed at me; report to HQ and then run to battle
+                            if (GameManager.I.levelHQTerminal() != null && !GameManager.I.isAlarmRadioInProgress(gameObject)) {
+                                ChangeState(new ReportGunshotsState(this, speechTextController, noise));
+                            } else {
+                                ChangeState(new SearchDirectionState(this, noise, doIntro: false, speedCoefficient: 2f));
+                            }
+                        } else {
+                            // gunshots directed at me
+                            ChangeState(new ReactToAttackState(this, speechTextController, noise));
+                        }
                     }
                     break;
                 case SearchDirectionState:

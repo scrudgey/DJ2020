@@ -81,6 +81,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     private static float shakeJitter = 0f;
     private float currentOrthographicSize;
     bool thermalGogglesActive;
+    CameraTargetParameters lastWallPressTargetParameters;
+    // CameraInput lastWallPressCameraInput;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
@@ -255,7 +257,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             transitionTime += Time.unscaledDeltaTime;
         }
         transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
-
         switch (state) {
             case CameraState.attractor:
                 ApplyTargetParameters(AttractorParameters(input));
@@ -349,10 +350,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Vector3 LROffset = input.targetTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
         // if we are at wall edge?
         if (input.atLeftEdge) {
-            LROffset += -0.9f * input.targetTransform.right;
-        } else if (input.atRightEdge) {
             LROffset += 0.9f * input.targetTransform.right;
+        } else if (input.atRightEdge) {
+            LROffset += -0.9f * input.targetTransform.right;
         }
+        if (input.state == CharacterState.popout) LROffset = -1f * LROffset;
 
         Vector3 distOffset = input.wallNormal * TargetDistance;
         Vector3 heightOffset = new Vector3(0, -0.5f, 0);
@@ -361,29 +363,20 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             heightOffset = new Vector3(0, -0.75f, 0);
         }
 
-        Vector3 horizontalOffset = Vector3.zero;
-        if (input.state == CharacterState.popout) {
-            float horizontalParity = input.popoutParity switch {
-                PopoutParity.left => 1f,
-                PopoutParity.right => -1f,
-                _ => 1f
-            };
-            horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection) * 1.5f;
-        }
 
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
         Vector3 camDirection = -1f * input.wallNormal;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
 
-        return new CameraTargetParameters() {
+        CameraTargetParameters targetParameters = new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
             rotation = planarRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
-            targetPosition = input.targetPosition + distOffset + LROffset + heightOffset + horizontalOffset,
+            targetPosition = input.targetPosition + distOffset + LROffset + heightOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -391,6 +384,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             state = input.state,
             playerDirection = input.playerDirection
         };
+
+        if (input.state == CharacterState.wallPress) {
+            lastWallPressTargetParameters = targetParameters;
+            return targetParameters;
+        } else {
+            return lastWallPressTargetParameters;
+        }
+
     }
     public CameraTargetParameters AimParameters(CameraInput input) {
         float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
@@ -523,10 +524,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         }
     }
     private CursorData CursorToTarget(Vector2 cursorPosition) {
-
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
+        // Debug.Log(Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         Vector3 direction = transform.forward;
+        // Debug.Log(projection);
         if (GameManager.I.showDebugRays)
             Debug.DrawRay(projection.origin, direction * 100, Color.magenta);
         Ray clickRay = new Ray(projection.origin, direction);
@@ -537,7 +539,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = Vector3.zero;
 
         TagSystemData priorityData = null;
@@ -628,9 +630,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         // Vector3 direction = transform.forward;
 
-        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
+        // TODO: nonalloc
+        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = projection.GetPoint(100f);
 
+        TagSystemData priorityData = null;
+        bool targetSet = false;
         bool prioritySet = false;
         HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
@@ -642,7 +647,22 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
             }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
-            targetPoint = hit.point;
+            if (data == null || data.targetPriority == -1) {
+                if (!prioritySet && !targetSet) {
+                    targetPoint = hit.point;
+                    targetSet = true;
+                }
+                continue;
+            }
+            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
+                priorityData = data;
+                if (data.targetPoint != null) {
+                    targetPoint = data.targetPoint.position;
+                } else {
+                    targetPoint = hit.collider.bounds.center;
+                }
+                prioritySet = true;
+            }
         }
         Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);
 
@@ -662,7 +682,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         } else {
             // TODO: aim through transparent objects
             if (hits.Length > 0)
-                targetPoint = hits.OrderBy(h => h.distance).FirstOrDefault().point;
+                targetPoint = hits
+                    .OrderBy(h => h.distance)
+                    .Where(hit => !hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform.root))
+                    .FirstOrDefault().point;
             return new CursorData {
                 type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,

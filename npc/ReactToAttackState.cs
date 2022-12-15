@@ -13,12 +13,12 @@ public class ReactToAttackState : SphereControlState {
     private TaskNode rootTaskNode;
     private SpeechTextController speechTextController;
 
-    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, Damage damage) : base(ai) {
+    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, Damage damage, float initialPause = 2f) : base(ai) {
         this.speechTextController = speechTextController;
         this.type = AttackType.damage;
         Vector3 damageSourcePosition = ai.transform.position + -10f * damage.direction;
         Vector3 coverPosition = ai.transform.position + 10f * damage.direction;
-        SetupRootNode(initialPause: 2f); // enough to time out hitstun
+        SetupRootNode(initialPause: initialPause); // enough to time out hitstun
         rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
         rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
     }
@@ -43,13 +43,12 @@ public class ReactToAttackState : SphereControlState {
     void SetupRootNode(float initialPause = 1f) {
         // TODO: write better code here
         LevelState levelData = GameManager.I.gameData.levelState;
-
-        string speechText = type switch {
-            AttackType.damage => "HQ respond! Taking fire!",
-            AttackType.gunshots => "HQ respond! Shots fired!",
-            _ => "HQ respond! Activate building alarm!"
-        };
         if (GameManager.I.levelHQTerminal() != null && !levelData.anyAlarmActive()) {
+            string speechText = type switch {
+                AttackType.damage => "HQ respond! Taking fire!",
+                AttackType.gunshots => "HQ respond! Shots fired!",
+                _ => "HQ respond! Activate building alarm!"
+            };
             SuspicionRecord intruderRecord = new SuspicionRecord {
                 content = "gunshots reported",
                 maxLifetime = 120,
@@ -93,9 +92,7 @@ public class ReactToAttackState : SphereControlState {
                 )
             );
         } else {
-
             // TODO: smarter behavior here. sometimes we want to run toward the firefight.
-
             rootTaskNode = new Sequence(
                     new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                         lookType = TaskLookAt.LookType.position,

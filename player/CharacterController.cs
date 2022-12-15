@@ -239,6 +239,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         switch (state) {
             default:
                 break;
+            case CharacterState.wallPress:
             case CharacterState.popout:
             case CharacterState.aim:
                 if (toState != CharacterState.popout && toState != CharacterState.aim && toState != CharacterState.wallPress)
@@ -763,8 +764,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             popRightPosition = transform.position;
             return false;
         }
-        Vector3 offset = new Vector3(0f, wallPressHeight, 0f) + 0.4f * Motor.CharacterRight;
-        popRightPosition = transform.position + Motor.CharacterRight;
+        Vector3 offset = new Vector3(0f, wallPressHeight, 0f) - 0.4f * Motor.CharacterRight;
+        popRightPosition = transform.position - 0.4f * Motor.CharacterRight;
         return !ColliderRay(offset);
     }
     bool AtLeftEdge() {
@@ -772,8 +773,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             popLeftPosition = transform.position;
             return false;
         }
-        Vector3 offset = new Vector3(0f, wallPressHeight, 0f) - 0.4f * Motor.CharacterRight;
-        popLeftPosition = transform.position - Motor.CharacterRight;
+        Vector3 offset = new Vector3(0f, wallPressHeight, 0f) + 0.4f * Motor.CharacterRight;
+        popLeftPosition = transform.position + 0.4f * Motor.CharacterRight;
         return !ColliderRay(offset);
     }
 
@@ -890,10 +891,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 atLeftEdge = AtLeftEdge();
                 atRightEdge = AtRightEdge();
                 if (atRightEdge) {
-                    _moveAxis.x = Mathf.Max(0, _moveAxis.x);
+                    _moveAxis.x = Mathf.Min(0, _moveAxis.x);
                 }
                 if (atLeftEdge) {
-                    _moveAxis.x = Mathf.Min(0, _moveAxis.x);
+                    _moveAxis.x = Mathf.Max(0, _moveAxis.x);
                 }
 
                 // wall style input is relative to the wall normal

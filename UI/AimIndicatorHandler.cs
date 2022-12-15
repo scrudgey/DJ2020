@@ -90,7 +90,7 @@ namespace UI {
         }
 
         public void SetScale(CursorData data) {
-            float inaccuracyLength = target.inaccuracy(target.currentTargetData);
+            float inaccuracyLength = target.inaccuracy(target.currentTargetData) * Vector3.Distance(target.transform.position, data.worldPosition) / 10f;
             float inaccuracyInPixels = 1f;
             if (UICamera.orthographic) {
                 float lengthPerAngle = (UICamera.orthographicSize * 2) / (UICamera.fieldOfView); // ?

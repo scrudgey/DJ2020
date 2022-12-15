@@ -26,9 +26,10 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
             textureData.Dispose();
         }
         catch (Exception e) {
-            Debug.Log("texturedata is already disposed");
+            // Debug.Log("texturedata is already disposed");
         }
-        StopCoroutine(coroutine);
+        if (coroutine != null)
+            StopCoroutine(coroutine);
     }
 
     IEnumerator RunJobRepeatedly() {
