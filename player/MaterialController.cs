@@ -49,8 +49,8 @@ public class MaterialController {
                 // interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
                 interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
                 interloperMaterial.SetTexture("_Texture", albedo);
-                // interloperMaterial.SetFloat("_Smoothness", 0);
-                // interloperMaterial.SetFloat("_Glossiness", 0);
+                interloperMaterial.SetFloat("_Smoothness", 0);
+                interloperMaterial.SetFloat("_Glossiness", 0);
                 // interloperMaterial
                 // Debug.Log("loaded interloper material " + interloperMaterial);
                 interloperMaterials[renderer] = interloperMaterial;

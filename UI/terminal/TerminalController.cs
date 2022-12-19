@@ -20,6 +20,7 @@ namespace UI {
             commands["test"] = RunTests;
             commands["alarm"] = ToggleAlarm;
             commands["disguise"] = ToggleDisguise;
+            commands["timescale"] = TimeScale;
         }
         public void OnEnable() {
             TakeFocus();
@@ -70,6 +71,10 @@ namespace UI {
                 GameManager.I.DeactivateDisguise();
             else
                 GameManager.I.ActivateDisguise();
+        }
+        public void TimeScale(string[] args) {
+            float timescale = float.Parse(args[0]);
+            Time.timeScale = timescale;
         }
 
         public void SetValue(string[] args) {

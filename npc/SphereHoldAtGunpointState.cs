@@ -23,7 +23,7 @@ public class SphereHoldAtGunpointState : SphereControlState {
         return timeSinceSawPlayer < 0.15f;
     }
     public bool isPlayerSuspicious() {
-        return !isPlayerVisible() || integratedPlayerMovement > AGGRESSION_THRESHOLD;
+        return !isPlayerVisible() || integratedPlayerMovement > AGGRESSION_THRESHOLD || GameManager.I.GetTotalSuspicion() >= Suspiciousness.aggressive;
     }
     public override PlayerInput Update(ref PlayerInput input) {
         timeSinceSawPlayer += Time.deltaTime;

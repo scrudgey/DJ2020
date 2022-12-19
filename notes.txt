@@ -1657,6 +1657,27 @@ note: layer "interactive"
 * the crawling around a body effect comes from boids avoidance
 * NPC reacts when seeing another shot
 * discovering a body should register suspicion record even if no HQ present
+* wallpress breaks normal aiming
+* popout aim through player
+* shooting at guys in 7-11 is broken?
+* wallpress aim at player
+* rifle / smg shoots weird
+* NPCs have sticky gun
+* shell bounce
+* aim mode fixed angular inaccuracy
+* update stored vr templates
+* in standalone build, billboard sprite has weird issue
+* in standalone build, possibly encountered a template load issue
+* in standalone build, textmeshpro size very small
+* guards interrogate, then interrogate again
+* lots of "i guess it was nothing"
+* automatic shooting is weird for seburo smg
+* terminal broken
+* crouch + hack
+* hack radius is smaller than wire reach
+* hack write should crouch with player
+* better UI for hack feedback
+    * bigger, keep with overall style
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1693,6 +1714,8 @@ nice to have / future goals:
     if an NPC sees another NPC shooting at something, look / search in that direction
     NPC better take cover
         move into another room
+    NPC reacts when seeing bullet impacts
+    NPC reacts when seeing another shooting
     strike team may arrive by vehicle
     HQ will be level specific state:
         HQ might be disabled if player assaults it
@@ -1772,15 +1795,10 @@ sound
         distant traffic sounds
 
 stealth:
-
-
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
-    NPC reacts when seeing another shooting
-    NPC reacts when seeing another shot
     NPC should look in direction of last noise
-    NPC when an aggressive noise is heard, do a quick visibility check.
-        when being shot by a noisy opponent, we should know where they are immediately
+    * NPC when an aggressive noise is heard, do a quick visibility check.
     stealth kill?
     be able to shoot out lights
 
@@ -1818,7 +1836,6 @@ more, bigger levels
     rooms
     wide, long level
     bright / brutalist concrete level
-new level?
 nimrod for texts
 5. doors
 6. attack surfaces
@@ -1829,28 +1846,23 @@ graphics:
     grenade
     some building textures
     patrol guard
+    title screen logo
+    title screen animations 
 model:
     cones
     sawhorse
-
+colt 2037 sped up sounds great
 
 DFS path finding doesn't quite work right for highlighting alarm path
 damage result addition is weird
-title screen logo
-title screen animations
-colt 2037 sped up sounds great
 don't shoot corpse away
-automatic shooting is weird for seburo smg
-better UI for hack feedback
-    bigger, keep with overall style
-NPC portraits not being set properly
-civ_female portrait could use some work
-
 
 NPC tuning:
-    lots of "i guess it was nothing"
     NPC sees destroyed cameras
     adjustable NPC difficulty
+        guards reacting to your shooting are too fast on the draw?
+        guards shoot you immediately when you become visible?
+        getting shot resets your aim too hard?
         how quickly acquire target
         accuracy
         shooting behavior
@@ -1859,23 +1871,17 @@ NPC tuning:
         notify others of location
     guard HQ potentially notices disabled cameras and sensors
 
-NPC reacts when seeing bullet impacts
-NPC reacts when seeing another shooting
-
 silenced gun is still OP
 anti-camping visibility boost
     guards are aware of your aggression 
     haven't moved in a while
     have shot more than once or twice?
 
-* wallpress breaks normal aiming
-* popout aim through player
-* shooting at guys in 7-11 is broken?
-* wallpress aim at player
+billboard interloper shader should be cutout, or something is up with interloper shader + shells
+credstick surfing
 
-* rifle / smg shoots weird
-* NPCs have sticky gun
-* shell bounce
-
-aim mode fixed angular inaccuracy
-billboard interloper shader should be cutout
+hack target ! indicator only sometimes visible
+NPC portraits not being set properly
+civ_female portrait could use some work
+strike team was not being dispatched in infiltration
+a guy danced on a corpse (I think he was investigating a noise?)

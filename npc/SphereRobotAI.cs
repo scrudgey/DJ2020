@@ -179,7 +179,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         switch (routine) {
             case SphereInvestigateState:
                 timeSinceInterrogatedStranger = 120f;
-                // TODO: initiate spotted cutscene
                 break;
             case StopAndListenState:
                 timeSinceInvestigatedFootsteps = 10f;
@@ -290,6 +289,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                             case SpherePatrolState:
                             case FollowTheLeaderState:
                             case StopAndListenState:
+                            case SphereInvestigateState:
                                 ChangeState(new InvestigateCorpseState(this, corpse, speechTextController));
                                 break;
                         }
@@ -341,6 +341,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case ReactToAttackState:
                     case FollowTheLeaderState:
                     case StopAndListenState:
+                    case SphereInvestigateState:
                         alertHandler.ShowAlert();
                         ChangeState(new SphereAttackState(this, gunHandler));
                         break;

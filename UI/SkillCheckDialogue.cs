@@ -49,6 +49,7 @@ public class SkillCheckDialogue : MonoBehaviour {
         // TODO: set threshold based on state / input
         float threshold = 25f;
         float roll = UnityEngine.Random.Range(0f, 100f);
+        // float roll = 20f;
         Debug.Log(roll);
 
         yield return StartUpIndicators(threshold, input);
@@ -162,8 +163,6 @@ public class SkillCheckDialogue : MonoBehaviour {
             yield return null;
         }
     }
-
-
 
     IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7) {
         float timer = 0f;

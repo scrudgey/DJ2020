@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 public class UIController : MonoBehaviour {
     public Canvas canvas;
+    public Canvas terminalCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
@@ -45,6 +46,7 @@ public class UIController : MonoBehaviour {
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
         HideVRStats();
+        HideTerminal();
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
@@ -72,9 +74,11 @@ public class UIController : MonoBehaviour {
         hitIndicatorController.Bind(target);
     }
     public void ShowTerminal() {
+        terminalCanvas.enabled = true;
         terminal.gameObject.SetActive(true);
     }
     public void HideTerminal() {
+        terminalCanvas.enabled = false;
         terminal.gameObject.SetActive(false);
     }
     void HandleCaptionChange(string newCaption) {

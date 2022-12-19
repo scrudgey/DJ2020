@@ -185,6 +185,7 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.console:
                 uiController.HideTerminal();
+                uiController.ShowUI();
                 break;
             case MenuType.dialogue:
                 uiController.ShowUI();
