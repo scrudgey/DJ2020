@@ -85,7 +85,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
-        // if (data != null) {
         data.target.EnableOutline();
         cursorText.enabled = true;
 
@@ -93,7 +92,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         cursorText.text = "";
         dotText.enabled = true;
         blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
-        // }
     }
     public IEnumerator BlitCalloutText(string actionText) {
         float blitInterval = 0.02f;

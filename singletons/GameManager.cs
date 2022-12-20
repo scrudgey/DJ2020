@@ -79,12 +79,12 @@ public partial class GameManager : Singleton<GameManager> {
     void LateUpdate() {
 
         // A hack to initialize a level from unity editor? doesn't currently work. 
-        if (numberFrames == 1 && SceneManager.GetActiveScene().name != "title") {
-            // TODO: set level in gamedata
-            gameData = GameData.TestInitialData();
-            // TODO: a better start of level method?
-            TransitionToState(GameState.levelPlay);
-        }
+        // if (numberFrames == 1 && SceneManager.GetActiveScene().name != "title") {
+        //     // TODO: set level in gamedata
+        //     gameData = GameData.TestInitialData();
+        //     // TODO: a better start of level method?
+        //     TransitionToState(GameState.levelPlay);
+        // }
         numberFrames += 1;
     }
 
@@ -95,6 +95,8 @@ public partial class GameManager : Singleton<GameManager> {
         CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
     }
     public void TransitionToState(GameState newState) {
+        if (newState == gameData.state)
+            return;
         GameState tmpInitialState = gameData.state;
         OnStateExit(tmpInitialState, newState);
         gameData.state = newState;
@@ -114,6 +116,7 @@ public partial class GameManager : Singleton<GameManager> {
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 if (!SceneManager.GetSceneByName("UI").isLoaded) {
+                    Debug.Log("loading UI");
                     LoadScene("UI", () => { uiController = GameObject.FindObjectOfType<UIController>(); }, unloadAll: false);
                 }
                 break;

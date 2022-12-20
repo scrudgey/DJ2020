@@ -1885,3 +1885,5 @@ NPC portraits not being set properly
 civ_female portrait could use some work
 strike team was not being dispatched in infiltration
 a guy danced on a corpse (I think he was investigating a noise?)
+
+use animation

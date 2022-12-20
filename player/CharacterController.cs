@@ -1275,6 +1275,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             if (GameManager.I.showDebugRays)
                 Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), wallNormal, Color.red, 2f);
         }
+
+        if (hitCollider.CompareTag("door")) {
+            // Debug.Log($"pushing door: {hitCollider} {hitNormal} {hitPoint} {hitStabilityReport}");
+            Door door = hitCollider.GetComponent<Door>();
+            door.Push(hitNormal, hitPoint);
+        }
     }
 
     public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {

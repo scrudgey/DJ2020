@@ -41,7 +41,7 @@ public partial class GameManager : Singleton<GameManager> {
         LoadScene(template.sceneName, () => StartVRMission(state));
     }
 
-    void StartVRMission(VRMissionState state) {
+    public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
         InitializeLevel();
         TransitionToState(GameState.levelPlay);
@@ -76,6 +76,9 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("show loading screen");
         StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
             isLoadingLevel = false;
+            foreach (LevelBootstrapper bootstrapper in GameObject.FindObjectsOfType<LevelBootstrapper>()) {
+                Destroy(bootstrapper.gameObject);
+            }
             Debug.Log("hide loading screen");
             if (callback != null)
                 callback();

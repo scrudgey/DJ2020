@@ -111,11 +111,25 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
         currentFollowingSharpness = followingSharpnessDefault;
         currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+
+        // initial planar
+        // the initial rotation here will be an offset to all subsequent rotations
+        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
+        rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
+        Quaternion rotationFromInput = rotationOffset;
+        PlanarDirection = rotationFromInput * PlanarDirection;
+        PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
+        Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
+        targetRotation = planarRot * verticalRot;
+        cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
+
     }
 
     void Start() {
         _currentDistance = 20f;
         GameManager.OnFocusChanged += SetFollowTransform;
+        SetFollowTransform(GameManager.I.playerObject);
         GameManager.OnEyeVisibilityChange += HandleEyeVisibilityChange;
 
         // TODO: move into on level load
@@ -204,24 +218,15 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(GameObject g) {
+        if (g == null)
+            return;
         // Transform t = g.transform;
         // Transform follow = t.Find("cameraFollowPoint");
         // if (follow != null) t = follow;
         // FollowTransform = t;
         // _currentFollowPosition = FollowTransform.position;
 
-        // initial planar
-        // the initial rotation here will be an offset to all subsequent rotations
-        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
-        rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
-        Quaternion rotationFromInput = rotationOffset;
-        PlanarDirection = rotationFromInput * PlanarDirection;
-        PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
-        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
-        Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
-        targetRotation = planarRot * verticalRot;
 
-        cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
 
         IgnoredColliders.Clear();
         IgnoredColliders.AddRange(g.GetComponentsInChildren<Collider>());
