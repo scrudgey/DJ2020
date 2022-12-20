@@ -46,7 +46,6 @@ public class Door : Interactive {
         };
     }
     void Update() {
-        HandleImpulse();
         switch (state) {
             case DoorState.closing:
                 MoveTowardTargetAngle();
@@ -56,11 +55,38 @@ public class Door : Interactive {
                 CheckAutoClose();
                 break;
             case DoorState.open:
+                HandleImpulse();
                 CheckAutoClose();
+                break;
+            case DoorState.closed:
+                HandleImpulse();
                 break;
         }
     }
     void HandleImpulse() {
+        if (impulse == 0)
+            return;
+        switch (parity) {
+            case DoorParity.twoWay:     // (-90, 90)
+                if (Mathf.Abs(impulse) < 50f && Mathf.Abs(angle) < ANGLE_THRESHOLD) {
+                    ChangeState(DoorState.closed);
+                }
+                break;
+            case DoorParity.openIn:     // (-90, 0)
+                if (impulse > 0 && Mathf.Abs(angle) < ANGLE_THRESHOLD && state != DoorState.closed) {
+                    ChangeState(DoorState.closed);
+                } else if (impulse < 0 && state == DoorState.closed) {
+                    ChangeState(DoorState.open);
+                }
+                break;
+            case DoorParity.openOut:    // (0, 90)
+                if (impulse < 0 && Mathf.Abs(angle) < ANGLE_THRESHOLD && state != DoorState.closed) {
+                    ChangeState(DoorState.closed);
+                } else if (impulse > 0 && state == DoorState.closed) {
+                    ChangeState(DoorState.open);
+                }
+                break;
+        }
         if (Mathf.Abs(impulse) > ANGLE_THRESHOLD) {
             float delta = Mathf.Max(0.1f * Mathf.Abs(impulse), 10f * Time.deltaTime);
             if (impulse > 0) {
@@ -108,6 +134,7 @@ public class Door : Interactive {
     void OnStateEnter(DoorState fromState, DoorState toState) {
         switch (toState) {
             case DoorState.closed:
+                impulse = 0;
                 Toolbox.RandomizeOneShot(audioSource, closeSounds);
                 break;
             default:
@@ -128,10 +155,10 @@ public class Door : Interactive {
         // Debug.Log($"{angle} {delta} {angleBounds}");
         if (angle + delta > angleBounds.high) {
             delta = angleBounds.high - angle;
-            impulse = -0.1f * impulse;
+            // impulse = -0.1f * impulse;
         } else if (angle + delta < angleBounds.low) {
             delta = angleBounds.low - angle;
-            impulse = -0.1f * impulse;
+            // impulse = -0.1f * impulse;
         }
         if (delta == 0)
             return;

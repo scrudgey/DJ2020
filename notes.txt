@@ -1887,3 +1887,12 @@ strike team was not being dispatched in infiltration
 a guy danced on a corpse (I think he was investigating a noise?)
 
 use animation
+
+
+keeping impulse separate from targetangle:
+    the two compete.
+    duplicated code.
+using only impulse:
+    now why have opening / closing state?
+    checking bounds: use angleBounds, not targetangle.
+    auto close?
