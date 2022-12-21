@@ -6,12 +6,14 @@ public class Door : Interactive {
     public enum DoorState { closed, opening, closing, open }
     public enum DoorParity { twoWay, openIn, openOut }
     public bool autoClose;
+    public bool latched;
     public DoorParity parity;
     private DoorState _state;
     public DoorState state {
         get { return _state; }
     }
     public Transform hinge;
+    public Transform parent;
     private Transform _myTransform;
     private Plane orientationPlane;
     public Transform myTransform {
@@ -34,8 +36,9 @@ public class Door : Interactive {
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
-
+    Vector3 parentOriginalPosition;
     void Awake() {
+        parentOriginalPosition = parent.position;
         orientationPlane = new Plane(transform.forward, hinge.position);
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         angleBounds = parity switch {
@@ -44,6 +47,8 @@ public class Door : Interactive {
             DoorParity.twoWay => new LoHi(-90f, 90f),
             _ => new LoHi(-90f, 90f)
         };
+        latched = true;
+        ChangeState(DoorState.closed);
     }
     void Update() {
         switch (state) {
@@ -66,6 +71,11 @@ public class Door : Interactive {
     void HandleImpulse() {
         if (impulse == 0)
             return;
+        if (latched) {
+            impulse = 0;
+            return;
+        }
+        // check closed & latched
         switch (parity) {
             case DoorParity.twoWay:     // (-90, 90)
                 if (Mathf.Abs(impulse) < 50f && Mathf.Abs(angle) < ANGLE_THRESHOLD) {
@@ -135,6 +145,7 @@ public class Door : Interactive {
         switch (toState) {
             case DoorState.closed:
                 impulse = 0;
+                latched = true;
                 Toolbox.RandomizeOneShot(audioSource, closeSounds);
                 break;
             default:
@@ -144,6 +155,7 @@ public class Door : Interactive {
     void OnStateExit(DoorState fromState, DoorState toState) {
         switch (fromState) {
             case DoorState.closed:
+                latched = false;
                 Toolbox.RandomizeOneShot(audioSource, openSounds);
                 break;
             default:
@@ -165,6 +177,10 @@ public class Door : Interactive {
         // Debug.Log($"{delta}");
         angle += delta;
         myTransform.RotateAround(hinge.position, Vector3.up, delta);
+
+        float offAxis = -0.05f * Mathf.Sin(angle * (2 * Mathf.PI / 360));
+        parent.position = parentOriginalPosition + offAxis * hinge.right;
+
         // TODO: check after rotation for collision
         // TODO: check for closing, opening
     }

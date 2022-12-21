@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class UIController : MonoBehaviour {
     public Canvas canvas;
     public Canvas terminalCanvas;
+    public Canvas burglarCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
@@ -26,6 +27,7 @@ public class UIController : MonoBehaviour {
     public TextMeshProUGUI caption;
     public HitIndicatorController hitIndicatorController;
     public VRStatHandler vRStatHandler;
+    public BurglarCanvasController burglarCanvasController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -45,8 +47,10 @@ public class UIController : MonoBehaviour {
         caption.text = "";
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
+        canvas.enabled = true;
         HideVRStats();
         HideTerminal();
+        HideBurglar();
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
@@ -80,6 +84,16 @@ public class UIController : MonoBehaviour {
     public void HideTerminal() {
         terminalCanvas.enabled = false;
         terminal.gameObject.SetActive(false);
+    }
+    public void ShowBurglar(BurgleTargetData data) {
+        HideUI();
+        burglarCanvas.enabled = true;
+        burglarCanvasController.Initialize(data);
+    }
+    public void HideBurglar() {
+        burglarCanvas.enabled = false;
+        burglarCanvasController.TearDown();
+        ShowUI();
     }
     void HandleCaptionChange(string newCaption) {
         caption.text = newCaption;

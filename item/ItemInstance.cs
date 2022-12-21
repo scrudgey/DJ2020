@@ -12,6 +12,7 @@ namespace Items {
                 IRGoggleData goggles => new IRGoggles(goggles),
                 ItemData itemData => itemData.shortName switch {
                     "deck" => new CyberDeck(itemData),
+                    "tools" => new BurglarTools(itemData),
                     _ => new BaseItem(baseItem)
                 },
                 _ => new BaseItem(baseItem)
@@ -28,6 +29,7 @@ namespace Items {
         }
         public virtual void Use(ItemHandler handler) { }
         public virtual bool EnablesManualHack() => false;
+        public virtual bool EnablesBurglary() => false;
     }
 }
 

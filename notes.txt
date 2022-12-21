@@ -1885,14 +1885,5 @@ NPC portraits not being set properly
 civ_female portrait could use some work
 strike team was not being dispatched in infiltration
 a guy danced on a corpse (I think he was investigating a noise?)
-
-use animation
-
-
-keeping impulse separate from targetangle:
-    the two compete.
-    duplicated code.
-using only impulse:
-    now why have opening / closing state?
-    checking bounds: use angleBounds, not targetangle.
-    auto close?
+clicking on overlay shot gun
+gun firing animation is broken now

@@ -1,5 +1,5 @@
 using UnityEngine;
-public class CameraTargetParameters {
+public record CameraTargetParameters {
     public float fieldOfView;
     public float deltaTime;
     public Quaternion rotation;

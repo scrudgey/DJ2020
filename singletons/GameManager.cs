@@ -10,7 +10,7 @@ public enum GameState { none, levelPlay, mainMenu }
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer }
-public enum InputMode { none, gun, cyber, aim, wallpressAim }
+public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
 public struct PointerData {
     public Texture2D mouseCursor;
     public Vector2 hotSpot;
@@ -46,6 +46,7 @@ public partial class GameManager : Singleton<GameManager> {
     public OverlayType activeOverlayType = OverlayType.none;
     private CursorType _cursorType;
     bool resetMouseControl;
+    public BurgleTargetData activeBurgleTargetData;
 
 
     public CursorType cursorType {
@@ -77,7 +78,6 @@ public partial class GameManager : Singleton<GameManager> {
         toggleConsoleThisFrame = ctx.ReadValueAsButton();
     }
     void LateUpdate() {
-
         // A hack to initialize a level from unity editor? doesn't currently work. 
         // if (numberFrames == 1 && SceneManager.GetActiveScene().name != "title") {
         //     // TODO: set level in gamedata
@@ -116,7 +116,6 @@ public partial class GameManager : Singleton<GameManager> {
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 if (!SceneManager.GetSceneByName("UI").isLoaded) {
-                    Debug.Log("loading UI");
                     LoadScene("UI", () => { uiController = GameObject.FindObjectOfType<UIController>(); }, unloadAll: false);
                 }
                 break;
@@ -285,6 +284,18 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
         cursorType = CursorType.gun;
+        TransitionToInputMode(InputMode.gun);
+    }
+
+    public void StartBurglar(BurgleTargetData data) {
+        // TransitionToState(GameState.burgle);
+        activeBurgleTargetData = data;
+        uiController.ShowBurglar(data);
+    }
+    public void CloseBurglar() {
+        // TransitionToState(GameState.levelPlay);
+        uiController.HideBurglar();
+        playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);
     }
 

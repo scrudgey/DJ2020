@@ -62,7 +62,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             tertiaryGun = GunState.Instantiate(gun3),
             activeGun = 2,
 
-            items = new List<string> { "explosive", "deck", "goggles", "ID" },
+            items = new List<string> { "explosive", "deck", "goggles", "ID", "tools" },
 
             cyberlegsLevel = 1,
             maxConcurrentNetworkHacks = 1,

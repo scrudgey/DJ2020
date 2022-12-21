@@ -16,7 +16,8 @@ public enum CharacterState {
     hitstun,
     keelOver,
     aim,
-    popout
+    popout,
+    burgle
 }
 public enum ClimbingState {
     Anchoring,
@@ -36,6 +37,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public ItemHandler itemHandler;
     public Interactor interactor;
     public ManualHacker manualHacker;
+    public Burglar burglar;
     public Footsteps footsteps;
     public AudioSource audioSource;
     public float defaultRadius = 0.25f;
@@ -184,6 +186,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             default:
+                break;
+            case CharacterState.burgle:
+                // GameManager.I.StartBurglar();
+                GameManager.I.TransitionToInputMode(InputMode.burglar);
                 break;
             case CharacterState.wallPress:
                 GameManager.I.TransitionToInputMode(InputMode.wallpressAim);
@@ -474,9 +480,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                         playerInput = input,
                         activeItem = itemHandler.activeItem
                     };
-                    if (manualHacker != null)
-                        manualHacker.SetInputs(manualHackInput);
-
+                    manualHacker?.SetInputs(manualHackInput);
+                    burglar?.SetInputs(manualHackInput);
                     if (interactor != null) {
                         interactor.SetInputs(input);
                     }
@@ -802,6 +807,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
         switch (state) {
+            case CharacterState.burgle:
+                currentVelocity = currentVelocity * 0.9f;
+                break;
             case CharacterState.hitstun:
                 currentVelocity = currentVelocity * 0.9f;
                 break;
