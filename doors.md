@@ -51,14 +51,3 @@ interactions:
     close door
     use key in door
     bash door
-
-how to enter manipulation mode?
-    take out burglar tools
-    this puts away gun
-    approach attack surface
-    click on attack surface
-this suggests a different way of handling hack device
-hackable / attackable things should be highlighted.
-
-when burglar tools are used:
-culling mask excludes player, includes attack surface special graphics

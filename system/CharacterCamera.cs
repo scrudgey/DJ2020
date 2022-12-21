@@ -443,19 +443,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         };
     }
     public CameraTargetParameters BurgleParameters(CameraInput input) {
-        // Find the smoothed follow position
-        // Vector3 LROffset = Vector3.zero;
-        // LROffset = input.targetTransform.right;
-        // Vector3 distOffset = input.wallNormal * TargetDistance * 2f;
-        // Vector3 heightOffset = new Vector3(0, -0.5f, 0);
-        // if (input.crouchHeld) {
-        //     heightOffset = new Vector3(0, -0.75f, 0);
-        // }
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
-        Vector3 camDirection = -1f * input.wallNormal;
+        Vector3 camDirection = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.forward;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
-
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
