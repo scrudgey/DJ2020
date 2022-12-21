@@ -44,6 +44,7 @@ public class BurglarCanvasController : MonoBehaviour {
             cursorRect.anchoredPosition = position;
             cursorRect.sizeDelta = new Vector2(bounds.width, bounds.height);
             cursorImage.color = Color.red;
+            cursorImage.enabled = false;
 
             uiElement.Initialize(this, element);
         }
