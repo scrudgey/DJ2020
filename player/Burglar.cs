@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 public class BurgleTargetData {
+    public Burglar burglar;
     public AttackSurface target;
-    public BurgleTargetData(AttackSurface target, Collider collider) {
+    public BurgleTargetData(AttackSurface target, Collider collider, Burglar burglar) {
         this.target = target;
+        this.burglar = burglar;
     }
     static public bool Equality(HighlightableTargetData a, HighlightableTargetData b) {
         if (a == null && b == null) {
@@ -51,7 +53,7 @@ public class Burglar : MonoBehaviour {
         } else return cyberComponents
             .ToList()
             .Where((KeyValuePair<Collider, AttackSurface> kvp) => IsNodeVulnerable(kvp.Value))
-            .Select((KeyValuePair<Collider, AttackSurface> kvp) => new BurgleTargetData(kvp.Value, kvp.Key))
+            .Select((KeyValuePair<Collider, AttackSurface> kvp) => new BurgleTargetData(kvp.Value, kvp.Key, this))
             .DefaultIfEmpty(null)
             .First(); // TODO: weigh the targets in some way, return deterministic
     }
@@ -79,9 +81,7 @@ public class Burglar : MonoBehaviour {
         }
         if (inputs.playerInput.useItem) {
             BurgleTargetData data = ActiveTarget();
-            Debug.Log($"burglar active target: {data}");
             if (data == null) return;
-            Debug.Log($"burglar burgle {data}");
             characterController.TransitionToState(CharacterState.burgle);
             GameManager.I.StartBurglar(data);
         }

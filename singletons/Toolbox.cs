@@ -342,7 +342,7 @@ public class Toolbox {
         lattice.Aggregate((curMin, x) => (curMin == null || (Quaternion.Angle(input, x)) < Quaternion.Angle(input, curMin) ? x : curMin));
 
 
-    static public Rect GetTotalRenderBoundingBox(Transform root, Camera UICamera) {
+    static public Rect GetTotalRenderBoundingBox(Transform root, Camera UICamera, bool adjustYScale = true) {
         float total_min_x = float.MaxValue;
         float total_max_x = float.MinValue;
         float total_min_y = float.MaxValue;
@@ -371,7 +371,8 @@ public class Toolbox {
 
                     // weird hack. maybe because billboarding? i.e. should be camera angle dependent?
                     Vector3 extents = bounds.extents;
-                    extents.y *= 1.3f;
+                    if (adjustYScale)
+                        extents.y *= 1.3f;
                     bounds.extents = extents;
                 }
             }

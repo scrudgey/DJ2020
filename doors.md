@@ -4,7 +4,8 @@ key requirements
 
 * door should open / close smoothly when interacted with
 * play sounds on open, close
-play sound on try to open but can't
+* play sound on try to open but can't
+we need a very satisfying unlock sound
 
 * door can be auto-closing
     * open door closes when player moves away
@@ -17,37 +18,31 @@ play sound on try to open but can't
 
 * slightly offset from hinge axis when open, to prevent z-fighting on flush jamb
 
-door can be locked / unlocked
+* door can be locked / unlocked
     locking systems:
-        physical lock
-        latch
+        * physical lock
+        * latch
         numeric keypad
         electronic access control
 
-locked door can be picked
+* locked door can be picked
 
-latch can be disabled
-    slip the latch while closed
+* latch can be disabled
+    * slip the latch while closed
     disable latching entirely
+    push door slightly when unlatched
+
+indicate 
 
 doors have knobs
     knob
     handle
     push bar
     no knob
+turn handle when door is activated
 
 doors can be bashed
 
 doors can have trip sensors
 
-selectable parameters in editor
-
-
-
-
-
-interactions:
-    open door
-    close door
-    use key in door
-    bash door
+* selectable parameters in editor

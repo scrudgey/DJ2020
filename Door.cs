@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Easings;
 using UnityEngine;
-
 public class Door : Interactive {
     public enum DoorState { closed, opening, closing, open }
     public enum DoorParity { twoWay, openIn, openOut }
     public bool autoClose;
     public bool latched;
+    public bool locked;
     public DoorParity parity;
     private DoorState _state;
     public DoorState state {
@@ -29,10 +30,15 @@ public class Door : Interactive {
     public AudioSource audioSource;
     public AudioClip[] openSounds;
     public AudioClip[] closeSounds;
+    public AudioClip[] lockedSounds;
+    public AudioClip[] unlockSounds;
+    public AudioClip[] unlatchSounds;
     public float manipulationSpeed = 150f;
     public float autoCloseSpeed = 80f;
     private static readonly float ANGLE_THRESHOLD = 0.1f;
     private Transform lastInteractorTransform;
+    public Transform knob;
+    Coroutine turnKnobCoroutine;
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
@@ -155,8 +161,10 @@ public class Door : Interactive {
     void OnStateExit(DoorState fromState, DoorState toState) {
         switch (fromState) {
             case DoorState.closed:
+                if (latched) {
+                    Toolbox.RandomizeOneShot(audioSource, openSounds);
+                }
                 latched = false;
-                Toolbox.RandomizeOneShot(audioSource, openSounds);
                 break;
             default:
                 break;
@@ -192,25 +200,33 @@ public class Door : Interactive {
     public override void DoAction(Interactor interactor) {
         // throw new System.NotImplementedException();
         lastInteractorTransform = interactor.transform;
+        ActivateDoorknob(interactor.transform);
+    }
+    public void ActivateDoorknob(Transform userTransform) {
         switch (state) {
             case DoorState.closing:
             case DoorState.closed:
-                if (parity == DoorParity.twoWay) {
-                    if (orientationPlane.GetSide(interactor.transform.position)) {
-                        ChangeState(DoorState.opening);
-                        targetAngle = 90f;
-                    } else {
+                if (locked) {
+                    Toolbox.RandomizeOneShot(audioSource, lockedSounds);
+                } else {
+                    TurnKnob();
+                    if (parity == DoorParity.twoWay) {
+                        if (orientationPlane.GetSide(interactor.transform.position)) {
+                            ChangeState(DoorState.opening);
+                            targetAngle = 90f;
+                        } else {
+                            ChangeState(DoorState.opening);
+                            targetAngle = -90f;
+                        }
+                    } else if (parity == DoorParity.openIn) {
                         ChangeState(DoorState.opening);
                         targetAngle = -90f;
+                    } else if (parity == DoorParity.openOut) {
+                        ChangeState(DoorState.opening);
+                        targetAngle = 90f;
                     }
-                } else if (parity == DoorParity.openIn) {
-                    ChangeState(DoorState.opening);
-                    targetAngle = -90f;
-                } else if (parity == DoorParity.openOut) {
-                    ChangeState(DoorState.opening);
-                    targetAngle = 90f;
+                    angularSpeed = manipulationSpeed;
                 }
-                angularSpeed = manipulationSpeed;
                 break;
             case DoorState.opening:
             case DoorState.open:
@@ -232,5 +248,57 @@ public class Door : Interactive {
         // Debug.Log($"torque: {torque}");
         // Rotate(f * torque.y);
         impulse += 10f * torque.y;
+    }
+
+    public void Unlock() {
+        if (locked) {
+            Toolbox.RandomizeOneShot(audioSource, unlockSounds);
+            locked = false;
+        }
+    }
+    public void Unlatch() {
+        if (latched) {
+            Toolbox.RandomizeOneShot(audioSource, unlatchSounds);
+            latched = false;
+        }
+    }
+    public void PushOpenSlightly(Transform opener) {
+        if (parity == DoorParity.twoWay) {
+            if (orientationPlane.GetSide(opener.position)) {
+                impulse = 10;
+            } else {
+                impulse = -10;
+            }
+        } else if (parity == DoorParity.openIn) {
+            impulse = -10f;
+        } else if (parity == DoorParity.openOut) {
+            impulse = 10f;
+        }
+    }
+
+    public void TurnKnob() {
+        if (turnKnobCoroutine == null) {
+            turnKnobCoroutine = StartCoroutine(DoTurnKnobRoutine());
+        }
+    }
+    IEnumerator DoTurnKnobRoutine() {
+        float timer = 0f;
+        float duration = 0.25f;
+        while (timer < duration) {
+            float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 0f, 90f, duration);
+            Quaternion turnRotation = Quaternion.AngleAxis(turnAngle, transform.right);
+            knob.localRotation = turnRotation;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        timer = 0f;
+        while (timer < duration) {
+            float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 90f, -90f, duration);
+            Quaternion turnRotation = Quaternion.AngleAxis(turnAngle, transform.right);
+            knob.localRotation = turnRotation;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        turnKnobCoroutine = null;
     }
 }
