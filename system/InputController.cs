@@ -45,6 +45,7 @@ public class InputController : MonoBehaviour {
 
     private Vector2 inputVector;
     private bool firePressedHeld;
+    private bool mouseDown;
     private bool firePressedThisFrame;
     private bool aimPressedThisFrame;
     private bool crouchHeld;
@@ -154,6 +155,7 @@ public class InputController : MonoBehaviour {
     }
     public void HandleFireActionCanceled(InputAction.CallbackContext ctx) {
         firePressedHeld = false;
+        mouseDown = false;
     }
     public void HandleCrouchActionCanceled(InputAction.CallbackContext ctx) {
         crouchHeld = false;
@@ -262,7 +264,7 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled -= HandleJumpActionCanceled;
     }
 
-    public void HandleCharacterInput(bool pointerOverUIElement) {
+    public PlayerInput HandleCharacterInput(bool pointerOverUIElement) {
         if (!escapePressedThisFrame && escapePressConsumed) {
             escapePressConsumed = false;
         }
@@ -271,17 +273,19 @@ public class InputController : MonoBehaviour {
             GameManager.I.ShowMenu(MenuType.escapeMenu);
             escapePressConsumed = true;
         }
+        mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;
         if (pointerOverUIElement) {
             firePressedThisFrame = false;
+            firePressedHeld = false;
         }
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
-
+        PlayerInput characterInputs = PlayerInput.none;
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
-            PlayerInput characterInputs = new PlayerInput() {
+            characterInputs = new PlayerInput() {
                 MoveAxisForward = inputVector.y,
                 MoveAxisRight = inputVector.x,
                 mouseDelta = mouseDelta,
@@ -306,7 +310,8 @@ public class InputController : MonoBehaviour {
                 rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
                 rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
                 lookAtDirection = directionToCursor,
-                zoomInput = zoomInput
+                zoomInput = zoomInput,
+                mouseDown = mouseDown
             };
             i.SetInputs(characterInputs);
         }
@@ -329,6 +334,8 @@ public class InputController : MonoBehaviour {
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
         escapePressedThisFrame = false;
+
+        return characterInputs;
     }
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public enum GameState { none, levelPlay, mainMenu }
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu }
 public enum OverlayType { none, power, cyber, alarm }
-public enum CursorType { none, gun, pointer }
+public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
 public struct PointerData {
     public Texture2D mouseCursor;
@@ -137,8 +137,15 @@ public partial class GameManager : Singleton<GameManager> {
             CursorType.pointer => new PointerData() {
                 // mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
                 // hotSpot = new Vector2(8, 8),
-                mouseCursor = Resources.Load("sprites/UI/elements/Cursor") as Texture2D,
+                mouseCursor = Resources.Load("sprites/UI/elements/Cursor32") as Texture2D,
                 hotSpot = new Vector2(0, 0),
+                cursorMode = CursorMode.Auto
+            },
+            CursorType.hand => new PointerData() {
+                // mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
+                // hotSpot = new Vector2(8, 8),
+                mouseCursor = Resources.Load("sprites/UI/elements/Hand") as Texture2D,
+                hotSpot = new Vector2(12, 0),
                 cursorMode = CursorMode.Auto
             },
             CursorType.gun => new PointerData {
@@ -243,28 +250,35 @@ public partial class GameManager : Singleton<GameManager> {
                 playerCharacterController.ResetInput();
             } else {
                 bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
-                if (uiclick) {
-                    cursorType = CursorType.pointer;
-                } else {
-                    cursorType = CursorType.gun;
-                }
 
-                if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                    resetMouseControl = true;
+                if (inputMode == InputMode.burglar) {
+                    if (!uiclick) {
+                        cursorType = CursorType.gun;
+                    }
                 } else {
-                    if (resetMouseControl) {
-                        Cursor.lockState = CursorLockMode.None;
-                        Cursor.visible = true;
-                        resetMouseControl = false;
+                    // TODO: adjust if we are in burglar mode
+                    if (uiclick) {
+                        cursorType = CursorType.pointer;
+                    } else {
+                        cursorType = CursorType.gun;
+                    }
+                    if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
+                        Cursor.lockState = CursorLockMode.Locked;
+                        Cursor.visible = false;
+                        resetMouseControl = true;
+                    } else {
+                        if (resetMouseControl) {
+                            Cursor.lockState = CursorLockMode.None;
+                            Cursor.visible = true;
+                            resetMouseControl = false;
+                        }
                     }
                 }
 
                 if (Time.timeScale > 0) {
-                    inputController.HandleCharacterInput(uiclick);
+                    PlayerInput playerInput = inputController.HandleCharacterInput(uiclick);
+                    uiController?.UpdateWithPlayerInput(playerInput);
                 }
-
                 // still not 100% clean here
                 CameraInput input = playerCharacterController.BuildCameraInput();
                 characterCamera.UpdateWithInput(input);

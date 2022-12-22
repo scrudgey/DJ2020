@@ -5,7 +5,7 @@ key requirements
 * door should open / close smoothly when interacted with
 * play sounds on open, close
 * play sound on try to open but can't
-we need a very satisfying unlock sound
+* we need a very satisfying unlock sound
 
 * door can be auto-closing
     * open door closes when player moves away
@@ -29,20 +29,24 @@ we need a very satisfying unlock sound
 
 * latch can be disabled
     * slip the latch while closed
-    disable latching entirely
-    push door slightly when unlatched
+    * push door slightly when unlatched
+    disable latching entirely (tape latch? damage?)
 
-indicate 
-
-doors have knobs
+* doors have knobs
+    * handle
     knob
-    handle
     push bar
     no knob
-turn handle when door is activated
+* turn handle when door is activated
+
+* selectable parameters in editor
+
+* indicate feedback to player?
 
 doors can be bashed
 
 doors can have trip sensors
 
-* selectable parameters in editor
+doubledoors
+
+two-sided door

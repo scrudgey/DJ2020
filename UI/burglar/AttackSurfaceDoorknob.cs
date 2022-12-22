@@ -7,15 +7,44 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public AudioSource audioSource;
     public AudioClip[] pickSounds;
     public AudioClip[] manipulateSounds;
-    public override void HandleAttack(BurglarToolType activeTool, BurgleTargetData data) {
-        base.HandleAttack(activeTool, data);
-        if (activeTool == BurglarToolType.lockpick) {
-            Toolbox.RandomizeOneShot(audioSource, pickSounds);
-            door.Unlock();
-        } else if (activeTool == BurglarToolType.probe) {
+    public float integratedPickTime;
+
+    public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
+        base.HandleSingleClick(activeTool, data);
+        if (activeTool == BurglarToolType.probe) {
             Toolbox.RandomizeOneShot(audioSource, manipulateSounds);
         } else if (activeTool == BurglarToolType.none) {
             door.ActivateDoorknob(data.burglar.transform);
         }
+
+        return BurglarAttackResult.None;
+    }
+
+    public override BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
+        base.HandleClickHeld(activeTool, data);
+        if (activeTool == BurglarToolType.lockpick) {
+            integratedPickTime += Time.deltaTime;
+            door.PickJiggleKnob();
+            if (!audioSource.isPlaying) {
+                Toolbox.RandomizeOneShot(audioSource, pickSounds);
+            }
+
+            if (integratedPickTime > 2f) {
+                integratedPickTime = 0f;
+                return DoPick();
+            }
+        }
+        return BurglarAttackResult.None;
+    }
+
+    BurglarAttackResult DoPick() {
+        bool success = door.locked;
+        door.Unlock();
+        if (success) {
+            return new BurglarAttackResult {
+                success = true,
+                feedbackText = "Door unlocked"
+            };
+        } else return BurglarAttackResult.None;
     }
 }

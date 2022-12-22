@@ -4,7 +4,6 @@
 tools
     finger: operate objects (how will this work?)
         turn handle
-
     lockpick
     shim / traveler's hook
     screwdriver
@@ -25,16 +24,15 @@ door:
     latched / unlatched
     locked / unlocked
 
-
 ### first effort
 
-show a handle with a keyhole in attack surface
+* show a handle with a keyhole in attack surface
 
-click lockpick to select it
+* click lockpick to select it
 
-with lockpick selected, click on the keyhole to pick it
+* with lockpick selected, click on the keyhole to pick it
 
-success causes the door to unlock
+* success causes the door to unlock
 
 ### numeric keypad
 
@@ -49,7 +47,6 @@ unscrew four screws on an access panel
 this reveals wires underneath the panel
 
 snip the wire to trigger something
-
 
 ## security levels
 
@@ -67,18 +64,35 @@ highest security:
 
 
 
-how will this work?
 
-set up interactive elements in the attack surface
+* set up interactive elements in the attack surface
+* when opening the attack camera, find the interactive elements in the attack surface
+* find their bounds in the camera view
+* create elements and place them in the camera view accordingly
+* make ui elements buttons
+* register buttons with canvas controller
+* click buttons -> callback
+    * specific logic 
+* click to select tools
+* text indicates selected tool
+* cursor image for tool
+* tools follow the cursor around
+* pointer or finger for interaction
+* toolbox icons
+* animate tool when in use?
+    * only when over element
+* jiggle door handle when locked
+* door handle rotation is weird!
 
-when opening the attack camera, find the interactive elements in the attack surface
-find their bounds in the camera view
-create elements and place them in the camera view accordingly
+lock keyway turns independently of the handle?
+highlight attack surfaces
+hotkeys 1-9 for tools
 
-make ui elements buttons
-register buttons with canvas controller
-click buttons -> callback
-    specific logic 
-click to select tools
-text indicates selected tool
-cursor image for tool
+
+
+* lockpicking takes time
+lockpicking takes skill
+    display timer
+    periodically reset timer
+
+auto-close when door is opened

@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class AttackSurfaceElement : MonoBehaviour {
     public string elementName;
-    public virtual void HandleAttack(BurglarToolType activeTool, BurgleTargetData data) {
-        Debug.Log($"{activeTool} -> {elementName}");
+    public virtual BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
+        return BurglarAttackResult.None;
+    }
+    public virtual BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
+        return BurglarAttackResult.None;
     }
 }

@@ -102,7 +102,7 @@ public class ManualHacker : MonoBehaviour {
         }
         if (inputs.playerInput.useItem) {
             HackTargetData data = ActiveTarget();
-            Debug.Log($"active target: {data}");
+            // Debug.Log($"active target: {data}");
             if (data == null) return;
             HackController.I.HandleHackInput(data.ToManualHackInput());
             OnActionDone?.Invoke(data);

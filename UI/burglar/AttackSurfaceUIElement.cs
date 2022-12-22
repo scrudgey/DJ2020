@@ -12,6 +12,9 @@ public class AttackSurfaceUIElement : MonoBehaviour {
     public void ClickCallback() {
         controller.ClickCallback(element);
     }
+    public void ClickDownCallback() {
+        controller.ClickDownCallback(element);
+    }
     public void MouseOverCallback() {
         controller.MouseOverUIElementCallback(element);
     }

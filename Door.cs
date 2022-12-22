@@ -208,6 +208,7 @@ public class Door : Interactive {
             case DoorState.closed:
                 if (locked) {
                     Toolbox.RandomizeOneShot(audioSource, lockedSounds);
+                    JiggleKnob();
                 } else {
                     TurnKnob();
                     if (parity == DoorParity.twoWay) {
@@ -281,12 +282,22 @@ public class Door : Interactive {
             turnKnobCoroutine = StartCoroutine(DoTurnKnobRoutine());
         }
     }
+    public void JiggleKnob() {
+        if (turnKnobCoroutine == null) {
+            turnKnobCoroutine = StartCoroutine(JiggleKnobRoutine());
+        }
+    }
+    public void PickJiggleKnob() {
+        if (turnKnobCoroutine == null) {
+            turnKnobCoroutine = StartCoroutine(PickJiggleKnobRoutine());
+        }
+    }
     IEnumerator DoTurnKnobRoutine() {
         float timer = 0f;
         float duration = 0.25f;
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 0f, 90f, duration);
-            Quaternion turnRotation = Quaternion.AngleAxis(turnAngle, transform.right);
+            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
             knob.localRotation = turnRotation;
             timer += Time.deltaTime;
             yield return null;
@@ -294,7 +305,35 @@ public class Door : Interactive {
         timer = 0f;
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 90f, -90f, duration);
-            Quaternion turnRotation = Quaternion.AngleAxis(turnAngle, transform.right);
+            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
+            knob.localRotation = turnRotation;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        turnKnobCoroutine = null;
+    }
+    IEnumerator JiggleKnobRoutine() {
+        float timer = 0f;
+        float duration = 0.25f;
+        while (timer < duration) {
+            float turnAngle = (float)PennerDoubleAnimation.BounceEaseOut(timer, 15f, -15f, duration);
+            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
+            knob.localRotation = turnRotation;
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        turnKnobCoroutine = null;
+    }
+    IEnumerator PickJiggleKnobRoutine() {
+        float timer = 0f;
+        float duration = Random.Range(0.05f, 0.15f);
+        float startAngle = knob.localRotation.eulerAngles.z;
+        if (startAngle > 180) startAngle -= 360f;
+        float offset = Random.Range(-10f, 10f);
+        float finalAngle = Mathf.Clamp(startAngle + offset, -10f, 10f);
+        while (timer < duration) {
+            float turnAngle = (float)PennerDoubleAnimation.CircEaseIn(timer, startAngle, finalAngle - startAngle, duration);
+            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
             knob.localRotation = turnRotation;
             timer += Time.deltaTime;
             yield return null;

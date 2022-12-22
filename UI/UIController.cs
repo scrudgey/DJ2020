@@ -52,6 +52,9 @@ public class UIController : MonoBehaviour {
         HideTerminal();
         HideBurglar();
     }
+    public void UpdateWithPlayerInput(PlayerInput input) {
+        burglarCanvasController.UpdateWithInput(input);
+    }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
     }
