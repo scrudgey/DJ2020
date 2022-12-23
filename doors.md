@@ -48,5 +48,3 @@ doors can be bashed
 doors can have trip sensors
 
 doubledoors
-
-two-sided door

@@ -88,11 +88,14 @@ lock keyway turns independently of the handle?
 highlight attack surfaces
 hotkeys 1-9 for tools
 
-
-
 * lockpicking takes time
 lockpicking takes skill
     display timer
     periodically reset timer
 
 auto-close when door is opened
+
+both sides of door
+
+
+display timer: this should be part of UI.

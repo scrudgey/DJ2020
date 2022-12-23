@@ -42,6 +42,7 @@ public class BurglarCanvasController : MonoBehaviour {
 
             GameObject obj = GameObject.Instantiate(UIElementPrefab);
             AttackSurfaceUIElement uiElement = obj.GetComponent<AttackSurfaceUIElement>();
+            uiElement.Bind(element.gameObject);
             obj.transform.SetParent(uiElementsContainer);
 
             RectTransform cursorRect = obj.GetComponent<RectTransform>();

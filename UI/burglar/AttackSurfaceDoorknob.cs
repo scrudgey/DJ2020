@@ -8,6 +8,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public AudioClip[] pickSounds;
     public AudioClip[] manipulateSounds;
     public float integratedPickTime;
+    bool clickedThisFrame;
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
@@ -23,6 +24,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public override BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleClickHeld(activeTool, data);
         if (activeTool == BurglarToolType.lockpick) {
+            clickedThisFrame = true;
             integratedPickTime += Time.deltaTime;
             door.PickJiggleKnob();
             if (!audioSource.isPlaying) {
@@ -31,6 +33,8 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
 
             if (integratedPickTime > 2f) {
                 integratedPickTime = 0f;
+                progressPercent = 0f;
+                OnValueChanged?.Invoke(this);
                 return DoPick();
             }
         }
@@ -46,5 +50,16 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                 feedbackText = "Door unlocked"
             };
         } else return BurglarAttackResult.None;
+    }
+
+    void Update() {
+        if (integratedPickTime > 0f) {
+            if (!clickedThisFrame) {
+                integratedPickTime -= Time.deltaTime;
+            }
+            progressPercent = integratedPickTime / 2f;
+            OnValueChanged?.Invoke(this);
+        }
+        clickedThisFrame = false;
     }
 }

@@ -190,7 +190,8 @@ public class VRMissionController : MonoBehaviour {
     }
 
     void OnDestroy() {
-        GameManager.I.OnNPCSpawn -= HandleStrikeTeamSpawn;
+        if (GameManager.I != null)
+            GameManager.I.OnNPCSpawn -= HandleStrikeTeamSpawn;
         foreach (CharacterController npcController in npcControllers) {
             npcController.OnCharacterDead -= HandleNPCDead;
         }
