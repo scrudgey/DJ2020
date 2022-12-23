@@ -70,6 +70,11 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 Toolbox.RandomizeOneShot(audioSource, goggles.goggleData.wearSounds);
                 break;
+            case BurglarTools:
+                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
+                    surface.EnableOutline();
+                }
+                break;
             default:
                 break;
         }
@@ -82,6 +87,11 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
             case IRGoggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
+                break;
+            case BurglarTools:
+                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
+                    surface.DisableOutline();
+                }
                 break;
             default:
                 break;

@@ -21,6 +21,7 @@ public class BurglarCanvasController : MonoBehaviour {
     bool mouseOverElement;
     bool mouseDown;
     AttackSurfaceElement selectedElement;
+    bool finishing;
     public void Initialize(BurgleTargetData data) {
         this.data = data;
 
@@ -37,7 +38,7 @@ public class BurglarCanvasController : MonoBehaviour {
         rawImage.texture = data.target.renderTexture;
         rawImage.color = Color.white;
         RectTransform containerRectTransform = uiElementsContainer.GetComponent<RectTransform>();
-        foreach (AttackSurfaceElement element in data.target.GetComponentsInChildren<AttackSurfaceElement>()) {
+        foreach (AttackSurfaceElement element in data.target.attackElementRoot.GetComponentsInChildren<AttackSurfaceElement>()) {
             Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
 
             GameObject obj = GameObject.Instantiate(UIElementPrefab);
@@ -108,6 +109,8 @@ public class BurglarCanvasController : MonoBehaviour {
     }
 
     public void ClickHeld(AttackSurfaceElement element) {
+        if (finishing)
+            return;
         BurglarAttackResult result = element.HandleClickHeld(selectedTool, data);
         if (result.success) {
             mouseOverElement = false;
@@ -116,12 +119,16 @@ public class BurglarCanvasController : MonoBehaviour {
         HandleAttackResult(result);
     }
     public void ClickDownCallback(AttackSurfaceElement element) {
+        if (finishing)
+            return;
         if (selectedTool == BurglarToolType.none)
             return;
         BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
         HandleAttackResult(result);
     }
     public void ClickCallback(AttackSurfaceElement element) {
+        if (finishing)
+            return;
         BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
         HandleAttackResult(result);
     }
@@ -136,6 +143,10 @@ public class BurglarCanvasController : MonoBehaviour {
                     feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
                 }
             }
+        }
+        if (result.finish) {
+            finishing = true;
+            StartCoroutine(WaitAndCloseMenu(1.5f));
         }
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
@@ -195,5 +206,10 @@ public class BurglarCanvasController : MonoBehaviour {
             toolPoint.rotation = jiggle;
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    IEnumerator WaitAndCloseMenu(float delay) {
+        yield return new WaitForSecondsRealtime(delay);
+        DoneButtonCallback();
     }
 }

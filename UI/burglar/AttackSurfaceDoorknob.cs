@@ -15,7 +15,11 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         if (activeTool == BurglarToolType.probe) {
             Toolbox.RandomizeOneShot(audioSource, manipulateSounds);
         } else if (activeTool == BurglarToolType.none) {
+            bool success = !door.locked;
             door.ActivateDoorknob(data.burglar.transform);
+            return BurglarAttackResult.None with {
+                finish = success
+            };
         }
 
         return BurglarAttackResult.None;

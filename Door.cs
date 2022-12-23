@@ -37,7 +37,7 @@ public class Door : Interactive {
     public float autoCloseSpeed = 80f;
     private static readonly float ANGLE_THRESHOLD = 0.1f;
     private Transform lastInteractorTransform;
-    public Transform knob;
+    public Transform[] knobs;
     Coroutine turnKnobCoroutine;
     float angularSpeed;
     LoHi angleBounds;
@@ -298,7 +298,10 @@ public class Door : Interactive {
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 0f, 90f, duration);
             Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            knob.localRotation = turnRotation;
+            foreach (Transform knob in knobs) {
+                knob.localRotation = turnRotation;
+
+            }
             timer += Time.deltaTime;
             yield return null;
         }
@@ -306,7 +309,10 @@ public class Door : Interactive {
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 90f, -90f, duration);
             Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            knob.localRotation = turnRotation;
+            foreach (Transform knob in knobs) {
+
+                knob.localRotation = turnRotation;
+            }
             timer += Time.deltaTime;
             yield return null;
         }
@@ -318,7 +324,10 @@ public class Door : Interactive {
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.BounceEaseOut(timer, 15f, -15f, duration);
             Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            knob.localRotation = turnRotation;
+            foreach (Transform knob in knobs) {
+
+                knob.localRotation = turnRotation;
+            }
             timer += Time.deltaTime;
             yield return null;
         }
@@ -327,14 +336,16 @@ public class Door : Interactive {
     IEnumerator PickJiggleKnobRoutine() {
         float timer = 0f;
         float duration = Random.Range(0.05f, 0.15f);
-        float startAngle = knob.localRotation.eulerAngles.z;
+        float startAngle = knobs[0].localRotation.eulerAngles.z;
         if (startAngle > 180) startAngle -= 360f;
         float offset = Random.Range(-10f, 10f);
         float finalAngle = Mathf.Clamp(startAngle + offset, -10f, 10f);
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.CircEaseIn(timer, startAngle, finalAngle - startAngle, duration);
             Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            knob.localRotation = turnRotation;
+            foreach (Transform knob in knobs) {
+                knob.localRotation = turnRotation;
+            }
             timer += Time.deltaTime;
             yield return null;
         }

@@ -38,7 +38,6 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
         progressRect.sizeDelta = new Vector2(width, 1f);
     }
     public override void HandleValueChanged(AttackSurfaceElement element) {
-        Debug.Log($"UI handle element changed: {element.progressPercent}");
         if (element.progressPercent > 0) {
             ShowProgress();
             SetProgress(element.progressPercent);

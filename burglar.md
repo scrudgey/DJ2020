@@ -61,6 +61,12 @@ highest security:
     key is vulnerable to pick
     door auto closes
 
+configuring attack surface:
+needs a collider
+    needs a rigidbody
+    needs to be on Object layer
+    needs to have tag system to stop interloper business
+
 
 
 
@@ -83,19 +89,14 @@ highest security:
     * only when over element
 * jiggle door handle when locked
 * door handle rotation is weird!
+* lockpicking takes time
+    * display timer
+* highlight attack surfaces
+* both sides of door
+* auto-close burglar view when door is opened
 
 lock keyway turns independently of the handle?
-highlight attack surfaces
 hotkeys 1-9 for tools
-
-* lockpicking takes time
 lockpicking takes skill
-    display timer
     periodically reset timer
-
-auto-close when door is opened
-
-both sides of door
-
-
-display timer: this should be part of UI.
+place doors in levels
