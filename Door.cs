@@ -1,30 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using UnityEngine;
+[System.Serializable]
+public class Lock {
+    public enum LockType { physical, electronic }
+    public Door door;
+    public LockType lockType;
+    public bool locked;
+    public int lockId;
+    public AudioClip[] unlockSounds;
+
+    public bool TryKey(LockType keyType, int keyId) {
+        if (keyType == lockType && keyId == lockId) {
+            this.locked = !this.locked;
+            Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+            return true;
+        }
+        return false;
+    }
+
+    public void PickLock() {
+        if (lockType == LockType.physical) {
+            this.locked = false;
+        }
+    }
+}
+
+
 public class Door : Interactive {
     public enum DoorState { closed, opening, closing, open }
     public enum DoorParity { twoWay, openIn, openOut }
     public bool autoClose;
     public bool latched;
-    public bool locked;
+    // public bool locked;
+    public Lock doorLock;
     public DoorParity parity;
     private DoorState _state;
     public DoorState state {
         get { return _state; }
     }
-    public Transform hinge;
-    public Transform parent;
+    public Transform[] hinges;
+    public Transform[] parents;
     private Transform _myTransform;
     private Plane orientationPlane;
-    public Transform myTransform {
-        get {
-            if (_myTransform == null) {
-                _myTransform = transform;
-            }
-            return _myTransform;
-        }
-    }
+    public Transform[] doorTransforms;
     public float angle;
     public float targetAngle;
     public AudioSource audioSource;
@@ -42,10 +63,12 @@ public class Door : Interactive {
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
-    Vector3 parentOriginalPosition;
+    Vector3[] parentOriginalPositions;
     void Awake() {
-        parentOriginalPosition = parent.position;
-        orientationPlane = new Plane(transform.forward, hinge.position);
+        // parentOriginalPositions = parent.position;
+        parentOriginalPositions = parents.Select(p => p.position).ToArray();
+        orientationPlane = new Plane(transform.forward, hinges[0].position);
+
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         angleBounds = parity switch {
             DoorParity.openIn => new LoHi(-90f, 0f),
@@ -184,13 +207,15 @@ public class Door : Interactive {
             return;
         // Debug.Log($"{delta}");
         angle += delta;
-        myTransform.RotateAround(hinge.position, Vector3.up, delta);
-
         float offAxis = -0.05f * Mathf.Sin(angle * (2 * Mathf.PI / 360));
-        parent.position = parentOriginalPosition + offAxis * hinge.right;
+        float parity = 1f;
+        for (int i = 0; i < doorTransforms.Length; i++) {
+            doorTransforms[i].RotateAround(hinges[i].position, hinges[i].up, parity * delta);
+            parents[i].position = parentOriginalPositions[i] + offAxis * hinges[i].right;
+            parity *= -1f;
+        }
 
         // TODO: check after rotation for collision
-        // TODO: check for closing, opening
     }
 
     void OnCollisionEnter(Collision col) {
@@ -202,11 +227,12 @@ public class Door : Interactive {
         lastInteractorTransform = interactor.transform;
         ActivateDoorknob(interactor.transform);
     }
+    public bool IsLocked() => doorLock.locked;
     public void ActivateDoorknob(Transform userTransform) {
         switch (state) {
             case DoorState.closing:
             case DoorState.closed:
-                if (locked) {
+                if (IsLocked()) {
                     Toolbox.RandomizeOneShot(audioSource, lockedSounds);
                     JiggleKnob();
                 } else {
@@ -240,23 +266,21 @@ public class Door : Interactive {
 
 
     public void Push(Vector3 hitNormal, Vector3 hitPoint) {
+        // TODO: fix!?
+
         // hitpoint is world coordinates.
-        // Debug.Log($"pushing: {hitNormal} {hitPoint}");
-        Vector3 d = hitPoint - hinge.position;
+        Vector3 d = hitPoint - hinges[0].position;
         d.y = 0;
-        // float torque = d.magnitude * hitNormal.magnitude;
         Vector3 torque = Vector3.Cross(d, -1f * hitNormal);
-        // Debug.Log($"torque: {torque}");
-        // Rotate(f * torque.y);
         impulse += 10f * torque.y;
     }
 
-    public void Unlock() {
-        if (locked) {
-            Toolbox.RandomizeOneShot(audioSource, unlockSounds);
-            locked = false;
-        }
-    }
+    // public void Unlock() {
+    //     if (locked) {
+    //         Toolbox.RandomizeOneShot(audioSource, unlockSounds);
+    //         locked = false;
+    //     }
+    // }
     public void Unlatch() {
         if (latched) {
             Toolbox.RandomizeOneShot(audioSource, unlatchSounds);

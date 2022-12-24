@@ -17,6 +17,8 @@ public class BurglarCanvasController : MonoBehaviour {
     public RectTransform toolPoint;
     public Image probeImage;
     public Image lockpickImage;
+    public Image keyImage;
+    public GameObject keyringButton;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
     bool mouseDown;
@@ -24,6 +26,7 @@ public class BurglarCanvasController : MonoBehaviour {
     bool finishing;
     public void Initialize(BurgleTargetData data) {
         this.data = data;
+        finishing = false;
 
         // initialize display
         captionText.text = "";
@@ -32,6 +35,7 @@ public class BurglarCanvasController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         SetTool(BurglarToolType.none);
+        keyringButton.SetActive(GameManager.I.gameData.playerState.physicalKeys.Count > 0);
 
         // configure elements
         data.target.EnableAttackSurface();
@@ -121,16 +125,14 @@ public class BurglarCanvasController : MonoBehaviour {
     public void ClickDownCallback(AttackSurfaceElement element) {
         if (finishing)
             return;
-        if (selectedTool == BurglarToolType.none)
-            return;
         BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
         HandleAttackResult(result);
     }
     public void ClickCallback(AttackSurfaceElement element) {
-        if (finishing)
-            return;
-        BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
-        HandleAttackResult(result);
+        // if (finishing)
+        //     return;
+        // BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
+        // HandleAttackResult(result);
     }
     void HandleAttackResult(BurglarAttackResult result) {
         if (result != BurglarAttackResult.None) {
@@ -163,12 +165,19 @@ public class BurglarCanvasController : MonoBehaviour {
         mouseOverElement = false;
         selectedElement = null;
     }
+    public void MouseEnterToolButton(string toolName) {
+        selectedToolText.text = toolName;
+    }
+    public void MouseExitToolButton() {
+        selectedToolText.text = selectedTool.ToString();
+    }
     public void ToolSelectCallback(string toolName) {
         // this is just so that we can properly wire up the buttons in unity editor.
         BurglarToolType toolType = toolName switch {
             "none" => BurglarToolType.none,
             "lockpick" => BurglarToolType.lockpick,
             "probe" => BurglarToolType.probe,
+            "key" => BurglarToolType.key,
             _ => BurglarToolType.none
         };
         SetTool(toolType);
@@ -181,14 +190,22 @@ public class BurglarCanvasController : MonoBehaviour {
             case BurglarToolType.none:
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
+                keyImage.enabled = false;
                 break;
             case BurglarToolType.lockpick:
                 probeImage.enabled = false;
                 lockpickImage.enabled = true;
+                keyImage.enabled = false;
                 break;
             case BurglarToolType.probe:
                 probeImage.enabled = true;
                 lockpickImage.enabled = false;
+                keyImage.enabled = false;
+                break;
+            case BurglarToolType.key:
+                probeImage.enabled = false;
+                lockpickImage.enabled = false;
+                keyImage.enabled = true;
                 break;
         }
     }

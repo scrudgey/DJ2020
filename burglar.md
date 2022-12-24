@@ -99,4 +99,4 @@ lock keyway turns independently of the handle?
 hotkeys 1-9 for tools
 lockpicking takes skill
     periodically reset timer
-place doors in levels
+suspicion when attacking a door

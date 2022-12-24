@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 [System.Serializable]
 public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICharacterHurtableState {
     public int credits;
@@ -47,6 +48,8 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public SpeechEtiquette[] etiquettes;
     public Sprite portrait;
 
+    public HashSet<int> physicalKeys;
+
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("s1");
         GunTemplate gun2 = GunTemplate.Load("p1");
@@ -75,7 +78,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
 
             speechSkillLevel = 3,
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
-            portrait = Resources.Load("sprites/portraits/Jack") as Sprite
+            portrait = Resources.Load("sprites/portraits/Jack") as Sprite,
+
+            physicalKeys = new HashSet<int>()
         };
     }
 

@@ -110,8 +110,9 @@ public class Toolbox {
             return Direction.rightUp;
         } else return Direction.right;
     }
-    static public T GetOrCreateComponent<T>(GameObject target) where T : Component {
-        T component = target.GetComponent<T>();
+    static public T GetOrCreateComponent<T>(GameObject target, bool inChildren = false) where T : Component {
+        T component = inChildren ? target.GetComponentInChildren<T>() : target.GetComponent<T>();
+
         if (component != null) {
             return component;
         } else {
