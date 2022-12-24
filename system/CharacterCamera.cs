@@ -498,7 +498,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         if (input.state == CharacterState.wallPress || state == CameraState.aim) {
             RaycastHit closestHit = new RaycastHit();
             closestHit.distance = Mathf.Infinity;
-            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
+            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetLayerMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
             for (int i = 0; i < _obstructionCount; i++) {
                 bool isIgnored = false;
                 for (int j = 0; j < IgnoredColliders.Count; j++) {
@@ -554,7 +554,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetLayerMask(Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = Vector3.zero;
 
         TagSystemData priorityData = null;
@@ -646,7 +646,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // Vector3 direction = transform.forward;
 
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = projection.GetPoint(100f);
 
         TagSystemData priorityData = null;

@@ -200,7 +200,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Vector3 trueDirection = gunDirection(input);
         Ray ray = new Ray(gunPosition, trueDirection);
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetMask(Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetLayerMask(Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.collider.transform.IsChildOf(root))
                 continue;
@@ -444,7 +444,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
             // TODO: if priority is not set, try lock 
             float lockRadius = gunInstance.template.lockOnSize;
-            int numColliders = Physics.OverlapSphereNonAlloc(targetPoint, lockRadius, lockOnColliders, LayerUtil.GetMask(Layer.obj));
+            int numColliders = Physics.OverlapSphereNonAlloc(targetPoint, lockRadius, lockOnColliders, LayerUtil.GetLayerMask(Layer.obj));
             Collider nearestOther = null;
             for (int i = 0; i < numColliders; i++) {
                 Collider collider = lockOnColliders[i];

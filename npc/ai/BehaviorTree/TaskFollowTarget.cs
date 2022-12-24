@@ -16,17 +16,19 @@ namespace AI {
         public Transform targetTransform;
         public Transform transform;
         LinkedList<Vector3> positions;
+        HashSet<int> keyIds;
         private static readonly float POINT_SPACING = 0.8f;
         public override void Initialize() {
             positions = new LinkedList<Vector3>();
             SetFollowPoint();
         }
-        public TaskFollowTarget(Transform transform, GameObject target, HeadBehavior headBehavior = HeadBehavior.normal) : base() {
+        public TaskFollowTarget(Transform transform, GameObject target, HashSet<int> keyIds, HeadBehavior headBehavior = HeadBehavior.normal) : base() {
             this.targetTransform = target.transform;
             this.transform = transform;
             this.headBehavior = headBehavior;
             this.targetController = target.GetComponent<CharacterController>();
-            taskMoveToKey = new TaskMoveToKey(transform, FOLLOW_TARGET_KEY);
+            this.keyIds = keyIds;
+            taskMoveToKey = new TaskMoveToKey(transform, FOLLOW_TARGET_KEY, keyIds);
             taskMoveToKey.SetData(FOLLOW_TARGET_KEY, targetTransform.position);
         }
 

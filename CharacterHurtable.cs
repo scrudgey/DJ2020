@@ -106,7 +106,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             return;
         Ray ray = new Ray(damage.position, damage.direction);
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(ray, wallDecalDistance, LayerUtil.GetMask(Layer.def, Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, wallDecalDistance, LayerUtil.GetLayerMask(Layer.def, Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.transform.IsChildOf(transform.root))
                 continue;

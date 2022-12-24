@@ -41,7 +41,7 @@ public class SphereAttackState : SphereControlState {
                     new TaskConditional(() => isPlayerVisible()),
                     new TaskShoot(gunHandler)
                 ),
-                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY)
+                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys)
             )
         );
     }

@@ -63,6 +63,8 @@ doors can be unlocked with keys
         IRL you want to steal a key without anyone noticing. but in game, you have only minutes
     try multiple keys in the door? realism
     key cutter -> generate master key? 
+    standard key codes
+    guards can drop keys
 
 
 doubledoors can be pushed?
@@ -75,3 +77,46 @@ doors can have trip sensors
 door interaction with NPC
 place doors in levels
 maybe auto-use key in door when using door
+
+
+
+# NPC interaction
+
+## NPC should be able to move through unlocked door
+
+Modify TaskMoveToKey to include logic for detecting when path passes through a door.
+
+Then the question is: how to handle it?
+
+Pause movement when I am in range. 
+Open door. 
+Wait until door is open.
+Resume movement.
+
+## NPC should navigate through only doors with access
+
+* unlocked doors
+
+* doors they have the key to
+
+This involves manually setting navmesh areas and masking them out selectively.
+Mapping from door keyId to navmesh area is tricky.
+    fixed mapping.
+    key1, key2: common keyed-alike.
+function: NPC key state -> NavMeshQueryFilter
+Better editor widgets can make the keyId obvious, and navmesh areas can be named after keyIds.
+
+now the only challenge is setting up the navmesh properly.
+
+## test environment
+
+set up a test environment level.
+
+spawn an NPC.
+
+instruct the NPC to move into a room, path takes through door.
+this could be a patrol route.
+
+
+
+how does it work with keyed-alike?

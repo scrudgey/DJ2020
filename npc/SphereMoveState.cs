@@ -16,7 +16,7 @@ public class SphereMoveState : SphereControlState {
     }
     void SetupRootNode() {
         rootTaskNode = new TaskRepeaterDecorator(new Sequence(
-            new TaskMoveToKey(owner.transform, RANDOM_POSITION_KEY),
+            new TaskMoveToKey(owner.transform, RANDOM_POSITION_KEY, owner.physicalKeys),
             new TaskTimerDectorator(2f),
             new TaskSetKey<Vector3>(RANDOM_POSITION_KEY, randomPoint)
         ));

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -37,4 +38,6 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public SpeechEtiquette[] etiquettes;
     [field: SerializeField]
     public Sprite portrait;
+
+    public List<int> physicalKeys;
 }

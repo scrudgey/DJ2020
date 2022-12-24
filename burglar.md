@@ -67,10 +67,6 @@ needs a collider
     needs to be on Object layer
     needs to have tag system to stop interloper business
 
-
-
-
-
 * set up interactive elements in the attack surface
 * when opening the attack camera, find the interactive elements in the attack surface
 * find their bounds in the camera view

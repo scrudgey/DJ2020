@@ -77,7 +77,7 @@ public class SearchDirectionState : SphereControlState {
                ), 3f);
 
             rootTaskNode = new Sequence(lookAround,
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, arrivalDistance: 1f) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient,
                 },
@@ -90,7 +90,7 @@ public class SearchDirectionState : SphereControlState {
             );
         } else {
             rootTaskNode = new Sequence(
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, arrivalDistance: 1f) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient
                 },

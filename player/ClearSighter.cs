@@ -51,7 +51,7 @@ public class ClearSighter : MonoBehaviour {
             myTransform.rotation = Quaternion.LookRotation(directionToCamera);
 
             // non-static colliders above me
-            int numberHits = Physics.OverlapSphereNonAlloc(myTransform.position, 20f, colliderHits, LayerUtil.GetMask(Layer.obj, Layer.bulletPassThrough, Layer.shell), QueryTriggerInteraction.Ignore);
+            int numberHits = Physics.OverlapSphereNonAlloc(myTransform.position, 20f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell), QueryTriggerInteraction.Ignore);
             // Debug.Log($"ovelap hits: {numberHits}");
             for (int k = 0; k < numberHits; k++) {
                 Collider collider = colliderHits[k];

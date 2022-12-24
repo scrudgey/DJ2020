@@ -14,9 +14,11 @@ namespace AI {
         Transform transform;
         Stack<Vector3> navPoints;
         PatrolRoute patrolRoute;
-        public TaskPatrol(Transform transform, PatrolRoute patrolRoute) : base() {
+        HashSet<int> keyIds;
+        public TaskPatrol(Transform transform, PatrolRoute patrolRoute, HashSet<int> keyIds) : base() {
             this.patrolRoute = patrolRoute;
             this.transform = transform;
+            this.keyIds = keyIds;
             setupRootNode();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
@@ -32,7 +34,7 @@ namespace AI {
             this.rootNode = new TaskUntilFailRepeater(new Sequence(
                 new TaskConditional(() => isDoneWaiting()),
                 new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
-                new TaskMoveToKey(transform, NAV_POINT_KEY) {
+                new TaskMoveToKey(transform, NAV_POINT_KEY, keyIds) {
                     headBehavior = TaskMoveToKey.HeadBehavior.casual,
                     speedCoefficient = 0.35f
                 }

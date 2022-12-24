@@ -73,7 +73,7 @@ public class ReactToAttackState : SphereControlState {
                     reorient = true
                 }, initialPause),
                 new Selector(
-                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY) {
+                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY, owner.physicalKeys) {
                         headBehavior = TaskMoveToKey.HeadBehavior.search,
                         speedCoefficient = 2f
                     },
@@ -100,7 +100,7 @@ public class ReactToAttackState : SphereControlState {
                         useKey = true,
                         reorient = true
                     }, initialPause),
-                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY) {
+                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY, owner.physicalKeys) {
                         headBehavior = TaskMoveToKey.HeadBehavior.search,
                         speedCoefficient = 2f
                     },

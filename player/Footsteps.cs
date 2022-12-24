@@ -72,7 +72,7 @@ public class Footsteps : MonoBehaviour {
         // TODO: use surface map...?
 
         TagSystemData data = new TagSystemData();
-        int numberHit = Physics.RaycastNonAlloc(transform.position + 0.1f * Vector3.up, -1f * transform.up, raycastHits, 0.5f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
+        int numberHit = Physics.RaycastNonAlloc(transform.position + 0.1f * Vector3.up, -1f * transform.up, raycastHits, 0.5f, LayerUtil.GetLayerMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
         if (numberHit > 0) {
             RaycastHit hit = raycastHits[0];
             data = Toolbox.GetTagData(hit.collider.gameObject);

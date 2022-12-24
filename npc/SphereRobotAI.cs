@@ -50,6 +50,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     bool awareOfCorpse;
     Collider[] nearbyOthers;
     RaycastHit[] raycastHits;
+    public HashSet<int> physicalKeys;
+
     public void Start() {
         raycastHits = new RaycastHit[1];
         nearbyOthers = new Collider[32];
@@ -207,7 +209,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (!input.CrouchDown) {
             float avoidFactor = 0.1f;
             float avoidRadius = 2f;
-            int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetMask(Layer.obj));
+            int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
             Vector3 closeness = Vector3.zero;
             for (int i = 0; i < numColliders; i++) {
                 Collider collider = nearbyOthers[i];
@@ -406,7 +408,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (distance > MAXIMUM_SIGHT_RANGE)
                 return false;
             Ray ray = new Ray(position, direction);
-            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
+            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetLayerMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
             clearLineOfSight |= numberHits == 0;
         }
         return clearLineOfSight;

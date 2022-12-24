@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using UnityEditor;
 using UnityEngine;
 [System.Serializable]
 public class Lock {
@@ -195,7 +196,6 @@ public class Door : Interactive {
     }
 
     void Rotate(float delta) {
-        // Debug.Log($"{angle} {delta} {angleBounds}");
         if (angle + delta > angleBounds.high) {
             delta = angleBounds.high - angle;
             // impulse = -0.1f * impulse;
@@ -205,7 +205,6 @@ public class Door : Interactive {
         }
         if (delta == 0)
             return;
-        // Debug.Log($"{delta}");
         angle += delta;
         float offAxis = -0.05f * Mathf.Sin(angle * (2 * Mathf.PI / 360));
         float parity = 1f;
@@ -223,7 +222,6 @@ public class Door : Interactive {
     }
 
     public override void DoAction(Interactor interactor) {
-        // throw new System.NotImplementedException();
         lastInteractorTransform = interactor.transform;
         ActivateDoorknob(interactor.transform);
     }
@@ -275,12 +273,6 @@ public class Door : Interactive {
         impulse += 10f * torque.y;
     }
 
-    // public void Unlock() {
-    //     if (locked) {
-    //         Toolbox.RandomizeOneShot(audioSource, unlockSounds);
-    //         locked = false;
-    //     }
-    // }
     public void Unlatch() {
         if (latched) {
             Toolbox.RandomizeOneShot(audioSource, unlatchSounds);
@@ -375,4 +367,10 @@ public class Door : Interactive {
         }
         turnKnobCoroutine = null;
     }
+
+#if UNITY_EDITOR
+    void OnDrawGizmos() {
+        Handles.Label(transform.position, $"KeyId: {doorLock.lockId}");
+    }
+#endif
 }

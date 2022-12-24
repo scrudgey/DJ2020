@@ -17,7 +17,7 @@ public class FollowTheLeaderState : SphereControlState {
     }
 
     void SetupRootNode(GameObject leader) {
-        rootTaskNode = new TaskFollowTarget(owner.transform, leader) {
+        rootTaskNode = new TaskFollowTarget(owner.transform, leader, owner.physicalKeys) {
             headBehavior = headBehavior
         };
     }

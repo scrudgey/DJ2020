@@ -215,7 +215,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 isCrouching = true;
                 PoolManager.I.GetPool("prefabs/fx/landImpactFx").GetObject(transform.position);
                 Ray ray = new Ray(transform.position + new Vector3(0f, 0.1f, 0f), Vector3.down);
-                RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
+                RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive));
                 foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
                     if (hit.collider.transform.IsChildOf(transform.root))
                         continue;
@@ -749,7 +749,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         Vector3 dir = -1f * wallNormal;
         float length = 0.4f;
         Debug.DrawRay(start, length * dir, new Color(162, 142, 149));
-        int numberHit = Physics.RaycastNonAlloc(start, dir, rayCastHits, length, LayerUtil.GetMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
+        int numberHit = Physics.RaycastNonAlloc(start, dir, rayCastHits, length, LayerUtil.GetLayerMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
         // for (int i = 0; i < numberHit; i++) {
         //     Debug.Log(rayCastHits[i].collider);
         // }

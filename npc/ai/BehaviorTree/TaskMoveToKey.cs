@@ -20,13 +20,14 @@ namespace AI {
         public float headSwivelOffset;
         public float speedCoefficient = 1f;
         Vector3 baseLookDirection;
-
-        public TaskMoveToKey(Transform transform, string key, float arrivalDistance = 0.15f) : base() {
+        HashSet<int> keyIds;
+        public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, float arrivalDistance = 0.15f) : base() {
             navMeshPath = new NavMeshPath();
             pathIndex = -1;
             this.transform = transform;
             this.key = key;
             this.CORNER_ARRIVAL_DISTANCE = arrivalDistance;
+            this.keyIds = keyIds;
             SetDestination();
         }
         public override void Initialize() {
@@ -87,13 +88,16 @@ namespace AI {
             if (keyObj == null)
                 return;
             Vector3 target = (Vector3)keyObj;
-            if (NavMesh.SamplePosition(target, out hit, 10f, NavMesh.AllAreas)) {
+            NavMeshQueryFilter filter = new NavMeshQueryFilter {
+                areaMask = LayerUtil.KeySetToNavLayerMask(keyIds)
+            };
+            if (NavMesh.SamplePosition(target, out hit, 10f, filter)) {
                 Vector3 destination = hit.position;
-                NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navMeshPath);
+                NavMesh.CalculatePath(transform.position, destination, filter, navMeshPath);
                 pathIndex = 1;
-            } else if (NavMesh.SamplePosition(target, out hit, 100f, NavMesh.AllAreas)) {
+            } else if (NavMesh.SamplePosition(target, out hit, 100f, filter)) {
                 Vector3 destination = hit.position;
-                NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navMeshPath);
+                NavMesh.CalculatePath(transform.position, destination, filter, navMeshPath);
                 pathIndex = 1;
             } else {
                 Debug.LogWarning($"could not find navmeshhit for {target}");

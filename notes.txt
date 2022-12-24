@@ -1823,11 +1823,20 @@ clearsighter
         1. restrict computation to only the visible
         2. octree
 
-faster shotgun
-    click to rack faster?
-    raise - shoot - pump
-    animator speed can be adjusted
 
+
+code-controlled shoot animation
+    fix shooting animation and automatic interval
+    faster shotgun
+        click to rack faster?
+        raise - shoot - pump
+        animator speed can be adjusted
+
+
+skills
+    gun skills
+    speech skills
+    lockpicking skills
 
 ---------------
 
@@ -1887,3 +1896,7 @@ strike team was not being dispatched in infiltration
 a guy danced on a corpse (I think he was investigating a noise?)
 clicking on overlay shot gun
 gun firing animation is broken now
+
+
+build AC vent
+line renderer
