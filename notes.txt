@@ -1678,6 +1678,8 @@ note: layer "interactive"
 * hack write should crouch with player
 * better UI for hack feedback
     * bigger, keep with overall style
+    * doors
+* attack surfaces
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1846,8 +1848,6 @@ more, bigger levels
     wide, long level
     bright / brutalist concrete level
 nimrod for texts
-5. doors
-6. attack surfaces
 
 graphics:
     silenced pistol
@@ -1897,6 +1897,11 @@ a guy danced on a corpse (I think he was investigating a noise?)
 clicking on overlay shot gun
 gun firing animation is broken now
 
-
-build AC vent
+place doors in level
+burglar tools cause suspicion
+* build AC vent
 line renderer
+
+
+build a test level equivalent to Jack That Data
+build a test level, 3 storey building infiltration

@@ -40,7 +40,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public Burglar burglar;
     public Footsteps footsteps;
     public AudioSource audioSource;
-    public float defaultRadius = 0.25f;
+    public float defaultRadius = 0.10f;
     public Action<CharacterController> OnCharacterDead;
     public Action<CharacterController> OnValueChanged { get; set; }
 
@@ -390,7 +390,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
             // Crouching input
             if (input.CrouchDown || input.jumpHeld || state == CharacterState.landStun || state == CharacterState.jumpPrep) {
-                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 if (!isCrouching) {
                     isCrouching = true;
                     if (input.CrouchDown)
@@ -433,7 +433,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 jumpIndicatorController.superJumpSpeed = superJumpSpeed;
                 jumpIndicatorController.gravity = Gravity;
                 jumpIndicatorController.SetInputs(input);
-                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 if (input.jumpReleased) {
                     _timeSinceJumpRequested = 0f;
                     _jumpRequested = true;
@@ -443,7 +443,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 isRunning = false;
                 isProne = false;
                 if (input.CrouchDown) {
-                    SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                    SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                     if (!isCrouching) {
                         isCrouching = true;
                         Toolbox.RandomizeOneShot(audioSource, crouchingSounds);
@@ -605,11 +605,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 if (Motor.Velocity.y < 0) {
                     SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 } else {
-                    SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                    SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 }
                 break;
             case CharacterState.landStun:
-                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 break;
         }
 
@@ -921,7 +921,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.landStun:
                 if (Motor.GroundingStatus.IsStableOnGround) {
-                    SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                    SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                     currentVelocity = Motor.GetDirectionTangentToSurface(currentVelocity, Motor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
                     currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, 0.2f);
                 } else {
@@ -1125,7 +1125,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             _probedColliders = new Collider[8];
             if (Motor.CharacterCollisionsOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders) > 0) {
                 // If obstructions, just stick to crouching dimensions
-                SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
             } else {
                 // If no obstructions, uncrouch
                 SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
@@ -1202,7 +1202,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.jumpPrep:
                 jumpIndicatorController.transform.rotation = Quaternion.identity;
                 direction = Motor.CharacterForward;
-                Motor.SetCapsuleDimensions(defaultRadius, 0.5f, 0.25f);
+                Motor.SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 break;
             case CharacterState.climbing:
                 switch (_climbingState) {

@@ -14,6 +14,8 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
         myRootTransform = transform.root;
     }
     private void OnTriggerEnter(Collider other) {
+        if (myRootTransform == null)
+            return;
         // Debug.Log($"FOV enter: {other}");
         if (other.transform.root.IsChildOf(myRootTransform))
             return;

@@ -110,13 +110,10 @@ now the only challenge is setting up the navmesh properly.
 
 ## test environment
 
-set up a test environment level.
+* set up a test environment level.
 
-spawn an NPC.
+* spawn an NPC.
 
-instruct the NPC to move into a room, path takes through door.
-this could be a patrol route.
-
-
+* instruct the NPC to move into a room, path takes through door.
 
 how does it work with keyed-alike?

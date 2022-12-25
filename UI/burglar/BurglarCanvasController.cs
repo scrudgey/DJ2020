@@ -18,6 +18,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image probeImage;
     public Image lockpickImage;
     public Image keyImage;
+    public Image screwdriverImage;
     public GameObject keyringButton;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
@@ -178,6 +179,7 @@ public class BurglarCanvasController : MonoBehaviour {
             "lockpick" => BurglarToolType.lockpick,
             "probe" => BurglarToolType.probe,
             "key" => BurglarToolType.key,
+            "screwdriver" => BurglarToolType.screwdriver,
             _ => BurglarToolType.none
         };
         SetTool(toolType);
@@ -191,21 +193,31 @@ public class BurglarCanvasController : MonoBehaviour {
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
+                screwdriverImage.enabled = false;
                 break;
             case BurglarToolType.lockpick:
                 probeImage.enabled = false;
                 lockpickImage.enabled = true;
                 keyImage.enabled = false;
+                screwdriverImage.enabled = false;
                 break;
             case BurglarToolType.probe:
                 probeImage.enabled = true;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
+                screwdriverImage.enabled = false;
                 break;
             case BurglarToolType.key:
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = true;
+                screwdriverImage.enabled = false;
+                break;
+            case BurglarToolType.screwdriver:
+                probeImage.enabled = false;
+                lockpickImage.enabled = false;
+                keyImage.enabled = false;
+                screwdriverImage.enabled = true;
                 break;
         }
     }

@@ -90,9 +90,12 @@ needs a collider
 * highlight attack surfaces
 * both sides of door
 * auto-close burglar view when door is opened
+* rattle grate sound
 
 lock keyway turns independently of the handle?
 hotkeys 1-9 for tools
 lockpicking takes skill
     periodically reset timer
 suspicion when attacking a door
+
+screw removed sound
