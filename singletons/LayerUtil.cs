@@ -37,9 +37,6 @@ public class LayerUtil {
             .Aggregate((mask1, mask2) => mask1 | mask2);
 
     public static int KeySetToNavLayerMask(HashSet<int> keyIds) {
-        foreach (int key in keyIds) {
-            Debug.Log($"key id: {key}");
-        }
         HashSet<NavLayer> totalNavLayer = keyIds.Select(keyId => KeyIdToNavLayer(keyId)).ToHashSet();
         totalNavLayer.Add(NavLayer.def);
         return GetNavLayerMask(totalNavLayer.ToArray());

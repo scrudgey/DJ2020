@@ -223,10 +223,15 @@ public class Door : Interactive {
 
     public override void DoAction(Interactor interactor) {
         lastInteractorTransform = interactor.transform;
-        ActivateDoorknob(interactor.transform);
+        ActivateDoorknob(interactor.transform.position);
     }
     public bool IsLocked() => doorLock.locked;
-    public void ActivateDoorknob(Transform userTransform) {
+    public void ActivateDoorknob(Vector3 position, HashSet<int> withKeySet = null) {
+        if (withKeySet != null && doorLock != null) {
+            foreach (int keyId in withKeySet) {
+                doorLock.TryKey(Lock.LockType.physical, keyId);
+            }
+        }
         switch (state) {
             case DoorState.closing:
             case DoorState.closed:
@@ -236,7 +241,7 @@ public class Door : Interactive {
                 } else {
                     TurnKnob();
                     if (parity == DoorParity.twoWay) {
-                        if (orientationPlane.GetSide(interactor.transform.position)) {
+                        if (orientationPlane.GetSide(position)) {
                             ChangeState(DoorState.opening);
                             targetAngle = 90f;
                         } else {

@@ -30,7 +30,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
             }
         } else if (activeTool == BurglarToolType.none) {
             bool success = !door.IsLocked();
-            door.ActivateDoorknob(data.burglar.transform);
+            door.ActivateDoorknob(data.burglar.transform.position);
             return BurglarAttackResult.None with {
                 finish = success
             };

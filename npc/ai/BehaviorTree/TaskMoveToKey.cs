@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-
 namespace AI {
 
     public class TaskMoveToKey : TaskNode {
@@ -21,6 +21,7 @@ namespace AI {
         public float speedCoefficient = 1f;
         Vector3 baseLookDirection;
         HashSet<int> keyIds;
+        Door waitForDoor;
         public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, float arrivalDistance = 0.15f) : base() {
             navMeshPath = new NavMeshPath();
             pathIndex = -1;
@@ -34,17 +35,21 @@ namespace AI {
             SetDestination();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
+
+            // possibly fail
             if (navFailures >= 2) {
                 return TaskState.failure;
             }
+
+            // repathing
             if (repathTimer > repathInterval) {
-                repathTimer = 0f;
+                repathTimer -= repathInterval;
                 SetDestination();
             }
             repathTimer += Time.deltaTime;
 
+            // Head / look direction
             if (headBehavior == HeadBehavior.casual) {
-                // TODO: abstract out to some equivalent of an easing function
                 headSwivelOffset = 45f * Mathf.Sin(Time.time);
             } else if (headBehavior == HeadBehavior.search) {
                 headSwivelOffset = 45f * Mathf.Sin(Time.time * 2f);
@@ -53,7 +58,13 @@ namespace AI {
             lookDirection = Quaternion.AngleAxis(headSwivelOffset, Vector3.up) * lookDirection;
             input.lookAtDirection = lookDirection;
 
-            if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
+            // navigation
+            if (waitForDoor != null) {
+                // TODO: more elaborate behavior to navigate to a specific point provided by the door.
+                if (waitForDoor.state != Door.DoorState.opening && waitForDoor.state != Door.DoorState.closing)
+                    waitForDoor = null;
+                return TaskState.running;
+            } else if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
                 return TaskState.running;
             } else if (pathIndex <= navMeshPath.corners.Length - 1) {
                 Vector3 inputVector = Vector3.zero;
@@ -72,6 +83,11 @@ namespace AI {
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
                 }
+
+                // check for doors between me and nextPoint
+                if (waitForDoor == null) {
+                    CheckForDoors(transform.position + new Vector3(0f, 1f, 0f), nextPoint + new Vector3(0f, 1f, 0f));
+                }
                 return TaskState.running;
             } else {
                 return TaskState.success;
@@ -80,6 +96,27 @@ namespace AI {
 
         public bool AtDestination() {
             return pathIndex == navMeshPath.corners.Length;
+        }
+
+        public void CheckForDoors(Vector3 position, Vector3 nextPoint) {
+            Vector3 direction = nextPoint - position;
+            Ray ray = new Ray(position, direction);
+            RaycastHit[] hits = Physics.RaycastAll(ray, 2f, LayerUtil.GetLayerMask(Layer.interactive));
+            Debug.DrawRay(position, direction, Color.green, 1f);
+            foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+                if (hit.transform.IsChildOf(transform.root))
+                    continue;
+                bool doorFound = hit.collider.CompareTag("door");
+                Color color = doorFound ? Color.yellow : Color.red;
+                Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
+                if (doorFound) {
+                    Door door = hit.collider.gameObject.GetComponent<Door>();
+                    if (door.state != Door.DoorState.open) {
+                        door.ActivateDoorknob(position, withKeySet: keyIds);
+                        waitForDoor = door;
+                    }
+                }
+            }
         }
 
         public void SetDestination() {
