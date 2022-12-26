@@ -1908,7 +1908,8 @@ build a test level equivalent to Jack That Data
     * guards on patrol
     * patrol back and forth
     * lively patrol
-    camera should be more visible
+        * patrol type is controlled by template
+    * camera should be more visible
     set up networks
     set up objective
     Mission, not VRMission
