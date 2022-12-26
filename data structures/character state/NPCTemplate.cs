@@ -40,4 +40,6 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public Sprite portrait;
 
     public List<int> physicalKeys;
+
+    public Alertness alertness;
 }

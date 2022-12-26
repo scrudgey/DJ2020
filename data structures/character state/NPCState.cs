@@ -34,6 +34,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
 
         SphereRobotAI ai = npcObject.GetComponent<SphereRobotAI>();
         ai.physicalKeys = new HashSet<int>(template.physicalKeys);
+        ai.alertness = template.alertness;
     }
 
     // public void Save() {
