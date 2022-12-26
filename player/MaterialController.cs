@@ -61,8 +61,8 @@ public class MaterialController {
     public void InterloperStart() {
         timer = 0.1f;
     }
-    public void CeilingCheck(Vector3 playerPosition, Plane cullingPlane) {
-        if (collider.bounds.center.y < playerPosition.y + 0.05f) {
+    public void CeilingCheck(Vector3 playerPosition, Plane cullingPlane, float floorHeight) {
+        if (collider.bounds.center.y < playerPosition.y + 0.05f || collider.bounds.center.y < floorHeight) {
             disableBecauseAbove = false;
             return;
         }
@@ -154,8 +154,15 @@ public class MaterialController {
                 if (renderer == null || !renderer.enabled || renderer.CompareTag("donthide"))
                     continue;
                 renderer.material.SetFloat("_TargetAlpha", targetAlpha);
-                // Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableBecauseAbove} targetAlpha: {targetAlpha}");
-                renderer.shadowCastingMode = (targetAlpha <= 0.01) ? ShadowCastingMode.ShadowsOnly : initialShadowCastingMode[renderer];
+                if (targetAlpha <= 0.01) {
+                    renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+                    renderer.material = normalMaterials[renderer];
+                } else {
+                    renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+                    renderer.material = interloperMaterials[renderer];
+                    renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+                }
+                // Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableBecauseAbove} targetAlpha: {targetAlpha} shadowcasting: {renderer.shadowCastingMode}");
             }
         }
     }

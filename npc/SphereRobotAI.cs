@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using KinematicCharacterController;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 public enum Reaction { ignore, attack, investigate }
@@ -663,4 +664,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         playerInDisguise = GameManager.I.gameData.playerState.disguise,
         playerSpeechSkill = GameManager.I.gameData.playerState.speechSkillLevel
     };
+
+#if UNITY_EDITOR
+    void OnDrawGizmos() {
+        if (stateMachine != null) {
+            string labelText = $"state: {stateMachine.currentStateName}";
+            Handles.Label(transform.position, labelText);
+        }
+    }
+#endif
 }

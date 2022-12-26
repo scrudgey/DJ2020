@@ -1744,7 +1744,7 @@ strike team
     when one is alerted, all are alerted?
     solution for total level wipe of NPCs
         reset strike team count when one dies?
-        if you've killed everyone, more arrive?
+        if you've killed everyone, more arrive? <-- this
     search level systematically
         ideally, move and clear room to room.
             possibility 1: generate room and door mappings automatically
@@ -1785,11 +1785,15 @@ UI:
         fix edge coloration from active node to alarm terminal
 
 control / combat:
+    controller support
     headshots
     shoulder switch is a control
     aim sway responds to movement and gun skill
     bullets that can pass through targets
     armor & armor piercing
+    modernize some controls:
+        weapon / item wheel
+        click to select interactive surfaces without selecting burglar tools.
 
 sound
     ambience
@@ -1814,18 +1818,16 @@ better action log
     font?
 
 clearsighter
-    we want to disable shells when they're newly produced, but hide them when they're static.
     * could be a lot more efficient if things are addressable by position in space.
     * apply shadows to interloper shader
-    a better system?
-        everything below the plane centered on camera and below player is visible
     * hiding corspe interlopers
         not interloper, but hide above.
+    we want to disable shells when they're newly produced, but hide them when they're static.
+    a better system?
+        everything below the plane centered on camera and below player is visible
     clearsighter optimization
         1. restrict computation to only the visible
         2. octree
-
-
 
 code-controlled shoot animation
     fix shooting animation and automatic interval
@@ -1833,7 +1835,6 @@ code-controlled shoot animation
         click to rack faster?
         raise - shoot - pump
         animator speed can be adjusted
-
 
 skills
     gun skills
@@ -1904,4 +1905,23 @@ line renderer
 
 
 build a test level equivalent to Jack That Data
+    * guards on patrol
+    * patrol back and forth
+    * lively patrol
+    camera should be more visible
+    set up networks
+    set up objective
+    Mission, not VRMission
+        no VR objective display
+    key in the grass
+    grass
+    roof zone
+    sphere robot
+    don't destroy the floors
+
+
+interloper shader casts full shadow
+minimap
+    it's an item?
+
 build a test level, 3 storey building infiltration

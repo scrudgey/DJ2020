@@ -67,7 +67,7 @@ public class ClearSighter : MonoBehaviour {
                     if (inRooftopZone) {
                         controller.disableBecauseAbove = false;
                     } else {
-                        controller.CeilingCheck(myTransform.position, cullingPlane);
+                        controller.CeilingCheck(myTransform.position, cullingPlane, floorHeight);
                     }
                 }
             }
@@ -151,7 +151,7 @@ public class ClearSighter : MonoBehaviour {
             if (inRooftopZone) {
                 controller.disableBecauseAbove = false;
             } else {
-                controller.CeilingCheck(myPosition, cullingPlane);
+                controller.CeilingCheck(myPosition, cullingPlane, floorHeight);
             }
             controller.Update();
         }

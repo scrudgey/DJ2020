@@ -19,7 +19,7 @@ public class SpherePatrolState : SphereControlState {
         SetupRootNode();
     }
     void SetupRootNode() {
-        rootTaskNode = new TaskPatrol(owner.transform, patrolRoute, owner.physicalKeys);
+        rootTaskNode = new TaskPatrol(owner.transform, patrolRoute, TaskPatrol.PatrolType.lively, owner.physicalKeys);
     }
 
     public override PlayerInput Update(ref PlayerInput input) {
