@@ -78,7 +78,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
 
             speechSkillLevel = 3,
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
-            portrait = Resources.Load("sprites/portraits/Jack") as Sprite,
+            portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
 
             physicalKeys = new HashSet<int>()
         };

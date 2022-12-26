@@ -49,6 +49,12 @@ public partial class GameManager : Singleton<GameManager> {
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(state);
     }
+
+    public void StartMission(LevelState state) {
+        Debug.Log($"GameMananger: start mission {state.template.levelName}");
+        InitializeLevel();
+        TransitionToState(GameState.levelPlay);
+    }
     public void ReturnToTitleScreen() {
         MusicController.I.Stop();
         LoadScene("title", () => {

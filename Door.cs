@@ -375,7 +375,8 @@ public class Door : Interactive {
 
 #if UNITY_EDITOR
     void OnDrawGizmos() {
-        Handles.Label(transform.position, $"KeyId: {doorLock.lockId}");
+        bool locked = IsLocked();
+        Handles.Label(transform.position, $"Locked: {locked}\nKeyId: {doorLock.lockId}");
     }
 #endif
 }

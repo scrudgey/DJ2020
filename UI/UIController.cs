@@ -112,7 +112,7 @@ public class UIController : MonoBehaviour {
         canvas.enabled = false;
     }
     public void ShowUI() {
-        ShowVRStats();
+        // ShowVRStats();
         canvas.enabled = true;
     }
 }

@@ -13,29 +13,49 @@ using UnityEngine.SceneManagement;
 [CustomEditor(typeof(LevelDataUtil))]
 [CanEditMultipleObjects]
 public class LevelDataUtilEditor : Editor {
-    public string levelName = "test";
+    // public string levelName = "test";
+    // public LevelTemplate levelData;
+    LevelDataUtil t;
+    SerializedObject GetTarget;
+    SerializedProperty levelData;
+    void OnEnable() {
+        t = (LevelDataUtil)target;
+        GetTarget = new SerializedObject(t);
+        levelData = GetTarget.FindProperty("levelData"); // Find the List in our script and create a refrence of it
+    }
     public override void OnInspectorGUI() {
-        levelName = EditorGUILayout.TextField("level name", levelName);
 
-        if (GUILayout.Button("Write Level Data")) {
-            LevelDataUtil networkUtil = (LevelDataUtil)target;
-            string sceneName = SceneManager.GetActiveScene().name;
+        EditorGUILayout.PropertyField(levelData);
+        // levelData = (LevelTemplate)base.serializedObject.FindProperty("levelData").objectReferenceValue;
 
-            PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
-            CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
-            AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
+        // levelName = EditorGUILayout.TextField("level name", levelName);
+        LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
+        if (template != null) {
+            string levelName = template.levelName;
+            // Debug.Log(levelName);
+            if (GUILayout.Button("Write Level Data")) {
+                LevelDataUtil networkUtil = (LevelDataUtil)target;
+                string sceneName = SceneManager.GetActiveScene().name;
 
-            foreach (Node node in powerGraph.nodes.Values) {
-                Debug.Log($"writing power graph: {node.idn} {levelName}");
+                PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
+                CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
+                AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
+
+                foreach (Node node in powerGraph.nodes.Values) {
+                    Debug.Log($"writing power graph: {node.idn} {levelName}");
+                }
+
+                powerGraph.Write(levelName, sceneName);
+                cyberGraph.Write(levelName, sceneName);
+                alarmGraph.Write(levelName, sceneName);
+
+                AssetDatabase.Refresh();
             }
-
-            powerGraph.Write(levelName, sceneName);
-            cyberGraph.Write(levelName, sceneName);
-            alarmGraph.Write(levelName, sceneName);
-
-            AssetDatabase.Refresh();
+        } else {
+            Debug.LogError("set level template before writing level data");
         }
-        serializedObject.ApplyModifiedProperties();
+
+        GetTarget.ApplyModifiedProperties();
     }
 
 

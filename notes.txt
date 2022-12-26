@@ -1680,6 +1680,8 @@ note: layer "interactive"
     * bigger, keep with overall style
     * doors
 * attack surfaces
+* place doors in level
+* build AC vent
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1898,11 +1900,17 @@ a guy danced on a corpse (I think he was investigating a noise?)
 clicking on overlay shot gun
 gun firing animation is broken now
 
-place doors in level
-burglar tools cause suspicion
-* build AC vent
 line renderer
-
+interloper shader casts full shadow
+minimap
+    it's an item?
+auto-use key in door
+get cyber network working once and for all
+normalize state name conventions
+level / mission / state / detla / template
+tighten up crawling
+navigable chair
+burglar tools cause suspicion
 
 build a test level equivalent to Jack That Data
     * guards on patrol
@@ -1910,19 +1918,21 @@ build a test level equivalent to Jack That Data
     * lively patrol
         * patrol type is controlled by template
     * camera should be more visible
-    set up networks
+    * set up networks
+    * wire up alarms
+    * Mission, not VRMission
+        * no VR objective display
+    * key in the grass
     set up objective
-    Mission, not VRMission
-        no VR objective display
-    key in the grass
     grass
     roof zone
     sphere robot
     don't destroy the floors
+    fix stairs
 
-
-interloper shader casts full shadow
-minimap
-    it's an item?
+graphics:
+    stairs ramp
+    alarm box
+    grass
 
 build a test level, 3 storey building infiltration

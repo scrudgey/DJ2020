@@ -4,5 +4,4 @@ using UnityEngine;
 
 public class LevelDataUtil : MonoBehaviour {
     public LevelTemplate levelData;
-    public AudioClip klaxonSound;
 }

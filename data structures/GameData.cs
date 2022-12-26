@@ -12,10 +12,10 @@ public record GameData {
 
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
-
+        PlayerState playerState = PlayerState.DefaultState();
         return new GameData() {
             state = GameState.none,
-            playerState = PlayerState.DefaultState(),
+            playerState = playerState,
             levelState = LevelState.Instantiate(levelTemplate),
             overlayIndex = 0
         };

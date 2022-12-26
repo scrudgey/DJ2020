@@ -11,6 +11,6 @@ public class LevelTemplate : ScriptableObject {
     public float strikeTeamResponseTime;
     public NPCTemplate strikeTeamTemplate;
     public static LevelTemplate LoadAsInstance(string name) {
-        return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/levelTemplate") as LevelTemplate);
+        return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/{name}") as LevelTemplate);
     }
 }
