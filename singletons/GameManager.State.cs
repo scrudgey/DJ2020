@@ -21,30 +21,38 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.physicalKeys.Add(keyId);
         CheckObjectives();
     }
+    public void CompleteAllObjectives() {
 
+    }
     public void CheckObjectives() {
+        foreach (Objective objective in gameData.levelState.template.objectives) {
+            ObjectiveStatus oldStatus = gameData.levelState.delta.objectivesState[objective];
+            ObjectiveStatus newStatus = objective.Status(gameData);
+            if (oldStatus != newStatus) {
+                uiController.LogMessage($"Objective {objective.title}: {newStatus}");
+            }
+            gameData.levelState.delta.objectivesState[objective] = newStatus;
+        }
+
         List<ObjectiveStatus> statuses = gameData.levelState.template.objectives
             .Where(objective => !objective.isOptional)
             .Select(objective => objective.Status(gameData)).ToList();
 
-
-
-        ObjectiveStatus newStatus;
-
+        ObjectiveStatus newTotalStatus;
         if (statuses.Any(status => status == ObjectiveStatus.failed)) {
-            newStatus = ObjectiveStatus.failed;
+            newTotalStatus = ObjectiveStatus.failed;
         } else if (statuses.All(status => status == ObjectiveStatus.complete)) {
-            newStatus = ObjectiveStatus.complete;
+            newTotalStatus = ObjectiveStatus.complete;
         } else {
-            newStatus = ObjectiveStatus.inProgress;
+            newTotalStatus = ObjectiveStatus.inProgress;
         }
 
-        if (newStatus != gameData.levelState.delta.objectiveStatus) {
-            gameData.levelState.delta.objectiveStatus = newStatus;
+        if (newTotalStatus != gameData.levelState.delta.objectiveStatus) {
+            gameData.levelState.delta.objectiveStatus = newTotalStatus;
             // notify watchers
-            if (newStatus == ObjectiveStatus.complete) {
+            if (newTotalStatus == ObjectiveStatus.complete) {
                 HandleAllObjectivesComplete();
-            } else if (newStatus == ObjectiveStatus.failed) {
+            } else if (newTotalStatus == ObjectiveStatus.failed) {
                 HandleObjectiveFailed();
             }
         }
@@ -57,12 +65,19 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"level status: {gameData.levelState.delta.objectiveStatus}");
     }
 
-    void HandleAllObjectivesComplete() {
+    public void HandleAllObjectivesComplete() {
+        bool cutsceneStarted = false;
+        uiController.LogMessage($"Objectives complete, proceed to extraction");
         foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
             zone.EnableExtractionZone();
+            if (zone.showCutscene && !cutsceneStarted) {
+                ShowExtractionZoneCutscene(zone);
+                cutsceneStarted = true;
+            }
         }
     }
     void HandleObjectiveFailed() {
         Debug.Log("objectives failed!");
+        uiController.LogMessage($"Objectives failed, proceed to extraction");
     }
 }

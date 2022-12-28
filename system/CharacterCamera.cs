@@ -218,7 +218,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         IgnoredColliders.AddRange(g.GetComponentsInChildren<Collider>());
     }
 
-    public void UpdateWithInput(CameraInput input) {
+    public void UpdateWithInput(CameraInput input, bool ignoreAttractor = false) {
         // if (FollowTransform == null)
         // return;
         CameraState camState = CameraState.normal;
@@ -230,7 +230,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             camState = CameraState.wallPress;
         } else if (input.state == CharacterState.burgle) {
             camState = CameraState.burgle;
-        } else {
+        } else if (!ignoreAttractor) {
             // check / update Attractor
             foreach (CameraAttractorZone attractor in attractors) {
                 if (attractor.sphereCollider.bounds.Contains(input.playerPosition)) {

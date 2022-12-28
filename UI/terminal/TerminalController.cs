@@ -21,6 +21,7 @@ namespace UI {
             commands["alarm"] = ToggleAlarm;
             commands["disguise"] = ToggleDisguise;
             commands["timescale"] = TimeScale;
+            commands["extract"] = Objectives;
         }
         public void OnEnable() {
             TakeFocus();
@@ -75,6 +76,11 @@ namespace UI {
         public void TimeScale(string[] args) {
             float timescale = float.Parse(args[0]);
             Time.timeScale = timescale;
+        }
+        public void Objectives(string[] args) {
+            // float timescale = float.Parse(args[0]);
+            // Time.timeScale = timescale;
+            GameManager.I.HandleAllObjectivesComplete();
         }
 
         public void SetValue(string[] args) {

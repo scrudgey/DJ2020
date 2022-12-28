@@ -1682,6 +1682,7 @@ note: layer "interactive"
 * attack surfaces
 * place doors in level
 * build AC vent
+* dark background for objectives holder
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1910,6 +1911,12 @@ tighten up crawling
 navigable chair
 burglar tools cause suspicion
 can we remove NPC json converter?
+tab to hide burglar 
+line renderer
+    clean up connections
+    marching ants?
+    better coloration
+
 
 build a test level, 3 storey building infiltration
 
@@ -1929,11 +1936,14 @@ build a test level equivalent to Jack That Data
         * steal the data
         * show objectives when one is completed
         * show objectives when level starts
+        * show objectives on pause screen
+    * log when objects change
+    * log when objectives complete
     * extraction zone
-        highlight the extraction zone
-        pulse the extraction zone, use text, use arrow
-        maybe a cutscene?
-        mission end 
+        * highlight the extraction zone
+        * pulse the extraction zone, use text, use arrow
+        * maybe a cutscene?
+    mission end 
     sphere robot
         NPC template should allow sphere? different spawner?
     don't destroy the floors
@@ -1944,17 +1954,10 @@ graphics:
     alarm box
     grass
 
-line renderer
-    clean up connections
-    marching ants?
-    better coloration
-
-
 victory conditions
 after action report
 mission select screen
 apartment
-tab to hide burglar 
 
-dark background for objectives holder
-show objectives on pause screen
+why do attack surfaces start out highlighted?
+why do we start with gun out but no suspicion?

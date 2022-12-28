@@ -85,6 +85,11 @@ public class UIController : MonoBehaviour {
         healthIndicatorController.Bind(target);
         hitIndicatorController.Bind(target);
     }
+    public void LogMessage(string message) {
+        if (actionLogHandler != null) {
+            actionLogHandler.ShowMessage(message);
+        }
+    }
     public void ShowTerminal() {
         terminalCanvas.enabled = true;
         terminal.gameObject.SetActive(true);
