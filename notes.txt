@@ -1929,11 +1929,11 @@ build a test level equivalent to Jack That Data
         * steal the data
         * show objectives when one is completed
         * show objectives when level starts
-        show objectives on pause screen
     * extraction zone
         highlight the extraction zone
         pulse the extraction zone, use text, use arrow
         maybe a cutscene?
+        mission end 
     sphere robot
         NPC template should allow sphere? different spawner?
     don't destroy the floors
@@ -1956,3 +1956,5 @@ mission select screen
 apartment
 tab to hide burglar 
 
+dark background for objectives holder
+show objectives on pause screen
