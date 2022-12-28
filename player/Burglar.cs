@@ -85,7 +85,6 @@ public class Burglar : MonoBehaviour {
         }
         if (inputs.playerInput.useItem) {
             BurgleTargetData data = ActiveTarget();
-            Debug.Log($"burglar target: {data}");
             if (data == null) return;
             characterController.TransitionToState(CharacterState.burgle);
             GameManager.I.StartBurglar(data);

@@ -1843,16 +1843,15 @@ skills
     speech skills
     lockpicking skills
 
----------------
+minimap
+    it's an item?
 
-NEXT:
-more, bigger levels
-    rooms
-    wide, long level
-    bright / brutalist concrete level
 nimrod for texts
 
-graphics:
+weapons
+    colt 2037 sped up sounds great
+
+graphics
     silenced pistol
     rocket launcher
     grenade
@@ -1860,16 +1859,17 @@ graphics:
     patrol guard
     title screen logo
     title screen animations 
-model:
+
+models
     cones
     sawhorse
-colt 2037 sped up sounds great
 
-DFS path finding doesn't quite work right for highlighting alarm path
-damage result addition is weird
-don't shoot corpse away
+
+
+---------------
 
 NPC tuning:
+    when you can't reach the player (navigation fail) don't just walk away
     NPC sees destroyed cameras
     adjustable NPC difficulty
         guards reacting to your shooting are too fast on the draw?
@@ -1888,10 +1888,11 @@ anti-camping visibility boost
     guards are aware of your aggression 
     haven't moved in a while
     have shot more than once or twice?
-
+DFS path finding doesn't quite work right for highlighting alarm path
+damage result addition is weird
+don't shoot corpse away
 billboard interloper shader should be cutout, or something is up with interloper shader + shells
 credstick surfing
-
 hack target ! indicator only sometimes visible
 NPC portraits not being set properly
 civ_female portrait could use some work
@@ -1899,11 +1900,8 @@ strike team was not being dispatched in infiltration
 a guy danced on a corpse (I think he was investigating a noise?)
 clicking on overlay shot gun
 gun firing animation is broken now
-
-line renderer
+SpottedHighlight should use full navigation path
 interloper shader casts full shadow
-minimap
-    it's an item?
 auto-use key in door
 get cyber network working once and for all
 normalize state name conventions
@@ -1911,6 +1909,9 @@ level / mission / state / detla / template
 tighten up crawling
 navigable chair
 burglar tools cause suspicion
+can we remove NPC json converter?
+
+build a test level, 3 storey building infiltration
 
 build a test level equivalent to Jack That Data
     * guards on patrol
@@ -1923,10 +1924,18 @@ build a test level equivalent to Jack That Data
     * Mission, not VRMission
         * no VR objective display
     * key in the grass
-    set up objective
-    grass
-    roof zone
+    * roof zone
+    * set up objective
+        * steal the data
+        * show objectives when one is completed
+        * show objectives when level starts
+        show objectives on pause screen
+    * extraction zone
+        highlight the extraction zone
+        pulse the extraction zone, use text, use arrow
+        maybe a cutscene?
     sphere robot
+        NPC template should allow sphere? different spawner?
     don't destroy the floors
     fix stairs
 
@@ -1935,4 +1944,15 @@ graphics:
     alarm box
     grass
 
-build a test level, 3 storey building infiltration
+line renderer
+    clean up connections
+    marching ants?
+    better coloration
+
+
+victory conditions
+after action report
+mission select screen
+apartment
+tab to hide burglar 
+

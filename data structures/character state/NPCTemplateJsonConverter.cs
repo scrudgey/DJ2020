@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
+    // is this really necessary?
     // required because NPCTemplate is a scriptableObject used as an instance, it cannot always be loaded from asset path
     public static class Constants {
         public static readonly string LEGSKIN = "legSkin";

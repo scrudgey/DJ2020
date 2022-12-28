@@ -11,6 +11,9 @@ public class SpottedHighlight : MonoBehaviour {
     public Color red;
     float timer;
     public void Update() {
+
+        // TODO: provide navigation mesh liens
+
         lineRenderer.enabled = target != null;
         targetIndicator.enabled = target != null;
         if (target == null)
@@ -34,5 +37,9 @@ public class SpottedHighlight : MonoBehaviour {
         // pulse material x offset
         float offset = Mathf.Sin(timer);
         lineMaterial.SetTextureOffset("_MainTex", new Vector2(offset, 0));
+    }
+
+    public void SetPoints() {
+
     }
 }

@@ -24,7 +24,9 @@ public class ClearSighter : MonoBehaviour {
         myTransform = transform;
         InitializeMaterialControllerCache();
         InvokeRepeating("HandleStaticGeometry", 0f, 1f);
-        rooftopZones = GameObject.FindObjectsOfType<RooftopZone>().Select(zone => zone.GetComponent<Collider>()).ToList();
+        rooftopZones = GameObject.FindObjectsOfType<RooftopZone>()
+            .SelectMany(zone => zone.GetComponentsInChildren<Collider>())
+            .ToList();
         coroutine = StartCoroutine(RunJobRepeatedly());
     }
     IEnumerator RunJobRepeatedly() {

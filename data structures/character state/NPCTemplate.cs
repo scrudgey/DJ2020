@@ -28,7 +28,6 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
 
     // health
     public float health { get; set; }
-
     [field: SerializeField]
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }

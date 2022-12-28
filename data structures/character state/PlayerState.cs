@@ -50,6 +50,8 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
 
     public HashSet<int> physicalKeys;
 
+    public List<PayData> payDatas;
+
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("s1");
         GunTemplate gun2 = GunTemplate.Load("p1");
@@ -80,7 +82,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
             portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
 
-            physicalKeys = new HashSet<int>()
+            physicalKeys = new HashSet<int>(),
+
+            payDatas = new List<PayData>()
         };
     }
 

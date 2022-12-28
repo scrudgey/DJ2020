@@ -7,7 +7,7 @@ public class Credstick : Interactive {
     public AudioClip[] pickupSounds;
     public override void DoAction(Interactor interactor) {
         Destroy(gameObject);
-        GameManager.I.gameData.playerState.credits += amount;
+        GameManager.I.AddCredits(amount);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
     }

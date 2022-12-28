@@ -28,6 +28,7 @@ public class UIController : MonoBehaviour {
     public HitIndicatorController hitIndicatorController;
     public VRStatHandler vRStatHandler;
     public BurglarCanvasController burglarCanvasController;
+    public ObjectiveCanvasController objectiveCanvasController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -41,10 +42,10 @@ public class UIController : MonoBehaviour {
         lockIndicatorHandler.UICamera = Camera.main;
         playerCalloutHandler.UICamera = Camera.main;
         hackDisplay.cam = Camera.main;
+        caption.text = "";
 
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnCaptionChange += HandleCaptionChange;
-        caption.text = "";
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
         canvas.enabled = true;
@@ -52,11 +53,15 @@ public class UIController : MonoBehaviour {
         HideTerminal();
         HideBurglar();
     }
+    public void InitializeObjectivesController(GameData data) {
+        objectiveCanvasController.Initialize(data);
+    }
     public void UpdateWithPlayerInput(PlayerInput input) {
         burglarCanvasController.UpdateWithInput(input);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
+        GameManager.OnCaptionChange -= HandleCaptionChange;
     }
 
     void BindToNewTarget(GameObject target) {

@@ -116,7 +116,10 @@ public partial class GameManager : Singleton<GameManager> {
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 if (!SceneManager.GetSceneByName("UI").isLoaded) {
-                    LoadScene("UI", () => { uiController = GameObject.FindObjectOfType<UIController>(); }, unloadAll: false);
+                    LoadScene("UI", () => {
+                        uiController = GameObject.FindObjectOfType<UIController>();
+                        uiController.InitializeObjectivesController(gameData);
+                    }, unloadAll: false);
                 }
                 break;
             default:

@@ -11,7 +11,7 @@ namespace AI {
         public HeadBehavior headBehavior;
         float CORNER_ARRIVAL_DISTANCE = 0.15f;
         public NavMeshPath navMeshPath;
-        int pathIndex;
+        public int pathIndex;
         Transform transform;
         string key;
         float repathTimer;
@@ -31,6 +31,13 @@ namespace AI {
             this.keyIds = keyIds;
             SetDestination();
         }
+
+        public Vector3[] GetNavPath() {
+            if (pathIndex <= navMeshPath.corners.Length - 1) {
+                return navMeshPath.corners[pathIndex..^0];
+            } else return new Vector3[0];
+        }
+
         public override void Initialize() {
             SetDestination();
         }

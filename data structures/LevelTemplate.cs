@@ -10,6 +10,7 @@ public class LevelTemplate : ScriptableObject {
     public AudioClip alarmAudioClip;
     public float strikeTeamResponseTime;
     public NPCTemplate strikeTeamTemplate;
+    public List<Objective> objectives;
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/{name}") as LevelTemplate);
     }

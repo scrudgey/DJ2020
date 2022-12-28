@@ -5,6 +5,7 @@ public record LevelDelta {
     public CyberGraph cyberGraph;
     public AlarmGraph alarmGraph;
     public int strikeTeamMaxSize;
+    public ObjectiveStatus objectiveStatus;
 
     public static LevelDelta Empty() => new LevelDelta {
 

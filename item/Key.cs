@@ -7,7 +7,7 @@ public class Key : Interactive {
     public AudioClip[] pickupSounds;
     public override void DoAction(Interactor interactor) {
         Destroy(gameObject);
-        GameManager.I.gameData.playerState.physicalKeys.Add(keyId);
+        GameManager.I.AddPhysicalKey(keyId);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
     }
