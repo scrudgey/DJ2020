@@ -6,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/LevelTemplate")]
 public class LevelTemplate : ScriptableObject {
     public string levelName;
+    public string sceneName;
     public SensitivityLevel sensitivityLevel;
     public AudioClip alarmAudioClip;
     public float strikeTeamResponseTime;

@@ -7,18 +7,19 @@ public class LevelBootstrapper : MonoBehaviour {
     public LevelTemplate levelTemplate;
     public bool VRMission;
     void Start() {
-
+        if (GameManager.I.isLoadingLevel)
+            return;
         if (VRMission) {
             BootStrapVR();
         } else {
             BootStrapMission();
         }
 
-        if (spawnNPCs) {
-            foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
-                spawnPoint.SpawnTemplated();
-            }
-        }
+        // if (spawnNPCs) {
+        //     foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+        //         spawnPoint.SpawnTemplated();
+        //     }
+        // }
     }
 
     void BootStrapVR() {

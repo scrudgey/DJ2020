@@ -1916,7 +1916,9 @@ line renderer
     clean up connections
     marching ants?
     better coloration
-
+fancy objectives complete display
+why do attack surfaces start out highlighted?
+why do we start with gun out but no suspicion?
 
 build a test level, 3 storey building infiltration
 
@@ -1943,21 +1945,26 @@ build a test level equivalent to Jack That Data
         * highlight the extraction zone
         * pulse the extraction zone, use text, use arrow
         * maybe a cutscene?
-    mission end 
     sphere robot
         NPC template should allow sphere? different spawner?
     don't destroy the floors
     fix stairs
+    fix laser 
+    make level more challenging
+        turrets
 
 graphics:
     stairs ramp
     alarm box
     grass
 
-victory conditions
-after action report
+
+wire up success -> FinishMission after action
+wire up after action report -> main menu
+
+* wire up death -> FinishMission fail menu
+* wire up retry -> reload mission
+* wire up replan -> main menu
+
 mission select screen
 apartment
-
-why do attack surfaces start out highlighted?
-why do we start with gun out but no suspicion?

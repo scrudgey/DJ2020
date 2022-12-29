@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GameState { none, levelPlay, mainMenu }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -169,6 +169,11 @@ public partial class GameManager : Singleton<GameManager> {
         GameManager.I.uiController.HideUI();
         switch (menuType) {
             default:
+                break;
+            case MenuType.missionFail:
+                if (!SceneManager.GetSceneByName("MissionFailMenu").isLoaded) {
+                    LoadScene("MissionFailMenu", callback, unloadAll: false);
+                }
                 break;
             case MenuType.dialogue:
                 if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {

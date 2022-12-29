@@ -28,6 +28,7 @@ public class ExtractionZone : MonoBehaviour {
             return;
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             Debug.Log("successful extraction");
+            GameManager.I.FinishMission(true);
         }
     }
     IEnumerator PulseExtractionZone() {

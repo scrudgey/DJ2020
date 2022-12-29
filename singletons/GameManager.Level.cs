@@ -40,6 +40,16 @@ public partial class GameManager : Singleton<GameManager> {
 
         LoadScene(template.sceneName, () => StartVRMission(state));
     }
+    public void LoadMission(LevelTemplate template) {
+        Debug.Log("GameMananger: load mission");
+
+        // instantiate gamedata
+        gameData = GameData.TestInitialData() with {
+            levelState = LevelState.Instantiate(template),
+        };
+
+        LoadScene(template.sceneName, () => StartMission(gameData.levelState));
+    }
 
     public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
@@ -53,8 +63,44 @@ public partial class GameManager : Singleton<GameManager> {
     public void StartMission(LevelState state) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         InitializeLevel();
+        playerCharacterController.OnCharacterDead += HandlePlayerDead;
+
+        // spawn NPC
+        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+            spawnPoint.SpawnTemplated();
+        }
+
         TransitionToState(GameState.levelPlay);
     }
+    void HandlePlayerDead(CharacterController npc) {
+        FinishMission(false);
+    }
+
+    public void FinishMission(bool success) {
+        playerCharacterController.OnCharacterDead -= HandlePlayerDead;
+        if (success) {
+            FinishMissionSuccess();
+        } else {
+            FinishMissionFail();
+        }
+    }
+
+    public void FinishMissionSuccess() {
+        Debug.Log("mission success");
+        MusicController.I.Stop();
+        LoadScene("title", () => {
+            Debug.Log("start title screen");
+            activeMenuType = MenuType.none;
+        });
+    }
+    public void FinishMissionFail() {
+        Debug.Log("mission fail");
+        GameManager.I.ShowMenu(MenuType.missionFail, () => {
+            MissionFailMenuController menuController = GameObject.FindObjectOfType<MissionFailMenuController>();
+            menuController.Initialize(gameData);
+        });
+    }
+
     public void ReturnToTitleScreen() {
         MusicController.I.Stop();
         LoadScene("title", () => {
@@ -83,7 +129,7 @@ public partial class GameManager : Singleton<GameManager> {
         StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
             isLoadingLevel = false;
             foreach (LevelBootstrapper bootstrapper in GameObject.FindObjectsOfType<LevelBootstrapper>()) {
-                Destroy(bootstrapper.gameObject);
+                DestroyImmediate(bootstrapper.gameObject);
             }
             Debug.Log("hide loading screen");
             if (callback != null)
@@ -383,6 +429,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     GameObject SpawnPlayer(PlayerState state) {
+        Debug.Log("spawn player object");
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
         return spawnPoint.SpawnPlayer(state);
     }

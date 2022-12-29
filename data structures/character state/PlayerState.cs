@@ -75,8 +75,8 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             hackRadius = 1.5f,
             thirdWeaponSlot = false,
 
-            health = 250f,
-            fullHealthAmount = 250f,
+            health = 100f,
+            fullHealthAmount = 100f,
 
             speechSkillLevel = 3,
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
