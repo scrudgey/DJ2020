@@ -24,7 +24,7 @@ public class ExtractionZone : MonoBehaviour {
         meshRenderer.enabled = false;
     }
     void OnTriggerEnter(Collider other) {
-        if (!isActive)
+        if (!isActive || other.isTrigger)
             return;
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             Debug.Log("successful extraction");

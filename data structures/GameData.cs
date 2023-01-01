@@ -1,23 +1,25 @@
+using System.Collections.Generic;
 using UnityEngine;
-
 [System.Serializable]
 public record GameData {
     // TODO: static save, load method
     public GameState state;
     public PlayerState playerState;
     public LevelState levelState;
-
-    // UI state:
+    // UI state: ???
+    public List<string> unlockedLevels;
     public int overlayIndex;
 
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
-        PlayerState playerState = PlayerState.DefaultState();
         return new GameData() {
             state = GameState.none,
-            playerState = playerState,
+            playerState = PlayerState.DefaultState(),
             levelState = LevelState.Instantiate(levelTemplate),
-            overlayIndex = 0
+            overlayIndex = 0,
+            unlockedLevels = new List<string>{
+                "Jack That Data"
+            }
         };
     }
 }

@@ -12,6 +12,12 @@ public class LevelTemplate : ScriptableObject {
     public float strikeTeamResponseTime;
     public NPCTemplate strikeTeamTemplate;
     public List<Objective> objectives;
+
+    public Faction faction;
+
+    public int creditReward;
+    public TextAsset prompt;
+    public TextAsset email;
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/{name}") as LevelTemplate);
     }

@@ -9,6 +9,7 @@ public class UIController : MonoBehaviour {
     public Canvas canvas;
     public Canvas terminalCanvas;
     public Canvas burglarCanvas;
+    public Canvas missionSelectorCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
@@ -29,6 +30,7 @@ public class UIController : MonoBehaviour {
     public VRStatHandler vRStatHandler;
     public BurglarCanvasController burglarCanvasController;
     public ObjectiveCanvasController objectiveCanvasController;
+    public MissionComputerController missionComputerController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -52,12 +54,14 @@ public class UIController : MonoBehaviour {
         HideVRStats();
         HideTerminal();
         HideBurglar();
+        HideMissionSelector();
     }
     public void InitializeObjectivesController(GameData data) {
         objectiveCanvasController.Initialize(data);
     }
     public void UpdateWithPlayerInput(PlayerInput input) {
-        burglarCanvasController.UpdateWithInput(input);
+        if (burglarCanvas != null && burglarCanvas.enabled)
+            burglarCanvasController?.UpdateWithInput(input);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
@@ -106,6 +110,15 @@ public class UIController : MonoBehaviour {
     public void HideBurglar() {
         burglarCanvas.enabled = false;
         burglarCanvasController.TearDown();
+        ShowUI();
+    }
+    public void ShowMissionSelector(GameData gameData) {
+        HideUI();
+        missionSelectorCanvas.enabled = true;
+        missionComputerController.Initialize(gameData);
+    }
+    public void HideMissionSelector() {
+        missionSelectorCanvas.enabled = false;
         ShowUI();
     }
     void HandleCaptionChange(string newCaption) {

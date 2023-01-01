@@ -52,6 +52,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
 
     public List<PayData> payDatas;
 
+
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("s1");
         GunTemplate gun2 = GunTemplate.Load("p1");
@@ -84,7 +85,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
 
             physicalKeys = new HashSet<int>(),
 
-            payDatas = new List<PayData>()
+            payDatas = new List<PayData>(),
+
+            credits = 10000
         };
     }
 

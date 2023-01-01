@@ -1683,6 +1683,39 @@ note: layer "interactive"
 * place doors in level
 * build AC vent
 * dark background for objectives holder
+* wire up success -> FinishMission after action
+* wire up after action report -> main menu
+* wire up death -> FinishMission fail menu
+* wire up retry -> reload mission
+* wire up replan -> main menu
+* victory: after action report
+    * show objectives
+    * show reward
+    * show text
+    * button for done -> return to mission select
+    * guards on patrol
+    * patrol back and forth
+    * lively patrol
+        * patrol type is controlled by template
+    * camera should be more visible
+    * set up networks
+    * wire up alarms
+    * Mission, not VRMission
+        * no VR objective display
+    * key in the grass
+    * roof zone
+    * set up objective
+        * steal the data
+        * show objectives when one is completed
+        * show objectives when level starts
+        * show objectives on pause screen
+    * log when objects change
+    * log when objectives complete
+    * extraction zone
+        * highlight the extraction zone
+        * pulse the extraction zone, use text, use arrow
+        * maybe a cutscene?
+* after action: objectives
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1844,9 +1877,6 @@ skills
     speech skills
     lockpicking skills
 
-minimap
-    it's an item?
-
 nimrod for texts
 
 weapons
@@ -1919,32 +1949,12 @@ line renderer
 fancy objectives complete display
 why do attack surfaces start out highlighted?
 why do we start with gun out but no suspicion?
+adjust all UI buttons to have consistent semantics for Cancel / OK
+carpet sounds
 
 build a test level, 3 storey building infiltration
 
 build a test level equivalent to Jack That Data
-    * guards on patrol
-    * patrol back and forth
-    * lively patrol
-        * patrol type is controlled by template
-    * camera should be more visible
-    * set up networks
-    * wire up alarms
-    * Mission, not VRMission
-        * no VR objective display
-    * key in the grass
-    * roof zone
-    * set up objective
-        * steal the data
-        * show objectives when one is completed
-        * show objectives when level starts
-        * show objectives on pause screen
-    * log when objects change
-    * log when objectives complete
-    * extraction zone
-        * highlight the extraction zone
-        * pulse the extraction zone, use text, use arrow
-        * maybe a cutscene?
     sphere robot
         NPC template should allow sphere? different spawner?
     don't destroy the floors
@@ -1952,19 +1962,96 @@ build a test level equivalent to Jack That Data
     fix laser 
     make level more challenging
         turrets
+        camera view bigger
 
 graphics:
     stairs ramp
     alarm box
     grass
 
+game loop
+    * mission select screen
+    * apartment
+    after action returns to apartment
+    apartment -> mission select
+    mission select -> mission plan
+    mission plan -> mission
+    mission fail -> mission plan
 
-wire up success -> FinishMission after action
-wire up after action report -> main menu
+elements for mission select
+    * faction
+    * title
+    * description
+    * reward
+    * current credits
+    * objectives
+    * optional objectives?
+    details... -> missin planning
+    * cancel -> exit
 
-* wire up death -> FinishMission fail menu
-* wire up retry -> reload mission
-* wire up replan -> main menu
+elements for mission planning
+    * player configuration
+    map
+    pre mission tactics
+    start mission -> mission
+    cancel -> mission select
 
-mission select screen
-apartment
+* map inspection
+    * considering insertion / extraction points should jump to location on map
+        considering / choosing can't be two different actions
+    * some insertion points are disabled without further unlocks
+        it should be clear what they are and what is required
+        e.g. rooftop insertion (requires airlift)
+    * inspect objective locations
+    * inspect points of interest
+
+tactics
+    distraction? cyber attack? 
+    purchase disguise
+    purchase credentials / fake ID / spoof keycard
+    buy info
+        locate key objectives
+        locate key items
+        locate traps / sensors / weapon emplacements: intel
+        locate guards / patrols / security operations center: intel
+
+
+minimap
+    multiple floors of map
+    orient relative to main camera
+    auto-generate map snapshots for a level from util
+        include metadata of tagged positions and labels
+            metadata includes floor
+            name
+            insertion point
+            extraction point
+    highlight enemies in red
+        show sightcone
+    indicate player
+
+
+item select
+map pane
+tactics pane
+
+
+* change "details"
+* (Clone)
+* set activemissiontemplate on computer open
+* change title text on different tabs
+* dont show tertiary slot when not unlocked
+* retry and replan/start is broken 
+    * UI does not load
+
+show mission overview or summary?
+indicate selected weapon slot
+move key to be visible
+tab icons
+
+mission fail display is a little wonky
+screen wobble on tab schange
+clean up the optional obejctives divider in mission selector
+
+cursor on mission UI
+
+abort -> show extraction zone

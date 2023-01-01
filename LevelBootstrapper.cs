@@ -6,20 +6,17 @@ public class LevelBootstrapper : MonoBehaviour {
     public bool spawnNPCs;
     public LevelTemplate levelTemplate;
     public bool VRMission;
+    public bool world;
     void Start() {
         if (GameManager.I.isLoadingLevel)
             return;
-        if (VRMission) {
+        if (world) {
+            BootStrapWorld();
+        } else if (VRMission) {
             BootStrapVR();
         } else {
             BootStrapMission();
         }
-
-        // if (spawnNPCs) {
-        //     foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
-        //         spawnPoint.SpawnTemplated();
-        //     }
-        // }
     }
 
     void BootStrapVR() {
@@ -47,9 +44,14 @@ public class LevelBootstrapper : MonoBehaviour {
             levelState = level
         };
 
-
         // start the game state
         GameManager.I.StartMission(level);
+    }
+
+    void BootStrapWorld() {
+        Debug.Log($"bootstrapping world ...");
+        GameManager.I.gameData = GameData.TestInitialData();
+        GameManager.I.StartWorld();
     }
 
 }

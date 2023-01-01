@@ -20,6 +20,14 @@ public class GunStatHandler : MonoBehaviour {
     public TextMeshProUGUI recoilHighText;
     public Image gunImage;
     public void DisplayGunTemplate(GunTemplate template) {
+        Debug.Log($"display gun template {template}");
+        if (template == null) {
+            ClearStats();
+        } else {
+            PopulateStats(template);
+        }
+    }
+    public void PopulateStats(GunTemplate template) {
         nameText.text = template.name;
         typeText.text = template.type.ToString();
         cycleText.text = template.cycle.ToString();
@@ -31,9 +39,27 @@ public class GunStatHandler : MonoBehaviour {
         lockSizeText.text = template.lockOnSize.ToString() + "m";
         damageLowText.text = template.baseDamage.low.ToString();
         damageHighText.text = template.baseDamage.high.ToString();
-        weightText.text = template.weight.ToString();
+        // weightText.text = template.weight.ToString();
         recoilLowText.text = (template.recoil.low * 10).ToString();
         recoilHighText.text = (template.recoil.high * 10).ToString();
+        gunImage.enabled = true;
         gunImage.sprite = template.image;
+    }
+    public void ClearStats() {
+        nameText.text = "";
+        typeText.text = "";
+        cycleText.text = "";
+        shootIntervalText.text = "-";
+        noiseText.text = "-";
+        clipSizeText.text = "-";
+        spreadText.text = "-";
+        recoilText.text = "-";
+        lockSizeText.text = "-";
+        damageLowText.text = "";
+        damageHighText.text = "";
+        // weightText.text = "";
+        recoilLowText.text = "";
+        recoilHighText.text = "";
+        gunImage.enabled = false;
     }
 }

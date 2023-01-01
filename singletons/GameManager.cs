@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public enum GameState { none, levelPlay, mainMenu }
+public enum GameState { none, levelPlay, mainMenu, afteraction, world } // TODO: different name!
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
@@ -112,6 +112,11 @@ public partial class GameManager : Singleton<GameManager> {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             case GameState.levelPlay:
+                Time.timeScale = 1f;
+                cursorType = CursorType.gun;
+                TransitionToInputMode(InputMode.gun);
+                break;
+            case GameState.world:
                 Time.timeScale = 1f;
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
@@ -248,7 +253,9 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         toggleConsoleThisFrame = false;
-        if (gameData.state == GameState.levelPlay) {
+        if (gameData.state == GameState.world) {
+            DoInputs();
+        } else if (gameData.state == GameState.levelPlay) {
             UpdateSuspicion();
             UpdateAlarm();
             UpdateReportTickets();
@@ -257,39 +264,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (cutsceneIsRunning) {
                 playerCharacterController.ResetInput();
             } else {
-                bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
-
-                if (inputMode == InputMode.burglar) {
-                    if (!uiclick) {
-                        cursorType = CursorType.gun;
-                    }
-                } else {
-                    // TODO: adjust if we are in burglar mode
-                    if (uiclick) {
-                        cursorType = CursorType.pointer;
-                    } else {
-                        cursorType = CursorType.gun;
-                    }
-                    if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
-                        Cursor.lockState = CursorLockMode.Locked;
-                        Cursor.visible = false;
-                        resetMouseControl = true;
-                    } else {
-                        if (resetMouseControl) {
-                            Cursor.lockState = CursorLockMode.None;
-                            Cursor.visible = true;
-                            resetMouseControl = false;
-                        }
-                    }
-                }
-
-                if (Time.timeScale > 0) {
-                    PlayerInput playerInput = inputController.HandleCharacterInput(uiclick);
-                    uiController?.UpdateWithPlayerInput(playerInput);
-                }
-                // still not 100% clean here
-                CameraInput input = playerCharacterController.BuildCameraInput();
-                characterCamera.UpdateWithInput(input);
+                DoInputs();
             }
         } else {
             if (resetMouseControl) {
@@ -298,6 +273,42 @@ public partial class GameManager : Singleton<GameManager> {
                 resetMouseControl = false;
             }
         }
+    }
+
+    void DoInputs() {
+        bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
+
+        if (inputMode == InputMode.burglar) {
+            if (!uiclick) {
+                cursorType = CursorType.gun;
+            }
+        } else {
+            // TODO: adjust if we are in burglar mode
+            if (uiclick) {
+                cursorType = CursorType.pointer;
+            } else {
+                cursorType = CursorType.gun;
+            }
+            if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                resetMouseControl = true;
+            } else {
+                if (resetMouseControl) {
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                    resetMouseControl = false;
+                }
+            }
+        }
+
+        if (Time.timeScale > 0) {
+            PlayerInput playerInput = inputController.HandleCharacterInput(uiclick);
+            uiController?.UpdateWithPlayerInput(playerInput);
+        }
+        // still not 100% clean here
+        CameraInput input = playerCharacterController.BuildCameraInput();
+        characterCamera.UpdateWithInput(input);
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
@@ -319,6 +330,32 @@ public partial class GameManager : Singleton<GameManager> {
         uiController.HideBurglar();
         playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);
+    }
+    public void ShowMissionSelectMenu() {
+        TransitionToState(GameState.mainMenu);  // TODO: correct state?
+        uiController.ShowMissionSelector(gameData);
+    }
+    public void HideMissionSelectMenu() {
+        TransitionToState(GameState.world);
+        uiController.HideMissionSelector();
+    }
+    public void ShowMissionPlanner(LevelTemplate template) {
+        LoadScene("MissionPlan", () => {
+            MissionPlanController controller = GameObject.FindObjectOfType<MissionPlanController>();
+            controller.Initialize(gameData, template);
+        });
+    }
+    public void ReturnToMissionSelector() {
+        LoadScene("Apartment", () => {
+            // TODO: move player, open computer
+            StartWorld();
+        });
+    }
+    public void ReturnToApartment() {
+        LoadScene("Apartment", () => {
+            // TODO: move player, open computer
+            StartWorld();
+        });
     }
 
     public bool IsPlayerVisible(float distance) {

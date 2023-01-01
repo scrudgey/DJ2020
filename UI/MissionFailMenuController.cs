@@ -16,7 +16,6 @@ public class MissionFailMenuController : MonoBehaviour {
         }
     }
     public void Initialize(GameData data) {
-        Debug.Log("initialize fail menu");
         this.gameData = data;
         foreach (Objective objective in data.levelState.template.objectives) {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
@@ -27,7 +26,7 @@ public class MissionFailMenuController : MonoBehaviour {
     }
     public void ReplanButtonCallback() {
         GameManager.I.CloseMenu();
-        GameManager.I.ReturnToTitleScreen();
+        GameManager.I.ShowMissionPlanner(gameData.levelState.template);
     }
     public void RetryButtonCallback() {
         GameManager.I.CloseMenu();

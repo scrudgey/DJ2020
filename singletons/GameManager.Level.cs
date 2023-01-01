@@ -44,8 +44,11 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("GameMananger: load mission");
 
         // instantiate gamedata
-        gameData = GameData.TestInitialData() with {
-            levelState = LevelState.Instantiate(template),
+        // gameData = GameData.TestInitialData() with {
+        //     levelState = LevelState.Instantiate(template),
+        // };
+        gameData = gameData with {
+            levelState = LevelState.Instantiate(template)
         };
 
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
@@ -61,7 +64,16 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartMission(LevelState state) {
+
+        // TODO: take a template as input?
+
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
+        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+            LoadScene("UI", () => {
+                uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.InitializeObjectivesController(gameData);
+            }, unloadAll: false);
+        }
         InitializeLevel();
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
@@ -71,6 +83,11 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         TransitionToState(GameState.levelPlay);
+    }
+    public void StartWorld() {
+        Debug.Log($"GameMananger: world scene");
+        InitializePlayerAndController();
+        TransitionToState(GameState.world);
     }
     void HandlePlayerDead(CharacterController npc) {
         FinishMission(false);
@@ -87,11 +104,8 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void FinishMissionSuccess() {
         Debug.Log("mission success");
-        MusicController.I.Stop();
-        LoadScene("title", () => {
-            Debug.Log("start title screen");
-            activeMenuType = MenuType.none;
-        });
+        gameData.playerState.credits += gameData.levelState.template.creditReward;
+        LoadAfterActionReport();
     }
     public void FinishMissionFail() {
         Debug.Log("mission fail");
@@ -106,6 +120,17 @@ public partial class GameManager : Singleton<GameManager> {
         LoadScene("title", () => {
             Debug.Log("start title screen");
             activeMenuType = MenuType.none;
+        });
+    }
+
+    public void LoadAfterActionReport() {
+        MusicController.I.Stop();
+        TransitionToState(GameState.afteraction);
+        LoadScene("AfterAction", () => {
+            Debug.Log("start afteraction");
+            // activeMenuType = MenuType.none;
+            AfterActionReportHandler handler = GameObject.FindObjectOfType<AfterActionReportHandler>();
+            handler.Initialize(gameData);
         });
     }
 
@@ -213,7 +238,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         // Debug.Log($"initialized poweredComponents {poweredComponents} {poweredComponents.Count}");
     }
-    private void InitializeLevel() {
+    private void InitializePlayerAndController() {
         ClearSceneData();
         inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
@@ -224,11 +249,14 @@ public partial class GameManager : Singleton<GameManager> {
 
         // connect player object to input controller
         inputController.SetInputReceivers(playerObj);
+    }
+    private void InitializeLevel() {
+
+        InitializePlayerAndController();
 
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
-            Debug.Log($"adding power component {component} {component.idn}");
             poweredComponents[component.idn] = component;
         }
 
@@ -431,6 +459,7 @@ public partial class GameManager : Singleton<GameManager> {
     GameObject SpawnPlayer(PlayerState state) {
         Debug.Log("spawn player object");
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
+        Debug.Log($"spawnPoint: {spawnPoint} playerState: {state}");
         return spawnPoint.SpawnPlayer(state);
     }
 }
