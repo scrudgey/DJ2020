@@ -7,6 +7,7 @@ using UnityEngine;
 public class LevelTemplate : ScriptableObject {
     public string levelName;
     public string sceneName;
+    public string sceneDescriptor;
     public SensitivityLevel sensitivityLevel;
     public AudioClip alarmAudioClip;
     public float strikeTeamResponseTime;

@@ -418,6 +418,15 @@ public class Toolbox {
         return 1.0f / (1.0f + (float)Math.Exp(-value));
     }
 
+    public static Texture2D RenderToTexture2D(RenderTexture rTex) {
+        Texture2D tex = new Texture2D(1024, 1024, TextureFormat.RGB24, false);
+        // ReadPixels looks at the active RenderTexture.
+        RenderTexture.active = rTex;
+        tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        tex.Apply();
+        return tex;
+    }
+
     // public static double Factorial(int number) {
     //     // please do not calculate facorials of large numbers
     //     if (number == 1)

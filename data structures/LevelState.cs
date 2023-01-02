@@ -30,8 +30,9 @@ public class LevelState {
         return delta.alarmGraph.anyAlarmActive();
     }
 
-    public static string LevelDataPath(string levelName) {
-        string path = Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName);
+    public static string LevelDataPath(string levelName, bool includeDataPath = true) {
+        string path = includeDataPath ? Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName) :
+                                        Path.Combine("data", "levels", levelName);
         if (!Directory.Exists(path)) {
             Directory.CreateDirectory(path);
         }

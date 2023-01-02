@@ -1716,6 +1716,15 @@ note: layer "interactive"
         * pulse the extraction zone, use text, use arrow
         * maybe a cutscene?
 * after action: objectives
+* change "details"
+* (Clone)
+* set activemissiontemplate on computer open
+* change title text on different tabs
+* dont show tertiary slot when not unlocked
+* retry and replan/start is broken 
+    * UI does not load
+* move key to be visible
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1882,14 +1891,6 @@ nimrod for texts
 weapons
     colt 2037 sped up sounds great
 
-graphics
-    silenced pistol
-    rocket launcher
-    grenade
-    some building textures
-    patrol guard
-    title screen logo
-    title screen animations 
 
 models
     cones
@@ -1942,6 +1943,10 @@ navigable chair
 burglar tools cause suspicion
 can we remove NPC json converter?
 tab to hide burglar 
+tab should not open burglar with c4
+c4 should crouch, place time
+crouch should not immediately go to crawl
+enemies are spotting plater somewhat easily
 line renderer
     clean up connections
     marching ants?
@@ -1954,56 +1959,15 @@ carpet sounds
 
 build a test level, 3 storey building infiltration
 
+* fix laser 
 build a test level equivalent to Jack That Data
     sphere robot
         NPC template should allow sphere? different spawner?
     don't destroy the floors
     fix stairs
-    fix laser 
     make level more challenging
         turrets
         camera view bigger
-
-graphics:
-    stairs ramp
-    alarm box
-    grass
-
-game loop
-    * mission select screen
-    * apartment
-    after action returns to apartment
-    apartment -> mission select
-    mission select -> mission plan
-    mission plan -> mission
-    mission fail -> mission plan
-
-elements for mission select
-    * faction
-    * title
-    * description
-    * reward
-    * current credits
-    * objectives
-    * optional objectives?
-    details... -> missin planning
-    * cancel -> exit
-
-elements for mission planning
-    * player configuration
-    map
-    pre mission tactics
-    start mission -> mission
-    cancel -> mission select
-
-* map inspection
-    * considering insertion / extraction points should jump to location on map
-        considering / choosing can't be two different actions
-    * some insertion points are disabled without further unlocks
-        it should be clear what they are and what is required
-        e.g. rooftop insertion (requires airlift)
-    * inspect objective locations
-    * inspect points of interest
 
 tactics
     distraction? cyber attack? 
@@ -2014,7 +1978,8 @@ tactics
         locate key items
         locate traps / sensors / weapon emplacements: intel
         locate guards / patrols / security operations center: intel
-
+        learn info to be used in dialogue
+        discoverable networks
 
 minimap
     multiple floors of map
@@ -2033,25 +1998,80 @@ minimap
 item select
 map pane
 tactics pane
-
-
-* change "details"
-* (Clone)
-* set activemissiontemplate on computer open
-* change title text on different tabs
-* dont show tertiary slot when not unlocked
-* retry and replan/start is broken 
-    * UI does not load
-
-show mission overview or summary?
 indicate selected weapon slot
-move key to be visible
 tab icons
+show mission overview or summary?
+    objectives go here!
+    show a freaking map!!
 
 mission fail display is a little wonky
 screen wobble on tab schange
 clean up the optional obejctives divider in mission selector
-
 cursor on mission UI
-
 abort -> show extraction zone
+
+
+* map gen util
+    * store multiple per floor
+    * store metadata
+* sounds for clicking level up/down zoom in/out
+* sounds for clicking on column
+    * support floors 0-9, remove nulls
+    * populate markerData:
+    * columns:
+        * containerTransforms
+        * columbButtonPrefab
+            * columnButtonController:
+            * columnButton callback
+    * decor:
+        * stair up
+        * stair down
+        * stair left
+        * stair right
+        door
+    * jump to point on map
+        * ping the point
+    * preserve marker state when switching levels
+    * indicate selected insertion / extraction
+    * make icons: lightning bolt, arrow
+    * start with insertion / extraction selected
+    * indicate floor
+    * door decor goes on all doors
+
+mapview 
+    support multiple scenes per level
+    disable selectors when necessary
+    markers gated behind tactical data
+    support select insertion / extraction
+    indicate glass walls somehow
+        another layer, visible only to map camera.
+        can be used to indicate map boundaries.
+    move spawnpoint to be visible on map
+
+
+models
+    stairs ramp
+    alarm box
+    grass
+objectives
+    data icon
+tab icons
+    map
+    loadout
+    tactics
+    overview
+graphics
+    silenced pistol
+    rocket launcher
+    grenade
+    some building textures
+    patrol guard
+    title screen logo
+    title screen animations 
+
+* map icons
+    * arrow
+    * lightning bolt
+    * door
+
+extraction / player spawn configuration automatically sets values on map marker. or is map marker?

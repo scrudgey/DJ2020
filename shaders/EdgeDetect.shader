@@ -3,6 +3,7 @@ Shader "Custom/EdgeDetect"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+         _Threshold("Threshold", int) = 0
     }
 
     SubShader
@@ -22,6 +23,7 @@ Shader "Custom/EdgeDetect"
 
 			sampler2D _MainTex;
 			float2 _MainTex_TexelSize;
+            float _Threshold;
 
 			float3 sobel(float2 uv)
 			{
@@ -44,8 +46,7 @@ Shader "Custom/EdgeDetect"
                 y += tex2D(_MainTex, uv + float2(-texelSize.x,  texelSize.y)) *  1.0;
                 y += tex2D(_MainTex, uv + float2(           0,  texelSize.y)) *  2.0;
                 y += tex2D(_MainTex, uv + float2( texelSize.x,  texelSize.y)) *  1.0;
-				// return sqrt(x * x + y * y);
-                return x > 0 || y > 0;
+				return sqrt(x * x + y * y) > _Threshold;
 			}
 
 			// Horizontal blurring pass.
