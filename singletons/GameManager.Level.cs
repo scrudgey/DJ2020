@@ -455,16 +455,12 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     GameObject SpawnPlayer(PlayerState state, LevelPlan plan) {
-        Debug.Log($"[insertion] spawn player object at {plan.insertionPointIdn}");
-
         if (plan.insertionPointIdn != "") { // default
             foreach (PlayerSpawnPoint point in GameObject.FindObjectsOfType<PlayerSpawnPoint>()) {
-                Debug.Log($"[insertion] considering spawnpoint {point} {point.data} {point.data.idn}=={plan.insertionPointIdn}:{point.data.idn == plan.insertionPointIdn}");
                 if (point.data.idn == plan.insertionPointIdn)
                     return point.SpawnPlayer(state);
             }
         }
-        Debug.Log("[insertion] defaulting spawn point to random");
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
         return spawnPoint.SpawnPlayer(state);
     }

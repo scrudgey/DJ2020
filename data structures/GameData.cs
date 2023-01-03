@@ -16,7 +16,7 @@ public record GameData {
         return new GameData() {
             state = GameState.none,
             playerState = PlayerState.DefaultState(),
-            // levelState = LevelState.Instantiate(levelTemplate),
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
             overlayIndex = 0,
             unlockedLevels = new List<string>{
                 "Jack That Data"

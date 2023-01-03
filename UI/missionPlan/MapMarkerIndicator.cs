@@ -90,7 +90,8 @@ public class MapMarkerIndicator : MonoBehaviour {
             StopCoroutine(selectionCoroutine);
         }
         if (value) {
-            selectionCoroutine = StartCoroutine(ShowSelection());
+            if (gameObject.activeInHierarchy)
+                selectionCoroutine = StartCoroutine(ShowSelection());
         } else {
             // StopCoroutine(selectionCoroutine);
             selectedIndicator.enabled = false;

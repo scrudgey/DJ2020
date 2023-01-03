@@ -43,6 +43,24 @@ public class MissionPlanMapController : MonoBehaviour {
         PopulateColumns();
         ChangeFloorView(1);
     }
+    void InitializeMapMarkers() {
+        foreach (Transform child in mapImage.transform) {
+            Destroy(child.gameObject);
+        }
+        indicators = new Dictionary<MapMarkerData, MapMarkerIndicator>();
+        foreach (MapMarkerData data in mapData) {
+            GameObject obj = GameObject.Instantiate(mapMarkerPrefab);
+            obj.transform.SetParent(mapImage.transform, false);
+            MapMarkerIndicator indicator = obj.GetComponent<MapMarkerIndicator>();
+            indicator.Configure(data, mapRect);
+            indicators[data] = indicator;
+            // why is this required?
+            foreach (MonoBehaviour component in obj.GetComponentsInChildren<MonoBehaviour>()) {
+                component.enabled = true;
+            }
+
+        }
+    }
 
     void OnEnable() {
         if (extractionIndicator != null) {
@@ -88,10 +106,17 @@ public class MissionPlanMapController : MonoBehaviour {
                 obj.transform.SetParent(column, false);
                 selector.Configure(this, data);
 
-                if (insertionIndicator == null && data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+                if (data.idn == plan.insertionPointIdn) {
                     SelectInsertionPoint(selector, indicators[data]);
                 }
-                if (extractionIndicator == null && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
+                if (data.idn == plan.extractionPointIdn) {
+                    SelectExtractionPoint(selector, indicators[data]);
+                }
+
+                if (plan.insertionPointIdn == "" && insertionIndicator == null && data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+                    SelectInsertionPoint(selector, indicators[data]);
+                }
+                if (plan.extractionPointIdn == "" && extractionIndicator == null && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
                     SelectExtractionPoint(selector, indicators[data]);
                 }
             }
@@ -148,23 +173,7 @@ public class MissionPlanMapController : MonoBehaviour {
     public void DisplayMapImage(int floor) {
         mapImage.texture = mapImages[floor];
     }
-    void InitializeMapMarkers() {
-        foreach (Transform child in mapImage.transform) {
-            Destroy(child.gameObject);
-        }
-        indicators = new Dictionary<MapMarkerData, MapMarkerIndicator>();
-        foreach (MapMarkerData data in mapData) {
-            GameObject obj = GameObject.Instantiate(mapMarkerPrefab);
-            obj.transform.SetParent(mapImage.transform, false);
-            MapMarkerIndicator indicator = obj.GetComponent<MapMarkerIndicator>();
-            indicator.Configure(data, mapRect);
-            indicators[data] = indicator;
-            // why is this required?
-            foreach (MonoBehaviour component in obj.GetComponentsInChildren<MonoBehaviour>()) {
-                component.enabled = true;
-            }
-        }
-    }
+
     public void DisplayMapMarkers(int floor) {
         foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
             kvp.Value.gameObject.SetActive(kvp.Key.floorNumber == floor);

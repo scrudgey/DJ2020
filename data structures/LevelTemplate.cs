@@ -13,6 +13,7 @@ public class LevelTemplate : ScriptableObject {
     public float strikeTeamResponseTime;
     public NPCTemplate strikeTeamTemplate;
     public List<Objective> objectives;
+    public List<Tactic> availableTactics;
 
     public Faction faction;
 

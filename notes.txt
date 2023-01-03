@@ -1759,6 +1759,10 @@ note: layer "interactive"
 * objectives
     * data icon
 * fix weird map marker offsets
+* support select insertion / extraction
+* use extraction / insertion idn when initializing level
+    * handle default value properly
+* retry plan results in insertion / extraction being unset
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2030,7 +2034,11 @@ cursor on mission UI
 abort -> show extraction zone
 extraction / player spawn configuration automatically sets values on map marker. or is map marker?
 move spawnpoint to be visible on map
-
+handle mission fail
+    when datastore is destroyed
+    reaching extraction zone -> fail
+footstep threshold could be higher?
+hide overlays in aim mode
 
 
 planning mode
@@ -2040,20 +2048,21 @@ mission overview
     show a freaking map!!
     summarize insertion, extraction
 item select
-support select insertion / extraction
 indicate selected weapon slot
 character breathing / animation
 
 tactics pane
-    support buying
-    icons for different tactics
-    available tactics set per mission
-    store which tactics are bought
+    * support buying
+    * icons for different tactics
+    * available tactics set per mission
+    * store which tactics are bought
     when map data is bought, show notification on map tab
+    clickable active tactics show description
+
     tactics
         distraction? cyber attack? 
-        purchase disguise
-        purchase credentials / fake ID / spoof keycard
+        * purchase disguise
+        * purchase fake ID / spoof keycard
         buy info
             locate key objectives
             locate key items
@@ -2062,12 +2071,5 @@ tactics pane
             learn info to be used in dialogue
             discoverable networks
 
-
 how do we identify the insertion point in the level?
-
-use extraction / insertion idn when initializing level
-    handle default value properly
-
-
-[insertion] considering spawnpoint playerSpawnPoint (PlayerSpawnPoint) MapMarkerData { idn = , markerType = insertionPoint, markerIcon = circle, floorNumber = 0, markerName = Alleyway, description = Alleyway, position = (0.00, 0.00) } ==b61b42e2-e41d-42cd-8ec7-ca76e99188bb:False
 

@@ -66,15 +66,19 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void HandleAllObjectivesComplete() {
-        bool cutsceneStarted = false;
         uiController.LogMessage($"Objectives complete, proceed to extraction");
-        foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
-            zone.EnableExtractionZone();
-            if (zone.showCutscene && !cutsceneStarted) {
-                ShowExtractionZoneCutscene(zone);
-                cutsceneStarted = true;
+        Debug.Log($"[extraction] looking for extraction point {gameData.levelState.plan.extractionPointIdn}");
+        if (gameData.levelState.plan.extractionPointIdn != "") { // default
+            foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
+                if (zone.data.idn == gameData.levelState.plan.extractionPointIdn) {
+                    Debug.Log($"[extraction] found extraction point {zone.data.idn}");
+                    zone.EnableExtractionZone();
+                    return;
+                }
             }
         }
+        Debug.Log("[extraction] defaulting random extraction point");
+        GameObject.FindObjectOfType<ExtractionZone>().EnableExtractionZone();
     }
     void HandleObjectiveFailed() {
         Debug.Log("objectives failed!");

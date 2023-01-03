@@ -20,6 +20,7 @@ public class MissionPlanController : MonoBehaviour {
     public TextMeshProUGUI titleText;
     public MissionPlanLoadoutController loadoutController;
     public MissionPlanMapController mapController;
+    public MissionPlanTacticsController tacticsController;
 
     void Start() {
         Toolbox.RandomizeOneShot(audioSource, startSound);
@@ -36,6 +37,7 @@ public class MissionPlanController : MonoBehaviour {
         plan = gameData.GetLevelPlan(template);
         loadoutController.Initialize(data, template, plan);
         mapController.Initialize(data, template, plan);
+        tacticsController.Initialize(data, template, plan);
         SwitchPanes(PaneType.loadout);
     }
     public void LoadOutButtonCallback() {
