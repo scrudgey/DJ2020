@@ -49,8 +49,12 @@ public partial class GameManager : Singleton<GameManager> {
         // this may not be necessary if we're passing around the correct references.
         gameData.SetLevelPlan(template, plan);
         gameData = gameData with {
-            levelState = LevelState.Instantiate(template, plan)
+            levelState = LevelState.Instantiate(template, plan),
         };
+
+        if (plan.startWithFakeID()) {
+            gameData.playerState.items.Append("ID");
+        }
 
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,9 +27,23 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     GameData data;
     LevelPlan plan;
 
+    // animation
+    Vector3 initialTorsoPosition;
+    Vector3 initialHeadPosition;
+    float timer;
+
+    Skin legsSkin;
+    Skin bodySkin;
+    Skin headSkin;
+
+    float headAngle;
     public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.data = data;
         this.plan = plan;
+        InitializeSkins(data);
+
+        initialTorsoPosition = torsoImage.transform.localPosition;
+        initialHeadPosition = headImage.transform.localPosition;
 
         primaryWeaponButton.ApplyGunTemplate(data.playerState.primaryGun.template);
         secondaryWeaponButton.ApplyGunTemplate(data.playerState.secondaryGun.template);
@@ -43,11 +58,31 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         InitializeWeaponPicker();
     }
 
+    void InitializeSkins(GameData data) {
+        string legSkinName = data.playerState.legSkin;
+        string torsoSkinName = data.playerState.bodySkin;
+        string headSkinName = data.playerState.headSkin;
+
+        legsSkin = Skin.LoadSkin(legSkinName);
+        bodySkin = Skin.LoadSkin(torsoSkinName);
+        headSkin = Skin.LoadSkin(headSkinName);
+
+        Direction headDirection = Direction.rightDown;
+
+        headImage.sprite = headSkin.headIdle[headDirection][0];
+        torsoImage.sprite = bodySkin.smgIdle[Direction.rightDown][0];
+        legsImage.sprite = legsSkin.legsIdle[Direction.rightDown][0];
+    }
+
+
     public void WeaponSlotClicked(int slotIndex, GunTemplate template) {
         Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds);
         activeWeaponSlot = slotIndex;
         gunStatHandler.DisplayGunTemplate(template);
         InitializeWeaponPicker();
+        if (template == null) {
+            torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
+        }
     }
     public void StashPickerCallback(LoadoutStashPickerButton picker) {
         Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds);
@@ -71,6 +106,14 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 data.playerState.tertiaryGun = newState;
                 break;
         }
+
+        Octet<Sprite[]> octet = picker.template.type switch {
+            GunType.pistol => bodySkin.pistolIdle,
+            GunType.smg => bodySkin.smgIdle,
+            GunType.rifle => bodySkin.rifleIdle,
+            GunType.shotgun => bodySkin.shotgunIdle,
+        };
+        torsoImage.sprite = octet[Direction.rightDown][0];
     }
 
     void InitializeWeaponPicker() {
@@ -127,5 +170,36 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         return text;
     }
 
+    void Update() {
+        timer += Time.unscaledDeltaTime;
+
+        Vector3 torsoPosition = new Vector3(initialTorsoPosition.x, initialTorsoPosition.y, initialTorsoPosition.z);
+        Vector3 headPosition = new Vector3(initialHeadPosition.x, initialHeadPosition.y, initialHeadPosition.z);
+
+        torsoPosition.y += 0.25f * Mathf.Sin(timer);
+        headPosition.y += 0.25f * Mathf.Sin(timer + Mathf.PI / 8);
+
+        torsoImage.transform.localPosition = torsoPosition;
+        headImage.transform.localPosition = headPosition;
+
+        Direction headDirection = Direction.rightDown;
+        headAngle = Mathf.Sin(timer);
+        switch (headAngle) {
+            case float n when (n < -0.5f):
+                headDirection = Direction.leftDown;
+                break;
+            case float n when (n >= -0.5f && n < 0):
+                headDirection = Direction.down;
+                break;
+            case float n when (n >= 0 && n < 0.5f):
+                headDirection = Direction.rightDown;
+                break;
+            case float n when (n > 0.5f):
+                headDirection = Direction.right;
+                break;
+        }
+        headImage.sprite = headSkin.headIdle[headDirection][0];
+
+    }
 
 }

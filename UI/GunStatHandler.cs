@@ -20,7 +20,6 @@ public class GunStatHandler : MonoBehaviour {
     public TextMeshProUGUI recoilHighText;
     public Image gunImage;
     public void DisplayGunTemplate(GunTemplate template) {
-        Debug.Log($"display gun template {template}");
         if (template == null) {
             ClearStats();
         } else {

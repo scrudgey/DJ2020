@@ -12,4 +12,5 @@ public record LevelPlan {
     };
 
     public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);
+    public bool startWithFakeID() => activeTactics.Any(tactic => tactic is TacticFakeID);
 }

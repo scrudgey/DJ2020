@@ -1771,7 +1771,10 @@ note: layer "interactive"
     * icons for different tactics
     * available tactics set per mission
     * store which tactics are bought
-
+* character breathing / animation
+    * tune the pulsation
+    * head looks around
+    * torso changes in response to weapon selection
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1950,6 +1953,11 @@ mission plan mapview
     disable selectors when necessary
     markers gated behind tactical data
 
+dialogue
+    use ID status
+    concoct one lie per mark against player
+    get once lie stratagem per mark from player
+
 ---------------
 
 NPC tuning:
@@ -2002,11 +2010,12 @@ line renderer
     clean up connections
     marching ants?
     better coloration
-* fancy objectives complete display
 why do attack surfaces start out highlighted?
 why do we start with gun out but no suspicion?
 adjust all UI buttons to have consistent semantics for Cancel / OK
 carpet sounds
+footstep threshold could be higher?
+hide overlays in aim mode
 
 graphics
     silenced pistol
@@ -2017,6 +2026,7 @@ graphics
     title screen logo
     title screen animations 
     civ_female portrait could use some work
+    burglar tools
 
 -----------------
 
@@ -2037,7 +2047,7 @@ build a test level equivalent to Jack That Data
         skybox buildings
             fixed size of textures, but apply to large or small buildings; 
 
-screen wobble on tab schange
+* screen wobble on tab schange
 clean up the optional obejctives divider in mission selector
 cursor on mission UI
 abort -> show extraction zone
@@ -2046,8 +2056,6 @@ move spawnpoint to be visible on map
 handle mission fail
     when datastore is destroyed
     reaching extraction zone -> fail
-footstep threshold could be higher?
-hide overlays in aim mode
 
 
 planning mode
@@ -2056,11 +2064,13 @@ mission overview
     objectives go here!
     show a freaking map!!
     summarize insertion, extraction
-item select
+    site security
 indicate selected weapon slot
-character breathing / animation
+HP / def indicators
 
 tactics pane
+    purchase keycard
+    ativate cyberattack
     clickable active tactics show description
     buy info
         locate key objectives
@@ -2071,7 +2081,8 @@ tactics pane
         discoverable networks
     when map data is bought, show notification on map tab
 
-tactics take effect
 
-disguise / alarm panel not working right
-when disguise is active, normal -> ignore should highlight.
+
+item select
+    how is item select going to work?
+    right now we set stuff on player state.
