@@ -61,6 +61,7 @@ public class MapMarker : MonoBehaviour {
 public record MapMarkerData {
     public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard }
     public enum MapMarkerIcon { circle, arrowUp, arrowRight, arrowDown, arrowLeft, lightningBolt, door }
+    public string idn;
     public MapMarkerType markerType;
     public MapMarkerIcon markerIcon;
     public int floorNumber;

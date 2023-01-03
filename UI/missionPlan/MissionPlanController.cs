@@ -11,6 +11,7 @@ public class MissionPlanController : MonoBehaviour {
     public AudioSource audioSource;
 
     public LevelTemplate template;
+    public LevelPlan plan;
     public GameData gameData;
 
     public GameObject loadOutPane;
@@ -32,8 +33,9 @@ public class MissionPlanController : MonoBehaviour {
     public void Initialize(GameData data, LevelTemplate template) {
         this.gameData = data;
         this.template = template;
-        loadoutController.Initialize(data, template);
-        mapController.Initialize(data, template);
+        plan = gameData.GetLevelPlan(template);
+        loadoutController.Initialize(data, template, plan);
+        mapController.Initialize(data, template, plan);
         SwitchPanes(PaneType.loadout);
     }
     public void LoadOutButtonCallback() {
@@ -73,9 +75,7 @@ public class MissionPlanController : MonoBehaviour {
 
     public void StartButtonCallback() {
         Debug.Log("start mission");
-        // start the game state
-        LevelState levelState = LevelState.Instantiate(template);
-        GameManager.I.LoadMission(template);
+        GameManager.I.LoadMission(template, plan);
     }
 
     public void CancelButtonCallback() {

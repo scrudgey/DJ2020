@@ -31,8 +31,11 @@ public class MissionPlanMapController : MonoBehaviour {
     MapMarkerIndicator extractionIndicator;
     MapMarkerIndicator insertionIndicator;
     LevelTemplate template;
-    public void Initialize(GameData data, LevelTemplate template) {
+    LevelPlan plan;
+
+    public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.template = template;
+        this.plan = plan;
         mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
         mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
         initialRectSize = new Vector2(mapRect.rect.width, mapRect.rect.height);
@@ -120,7 +123,7 @@ public class MissionPlanMapController : MonoBehaviour {
         insertionSelector = selector;
         indicator.ShowSelection(true);
         selector.Check(true);
-        // TODO: modify level delta
+        plan.insertionPointIdn = selector.data.idn;
     }
     void SelectExtractionPoint(InsertionPointSelector selector, MapMarkerIndicator indicator) {
         if (extractionIndicator != null) {
@@ -133,7 +136,8 @@ public class MissionPlanMapController : MonoBehaviour {
         extractionSelector = selector;
         indicator.ShowSelection(true);
         selector.Check(true);
-        // TODO: modify level delta
+
+        plan.extractionPointIdn = selector.data.idn;
     }
     void ScrollTo(Transform target) {
         Canvas.ForceUpdateCanvases();

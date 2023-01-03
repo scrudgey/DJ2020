@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExtractionZone : MonoBehaviour {
+public class ExtractionZone : MapMarker {
     public MeshRenderer meshRenderer;
     public bool isActive;
     public bool showCutscene;

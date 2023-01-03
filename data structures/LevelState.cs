@@ -7,10 +7,12 @@ using UnityEngine;
 [System.Serializable]
 public class LevelState {
     public LevelTemplate template;
+    public LevelPlan plan;
     public LevelDelta delta;
 
-    public static LevelState Instantiate(LevelTemplate template) => new LevelState {
+    public static LevelState Instantiate(LevelTemplate template, LevelPlan plan) => new LevelState {
         template = template,
+        plan = plan,
         delta = LevelDelta.Empty() with {
             powerGraph = PowerGraph.LoadAll(template.levelName),
             cyberGraph = CyberGraph.LoadAll(template.levelName),

@@ -26,6 +26,7 @@ public class PauseScreenObjectiveIndicator : MonoBehaviour {
         titleText.text = objective.title;
         descriptionText.text = objective.decsription;
 
+        thumbnail.sprite = objective.objectiveImage;
 
         Color color = status switch {
             ObjectiveStatus.inProgress => inProgressColor,

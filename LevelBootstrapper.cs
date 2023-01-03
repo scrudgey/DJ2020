@@ -37,7 +37,7 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapMission() {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
-        LevelState level = LevelState.Instantiate(levelTemplate);
+        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default());
 
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData() with {

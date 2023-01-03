@@ -30,6 +30,7 @@ public class MissionFailMenuController : MonoBehaviour {
     }
     public void RetryButtonCallback() {
         GameManager.I.CloseMenu();
-        GameManager.I.LoadMission(gameData.levelState.template);
+        LevelPlan plan = gameData.GetLevelPlan(gameData.levelState.template);
+        GameManager.I.LoadMission(gameData.levelState.template, plan);
     }
 }

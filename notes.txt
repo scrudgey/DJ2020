@@ -1724,7 +1724,41 @@ note: layer "interactive"
 * retry and replan/start is broken 
     * UI does not load
 * move key to be visible
-
+* map gen util
+    * store multiple per floor
+    * store metadata
+* sounds for clicking level up/down zoom in/out
+* sounds for clicking on column
+    * support floors 0-9, remove nulls
+    * populate markerData:
+    * columns:
+        * containerTransforms
+        * columbButtonPrefab
+            * columnButtonController:
+            * columnButton callback
+    * decor:
+        * stair up
+        * stair down
+        * stair left
+        * stair right
+        door
+    * jump to point on map
+        * ping the point
+    * preserve marker state when switching levels
+    * indicate selected insertion / extraction
+    * make icons: lightning bolt, arrow
+    * start with insertion / extraction selected
+    * indicate floor
+    * door decor goes on all doors
+    * indicate glass walls somehow
+        * another layer, visible only to map camera.
+        * can be used to indicate map boundaries.
+* fix laser 
+* tab icons
+* mission fail display is a little wonky
+* objectives
+    * data icon
+* fix weird map marker offsets
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1891,12 +1925,17 @@ nimrod for texts
 weapons
     colt 2037 sped up sounds great
 
+minimap
+    multiple floors of map
+    orient relative to main camera
+    highlight enemies in red
+        show sightcone
+    indicate player
 
-models
-    cones
-    sawhorse
-
-
+mission plan mapview 
+    support multiple scenes per level
+    disable selectors when necessary
+    markers gated behind tactical data
 
 ---------------
 
@@ -1927,7 +1966,6 @@ billboard interloper shader should be cutout, or something is up with interloper
 credstick surfing
 hack target ! indicator only sometimes visible
 NPC portraits not being set properly
-civ_female portrait could use some work
 strike team was not being dispatched in infiltration
 a guy danced on a corpse (I think he was investigating a noise?)
 clicking on overlay shot gun
@@ -1937,129 +1975,26 @@ interloper shader casts full shadow
 auto-use key in door
 get cyber network working once and for all
 normalize state name conventions
-level / mission / state / detla / template
+    level / mission / state / detla / template
 tighten up crawling
+crouch should not immediately go to crawl
 navigable chair
 burglar tools cause suspicion
 can we remove NPC json converter?
 tab to hide burglar 
 tab should not open burglar with c4
 c4 should crouch, place time
-crouch should not immediately go to crawl
-enemies are spotting plater somewhat easily
+enemies are spotting player somewhat easily
 line renderer
     clean up connections
     marching ants?
     better coloration
-fancy objectives complete display
+* fancy objectives complete display
 why do attack surfaces start out highlighted?
 why do we start with gun out but no suspicion?
 adjust all UI buttons to have consistent semantics for Cancel / OK
 carpet sounds
 
-build a test level, 3 storey building infiltration
-
-* fix laser 
-build a test level equivalent to Jack That Data
-    sphere robot
-        NPC template should allow sphere? different spawner?
-    don't destroy the floors
-    fix stairs
-    make level more challenging
-        turrets
-        camera view bigger
-
-tactics
-    distraction? cyber attack? 
-    purchase disguise
-    purchase credentials / fake ID / spoof keycard
-    buy info
-        locate key objectives
-        locate key items
-        locate traps / sensors / weapon emplacements: intel
-        locate guards / patrols / security operations center: intel
-        learn info to be used in dialogue
-        discoverable networks
-
-minimap
-    multiple floors of map
-    orient relative to main camera
-    auto-generate map snapshots for a level from util
-        include metadata of tagged positions and labels
-            metadata includes floor
-            name
-            insertion point
-            extraction point
-    highlight enemies in red
-        show sightcone
-    indicate player
-
-
-item select
-map pane
-tactics pane
-indicate selected weapon slot
-tab icons
-show mission overview or summary?
-    objectives go here!
-    show a freaking map!!
-
-mission fail display is a little wonky
-screen wobble on tab schange
-clean up the optional obejctives divider in mission selector
-cursor on mission UI
-abort -> show extraction zone
-
-
-* map gen util
-    * store multiple per floor
-    * store metadata
-* sounds for clicking level up/down zoom in/out
-* sounds for clicking on column
-    * support floors 0-9, remove nulls
-    * populate markerData:
-    * columns:
-        * containerTransforms
-        * columbButtonPrefab
-            * columnButtonController:
-            * columnButton callback
-    * decor:
-        * stair up
-        * stair down
-        * stair left
-        * stair right
-        door
-    * jump to point on map
-        * ping the point
-    * preserve marker state when switching levels
-    * indicate selected insertion / extraction
-    * make icons: lightning bolt, arrow
-    * start with insertion / extraction selected
-    * indicate floor
-    * door decor goes on all doors
-
-mapview 
-    support multiple scenes per level
-    disable selectors when necessary
-    markers gated behind tactical data
-    support select insertion / extraction
-    indicate glass walls somehow
-        another layer, visible only to map camera.
-        can be used to indicate map boundaries.
-    move spawnpoint to be visible on map
-
-
-models
-    stairs ramp
-    alarm box
-    grass
-objectives
-    data icon
-tab icons
-    map
-    loadout
-    tactics
-    overview
 graphics
     silenced pistol
     rocket launcher
@@ -2068,10 +2003,71 @@ graphics
     patrol guard
     title screen logo
     title screen animations 
+    civ_female portrait could use some work
 
-* map icons
-    * arrow
-    * lightning bolt
-    * door
+-----------------
 
+build a test level, 3 storey building infiltration
+
+build a test level equivalent to Jack That Data
+    sphere robot
+        NPC template should allow sphere? different spawner?
+    don't destroy the floors
+    fix stairs
+    make level more challenging
+        turrets
+        camera view bigger
+    models
+        stairs ramp
+        alarm box
+        grass
+        skybox buildings
+            fixed size of textures, but apply to large or small buildings; 
+
+screen wobble on tab schange
+clean up the optional obejctives divider in mission selector
+cursor on mission UI
+abort -> show extraction zone
 extraction / player spawn configuration automatically sets values on map marker. or is map marker?
+move spawnpoint to be visible on map
+
+
+
+planning mode
+-----------
+mission overview
+    objectives go here!
+    show a freaking map!!
+    summarize insertion, extraction
+item select
+support select insertion / extraction
+indicate selected weapon slot
+character breathing / animation
+
+tactics pane
+    support buying
+    icons for different tactics
+    available tactics set per mission
+    store which tactics are bought
+    when map data is bought, show notification on map tab
+    tactics
+        distraction? cyber attack? 
+        purchase disguise
+        purchase credentials / fake ID / spoof keycard
+        buy info
+            locate key objectives
+            locate key items
+            locate traps / sensors / weapon emplacements: intel
+            locate guards / patrols / security operations center: intel
+            learn info to be used in dialogue
+            discoverable networks
+
+
+how do we identify the insertion point in the level?
+
+use extraction / insertion idn when initializing level
+    handle default value properly
+
+
+[insertion] considering spawnpoint playerSpawnPoint (PlayerSpawnPoint) MapMarkerData { idn = , markerType = insertionPoint, markerIcon = circle, floorNumber = 0, markerName = Alleyway, description = Alleyway, position = (0.00, 0.00) } ==b61b42e2-e41d-42cd-8ec7-ca76e99188bb:False
+

@@ -8,6 +8,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
+
+    // these things should belong to level delta
     public static Dictionary<string, PoweredComponent> poweredComponents;
     public static Dictionary<string, CyberComponent> cyberComponents;
     public static Dictionary<string, AlarmComponent> alarmComponents;
@@ -32,7 +34,7 @@ public partial class GameManager : Singleton<GameManager> {
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
             playerState = PlayerState.Instantiate(template.playerState),
-            levelState = LevelState.Instantiate(levelTemplate),
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
         };
 
         // instantiate mission state from template
@@ -40,15 +42,14 @@ public partial class GameManager : Singleton<GameManager> {
 
         LoadScene(template.sceneName, () => StartVRMission(state));
     }
-    public void LoadMission(LevelTemplate template) {
+    public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
+        // gameData.levelPlans
 
-        // instantiate gamedata
-        // gameData = GameData.TestInitialData() with {
-        //     levelState = LevelState.Instantiate(template),
-        // };
+        // this may not be necessary if we're passing around the correct references.
+        gameData.SetLevelPlan(template, plan);
         gameData = gameData with {
-            levelState = LevelState.Instantiate(template)
+            levelState = LevelState.Instantiate(template, plan)
         };
 
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
@@ -56,7 +57,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
-        InitializeLevel();
+        InitializeLevel(LevelPlan.Default());
         TransitionToState(GameState.levelPlay);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
@@ -64,9 +65,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartMission(LevelState state) {
-
-        // TODO: take a template as input?
-
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
@@ -74,7 +72,7 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
-        InitializeLevel();
+        InitializeLevel(state.plan);
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
         // spawn NPC
@@ -86,7 +84,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void StartWorld() {
         Debug.Log($"GameMananger: world scene");
-        InitializePlayerAndController();
+        InitializePlayerAndController(LevelPlan.Default());
         TransitionToState(GameState.world);
     }
     void HandlePlayerDead(CharacterController npc) {
@@ -227,6 +225,7 @@ public partial class GameManager : Singleton<GameManager> {
         OnEyeVisibilityChange?.Invoke(gameData.playerState);
     }
     void ClearSceneData() {
+        // this stuff should all belong to level delta
         poweredComponents = new Dictionary<string, PoweredComponent>();
         cyberComponents = new Dictionary<string, CyberComponent>();
         alarmComponents = new Dictionary<string, AlarmComponent>();
@@ -238,21 +237,20 @@ public partial class GameManager : Singleton<GameManager> {
 
         // Debug.Log($"initialized poweredComponents {poweredComponents} {poweredComponents.Count}");
     }
-    private void InitializePlayerAndController() {
+    private void InitializePlayerAndController(LevelPlan plan) {
         ClearSceneData();
         inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
 
         // spawn player object
-        GameObject playerObj = SpawnPlayer(gameData.playerState);
+        GameObject playerObj = SpawnPlayer(gameData.playerState, plan);
         SetFocus(playerObj);
 
         // connect player object to input controller
         inputController.SetInputReceivers(playerObj);
     }
-    private void InitializeLevel() {
-
-        InitializePlayerAndController();
+    private void InitializeLevel(LevelPlan plan) {
+        InitializePlayerAndController(plan);
 
         // connect up power grids
         Debug.Log("connecting power grid...");
@@ -456,10 +454,18 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
-    GameObject SpawnPlayer(PlayerState state) {
-        Debug.Log("spawn player object");
+    GameObject SpawnPlayer(PlayerState state, LevelPlan plan) {
+        Debug.Log($"[insertion] spawn player object at {plan.insertionPointIdn}");
+
+        if (plan.insertionPointIdn != "") { // default
+            foreach (PlayerSpawnPoint point in GameObject.FindObjectsOfType<PlayerSpawnPoint>()) {
+                Debug.Log($"[insertion] considering spawnpoint {point} {point.data} {point.data.idn}=={plan.insertionPointIdn}:{point.data.idn == plan.insertionPointIdn}");
+                if (point.data.idn == plan.insertionPointIdn)
+                    return point.SpawnPlayer(state);
+            }
+        }
+        Debug.Log("[insertion] defaulting spawn point to random");
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
-        Debug.Log($"spawnPoint: {spawnPoint} playerState: {state}");
         return spawnPoint.SpawnPlayer(state);
     }
 }

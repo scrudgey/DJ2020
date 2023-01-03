@@ -169,11 +169,16 @@ public class LevelDataUtilEditor : Editor {
     void SaveMapMetaData(Camera mapCam, LevelTemplate template) {
         string levelName = template.levelName;
         string sceneName = SceneManager.GetActiveScene().name;
-        List<MapMarkerData> datas = GameObject.FindObjectsOfType<MapMarker>()
-            .Select(marker =>
-                marker.data with { position = mapCam.WorldToViewportPoint(marker.transform.position) }
-                )
-            .ToList();
+        List<MapMarkerData> datas = new List<MapMarkerData>();
+        foreach (MapMarker marker in GameObject.FindObjectsOfType<MapMarker>()) {
+            Guid guid = Guid.NewGuid();
+            string idn = guid.ToString();
+            marker.data.position = mapCam.WorldToViewportPoint(marker.transform.position);
+            marker.data.idn = idn;
+            datas.Add(marker.data);
+            EditorUtility.SetDirty(marker);
+        }
+        Debug.Log($"writing {datas.Count} map marker data...");
         MapMarker.WriteMapMetaData(levelName, sceneName, datas);
     }
 

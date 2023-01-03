@@ -24,9 +24,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
     int activeWeaponSlot;
     GameData data;
+    LevelPlan plan;
 
-    public void Initialize(GameData data, LevelTemplate template) {
+    public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.data = data;
+        this.plan = plan;
 
         primaryWeaponButton.ApplyGunTemplate(data.playerState.primaryGun.template);
         secondaryWeaponButton.ApplyGunTemplate(data.playerState.secondaryGun.template);
