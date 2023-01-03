@@ -86,7 +86,7 @@ public partial class GameManager : Singleton<GameManager> {
                     // GameManager.I.ActivateAlarm();
                 }
             }
-            if (gameData.playerState.disguise) {
+            if (gameData.levelState.delta.disguise) {
                 if (reaction == Reaction.investigate) {
                     reaction = Reaction.ignore;
                 } else if (reaction == Reaction.attack) {
@@ -99,11 +99,11 @@ public partial class GameManager : Singleton<GameManager> {
 
 
     public void ActivateDisguise() {
-        gameData.playerState.disguise = true;
+        gameData.levelState.delta.disguise = true;
         OnSuspicionChange?.Invoke();
     }
     public void DeactivateDisguise() {
-        gameData.playerState.disguise = false;
+        gameData.levelState.delta.disguise = false;
         OnSuspicionChange?.Invoke();
     }
 }

@@ -1763,6 +1763,15 @@ note: layer "interactive"
 * use extraction / insertion idn when initializing level
     * handle default value properly
 * retry plan results in insertion / extraction being unset
+    * tactics
+        * cyber attack
+        * purchase disguise
+        * purchase fake ID / spoof keycard
+    * support buying
+    * icons for different tactics
+    * available tactics set per mission
+    * store which tactics are bought
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2052,24 +2061,17 @@ indicate selected weapon slot
 character breathing / animation
 
 tactics pane
-    * support buying
-    * icons for different tactics
-    * available tactics set per mission
-    * store which tactics are bought
-    when map data is bought, show notification on map tab
     clickable active tactics show description
+    buy info
+        locate key objectives
+        locate key items
+        locate traps / sensors / weapon emplacements: intel
+        locate guards / patrols / security operations center: intel
+        learn info to be used in dialogue
+        discoverable networks
+    when map data is bought, show notification on map tab
 
-    tactics
-        distraction? cyber attack? 
-        * purchase disguise
-        * purchase fake ID / spoof keycard
-        buy info
-            locate key objectives
-            locate key items
-            locate traps / sensors / weapon emplacements: intel
-            locate guards / patrols / security operations center: intel
-            learn info to be used in dialogue
-            discoverable networks
+tactics take effect
 
-how do we identify the insertion point in the level?
-
+disguise / alarm panel not working right
+when disguise is active, normal -> ignore should highlight.

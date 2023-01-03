@@ -661,7 +661,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         suspicionRecords = GameManager.I.suspicionRecords,
         playerSuspiciousness = GameManager.I.GetTotalSuspicion(),
         alarmActive = GameManager.I.gameData.levelState.delta.alarmGraph.anyAlarmActive(),
-        playerInDisguise = GameManager.I.gameData.playerState.disguise,
+        playerInDisguise = GameManager.I.gameData.levelState.delta.disguise,
         playerSpeechSkill = GameManager.I.gameData.playerState.speechSkillLevel
     };
 

@@ -18,6 +18,7 @@ public class LevelState {
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
             strikeTeamMaxSize = 3,
+            disguise = plan.startWithDisguise(),
             objectivesState = template.objectives
                 .ToDictionary(t => t, t => ObjectiveStatus.inProgress)
         }

@@ -43,7 +43,6 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public float hackSpeedCoefficient;
     public float hackRadius;
 
-    public bool disguise;
 
     public SpeechEtiquette[] etiquettes;
     public Sprite portrait;

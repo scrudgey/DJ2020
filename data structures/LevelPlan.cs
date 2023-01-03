@@ -1,13 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
+
 public record LevelPlan {
-    public bool startWithDisguise;
     public string insertionPointIdn;
     public string extractionPointIdn;
     public List<Tactic> activeTactics;
     public static LevelPlan Default() => new LevelPlan {
         insertionPointIdn = "",
         extractionPointIdn = "",
-        startWithDisguise = false,
         activeTactics = new List<Tactic>()
     };
+
+    public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);
 }

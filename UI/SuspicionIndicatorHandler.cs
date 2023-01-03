@@ -265,7 +265,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
-                if (GameManager.I.gameData.playerState.disguise && !GameManager.I.gameData.levelState.anyAlarmActive()) {
+                if (GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmActive()) {
                     reactionIgnoreChevron.color = disabledColor;
                     reactionIgnoreLight.color = lightGreenDisabled;
                 }
@@ -286,7 +286,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
 
-                if (GameManager.I.gameData.levelState.anyAlarmActive() && !GameManager.I.gameData.playerState.disguise) {
+                if (GameManager.I.gameData.levelState.anyAlarmActive() && !GameManager.I.gameData.levelState.delta.disguise) {
                     reactionAttackChevron.color = disabledColor;
                     reactionAttackLight.color = lightRedDisabled;
                 }
@@ -315,7 +315,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             alarmChevronObject.SetActive(false);
         }
 
-        if (GameManager.I.gameData.playerState.disguise) {
+        if (GameManager.I.gameData.levelState.delta.disguise) {
             if (!disguiseChevronObject.activeInHierarchy) {
                 easeInDisguiseChevron = true;
                 disguiseChevronEaseTimer = 0f;

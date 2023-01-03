@@ -67,7 +67,7 @@ namespace UI {
 
         }
         public void ToggleDisguise(string[] args) {
-            bool disguise = GameManager.I.gameData.playerState.disguise;
+            bool disguise = GameManager.I.gameData.levelState.delta.disguise;
             if (disguise)
                 GameManager.I.DeactivateDisguise();
             else

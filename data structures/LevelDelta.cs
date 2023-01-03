@@ -6,10 +6,11 @@ public record LevelDelta {
     public AlarmGraph alarmGraph;
     public int strikeTeamMaxSize;
     public ObjectiveStatus objectiveStatus;
+    public bool disguise;
 
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
 
     public static LevelDelta Empty() => new LevelDelta {
-        objectivesState = new Dictionary<Objective, ObjectiveStatus>() 
+        objectivesState = new Dictionary<Objective, ObjectiveStatus>()
     };
 }
