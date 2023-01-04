@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Items;
 using UnityEngine;
-public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerStateLoader, IInputReceiver {
+public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IInputReceiver {
     public Action<ItemHandler> OnValueChanged { get; set; }
 
     public List<BaseItem> items = new List<BaseItem>();
@@ -38,20 +39,19 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
-    public void LoadItemState(IItemHandlerState data) {
+    void ClearItem() {
+        SwitchToItem(null);
+        index = items.IndexOf(null);
+    }
+    public void LoadItemState(string[] itemNames) {
         items = new List<BaseItem>();
-        foreach (string itemName in data.items) {
-            BaseItem newItem = ItemInstance.NewInstance(itemName);
-            if (newItem != null) {
-                items.Add(newItem);
-                // Debug.Log(newItem);
-            } else {
-                Debug.LogError($"unable to load saved item {itemName}");
-            }
+        foreach (string itemName in itemNames) {
+            BaseItem newItem = ItemInstance.LoadItem(itemName);
+            items.Add(newItem);
         }
-        if (items.Count > 0) {
-            SwitchToItem(items[0]);    // TODO: save active item
-        }
+        items.Add(null);
+        items = items.ToHashSet().ToList();
+        ClearItem();
     }
 
     void UseItem() {
@@ -61,6 +61,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
     }
 
     void OnItemEnter(BaseItem item) {
+        if (item == null)
+            return;
         switch (item) {
             case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.cyber);
@@ -80,6 +82,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
         }
     }
     void OnItemExit(BaseItem item) {
+        if (item == null)
+            return;
         switch (item) {
             case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.none);

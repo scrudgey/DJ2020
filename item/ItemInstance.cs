@@ -5,7 +5,8 @@ using UnityEngine;
 
 namespace Items {
     public abstract class ItemInstance {
-        public static BaseItem NewInstance(string baseName) {
+        static BaseItem NewInstance(string baseName) {
+            if (baseName == "") return null;
             ItemData baseItem = ItemData.LoadItem(baseName);
             return baseItem switch {
                 C4Data c4Data => new C4(c4Data),
@@ -17,6 +18,17 @@ namespace Items {
                 },
                 _ => new BaseItem(baseItem)
             };
+        }
+
+        public static BaseItem LoadItem(string itemName) {
+            if (itemName == "") return null;
+            BaseItem newItem = ItemInstance.NewInstance(itemName);
+            if (newItem != null) {
+                return newItem;
+            } else {
+                Debug.LogError($"unable to load plan item {itemName}");
+                return null;
+            }
         }
 
         public virtual void Use(ItemHandler handler) { }

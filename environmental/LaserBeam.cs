@@ -48,7 +48,7 @@ public class LaserBeam : MonoBehaviour {
             if (hit.collider.isTrigger)
                 continue;
             length = hit.distance / 2f;
-            if (hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            if (GameManager.I.playerObject != null && hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform)) {
                 // TODO: possibly, trigger on anything, not just player
                 AlertTripWire();
             }

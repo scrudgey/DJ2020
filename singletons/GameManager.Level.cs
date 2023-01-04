@@ -44,17 +44,10 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
-        // gameData.levelPlans
 
-        // this may not be necessary if we're passing around the correct references.
-        gameData.SetLevelPlan(template, plan);
         gameData = gameData with {
             levelState = LevelState.Instantiate(template, plan),
         };
-
-        if (plan.startWithFakeID()) {
-            gameData.playerState.items.Append("ID");
-        }
 
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }
@@ -462,10 +455,10 @@ public partial class GameManager : Singleton<GameManager> {
         if (plan.insertionPointIdn != "") { // default
             foreach (PlayerSpawnPoint point in GameObject.FindObjectsOfType<PlayerSpawnPoint>()) {
                 if (point.data.idn == plan.insertionPointIdn)
-                    return point.SpawnPlayer(state);
+                    return point.SpawnPlayer(state, plan);
             }
         }
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
-        return spawnPoint.SpawnPlayer(state);
+        return spawnPoint.SpawnPlayer(state, plan);
     }
 }

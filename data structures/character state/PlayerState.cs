@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 [System.Serializable]
-public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICharacterHurtableState {
+public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
     public int credits;
 
     // skin
@@ -21,9 +21,6 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public float health { get; set; }
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
-
-    // items
-    public List<string> items { get; set; }
 
     // stats
     public int cyberlegsLevel;
@@ -67,7 +64,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             tertiaryGun = GunState.Instantiate(gun3),
             activeGun = 2,
 
-            items = new List<string> { "explosive", "deck", "goggles", "tools" },
+            // items = new List<string> { "explosive", "deck", "goggles", "tools" },
 
             cyberlegsLevel = 1,
             maxConcurrentNetworkHacks = 1,
@@ -93,7 +90,7 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public void ApplyState(GameObject playerObject) {
         ((IGunHandlerState)this).ApplyGunState(playerObject);
         ((ISkinState)this).ApplySkinState(playerObject);
-        ((IItemHandlerState)this).ApplyItemState(playerObject);
+        // ((IItemHandlerState)this).ApplyItemState(playerObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(playerObject);
         ApplyPlayerState(playerObject);
     }

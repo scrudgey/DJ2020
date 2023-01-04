@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class MissionPlanLoadoutController : MonoBehaviour {
     public AudioClip[] pickerCallbackSounds;
     public AudioClip[] weaponSelectorSounds;
@@ -19,11 +21,15 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public GameObject pickerEntryPrefab;
     public GameObject pickerHeaderPrefab;
 
+    [Header("weapon slots")]
     public LoadoutWeaponButton primaryWeaponButton;
     public LoadoutWeaponButton secondaryWeaponButton;
     public LoadoutWeaponButton tertiaryWeaponButton;
+    [Header("item slots")]
+    public LoadoutGearSlotButton[] itemSlots;
 
-    int activeWeaponSlot;
+    int selectedWeaponSlot;
+    int selectedItemSlot;
     GameData data;
     LevelPlan plan;
 
@@ -48,14 +54,35 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         primaryWeaponButton.ApplyGunTemplate(data.playerState.primaryGun.template);
         secondaryWeaponButton.ApplyGunTemplate(data.playerState.secondaryGun.template);
         tertiaryWeaponButton.ApplyGunTemplate(data.playerState.tertiaryGun.template);
+        InitializeItemSlots(plan);
 
         thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
 
         // data.playerState.items
-        activeWeaponSlot = 1;
+        selectedWeaponSlot = 1;
         gunStatHandler.DisplayGunTemplate(data.playerState.primaryGun.template);
 
         InitializeWeaponPicker();
+    }
+
+    void InitializeItemSlots(LevelPlan plan) {
+        for (int i = 0; i < 4; i++) {
+            itemSlots[i].Initialize(this, i);
+            if (i < plan.items.Length) {
+                BaseItem item = ItemInstance.LoadItem(plan.items[i]);
+                SetItemSlot(i, item);
+            } else {
+                SetItemSlot(i, null);
+            }
+        }
+    }
+    void SetItemSlot(int index, BaseItem item) {
+        if (item == null) {
+            itemSlots[index].Clear();
+            return;
+        } else {
+            itemSlots[index].SetItem(item);
+        }
     }
 
     void InitializeSkins(GameData data) {
@@ -77,25 +104,38 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
     public void WeaponSlotClicked(int slotIndex, GunTemplate template) {
         Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds);
-        activeWeaponSlot = slotIndex;
+        selectedWeaponSlot = slotIndex;
         gunStatHandler.DisplayGunTemplate(template);
         InitializeWeaponPicker();
         if (template == null) {
             torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
         }
     }
+    public void ItemSlotClicked(int slotIndex, LoadoutGearSlotButton button) {
+        Debug.Log($"item slot {slotIndex} {button.item}");
+        selectedItemSlot = slotIndex;
+        InitializeItemPicker();
+    }
     public void StashPickerCallback(LoadoutStashPickerButton picker) {
         Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds);
+        switch (picker.type) {
+            case LoadoutStashPickerButton.PickerType.gun: WeaponPickerCallback(picker); break;
+            case LoadoutStashPickerButton.PickerType.item: ItemPickerCallback(picker); break;
+        }
+    }
 
-        LoadoutWeaponButton button = activeWeaponSlot switch {
+    void WeaponPickerCallback(LoadoutStashPickerButton picker) {
+        LoadoutWeaponButton button = selectedWeaponSlot switch {
             1 => primaryWeaponButton,
             2 => secondaryWeaponButton,
             3 => tertiaryWeaponButton
         };
         button.ApplyGunTemplate(picker.template);
         gunStatHandler.DisplayGunTemplate(picker.template);
+
+        // TODO: change plan, not player state (requires change to VR mission designer too?)
         GunState newState = picker.template ? GunState.Instantiate(picker.template) : null;
-        switch (activeWeaponSlot) {
+        switch (selectedWeaponSlot) {
             case 1:
                 data.playerState.primaryGun = newState;
                 break;
@@ -115,7 +155,25 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         };
         torsoImage.sprite = octet[Direction.rightDown][0];
     }
+    void ItemPickerCallback(LoadoutStashPickerButton picker) {
+        SetItemSlot(selectedItemSlot, picker.item);
+        // plan.items.Add(picker.item.data.shortName);
+        plan.items[selectedItemSlot] = picker.item.data.shortName;
+        InitializeItemPicker();
+    }
 
+    void InitializeItemPicker() {
+        foreach (Transform child in pickerContainer) {
+            Destroy(child.gameObject);
+        }
+        foreach (string itemName in data.unlockedItems) {
+            BaseItem item = ItemInstance.LoadItem(itemName);
+            if (item == null) continue;
+            if (plan.items.Any(planItem => item.data.shortName == planItem)) continue;
+            LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
+            pickerHandler.Initialize(this, item);
+        }
+    }
     void InitializeWeaponPicker() {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
@@ -183,7 +241,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         headImage.transform.localPosition = headPosition;
 
         Direction headDirection = Direction.rightDown;
-        headAngle = Mathf.Sin(timer);
+        headAngle = Mathf.Sin(timer + Mathf.PI * 3f / 4f);
         switch (headAngle) {
             case float n when (n < -0.5f):
                 headDirection = Direction.leftDown;

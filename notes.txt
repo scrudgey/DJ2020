@@ -1958,6 +1958,20 @@ dialogue
     concoct one lie per mark against player
     get once lie stratagem per mark from player
 
+tactics pane
+    purchase keycard
+    ativate cyberattack
+    clickable active tactics show description
+    buy info
+        locate key objectives
+        locate key items
+        locate traps / sensors / weapon emplacements: intel
+        locate guards / patrols / security operations center: intel
+        learn info to be used in dialogue
+        discoverable networks
+    when map data is bought, show notification on map tab
+
+
 ---------------
 
 NPC tuning:
@@ -2056,7 +2070,8 @@ move spawnpoint to be visible on map
 handle mission fail
     when datastore is destroyed
     reaching extraction zone -> fail
-
+allow switch to 0 item
+    hide UI handler in that case
 
 planning mode
 -----------
@@ -2065,24 +2080,6 @@ mission overview
     show a freaking map!!
     summarize insertion, extraction
     site security
-indicate selected weapon slot
+indicate selected weapon / item slot
 HP / def indicators
-
-tactics pane
-    purchase keycard
-    ativate cyberattack
-    clickable active tactics show description
-    buy info
-        locate key objectives
-        locate key items
-        locate traps / sensors / weapon emplacements: intel
-        locate guards / patrols / security operations center: intel
-        learn info to be used in dialogue
-        discoverable networks
-    when map data is bought, show notification on map tab
-
-
-
-item select
-    how is item select going to work?
-    right now we set stuff on player state.
+* item select
