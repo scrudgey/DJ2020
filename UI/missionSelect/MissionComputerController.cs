@@ -14,6 +14,8 @@ public class MissionComputerController : MonoBehaviour {
     public Image factionLogo;
     public TextMeshProUGUI factionText;
     public TextMeshProUGUI emailText;
+    public TextMeshProUGUI missionNameText;
+    public TextMeshProUGUI taglineText;
     public Transform objectivesContainer;
 
     public GameObject missionButtonPrefab;
@@ -24,10 +26,21 @@ public class MissionComputerController : MonoBehaviour {
     public LevelTemplate activeLevelTemplate;
     GameData data;
 
+    [Header("map")]
+    public Image mapImage;
+    public Color mapColor1;
+    public Color mapColor2;
+    public float timer;
+    public float colorFlipInterval;
+
+    [Header("objects")]
+    public GameObject rewardBox;
+    public GameObject factionBox;
+
     public void Initialize(GameData data) {
         Toolbox.RandomizeOneShot(audioSource, openMenuSound);
         this.data = data;
-        LevelTemplate defaultTemplate = null;
+        // LevelTemplate defaultTemplate = null;
         foreach (Transform child in missionButtonContainer) {
             Destroy(child.gameObject);
         }
@@ -35,13 +48,28 @@ public class MissionComputerController : MonoBehaviour {
         foreach (string levelName in data.unlockedLevels) {
             LevelTemplate template = LevelTemplate.LoadAsInstance(levelName);
             CreateMissionButton(template);
-            if (defaultTemplate == null) {
-                defaultTemplate = template;
-            }
+            // if (defaultTemplate == null) {
+            //     defaultTemplate = template;
+            // }
         }
-        if (defaultTemplate != null) {
-            LoadTemplate(defaultTemplate);
-        }
+        // if (defaultTemplate != null) {
+        //     LoadTemplate(defaultTemplate);
+        // }
+        ClearAll();
+    }
+    void ClearAll() {
+        rewardAmountText.text = "-";
+        creditAmountText.text = data.playerState.credits.ToString("#,#");
+
+        factionLogo.enabled = false;
+        factionText.text = "";
+
+        emailText.text = "<NONE>";
+
+        missionNameText.gameObject.SetActive(false);
+        taglineText.gameObject.SetActive(false);
+        rewardBox.SetActive(false);
+        factionBox.SetActive(false);
     }
     void CreateMissionButton(LevelTemplate template) {
         GameObject obj = GameObject.Instantiate(missionButtonPrefab);
@@ -56,31 +84,40 @@ public class MissionComputerController : MonoBehaviour {
 
     public void LoadTemplate(LevelTemplate template) {
         activeLevelTemplate = template;
-        Debug.Log($"Load {template.name}");
+
+
+        missionNameText.gameObject.SetActive(true);
+        taglineText.gameObject.SetActive(true);
+        rewardBox.SetActive(true);
+        factionBox.SetActive(true);
 
         rewardAmountText.text = template.creditReward.ToString("#,#");
         creditAmountText.text = data.playerState.credits.ToString("#,#");
 
+        factionLogo.enabled = true;
         factionLogo.sprite = template.faction.logo;
         factionText.text = template.faction.description;
 
-        emailText.text = template.prompt.text;
+        emailText.text = template.proposalEmail.text;
 
-        foreach (Transform child in objectivesContainer) {
-            if (child.name == "title") continue;
-            Destroy(child.gameObject);
-        }
-        foreach (Objective objective in template.objectives) {
-            GameObject obj = GameObject.Instantiate(objectivePrefab);
-            obj.transform.SetParent(objectivesContainer, false);
-            MissionSelectorObjective handler = obj.GetComponent<MissionSelectorObjective>();
-            handler.Initialize(objective);
-            // TextMeshProUGUI objText = obj.GetComponentInChildren<TextMeshProUGUI>();
-            // objText.text = objective.title;
-        }
-        AddSpacer();
-        AddDivider();
-        AddSpacer();
+        missionNameText.text = template.levelName;
+        taglineText.text = "covert data exfiltration";
+
+        // foreach (Transform child in objectivesContainer) {
+        //     if (child.name == "title") continue;
+        //     Destroy(child.gameObject);
+        // }
+        // foreach (Objective objective in template.objectives) {
+        //     GameObject obj = GameObject.Instantiate(objectivePrefab);
+        //     obj.transform.SetParent(objectivesContainer, false);
+        //     MissionSelectorObjective handler = obj.GetComponent<MissionSelectorObjective>();
+        //     handler.Initialize(objective);
+        //     // TextMeshProUGUI objText = obj.GetComponentInChildren<TextMeshProUGUI>();
+        //     // objText.text = objective.title;
+        // }
+        // AddSpacer();
+        // AddDivider();
+        // AddSpacer();
     }
     public void AddSpacer() {
         GameObject spacerObj = GameObject.Instantiate(spacerPrefab);
@@ -98,5 +135,17 @@ public class MissionComputerController : MonoBehaviour {
     public void PlanButtonCallback() {
         Debug.Log($"Plan {activeLevelTemplate.name}");
         GameManager.I.ShowMissionPlanner(activeLevelTemplate);
+    }
+
+    void Update() {
+        timer += Time.unscaledDeltaTime;
+        if (timer > colorFlipInterval) {
+            timer -= colorFlipInterval;
+            if (mapImage.color == mapColor1) {
+                mapImage.color = mapColor2;
+            } else {
+                mapImage.color = mapColor1;
+            }
+        }
     }
 }

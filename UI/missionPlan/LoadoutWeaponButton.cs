@@ -17,7 +17,7 @@ public class LoadoutWeaponButton : MonoBehaviour {
         this.gunTemplate = null;
         nameText.text = "";
         weaponImage.enabled = false;
-        loadoutController.WeaponSlotClicked(weaponIndex, gunTemplate);
+        loadoutController.WeaponSlotClicked(weaponIndex, gunTemplate, clear: true);
     }
 
     public void ApplyGunTemplate(GunTemplate template) {

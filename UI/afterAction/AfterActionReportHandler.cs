@@ -27,7 +27,7 @@ public class AfterActionReportHandler : MonoBehaviour {
             AfterActionReportObjectiveHandler handler = obj.GetComponent<AfterActionReportObjectiveHandler>();
             handler.Initialize(objective, data);
         }
-        emailText.text = data.levelState.template.email.text;
+        emailText.text = data.levelState.template.successEmail.text;
 
         rewardAmountText.text = data.levelState.template.creditReward.ToString("n2");
         bonusAmountText.text = "0";

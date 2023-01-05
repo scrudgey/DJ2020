@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MissionPlanLoadoutController : MonoBehaviour {
+    public AudioClip[] openPickerSounds;
     public AudioClip[] pickerCallbackSounds;
     public AudioClip[] weaponSelectorSounds;
     public AudioSource audioSource;
@@ -25,8 +26,18 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public LoadoutWeaponButton primaryWeaponButton;
     public LoadoutWeaponButton secondaryWeaponButton;
     public LoadoutWeaponButton tertiaryWeaponButton;
+
+    public GameObject primaryHighlight;
+    public GameObject secondaryHighlight;
+    public GameObject tertiaryHighlight;
+
     [Header("item slots")]
     public LoadoutGearSlotButton[] itemSlots;
+    [Header("picker")]
+    public RectTransform statsRect;
+    public RectTransform pickerRect;
+    public GameObject pickerHeader;
+    bool pickerOpen;
 
     int selectedWeaponSlot;
     int selectedItemSlot;
@@ -43,6 +54,8 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     Skin headSkin;
 
     float headAngle;
+
+    Coroutine pickerCoroutine;
     public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.data = data;
         this.plan = plan;
@@ -60,9 +73,17 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
         // data.playerState.items
         selectedWeaponSlot = 1;
-        gunStatHandler.DisplayGunTemplate(data.playerState.primaryGun.template);
+        // gunStatHandler.DisplayGunTemplate(data.playerState.primaryGun.template);
 
-        InitializeWeaponPicker();
+
+        pickerRect.gameObject.SetActive(false);
+        pickerHeader.SetActive(false);
+        pickerOpen = false;
+
+        primaryHighlight.SetActive(false);
+        secondaryHighlight.SetActive(false);
+        tertiaryHighlight.SetActive(false);
+        // InitializeWeaponPicker();
     }
 
     void InitializeItemSlots(LevelPlan plan) {
@@ -102,29 +123,69 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
 
-    public void WeaponSlotClicked(int slotIndex, GunTemplate template) {
-        Toolbox.RandomizeOneShot(audioSource, weaponSelectorSounds);
+    public void WeaponSlotClicked(int slotIndex, GunTemplate template, bool clear = false) {
         selectedWeaponSlot = slotIndex;
+        switch (slotIndex) {
+            case 1:
+                primaryHighlight.SetActive(true);
+                secondaryHighlight.SetActive(false);
+                tertiaryHighlight.SetActive(false);
+                break;
+            case 2:
+                primaryHighlight.SetActive(false);
+                secondaryHighlight.SetActive(true);
+                tertiaryHighlight.SetActive(false);
+                break;
+            case 3:
+                primaryHighlight.SetActive(false);
+                secondaryHighlight.SetActive(false);
+                tertiaryHighlight.SetActive(true);
+                break;
+        }
         gunStatHandler.DisplayGunTemplate(template);
         InitializeWeaponPicker();
         if (template == null) {
             torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
         }
+        if (clear) {
+            StartPickerCoroutine(ClosePicker());
+        } else if (!pickerOpen) {
+            Toolbox.RandomizeOneShot(audioSource, openPickerSounds, randomPitchWidth: 0.05f);
+            StartPickerCoroutine(OpenPicker());
+        }
+
     }
     public void ItemSlotClicked(int slotIndex, LoadoutGearSlotButton button) {
         Debug.Log($"item slot {slotIndex} {button.item}");
         selectedItemSlot = slotIndex;
         InitializeItemPicker();
+
+        primaryHighlight.SetActive(false);
+        secondaryHighlight.SetActive(false);
+        tertiaryHighlight.SetActive(false);
+
+        if (!pickerOpen) {
+            Toolbox.RandomizeOneShot(audioSource, openPickerSounds, randomPitchWidth: 0.05f);
+            StartPickerCoroutine(OpenPicker());
+        }
     }
     public void StashPickerCallback(LoadoutStashPickerButton picker) {
-        Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds);
+        // Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds, randomPitchWidth: 0.05f);
         switch (picker.type) {
             case LoadoutStashPickerButton.PickerType.gun: WeaponPickerCallback(picker); break;
             case LoadoutStashPickerButton.PickerType.item: ItemPickerCallback(picker); break;
         }
+        StartPickerCoroutine(ClosePicker());
+
     }
 
     void WeaponPickerCallback(LoadoutStashPickerButton picker) {
+        Toolbox.RandomizeOneShot(audioSource, picker.template.unholster, randomPitchWidth: 0.05f);
+
+        primaryHighlight.SetActive(false);
+        secondaryHighlight.SetActive(false);
+        tertiaryHighlight.SetActive(false);
+
         LoadoutWeaponButton button = selectedWeaponSlot switch {
             1 => primaryWeaponButton,
             2 => secondaryWeaponButton,
@@ -234,11 +295,13 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         Vector3 torsoPosition = new Vector3(initialTorsoPosition.x, initialTorsoPosition.y, initialTorsoPosition.z);
         Vector3 headPosition = new Vector3(initialHeadPosition.x, initialHeadPosition.y, initialHeadPosition.z);
 
-        torsoPosition.y += 0.25f * Mathf.Sin(timer);
-        headPosition.y += 0.25f * Mathf.Sin(timer + Mathf.PI / 8);
+        torsoPosition.y += 0.35f * Mathf.Sin(timer);
+        headPosition.y += 0.55f * Mathf.Sin(timer + Mathf.PI / 8);
 
         torsoImage.transform.localPosition = torsoPosition;
         headImage.transform.localPosition = headPosition;
+
+        torsoImage.transform.localScale = (1 + Mathf.Clamp(Mathf.Sin(timer), 0f, 1f) * 0.02f) * Vector3.one;
 
         Direction headDirection = Direction.rightDown;
         headAngle = Mathf.Sin(timer + Mathf.PI * 3f / 4f);
@@ -258,6 +321,48 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         }
         headImage.sprite = headSkin.headIdle[headDirection][0];
 
+    }
+
+
+    public void OnWeaponSlotMouseOver(LoadoutWeaponButton button) {
+        gunStatHandler.DisplayGunTemplate(button.gunTemplate);
+    }
+
+    void StartPickerCoroutine(IEnumerator coroutine) {
+        if (pickerCoroutine != null) {
+            StopCoroutine(pickerCoroutine);
+        }
+        pickerCoroutine = StartCoroutine(coroutine);
+    }
+    IEnumerator OpenPicker() {
+        pickerOpen = true;
+        pickerRect.gameObject.SetActive(true);
+        pickerHeader.SetActive(true);
+        float timer = 0f;
+        float duration = 0.15f;
+        float width = pickerRect.rect.width;
+        while (timer < duration) {
+            timer += Time.unscaledDeltaTime;
+            float height = (float)PennerDoubleAnimation.Linear(timer, 0f, 340f, duration);
+            pickerRect.sizeDelta = new Vector2(width, height);
+            yield return null;
+        }
+        pickerCoroutine = null;
+    }
+    IEnumerator ClosePicker() {
+        pickerOpen = false;
+        float timer = 0f;
+        float duration = 0.15f;
+        float width = pickerRect.rect.width;
+        while (timer < duration) {
+            timer += Time.unscaledDeltaTime;
+            float height = (float)PennerDoubleAnimation.Linear(timer, 340f, -340f, duration);
+            pickerRect.sizeDelta = new Vector2(width, height);
+            yield return null;
+        }
+        pickerRect.gameObject.SetActive(false);
+        pickerHeader.SetActive(false);
+        pickerCoroutine = null;
     }
 
 }

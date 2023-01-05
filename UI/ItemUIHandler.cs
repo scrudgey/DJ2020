@@ -10,6 +10,7 @@ namespace UI {
         public Image itemImage;
         public TextMeshProUGUI itemTitle;
         public TextMeshProUGUI itemCaption;
+        public GameObject parent;
 
         override public void HandleValueChanged(ItemHandler itemHandler) {
             if (itemHandler.activeItem == null) {
@@ -17,7 +18,10 @@ namespace UI {
                 itemImage.enabled = false;
                 itemTitle.text = "N/A";
                 itemCaption.text = "";
+                parent.SetActive(false);
             } else {
+                parent.SetActive(true);
+
                 // TODO: fix this up
                 itemImage.enabled = true;
                 itemImage.sprite = itemHandler.activeItem.data.image;

@@ -127,6 +127,10 @@ public partial class GameManager : Singleton<GameManager> {
                     }, unloadAll: false);
                 }
                 break;
+            case GameState.mainMenu:
+                Time.timeScale = 0f;
+                cursorType = CursorType.pointer;
+                break;
             default:
                 break;
         }

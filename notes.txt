@@ -1775,6 +1775,19 @@ note: layer "interactive"
     * tune the pulsation
     * head looks around
     * torso changes in response to weapon selection
+* item select
+* overview
+* clean up the optional objectives divider in mission selector
+* allow switch to 0 item
+    * hide UI handler in that case
+* screen wobble on tab schange
+* extraction / player spawn configuration automatically sets values on map marker. or is map marker?
+* move spawnpoint to be visible on map
+* cursor on mission UI
+* indicate selected weapon / item slot
+    * open the picker when a slot is selected.
+    * close it when something is picked.
+    * bleeoop open - short close sound
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1941,6 +1954,32 @@ nimrod for texts
 weapons
     colt 2037 sped up sounds great
 
+planning mode
+    optional objectives
+    HP / def indicators
+    mission select map
+        indicate a point on map
+        move map, zoom
+    on mouseover picker: change stat viewer
+        smooth rolling stat bars when values change
+        compare stats +/-
+    mission plan mapview 
+        support multiple scenes per level
+        disable selectors when necessary
+        markers gated behind tactical data
+    tactics pane
+        purchase keycard
+        ativate cyberattack
+        clickable active tactics show description
+        buy info
+            locate key objectives
+            locate key items
+            locate traps / sensors / weapon emplacements: intel
+            locate guards / patrols / security operations center: intel
+            learn info to be used in dialogue
+            discoverable networks
+        when map data is bought, show notification on map tab
+
 minimap
     multiple floors of map
     orient relative to main camera
@@ -1948,29 +1987,10 @@ minimap
         show sightcone
     indicate player
 
-mission plan mapview 
-    support multiple scenes per level
-    disable selectors when necessary
-    markers gated behind tactical data
-
 dialogue
     use ID status
     concoct one lie per mark against player
     get once lie stratagem per mark from player
-
-tactics pane
-    purchase keycard
-    ativate cyberattack
-    clickable active tactics show description
-    buy info
-        locate key objectives
-        locate key items
-        locate traps / sensors / weapon emplacements: intel
-        locate guards / patrols / security operations center: intel
-        learn info to be used in dialogue
-        discoverable networks
-    when map data is bought, show notification on map tab
-
 
 ---------------
 
@@ -2043,7 +2063,6 @@ graphics
     burglar tools
 
 -----------------
-
 build a test level, 3 storey building infiltration
 
 build a test level equivalent to Jack That Data
@@ -2060,26 +2079,10 @@ build a test level equivalent to Jack That Data
         grass
         skybox buildings
             fixed size of textures, but apply to large or small buildings; 
+    fill out proper texts
 
-* screen wobble on tab schange
-clean up the optional obejctives divider in mission selector
-cursor on mission UI
 abort -> show extraction zone
-extraction / player spawn configuration automatically sets values on map marker. or is map marker?
-move spawnpoint to be visible on map
 handle mission fail
     when datastore is destroyed
     reaching extraction zone -> fail
-allow switch to 0 item
-    hide UI handler in that case
-
-planning mode
------------
-mission overview
-    objectives go here!
-    show a freaking map!!
-    summarize insertion, extraction
-    site security
-indicate selected weapon / item slot
-HP / def indicators
-* item select
+gun state can be moved into plan
