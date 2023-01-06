@@ -1788,6 +1788,16 @@ note: layer "interactive"
     * open the picker when a slot is selected.
     * close it when something is picked.
     * bleeoop open - short close sound
+* abort -> show extraction zone
+* handle mission fail
+    * when datastore is destroyed
+    * reaching extraction zone -> fail
+* sphere robot
+    * NPC template should allow sphere? different spawner?
+* don't destroy the floors
+* wall off the limits
+
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2050,6 +2060,7 @@ adjust all UI buttons to have consistent semantics for Cancel / OK
 carpet sounds
 footstep threshold could be higher?
 hide overlays in aim mode
+gun state can be moved into plan
 
 graphics
     silenced pistol
@@ -2066,23 +2077,21 @@ graphics
 build a test level, 3 storey building infiltration
 
 build a test level equivalent to Jack That Data
-    sphere robot
-        NPC template should allow sphere? different spawner?
-    don't destroy the floors
-    fix stairs
     make level more challenging
         turrets
         camera view bigger
+
     models
-        stairs ramp
+        fix stairs
+        stairs ramp: how to?
         alarm box
         grass
         skybox buildings
-            fixed size of textures, but apply to large or small buildings; 
     fill out proper texts
+    ac unit on roof
 
-abort -> show extraction zone
-handle mission fail
-    when datastore is destroyed
-    reaching extraction zone -> fail
-gun state can be moved into plan
+
+blinkenlight:
+    start big, fade out
+    random period offset
+    ideally, some glow, inner white, outer halo, etc

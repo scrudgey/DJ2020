@@ -14,6 +14,7 @@ public class LevelState {
         template = template,
         plan = plan,
         delta = LevelDelta.Empty() with {
+            phase = LevelDelta.MissionPhase.action,
             powerGraph = PowerGraph.LoadAll(template.levelName),
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),

@@ -31,7 +31,7 @@ public class ExtractionZone : MapMarker {
             return;
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             Debug.Log("successful extraction");
-            GameManager.I.FinishMission(true);
+            GameManager.I.FinishMission();
         }
     }
     IEnumerator PulseExtractionZone() {

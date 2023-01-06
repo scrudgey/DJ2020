@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
 public class CyberDataStore : MonoBehaviour {
     public AudioSource audioSource;
 
@@ -30,5 +30,21 @@ public class CyberDataStore : MonoBehaviour {
     }
     public void PlayParticles() {
         particles.Play();
+    }
+
+    void OnDestroy() {
+        // check if we invalidate an objective
+        List<string> myFileNames = payDatas.Select(data => data.filename).ToList();
+        if (GameManager.I == null || GameManager.I.gameData.levelState == null || GameManager.I.gameData.levelState.template == null) return;
+        foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {
+            if (objective is ObjectiveData) {
+                ObjectiveData objectiveData = (ObjectiveData)objective;
+                foreach (string targetData in objectiveData.targetFileNames) {
+                    if (myFileNames.Contains(targetData)) {
+                        GameManager.I.FailObjective(objective);
+                    }
+                }
+            }
+        }
     }
 }

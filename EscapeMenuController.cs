@@ -36,7 +36,8 @@ public class EscapeMenuController : MonoBehaviour {
     }
     public void AbortButtonCallback() {
         GameManager.I.CloseMenu();
-        GameManager.I.ReturnToTitleScreen();
+        GameManager.I.HandleObjectiveFailed();
+        // GameManager.I.ReturnToTitleScreen();
     }
     public void HandleEscapeAction(InputAction.CallbackContext ctx) {
         ContinueButtonCallback();

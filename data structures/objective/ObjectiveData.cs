@@ -8,7 +8,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/Objectives/ObjectiveData")]
 public class ObjectiveData : Objective {
     public List<string> targetFileNames;
-    public override ObjectiveStatus Status(GameData data) {
+    protected override ObjectiveStatus EvaluateStatus(GameData data) {
         if (targetFileNames.All(filename => data.playerState.payDatas.Select(dat => dat.filename).Contains(filename))) {
             return ObjectiveStatus.complete;
         } else {

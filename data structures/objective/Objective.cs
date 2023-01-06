@@ -8,6 +8,13 @@ public abstract class Objective : ScriptableObject {
     public string decsription;
     public bool isOptional;
     public Sprite objectiveImage;
-    abstract public ObjectiveStatus Status(GameData data);
+    public ObjectiveStatus Status(GameData data) {
+        if (data.levelState.delta.failedObjectives.Contains(this)) {
+            return ObjectiveStatus.failed;
+        } else {
+            return EvaluateStatus(data);
+        }
+    }
+    abstract protected ObjectiveStatus EvaluateStatus(GameData data);
     abstract public float Progress(GameData data);
 }

@@ -76,6 +76,9 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
             spawnPoint.SpawnTemplated();
         }
+        foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+            spawnPoint.SpawnNPC(useSpawnEffect: false);
+        }
 
         TransitionToState(GameState.levelPlay);
     }
@@ -85,15 +88,20 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToState(GameState.world);
     }
     void HandlePlayerDead(CharacterController npc) {
-        FinishMission(false);
+        gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
+        FinishMission();
     }
 
-    public void FinishMission(bool success) {
+    public void FinishMission() {
         playerCharacterController.OnCharacterDead -= HandlePlayerDead;
-        if (success) {
-            FinishMissionSuccess();
-        } else {
-            FinishMissionFail();
+        switch (gameData.levelState.delta.phase) {
+            case LevelDelta.MissionPhase.extractionSuccess:
+                FinishMissionSuccess();
+                break;
+            case LevelDelta.MissionPhase.extractionFail:
+            case LevelDelta.MissionPhase.playerDead:
+                FinishMissionFail();
+                break;
         }
     }
 

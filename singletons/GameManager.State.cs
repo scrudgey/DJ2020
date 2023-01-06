@@ -67,11 +67,23 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void HandleAllObjectivesComplete() {
         uiController.LogMessage($"Objectives complete, proceed to extraction");
-        Debug.Log($"[extraction] looking for extraction point {gameData.levelState.plan.extractionPointIdn}");
+        gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionSuccess;
+        ActivateExtractionPoint();
+    }
+    public void FailObjective(Objective objective) {
+        gameData.levelState.delta.failedObjectives.Add(objective);
+        HandleObjectiveFailed();
+    }
+    public void HandleObjectiveFailed() {
+        uiController.LogMessage($"Objectives failed, proceed to extraction");
+        gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionFail;
+        ActivateExtractionPoint();
+    }
+
+    void ActivateExtractionPoint() {
         if (gameData.levelState.plan.extractionPointIdn != "") { // default
             foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
                 if (zone.data.idn == gameData.levelState.plan.extractionPointIdn) {
-                    Debug.Log($"[extraction] found extraction point {zone.data.idn}");
                     zone.EnableExtractionZone();
                     return;
                 }
@@ -79,9 +91,5 @@ public partial class GameManager : Singleton<GameManager> {
         }
         Debug.Log("[extraction] defaulting random extraction point");
         GameObject.FindObjectOfType<ExtractionZone>().EnableExtractionZone();
-    }
-    void HandleObjectiveFailed() {
-        Debug.Log("objectives failed!");
-        uiController.LogMessage($"Objectives failed, proceed to extraction");
     }
 }
