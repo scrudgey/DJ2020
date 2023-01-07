@@ -1804,6 +1804,12 @@ note: layer "interactive"
 * why do attack surfaces start out highlighted?
 * why do we start with gun out but no suspicion?
 * footstep threshold could be higher?
+* tab to hide burglar 
+* tab should not open burglar with c4
+* after popping a door open, use should not close it, it should open it
+* navigable chair
+    * same treatment for:
+    * wastebasket, etc.
 
 
 graphical issues:
@@ -2055,15 +2061,11 @@ auto-use key in door
 get cyber network working once and for all
 normalize state name conventions
     level / mission / state / detla / template
-tighten up crawling
-crouch should not immediately go to crawl
-navigable chair
-burglar tools cause suspicion
-can we remove NPC json converter?
-c4 should crouch, place time
-enemies are spotting player somewhat easily
+
+- enemies are spotting player somewhat easily
+- can we remove NPC json converter?
+
 line renderer
-    clean up connections
     marching ants?
     better coloration
 carpet sounds
@@ -2091,8 +2093,14 @@ build a test level equivalent to Jack That Data
     * ac unit on roof
 
 
-* tab to hide burglar 
-* tab should not open burglar with c4
-after popping a door open, use should not close it, it should open it
+* interloper: not just center between me and camera, but center on one side of plane defined by camera isometric rotation
+* tighten up crawling
+* crouch should not immediately go to crawl
 
-interloper: not just center between me and camera, but center on one side of plane defined by camera isometric rotation
+line renderer
+    clean up connections
+        this is tricky: graph nodes represent connectedness in the graph, but we wish instead to draw some sort of overlay separate from the graph.
+
+burglar tools cause suspicion
+c4 should crouch, place time
+

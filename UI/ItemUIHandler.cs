@@ -13,7 +13,7 @@ namespace UI {
         public GameObject parent;
 
         override public void HandleValueChanged(ItemHandler itemHandler) {
-            if (itemHandler.activeItem == null) {
+            if (itemHandler.activeItem == null || itemHandler.activeItem.data == null) {
                 itemImage.sprite = null;
                 itemImage.enabled = false;
                 itemTitle.text = "N/A";
@@ -21,7 +21,6 @@ namespace UI {
                 parent.SetActive(false);
             } else {
                 parent.SetActive(true);
-
                 // TODO: fix this up
                 itemImage.enabled = true;
                 itemImage.sprite = itemHandler.activeItem.data.image;

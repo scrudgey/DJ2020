@@ -31,7 +31,7 @@ public class Lock {
 
 
 public class Door : Interactive {
-    public enum DoorState { closed, opening, closing, open }
+    public enum DoorState { closed, opening, closing, open, ajar }
     public enum DoorParity { twoWay, openIn, openOut }
     public bool autoClose;
     public bool latched;
@@ -95,6 +95,10 @@ public class Door : Interactive {
                 break;
             case DoorState.closed:
                 HandleImpulse();
+                break;
+            case DoorState.ajar:
+                HandleImpulse();
+                CheckAutoClose();
                 break;
         }
     }
@@ -233,6 +237,9 @@ public class Door : Interactive {
             }
         }
         switch (state) {
+            case DoorState.ajar:
+                DoApplyOpening(position);
+                break;
             case DoorState.closing:
             case DoorState.closed:
                 if (IsLocked()) {
@@ -240,31 +247,33 @@ public class Door : Interactive {
                     JiggleKnob();
                 } else {
                     TurnKnob();
-                    if (parity == DoorParity.twoWay) {
-                        if (orientationPlane.GetSide(position)) {
-                            ChangeState(DoorState.opening);
-                            targetAngle = 90f;
-                        } else {
-                            ChangeState(DoorState.opening);
-                            targetAngle = -90f;
-                        }
-                    } else if (parity == DoorParity.openIn) {
-                        ChangeState(DoorState.opening);
-                        targetAngle = -90f;
-                    } else if (parity == DoorParity.openOut) {
-                        ChangeState(DoorState.opening);
-                        targetAngle = 90f;
-                    }
-                    angularSpeed = manipulationSpeed;
+                    DoApplyOpening(position);
                 }
                 break;
-            case DoorState.opening:
             case DoorState.open:
                 ChangeState(DoorState.closing);
                 targetAngle = 0f;
                 angularSpeed = manipulationSpeed;
                 break;
         }
+    }
+    void DoApplyOpening(Vector3 position) {
+        if (parity == DoorParity.twoWay) {
+            if (orientationPlane.GetSide(position)) {
+                ChangeState(DoorState.opening);
+                targetAngle = 90f;
+            } else {
+                ChangeState(DoorState.opening);
+                targetAngle = -90f;
+            }
+        } else if (parity == DoorParity.openIn) {
+            ChangeState(DoorState.opening);
+            targetAngle = -90f;
+        } else if (parity == DoorParity.openOut) {
+            ChangeState(DoorState.opening);
+            targetAngle = 90f;
+        }
+        angularSpeed = manipulationSpeed;
     }
 
 
@@ -296,6 +305,7 @@ public class Door : Interactive {
         } else if (parity == DoorParity.openOut) {
             impulse = 10f;
         }
+        ChangeState(DoorState.ajar);
     }
 
     public void TurnKnob() {

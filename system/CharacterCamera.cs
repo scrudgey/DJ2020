@@ -187,7 +187,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                     // kind of hacky but w/e
                     _currentDistance = 20f;
                 }
-                if (fromState == CameraState.wallPress) {
+                if (fromState == CameraState.wallPress || fromState == CameraState.burgle) {
                     currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
                     currentFollowingSharpness = followingSharpnessDefault;
                     currentDistanceMovementSpeed = distanceMovementSpeedDefault;

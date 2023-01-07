@@ -61,7 +61,7 @@ public partial class GameManager : Singleton<GameManager> {
         missionController.StartVRMission(state);
     }
 
-    public void StartMission(LevelState state) {
+    public void StartMission(LevelState state, bool spawnNpcs = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
@@ -73,12 +73,15 @@ public partial class GameManager : Singleton<GameManager> {
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
         // spawn NPC
-        foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
-            spawnPoint.SpawnTemplated();
+        if (spawnNpcs) {
+            foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+                spawnPoint.SpawnTemplated();
+            }
+            foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+                spawnPoint.SpawnNPC(useSpawnEffect: false);
+            }
         }
-        foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
-            spawnPoint.SpawnNPC(useSpawnEffect: false);
-        }
+
 
         TransitionToState(GameState.levelPlay);
     }

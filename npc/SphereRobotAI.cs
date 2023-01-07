@@ -409,7 +409,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (distance > MAXIMUM_SIGHT_RANGE)
                 return false;
             Ray ray = new Ray(position, direction);
-            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetLayerMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
+            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.95f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
             clearLineOfSight |= numberHits == 0;
         }
         return clearLineOfSight;

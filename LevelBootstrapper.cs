@@ -45,7 +45,7 @@ public class LevelBootstrapper : MonoBehaviour {
         };
 
         // start the game state
-        GameManager.I.StartMission(level);
+        GameManager.I.StartMission(level, spawnNpcs: spawnNPCs);
     }
 
     void BootStrapWorld() {

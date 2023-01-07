@@ -556,7 +556,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     crouchMovementInputTimer += Time.deltaTime;
                 } else {
                     crouchMovementInputTimer = 0f;
-                    crouchMovementInputTimer = 1f;
+                    // crouchMovementInputTimer = 1f;
                 }
 
                 if (input.Fire.AimPressed) {
@@ -1013,9 +1013,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                             }
                             Vector3 initialMovementVelocity = targetMovementVelocity;
                             targetMovementVelocity *= crawlSpeedFraction * Toolbox.SquareWave(crouchMovementInputTimer, dutycycle: 0.75f);
-                            targetMovementVelocity += 0.5f * crawlSpeedFraction * initialMovementVelocity;
-
-
+                            targetMovementVelocity += 0.25f * crawlSpeedFraction * initialMovementVelocity;
                         } else {
                             targetMovementVelocity = Vector3.zero;
                         }
@@ -1380,7 +1378,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);
     public bool isMoving() {
-        return Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing);
+        if (isCrouching) {
+            Debug.Log(crouchMovementInputTimer);
+            return crouchMovementInputTimer > 0.5f && Motor.Velocity.magnitude > 0.1;
+        } else {
+            return Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing);
+        }
     }
     void LateUpdate() {
         OnValueChanged?.Invoke(this);

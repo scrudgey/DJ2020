@@ -76,6 +76,8 @@ public class ClearSighter : MonoBehaviour {
 
             // interloper colliders
             // Debug.Log($"interlopers: {interlopers.Count}");
+            Plane detectionPlane = new Plane(myCamera.PlanarDirection, myTransform.position);
+            Toolbox.DrawPlane(myTransform.position, detectionPlane);
             for (int k = 0; k < interloperCount; k++) {
                 // in case the collection was modified in the interim
                 if (k >= interlopers.Count)
@@ -90,8 +92,9 @@ public class ClearSighter : MonoBehaviour {
                     yield return waitForFrame;
                 }
                 Vector3 directionToInterloper = interloper.collider.bounds.center - myTransform.position;
-                if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > 0.1f)
+                if (directionToInterloper.y > 0.1f && !detectionPlane.GetSide(interloper.collider.bounds.center)) {
                     interloper.InterloperStart();
+                }
 
                 Vector3 directionToMesh = interloper.collider.bounds.center - myTransform.position;
                 float axialDistance = Vector3.Dot(directionToMesh, directionToCamera);
