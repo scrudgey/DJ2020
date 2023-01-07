@@ -2013,6 +2013,9 @@ dialogue
 adjust all UI buttons to have consistent semantics for Cancel / OK
 
 
+half fade = tex3D(_DitherMaskLOD, float3(i.screenPos.xy / i. screenPos.w * 400, o.Alpha * 0.9)).a;
+clip( fade - 0.01 );
+
 ---------------
 
 NPC tuning:
@@ -2088,5 +2091,8 @@ build a test level equivalent to Jack That Data
     * ac unit on roof
 
 
-tab to hide burglar 
-tab should not open burglar with c4
+* tab to hide burglar 
+* tab should not open burglar with c4
+after popping a door open, use should not close it, it should open it
+
+interloper: not just center between me and camera, but center on one side of plane defined by camera isometric rotation

@@ -270,7 +270,7 @@ public class InputController : MonoBehaviour {
         }
         if (escapePressedThisFrame && !escapePressConsumed) {
             escapePressedThisFrame = false;
-            GameManager.I.ShowMenu(MenuType.escapeMenu);
+            GameManager.I.HandleEscapePressed();
             escapePressConsumed = true;
         }
         mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;

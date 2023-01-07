@@ -170,6 +170,13 @@ public partial class GameManager : Singleton<GameManager> {
         };
         Cursor.SetCursor(data.mouseCursor, data.hotSpot, data.cursorMode);
     }
+    public void HandleEscapePressed() {
+        if (inputMode == InputMode.burglar) {
+            CloseBurglar();
+        } else {
+            GameManager.I.ShowMenu(MenuType.escapeMenu);
+        }
+    }
     public void ShowMenu(MenuType menuType, Action callback = null) {
         if (activeMenuType != MenuType.none) {
             CloseMenu();
@@ -310,6 +317,7 @@ public partial class GameManager : Singleton<GameManager> {
         if (Time.timeScale > 0) {
             PlayerInput playerInput = inputController.HandleCharacterInput(uiclick);
             uiController?.UpdateWithPlayerInput(playerInput);
+
         }
         // still not 100% clean here
         CameraInput input = playerCharacterController.BuildCameraInput();
@@ -326,12 +334,12 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartBurglar(BurgleTargetData data) {
-        // TransitionToState(GameState.burgle);
+        Debug.Log("start burglar");
         activeBurgleTargetData = data;
         uiController.ShowBurglar(data);
     }
     public void CloseBurglar() {
-        // TransitionToState(GameState.levelPlay);
+        Debug.Log("close burglar");
         uiController.HideBurglar();
         playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);

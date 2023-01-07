@@ -29,8 +29,8 @@ public class BurgleTargetData {
 public class Burglar : MonoBehaviour {
     public CharacterController characterController;
     public SphereCollider sphereCollider;
-    public CapsuleCollider characterCollider;
-    bool hackToolDeployed;
+    // public CapsuleCollider characterCollider;
+    // bool hackToolDeployed;
     public Dictionary<Collider, AttackSurface> cyberComponents = new Dictionary<Collider, AttackSurface>();
     public void AddInteractive(Collider other) {
         // Debug.Log($"add burglar target {other}");
@@ -75,19 +75,18 @@ public class Burglar : MonoBehaviour {
     void OnTriggerExit(Collider other) => RemoveInteractive(other);
 
     public void SetInputs(ManualHackInput inputs) {
-        bool refresh = false;
-        if (inputs.activeItem != null && hackToolDeployed != inputs.activeItem.EnablesBurglary()) {
-            hackToolDeployed = inputs.activeItem.EnablesBurglary();
-            refresh = true;
-        }
-        if (refresh) {
-            // HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-        }
-        if (inputs.playerInput.useItem) {
-            BurgleTargetData data = ActiveTarget();
-            if (data == null) return;
-            characterController.TransitionToState(CharacterState.burgle);
-            GameManager.I.StartBurglar(data);
+        // Debug.Log($"{inputs.playerInput.useItem} {GameManager.I.inputMode}");
+        if (inputs.activeItem?.EnablesBurglary() ?? false) {
+            if (inputs.playerInput.useItem && inputs.activeItem.EnablesBurglary()) {
+                // if (GameManager.I.inputMode != InputMode.burglar) {
+                BurgleTargetData data = ActiveTarget();
+                if (data == null) return;
+                characterController.TransitionToState(CharacterState.burgle);
+                GameManager.I.StartBurglar(data);
+                // } else {
+                //     GameManager.I.CloseBurglar();
+                // }
+            }
         }
     }
 

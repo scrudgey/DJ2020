@@ -437,6 +437,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.hitstun:
             case CharacterState.dead:
                 break;
+            case CharacterState.burgle:
+                if (input.useItem) {
+                    GameManager.I.CloseBurglar();
+                }
+                break;
             case CharacterState.jumpPrep:
                 // TODO: normalize this player state
                 jumpIndicatorController.superJumpSpeed = superJumpSpeed;
