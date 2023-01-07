@@ -1,3 +1,5 @@
+// Made with Amplify Shader Editor
+// Available at the Unity Asset Store - http://u3d.as/y3X 
 Shader "Custom/InterloperShadow"
 {
 	Properties
@@ -11,8 +13,9 @@ Shader "Custom/InterloperShadow"
 
 	SubShader
 	{
-		// Tags{ "RenderType" = "TransparentCutout"  "Queue" = "Geometry+0" }
-		Tags {"Queue" = "Transparent" "RenderType"="Transparent" }
+		Tags{ "RenderType" = "TransparentCutout"  "Queue" = "Geometry+0" }
+        // Tags {"Queue" = "Transparent" "RenderType"="Transparent" }
+
 		Cull Back
 		AlphaToMask On
 		CGINCLUDE
@@ -22,6 +25,7 @@ Shader "Custom/InterloperShadow"
 		struct Input
 		{
 			float2 uv_texcoord;
+			float4 screenPos;
 		};
 
 		uniform float4 _Color0;
@@ -41,11 +45,22 @@ Shader "Custom/InterloperShadow"
                 o.Alpha = _TargetAlpha;
             else
                 o.Alpha = 0;
+
+			// Screen-door transparency: Discard pixel if below threshold.
+            float4x4 thresholdMatrix =
+            {  1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
+            13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
+            4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
+            16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
+            };
+            float2 pos = i.screenPos.xy / i.screenPos.w;
+            pos *= _ScreenParams.xy; // pixel position
+            clip(o.Alpha - thresholdMatrix[pos.x % 4] [pos.y % 4]);
 		}
 
 		ENDCG
 		CGPROGRAM
-		#pragma surface surf Standard keepalpha fullforwardshadows  alpha:fade
+		#pragma surface surf Standard keepalpha fullforwardshadows
 
 		ENDCG
 		Pass
@@ -55,8 +70,8 @@ Shader "Custom/InterloperShadow"
 			ZWrite On
 			AlphaToMask Off
 			CGPROGRAM
-// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members _TargetAlpha)
-#pragma exclude_renderers d3d11
+		// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members _TargetAlpha)
+		#pragma exclude_renderers d3d11
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0
@@ -78,8 +93,9 @@ Shader "Custom/InterloperShadow"
 				float3 worldPos : TEXCOORD2;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
+
 			};
-			v2f vert( appdata_full v )
+			v2f vert( appdata_full v)
 			{
 				v2f o;
 				UNITY_SETUP_INSTANCE_ID( v );
@@ -105,10 +121,8 @@ Shader "Custom/InterloperShadow"
 				Input surfIN;
 				UNITY_INITIALIZE_OUTPUT( Input, surfIN );
 				surfIN.uv_texcoord = IN.customPack1.xy;
-
 				float3 worldPos = IN.worldPos;
 				half3 worldViewDir = normalize( UnityWorldSpaceViewDir( worldPos ) );
-
 				SurfaceOutputStandard o;
 				UNITY_INITIALIZE_OUTPUT( SurfaceOutputStandard, o )
                 o.Alpha = _TargetAlpha;
@@ -118,11 +132,12 @@ Shader "Custom/InterloperShadow"
 				#endif
 				half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.9375 ) ).a;
 				clip( alphaRef - 0.01 );
+				// clip( alphaRef - 0.75);
 				SHADOW_CASTER_FRAGMENT( IN )
 			}
 			ENDCG
 		}
 	}
 	Fallback "Diffuse"
-	// CustomEditor "ASEMaterialInspector"
+	CustomEditor "ASEMaterialInspector"
 }
