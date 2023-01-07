@@ -1796,7 +1796,10 @@ note: layer "interactive"
     * NPC template should allow sphere? different spawner?
 * don't destroy the floors
 * wall off the limits
-
+* blinkenlight:
+    * start big, fade out
+    * random period offset
+    * ideally, some glow, inner white, outer halo, etc
 
 
 graphical issues:
@@ -2054,12 +2057,8 @@ line renderer
     clean up connections
     marching ants?
     better coloration
-why do attack surfaces start out highlighted?
-why do we start with gun out but no suspicion?
 adjust all UI buttons to have consistent semantics for Cancel / OK
 carpet sounds
-footstep threshold could be higher?
-hide overlays in aim mode
 gun state can be moved into plan
 
 graphics
@@ -2075,23 +2074,16 @@ graphics
 
 -----------------
 build a test level, 3 storey building infiltration
-
 build a test level equivalent to Jack That Data
     make level more challenging
         turrets
         camera view bigger
-
-    models
-        fix stairs
-        stairs ramp: how to?
-        alarm box
-        grass
-        skybox buildings
+    skybox buildings
     fill out proper texts
-    ac unit on roof
+    * ac unit on roof
 
 
-blinkenlight:
-    start big, fade out
-    random period offset
-    ideally, some glow, inner white, outer halo, etc
+* hide overlays in aim mode
+why do attack surfaces start out highlighted?
+why do we start with gun out but no suspicion?
+footstep threshold could be higher?

@@ -2,14 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 [System.Serializable]
 public record GameData {
-    // TODO: static save, load method
     public GameState state;
     public PlayerState playerState;
     public LevelState levelState;
-    // UI state: ???
     public List<string> unlockedLevels;
     public SerializableDictionary<string, LevelPlan> levelPlans;
-    public int overlayIndex;
     public List<string> unlockedItems;
 
     public static GameData TestInitialData() {
@@ -18,7 +15,6 @@ public record GameData {
             state = GameState.none,
             playerState = PlayerState.DefaultState(),
             levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
-            overlayIndex = 0,
             unlockedLevels = new List<string>{
                 "Jack That Data"
             },

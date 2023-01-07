@@ -82,6 +82,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     float targetRightLineHeight;
     bool doUpdate;
     public void Bind() {
+        Debug.Log("suspicion handler binding");
         GameManager.OnSuspicionChange += HandleSuspicionChange;
         HandleSuspicionChange();
     }
@@ -89,20 +90,13 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         GameManager.OnSuspicionChange -= HandleSuspicionChange;
     }
     void Start() {
-
         foreach (Transform child in statusRecordsContainer) {
             Destroy(child.gameObject);
         }
-
         for (int i = 0; i < 10; i++) {
             GameObject obj = GameObject.Instantiate(statusRecordPrefab);
             obj.transform.SetParent(statusRecordsContainer, worldPositionStays: false);
             obj.SetActive(false);
-            // SuspicionRecord record = records[i];
-            // Transform obj = statusRecordsContainer.GetChild(i);
-            // obj.gameObject.SetActive(true);
-            // SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
-            // handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
         }
     }
 

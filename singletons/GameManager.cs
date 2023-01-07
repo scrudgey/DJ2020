@@ -33,7 +33,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<AlarmGraph> OnAlarmGraphChange;
-    public static Action<OverlayType> OnOverlayChange;
+    public static Action<OverlayType, bool> OnOverlayChange;
     public static Action<InputMode, InputMode> OnInputModeChange; // TODO: legit? should be camera state change?
     public static Action<CursorType> OnCursorTypeChange;
     public static Action<String> OnCaptionChange;
@@ -107,6 +107,7 @@ public partial class GameManager : Singleton<GameManager> {
             return;
         OnInputModeChange?.Invoke(inputMode, newInputMode);
         _inputMode = newInputMode;
+        SetOverlay(activeOverlayType);
     }
     private void OnStateEnter(GameState state, GameState fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
@@ -226,9 +227,8 @@ public partial class GameManager : Singleton<GameManager> {
         activeMenuType = MenuType.none;
     }
 
-    // should there be a UI state holder?
     public void IncrementOverlay(int increment) {
-        int current = (int)gameData.overlayIndex;
+        int current = (int)activeOverlayType;
         int length = Enum.GetNames(typeof(OverlayType)).Length;
         int nextInt = (current + increment);
 
@@ -242,9 +242,10 @@ public partial class GameManager : Singleton<GameManager> {
         SetOverlay(newType);
     }
     public void SetOverlay(OverlayType newType) {
-        gameData.overlayIndex = (int)newType;
+        // gameData.overlayIndex = (int)newType;
         activeOverlayType = newType;
-        OnOverlayChange?.Invoke(newType);
+        bool overlayEnabled = inputMode != InputMode.aim && inputMode != InputMode.wallpressAim && inputMode != InputMode.burglar;
+        OnOverlayChange?.Invoke(newType, overlayEnabled);
     }
 
     public void Update() {
