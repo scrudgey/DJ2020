@@ -382,6 +382,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         gunInstance = instance;
 
+        SetGunAppearanceSuspicion();
+        OnValueChanged?.Invoke(this);
+    }
+    public void SetGunAppearanceSuspicion() {
         if (gunInstance != null && gunInstance.template != null) {
             Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
             PoolManager.I?.RegisterPool(gunInstance.template.shellCasing);
@@ -390,7 +394,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 GameManager.I.AddSuspicionRecord(BrandishingWeaponRecord);
             }
         }
-        OnValueChanged?.Invoke(this);
     }
     public void Holster() {
         isSwitchingWeapon = true;

@@ -363,7 +363,7 @@ public class Toolbox {
             if (renderer.name.ToLower().Contains("sharp_explosion")) continue;
             if (renderer.name.ToLower().Contains("target")) continue;
             if (renderer.name.ToLower().Contains("shadow")) continue;
-            Debug.Log(renderer.name);
+            // Debug.Log(renderer.name);
 
             Bounds bounds = renderer.bounds;
             if (renderer is SpriteRenderer) {

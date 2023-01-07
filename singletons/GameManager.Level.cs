@@ -226,6 +226,9 @@ public partial class GameManager : Singleton<GameManager> {
         if (clearSighter != null && focus != null)
             clearSighter.followTransform = focus.transform;
 
+        GunHandler handler = focus.GetComponentInChildren<GunHandler>();
+        handler.SetGunAppearanceSuspicion();
+
         OnFocusChanged?.Invoke(focus);
         OnEyeVisibilityChange?.Invoke(gameData.playerState);
     }

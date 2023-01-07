@@ -62,7 +62,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             primaryGun = GunState.Instantiate(gun1),
             secondaryGun = GunState.Instantiate(gun2),
             tertiaryGun = GunState.Instantiate(gun3),
-            activeGun = 2,
+            activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
 
