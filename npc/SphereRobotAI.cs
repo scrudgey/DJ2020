@@ -578,7 +578,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     void HandleFootstepNoise(NoiseComponent noise) {
         footstepImpulse += noise.data.volume * 2f;
-        bool reachedFootstepThreshold = footstepImpulse > 4f;
+        bool reachedFootstepThreshold = footstepImpulse > 6f;
         bool notBoredOfFootsteps = timeSinceInvestigatedFootsteps <= 0 && timeSinceInterrogatedStranger <= 0;
         if (GameManager.I.gameData.levelState.template.sensitivityLevel == SensitivityLevel.publicProperty) {
             if (reachedFootstepThreshold && recentlyInCombat && notBoredOfFootsteps) {

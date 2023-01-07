@@ -11,7 +11,8 @@ Shader "Custom/InterloperShadow"
 
 	SubShader
 	{
-		Tags{ "RenderType" = "TransparentCutout"  "Queue" = "Geometry+0" }
+		// Tags{ "RenderType" = "TransparentCutout"  "Queue" = "Geometry+0" }
+		Tags {"Queue" = "Transparent" "RenderType"="Transparent" }
 		Cull Back
 		AlphaToMask On
 		CGINCLUDE
@@ -44,7 +45,7 @@ Shader "Custom/InterloperShadow"
 
 		ENDCG
 		CGPROGRAM
-		#pragma surface surf Standard keepalpha fullforwardshadows 
+		#pragma surface surf Standard keepalpha fullforwardshadows  alpha:fade
 
 		ENDCG
 		Pass
@@ -54,8 +55,8 @@ Shader "Custom/InterloperShadow"
 			ZWrite On
 			AlphaToMask Off
 			CGPROGRAM
-            // Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members _TargetAlpha)
-            #pragma exclude_renderers d3d11
+// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members _TargetAlpha)
+#pragma exclude_renderers d3d11
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0
@@ -104,8 +105,10 @@ Shader "Custom/InterloperShadow"
 				Input surfIN;
 				UNITY_INITIALIZE_OUTPUT( Input, surfIN );
 				surfIN.uv_texcoord = IN.customPack1.xy;
+
 				float3 worldPos = IN.worldPos;
 				half3 worldViewDir = normalize( UnityWorldSpaceViewDir( worldPos ) );
+
 				SurfaceOutputStandard o;
 				UNITY_INITIALIZE_OUTPUT( SurfaceOutputStandard, o )
                 o.Alpha = _TargetAlpha;
@@ -121,5 +124,5 @@ Shader "Custom/InterloperShadow"
 		}
 	}
 	Fallback "Diffuse"
-	CustomEditor "ASEMaterialInspector"
+	// CustomEditor "ASEMaterialInspector"
 }

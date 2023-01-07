@@ -1800,6 +1800,10 @@ note: layer "interactive"
     * start big, fade out
     * random period offset
     * ideally, some glow, inner white, outer halo, etc
+* hide overlays in aim mode
+* why do attack surfaces start out highlighted?
+* why do we start with gun out but no suspicion?
+* footstep threshold could be higher?
 
 
 graphical issues:
@@ -1890,15 +1894,16 @@ graphical embellishments
     reflective puddle
 
 UI:
+    adjust all UI buttons to have consistent semantics for Cancel / OK
     display different UI when in aim mode?
-    UI: gun wireframe in lower-right corner.
-    blink cursor when reaching maximum aim
-    larger mouse cursor, with color
+    * UI: gun wireframe in lower-right corner.
+    - blink cursor when reaching maximum aim
+    * larger mouse cursor, with color
     aim lock stats system 
         scan time 
         retain stats after breaking lock up to N 
         small health bar 
-    minimap
+    * minimap
     weapon wheel
     better clarity around alarm logic
         * indicate alarm terminal more clearly!
@@ -2005,6 +2010,9 @@ dialogue
     concoct one lie per mark against player
     get once lie stratagem per mark from player
 
+adjust all UI buttons to have consistent semantics for Cancel / OK
+
+
 ---------------
 
 NPC tuning:
@@ -2049,15 +2057,12 @@ crouch should not immediately go to crawl
 navigable chair
 burglar tools cause suspicion
 can we remove NPC json converter?
-tab to hide burglar 
-tab should not open burglar with c4
 c4 should crouch, place time
 enemies are spotting player somewhat easily
 line renderer
     clean up connections
     marching ants?
     better coloration
-adjust all UI buttons to have consistent semantics for Cancel / OK
 carpet sounds
 gun state can be moved into plan
 
@@ -2083,7 +2088,5 @@ build a test level equivalent to Jack That Data
     * ac unit on roof
 
 
-* hide overlays in aim mode
-why do attack surfaces start out highlighted?
-why do we start with gun out but no suspicion?
-footstep threshold could be higher?
+tab to hide burglar 
+tab should not open burglar with c4

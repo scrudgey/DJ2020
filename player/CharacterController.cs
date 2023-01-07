@@ -216,6 +216,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 PoolManager.I.GetPool("prefabs/fx/landImpactFx").GetObject(transform.position);
                 Ray ray = new Ray(transform.position + new Vector3(0f, 0.1f, 0f), Vector3.down);
                 RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive));
+
+                NoiseData noise = new NoiseData {
+                    player = gameObject == GameManager.I.playerObject,
+                    suspiciousness = Suspiciousness.normal,
+                    volume = 4,
+                    isFootsteps = true
+                };
+                Toolbox.Noise(transform.position, noise, transform.root.gameObject);
+
                 foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
                     if (hit.collider.transform.IsChildOf(transform.root))
                         continue;
