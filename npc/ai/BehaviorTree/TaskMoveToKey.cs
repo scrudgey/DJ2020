@@ -22,13 +22,15 @@ namespace AI {
         Vector3 baseLookDirection;
         HashSet<int> keyIds;
         Door waitForDoor;
-        public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, float arrivalDistance = 0.15f) : base() {
+        public SpottedHighlight highlight;
+        public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, float arrivalDistance = 0.15f, SpottedHighlight highlight = null) : base() {
             navMeshPath = new NavMeshPath();
             pathIndex = -1;
             this.transform = transform;
             this.key = key;
             this.CORNER_ARRIVAL_DISTANCE = arrivalDistance;
             this.keyIds = keyIds;
+            this.highlight = highlight;
             SetDestination();
         }
 
@@ -146,6 +148,9 @@ namespace AI {
             } else {
                 Debug.LogWarning($"could not find navmeshhit for {target}");
                 navFailures += 1;
+            }
+            if (highlight != null) {
+                highlight.navMeshPath = navMeshPath;
             }
         }
         public override void Reset() {

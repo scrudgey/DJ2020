@@ -72,7 +72,8 @@ public class SphereInvestigateState : SphereControlState {
         alertTaskNode = new Sequence(
             new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 0.5f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
-                speedCoefficient = 1.2f
+                speedCoefficient = 1.2f,
+                highlight = highlight
             },
             new Selector(
                     new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
@@ -90,7 +91,8 @@ public class SphereInvestigateState : SphereControlState {
             new Selector(
                 new Sequence(
                     new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1.25f) {
-                        speedCoefficient = 0.5f
+                        speedCoefficient = 0.5f,
+                        highlight = highlight
                     },
                     new TaskConditional(() => isPlayerNear()),
                     dialogueTask
@@ -99,7 +101,8 @@ public class SphereInvestigateState : SphereControlState {
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
                         new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
-                            headBehavior = TaskMoveToKey.HeadBehavior.search
+                            headBehavior = TaskMoveToKey.HeadBehavior.search,
+                            highlight = highlight,
                         },
                         new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                             lookType = TaskLookAt.LookType.position,

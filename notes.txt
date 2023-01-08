@@ -1820,7 +1820,11 @@ note: layer "interactive"
 * carpet sounds
 * interloper shader casts full shadow: hard
 * strike team was not being dispatched in infiltration
-
+* auto-use key in door
+* don't shoot corpse away
+* credstick surfing
+* load screen (black)
+* clicking on overlay shot gun
 
 
 
@@ -2017,7 +2021,7 @@ planning mode
         when map data is bought, show notification on map tab
 
 minimap
-    multiple floors of map
+    * multiple floors of map
     orient relative to main camera
     highlight enemies in red
         show sightcone
@@ -2028,11 +2032,24 @@ dialogue
     concoct one lie per mark against player
     get once lie stratagem per mark from player
 
-adjust all UI buttons to have consistent semantics for Cancel / OK
+UI
+    adjust all UI buttons to have consistent semantics for Cancel / OK
+    remove action feed?
+    show iconography when disguise is lost
+    show iconography when optional objective is complete
+
+does VR mission still work?
+    hack target ! indicator only sometimes visible
+    NPC portraits not being set properly
+
+level state
+    normalize level / mission / state / detla / template
+    gun state can be moved into plan
+    HQ state can be moved into delta
 
 
-half fade = tex3D(_DitherMaskLOD, float3(i.screenPos.xy / i. screenPos.w * 400, o.Alpha * 0.9)).a;
-clip( fade - 0.01 );
+a guy danced on a corpse (I think he was investigating a noise?)
+
 
 ---------------
 
@@ -2053,7 +2070,6 @@ NPC tuning:
     strike team seems to have a hard time investigating repeated explosions
 
 
-
 silenced gun is still OP
     seeing corpse or bullets -> high alert, easier to see player
 anti-camping visibility boost
@@ -2063,21 +2079,13 @@ anti-camping visibility boost
 damage result addition is weird
 billboard interloper shader should be cutout, or something is up with interloper shader + shells
 
-SpottedHighlight should use full navigation path
-
 networks
     marching ants?
     better coloration
     clean up connections
-        this is tricky: graph nodes represent connectedness in the graph, but we wish instead to draw some sort of overlay separate from the graph.
+        can we do this programmatically?
     get cyber network working once and for all
     DFS path finding doesn't quite work right for highlighting alarm path
-
-normalize state name conventions
-    level / mission / state / detla / template
-gun state can be moved into plan
-HQ state can be moved into delta
-
 
 graphics
     silenced pistol
@@ -2089,6 +2097,7 @@ graphics
     title screen animations 
     civ_female portrait could use some work
     burglar tools
+    loot
 
 -----------------
 build a test level, 3 storey building infiltration
@@ -2100,16 +2109,7 @@ build a test level equivalent to Jack That Data
     fill out proper texts
     * ac unit on roof
 
-
-
-* auto-use key in door
-* don't shoot corpse away
-* credstick surfing
-load screen (black)
-
-hack target ! indicator only sometimes visible
-NPC portraits not being set properly
-a guy danced on a corpse (I think he was investigating a noise?)
-clicking on overlay shot gun
-lose disguise when openly aggressive, or identity is revealed
+* SpottedHighlight should use full navigation path
+* lose disguise when openly aggressive, or identity is revealed
 gun firing animation is broken now
+
