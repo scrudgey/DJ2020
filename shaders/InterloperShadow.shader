@@ -130,8 +130,8 @@ Shader "Custom/InterloperShadow"
 				#if defined( CAN_SKIP_VPOS )
 				float2 vpos = IN.pos;
 				#endif
-				half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.9375 ) ).a;
-				clip( alphaRef - 0.01 );
+				// half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.9375 ) ).a;
+				// clip( alphaRef - 0.01 );
 				// clip( alphaRef - 0.75);
 				SHADOW_CASTER_FRAGMENT( IN )
 			}

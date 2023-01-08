@@ -9,6 +9,7 @@ public class FootstepData : ScriptableObject {
     public AudioClip[] metalSounds;
     public AudioClip[] bushSounds;
     public AudioClip[] tileSounds;
+    public AudioClip[] carpetSounds;
     public AudioClip[] GetSoundSet(SurfaceType surfaceType) {
         return surfaceType switch {
             SurfaceType.grass => grassSounds,
@@ -16,6 +17,7 @@ public class FootstepData : ScriptableObject {
             SurfaceType.normal => defaultSounds,
             SurfaceType.tree => bushSounds,
             SurfaceType.tile => tileSounds,
+            SurfaceType.carpet => carpetSounds,
             _ => defaultSounds
         };
     }

@@ -26,10 +26,11 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     public List<HackData> targets = new List<HackData>();
     public List<CyberNode> vulnerableManualNodes = new List<CyberNode>();
     public CyberNode vulnerableNetworkNode = null;
-    SuspicionRecord suspicionTamper = new SuspicionRecord {
+    SuspicionRecord suspicionTamper() => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,
-        maxLifetime = 0f
+        lifetime = 2f,
+        maxLifetime = 2f
     };
     void Awake() {
         vulnerableNetworkNode = null;
@@ -94,9 +95,9 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     }
     void UpdateSuspicion() {
         if (targets.Count > 0) {
-            GameManager.I.AddSuspicionRecord(suspicionTamper);
+            GameManager.I.AddSuspicionRecord(suspicionTamper());
         } else {
-            GameManager.I.RemoveSuspicionRecord(suspicionTamper);
+            GameManager.I.RemoveSuspicionRecord(suspicionTamper());
         }
     }
     void UpdateManualHack(HackData data) {

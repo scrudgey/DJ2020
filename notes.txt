@@ -1810,6 +1810,18 @@ note: layer "interactive"
 * navigable chair
     * same treatment for:
     * wastebasket, etc.
+* interloper: not just center between me and camera, but center on one side of plane defined by camera isometric rotation
+* tighten up crawling
+* crouch should not immediately go to crawl
+* burglar tools cause suspicion
+* c4 should crouch, place time
+- enemies are spotting player somewhat easily
+- can we remove NPC json converter?
+* carpet sounds
+* interloper shader casts full shadow: hard
+* strike team was not being dispatched in infiltration
+
+
 
 
 graphical issues:
@@ -2038,38 +2050,33 @@ NPC tuning:
     alarm terminal triggering effects
         notify others of location
     guard HQ potentially notices disabled cameras and sensors
+    strike team seems to have a hard time investigating repeated explosions
+
+
 
 silenced gun is still OP
 anti-camping visibility boost
     guards are aware of your aggression 
     haven't moved in a while
     have shot more than once or twice?
-DFS path finding doesn't quite work right for highlighting alarm path
 damage result addition is weird
-don't shoot corpse away
 billboard interloper shader should be cutout, or something is up with interloper shader + shells
-credstick surfing
-hack target ! indicator only sometimes visible
-NPC portraits not being set properly
-strike team was not being dispatched in infiltration
-a guy danced on a corpse (I think he was investigating a noise?)
-clicking on overlay shot gun
-gun firing animation is broken now
+
 SpottedHighlight should use full navigation path
-interloper shader casts full shadow
-auto-use key in door
-get cyber network working once and for all
-normalize state name conventions
-    level / mission / state / detla / template
 
-- enemies are spotting player somewhat easily
-- can we remove NPC json converter?
-
-line renderer
+networks
     marching ants?
     better coloration
-carpet sounds
+    clean up connections
+        this is tricky: graph nodes represent connectedness in the graph, but we wish instead to draw some sort of overlay separate from the graph.
+    get cyber network working once and for all
+    DFS path finding doesn't quite work right for highlighting alarm path
+
+normalize state name conventions
+    level / mission / state / detla / template
 gun state can be moved into plan
+HQ state can be moved into delta
+
 
 graphics
     silenced pistol
@@ -2093,14 +2100,13 @@ build a test level equivalent to Jack That Data
     * ac unit on roof
 
 
-* interloper: not just center between me and camera, but center on one side of plane defined by camera isometric rotation
-* tighten up crawling
-* crouch should not immediately go to crawl
 
-line renderer
-    clean up connections
-        this is tricky: graph nodes represent connectedness in the graph, but we wish instead to draw some sort of overlay separate from the graph.
-
-burglar tools cause suspicion
-c4 should crouch, place time
-
+auto-use key in door
+don't shoot corpse away
+credstick surfing
+hack target ! indicator only sometimes visible
+NPC portraits not being set properly
+a guy danced on a corpse (I think he was investigating a noise?)
+clicking on overlay shot gun
+lose disguise when openly aggressive, or identity is revealed
+gun firing animation is broken now

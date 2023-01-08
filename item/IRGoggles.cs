@@ -8,9 +8,8 @@ namespace Items {
         public IRGoggles(IRGoggleData baseItem) : base(baseItem) {
             this.goggleData = baseItem;
         }
-        public override void Use(ItemHandler handler) {
-            base.Use(handler);
-            // handler.SetSuspicion(Suspiciousness.suspicious, 1f);
+        public override ItemUseResult Use(ItemHandler handler) {
+            return base.Use(handler);
         }
     }
 }

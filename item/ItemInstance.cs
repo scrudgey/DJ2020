@@ -39,7 +39,7 @@ namespace Items {
         public BaseItem(ItemData baseData) {
             this.data = baseData;
         }
-        public virtual void Use(ItemHandler handler) { }
+        public virtual ItemUseResult Use(ItemHandler handler) => ItemUseResult.Empty();
         public virtual bool EnablesManualHack() => false;
         public virtual bool EnablesBurglary() => false;
     }

@@ -17,7 +17,8 @@ public enum CharacterState {
     keelOver,
     aim,
     popout,
-    burgle
+    burgle,
+    useItem
 }
 public enum ClimbingState {
     Anchoring,
@@ -119,6 +120,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public Vector3 wallNormal = Vector3.zero;
     public Vector2 lastWallInput = Vector2.zero;
     private CharacterState _state;
+    private float timeInState;
+    private float waveArmTimer;
     [Header("Popout")]
     private Vector3 popOutPosition;
     private Vector3 prePopPosition;
@@ -181,6 +184,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         _state = newState;
         OnStateEnter(newState, tmpInitialState);
         OnValueChanged?.Invoke(this);
+        timeInState = 0f;
     }
     private void OnStateEnter(CharacterState state, CharacterState fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
@@ -339,6 +343,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     /// </summary>
     public void SetInputs(PlayerInput input) {
         // Handle ladder transitions
+        timeInState += Time.deltaTime;
+        if (waveArmTimer > 0f) {
+            waveArmTimer -= Time.deltaTime;
+        }
         _ladderUpDownInput = input.MoveAxisForward;
         if (input.actionButtonPressed) {
             _probedColliders = new Collider[8];
@@ -396,9 +404,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             isRunning = true;
         } else {
             isRunning = false;
-
             // Crouching input
-            if (input.CrouchDown || input.jumpHeld || state == CharacterState.landStun || state == CharacterState.jumpPrep) {
+            if (input.CrouchDown || input.jumpHeld || state == CharacterState.landStun || state == CharacterState.jumpPrep || state == CharacterState.useItem) {
                 SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 if (!isCrouching) {
                     isCrouching = true;
@@ -487,7 +494,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
-                    itemHandler.SetInputs(input);
+                    ItemUseResult result = itemHandler.SetInputs(input);
+                    HandleItemUseResult(result);
 
                     // Cyberdeck
                     ManualHackInput manualHackInput = new ManualHackInput {
@@ -497,7 +505,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     manualHacker?.SetInputs(manualHackInput);
                     burglar?.SetInputs(manualHackInput);
                     if (interactor != null) {
-                        interactor.SetInputs(input);
+                        ItemUseResult interactorResult = interactor.SetInputs(input);
+                        HandleItemUseResult(interactorResult);
                     }
                 }
 
@@ -634,6 +643,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
         _lastInput = input;
         lastTargetDataInput = cursorData;
+    }
+
+    void HandleItemUseResult(ItemUseResult result) {
+        if (result.transitionToUseItem) {
+            TransitionToState(CharacterState.useItem);
+        }
+        if (result.waveArm) {
+            waveArmTimer = 0.5f;
+        }
     }
 
     Vector2 InputThreshold(Vector2 input) {
@@ -821,6 +839,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
         switch (state) {
+            case CharacterState.useItem:
+                currentVelocity = currentVelocity * 0.5f;
+                break;
             case CharacterState.burgle:
                 currentVelocity = currentVelocity * 0.9f;
                 break;
@@ -1252,6 +1273,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                         break;
                 }
                 break;
+            case CharacterState.useItem:
+                if (timeInState > 0.5f) {
+                    TransitionToState(CharacterState.normal);
+                }
+                break;
 
         }
         // tookDamageThisFrame = false;
@@ -1373,7 +1399,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             movementSticking = IsMovementSticking(),
             directionToCamera = OrbitCamera.Transform.position - transform.position,
             hitState = hitState,
-            velocity = Motor.Velocity
+            velocity = Motor.Velocity,
+            wavingArm = waveArmTimer > 0f
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

@@ -37,6 +37,7 @@ public class Footsteps : MonoBehaviour {
                     SurfaceType.metal => 4f,
                     SurfaceType.normal => 2f,
                     SurfaceType.tree => 2f,
+                    SurfaceType.carpet => 0.75f,
                     _ => 1.5f
                 };
                 // if (isRunning) {

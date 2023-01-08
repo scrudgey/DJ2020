@@ -7,7 +7,7 @@ namespace Items {
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;
         }
-        public override void Use(ItemHandler handler) {
+        public override ItemUseResult Use(ItemHandler handler) {
             base.Use(handler);
             Toolbox.RandomizeOneShot(handler.audioSource, c4Data.deploySound);
             GameObject c4 = GameObject.Instantiate(c4Data.prefab, handler.transform.position, Quaternion.identity);
@@ -20,6 +20,7 @@ namespace Items {
                 maxLifetime = 1f
             };
             GameManager.I.AddSuspicionRecord(record);
+            return ItemUseResult.Empty() with { transitionToUseItem = true };
         }
     }
 

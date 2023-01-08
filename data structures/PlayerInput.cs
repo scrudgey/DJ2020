@@ -48,3 +48,7 @@ public struct PlayerInput {
         return new Vector2(MoveAxisRight, MoveAxisForward);
     }
 }
+
+public struct OverrideInput {
+
+}

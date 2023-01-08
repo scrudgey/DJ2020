@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum SurfaceType { normal, metal, grass, tree, tile }
+public enum SurfaceType { normal, metal, grass, tree, tile, carpet }
 
 [System.Serializable]
 public class TagSystemData {

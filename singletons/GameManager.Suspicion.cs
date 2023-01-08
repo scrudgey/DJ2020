@@ -24,7 +24,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void AddSuspicionRecord(SuspicionRecord record) {
-        Debug.Log("add suspicion record");
         suspicionRecords[record.content] = record;
         OnSuspicionChange?.Invoke();
     }

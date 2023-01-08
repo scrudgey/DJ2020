@@ -27,4 +27,5 @@ public struct AnimationInput {
     public Vector3 directionToCamera;
     public HitState hitState;
     public Vector3 velocity;
+    public bool wavingArm;
 }

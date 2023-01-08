@@ -487,6 +487,8 @@ public class Skin {
             return gunCrouchSprites(input.gunInput.gunType);
         } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
             return unarmedCrawl;
+        } else if (input.wavingArm) {
+            return unarmedUse;
         }
         // gun states
         switch (input.gunInput.gunState) {

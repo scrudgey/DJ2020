@@ -26,7 +26,7 @@ public class InteractorTargetData : HighlightableTargetData {
         this.target = target;
     }
 }
-public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
+public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
     public Action<InteractorTargetData> OnActionDone;
     public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
@@ -79,26 +79,15 @@ public class Interactor : MonoBehaviour, IBindable<Interactor>, IInputReceiver {
     void OnTriggerExit(Collider other)
         => RemoveInteractive(other);
 
-    // TODO: fix
-    public void SetInputs(PlayerInput inputs) {
-        // if (inputs.state != CharacterState.wallPress) {
-        //     if (inputs.Fire.targetData.highlightableTargetData != highlighted) {
-        //         highlighted = inputs.Fire.targetData.highlightableTargetData;
-        //         OnValueChanged?.Invoke(this);
-        //     }
-        // } else {
-        //     if (highlighted != null) {
-        //         highlighted = null;
-        //         OnValueChanged?.Invoke(this);
-        //     }
-        // }
-
-        // TODO: handle the case when there's a ladder separate from interactives
+    public ItemUseResult SetInputs(PlayerInput inputs) {
         if (inputs.actionButtonPressed) {
             InteractorTargetData data = ActiveTarget();
-            if (data == null) return;
+            if (data == null) return ItemUseResult.Empty();
             data.target.DoAction(this);
             OnActionDone?.Invoke(data);
+            return ItemUseResult.Empty() with { waveArm = true };
+        } else {
+            return ItemUseResult.Empty();
         }
     }
 }

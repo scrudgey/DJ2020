@@ -337,12 +337,13 @@ public class InputController : MonoBehaviour {
 
         return characterInputs;
     }
+
+    // TODO: this can belong to gamemanager.
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();
         foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<CharacterController>()) {
             inputReceivers.Add(inputReceiver);
         }
-
         inputReceivers.Add(GameManager.I.characterCamera);
     }
 }

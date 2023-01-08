@@ -4,7 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Items;
 using UnityEngine;
-public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IInputReceiver {
+public record ItemUseResult {
+    public bool transitionToUseItem;
+    public bool waveArm;
+    public static ItemUseResult Empty() => new ItemUseResult {
+
+    };
+}
+public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
+
     public Action<ItemHandler> OnValueChanged { get; set; }
 
     public List<BaseItem> items = new List<BaseItem>();
@@ -19,7 +27,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IInputReceiver
         OnItemEnter(activeItem);
     }
 
-    public void SetInputs(PlayerInput input) {
+    public ItemUseResult SetInputs(PlayerInput input) {
         if (input.incrementItem != 0) {
             index += input.incrementItem;
             if (index < 0) {
@@ -30,8 +38,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IInputReceiver
             SwitchToItem(items[index]);
         }
         if (input.useItem) {
-            UseItem();
-        }
+            return UseItem();
+        } else return ItemUseResult.Empty();
     }
     void SwitchToItem(BaseItem item) {
         OnItemExit(this.activeItem);
@@ -54,10 +62,10 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IInputReceiver
         ClearItem();
     }
 
-    void UseItem() {
+    ItemUseResult UseItem() {
         if (activeItem == null)
-            return;
-        activeItem.Use(this);
+            return ItemUseResult.Empty();
+        return activeItem.Use(this);
     }
 
     void OnItemEnter(BaseItem item) {
