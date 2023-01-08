@@ -34,7 +34,7 @@ public class UIController : MonoBehaviour {
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
-    void Start() {
+    public void Start() {
         // cameras
         canvas.worldCamera = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;

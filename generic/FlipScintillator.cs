@@ -28,7 +28,7 @@ public class FlipScintillator : MonoBehaviour {
     public void Update() {
         if (dutyCycle <= 0)
             return;
-        if (scaleWithVelocity) {
+        if (scaleWithVelocity && body != null) {
             timer += Time.deltaTime * (body.velocity.magnitude);
         } else {
             timer += Time.deltaTime;

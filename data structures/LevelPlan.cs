@@ -11,9 +11,9 @@ public record LevelPlan {
         insertionPointIdn = "",
         extractionPointIdn = "",
         // items = new string[4] { "deck", "", "", "" },
-        items = new string[4] { "explosive", "deck", "C4", "tools" },
-        // activeTactics = new List<Tactic>()
-        activeTactics = new List<Tactic>() { new TacticDisguise() }
+        items = new string[4] { "", "deck", "C4", "tools" },
+        activeTactics = new List<Tactic>()
+        // activeTactics = new List<Tactic>() { }
     };
 
     public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);

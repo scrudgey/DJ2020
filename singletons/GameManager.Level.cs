@@ -156,15 +156,22 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        Debug.Log("show loading screen");
+        if (unloadAll) {
+            Debug.Log("show loading screen");
+            SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Additive);
+        }
+
         StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
             isLoadingLevel = false;
             foreach (LevelBootstrapper bootstrapper in GameObject.FindObjectsOfType<LevelBootstrapper>()) {
                 DestroyImmediate(bootstrapper.gameObject);
             }
-            Debug.Log("hide loading screen");
             if (callback != null)
                 callback();
+
+            if (unloadAll) {
+                SceneManager.UnloadSceneAsync("LoadingScreen");
+            }
         }));
     }
     public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback) {

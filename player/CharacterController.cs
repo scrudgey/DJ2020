@@ -1406,7 +1406,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);
     public bool isMoving() {
         if (isCrouching) {
-            Debug.Log(crouchMovementInputTimer);
             return crouchMovementInputTimer > 0.5f && Motor.Velocity.magnitude > 0.1;
         } else {
             return Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing);
