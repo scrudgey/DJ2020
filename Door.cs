@@ -225,9 +225,11 @@ public class Door : Interactive {
         // Debug.Log($"on collision enter: {col.gameObject}");
     }
 
-    public override void DoAction(Interactor interactor) {
+    public override ItemUseResult DoAction(Interactor interactor) {
         lastInteractorTransform = interactor.transform;
-        ActivateDoorknob(interactor.transform.position);
+        // NOTE: assumes that only the player can use the door
+        ActivateDoorknob(interactor.transform.position, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
+        return ItemUseResult.Empty() with { waveArm = true };
     }
     public bool IsLocked() => doorLock.locked;
     public void ActivateDoorknob(Vector3 position, HashSet<int> withKeySet = null) {

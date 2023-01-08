@@ -2055,6 +2055,7 @@ NPC tuning:
 
 
 silenced gun is still OP
+    seeing corpse or bullets -> high alert, easier to see player
 anti-camping visibility boost
     guards are aware of your aggression 
     haven't moved in a while
@@ -2101,9 +2102,11 @@ build a test level equivalent to Jack That Data
 
 
 
-auto-use key in door
-don't shoot corpse away
-credstick surfing
+* auto-use key in door
+* don't shoot corpse away
+* credstick surfing
+load screen (black)
+
 hack target ! indicator only sometimes visible
 NPC portraits not being set properly
 a guy danced on a corpse (I think he was investigating a noise?)

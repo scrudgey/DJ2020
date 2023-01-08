@@ -83,9 +83,9 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         if (inputs.actionButtonPressed) {
             InteractorTargetData data = ActiveTarget();
             if (data == null) return ItemUseResult.Empty();
-            data.target.DoAction(this);
             OnActionDone?.Invoke(data);
-            return ItemUseResult.Empty() with { waveArm = true };
+            return data.target.DoAction(this);
+            // return ItemUseResult.Empty() with { waveArm = true };
         } else {
             return ItemUseResult.Empty();
         }
