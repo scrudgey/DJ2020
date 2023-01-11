@@ -8,8 +8,8 @@ namespace Items {
         public IRGoggles(IRGoggleData baseItem) : base(baseItem) {
             this.goggleData = baseItem;
         }
-        public override ItemUseResult Use(ItemHandler handler) {
-            return base.Use(handler);
+        public override ItemUseResult Use(ItemHandler handler, PlayerInput input) {
+            return base.Use(handler, input);
         }
     }
 }

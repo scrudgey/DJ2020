@@ -66,15 +66,18 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void HandleAllObjectivesComplete() {
+        if (GameManager.I.isLoadingLevel) return;
         uiController.LogMessage($"Objectives complete, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionSuccess;
         ActivateExtractionPoint();
     }
     public void FailObjective(Objective objective) {
+        if (GameManager.I.isLoadingLevel) return;
         gameData.levelState.delta.failedObjectives.Add(objective);
         HandleObjectiveFailed();
     }
     public void HandleObjectiveFailed() {
+        if (GameManager.I.isLoadingLevel) return;
         uiController.LogMessage($"Objectives failed, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionFail;
         ActivateExtractionPoint();

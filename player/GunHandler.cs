@@ -470,8 +470,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                     input.Fire.cursorData.type = CursorData.TargetType.objectLock;
                     input.Fire.cursorData.screenPosition = pointPosition;
                     input.Fire.cursorData.targetCollider = nearestOther;
-
-
                     // TODO: is this a hack? what about NPCs?
                     if (GameManager.I.inputMode == InputMode.aim) {
 

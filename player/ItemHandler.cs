@@ -19,6 +19,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     public int index;
     public BaseItem activeItem;
     public AudioSource audioSource;
+    public RocketLauncher rocketLauncher;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -37,8 +38,14 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             }
             SwitchToItem(items[index]);
         }
+        if (activeItem is RocketLauncherItem) {
+            if (input.Fire.FirePressed) {
+                return UseItem(input);
+            }
+        }
+
         if (input.useItem) {
-            return UseItem();
+            return UseItem(input);
         } else return ItemUseResult.Empty();
     }
     void SwitchToItem(BaseItem item) {
@@ -62,16 +69,19 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         ClearItem();
     }
 
-    ItemUseResult UseItem() {
+    ItemUseResult UseItem(PlayerInput input) {
         if (activeItem == null)
             return ItemUseResult.Empty();
-        return activeItem.Use(this);
+        return activeItem.Use(this, input);
     }
 
     void OnItemEnter(BaseItem item) {
         if (item == null)
             return;
         switch (item) {
+            case RocketLauncherItem rocketItem:
+                Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);
+                break;
             case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.cyber);
                 break;

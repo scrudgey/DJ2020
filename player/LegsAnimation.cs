@@ -265,10 +265,12 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         transform.localRotation = Quaternion.identity;
 
         // set position back to the rotated position.
-        headAnimation.transform.position = absoluteWorldPosition;
+        // this is hacky
 
+        headAnimation.transform.position = absoluteWorldPosition;
         torsoAnimation.transform.position += 0.001f * directionToCamera;
-        // TODO: this is a hack/patch.
+        if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.localPosition = Vector3.zero;
+
         if (torsoSpriteData != null && torsoSpriteData.headInFrontOfTorso) {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
             headAnimation.transform.position += 0.002f * input.directionToCamera;
@@ -276,6 +278,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
             headAnimation.transform.position -= 0.002f * input.directionToCamera;
         }
+        if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.position += 0.004f * input.directionToCamera;
     }
 
     public void LoadSkinState(ISkinState state) {

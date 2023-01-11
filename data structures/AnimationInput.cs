@@ -1,3 +1,4 @@
+using Items;
 using UnityEngine;
 public struct AnimationInput {
     public struct GunAnimationInput {
@@ -12,6 +13,7 @@ public struct AnimationInput {
     public GunAnimationInput gunInput;
     public Direction orientation;
     public PlayerInput playerInputs;
+    public BaseItem activeItem;
     public bool isMoving;
     public bool isCrouching;
     public bool isProne;

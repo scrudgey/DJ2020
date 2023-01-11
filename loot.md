@@ -23,7 +23,6 @@ high value street:
     nuke
     synthmesc
     drencrom
-    Nuke
     credstick
 
 low value street:

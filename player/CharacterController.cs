@@ -486,6 +486,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 Vector3 aimSway = new Vector3(aimSwayX, aimSwayY, 0f) * aimSwayMagnitude;
                 _inputTorque += aimSway;
 
+                ItemUseResult itemresult = itemHandler.SetInputs(input);
+                HandleItemUseResult(itemresult);
+
                 if (input.Fire.AimPressed) {
                     TransitionToState(CharacterState.normal);
                 }
@@ -1400,7 +1403,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             directionToCamera = OrbitCamera.Transform.position - transform.position,
             hitState = hitState,
             velocity = Motor.Velocity,
-            wavingArm = waveArmTimer > 0f
+            wavingArm = waveArmTimer > 0f,
+            activeItem = itemHandler.activeItem
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

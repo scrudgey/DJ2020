@@ -169,7 +169,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (callback != null)
                 callback();
 
-            if (unloadAll) {
+            if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
         }));

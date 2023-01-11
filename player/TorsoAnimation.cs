@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Items;
 using KinematicCharacterController;
 using UnityEngine;
 public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
@@ -11,6 +12,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     private Direction direction;
     public HeadAnimation headAnimation;
     public SpriteRenderer spriteRenderer;
+    public RocketLauncher rocketLauncher;
     public Animation animator;
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
@@ -147,8 +149,24 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             }
         }
         UpdateFrame(input);
+        SetItemSprite(input);
         return ApplyTorsoSpriteData(input);
     }
+
+    void SetItemSprite(AnimationInput input) {
+        switch (input.activeItem) {
+            case RocketLauncherItem rocketItem:
+                rocketLauncher.spritesheet = rocketItem.rocketData.spritesheet;
+                rocketLauncher.gameObject.SetActive(true);
+                rocketLauncher?.SetSprite(direction);
+                break;
+            default:
+                if (rocketLauncher != null)
+                    rocketLauncher.gameObject.SetActive(false);
+                break;
+        }
+    }
+
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
         if (forcePlay) {
             animator.Stop();

@@ -9,6 +9,7 @@ namespace Items {
             if (baseName == "") return null;
             ItemData baseItem = ItemData.LoadItem(baseName);
             return baseItem switch {
+                RocketLauncherData rocketData => new RocketLauncherItem(rocketData),
                 C4Data c4Data => new C4(c4Data),
                 IRGoggleData goggles => new IRGoggles(goggles),
                 ItemData itemData => itemData.shortName switch {
@@ -39,7 +40,7 @@ namespace Items {
         public BaseItem(ItemData baseData) {
             this.data = baseData;
         }
-        public virtual ItemUseResult Use(ItemHandler handler) => ItemUseResult.Empty();
+        public virtual ItemUseResult Use(ItemHandler handler, PlayerInput input) => ItemUseResult.Empty();
         public virtual bool EnablesManualHack() => false;
         public virtual bool EnablesBurglary() => false;
     }

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using Items;
 using UnityEngine;
-
 [System.Serializable]
 public class Skin {
     // head
@@ -488,6 +488,8 @@ public class Skin {
         } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
             return unarmedCrawl;
         } else if (input.wavingArm) {
+            return unarmedUse;
+        } else if (input.activeItem != null && input.activeItem is RocketLauncherItem) {
             return unarmedUse;
         }
         // gun states
