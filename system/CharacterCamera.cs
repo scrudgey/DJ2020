@@ -605,13 +605,20 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             float distance = 0;
 
             Vector3 origin = Vector3.zero;
+            Vector3 groundOrigin = Vector3.zero;
             if (GameManager.I.playerObject != null) {
                 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1.35f, 0f); // TODO: fix this hack!
+                groundOrigin = GameManager.I.playerObject.transform.position;
             }
-
             Plane plane = new Plane(Vector3.up, origin);
             if (plane.Raycast(clickRay, out distance)) {
                 targetPoint = clickRay.GetPoint(distance);
+            }
+
+            Plane groundPlane = new Plane(Vector3.up, groundOrigin);
+            Vector3 groundPoint = Vector3.zero;
+            if (groundPlane.Raycast(clickRay, out distance)) {
+                groundPoint = clickRay.GetPoint(distance);
             }
 
             return new CursorData {
@@ -622,7 +629,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
                 worldPosition = targetPoint,
-                mousePosition = cursorPosition
+                mousePosition = cursorPosition,
+                groundPosition = groundPoint
                 // targetCollider = interactorData.collider
             };
         }

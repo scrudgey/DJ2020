@@ -9,6 +9,7 @@ namespace Items {
             if (baseName == "") return null;
             ItemData baseItem = ItemData.LoadItem(baseName);
             return baseItem switch {
+                GrenadeData grenadeData => new GrenadeItem(grenadeData),
                 RocketLauncherData rocketData => new RocketLauncherItem(rocketData),
                 C4Data c4Data => new C4(c4Data),
                 IRGoggleData goggles => new IRGoggles(goggles),

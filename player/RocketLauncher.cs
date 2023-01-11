@@ -15,7 +15,6 @@ public class RocketLauncher : MonoBehaviour {
             }
         }
         rocketBody.velocity = item.rocketData.rocketVelocity * direction;
-        Debug.Log($"gunpos:{gunPosition()} worldpos:{input.Fire.cursorData.worldPosition} dir:{direction}");
     }
     public void SetSprite(Direction direction) {
         if (spritesheet == null || spritesheet[direction].Length == 0) return;

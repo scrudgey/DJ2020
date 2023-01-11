@@ -92,6 +92,12 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
+        // FinishMission();
+        StartCoroutine(WaitAndShowMissionFinish());
+    }
+
+    IEnumerator WaitAndShowMissionFinish() {
+        yield return new WaitForSeconds(2f);
         FinishMission();
     }
 

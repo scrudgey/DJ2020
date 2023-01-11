@@ -2095,6 +2095,7 @@ build a test level equivalent to Jack That Data
 
 * SpottedHighlight should use full navigation path
 * lose disguise when openly aggressive, or identity is revealed
+* delay after death before fail screen
 
 code-controlled gun animation
 
@@ -2123,42 +2124,26 @@ navigable AC units
 graphics
     silenced pistol
     fix silenced smg
-    rocket launcher
-        * sprite
-        icon
-    grenade
-        * sprite
-        icon
+    rocket launcher inventory icon
+    burglary tools icon
+    grenade icon
     patrol guard spritesheet
     disguise spritesheet (fireman)
     swat team spritesheet
     civ_female portrait could use some work
-    burglar tools
     loot
     title screen logo
     title screen animations 
 
-rocket launcher
-    rocket explosion custom?
-        different sounds
+rocket launcher explosion?
+hand grenade explosion
+check blood pool prefab pooling
 
-hand grenade
-    explosion not as big as c4: doesn't destroy walls but will destroy people
 
 door should be destructible
-delay after death before fail screen
-#indiedev #unity3d #immersivesim #gamedev
-destroyed walls leave decal on the ground
-
-
-legs: +0.85y
-torso: 0
-gunhandler: position + height = 0.85 + 0.5 = 1.35
-rocket launcher: position + height = 0.85
-0.85+0.35+0.5
-
-
+destroyed walls leave decal on the ground (difficult?)
 destructible light pylon
 destructible dumpster
 destructible AC unit
 destructible radio dish tower
+#indiedev #unity3d #immersivesim #gamedev

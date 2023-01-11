@@ -119,5 +119,23 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 break;
         }
     }
+    public void ThrowGrenade(GrenadeData data, PlayerInput input) {
+        float sin45 = 0.70710678118f;  // 1/√2
 
+        Vector3 gunPosition = new Vector3(transform.position.x, transform.position.y + 0.45f, transform.position.z);
+        Vector3 localPosition = (input.Fire.cursorData.groundPosition - gunPosition);
+        Vector3 localDirection = localPosition.normalized;
+
+        float distance = localPosition.magnitude;
+        float initialSpeed = Mathf.Sqrt(distance * Mathf.Abs(Physics.gravity.y));
+        Vector3 initialVelocity = initialSpeed * sin45 * Vector3.up + initialSpeed * sin45 * localDirection;
+        GameObject obj = GameObject.Instantiate(data.grenadePrefab, gunPosition + (0.15f * localDirection), Quaternion.identity);
+        Rigidbody body = obj.GetComponent<Rigidbody>();
+        body.velocity = initialVelocity;
+        foreach (Collider myCollider in transform.root.GetComponentsInChildren<Collider>()) {
+            foreach (Collider grenadeCollider in obj.GetComponentsInChildren<Collider>()) {
+                Physics.IgnoreCollision(myCollider, grenadeCollider, true);
+            }
+        }
+    }
 }
