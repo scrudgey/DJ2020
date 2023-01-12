@@ -2099,12 +2099,27 @@ build a test level equivalent to Jack That Data
 
 code-controlled gun animation
 
-more door styles
-    suscpetible / not to latch attacks
-    picking more / less difficult
-    different handles
-    electronic access control
+attack surfaces
+    more door styles
+        suscpetible / not to latch attacks
+        picking more / less difficult
+        different handles
+        electronic access control
+        Request-to-Exit (REX) sensor 
     alarm sensors on doors
+    padlock
+    screwdriver graphics
+    tools
+        power drill through lock
+        keyed-alike
+        shim
+        bump keys
+    maybe there is a difference in suspicion between differen kinds of tools
+        if everything is vulnerable to lock pick then why bother with other things?
+    interface:
+        tools are placed on the spread to the right
+        clicking on the panel in general replaces item, returns to hand
+
 loot
     guards can drop keys or loot
     collect loot
@@ -2122,11 +2137,6 @@ navigable AC units
     you should be able to crawl through the duct on the ceiling
 
 graphics
-    silenced pistol
-    fix silenced smg
-    rocket launcher inventory icon
-    burglary tools icon
-    grenade icon
     patrol guard spritesheet
     disguise spritesheet (fireman)
     swat team spritesheet
@@ -2140,10 +2150,20 @@ hand grenade explosion
 check blood pool prefab pooling
 
 
-door should be destructible
+* door should be destructible
 destroyed walls leave decal on the ground (difficult?)
 destructible light pylon
 destructible dumpster
 destructible AC unit
 destructible radio dish tower
 #indiedev #unity3d #immersivesim #gamedev
+
+guns:
+    silenced pistol
+    fix silenced smg
+icons:
+    * burglary tools
+    * rocket launcher
+    * grenade
+    redraw others?
+        thermals

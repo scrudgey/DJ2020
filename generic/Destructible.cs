@@ -45,8 +45,8 @@ public class Destructible : Damageable, IPoolable {
         DoDestruct(damage);
     }
     virtual protected void DoDestruct(Damage damage) {
-        if (transform.parent != null) {
-            Destroy(transform.parent.gameObject, destructionTimer);
+        if (transform.root != null) {
+            Destroy(transform.root.gameObject, destructionTimer);
         } else {
             Destroy(gameObject, destructionTimer);
         }

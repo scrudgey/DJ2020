@@ -12,7 +12,7 @@ namespace Items {
             Toolbox.RandomizeOneShot(handler.audioSource, c4Data.deploySound);
             GameObject c4 = GameObject.Instantiate(c4Data.prefab, handler.transform.position, Quaternion.identity);
             Explosive explosive = c4.GetComponentInChildren<Explosive>();
-            explosive.data = c4Data;
+            explosive.data = c4Data.explosionData;
             SuspicionRecord record = new SuspicionRecord {
                 content = "seen placing infernal device",
                 suspiciousness = Suspiciousness.aggressive,

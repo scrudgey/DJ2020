@@ -8,7 +8,8 @@ public class Explosive : MonoBehaviour {
     public AudioClip[] explodeSounds;
     public float lifetime;
     public float timer;
-    public C4Data data;
+    // public C4Data data;
+    public ExplosionData data;
     public static GameObject explosiveRadius;
 
     void Update() {
@@ -28,7 +29,12 @@ public class Explosive : MonoBehaviour {
         Explosion explosion = Toolbox.Explosion(transform.position);
         explosion.radius = data.explosionRadius;
         explosion.power = data.explosionPower;
-        if (transform != null && transform.parent != null && transform.parent.gameObject != null)
+        if (transform != null && transform.parent != null && transform.parent.gameObject != null) {
             Destroy(transform.parent.gameObject);
+
+        } else {
+            Destroy(gameObject);
+        }
+
     }
 }
