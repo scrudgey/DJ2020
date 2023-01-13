@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -27,7 +28,6 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
 
     // health
     public float health { get; set; }
-
     [field: SerializeField]
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
@@ -37,4 +37,8 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public SpeechEtiquette[] etiquettes;
     [field: SerializeField]
     public Sprite portrait;
+
+    public List<int> physicalKeys;
+
+    public Alertness alertness;
 }

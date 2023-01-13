@@ -8,6 +8,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
+
+    // these things should belong to level delta
     public static Dictionary<string, PoweredComponent> poweredComponents;
     public static Dictionary<string, CyberComponent> cyberComponents;
     public static Dictionary<string, AlarmComponent> alarmComponents;
@@ -32,7 +34,7 @@ public partial class GameManager : Singleton<GameManager> {
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
             playerState = PlayerState.Instantiate(template.playerState),
-            levelState = LevelState.Instantiate(levelTemplate),
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
         };
 
         // instantiate mission state from template
@@ -40,20 +42,107 @@ public partial class GameManager : Singleton<GameManager> {
 
         LoadScene(template.sceneName, () => StartVRMission(state));
     }
+    public void LoadMission(LevelTemplate template, LevelPlan plan) {
+        Debug.Log("GameMananger: load mission");
 
-    void StartVRMission(VRMissionState state) {
+        gameData = gameData with {
+            levelState = LevelState.Instantiate(template, plan),
+        };
+
+        LoadScene(template.sceneName, () => StartMission(gameData.levelState));
+    }
+
+    public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
-        InitializeLevel();
+        InitializeLevel(LevelPlan.Default());
         TransitionToState(GameState.levelPlay);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(state);
     }
+
+    public void StartMission(LevelState state, bool spawnNpcs = true) {
+        Debug.Log($"GameMananger: start mission {state.template.levelName}");
+        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+            LoadScene("UI", () => {
+                uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.InitializeObjectivesController(gameData);
+            }, unloadAll: false);
+        }
+        InitializeLevel(state.plan);
+        playerCharacterController.OnCharacterDead += HandlePlayerDead;
+
+        // spawn NPC
+        if (spawnNpcs) {
+            foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+                spawnPoint.SpawnTemplated();
+            }
+            foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+                spawnPoint.SpawnNPC(useSpawnEffect: false);
+            }
+        }
+
+
+        TransitionToState(GameState.levelPlay);
+    }
+    public void StartWorld() {
+        Debug.Log($"GameMananger: world scene");
+        InitializePlayerAndController(LevelPlan.Default());
+        TransitionToState(GameState.world);
+    }
+    void HandlePlayerDead(CharacterController npc) {
+        gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
+        // FinishMission();
+        StartCoroutine(WaitAndShowMissionFinish());
+    }
+
+    IEnumerator WaitAndShowMissionFinish() {
+        yield return new WaitForSeconds(2f);
+        FinishMission();
+    }
+
+    public void FinishMission() {
+        playerCharacterController.OnCharacterDead -= HandlePlayerDead;
+        switch (gameData.levelState.delta.phase) {
+            case LevelDelta.MissionPhase.extractionSuccess:
+                FinishMissionSuccess();
+                break;
+            case LevelDelta.MissionPhase.extractionFail:
+            case LevelDelta.MissionPhase.playerDead:
+                FinishMissionFail();
+                break;
+        }
+    }
+
+    public void FinishMissionSuccess() {
+        Debug.Log("mission success");
+        gameData.playerState.credits += gameData.levelState.template.creditReward;
+        LoadAfterActionReport();
+    }
+    public void FinishMissionFail() {
+        Debug.Log("mission fail");
+        GameManager.I.ShowMenu(MenuType.missionFail, () => {
+            MissionFailMenuController menuController = GameObject.FindObjectOfType<MissionFailMenuController>();
+            menuController.Initialize(gameData);
+        });
+    }
+
     public void ReturnToTitleScreen() {
         MusicController.I.Stop();
         LoadScene("title", () => {
             Debug.Log("start title screen");
             activeMenuType = MenuType.none;
+        });
+    }
+
+    public void LoadAfterActionReport() {
+        MusicController.I.Stop();
+        TransitionToState(GameState.afteraction);
+        LoadScene("AfterAction", () => {
+            Debug.Log("start afteraction");
+            // activeMenuType = MenuType.none;
+            AfterActionReportHandler handler = GameObject.FindObjectOfType<AfterActionReportHandler>();
+            handler.Initialize(gameData);
         });
     }
 
@@ -73,11 +162,22 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        Debug.Log("show loading screen");
+        if (unloadAll) {
+            Debug.Log("show loading screen");
+            SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Additive);
+        }
+
         StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
             isLoadingLevel = false;
-            Debug.Log("hide loading screen");
-            callback();
+            foreach (LevelBootstrapper bootstrapper in GameObject.FindObjectsOfType<LevelBootstrapper>()) {
+                DestroyImmediate(bootstrapper.gameObject);
+            }
+            if (callback != null)
+                callback();
+
+            if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
+                SceneManager.UnloadSceneAsync("LoadingScreen");
+            }
         }));
     }
     public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback) {
@@ -106,7 +206,9 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
+        // TODO: better system here
+        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "EscapeMenu")
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
 
         foreach (string sceneToUnload in scenesToUnload) {
             Debug.Log($"try unload scene async: {sceneToUnload} {SceneManager.GetSceneByName(sceneToUnload).isLoaded}");
@@ -126,7 +228,7 @@ public partial class GameManager : Singleton<GameManager> {
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
-
+        this.playerCollider = focus.GetComponentInChildren<Collider>();
         if (playerOutlineHandler != null) {
             playerOutlineHandler.UnBind();
         }
@@ -140,10 +242,14 @@ public partial class GameManager : Singleton<GameManager> {
         if (clearSighter != null && focus != null)
             clearSighter.followTransform = focus.transform;
 
+        GunHandler handler = focus.GetComponentInChildren<GunHandler>();
+        handler.SetGunAppearanceSuspicion();
+
         OnFocusChanged?.Invoke(focus);
         OnEyeVisibilityChange?.Invoke(gameData.playerState);
     }
     void ClearSceneData() {
+        // this stuff should all belong to level delta
         poweredComponents = new Dictionary<string, PoweredComponent>();
         cyberComponents = new Dictionary<string, CyberComponent>();
         alarmComponents = new Dictionary<string, AlarmComponent>();
@@ -155,22 +261,24 @@ public partial class GameManager : Singleton<GameManager> {
 
         // Debug.Log($"initialized poweredComponents {poweredComponents} {poweredComponents.Count}");
     }
-    private void InitializeLevel() {
+    private void InitializePlayerAndController(LevelPlan plan) {
         ClearSceneData();
         inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
 
         // spawn player object
-        GameObject playerObj = SpawnPlayer(gameData.playerState);
+        GameObject playerObj = SpawnPlayer(gameData.playerState, plan);
         SetFocus(playerObj);
 
         // connect player object to input controller
         inputController.SetInputReceivers(playerObj);
+    }
+    private void InitializeLevel(LevelPlan plan) {
+        InitializePlayerAndController(plan);
 
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
-            Debug.Log($"adding power component {component} {component.idn}");
             poweredComponents[component.idn] = component;
         }
 
@@ -370,8 +478,14 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
-    GameObject SpawnPlayer(PlayerState state) {
+    GameObject SpawnPlayer(PlayerState state, LevelPlan plan) {
+        if (plan.insertionPointIdn != "") { // default
+            foreach (PlayerSpawnPoint point in GameObject.FindObjectsOfType<PlayerSpawnPoint>()) {
+                if (point.data.idn == plan.insertionPointIdn)
+                    return point.SpawnPlayer(state, plan);
+            }
+        }
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
-        return spawnPoint.SpawnPlayer(state);
+        return spawnPoint.SpawnPlayer(state, plan);
     }
 }

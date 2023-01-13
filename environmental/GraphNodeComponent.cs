@@ -47,9 +47,7 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     public abstract U GetNode();
 
 #if UNITY_EDITOR
-    private void OnDrawGizmos() {
-        // string customName = "Relic\\" + relicType.ToString() + ".png";
-        // Gizmos.DrawIcon(transform.position, customName, true);
+    protected virtual void OnDrawGizmos() {
         foreach (T other in edges) {
             if (other == null)
                 continue;

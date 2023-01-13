@@ -58,7 +58,7 @@ public record VRMissionTemplate {
     public static VRMissionTemplate LoadVRMissionTemplate(string filename) {
         CreateScenarioFolderIfMissing(VRMissionRootDirectory());
         string path = VRMissionPath(filename);
-        Debug.Log($"loading {path}...");
+        // Debug.Log($"loading {path}...");
         try {
             // deserialize JSON directly from a file
             using (StreamReader file = File.OpenText(path)) {
@@ -98,7 +98,6 @@ public record VRMissionTemplate {
             Debug.LogError("no templates found!");
         }
 
-        // Add each result to the worldList
         foreach (UnityEngine.Object world in worlds) {
             TextAsset w = (TextAsset)world;
             string filename = System.IO.Path.Join(targetDirectoryPath, w.name);

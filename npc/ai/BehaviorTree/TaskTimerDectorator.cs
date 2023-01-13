@@ -19,8 +19,6 @@ namespace AI {
             this.lifetime = lifetime;
             timer = 0f;
             this.children = new List<TaskNode> { wrapped };
-
-
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             timer += Time.deltaTime;

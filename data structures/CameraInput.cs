@@ -22,4 +22,6 @@ public struct CameraInput {
     public Quaternion aimCameraRotation;
     public Vector3 targetPosition;
     public Transform targetTransform;
+    public bool atLeftEdge;
+    public bool atRightEdge;
 }

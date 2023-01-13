@@ -70,9 +70,10 @@ public class SphereInvestigateState : SphereControlState {
         dialogueTask = new TaskOpenDialogue(owner);
 
         alertTaskNode = new Sequence(
-            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 0.5f) {
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 0.5f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
-                speedCoefficient = 1.2f
+                speedCoefficient = 1.2f,
+                highlight = highlight
             },
             new Selector(
                     new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
@@ -89,8 +90,9 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, arrivalDistance: 1.25f) {
-                        speedCoefficient = 0.5f
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1.25f) {
+                        speedCoefficient = 0.5f,
+                        highlight = highlight
                     },
                     new TaskConditional(() => isPlayerNear()),
                     dialogueTask
@@ -98,8 +100,9 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
-                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, arrivalDistance: 1f) {
-                            headBehavior = TaskMoveToKey.HeadBehavior.search
+                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+                            headBehavior = TaskMoveToKey.HeadBehavior.search,
+                            highlight = highlight,
                         },
                         new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                             lookType = TaskLookAt.LookType.position,
@@ -170,12 +173,12 @@ public class SphereInvestigateState : SphereControlState {
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             if (lastSeenPlayerPosition != Vector3.zero) {
-                float amountOfMotion = (other.bounds.center - lastSeenPlayerPosition).magnitude;
+                float amountOfMotion = (other.transform.root.position - lastSeenPlayerPosition).magnitude;
                 integratedPlayerMovement += amountOfMotion;
                 totalPlayerMovement += amountOfMotion;
             }
             timeSinceSawPlayer = 0;
-            lastSeenPlayerPosition = other.bounds.center;
+            lastSeenPlayerPosition = other.transform.root.position;
             rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
             alertTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);
             rootTaskNode.SetData(SEARCH_POSITION_KEY, lastSeenPlayerPosition);

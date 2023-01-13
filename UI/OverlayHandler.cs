@@ -45,7 +45,7 @@ public class OverlayHandler : MonoBehaviour {
         RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
         RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
-        HandleOverlayChange(GameManager.I.activeOverlayType);
+        HandleOverlayChange(GameManager.I.activeOverlayType, false);
     }
     void OnDestroy() {
         GameManager.OnOverlayChange -= HandleOverlayChange;
@@ -66,8 +66,9 @@ public class OverlayHandler : MonoBehaviour {
         alarmOverlay.cam = cam;
         alarmOverlay.Refresh(graph);
     }
-    public void HandleOverlayChange(OverlayType type) {
+    public void HandleOverlayChange(OverlayType type, bool enabled) {
         // Debug.Log($"handling overlay change: {type}");
+
         switch (type) {
             case OverlayType.none:
             default:
@@ -104,7 +105,12 @@ public class OverlayHandler : MonoBehaviour {
                 titleText.text = "Alarm";
                 break;
         }
-        if (type == OverlayType.none) {
+        if (!enabled) {
+            powerOverlay.gameObject.SetActive(false);
+            cyberOverlay.gameObject.SetActive(false);
+            alarmOverlay.gameObject.SetActive(false);
+            outlineImage.enabled = false;
+        } else if (type == OverlayType.none) {
             outlineImage.enabled = false;
         } else {
             outlineImage.enabled = true;

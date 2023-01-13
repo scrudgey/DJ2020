@@ -7,7 +7,7 @@ public abstract class Interactive : Highlightable {
     public virtual string ResponseString() {
         return $"did {actionPrompt}";
     }
-    public abstract void DoAction(Interactor interactor);
+    public abstract ItemUseResult DoAction(Interactor interactor);
     public static T TopTarget<T>(IEnumerable<T> interactives) where T : HighlightableTargetData {
         T topInteractive = null;
         foreach (T data in interactives) {

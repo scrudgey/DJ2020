@@ -40,10 +40,15 @@ public struct PlayerInput {
     public bool preventWallPress;
     public Vector2 zoomInput;
     public bool aimWeapon;
+    public bool mouseDown;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };
     public Vector2 MoveAxis() {
         return new Vector2(MoveAxisRight, MoveAxisForward);
     }
+}
+
+public struct OverrideInput {
+
 }

@@ -7,6 +7,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 public class UIController : MonoBehaviour {
     public Canvas canvas;
+    public Canvas terminalCanvas;
+    public Canvas burglarCanvas;
+    public Canvas missionSelectorCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
@@ -25,10 +28,13 @@ public class UIController : MonoBehaviour {
     public TextMeshProUGUI caption;
     public HitIndicatorController hitIndicatorController;
     public VRStatHandler vRStatHandler;
+    public BurglarCanvasController burglarCanvasController;
+    public ObjectiveCanvasController objectiveCanvasController;
+    public MissionComputerController missionComputerController;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
-    void Start() {
+    public void Start() {
         // cameras
         canvas.worldCamera = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
@@ -38,16 +44,28 @@ public class UIController : MonoBehaviour {
         lockIndicatorHandler.UICamera = Camera.main;
         playerCalloutHandler.UICamera = Camera.main;
         hackDisplay.cam = Camera.main;
+        caption.text = "";
 
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnCaptionChange += HandleCaptionChange;
-        caption.text = "";
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
+        canvas.enabled = true;
         HideVRStats();
+        HideTerminal();
+        HideBurglar();
+        HideMissionSelector();
+    }
+    public void InitializeObjectivesController(GameData data) {
+        objectiveCanvasController.Initialize(data);
+    }
+    public void UpdateWithPlayerInput(PlayerInput input) {
+        if (burglarCanvas != null && burglarCanvas.enabled)
+            burglarCanvasController?.UpdateWithInput(input);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;
+        GameManager.OnCaptionChange -= HandleCaptionChange;
     }
 
     void BindToNewTarget(GameObject target) {
@@ -71,11 +89,37 @@ public class UIController : MonoBehaviour {
         healthIndicatorController.Bind(target);
         hitIndicatorController.Bind(target);
     }
+    public void LogMessage(string message) {
+        if (actionLogHandler != null) {
+            actionLogHandler.ShowMessage(message);
+        }
+    }
     public void ShowTerminal() {
+        terminalCanvas.enabled = true;
         terminal.gameObject.SetActive(true);
     }
     public void HideTerminal() {
+        terminalCanvas.enabled = false;
         terminal.gameObject.SetActive(false);
+    }
+    public void ShowBurglar(BurgleTargetData data) {
+        HideUI();
+        burglarCanvas.enabled = true;
+        burglarCanvasController.Initialize(data);
+    }
+    public void HideBurglar() {
+        burglarCanvas.enabled = false;
+        burglarCanvasController.TearDown();
+        ShowUI();
+    }
+    public void ShowMissionSelector(GameData gameData) {
+        HideUI();
+        missionSelectorCanvas.enabled = true;
+        missionComputerController.Initialize(gameData);
+    }
+    public void HideMissionSelector() {
+        missionSelectorCanvas.enabled = false;
+        ShowUI();
     }
     void HandleCaptionChange(string newCaption) {
         caption.text = newCaption;
@@ -87,13 +131,11 @@ public class UIController : MonoBehaviour {
         vRStatHandler.gameObject.SetActive(false);
     }
     public void HideUI() {
-        Debug.Log("hide UI");
         HideVRStats();
         canvas.enabled = false;
     }
     public void ShowUI() {
-        Debug.Log("show UI");
-        ShowVRStats();
+        // ShowVRStats();
         canvas.enabled = true;
     }
 }

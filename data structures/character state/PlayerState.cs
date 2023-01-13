@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 [System.Serializable]
-public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICharacterHurtableState {
+public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
     public int credits;
 
     // skin
@@ -20,9 +21,6 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public float health { get; set; }
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
-
-    // items
-    public List<string> items { get; set; }
 
     // stats
     public int cyberlegsLevel;
@@ -42,10 +40,14 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
     public float hackSpeedCoefficient;
     public float hackRadius;
 
-    public bool disguise;
 
     public SpeechEtiquette[] etiquettes;
     public Sprite portrait;
+
+    public HashSet<int> physicalKeys;
+
+    public List<PayData> payDatas;
+
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("s1");
@@ -60,9 +62,9 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             primaryGun = GunState.Instantiate(gun1),
             secondaryGun = GunState.Instantiate(gun2),
             tertiaryGun = GunState.Instantiate(gun3),
-            activeGun = 2,
+            activeGun = -1,
 
-            items = new List<string> { "explosive", "deck", "goggles", "ID" },
+            // items = new List<string> { "explosive", "deck", "goggles", "tools" },
 
             cyberlegsLevel = 1,
             maxConcurrentNetworkHacks = 1,
@@ -70,19 +72,25 @@ public record PlayerState : ISkinState, IGunHandlerState, IItemHandlerState, ICh
             hackRadius = 1.5f,
             thirdWeaponSlot = false,
 
-            health = 250f,
-            fullHealthAmount = 250f,
+            health = 100f,
+            fullHealthAmount = 100f,
 
             speechSkillLevel = 3,
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
-            portrait = Resources.Load("sprites/portraits/Jack") as Sprite
+            portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
+
+            physicalKeys = new HashSet<int>(),
+
+            payDatas = new List<PayData>(),
+
+            credits = 10000
         };
     }
 
     public void ApplyState(GameObject playerObject) {
         ((IGunHandlerState)this).ApplyGunState(playerObject);
         ((ISkinState)this).ApplySkinState(playerObject);
-        ((IItemHandlerState)this).ApplyItemState(playerObject);
+        // ((IItemHandlerState)this).ApplyItemState(playerObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(playerObject);
         ApplyPlayerState(playerObject);
     }

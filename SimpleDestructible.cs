@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SimpleDestructible : Destructible {
+    public float bulletDamageModifier = 1f;
+    public float explosionDamageModifier = 1f;
     public DamageResult TakeBulletDamage(BulletDamage impact) {
         return new DamageResult {
-            damageAmount = impact.bullet.damage,
+            damageAmount = impact.bullet.damage * bulletDamageModifier,
             damage = impact
         };
     }
     public DamageResult TakeExplosiveDamage(ExplosionDamage explosion) {
         return new DamageResult {
-            damageAmount = explosion.amount,
+            damageAmount = explosion.amount * explosionDamageModifier,
             damage = explosion
         };
     }

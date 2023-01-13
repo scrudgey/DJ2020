@@ -4,5 +4,7 @@ using UnityEngine;
 
 public class LevelDataUtil : MonoBehaviour {
     public LevelTemplate levelData;
-    public AudioClip klaxonSound;
+    public Camera mapCamera;
+    public RenderTexture mapTexture;
+    public int floorNumber;
 }

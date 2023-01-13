@@ -1,0 +1,1 @@
+public enum ObjectiveStatus { inProgress, complete, failed, disabled, canceled }

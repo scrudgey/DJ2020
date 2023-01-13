@@ -91,7 +91,7 @@ public class StopAndListenState : SphereControlState {
         if (FoundSomethingSuspicious()) {
             return new SearchDirectionState(owner, lastNoise, doIntro: false);
         } else {
-            Debug.Log("guess it was nothing");
+            // Debug.Log("guess it was nothing");
             speechTextController.Say("Guess it was nothing.");
             return previousState;
         }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class NPCSpawnPoint : MonoBehaviour {
     public bool isStrikeTeamSpawn;
     public GameObject spawnEffect;
+    public NPCTemplate myTemplate;
     PrefabPool effectPool;
     PrefabPool NPCPool;
     void Start() {
@@ -14,7 +15,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         NPCPool = PoolManager.I?.RegisterPool("prefabs/NPC", poolSize: 10);
         effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
-    public GameObject SpawnNPC(NPCTemplate template) {
+    public GameObject SpawnNPC(NPCTemplate template, bool useSpawnEffect = true) {
         if (effectPool == null) {
             InitializePools();
         }
@@ -42,5 +43,9 @@ public class NPCSpawnPoint : MonoBehaviour {
     void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
         NPCState state = NPCState.Instantiate(template);
         state.ApplyState(npcObject);
+    }
+
+    public void SpawnTemplated() {
+        SpawnNPC(myTemplate, useSpawnEffect: false);
     }
 }

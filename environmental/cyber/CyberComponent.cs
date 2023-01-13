@@ -13,4 +13,16 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
     }
 
     public override CyberNode GetNode() => GameManager.I.GetCyberNode(idn);
+
+
+#if UNITY_EDITOR
+    protected override void OnDrawGizmos() {
+        foreach (CyberComponent other in edges) {
+            if (other == null)
+                continue;
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(NodePosition(), other.NodePosition());
+        }
+    }
+#endif
 }

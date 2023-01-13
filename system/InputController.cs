@@ -18,6 +18,7 @@ public class InputController : MonoBehaviour {
     public List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
 
     [Header("Inputs")]
+    public InputActionReference escapeAction;
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
     public InputActionReference AimAction;
@@ -44,6 +45,7 @@ public class InputController : MonoBehaviour {
 
     private Vector2 inputVector;
     private bool firePressedHeld;
+    private bool mouseDown;
     private bool firePressedThisFrame;
     private bool aimPressedThisFrame;
     private bool crouchHeld;
@@ -60,6 +62,8 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
+    private bool escapePressedThisFrame;
+    private bool escapePressConsumed;
 
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -67,6 +71,9 @@ public class InputController : MonoBehaviour {
     public void HandleFireAction(InputAction.CallbackContext ctx) {
         firePressedThisFrame = ctx.ReadValueAsButton();
         firePressedHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleEscapeAction(InputAction.CallbackContext ctx) {
+        escapePressedThisFrame = ctx.ReadValueAsButton();
     }
     public void HandleAimAction(InputAction.CallbackContext ctx) {
         aimPressedThisFrame = ctx.ReadValueAsButton();
@@ -148,6 +155,7 @@ public class InputController : MonoBehaviour {
     }
     public void HandleFireActionCanceled(InputAction.CallbackContext ctx) {
         firePressedHeld = false;
+        mouseDown = false;
     }
     public void HandleCrouchActionCanceled(InputAction.CallbackContext ctx) {
         crouchHeld = false;
@@ -170,6 +178,8 @@ public class InputController : MonoBehaviour {
     }
 
     void RegisterCallbacks() {
+        // Escape
+        escapeAction.action.performed += HandleEscapeAction;
         // Move
         MoveAction.action.performed += HandleMoveAction;
         // Fire
@@ -211,6 +221,8 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled += HandleJumpActionCanceled;
     }
     void DeregisterCallbacks() {
+        // Escape
+        escapeAction.action.performed -= HandleEscapeAction;
         // Move
         MoveAction.action.performed -= HandleMoveAction;
         // Fire
@@ -252,18 +264,28 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled -= HandleJumpActionCanceled;
     }
 
-    public void HandleCharacterInput(bool pointerOverUIElement) {
+    public PlayerInput HandleCharacterInput(bool pointerOverUIElement) {
+        if (!escapePressedThisFrame && escapePressConsumed) {
+            escapePressConsumed = false;
+        }
+        if (escapePressedThisFrame && !escapePressConsumed) {
+            escapePressedThisFrame = false;
+            GameManager.I.HandleEscapePressed();
+            escapePressConsumed = true;
+        }
+        mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;
         if (pointerOverUIElement) {
             firePressedThisFrame = false;
+            firePressedHeld = false;
         }
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
-
+        PlayerInput characterInputs = PlayerInput.none;
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
-            PlayerInput characterInputs = new PlayerInput() {
+            characterInputs = new PlayerInput() {
                 MoveAxisForward = inputVector.y,
                 MoveAxisRight = inputVector.x,
                 mouseDelta = mouseDelta,
@@ -288,7 +310,8 @@ public class InputController : MonoBehaviour {
                 rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
                 rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
                 lookAtDirection = directionToCursor,
-                zoomInput = zoomInput
+                zoomInput = zoomInput,
+                mouseDown = mouseDown
             };
             i.SetInputs(characterInputs);
         }
@@ -310,13 +333,17 @@ public class InputController : MonoBehaviour {
         rotateCameraLeftPressedThisFrame = false;
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
+        escapePressedThisFrame = false;
+
+        return characterInputs;
     }
+
+    // TODO: this can belong to gamemanager.
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();
         foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<CharacterController>()) {
             inputReceivers.Add(inputReceiver);
         }
-
         inputReceivers.Add(GameManager.I.characterCamera);
     }
 }

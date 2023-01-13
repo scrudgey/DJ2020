@@ -58,7 +58,6 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
                     spriteRenderer.material.EnableKeyword("_BILLBOARD");
                 }
                 spriteRenderer.flipX = direction == Direction.left || direction == Direction.leftUp || direction == Direction.leftDown;
-
                 break;
             default:
                 break;

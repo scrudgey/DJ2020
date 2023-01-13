@@ -28,7 +28,7 @@ namespace UI {
         int clipsize;
         PrefabPool ammoSpentPool;
         PrefabPool ammoPipPool;
-        void Awake() {
+        void Start() {
             ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);
             ammoPipPool = PoolManager.I.RegisterPool(ammoPipPrefab, 50);
             liveAmmoPipsTop = new List<AmmoPip>();
@@ -133,11 +133,11 @@ namespace UI {
                 liveAmmoPipsTop.Remove(pip1);
                 pip1.Disappear(ammoPipPool);
 
-                if (liveAmmoPipsBottom.Count > 0) {
-                    AmmoPip pip2 = liveAmmoPipsBottom[0];
-                    liveAmmoPipsBottom.Remove(pip2);
-                    pip2.Disappear(ammoPipPool);
-                }
+                // if (liveAmmoPipsBottom.Count > 0) {
+                AmmoPip pip2 = liveAmmoPipsBottom[0];
+                liveAmmoPipsBottom.Remove(pip2);
+                pip2.Disappear(ammoPipPool);
+                // }
 
                 GameObject newPip = ammoPipPool.GetObject(ammoPipContainer.transform.position);
                 AmmoPip pip = newPip.GetComponent<AmmoPip>();

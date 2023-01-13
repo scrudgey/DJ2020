@@ -25,7 +25,9 @@ namespace AI {
             started = false;
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            if (!started) {
+            if (GameManager.I.levelHQTerminal() == null) {
+                return TaskState.failure;
+            } else if (!started) {
                 alertHandler.ShowRadio();
                 started = true;
                 speechTextController.Say(report.speechText);

@@ -7,7 +7,7 @@ public class SphereAttackState : SphereControlState {
     public SphereRobotSpeaker speaker;
     readonly float ATTACK_TIMEOUT = 3f;
     readonly float ROUTINE_TIMEOUT = 10f;
-    readonly float MAX_SHOOT_RANGE = 10f;
+    readonly float MAX_SHOOT_RANGE = 20f;
     float timeSinceSawPlayer;
     float changeStateCountDown;
     public GunHandler gunHandler;
@@ -41,7 +41,7 @@ public class SphereAttackState : SphereControlState {
                     new TaskConditional(() => isPlayerVisible()),
                     new TaskShoot(gunHandler)
                 ),
-                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY)
+                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys)
             )
         );
     }

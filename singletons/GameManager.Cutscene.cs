@@ -27,6 +27,9 @@ public partial class GameManager : Singleton<GameManager> {
     public void StartSpottedCutscene(GameObject NPC) {
         StartCutsceneCoroutine(SpottedCutscene(NPC));
     }
+    public void ShowExtractionZoneCutscene(ExtractionZone zone) {
+        StartCutsceneCoroutine(ExtractionZoneCutscene(zone));
+    }
     public IEnumerator SpottedCutscene(GameObject NPC) {
         float timer = 0f;
         SphereRobotSpeaker speaker = NPC.GetComponentInChildren<SphereRobotSpeaker>();
@@ -77,5 +80,38 @@ public partial class GameManager : Singleton<GameManager> {
         characterCamera.followingSharpnessDefault = 5f;
         yield return null;
     }
+
+    public IEnumerator ExtractionZoneCutscene(ExtractionZone zone) {
+        float timer = 0f;
+        // characterCamera.followingSharpnessDefault = 1f;
+        characterCamera.followCursorCoefficient = 1f;
+        while (timer < 2f) {
+            timer += Time.unscaledDeltaTime;
+            Time.timeScale = Mathf.Lerp(Time.timeScale, 0f, 0.01f);
+            PlayerInput playerInput = PlayerInput.none;
+            playerInput.zoomInput = new Vector2(0f, 5f);
+            characterCamera.SetInputs(playerInput);
+            CameraInput input = new CameraInput {
+                deltaTime = Time.deltaTime,
+                wallNormal = Vector2.zero,
+                lastWallInput = Vector2.zero,
+                crouchHeld = false,
+                playerPosition = transform.position,
+                state = CharacterState.normal,
+                targetData = CursorData.none,
+                playerDirection = playerCharacterController.direction,
+                playerLookDirection = playerCharacterController.direction,
+                popoutParity = PopoutParity.left,
+                aimCameraRotation = Quaternion.identity,
+                targetPosition = zone.transform.position
+            };
+            characterCamera.UpdateWithInput(input, ignoreAttractor: true);
+            yield return null;
+        }
+        Time.timeScale = 1f;
+        characterCamera.followCursorCoefficient = 5f;
+        yield return null;
+    }
+
 
 }

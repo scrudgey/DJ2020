@@ -1,21 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
-
 [System.Serializable]
 public class LevelState {
     public LevelTemplate template;
+    public LevelPlan plan;
     public LevelDelta delta;
 
-    public static LevelState Instantiate(LevelTemplate template) => new LevelState {
+    public static LevelState Instantiate(LevelTemplate template, LevelPlan plan) => new LevelState {
         template = template,
+        plan = plan,
         delta = LevelDelta.Empty() with {
+            phase = LevelDelta.MissionPhase.action,
             powerGraph = PowerGraph.LoadAll(template.levelName),
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
-            strikeTeamMaxSize = 3
+            strikeTeamMaxSize = 3,
+            disguise = plan.startWithDisguise(),
+            objectivesState = template.objectives
+                .ToDictionary(t => t, t => ObjectiveStatus.inProgress)
         }
     };
 
@@ -28,39 +34,12 @@ public class LevelState {
         return delta.alarmGraph.anyAlarmActive();
     }
 
-    public static LevelState Load(string levelName) {
-        string path = FilePath(levelName);
-        LevelState data = LoadXML(path);
-        return data;
-    }
-    public static string FilePath(string levelName) {
-        string scenePath = LevelDataPath(levelName);
-        return Path.Combine(scenePath, $"{levelName}.xml");
-    }
-    public static string LevelDataPath(string levelName) {
-        string path = Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName);
+    public static string LevelDataPath(string levelName, bool includeDataPath = true) {
+        string path = includeDataPath ? Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName) :
+                                        Path.Combine("data", "levels", levelName);
         if (!Directory.Exists(path)) {
             Directory.CreateDirectory(path);
         }
         return path;
-    }
-    public static LevelState LoadXML(string path) {
-        XmlSerializer serializer = new XmlSerializer(typeof(LevelState));
-        if (File.Exists(path)) {
-            using (FileStream sceneStream = new FileStream(path, FileMode.Open)) {
-                LevelState levelData = (LevelState)serializer.Deserialize(sceneStream);
-                return levelData;
-            }
-        } else {
-            Debug.LogError($"level data file not found: {path}");
-            return null;
-        }
-    }
-    public void WriteXML(string levelName) {
-        XmlSerializer serializer = new XmlSerializer(typeof(LevelState));
-        string path = FilePath(levelName);
-        using (FileStream sceneStream = File.Create(path)) {
-            serializer.Serialize(sceneStream, this);
-        }
     }
 }

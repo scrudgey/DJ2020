@@ -89,20 +89,13 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
         GameManager.OnSuspicionChange -= HandleSuspicionChange;
     }
     void Start() {
-
         foreach (Transform child in statusRecordsContainer) {
             Destroy(child.gameObject);
         }
-
         for (int i = 0; i < 10; i++) {
             GameObject obj = GameObject.Instantiate(statusRecordPrefab);
             obj.transform.SetParent(statusRecordsContainer, worldPositionStays: false);
             obj.SetActive(false);
-            // SuspicionRecord record = records[i];
-            // Transform obj = statusRecordsContainer.GetChild(i);
-            // obj.gameObject.SetActive(true);
-            // SuspicionStatusRecordIndicatorHandler handler = obj.GetComponent<SuspicionStatusRecordIndicatorHandler>();
-            // handler.Configure(record, newRecord: !activeRecords.Contains(record.content));
         }
     }
 
@@ -149,14 +142,10 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             SuspicionStatusRecordIndicatorHandler handler = child.GetComponent<SuspicionStatusRecordIndicatorHandler>();
             if (handler != null && handler.suspicionRecord != null)
                 activeRecords.Add(handler.suspicionRecord.content);
-            // child.gameObject.SetActive(false);
         }
 
-        // foreach (SuspicionRecord record in GameManager.I.suspicionRecords.Values) {
         List<SuspicionRecord> records = GameManager.I.suspicionRecords.Values.ToList();
         for (int i = 0; i < records.Count; i++) {
-            // obj.SetParent(statusRecordsContainer, worldPositionStays: false);
-            // GameObject obj = GameObject.Instantiate(statusRecordPrefab);
             SuspicionRecord record = records[i];
             Transform obj = statusRecordsContainer.GetChild(i);
             if (!obj.gameObject.activeInHierarchy)
@@ -265,7 +254,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
-                if (GameManager.I.gameData.playerState.disguise && !GameManager.I.gameData.levelState.anyAlarmActive()) {
+                if (GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmActive()) {
                     reactionIgnoreChevron.color = disabledColor;
                     reactionIgnoreLight.color = lightGreenDisabled;
                 }
@@ -286,7 +275,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
 
-                if (GameManager.I.gameData.levelState.anyAlarmActive() && !GameManager.I.gameData.playerState.disguise) {
+                if (GameManager.I.gameData.levelState.anyAlarmActive() && !GameManager.I.gameData.levelState.delta.disguise) {
                     reactionAttackChevron.color = disabledColor;
                     reactionAttackLight.color = lightRedDisabled;
                 }
@@ -315,7 +304,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             alarmChevronObject.SetActive(false);
         }
 
-        if (GameManager.I.gameData.playerState.disguise) {
+        if (GameManager.I.gameData.levelState.delta.disguise) {
             if (!disguiseChevronObject.activeInHierarchy) {
                 easeInDisguiseChevron = true;
                 disguiseChevronEaseTimer = 0f;

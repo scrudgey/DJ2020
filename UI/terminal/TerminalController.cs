@@ -20,6 +20,8 @@ namespace UI {
             commands["test"] = RunTests;
             commands["alarm"] = ToggleAlarm;
             commands["disguise"] = ToggleDisguise;
+            commands["timescale"] = TimeScale;
+            commands["extract"] = Objectives;
         }
         public void OnEnable() {
             TakeFocus();
@@ -65,11 +67,21 @@ namespace UI {
 
         }
         public void ToggleDisguise(string[] args) {
-            bool disguise = GameManager.I.gameData.playerState.disguise;
+            bool disguise = GameManager.I.gameData.levelState.delta.disguise;
             if (disguise)
                 GameManager.I.DeactivateDisguise();
             else
                 GameManager.I.ActivateDisguise();
+        }
+        public void TimeScale(string[] args) {
+            float timescale = float.Parse(args[0]);
+            Time.timeScale = timescale;
+        }
+        public void Objectives(string[] args) {
+            // float timescale = float.Parse(args[0]);
+            // Time.timeScale = timescale;
+            GameManager.I.gameData.levelState.delta.objectiveStatus = ObjectiveStatus.complete;
+            GameManager.I.HandleAllObjectivesComplete();
         }
 
         public void SetValue(string[] args) {

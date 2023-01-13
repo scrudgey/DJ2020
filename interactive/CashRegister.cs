@@ -16,8 +16,9 @@ public class CashRegister : Interactive {
     void OnDestroy() {
         cyberComponent.OnStateChange -= HandleCyberStateChange;
     }
-    public override void DoAction(Interactor interactor) {
+    public override ItemUseResult DoAction(Interactor interactor) {
         Open();
+        return ItemUseResult.Empty() with { waveArm = true };
     }
     public void Open() {
         if (opened)

@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.PostProcessing;
 
 // TODO: eliminate this enum
-public enum CameraState { normal, wallPress, attractor, aim }
+public enum CameraState { normal, wallPress, attractor, aim, burgle }
 
 public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
     private CameraState _state;
@@ -29,6 +29,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
     public float followingSharpnessDefault = 10000f;
     public Quaternion isometricRotation;
+    public float followCursorCoefficient = 5f;
 
     [Header("Distance")]
     public float DefaultDistance = 6f;
@@ -80,6 +81,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     private static float shakeJitter = 0f;
     private float currentOrthographicSize;
     bool thermalGogglesActive;
+    CameraTargetParameters lastWallPressTargetParameters;
     void OnValidate() {
         DefaultDistance = Mathf.Clamp(DefaultDistance, MinDistance, MaxDistance);
     }
@@ -94,7 +96,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         zoomCoefficientTarget -= input.zoomInput.y * Time.unscaledDeltaTime * 0.1f;
         zoomCoefficientTarget = Math.Max(0.25f, zoomCoefficientTarget);
         zoomCoefficientTarget = Math.Min(1.0f, zoomCoefficientTarget);
-        // zoomCoefficient = Mathf.Lerp(zoomCoefficient, zoomCoefficientTarget, 0.1f);
         zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f);
     }
     void Awake() {
@@ -108,11 +109,24 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
         currentFollowingSharpness = followingSharpnessDefault;
         currentDistanceMovementSpeed = distanceMovementSpeedDefault;
+
+        // initial planar
+        // the initial rotation here will be an offset to all subsequent rotations
+        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
+        rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
+        Quaternion rotationFromInput = rotationOffset;
+        PlanarDirection = rotationFromInput * PlanarDirection;
+        PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
+        Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
+        targetRotation = planarRot * verticalRot;
+        cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
     }
 
     void Start() {
         _currentDistance = 20f;
         GameManager.OnFocusChanged += SetFollowTransform;
+        SetFollowTransform(GameManager.I.playerObject);
         GameManager.OnEyeVisibilityChange += HandleEyeVisibilityChange;
 
         // TODO: move into on level load
@@ -127,12 +141,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     void HandleEyeVisibilityChange(PlayerState playerData) {
         thermalGogglesActive = playerData.cyberEyesThermalBuff;
-
         if (playerData.cyberEyesThermal || playerData.cyberEyesThermalBuff) {
             ShowLasers();
-            // thermalGogglesActive = true;
         } else {
-            // thermalGogglesActive = false;
             HideLasers();
         }
     }
@@ -176,7 +187,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                     // kind of hacky but w/e
                     _currentDistance = 20f;
                 }
-                if (fromState == CameraState.wallPress) {
+                if (fromState == CameraState.wallPress || fromState == CameraState.burgle) {
                     currentDistanceMovementSharpness = distanceMovementSharpnessDefault;
                     currentFollowingSharpness = followingSharpnessDefault;
                     currentDistanceMovementSpeed = distanceMovementSpeedDefault;
@@ -201,34 +212,13 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     // Set the transform that the camera will orbit around
     public void SetFollowTransform(GameObject g) {
-        // Transform t = g.transform;
-        // Transform follow = t.Find("cameraFollowPoint");
-        // if (follow != null) t = follow;
-        // FollowTransform = t;
-        // _currentFollowPosition = FollowTransform.position;
-
-        // initial planar
-        // the initial rotation here will be an offset to all subsequent rotations
-        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
-        rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
-        Quaternion rotationFromInput = rotationOffset;
-        PlanarDirection = rotationFromInput * PlanarDirection;
-        PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
-        Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
-        Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
-        targetRotation = planarRot * verticalRot;
-
-        cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
-
+        if (g == null)
+            return;
         IgnoredColliders.Clear();
         IgnoredColliders.AddRange(g.GetComponentsInChildren<Collider>());
     }
 
-    // override public void HandleValueChanged(CharacterController controller) {
-    //     CameraInput input = controller.BuildCameraInput();
-    //     UpdateWithInput(input);
-    // }
-    public void UpdateWithInput(CameraInput input) {
+    public void UpdateWithInput(CameraInput input, bool ignoreAttractor = false) {
         // if (FollowTransform == null)
         // return;
         CameraState camState = CameraState.normal;
@@ -238,7 +228,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             camState = CameraState.aim;
         } else if (input.state == CharacterState.wallPress || input.state == CharacterState.popout) {
             camState = CameraState.wallPress;
-        } else {
+        } else if (input.state == CharacterState.burgle) {
+            camState = CameraState.burgle;
+        } else if (!ignoreAttractor) {
             // check / update Attractor
             foreach (CameraAttractorZone attractor in attractors) {
                 if (attractor.sphereCollider.bounds.Contains(input.playerPosition)) {
@@ -254,7 +246,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             transitionTime += Time.unscaledDeltaTime;
         }
         transitionTime = Mathf.Clamp(transitionTime, 0, 1f);
-
         switch (state) {
             case CameraState.attractor:
                 ApplyTargetParameters(AttractorParameters(input));
@@ -270,6 +261,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 RenderSettings.skybox = wallPressSkybox;
                 ApplyTargetParameters(WallPressParameters(input));
                 volume.profile = wallPressProfile;
+                break;
+            case CameraState.burgle:
+                RenderSettings.skybox = wallPressSkybox;
+                ApplyTargetParameters(BurgleParameters(input));
+                volume.profile = aimProfile;
                 break;
             case CameraState.aim:
                 RenderSettings.skybox = wallPressSkybox;
@@ -307,7 +303,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
-            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y);
+            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y) * followCursorCoefficient;
             targetPosition = input.targetPosition + worldOffset;
             lastTargetPosition = targetPosition;
         }
@@ -345,7 +341,16 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     public CameraTargetParameters WallPressParameters(CameraInput input) {
         // Find the smoothed follow position
-        Vector3 LROffset = input.targetTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
+        Vector3 LROffset = Vector3.zero;
+        LROffset = input.targetTransform.right * -0.5f * Mathf.Sign(input.lastWallInput.x);
+        // if we are at wall edge?
+        if (input.atLeftEdge) {
+            LROffset += 0.9f * input.targetTransform.right;
+        } else if (input.atRightEdge) {
+            LROffset += -0.9f * input.targetTransform.right;
+        }
+        if (input.state == CharacterState.popout) LROffset = -1f * LROffset;
+
         Vector3 distOffset = input.wallNormal * TargetDistance;
         Vector3 heightOffset = new Vector3(0, -0.5f, 0);
 
@@ -353,29 +358,19 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             heightOffset = new Vector3(0, -0.75f, 0);
         }
 
-        Vector3 horizontalOffset = Vector3.zero;
-        if (input.state == CharacterState.popout) {
-            float horizontalParity = input.popoutParity switch {
-                PopoutParity.left => 1f,
-                PopoutParity.right => -1f,
-                _ => 1f
-            };
-            horizontalOffset = horizontalParity * Vector3.Cross(Vector3.up, input.playerDirection) * 1.5f;
-        }
-
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
         Vector3 camDirection = -1f * input.wallNormal;
         camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
 
-        return new CameraTargetParameters() {
+        CameraTargetParameters targetParameters = new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
             rotation = planarRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
-            targetPosition = input.targetPosition + distOffset + LROffset + heightOffset + horizontalOffset,
+            targetPosition = input.targetPosition + distOffset + LROffset + heightOffset,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -383,6 +378,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             state = input.state,
             playerDirection = input.playerDirection
         };
+
+        if (input.state == CharacterState.wallPress || input.state == CharacterState.burgle) {
+            lastWallPressTargetParameters = targetParameters;
+            return targetParameters;
+        } else {
+            return lastWallPressTargetParameters;
+        }
+
     }
     public CameraTargetParameters AimParameters(CameraInput input) {
         float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
@@ -439,6 +442,27 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             playerDirection = input.playerDirection
         };
     }
+    public CameraTargetParameters BurgleParameters(CameraInput input) {
+        Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
+        Vector3 camDirection = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.forward;
+        camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
+        Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+        return new CameraTargetParameters() {
+            fieldOfView = 50f,
+            orthographic = false,
+            rotation = planarRot,
+            snapToRotation = Quaternion.identity,
+            deltaTime = input.deltaTime,
+            targetDistance = 1.5f,
+            targetPosition = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.position,
+            orthographicSize = 4f,
+            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            distanceMovementSpeed = currentDistanceMovementSpeed,
+            state = input.state,
+            playerDirection = input.playerDirection
+        };
+    }
 
     bool PlayerInsideBounds(Vector3 screenPoint) {
         return screenPoint.x > 0.1 && screenPoint.y > 0.1 && screenPoint.x < 0.9 && screenPoint.y < 0.9;
@@ -474,7 +498,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         if (input.state == CharacterState.wallPress || state == CameraState.aim) {
             RaycastHit closestHit = new RaycastHit();
             closestHit.distance = Mathf.Infinity;
-            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, ObstructionLayers, QueryTriggerInteraction.Ignore);
+            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetLayerMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
             for (int i = 0; i < _obstructionCount; i++) {
                 bool isIgnored = false;
                 for (int j = 0; j < IgnoredColliders.Count; j++) {
@@ -483,26 +507,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                         break;
                     }
                 }
-                for (int j = 0; j < IgnoredColliders.Count; j++) {
-                    if (IgnoredColliders[j] == _obstructions[i].collider) {
-                        isIgnored = true;
-                        break;
-                    }
-                }
 
-                if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance > 0) {
+                if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance >= 0) {
                     closestHit = _obstructions[i];
                 }
             }
-
-            // If obstructions detecter
             if (closestHit.distance < Mathf.Infinity) {
-                // _distanceIsObstructed = true;
                 _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
-            }
-            // If no obstruction
-            else {
-                // _distanceIsObstructed = false;
+            } else {
                 _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
             }
         }
@@ -527,10 +539,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         }
     }
     private CursorData CursorToTarget(Vector2 cursorPosition) {
-
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
+        // Debug.Log(Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         Vector3 direction = transform.forward;
+        // Debug.Log(projection);
         if (GameManager.I.showDebugRays)
             Debug.DrawRay(projection.origin, direction * 100, Color.magenta);
         Ray clickRay = new Ray(projection.origin, direction);
@@ -541,8 +554,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
-        // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetMask(Layer.obj, Layer.interactive));
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetLayerMask(Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = Vector3.zero;
 
         TagSystemData priorityData = null;
@@ -593,13 +605,20 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             float distance = 0;
 
             Vector3 origin = Vector3.zero;
+            Vector3 groundOrigin = Vector3.zero;
             if (GameManager.I.playerObject != null) {
                 origin = GameManager.I.playerObject.transform.position + new Vector3(0f, 1.35f, 0f); // TODO: fix this hack!
+                groundOrigin = GameManager.I.playerObject.transform.position;
             }
-
             Plane plane = new Plane(Vector3.up, origin);
             if (plane.Raycast(clickRay, out distance)) {
                 targetPoint = clickRay.GetPoint(distance);
+            }
+
+            Plane groundPlane = new Plane(Vector3.up, groundOrigin);
+            Vector3 groundPoint = Vector3.zero;
+            if (groundPlane.Raycast(clickRay, out distance)) {
+                groundPoint = clickRay.GetPoint(distance);
             }
 
             return new CursorData {
@@ -610,7 +629,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 highlightableTargetData = interactorData,
                 // clickRay = clickRay,
                 worldPosition = targetPoint,
-                mousePosition = cursorPosition
+                mousePosition = cursorPosition,
+                groundPosition = groundPoint
                 // targetCollider = interactorData.collider
             };
         }
@@ -634,7 +654,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // Vector3 direction = transform.forward;
 
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
+        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = projection.GetPoint(100f);
 
         TagSystemData priorityData = null;
@@ -685,7 +705,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         } else {
             // TODO: aim through transparent objects
             if (hits.Length > 0)
-                targetPoint = hits.OrderBy(h => h.distance).FirstOrDefault().point;
+                targetPoint = hits
+                    .OrderBy(h => h.distance)
+                    .Where(hit => !hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform.root))
+                    .FirstOrDefault().point;
             return new CursorData {
                 type = CursorData.TargetType.direction,
                 screenPosition = cursorPosition,

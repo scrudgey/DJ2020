@@ -15,7 +15,7 @@ public class ClearSighter : MonoBehaviour {
     Dictionary<MaterialController, Vector3> staticGeometry = new Dictionary<MaterialController, Vector3>();
     public Transform followTransform;
     private List<Collider> rooftopZones = new List<Collider>();
-
+    Plane cullingPlane;
     Coroutine coroutine;
     bool inRooftopZone;
     Collider[] colliderHits;
@@ -24,17 +24,21 @@ public class ClearSighter : MonoBehaviour {
         myTransform = transform;
         InitializeMaterialControllerCache();
         InvokeRepeating("HandleStaticGeometry", 0f, 1f);
-        rooftopZones = GameObject.FindObjectsOfType<RooftopZone>().Select(zone => zone.GetComponent<Collider>()).ToList();
+        rooftopZones = GameObject.FindObjectsOfType<RooftopZone>()
+            .SelectMany(zone => zone.GetComponentsInChildren<Collider>())
+            .ToList();
         coroutine = StartCoroutine(RunJobRepeatedly());
     }
     IEnumerator RunJobRepeatedly() {
+        WaitForEndOfFrame waitForFrame = new WaitForEndOfFrame();
         while (true) {
             if (followTransform == null) {
                 yield return null;
                 continue;
             }
-            // int i = 0;
             int j = 0;
+            int interloperCount = interlopers.Count;
+            int allControllerCount = controllers.controllers.Count;
 
             myTransform.position = followTransform.position;
 
@@ -49,7 +53,8 @@ public class ClearSighter : MonoBehaviour {
             myTransform.rotation = Quaternion.LookRotation(directionToCamera);
 
             // non-static colliders above me
-            int numberHits = Physics.OverlapSphereNonAlloc(myTransform.position, 20f, colliderHits, LayerUtil.GetMask(Layer.obj, Layer.bulletPassThrough, Layer.shell), QueryTriggerInteraction.Ignore);
+            int numberHits = Physics.OverlapSphereNonAlloc(myTransform.position, 20f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell), QueryTriggerInteraction.Ignore);
+            // Debug.Log($"ovelap hits: {numberHits}");
             for (int k = 0; k < numberHits; k++) {
                 Collider collider = colliderHits[k];
                 if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
@@ -57,31 +62,39 @@ public class ClearSighter : MonoBehaviour {
                 j += 1;
                 if (j > 500) {
                     j = 0;
-                    yield return new WaitForEndOfFrame();
+                    yield return waitForFrame;
                 }
                 MaterialController controller = controllers.get(collider);
                 if (controller != null) {
                     if (inRooftopZone) {
                         controller.disableBecauseAbove = false;
                     } else {
-                        controller.CeilingCheck(myTransform.position);
+                        controller.CeilingCheck(myTransform.position, cullingPlane, floorHeight);
                     }
                 }
             }
 
             // interloper colliders
             // Debug.Log($"interlopers: {interlopers.Count}");
-            foreach (MaterialController interloper in interlopers.Where(interloper =>
-                                                                        interloper != null &&
-                                                                        interloper.gameObject != null)) {
+            Plane detectionPlane = new Plane(myCamera.PlanarDirection, myTransform.position);
+            Toolbox.DrawPlane(myTransform.position, detectionPlane);
+            for (int k = 0; k < interloperCount; k++) {
+                // in case the collection was modified in the interim
+                if (k >= interlopers.Count)
+                    break;
+                MaterialController interloper = interlopers[k];
+                if (interloper == null || interloper.gameObject == null)
+                    continue;
+                interloper.updatedThisLoop = true;
                 j += 1;
                 if (j > 500) {
                     j = 0;
-                    yield return new WaitForEndOfFrame();
+                    yield return waitForFrame;
                 }
                 Vector3 directionToInterloper = interloper.collider.bounds.center - myTransform.position;
-                if (Vector3.Dot(directionToCamera, directionToInterloper) > 0 && directionToInterloper.y > -0.01f)
+                if (directionToInterloper.y > 0.1f && !detectionPlane.GetSide(interloper.collider.bounds.center)) {
                     interloper.InterloperStart();
+                }
 
                 Vector3 directionToMesh = interloper.collider.bounds.center - myTransform.position;
                 float axialDistance = Vector3.Dot(directionToMesh, directionToCamera);
@@ -90,15 +103,24 @@ public class ClearSighter : MonoBehaviour {
                 interloper.UpdateTargetAlpha(offAxisLength: offAxisLength);
                 interloper.Update();
             }
-            var nonInterlopers = controllers.controllers.Values.Where(controller => controller != null && !interlopers.Contains(controller)).ToList();
-            foreach (MaterialController controller in nonInterlopers) {
-                j += 1;
-                if (j > 500) {
-                    j = 0;
-                    yield return new WaitForEndOfFrame();
+            // var nonInterlopers = controllers.controllers.Values.Where(controller => controller != null && !interlopers.Contains(controller)).ToList();
+            // Debug.Log($"nonInterlopers: {nonInterlopers.Count}");
+            foreach (MaterialController controller in controllers.controllers.Values) {
+                if (controller == null)
+                    continue;
+                if (controller.updatedThisLoop) {
+                    controller.updatedThisLoop = false;
+                    continue;
                 }
-                controller.UpdateTargetAlpha(0);
+                // j += 1;
+                // if (j > 500) {
+                //     j = 0;
+                //     yield return waitForFrame;
+                // }
+                // Debug.Log("updating alpha");
+                controller.UpdateTargetAlpha(2);
                 controller.Update();
+                controller.updatedThisLoop = false;
             }
             yield return null;
         }
@@ -117,22 +139,24 @@ public class ClearSighter : MonoBehaviour {
             if (collider.transform.IsChildOf(myTransform))
                 continue;
             MaterialController controller = controllers.get(collider);
-            if (collider.gameObject.isStatic) {
+            if (controller != null && controller.childRenderers.Any(renderer => renderer != null && renderer.isPartOfStaticBatch)) {
                 staticGeometry[controller] = collider.transform.position;
             }
         }
-        Debug.Log($"[ClearSighter] initialized material controller cache with {controllers.controllers.Count}");
+        Debug.Log($"[ClearSighter] initialized material controller cache with {controllers.controllers.Count}, static: {staticGeometry.Count}");
     }
 
     void HandleStaticGeometry() {
         Vector3 myPosition = myTransform.position;
+        // Debug.Log($"static geometry: {inRooftopZone} {staticGeometry.Count}");
+        cullingPlane.Set3Points(myTransform.position, myTransform.right, myTransform.up);
         foreach ((MaterialController controller, Vector3 position) in staticGeometry) {
             if (controller == null || controller.gameObject == null || controller.collider == null || !controller.gameObject.activeInHierarchy)
                 continue;
             if (inRooftopZone) {
                 controller.disableBecauseAbove = false;
             } else {
-                controller.CeilingCheck(myPosition);
+                controller.CeilingCheck(myPosition, cullingPlane, floorHeight);
             }
             controller.Update();
         }
@@ -145,7 +169,6 @@ public class ClearSighter : MonoBehaviour {
     void AddInterloper(Collider other) {
         if (followTransform == null)
             return;
-        // Debug.Log("onaddinterloper");
         if (other.transform.IsChildOf(myTransform.root) || other.transform.IsChildOf(followTransform)) {
             return;
         }
@@ -163,7 +186,7 @@ public class ClearSighter : MonoBehaviour {
     }
     void RemoveNullInterlopers() {
         interlopers = interlopers
-            .Where(f => f != null)
+            .Where(f => f != null && f.gameObject != null)
             .ToList();
     }
 

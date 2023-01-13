@@ -19,7 +19,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
     Vector3 targetDirection;
     private void Start() {
         Motor.CharacterController = this;
-
+        gunHandler.nonAnimatedReload = true;
         // TODO: remove?
         gunHandler.primary = GunState.Instantiate(GunTemplate.Load("s1"));
         gunHandler.SwitchToGun(1);

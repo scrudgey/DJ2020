@@ -197,6 +197,10 @@ i had to modify NPCTemplateJSONConverter, even after modifying the scriptable ob
     State
         Delta
         Template
+    template contains references to resources. delta contains mutable primitives.
+    on save, save state: reference the template by string.
+    this works when templates can be scriptable objects.
+    but VR mission template wants to 
     
 2. enumerate all current save related systems
 
@@ -217,4 +221,53 @@ the system needs to be able to resolve a Resources/ path given an asset.
 
 
 how could we do something like AssetDatabase.GetAssetPath at runtime?
-we would need to enumerate 
+we would need to enumerate all resources on start, and build a dictionary.
+
+
+# fixing the save system, take two
+
+## problem statement
+
+the above system worked to remove UnityEditor from runtime, which is good.
+
+however, it does not work in standalone because of the following lines:
+
+```
+DirectoryInfo levelDirectoryPath = new DirectoryInfo(Application.dataPath);
+FileInfo[] fileInfo = levelDirectoryPath.GetFiles("*.*", SearchOption.AllDirectories);
+foreach (FileInfo file in fileInfo) {
+```
+
+The problem is, we can traverse the Resources directory on disk in editor mode, but not in standalone build.
+
+Instead of populating the path dictionary at runtime, we should do it from an editor script.
+
+`Resources.FindObjectsOfTypeAll(typeof(UnityEngine.Object));`
+
+This approach won't work, because just loading the resource does not tell us the path.
+
+There is no way to get a path from a resource without using AssetDatabase.
+
+Therefore we have to either supply some information ourselves about the expected directory structure,
+or we use the directory traversal from editor script and save the information?
+
+if we capture just the paths to a text asset, we will lose the asset reference.
+
+## solution
+
+Make a new singleton.
+
+Make a gameobject for the singleton.
+
+The gameobject for the singleton will store a Dictionary<GameObject, String> that stores the resources path for all resources.
+
+An editor script populates this list.
+
+At runtime, the singleton has access to the saved Dictionary.
+
+### considerations
+
+Unity editor does not allow us to inspect Dictionary<GameObject, String>.
+
+this still fails?
+resource reference size: 0

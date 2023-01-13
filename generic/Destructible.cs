@@ -4,7 +4,7 @@ public class Destructible : Damageable, IPoolable {
     public float health;
     public float fullHealthAmount;
     private bool doDestruct;
-    public float destructionTimer = 5f;
+    public float destructionTimer = 0f;
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
     public Action<Destructible> OnHitStateChanged { get; set; }
@@ -45,8 +45,8 @@ public class Destructible : Damageable, IPoolable {
         DoDestruct(damage);
     }
     virtual protected void DoDestruct(Damage damage) {
-        if (transform.parent != null) {
-            Destroy(transform.parent.gameObject, destructionTimer);
+        if (transform.root != null) {
+            Destroy(transform.root.gameObject, destructionTimer);
         } else {
             Destroy(gameObject, destructionTimer);
         }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 [System.Serializable]
-public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerState, ICharacterHurtableState {
+public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtableState {
     public int credits;
 
     // skin
@@ -28,7 +28,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
     public HitState hitState { get; set; }
 
     // items
-    public List<string> items { get; set; }
+    // public List<string> items { get; set; }
 
     // stats
     public int cyberlegsLevel;
@@ -68,7 +68,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, IItemHandlerStat
             tertiaryGun = GunTemplate.Load("sh1"),
             activeGun = 2,
 
-            items = new List<string> { "explosive", "deck", "goggles", "ID" },
+            // items = new List<string> { "explosive", "deck", "goggles", "ID", "tools" },
 
             cyberlegsLevel = 1,
             maxConcurrentNetworkHacks = 1,

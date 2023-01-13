@@ -1,15 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Items;
 using UnityEngine;
-public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerStateLoader, IInputReceiver {
+public record ItemUseResult {
+    public bool transitionToUseItem;
+    public bool waveArm;
+    public static ItemUseResult Empty() => new ItemUseResult {
+
+    };
+}
+public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
+
     public Action<ItemHandler> OnValueChanged { get; set; }
 
     public List<BaseItem> items = new List<BaseItem>();
     public int index;
     public BaseItem activeItem;
     public AudioSource audioSource;
+    public RocketLauncher rocketLauncher;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -18,7 +28,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
         OnItemEnter(activeItem);
     }
 
-    public void SetInputs(PlayerInput input) {
+    public ItemUseResult SetInputs(PlayerInput input) {
         if (input.incrementItem != 0) {
             index += input.incrementItem;
             if (index < 0) {
@@ -26,12 +36,17 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
             } else if (index >= items.Count) {
                 index = 0;
             }
-            Debug.Log($"{index} {items.Count} {items[index]}");
             SwitchToItem(items[index]);
         }
-        if (input.useItem) {
-            UseItem();
+        if (activeItem is RocketLauncherItem) {
+            if (input.Fire.FirePressed) {
+                return UseItem(input);
+            }
         }
+
+        if (input.useItem) {
+            return UseItem(input);
+        } else return ItemUseResult.Empty();
     }
     void SwitchToItem(BaseItem item) {
         OnItemExit(this.activeItem);
@@ -39,30 +54,34 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
-    public void LoadItemState(IItemHandlerState data) {
+    void ClearItem() {
+        SwitchToItem(null);
+        index = items.IndexOf(null);
+    }
+    public void LoadItemState(string[] itemNames) {
         items = new List<BaseItem>();
-        foreach (string itemName in data.items) {
-            BaseItem newItem = ItemInstance.NewInstance(itemName);
-            if (newItem != null) {
-                items.Add(newItem);
-                // Debug.Log(newItem);
-            } else {
-                Debug.LogError($"unable to load saved item {itemName}");
-            }
+        foreach (string itemName in itemNames) {
+            BaseItem newItem = ItemInstance.LoadItem(itemName);
+            items.Add(newItem);
         }
-        if (items.Count > 0) {
-            SwitchToItem(items[0]);    // TODO: save active item
-        }
+        items.Add(null);
+        items = items.ToHashSet().ToList();
+        ClearItem();
     }
 
-    void UseItem() {
+    ItemUseResult UseItem(PlayerInput input) {
         if (activeItem == null)
-            return;
-        activeItem.Use(this);
+            return ItemUseResult.Empty();
+        return activeItem.Use(this, input);
     }
 
     void OnItemEnter(BaseItem item) {
+        if (item == null)
+            return;
         switch (item) {
+            case RocketLauncherItem rocketItem:
+                Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);
+                break;
             case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.cyber);
                 break;
@@ -71,11 +90,18 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 Toolbox.RandomizeOneShot(audioSource, goggles.goggleData.wearSounds);
                 break;
+            case BurglarTools:
+                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
+                    surface.EnableOutline();
+                }
+                break;
             default:
                 break;
         }
     }
     void OnItemExit(BaseItem item) {
+        if (item == null)
+            return;
         switch (item) {
             case CyberDeck:
                 GameManager.I.SetOverlay(OverlayType.none);
@@ -84,9 +110,32 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler>, IItemHandlerSt
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 break;
+            case BurglarTools:
+                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
+                    surface.DisableOutline();
+                }
+                break;
             default:
                 break;
         }
     }
+    public void ThrowGrenade(GrenadeData data, PlayerInput input) {
+        float sin45 = 0.70710678118f;  // 1/√2
 
+        Vector3 gunPosition = new Vector3(transform.position.x, transform.position.y + 0.45f, transform.position.z);
+        Vector3 localPosition = (input.Fire.cursorData.groundPosition - gunPosition);
+        Vector3 localDirection = localPosition.normalized;
+
+        float distance = localPosition.magnitude;
+        float initialSpeed = Mathf.Sqrt(distance * Mathf.Abs(Physics.gravity.y));
+        Vector3 initialVelocity = initialSpeed * sin45 * Vector3.up + initialSpeed * sin45 * localDirection;
+        GameObject obj = GameObject.Instantiate(data.grenadePrefab, gunPosition + (0.15f * localDirection), Quaternion.identity);
+        Rigidbody body = obj.GetComponent<Rigidbody>();
+        body.velocity = initialVelocity;
+        foreach (Collider myCollider in transform.root.GetComponentsInChildren<Collider>()) {
+            foreach (Collider grenadeCollider in obj.GetComponentsInChildren<Collider>()) {
+                Physics.IgnoreCollision(myCollider, grenadeCollider, true);
+            }
+        }
+    }
 }

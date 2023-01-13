@@ -31,14 +31,13 @@ public class Footsteps : MonoBehaviour {
                 onRightFoot = !onRightFoot;
                 timer = 1f + Random.Range(-0.1f, 0.1f);
 
-
-                // TODO: adjust volume by velocity
                 float volume = lastSurfaceType switch {
                     SurfaceType.grass => 1f,
                     SurfaceType.tile => 2.8f,
                     SurfaceType.metal => 4f,
                     SurfaceType.normal => 2f,
                     SurfaceType.tree => 2f,
+                    SurfaceType.carpet => 0.75f,
                     _ => 1.5f
                 };
                 // if (isRunning) {
@@ -52,13 +51,15 @@ public class Footsteps : MonoBehaviour {
                     Toolbox.RandomizeOneShot(audioSource, leftFoot, volume: volume);
                 }
 
+                bool player = !GameManager.I.gameData.levelState.delta.disguise && GameManager.I.playerObject;
+
                 NoiseData noise = new NoiseData {
-                    player = gameObject == GameManager.I.playerObject,
+                    player = player,
                     suspiciousness = Suspiciousness.normal,
                     volume = volume,
                     isFootsteps = true
                 };
-                Toolbox.Noise(transform.position, noise);
+                Toolbox.Noise(transform.position, noise, transform.root.gameObject);
             }
         }
 
@@ -74,7 +75,7 @@ public class Footsteps : MonoBehaviour {
         // TODO: use surface map...?
 
         TagSystemData data = new TagSystemData();
-        int numberHit = Physics.RaycastNonAlloc(transform.position + 0.1f * Vector3.up, -1f * transform.up, raycastHits, 0.5f, LayerUtil.GetMask(Layer.def), QueryTriggerInteraction.Ignore);
+        int numberHit = Physics.RaycastNonAlloc(transform.position + 0.1f * Vector3.up, -1f * transform.up, raycastHits, 0.5f, LayerUtil.GetLayerMask(Layer.def, Layer.obj), QueryTriggerInteraction.Ignore);
         if (numberHit > 0) {
             RaycastHit hit = raycastHits[0];
             data = Toolbox.GetTagData(hit.collider.gameObject);

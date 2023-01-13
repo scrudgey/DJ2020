@@ -7,12 +7,12 @@ namespace Items {
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;
         }
-        public override void Use(ItemHandler handler) {
-            base.Use(handler);
+        public override ItemUseResult Use(ItemHandler handler, PlayerInput input) {
+            base.Use(handler, input);
             Toolbox.RandomizeOneShot(handler.audioSource, c4Data.deploySound);
             GameObject c4 = GameObject.Instantiate(c4Data.prefab, handler.transform.position, Quaternion.identity);
             Explosive explosive = c4.GetComponentInChildren<Explosive>();
-            explosive.data = c4Data;
+            explosive.data = c4Data.explosionData;
             SuspicionRecord record = new SuspicionRecord {
                 content = "seen placing infernal device",
                 suspiciousness = Suspiciousness.aggressive,
@@ -20,6 +20,7 @@ namespace Items {
                 maxLifetime = 1f
             };
             GameManager.I.AddSuspicionRecord(record);
+            return ItemUseResult.Empty() with { transitionToUseItem = true };
         }
     }
 

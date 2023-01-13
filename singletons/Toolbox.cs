@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 // random from list
@@ -36,6 +35,8 @@ public class Toolbox {
         audioSource.PlayOneShot(audioClip, volume);
     }
     static public string NameWithoutClone(GameObject gameObject) {
+        if (gameObject == null)
+            return "";
         return CloneRemover(gameObject.name);
     }
     public static string CloneRemover(string input) {
@@ -109,14 +110,41 @@ public class Toolbox {
             return Direction.rightUp;
         } else return Direction.right;
     }
-    static public T GetOrCreateComponent<T>(GameObject target) where T : Component {
-        T component = target.GetComponent<T>();
+    static public T GetOrCreateComponent<T>(GameObject target, bool inChildren = false) where T : Component {
+        T component = inChildren ? target.GetComponentInChildren<T>() : target.GetComponent<T>();
+
         if (component != null) {
             return component;
         } else {
             component = target.AddComponent<T>();
             return component;
         }
+    }
+    public static void DrawPlane(Vector3 position, Plane plane) {
+
+        Vector3 normal = plane.normal;
+
+        Vector3 v3;
+
+        if (normal.normalized != Vector3.forward)
+            v3 = Vector3.Cross(normal, Vector3.forward).normalized * normal.magnitude;
+        else
+            v3 = Vector3.Cross(normal, Vector3.up).normalized * normal.magnitude; ;
+
+        var corner0 = position + v3;
+        var corner2 = position - v3;
+        var q = Quaternion.AngleAxis(90.0f, normal);
+        v3 = q * v3;
+        var corner1 = position + v3;
+        var corner3 = position - v3;
+
+        Debug.DrawLine(corner0, corner2, Color.green);
+        Debug.DrawLine(corner1, corner3, Color.green);
+        Debug.DrawLine(corner0, corner1, Color.green);
+        Debug.DrawLine(corner1, corner2, Color.green);
+        Debug.DrawLine(corner2, corner3, Color.green);
+        Debug.DrawLine(corner3, corner0, Color.green);
+        Debug.DrawRay(position, normal, Color.red);
     }
     static public TagSystemData GetTagData(GameObject target) {
         TagSystem system = target.transform.root.GetComponentInChildren<TagSystem>();
@@ -164,10 +192,12 @@ public class Toolbox {
         }
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
     }
-    public static NoiseComponent Noise(Vector3 position, NoiseData data) {
+    public static NoiseComponent Noise(Vector3 position, NoiseData data, GameObject source) {
         GameObject noiseObject = PoolManager.I.GetPool("prefabs/noise").GetObject(position);
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
-        component.data = data;
+        component.data = data with {
+            source = source
+        };
         component.sphereCollider.radius = data.volume;
         return component;
     }
@@ -339,7 +369,7 @@ public class Toolbox {
         lattice.Aggregate((curMin, x) => (curMin == null || (Quaternion.Angle(input, x)) < Quaternion.Angle(input, curMin) ? x : curMin));
 
 
-    static public Rect GetTotalRenderBoundingBox(Transform root, Camera UICamera) {
+    static public Rect GetTotalRenderBoundingBox(Transform root, Camera UICamera, bool adjustYScale = true) {
         float total_min_x = float.MaxValue;
         float total_max_x = float.MinValue;
         float total_min_y = float.MaxValue;
@@ -358,6 +388,7 @@ public class Toolbox {
             if (renderer.name.ToLower().Contains("particle")) continue;
             if (renderer.name.ToLower().Contains("sharp_explosion")) continue;
             if (renderer.name.ToLower().Contains("target")) continue;
+            if (renderer.name.ToLower().Contains("shadow")) continue;
             // Debug.Log(renderer.name);
 
             Bounds bounds = renderer.bounds;
@@ -368,7 +399,8 @@ public class Toolbox {
 
                     // weird hack. maybe because billboarding? i.e. should be camera angle dependent?
                     Vector3 extents = bounds.extents;
-                    extents.y *= 1.3f;
+                    if (adjustYScale)
+                        extents.y *= 1.3f;
                     bounds.extents = extents;
                 }
             }
@@ -401,15 +433,25 @@ public class Toolbox {
         return totalRect;
     }
     public static string AssetRelativePath(UnityEngine.Object asset) {
-        String rootPath = AssetDatabase.GetAssetPath(asset);
-        String relativePath = rootPath.Replace("Assets/Resources/", "");
-        int fileExtPos = relativePath.LastIndexOf(".");
-        if (fileExtPos >= 0)
-            relativePath = relativePath.Substring(0, fileExtPos);
-        return relativePath;
+        // String rootPath = AssetDatabase.GetAssetPath(asset);
+        return ResourceReference.I.GetPath(asset);
+        // String relativePath = rootPath.Replace("Assets/Resources/", "");
+        // int fileExtPos = relativePath.LastIndexOf(".");
+        // if (fileExtPos >= 0)
+        //     relativePath = relativePath.Substring(0, fileExtPos);
+        // return relativePath;
     }
     public static float Sigmoid(float value) {
         return 1.0f / (1.0f + (float)Math.Exp(-value));
+    }
+
+    public static Texture2D RenderToTexture2D(RenderTexture rTex) {
+        Texture2D tex = new Texture2D(1024, 1024, TextureFormat.RGB24, false);
+        // ReadPixels looks at the active RenderTexture.
+        RenderTexture.active = rTex;
+        tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        tex.Apply();
+        return tex;
     }
 
     // public static double Factorial(int number) {

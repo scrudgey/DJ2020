@@ -998,17 +998,13 @@ CanvasUpdate.Layout
 
 increase final texture resolution, and padding potentially for better outline.
 
-
-
-
-
-
 IF it is safe to be spotted except when we are doing suspicious stuff, how can I make a level challenging?
     more sensors to trip
     activity builds up into suspicious footprint, ideally by the time you are deep in the building like a trap
     deeper area becomes higher security
     goal involves doing something that will necessarily attract attention (planting explosives, etc)
 
+note: layer "interactive"
 
 
 
@@ -1569,7 +1565,287 @@ IF it is safe to be spotted except when we are doing suspicious stuff, how can I
     * create several presets
 * line of sight detection: using RayCastHit[1] might yield false positives because it does not detect the first hit.
 * ammo pips are broken!
-
+* music
+* preset scenarios
+* dialogue
+* save state overhaul
+* enable 711 level
+* enable office level
+* player bugs:
+    * player is corrupting defaultMission.json
+    * standalone is much brighter
+    * clearsighter doesn't work
+    * ammo pips grow out of control
+    * scenario pickers don't scale
+* model:
+    * nystreet wall: roll shutters, graffiti, etc
+    * large wall
+    * tall fence with barbed wire
+    * inverted cylinder for skybox
+    * buildings for skybox
+* adjust patrol routes, make a scenario with fewer guards
+* broken interrogate
+* broken cyber hack objects
+* adjust destruction timer on all walls
+* 7/11 mission
+* assault -> timer
+* remove jack that data
+* adjust names
+* shotgun rampage
+* garbage collection in clearsighter routine?
+* wallpress, aim messes up clearsighter
+* 7/11 rooftop is being weird
+* 7/11 has some things outside normal clearsighter
+* clearsighter:
+    * fade in behavior
+    * apply shadows better
+    * better ground exclusion
+* 7/11 hack support
+* allow saving null for gun slots
+* fix up sphere and NPC alert sizing and positioning.
+* fix sphere AI 
+    * big / misaligned alert handler
+    * can sphere robot reload?   
+* restarting missions is broken
+* enlarge office level
+* finish up 7-11 level
+    * enclose level
+    * finish skybox
+    * destructible wall destruction timer
+    * fix sphere robot
+    * remove doors for now
+    * visibility through windows?
+* saved prefab VR mission templates
+* NPC reacts to corpses
+    * show some sort of gun stats
+* reenable focus zone in 7-11 map
+* poolmanager is unloaded?
+* lots of garbage collection in clearsighter
+* create good templates
+    * shotgun rampage
+    * basic combat in infiltration
+    * steal the data in infiltration
+* allow change npc outfit
+* smg / rifle shoot animation
+* why do gibs fall through the wall/floor? (probably because they are childed to parent?)
+* weird gibs situation with bullet impact
+* disable lock-on in aim mode?
+* why do gibs fall through floor?
+* camera clips through wall in wallpress, in aim
+* strike team spawning screws up NPC spawning
+* blood particle impact vs sparks particle impact
+* better clearsighter culling
+    test all levels
+* crouching is slightly above ground.
+* escape - quit menu.
+* NPC can't see me when i'm standing behind low cover?
+    * could it be the shadows?
+* NPC investigate routine
+* NPC reacts to corpses
+* NPC speeds a little more when pursuing player.
+* shooting at crouching guard
+* pop-out should not move camera as much
+* fix VR mission tabs
+* hide third tab if HQ alarm is not enabled
+* don't allow third weapon if third weapon slot is disabled
+* create VR mission title display
+* unable to detect shooting player, on rooftop
+    * player can stand at distance and shoot approaching NPCs with impunity
+        * do a sight check immediately on shoot, bypass visibility.
+* light levels generally low
+* more lights in interiors
+* the crawling around a body effect comes from boids avoidance
+* NPC reacts when seeing another shot
+* discovering a body should register suspicion record even if no HQ present
+* wallpress breaks normal aiming
+* popout aim through player
+* shooting at guys in 7-11 is broken?
+* wallpress aim at player
+* rifle / smg shoots weird
+* NPCs have sticky gun
+* shell bounce
+* aim mode fixed angular inaccuracy
+* update stored vr templates
+* in standalone build, billboard sprite has weird issue
+* in standalone build, possibly encountered a template load issue
+* in standalone build, textmeshpro size very small
+* guards interrogate, then interrogate again
+* lots of "i guess it was nothing"
+* automatic shooting is weird for seburo smg
+* terminal broken
+* crouch + hack
+* hack radius is smaller than wire reach
+* hack write should crouch with player
+* better UI for hack feedback
+    * bigger, keep with overall style
+    * doors
+* attack surfaces
+* place doors in level
+* build AC vent
+* dark background for objectives holder
+* wire up success -> FinishMission after action
+* wire up after action report -> main menu
+* wire up death -> FinishMission fail menu
+* wire up retry -> reload mission
+* wire up replan -> main menu
+* victory: after action report
+    * show objectives
+    * show reward
+    * show text
+    * button for done -> return to mission select
+    * guards on patrol
+    * patrol back and forth
+    * lively patrol
+        * patrol type is controlled by template
+    * camera should be more visible
+    * set up networks
+    * wire up alarms
+    * Mission, not VRMission
+        * no VR objective display
+    * key in the grass
+    * roof zone
+    * set up objective
+        * steal the data
+        * show objectives when one is completed
+        * show objectives when level starts
+        * show objectives on pause screen
+    * log when objects change
+    * log when objectives complete
+    * extraction zone
+        * highlight the extraction zone
+        * pulse the extraction zone, use text, use arrow
+        * maybe a cutscene?
+* after action: objectives
+* change "details"
+* (Clone)
+* set activemissiontemplate on computer open
+* change title text on different tabs
+* dont show tertiary slot when not unlocked
+* retry and replan/start is broken 
+    * UI does not load
+* move key to be visible
+* map gen util
+    * store multiple per floor
+    * store metadata
+* sounds for clicking level up/down zoom in/out
+* sounds for clicking on column
+    * support floors 0-9, remove nulls
+    * populate markerData:
+    * columns:
+        * containerTransforms
+        * columbButtonPrefab
+            * columnButtonController:
+            * columnButton callback
+    * decor:
+        * stair up
+        * stair down
+        * stair left
+        * stair right
+        door
+    * jump to point on map
+        * ping the point
+    * preserve marker state when switching levels
+    * indicate selected insertion / extraction
+    * make icons: lightning bolt, arrow
+    * start with insertion / extraction selected
+    * indicate floor
+    * door decor goes on all doors
+    * indicate glass walls somehow
+        * another layer, visible only to map camera.
+        * can be used to indicate map boundaries.
+* fix laser 
+* tab icons
+* mission fail display is a little wonky
+* objectives
+    * data icon
+* fix weird map marker offsets
+* support select insertion / extraction
+* use extraction / insertion idn when initializing level
+    * handle default value properly
+* retry plan results in insertion / extraction being unset
+    * tactics
+        * cyber attack
+        * purchase disguise
+        * purchase fake ID / spoof keycard
+    * support buying
+    * icons for different tactics
+    * available tactics set per mission
+    * store which tactics are bought
+* character breathing / animation
+    * tune the pulsation
+    * head looks around
+    * torso changes in response to weapon selection
+* item select
+* overview
+* clean up the optional objectives divider in mission selector
+* allow switch to 0 item
+    * hide UI handler in that case
+* screen wobble on tab schange
+* extraction / player spawn configuration automatically sets values on map marker. or is map marker?
+* move spawnpoint to be visible on map
+* cursor on mission UI
+* indicate selected weapon / item slot
+    * open the picker when a slot is selected.
+    * close it when something is picked.
+    * bleeoop open - short close sound
+* abort -> show extraction zone
+* handle mission fail
+    * when datastore is destroyed
+    * reaching extraction zone -> fail
+* sphere robot
+    * NPC template should allow sphere? different spawner?
+* don't destroy the floors
+* wall off the limits
+* blinkenlight:
+    * start big, fade out
+    * random period offset
+    * ideally, some glow, inner white, outer halo, etc
+* hide overlays in aim mode
+* why do attack surfaces start out highlighted?
+* why do we start with gun out but no suspicion?
+* footstep threshold could be higher?
+* tab to hide burglar 
+* tab should not open burglar with c4
+* after popping a door open, use should not close it, it should open it
+* navigable chair
+    * same treatment for:
+    * wastebasket, etc.
+* interloper: not just center between me and camera, but center on one side of plane defined by camera isometric rotation
+* tighten up crawling
+* crouch should not immediately go to crawl
+* burglar tools cause suspicion
+* c4 should crouch, place time
+- enemies are spotting player somewhat easily
+- can we remove NPC json converter?
+* carpet sounds
+* interloper shader casts full shadow: hard
+* strike team was not being dispatched in infiltration
+* auto-use key in door
+* don't shoot corpse away
+* credstick surfing
+* load screen (black)
+* clicking on overlay shot gun
+* fix camera position in wallpress mode when near edge
+* NPC reacts when seeing bullet impacts
+* NPC reacts when seeing another shooting
+* the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
+* laser tripwire
+    * laser grid don't trip when NPC walks through? disable temporarily?laser grid
+    * goggles create tint
+    * minimap
+    * UI: gun wireframe in lower-right corner.
+    - blink cursor when reaching maximum aim
+    * larger mouse cursor, with color
+    * indicate alarm terminal more clearly!
+    * indicate when alarm teminal is active!
+    * could be a lot more efficient if things are addressable by position in space.
+    * apply shadows to interloper shader
+    * hiding corspe interlopers
+        not interloper, but hide above.
+    * click to shoot
+    * orient toward shoot direction
+    * fix rocket aim
+    * rocket launcher graphic and visibility should belong to item handler
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1579,6 +1855,7 @@ uncertain:
     less intense wall sticking?
     creep button (crawling is?)
         slow walk?
+    apply skin graphics to corpse?
 
 nice to have / future goals:
     ambient sounds
@@ -1592,37 +1869,28 @@ nice to have / future goals:
         allow different materials or different prefabs accordingly
     glass break fx
     leaves and junk in the street that blows around
-    fix camera position in wallpress mode when near edge
-    camera should move a bit to the lock or something?
-        or: off-screen lock indicator?
     off-screen indicator for active threats?
     pixel perfect shaders
-    apply skin graphics to corpse
     animation shows recoil
-    laser pointer attachment
-    flashlight attachment
     head look around if player has been idle
     make elevator
     if an NPC sees another NPC shooting at something, look / search in that direction
     NPC better take cover
         move into another room
-    strike team may arrive by vehicle
     HQ will be level specific state:
         HQ might be disabled if player assaults it
         what to do if there is no HQ?
             run to the alarm panel if there is no HQ
                 do nothing if there is no alarm panel
             how to decide who to run to alarm panel?
-    the problem with the outline color red / green / blue is that base colors are how the shader determines which color to use ?
-        i.e. using yellow just resolves to red? 
-    laser tripwire
-        laser grid don't trip when NPC walks through? disable temporarily?laser grid
-        dust / smoke shader
-        goggles create tint
+
+
+    dust / smoke shader
     digitized voice for "operation jetlag"
     highlight item container when item is switched
     after passing a lie check, npc discovers body: reconsiders player status
-
+    sphere robot might not investigate?
+    performance tuning: separate canvases, implement octree or smth
 
 deep save system:
     serialize the complete level state
@@ -1631,7 +1899,7 @@ strike team
     when one is alerted, all are alerted?
     solution for total level wipe of NPCs
         reset strike team count when one dies?
-        if you've killed everyone, more arrive?
+        if you've killed everyone, more arrive? <-- this
     search level systematically
         ideally, move and clear room to room.
             possibility 1: generate room and door mappings automatically
@@ -1641,7 +1909,6 @@ strike team
 
 graphical embellishments
     small font text near locked-on character
-    ? [[ LOCKED ]] text blink (this might not work very well with constant lost / reacquired lock)
     arcs swing about lock size indicator
     callout:
         extended mode callout on level start vs quick callout on display changes 
@@ -1657,27 +1924,27 @@ graphical embellishments
     reflective puddle
 
 UI:
+    adjust all UI buttons to have consistent semantics for Cancel / OK
     display different UI when in aim mode?
-    UI: gun wireframe in lower-right corner.
-    blink cursor when reaching maximum aim
-    larger mouse cursor, with color
+
     aim lock stats system 
         scan time 
         retain stats after breaking lock up to N 
         small health bar 
-    minimap
     weapon wheel
     better clarity around alarm logic
-        indicate alarm terminal more clearly!
-        indicate when alarm teminal is active!
         fix edge coloration from active node to alarm terminal
 
 control / combat:
+    controller support
     headshots
     shoulder switch is a control
     aim sway responds to movement and gun skill
     bullets that can pass through targets
     armor & armor piercing
+    modernize some controls:
+        weapon / item wheel
+        click to select interactive surfaces without selecting burglar tools.
 
 sound
     ambience
@@ -1687,105 +1954,216 @@ sound
 stealth:
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
-    NPC reacts when seeing another shooting
-    NPC reacts to corpses
-    NPC reacts when seeing another shot
-    NPC investigate routine
     NPC should look in direction of last noise
-    NPC speeds a little more when pursuing player.
-    NPC when an aggressive noise is heard, do a quick visibility check.
-        when being shot by a noisy opponent, we should know where they are immediately
-    NPC can't see me when i'm standing behind low cover?
-        could it be the shadows?
+    * NPC when an aggressive noise is heard, do a quick visibility check.
     stealth kill?
+    be able to shoot out lights
 
-overhauled VR mission designer
-    * show some sort of gun stats
+VR mission designer
     player stats
+    survive x waves of y NPCS
+    inventory management
 
-better action log
+better action log (remove?)
     blit the text
     font?
 
 clearsighter
     we want to disable shells when they're newly produced, but hide them when they're static.
-    could be a lot more efficient if things are addressable by position in space.
-    apply shadows to interloper shader
-    a better system?
-        everything below the plane centered on camera and below player is visible
-    hiding corspe interlopers
-        not interloper, but hide above.
+    clearsighter optimization
+        1. restrict computation to only the visible
+        2. octree
+
+code-controlled shoot animation
+    fix shooting animation and automatic interval
+    faster shotgun
+        click to rack faster?
+        raise - shoot - pump
+        animator speed can be adjusted
+
+skills
+    gun skills
+    speech skills
+    lockpicking skills
+
+nimrod for texts
+
+weapons
+    colt 2037 sped up sounds great
+    attachments
+    laser pointer attachment
+    flashlight attachment
+
+planning mode
+    optional objectives
+    HP / def indicators
+    mission select map
+        indicate a point on map
+        move map, zoom
+    on mouseover picker: change stat viewer
+        smooth rolling stat bars when values change
+        compare stats +/-
+    mission plan mapview 
+        support multiple scenes per level
+        disable selectors when necessary
+        markers gated behind tactical data
+    tactics pane
+        purchase keycard
+        ativate cyberattack
+        clickable active tactics show description
+        buy info
+            locate key objectives
+            locate key items
+            locate traps / sensors / weapon emplacements: intel
+            locate guards / patrols / security operations center: intel
+            learn info to be used in dialogue
+            discoverable networks
+        when map data is bought, show notification on map tab
+
+minimap
+    * multiple floors of map
+    orient relative to main camera
+    highlight enemies in red
+        show sightcone
+    indicate player
+
+
+UI
+    adjust all UI buttons to have consistent semantics for Cancel / OK
+    remove action feed?
+    show iconography when disguise is lost
+    show iconography when optional objective is complete
+
+does VR mission still work?
+    hack target ! indicator only sometimes visible
+    NPC portraits not being set properly
+
+level state
+    normalize level / mission / state / detla / template
+    gun state can be moved into plan
+    HQ state can be moved into delta
+
+
+a guy danced on a corpse (I think he was investigating a noise?)
+
 
 ---------------
 
-faster shotgun
-    click to rack faster?
-    raise - shoot - pump
-    animator speed can be adjusted
+NPC tuning:
+    when you can't reach the player (navigation fail) don't just walk away
+    NPC sees destroyed cameras
+    adjustable NPC difficulty
+        guards reacting to your shooting are too fast on the draw?
+        guards shoot you immediately when you become visible?
+        getting shot resets your aim too hard?
+        how quickly acquire target
+        accuracy
+        shooting behavior
+            quickness, bursts
+    alarm terminal triggering effects
+        notify others of location
+    guard HQ potentially notices disabled cameras and sensors
+    strike team seems to have a hard time investigating repeated explosions
 
-survive x waves of y NPCs
-press esc to bring up vr mission menu
-    overall, menus should be a little more stylized
-adjustable NPC difficulty
-    how quickly acquire target
-    accuracy
-    shooting behavior
-        quickness, bursts
-DFS path finding doesn't quite work right for highlighting alarm path
-alarm terminal triggering effects
-    notify others of location
-why do gibs fall through the wall/floor?
+
+silenced gun is still OP
+    seeing corpse or bullets -> high alert, easier to see player
+anti-camping visibility boost
+    guards are aware of your aggression 
+    haven't moved in a while
+    have shot more than once or twice?
 damage result addition is weird
-VRmissionTemplate -> LevelTemplate is incomplete.
-playertemplate / playerstate is still a little weird.
-title screen logo
-title screen animations
-doors
-colt 2037 sped up sounds great
-don't shoot corpse away
+billboard interloper shader should be cutout, or something is up with interloper shader + shells
 
-saved prefab VR mission templates
-better UI for hack feedback
-NPC reacts when seeing another shooting
-NPC reacts to corpses
-NPC reacts when seeing another shot
+networks
+    marching ants?
+    better coloration
+    clean up connections
+        can we do this programmatically?
+    get cyber network working once and for all
+    DFS path finding doesn't quite work right for highlighting alarm path
 
-more, bigger levels
-    rooms
-    wide, long level
-    bright / brutalist concrete level
-allow 7-11 to be a level
-    add proper boundary
-    add intermediate skybox
+-----------------
+build a test level, 3 storey building infiltration
+build a test level equivalent to Jack That Data
+    make level more challenging
+        turrets
+        camera view bigger
+    skybox buildings
+    fill out proper texts
+    * ac unit on roof
+
+* SpottedHighlight should use full navigation path
+* lose disguise when openly aggressive, or identity is revealed
+* delay after death before fail screen
+
+code-controlled gun animation
+
+attack surfaces
+    more door styles
+        suscpetible / not to latch attacks
+        picking more / less difficult
+        different handles
+        electronic access control
+        Request-to-Exit (REX) sensor 
+    alarm sensors on doors
+    padlock
+    screwdriver graphics
+    tools
+        power drill through lock
+        keyed-alike
+        shim
+        bump keys
+    maybe there is a difference in suspicion between differen kinds of tools
+        if everything is vulnerable to lock pick then why bother with other things?
+    interface:
+        tools are placed on the spread to the right
+        clicking on the panel in general replaces item, returns to hand
+
+loot
+    guards can drop keys or loot
+    collect loot
+    loot details: sprite, profile, description, value, category
+    loot can be found: in environment, on shelves, in drawers, on NPCs
+    iconography
+dialogue
+    use ID status
+    concoct one lie per suspicion against player
+    get once lie stratagem per mark from player
+vehicles
+    strike team may arrive by vehicle
+    exfiltration / insertion may be by vehicle
+navigable AC units
+    you should be able to crawl through the duct on the ceiling
+
+graphics
+    patrol guard spritesheet
+    disguise spritesheet (fireman)
+    swat team spritesheet
+    civ_female portrait could use some work
+    loot
+    title screen logo
+    title screen animations 
+
+rocket launcher explosion?
+hand grenade explosion
+check blood pool prefab pooling
 
 
+* door should be destructible
+destroyed walls leave decal on the ground (difficult?)
+destructible light pylon
+destructible dumpster
+destructible AC unit
+destructible radio dish tower
+#indiedev #unity3d #immersivesim #gamedev
 
-MVP:
-* music
-* preset scenarios
-* dialogue
-4. new level
-5. save state overhaul
-allow change npc outfit
-NEXT:
-5. doors
-6. attack surfaces
-
-weird gibs situation with bullet impact
-camera clips through wall in wallpress, in aim
-create good templates
-    shotgun rampage
-    basic combat in infiltration
-    steal the data in infiltration
-guard HQ potentially notices disabled cameras and sensors
-
-enable 711 level
-enable office level
-shooting at crouching guard
-
-
-graphics:
+guns:
     silenced pistol
-    rocket launcher
-    grenade
-    patrol guard
+    fix silenced smg
+icons:
+    * burglary tools
+    * rocket launcher
+    * grenade
+    redraw others?
+        thermals

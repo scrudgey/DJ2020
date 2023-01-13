@@ -9,13 +9,14 @@ public class Bullet {
     public float range;
     public Vector3 gunPosition;
     public Ray ray;
+    public Vector3 source;
     public Bullet(Ray ray) {
         this.ray = ray;
     }
 
     public void DoImpacts(Transform shooter) {
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetMask(Layer.def, Layer.obj, Layer.interactive));
+        RaycastHit[] hits = Physics.RaycastAll(ray, range, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletPassThrough, Layer.bulletOnly), QueryTriggerInteraction.Ignore);
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.collider.transform.IsChildOf(shooter))
                 continue;
@@ -76,7 +77,7 @@ public class Bullet {
 
         Rigidbody body = hit.transform.GetComponent<Rigidbody>();
         if (body != null) {
-            body?.AddForceAtPosition(damage * -1f * hit.normal, hit.point, ForceMode.Impulse);
+            body?.AddForceAtPosition(damage * -1f * hit.normal / 10f, hit.point, ForceMode.Impulse);
         }
 
         if (!tagData.bulletPassthrough) {

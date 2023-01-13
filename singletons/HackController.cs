@@ -26,17 +26,21 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     public List<HackData> targets = new List<HackData>();
     public List<CyberNode> vulnerableManualNodes = new List<CyberNode>();
     public CyberNode vulnerableNetworkNode = null;
-    SuspicionRecord suspicionTamper = new SuspicionRecord {
+    SuspicionRecord suspicionTamper() => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,
-        maxLifetime = 0f
+        lifetime = 2f,
+        maxLifetime = 2f
     };
     void Awake() {
         vulnerableNetworkNode = null;
     }
     public void HandleHackInput(HackInput input) {
+        Debug.Log($"handle hack input {targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks}");
         if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)
             return;
+
+        Debug.Log($"targets any: {targets.Any(t => t.node == input.targetNode)}");
         if (!targets.Any(t => t.node == input.targetNode)) {
             HackData data = new HackData {
                 node = input.targetNode,
@@ -44,6 +48,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
                 lifetime = 5f,
                 type = input.type
             };
+            Debug.Log(data);
             targets.Add(data);
             UpdateSuspicion();
             OnValueChanged?.Invoke(this);
@@ -90,23 +95,23 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     }
     void UpdateSuspicion() {
         if (targets.Count > 0) {
-            GameManager.I.AddSuspicionRecord(suspicionTamper);
+            GameManager.I.AddSuspicionRecord(suspicionTamper());
         } else {
-            GameManager.I.RemoveSuspicionRecord(suspicionTamper);
+            GameManager.I.RemoveSuspicionRecord(suspicionTamper());
         }
     }
     void UpdateManualHack(HackData data) {
         // really ugly
         Vector3 playerPos = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f);
-        Vector3[] points = new Vector3[2];
-        points = new Vector3[]{
+        // Vector3[] points = new Vector3[2];
+        Vector3[] points = new Vector3[]{
                     data.node.position,
                     playerPos
                 };
 
         // this is weird, and indicates that state should be handled by manual hacker?
         float radius = GameManager.I?.gameData?.playerState.hackRadius ?? 1.5f;
-        if (Vector3.Distance(points[0], points[1]) > radius) {
+        if (Vector3.Distance(points[0], points[1]) > radius * 1.2f) {
             data.done = true;
         }
     }

@@ -162,7 +162,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
 
         // set mode and animation
         if (input.isCrouching || input.state == CharacterState.landStun) {
-            spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
             if (input.isProne && !(input.state == CharacterState.wallPress || input.wallPressTimer > 0)) {
                 spriteRenderer.transform.localPosition = new Vector3(0f, 0.75f, 0f);
             }
@@ -176,7 +176,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             state = State.jump;
             spriteRenderer.sprite = skin.legsJump[direction][0];
         } else if (input.state == CharacterState.landStun) {
-            spriteRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+            spriteRenderer.transform.localPosition = new Vector3(0f, 0.4f, 0f);
             shadowCaster.localScale = new Vector3(1f, 0.3f, 0.5f);
         } else if (input.isMoving) {
             if (input.isJumping) {
@@ -265,10 +265,12 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         transform.localRotation = Quaternion.identity;
 
         // set position back to the rotated position.
-        headAnimation.transform.position = absoluteWorldPosition;
+        // this is hacky
 
+        headAnimation.transform.position = absoluteWorldPosition;
         torsoAnimation.transform.position += 0.001f * directionToCamera;
-        // TODO: this is a hack/patch.
+        if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.localPosition = Vector3.zero;
+
         if (torsoSpriteData != null && torsoSpriteData.headInFrontOfTorso) {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
             headAnimation.transform.position += 0.002f * input.directionToCamera;
@@ -276,6 +278,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
             headAnimation.transform.position -= 0.002f * input.directionToCamera;
         }
+        if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.position += 0.004f * input.directionToCamera;
     }
 
     public void LoadSkinState(ISkinState state) {

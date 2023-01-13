@@ -32,13 +32,12 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public CursorData lastShootInput;
     public bool shootRequestedThisFrame;
     public CursorData currentTargetData;
-    // public Collider lockedOnCollider;
-    // public Vector3 lockedOnPoint;
     public bool isShooting;
     public bool isSwitchingWeapon;
     public Action<GunHandler> OnShoot;
     public bool isAimingWeapon;
     Collider[] lockOnColliders;
+    public bool nonAnimatedReload;
     static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious
@@ -137,9 +136,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // range
         // TODO: change this. use a fixed angular 
+        // to do that, inaccuracy must be fixed; when we want to show accuracy at a given distance, apply scale there.
+        // inaccuracy should be a quantity that then is applied to a distance.
+        // when shooting, it is applied at a fixed distance
+        // when displaying, it is shown at that distance
         float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
-        inaccuracy += gunInstance.template.spread * (distance / 10f);
-        // accuracy += gunInstance.template.spread * distance;
+        // inaccuracy += gunInstance.template.spread * (distance / 10f);
+        inaccuracy += gunInstance.template.spread;
 
         // movement
         inaccuracy += movementInaccuracy;
@@ -162,7 +165,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         return inaccuracy;
     }
-    public void EmitBullet(CursorData input) {
+    public Bullet EmitBullet(CursorData input) {
         Vector3 gunPosition = this.gunPosition();
 
         Vector3 trueDirection = gunDirection(input);
@@ -181,12 +184,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Bullet bullet = new Bullet(new Ray(gunPosition, direction)) {
             damage = gunInstance.template.getBaseDamage(),
             range = gunInstance.template.range,
-            gunPosition = gunPosition
+            gunPosition = gunPosition,
+            source = transform.position
         };
 
         bullet.DoImpacts(transform.root);
 
         Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
+        return bullet;
     }
     public bool IsClearShot(CursorData input) {
         Vector3 targetPosition = input.worldPosition;
@@ -195,7 +200,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Vector3 trueDirection = gunDirection(input);
         Ray ray = new Ray(gunPosition, trueDirection);
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetMask(Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetLayerMask(Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.collider.transform.IsChildOf(root))
                 continue;
@@ -224,16 +229,19 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         // shoot bullet
         int numberBullets = gunInstance.template.type == GunType.shotgun ? 5 : 1;
+        Bullet bullet = null;
         for (int i = 0; i < numberBullets; i++) {
-            EmitBullet(input);
+            bullet = EmitBullet(input);
         }
 
         // play sound
-        NoiseData noiseData = gunInstance.GetShootNoise();
+        NoiseData noiseData = gunInstance.GetShootNoise() with {
+            ray = bullet.ray
+        };
         noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.template.GetShootSounds()));
-        Toolbox.Noise(gunPosition(), noiseData);
+        Toolbox.Noise(gunPosition(), noiseData, transform.root.gameObject);
 
         // flash
         if (!gunInstance.template.silencer) {
@@ -352,6 +360,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         // play sound
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipOut);
 
+        if (nonAnimatedReload) {
+            ClipIn();
+            StopReload();
+            // state = GunStateEnum.idle;
+            Rack();
+            EndRack();
+        }
+
         OnValueChanged?.Invoke(this);
     }
     public void ReloadShell() {
@@ -366,6 +382,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         gunInstance = instance;
 
+        SetGunAppearanceSuspicion();
+        OnValueChanged?.Invoke(this);
+    }
+    public void SetGunAppearanceSuspicion() {
         if (gunInstance != null && gunInstance.template != null) {
             Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
             PoolManager.I?.RegisterPool(gunInstance.template.shellCasing);
@@ -374,7 +394,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 GameManager.I.AddSuspicionRecord(BrandishingWeaponRecord);
             }
         }
-        OnValueChanged?.Invoke(this);
     }
     public void Holster() {
         isSwitchingWeapon = true;
@@ -428,7 +447,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
             // TODO: if priority is not set, try lock 
             float lockRadius = gunInstance.template.lockOnSize;
-            int numColliders = Physics.OverlapSphereNonAlloc(targetPoint, lockRadius, lockOnColliders, LayerUtil.GetMask(Layer.obj));
+            int numColliders = Physics.OverlapSphereNonAlloc(targetPoint, lockRadius, lockOnColliders, LayerUtil.GetLayerMask(Layer.obj));
             Collider nearestOther = null;
             for (int i = 0; i < numColliders; i++) {
                 Collider collider = lockOnColliders[i];
@@ -451,7 +470,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                     input.Fire.cursorData.type = CursorData.TargetType.objectLock;
                     input.Fire.cursorData.screenPosition = pointPosition;
                     input.Fire.cursorData.targetCollider = nearestOther;
-
                     // TODO: is this a hack? what about NPCs?
                     if (GameManager.I.inputMode == InputMode.aim) {
 

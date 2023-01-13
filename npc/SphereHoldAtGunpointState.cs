@@ -23,7 +23,7 @@ public class SphereHoldAtGunpointState : SphereControlState {
         return timeSinceSawPlayer < 0.15f;
     }
     public bool isPlayerSuspicious() {
-        return !isPlayerVisible() || integratedPlayerMovement > AGGRESSION_THRESHOLD;
+        return !isPlayerVisible() || integratedPlayerMovement > AGGRESSION_THRESHOLD || GameManager.I.GetTotalSuspicion() >= Suspiciousness.aggressive;
     }
     public override PlayerInput Update(ref PlayerInput input) {
         timeSinceSawPlayer += Time.deltaTime;
@@ -69,13 +69,12 @@ public class SphereHoldAtGunpointState : SphereControlState {
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             if (lastSeenPlayerPosition != Vector3.zero) {
-                float amountOfMotion = (other.bounds.center - lastSeenPlayerPosition).magnitude;
+                float amountOfMotion = (other.transform.root.position - lastSeenPlayerPosition).magnitude;
                 integratedPlayerMovement += amountOfMotion;
                 totalPlayerMovement += amountOfMotion;
             }
-
             timeSinceSawPlayer = 0;
-            lastSeenPlayerPosition = other.bounds.center;
+            lastSeenPlayerPosition = other.transform.root.position;
         }
     }
     public override void OnNoiseHeard(NoiseComponent noise) {

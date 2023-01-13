@@ -60,4 +60,15 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
             EnableSource();
         }
     }
+
+#if UNITY_EDITOR
+    protected override void OnDrawGizmos() {
+        foreach (AlarmComponent other in edges) {
+            if (other == null)
+                continue;
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(NodePosition(), other.NodePosition());
+        }
+    }
+#endif
 }

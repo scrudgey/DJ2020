@@ -28,6 +28,7 @@ public class HackTargetData {
 }
 public class ManualHacker : MonoBehaviour {
     public SphereCollider sphereCollider;
+    public CapsuleCollider characterCollider;
     public Action<HackTargetData> OnActionDone;
     public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
     bool hackToolDeployed;
@@ -79,7 +80,7 @@ public class ManualHacker : MonoBehaviour {
 
     bool IsNodeVulnerable(CyberNode node) {
         // TODO: compute various checks to see if node is indeed vulnerable
-        return hackToolDeployed && !node.compromised;
+        return hackToolDeployed && !node.compromised && Vector3.Distance(node.position, transform.position) < sphereCollider.radius;
     }
     void RemoveNullCyberComponents() => cyberComponents =
         cyberComponents
@@ -101,6 +102,7 @@ public class ManualHacker : MonoBehaviour {
         }
         if (inputs.playerInput.useItem) {
             HackTargetData data = ActiveTarget();
+            // Debug.Log($"active target: {data}");
             if (data == null) return;
             HackController.I.HandleHackInput(data.ToManualHackInput());
             OnActionDone?.Invoke(data);
@@ -111,6 +113,7 @@ public class ManualHacker : MonoBehaviour {
         .ToList()
         .Select((KeyValuePair<Collider, CyberComponent> kvp) => kvp.Value.GetNode())
         .Where(IsNodeVulnerable)
+
         .ToList();
 
     void Update() {
@@ -128,7 +131,7 @@ public class ManualHacker : MonoBehaviour {
         sphereCollider.radius = radius;
     }
     void UpdateWire(CyberNode node) {
-        Vector3 playerPos = transform.position;
+        Vector3 playerPos = characterCollider.bounds.center;
         lineRenderer.enabled = true;
         Vector3[] points = new Vector3[2];
         if (timer < 0.25) {

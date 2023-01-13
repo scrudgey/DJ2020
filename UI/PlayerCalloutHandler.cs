@@ -91,6 +91,7 @@ public class PlayerCalloutHandler : MonoBehaviour {
         }
     }
     public void SetScale() {
+        if (UICamera == null) return;
         Transform root = target.transform;
         Rect bounds = Toolbox.GetTotalRenderBoundingBox(root, UICamera);
         cursorRect.position = UICamera.WorldToScreenPoint(root.position) + new Vector3(0f, bounds.height / 2f, 0f);

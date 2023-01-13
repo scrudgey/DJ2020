@@ -49,6 +49,22 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             hitState = Toolbox.Max(hitState, HitState.invulnerable);
         }
 
+        if (!transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            GameObject impactPrefab = Resources.Load("prefabs/bulletImpact") as GameObject;
+            GameObject obj = GameObject.Instantiate(impactPrefab, damage.position, Quaternion.identity);
+            BulletImpact impact = obj.GetComponent<BulletImpact>();
+            impact.damage = damage;
+            Destroy(obj, 0.1f);
+
+            NoiseData noise = new NoiseData {
+                player = false,
+                suspiciousness = Suspiciousness.suspicious,
+                volume = 5,
+                isFootsteps = false
+            };
+            Toolbox.Noise(transform.position, noise, transform.root.gameObject);
+        }
+
         return new DamageResult {
             damageAmount = damage.amount,
             damage = damage
@@ -90,7 +106,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             return;
         Ray ray = new Ray(damage.position, damage.direction);
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(ray, wallDecalDistance, LayerUtil.GetMask(Layer.def, Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, wallDecalDistance, LayerUtil.GetLayerMask(Layer.def, Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.transform.IsChildOf(transform.root))
                 continue;

@@ -1,3 +1,3 @@
-public interface IItemHandlerStateLoader {
-    public void LoadItemState(IItemHandlerState state);
-}
+// public interface IItemHandlerStateLoader {
+//     public void LoadItemState(IItemHandlerState state);
+// }

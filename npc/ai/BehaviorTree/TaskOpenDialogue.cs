@@ -18,7 +18,6 @@ namespace AI {
                 GameManager.I.ShowMenu(MenuType.dialogue, () => {
                     DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
                     menuController.Initialize(input);
-                    GameManager.I.uiController.HideUI();
                     DialogueController.OnDialogueConclude += HandleDialogueResult;
                 });
             }
