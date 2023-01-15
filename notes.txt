@@ -2109,13 +2109,7 @@ attack surfaces
     alarm sensors on doors
     padlock
     screwdriver graphics
-    tools
-        power drill through lock
-        keyed-alike
-        shim
-        bump keys
-    maybe there is a difference in suspicion between differen kinds of tools
-        if everything is vulnerable to lock pick then why bother with other things?
+
     interface:
         tools are placed on the spread to the right
         clicking on the panel in general replaces item, returns to hand
@@ -2126,6 +2120,10 @@ loot
     loot details: sprite, profile, description, value, category
     loot can be found: in environment, on shelves, in drawers, on NPCs
     iconography
+    loot dovetails with data system
+        paydata is good
+        some data is useful in social engineering
+        some data provides keycodes
 dialogue
     use ID status
     concoct one lie per suspicion against player
@@ -2144,6 +2142,7 @@ graphics
     loot
     title screen logo
     title screen animations 
+    helicopters for skybox
 
 rocket launcher explosion?
 hand grenade explosion
@@ -2156,7 +2155,7 @@ destructible light pylon
 destructible dumpster
 destructible AC unit
 destructible radio dish tower
-#indiedev #unity3d #immersivesim #gamedev
+plants can catch on fire
 
 guns:
     silenced pistol
@@ -2167,3 +2166,12 @@ icons:
     * grenade
     redraw others?
         thermals
+
+
+in terms of next level, planning, difficulty:
+* dialogue
+* attack surfaces
+dialogue interaction with attack surface
+
+
+#indiedev #unity3d #immersivesim #gamedev
