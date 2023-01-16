@@ -33,6 +33,8 @@ security setting plus a random seed will determine the configuration of the door
     2. latch present / not, vulnerable / not: based on security
     3. lock picking difficulty: easy , medium, hard, impossible: based on security
     
+Request-to-Exit (REX) sensor 
+
 
 ##
 

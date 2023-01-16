@@ -2098,22 +2098,18 @@ build a test level equivalent to Jack That Data
 * delay after death before fail screen
 
 code-controlled gun animation
-
 attack surfaces
     more door styles
         suscpetible / not to latch attacks
         picking more / less difficult
         different handles
         electronic access control
-        Request-to-Exit (REX) sensor 
     alarm sensors on doors
     padlock
     screwdriver graphics
-
     interface:
         tools are placed on the spread to the right
         clicking on the panel in general replaces item, returns to hand
-
 loot
     guards can drop keys or loot
     collect loot
@@ -2147,8 +2143,6 @@ graphics
 rocket launcher explosion?
 hand grenade explosion
 check blood pool prefab pooling
-
-
 * door should be destructible
 destroyed walls leave decal on the ground (difficult?)
 destructible light pylon
@@ -2167,11 +2161,33 @@ icons:
     redraw others?
         thermals
 
+* half-width walls
+* basement stairs -> first floor
+* power mains in the basement
+* brick 2
+* brick half
+* light interior
+holes for AC ducts 
+rig doors, etc.
+    random keyways
+set up objectives
+elevator
+place cameras
+place lasers
+NPCs
+player spawn points
+generate map data
 
-in terms of next level, planning, difficulty:
-* dialogue
-* attack surfaces
-dialogue interaction with attack surface
 
+flickering windows
+pylon light
+floating head syndrome
 
+optimizations:
+    * disable skycams when in normal camera mode
+    use octree in clearsighter
+    optimize the ammo counter
+        this could free up the equivalent of a whole camera render
+    static batching / dynamic batching / occlusion culling  / gpu instancing
+ 
 #indiedev #unity3d #immersivesim #gamedev

@@ -24,6 +24,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public Material isometricSkybox;
     public Material wallPressSkybox;
     public Transform maskCylinder;
+    public Camera[] skyBoxCameras;
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
@@ -250,31 +251,41 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             case CameraState.attractor:
                 ApplyTargetParameters(AttractorParameters(input));
                 volume.profile = isometricProfile;
+                SetSkyBoxCamerasEnabled(false);
                 break;
             default:
             case CameraState.normal:
                 RenderSettings.skybox = isometricSkybox;
                 ApplyTargetParameters(NormalParameters(input));
                 volume.profile = isometricProfile;
+                SetSkyBoxCamerasEnabled(false);
                 break;
             case CameraState.wallPress:
                 RenderSettings.skybox = wallPressSkybox;
                 ApplyTargetParameters(WallPressParameters(input));
                 volume.profile = wallPressProfile;
+                SetSkyBoxCamerasEnabled(true);
                 break;
             case CameraState.burgle:
                 RenderSettings.skybox = wallPressSkybox;
                 ApplyTargetParameters(BurgleParameters(input));
                 volume.profile = aimProfile;
+                SetSkyBoxCamerasEnabled(false);
                 break;
             case CameraState.aim:
                 RenderSettings.skybox = wallPressSkybox;
                 ApplyTargetParameters(AimParameters(input));
                 volume.profile = aimProfile;
+                SetSkyBoxCamerasEnabled(true);
                 break;
         }
         if (thermalGogglesActive) {
             volume.profile = thermalProfile;
+        }
+    }
+    public void SetSkyBoxCamerasEnabled(bool enabled) {
+        foreach (Camera camera in skyBoxCameras) {
+            camera.enabled = enabled;
         }
     }
 
