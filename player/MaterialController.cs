@@ -5,8 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class MaterialController {
-    enum State { opaque, transparent, fadeOut, fadeIn }
-    State state;
+    public enum State { opaque, transparent, fadeOut, fadeIn }
+    public State state;
     public List<Renderer> childRenderers;
     public GameObject gameObject;
     public Collider collider;
@@ -15,7 +15,7 @@ public class MaterialController {
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableRender;
-    public float ceilingHeight = 1.5f;
+    public float ceilingHeight = 1.25f;
     public float targetAlpha;
     public bool updatedThisLoop;
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
@@ -23,7 +23,7 @@ public class MaterialController {
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
     public MaterialController(Collider collider, CharacterCamera camera) {
         this.camera = camera;
-        this.gameObject = collider.gameObject;
+        this.gameObject = collider.transform.root.gameObject;
         this.tagSystemData = Toolbox.GetTagData(collider.gameObject);
         this.childRenderers = new List<Renderer>();
         this.childRenderers = new List<Renderer>(gameObject.transform.root.GetComponentsInChildren<Renderer>())
@@ -62,15 +62,17 @@ public class MaterialController {
         timer = 0.1f;
     }
     public bool CeilingCheck(Vector3 playerPosition, float floorHeight, bool debug = false) {
+
+        float otherFloorY = collider.bounds.center.y - collider.bounds.extents.y;
+        float directionY = otherFloorY - playerPosition.y;
+        if (debug)
+            Debug.Log($"[MaterialController] {gameObject} {directionY} {collider.bounds.center} < {playerPosition.y} = {collider.bounds.center.y < playerPosition.y} ");
+
         if (collider.bounds.center.y < playerPosition.y + 0.05f || collider.bounds.center.y < floorHeight) {
             // disableRender = false;
             return false;
         }
 
-        float otherFloorY = collider.bounds.center.y - collider.bounds.extents.y;
-        float directionY = otherFloorY - playerPosition.y;
-        if (debug)
-            Debug.Log($"[MaterialController] {gameObject} {directionY} {directionY > ceilingHeight} {collider.bounds.center} {collider.bounds.extents.y} {collider.bounds.center.y < playerPosition.y} ");
 
         // between camera and player and above player
         // if (cullingPlane.GetSide(collider.bounds.center) && (collider.bounds.center.y - playerPosition.y > ceilingHeight * 1.5)) {
@@ -79,12 +81,9 @@ public class MaterialController {
         // } else 
         if (directionY > ceilingHeight) {
             // above player
-
-            // disableRender = true;
             return true;
 
         } else {
-            // disableRender = false;
             return false;
         }
     }
@@ -92,10 +91,12 @@ public class MaterialController {
         if (state == State.transparent || state == State.fadeOut)
             return;
         state = State.fadeOut;
-        if (gameObject.name.ToLower().Contains("window_glass"))
-            Debug.Log($"fadeout: {gameObject}");
-        // TODO: not working?
         foreach (Renderer renderer in childRenderers) {
+            if (renderer is SpriteRenderer) {
+                // Debug.Log($"fadeout sprite renderer: {gameObject}");
+                renderer.enabled = false;
+                continue;
+            }
             if (renderer == null || interloperMaterials[renderer] == null || renderer.CompareTag("donthide"))
                 continue;
             renderer.material = interloperMaterials[renderer];
@@ -106,8 +107,6 @@ public class MaterialController {
     public void MakeFadeIn() {
         if (state == State.opaque || state == State.fadeIn)
             return;
-        if (gameObject.name.ToLower().Contains("window_glass"))
-            Debug.Log("fadein");
         state = State.fadeIn;
     }
     public void MakeOpaque() {
@@ -120,6 +119,11 @@ public class MaterialController {
         foreach (Renderer renderer in childRenderers) {
             if (renderer == null || normalMaterials[renderer] == null)
                 return;
+            if (renderer is SpriteRenderer) {
+                renderer.enabled = true;
+                // Debug.Log($"enabling sprite renderer: {gameObject}");
+                continue;
+            }
             renderer.material = normalMaterials[renderer];
         }
     }
@@ -136,13 +140,13 @@ public class MaterialController {
         float minimumAlpha = disableRender ? 0f : (1f * (offAxisLength / 2f));
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {
-                targetAlpha += Time.unscaledDeltaTime * 3f;
+                targetAlpha += Time.unscaledDeltaTime * 10f;
             } else {
                 MakeOpaque();
             }
         } else if (state == State.fadeOut) {
             if (targetAlpha > minimumAlpha) {
-                targetAlpha -= Time.unscaledDeltaTime * 3f;
+                targetAlpha -= Time.unscaledDeltaTime * 10f;
                 targetAlpha = Mathf.Max(targetAlpha, minimumAlpha);
             } else {
                 targetAlpha = minimumAlpha;
@@ -162,11 +166,19 @@ public class MaterialController {
         } else {
             MakeFadeIn();
         }
+        // if (gameObject.name.ToLower().Contains("door") && !gameObject.name.ToLower().Contains("double")) {
+        //     Debug.Log($"[update 2] {gameObject} {gameObject.transform.position} {childRenderers.Count} {active()} {state} {targetAlpha}");
+        // }
         if (state == State.fadeIn || state == State.fadeOut) {
             foreach (Renderer renderer in childRenderers) {
                 if (renderer == null || !renderer.enabled || renderer.CompareTag("donthide"))
                     continue;
-                renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+                if (renderer is SpriteRenderer) {
+                    // Debug.Log($"disable sprite renderer: {gameObject}");
+                    renderer.enabled = false;
+                    continue;
+                }
+                // renderer.material.SetFloat("_TargetAlpha", targetAlpha);
                 if (targetAlpha <= 0.1) {
                     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
                     renderer.material = normalMaterials[renderer];
@@ -175,8 +187,6 @@ public class MaterialController {
                     renderer.material = interloperMaterials[renderer];
                     renderer.material.SetFloat("_TargetAlpha", targetAlpha);
                 }
-                if (gameObject.name.ToLower().Contains("window_glass"))
-                    Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableRender} targetAlpha: {targetAlpha} shadowcasting: {renderer.shadowCastingMode}");
             }
         }
     }

@@ -334,12 +334,10 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartBurglar(BurgleTargetData data) {
-        Debug.Log("start burglar");
         activeBurgleTargetData = data;
         uiController.ShowBurglar(data);
     }
     public void CloseBurglar() {
-        Debug.Log("close burglar");
         uiController.HideBurglar();
         playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);

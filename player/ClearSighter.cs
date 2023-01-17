@@ -25,7 +25,7 @@ public class ClearSighter : MonoBehaviour {
         colliderHits = new Collider[5000];
         myTransform = transform;
         InitializeMaterialControllerCache();
-        InvokeRepeating("HandleStaticGeometry", 0f, 0.1f);
+        InvokeRepeating("HandleStaticGeometry", 0f, 0.5f);
         rooftopZones = GameObject.FindObjectsOfType<RooftopZone>()
             .SelectMany(zone => zone.GetComponentsInChildren<Collider>())
             .ToList();
@@ -66,6 +66,7 @@ public class ClearSighter : MonoBehaviour {
                     yield return waitForFrame;
                 }
                 MaterialController controller = controllers.get(collider);
+                if (staticGeometry.ContainsKey(controller)) continue;
                 if (controller != null) {
                     if (inRooftopZone) {
                         controller.disableRender = false;
@@ -110,6 +111,10 @@ public class ClearSighter : MonoBehaviour {
             foreach (MaterialController controller in controllers.controllers.Values) {
                 if (controller == null)
                     continue;
+                // if (controller.gameObject.name.ToLower().Contains("door") && !controller.gameObject.name.ToLower().Contains("double")) {
+                //     Debug.Log($"considering update to {controller.gameObject}  {gameObject.transform.position} {controller.childRenderers.Count} {controller.active()} {controller.state} {controller.updatedThisLoop} {controller.disableRender} {controller.targetAlpha}");
+                // }
+                // skip  interloper
                 if (controller.updatedThisLoop) {
                     controller.updatedThisLoop = false;
                     continue;
@@ -177,15 +182,16 @@ public class ClearSighter : MonoBehaviour {
     }
     void HandleStaticGeometryInside() {
         Vector3 myPosition = myTransform.position;
+
+        // TODO: there is a much better way to handlethis.
+        myPosition.y = Mathf.Round(myPosition.y);
+
         Vector3 cameraPosition = myCamera.transform.position;
         Plane cameraForwardPlane = new Plane(-1f * myCamera.PlanarDirection, myPosition);
         Plane playerXPlane = new Plane(new Vector3(1f, 0f, 0f), myPosition);
         Plane playerZPlane = new Plane(new Vector3(0f, 0f, 1f), myPosition);
         bool cameraXParity = playerXPlane.GetSide(cameraPosition);
         bool cameraZParity = playerZPlane.GetSide(cameraPosition);
-        // Debug.DrawRay(myPosition, 5f * playerXPlane.normal, Color.white, 1f);
-        // Debug.DrawRay(myPosition, 5f * playerZPlane.normal, Color.yellow, 1f);
-        // Debug.DrawRay(myPosition, 5f * cameraForwardPlane.normal, Color.magenta, 1f);
         foreach ((MaterialController controller, Vector3 position) in staticGeometry) {
             if (controller == null || controller.gameObject == null || controller.collider == null || !controller.gameObject.activeInHierarchy)
                 continue;
@@ -195,9 +201,8 @@ public class ClearSighter : MonoBehaviour {
             } else {
                 bool disableBecauseAbove = controller.CeilingCheck(myPosition, floorHeight);
                 controller.disableRender = disableBecauseAbove;
-                // controller.disableRender = false;
                 float ceilingHeight = (controller.collider.bounds.center.y + controller.collider.bounds.extents.y) - myPosition.y;
-                if (ceilingHeight > 0.5f) {
+                if (ceilingHeight > 0.75f) {
                     bool disableXPlane = playerXPlane.GetSide(position) == cameraXParity;
                     bool disableZPlane = playerZPlane.GetSide(position) == cameraZParity;
                     controller.disableRender |= disableXPlane && disableZPlane && cameraForwardPlane.GetSide(position);

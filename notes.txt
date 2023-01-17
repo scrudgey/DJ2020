@@ -2167,23 +2167,51 @@ icons:
 * brick 2
 * brick half
 * light interior
-holes for AC ducts 
-rig doors, etc.
-    random keyways
+* place cameras
+* place lasers
+* flickering windows
+* pylon light
+* hide the key above
+* attack surface disappears
+* adjust skybox heights: can skybox scale with y more rapidly?
+* faster fade in / out
+* adjust clearsighter interval
+* do not highlight interactives when player is above
+* attractor zone in building
+* chair, power mains
+* BURGLAR highlights are visible across all levels
+* build rooftop zones
+* NPCs
+* player spawn points
+* generate map data
+
+doors
+    random doors
+        random key range
+            this is handled during initialization, door stores range of key ids, selects one on initialize
+    random attack surfaces
+        random lock pick difficulty: easy / med / hard / impossible
+        latch vulnerable / not
+    chainlink fence door
+        padlock
 set up objectives
+    randomized placement of paydatas
+        this will be done on level initialization.
+        level data then should include a map paydata -> cyber
+        ensure that all objective data is placed
+
+
+holes for AC ducts 
 elevator
-place cameras
-place lasers
-NPCs
-player spawn points
-generate map data
+cameras on map marker
 
 
-flickering windows
-pylon light
 floating head syndrome
 
-optimizations:
+clearsighter:
+    it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
+    instead everything should be sliced into y intervals, and all deactivated / activated at once.
+woptimizations:
     * disable skycams when in normal camera mode
     use octree in clearsighter
     optimize the ammo counter
@@ -2191,3 +2219,13 @@ optimizations:
     static batching / dynamic batching / occlusion culling  / gpu instancing
  
 #indiedev #unity3d #immersivesim #gamedev
+
+
+NPCs problems:
+    1. guards should investigate the site of a tripped alarm
+
+    2. guards getting stuck on double doors'
+    3. guards should be moving through the building more quickly
+        pausing less
+        moving more quickly
+    4. guards do not navigate to correct floor position

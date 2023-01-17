@@ -16,7 +16,8 @@ public record GameData {
             playerState = PlayerState.DefaultState(),
             levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
             unlockedLevels = new List<string>{
-                "Jack That Data"
+                "Jack That Data",
+                "Tower"
             },
             unlockedItems = new List<string> { "C4", "deck", "goggles", "tools" },
             levelPlans = new SerializableDictionary<string, LevelPlan>()

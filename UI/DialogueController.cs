@@ -233,7 +233,6 @@ public class DialogueController : MonoBehaviour {
         CreateDialogueResponse("[CONTINUE]", DialogueEndCallback);
     }
     public void DialogueEndCallback(DialogueResponseButton dialogueResponseButton) {
-        Debug.Log("end");
         Conclude();
     }
     public void SetLeftDialogueText(string content) {

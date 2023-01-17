@@ -16,8 +16,9 @@ public class Skycam : MonoBehaviour {
         myCamera = GetComponent<Camera>();
     }
     void Update() {
-        transform.position = myInitialPosition + (masterCameraTransform.position - masterCameraInitialPosition) * translationRatio;
-        // transform.rotation = masterCameraTransform.rotation;
-        // myCamera.fieldOfView = masterCamera.fieldOfView;
+        Vector3 offset = (masterCameraTransform.position - masterCameraInitialPosition);
+        offset.y = 2f * offset.y;
+        transform.position = myInitialPosition + offset * translationRatio;
+        // transform.position = myInitialPosition + (masterCameraTransform.position - masterCameraInitialPosition) * translationRatio;
     }
 }

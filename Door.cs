@@ -311,16 +311,22 @@ public class Door : Interactive {
     }
 
     public void TurnKnob() {
+        if (knobs == null || knobs.Count() == 0)
+            return;
         if (turnKnobCoroutine == null) {
             turnKnobCoroutine = StartCoroutine(DoTurnKnobRoutine());
         }
     }
     public void JiggleKnob() {
+        if (knobs == null || knobs.Count() == 0)
+            return;
         if (turnKnobCoroutine == null) {
             turnKnobCoroutine = StartCoroutine(JiggleKnobRoutine());
         }
     }
     public void PickJiggleKnob() {
+        if (knobs == null || knobs.Count() == 0)
+            return;
         if (turnKnobCoroutine == null) {
             turnKnobCoroutine = StartCoroutine(PickJiggleKnobRoutine());
         }

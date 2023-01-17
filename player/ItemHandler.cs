@@ -21,6 +21,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     public AudioSource audioSource;
     public RocketLauncher rocketLauncher;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
+    float burglarHighlightTimer;
+    float burglarHighlightRefreshInterval = 1f;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
@@ -91,12 +93,28 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 Toolbox.RandomizeOneShot(audioSource, goggles.goggleData.wearSounds);
                 break;
             case BurglarTools:
-                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
-                    surface.EnableOutline();
-                }
+                // foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
+                //     surface.EnableOutline();
+                // }
                 break;
             default:
                 break;
+        }
+    }
+    void Update() {
+        if (activeItem is BurglarTools) {
+            burglarHighlightTimer += Time.deltaTime;
+            if (burglarHighlightTimer > burglarHighlightRefreshInterval) {
+                burglarHighlightTimer -= burglarHighlightRefreshInterval;
+                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
+                    if (Math.Abs(surface.transform.position.y - transform.position.y) < 1f) {
+                        surface.EnableOutline();
+                    } else {
+                        surface.DisableOutline();
+                    }
+                }
+            }
+
         }
     }
     void OnItemExit(BaseItem item) {
@@ -111,6 +129,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 break;
             case BurglarTools:
+                burglarHighlightTimer = 0f;
                 foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
                     surface.DisableOutline();
                 }
