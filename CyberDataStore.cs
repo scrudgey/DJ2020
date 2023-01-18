@@ -34,13 +34,13 @@ public class CyberDataStore : MonoBehaviour {
 
     void OnDestroy() {
         // check if we invalidate an objective
-        List<string> myFileNames = payDatas.Select(data => data.filename).ToList();
+        // List<string> myFileNames = payDatas.Select(data => data.filename).ToList();
         if (GameManager.I == null || GameManager.I.gameData.levelState == null || GameManager.I.gameData.levelState.template == null) return;
         foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {
             if (objective is ObjectiveData) {
                 ObjectiveData objectiveData = (ObjectiveData)objective;
-                foreach (string targetData in objectiveData.targetFileNames) {
-                    if (myFileNames.Contains(targetData)) {
+                foreach (PayData targetData in objectiveData.targetPaydata) {
+                    if (payDatas.Contains(targetData)) {
                         GameManager.I.FailObjective(objective);
                     }
                 }
