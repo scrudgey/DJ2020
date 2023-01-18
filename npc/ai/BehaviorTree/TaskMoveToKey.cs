@@ -136,7 +136,7 @@ namespace AI {
         }
 
         void OpenDoor(Vector3 position, Door door) {
-            if (door.state != Door.DoorState.open) {
+            if (door.state != Door.DoorState.open && door.state != Door.DoorState.opening) {
                 door.ActivateDoorknob(position, withKeySet: keyIds);
                 waitForDoor = door;
             }
@@ -160,7 +160,7 @@ namespace AI {
                 Vector3 destination = hit.position;
                 NavMesh.CalculatePath(transform.position, destination, filter, navMeshPath);
                 pathIndex = 1;
-            } else if (NavMesh.SamplePosition(target, out hit, 10f, filter)) {
+            } else if (NavMesh.SamplePosition(target, out hit, 20f, filter)) {
                 Vector3 destination = hit.position;
                 // Debug.LogWarning($"[NavMesh] delta: {destination.y - target.y}");
                 NavMesh.CalculatePath(transform.position, destination, filter, navMeshPath);

@@ -15,7 +15,7 @@ public class MaterialController {
     public float timer;
     public bool disableBecauseInterloper;
     public bool disableRender;
-    public float ceilingHeight = 1.25f;
+    public float ceilingHeight = 1.75f;
     public float targetAlpha;
     public bool updatedThisLoop;
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
@@ -92,13 +92,13 @@ public class MaterialController {
             return;
         state = State.fadeOut;
         foreach (Renderer renderer in childRenderers) {
+            if (renderer == null || interloperMaterials[renderer] == null || renderer.CompareTag("donthide"))
+                continue;
             if (renderer is SpriteRenderer) {
                 // Debug.Log($"fadeout sprite renderer: {gameObject}");
                 renderer.enabled = false;
                 continue;
             }
-            if (renderer == null || interloperMaterials[renderer] == null || renderer.CompareTag("donthide"))
-                continue;
             renderer.material = interloperMaterials[renderer];
             renderer.material.SetFloat("_TargetAlpha", 1);
             targetAlpha = 1;

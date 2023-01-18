@@ -1876,7 +1876,22 @@ note: layer "interactive"
 * NPCs
 * player spawn points
 * generate map data
-
+* disable skycams when in normal camera mode
+* blood pools should hide
+* shells should hide
+* cameras should hide
+* cameras should not hide that much!
+* railings
+* interrogate distance?
+* remove sphere
+* alarm box hide
+* laser block hide
+* guards do not navigate to correct floor position
+* guards getting stuck on double doors'
+* guards should be moving through the building more quickly
+* searchDirection is not quite right
+* maybe too much bunching
+* a long way to travel means guards give up too easily
 
 
 graphical issues:
@@ -2178,53 +2193,77 @@ destructible AC unit
 destructible radio dish tower
 plants can catch on fire
 
+
+optimizations:
+    use octree in clearsighter
+    optimize the ammo counter
+        this could free up the equivalent of a whole camera render
+    static batching / dynamic batching / occlusion culling  / gpu instancing
+
 guns:
     silenced pistol
     fix silenced smg
 icons:
     redraw others?
         thermals
-        
+
 doors
     random doors
         random key range
             this is handled during initialization, door stores range of key ids, selects one on initialize
-    random attack surfaces
-        random lock pick difficulty: easy / med / hard / impossible
-        latch vulnerable / not
+        random attack surfaces
+            random lock pick difficulty: easy / med / hard / impossible
+            latch vulnerable / not
     chainlink fence door
         padlock
+
+holes for AC ducts 
+elevator
+
+
+cameras on map marker
+    marker icon
+
+NPCs problems:
+    1. guards should investigate the site of a tripped alarm
+    strike team should come in with a purpose
+        investigate the last position
+
+floating head syndrome
+
+ 
+
+
+
+
+clearsighter:
+    it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
+    instead everything should be sliced into y intervals, and all deactivated / activated at once.
+    clearsighter interacting with alerthandler
+        problem: visibility should not be controlled by clearsighter but should be overridden by clearsighter.
+        e.g:
+            turn on clearsight hide
+            turn on alerthandler
+            turn off clearsight hide
+        e.g:
+            turn on alerthandler
+            turn on clearsight hide
+            turn off clearsight hide
+    what about extra-height camera in basement?
+        clearsighters should be able to specify extra information
+
+
 set up objectives
     randomized placement of paydatas
         this will be done on level initialization.
         level data then should include a map paydata -> cyber
         ensure that all objective data is placed
-holes for AC ducts 
-elevator
-cameras on map marker
-
-
-floating head syndrome
-
-clearsighter:
-    it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
-    instead everything should be sliced into y intervals, and all deactivated / activated at once.
-woptimizations:
-    * disable skycams when in normal camera mode
-    use octree in clearsighter
-    optimize the ammo counter
-        this could free up the equivalent of a whole camera render
-    static batching / dynamic batching / occlusion culling  / gpu instancing
- 
-
-
-NPCs problems:
-    * guards do not navigate to correct floor position
-    * guards getting stuck on double doors'
-        solution is currently a hack but it's ok
-    * guards should be moving through the building more quickly
-    
-    1. guards should investigate the site of a tripped alarm
-    searchDirection is not quite right
-    maybe too much bunching
-    a long way to travel means guards give up too easily
+how does this work?
+    objective is: find DAT001, find DAT002
+    if we place DAT001, DAT002 from objectives, then how do we set up the potential gameobjects to hold them?
+        ideally, we'd like to put one on floor 1 and one on floor 2
+        do not place them on the same gameobject
+        definitely do not override
+    if we set up potential datas on individual gameobjects, there's no guarantee that both DAT001 and DAT002 get placed.
+    instead we need: a level initializer
+        this holds references to gameobjects in the scene.

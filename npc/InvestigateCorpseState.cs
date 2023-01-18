@@ -27,7 +27,7 @@ public class InvestigateCorpseState : SphereControlState {
         rootTaskNode.SetData(CORPSE_KEY, corpse.transform.position);
     }
     void SetupRootNode() {
-        moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, characterController, arrivalDistance: 1f) {
+        moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
             headBehavior = TaskMoveToKey.HeadBehavior.normal,
             speedCoefficient = 0.75f
         };

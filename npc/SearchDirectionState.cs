@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class SearchDirectionState : SphereControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
-    readonly float ROUTINE_TIMEOUT = 180f;
+    readonly float ROUTINE_TIMEOUT = 120f;
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
@@ -86,7 +86,7 @@ public class SearchDirectionState : SphereControlState {
                ), 3f);
 
             rootTaskNode = new Sequence(lookAround,
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 1f) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient,
                 },
@@ -99,7 +99,7 @@ public class SearchDirectionState : SphereControlState {
             );
         } else {
             rootTaskNode = new Sequence(
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 1f) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient
                 },

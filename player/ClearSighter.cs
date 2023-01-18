@@ -184,7 +184,7 @@ public class ClearSighter : MonoBehaviour {
         Vector3 myPosition = myTransform.position;
 
         // TODO: there is a much better way to handlethis.
-        myPosition.y = Mathf.Round(myPosition.y);
+        // myPosition.y = Mathf.Round(myPosition.y);
 
         Vector3 cameraPosition = myCamera.transform.position;
         Plane cameraForwardPlane = new Plane(-1f * myCamera.PlanarDirection, myPosition);

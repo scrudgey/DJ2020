@@ -81,13 +81,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public Vector3 getLocationOfInterest() {
-        if (lastSeenPlayerPosition != null)
-            Debug.Log($"point of interest check: playerPos: {lastSeenPlayerPosition.position}");
-        if (lastHeardPlayerPosition != null)
-            Debug.Log($"point of interest check: heardPlayerPos:{lastHeardPlayerPosition.position}");
-        if (lastHeardDisturbancePosition != null)
-            Debug.Log($"point of interest check: disturbancePos:{lastHeardDisturbancePosition.position}");
-
         if (lastSeenPlayerPosition != null && lastHeardPlayerPosition != null) {
             if (lastSeenPlayerPosition.time > lastHeardPlayerPosition.time) {
                 return lastSeenPlayerPosition.position;
@@ -215,12 +208,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         // avoid bunching with boids algorithm
         if (!input.CrouchDown) {
-            // float avoidFactor = 0.1f;
-            // float avoidRadius = 2f;
+            float avoidFactor = 0.1f;
+            float avoidRadius = 2f;
 
 
-            float avoidFactor = 10f;
-            float avoidRadius = 0.4f;
+            // float avoidFactor = 1f;
+            // float avoidRadius = 0.5f;
 
             int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
             Vector3 closeness = Vector3.zero;
