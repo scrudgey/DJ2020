@@ -195,15 +195,16 @@ public partial class GameManager : Singleton<GameManager> {
     void SpawnStrikeTeamMember() {
         GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
+        CharacterController controller = npc.GetComponent<CharacterController>();
 
         if (strikeTeamCount == 0) {
-            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, doIntro: false, speedCoefficient: 1.5f));
+            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, controller, doIntro: false, speedCoefficient: 1.5f));
             lastStrikeTeamMember = npc;
         } else if (strikeTeamCount == 1) {
-            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
+            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
             lastStrikeTeamMember = npc;
         } else if (strikeTeamCount == 2) {
-            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
+            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
         OnNPCSpawn?.Invoke(npc);

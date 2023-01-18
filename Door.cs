@@ -332,30 +332,34 @@ public class Door : Interactive {
         }
     }
     IEnumerator DoTurnKnobRoutine() {
-        float timer = 0f;
-        float duration = 0.25f;
-        while (timer < duration) {
-            float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 0f, 90f, duration);
-            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            foreach (Transform knob in knobs) {
-                knob.localRotation = turnRotation;
-
-            }
-            timer += Time.deltaTime;
+        if (knobs == null || knobs.Count() == 0) {
             yield return null;
-        }
-        timer = 0f;
-        while (timer < duration) {
-            float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 90f, -90f, duration);
-            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            foreach (Transform knob in knobs) {
+        } else {
+            float timer = 0f;
+            float duration = 0.25f;
+            while (timer < duration) {
+                float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 0f, 90f, duration);
+                Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
+                foreach (Transform knob in knobs) {
+                    knob.localRotation = turnRotation;
 
-                knob.localRotation = turnRotation;
+                }
+                timer += Time.deltaTime;
+                yield return null;
             }
-            timer += Time.deltaTime;
-            yield return null;
+            timer = 0f;
+            while (timer < duration) {
+                float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 90f, -90f, duration);
+                Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
+                foreach (Transform knob in knobs) {
+
+                    knob.localRotation = turnRotation;
+                }
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            turnKnobCoroutine = null;
         }
-        turnKnobCoroutine = null;
     }
     IEnumerator JiggleKnobRoutine() {
         float timer = 0f;

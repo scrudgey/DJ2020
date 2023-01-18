@@ -749,13 +749,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         GameManager.I.StartCoroutine(DoShake(intensity, lifetime));
     }
 
-    private void OnDrawGizmos() {
-        string customName = "Relic\\MaskedSpider.png";
-        Gizmos.DrawIcon(lastTargetPosition, customName, true);
-    }
-
-
-
     // Turn on the bit using an OR operation:
     private void ShowLasers() {
         Camera.cullingMask |= 1 << LayerMask.NameToLayer("laser");

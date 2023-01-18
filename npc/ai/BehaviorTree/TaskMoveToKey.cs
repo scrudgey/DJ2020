@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AI;
+// using KinematicCharacterController;
 using UnityEngine;
 using UnityEngine.AI;
 namespace AI {
@@ -9,7 +10,8 @@ namespace AI {
     public class TaskMoveToKey : TaskNode {
         public enum HeadBehavior { normal, casual, search }
         public HeadBehavior headBehavior;
-        float CORNER_ARRIVAL_DISTANCE = 0.15f;
+        readonly float CORNER_ARRIVAL_DISTANCE = 0.15f;
+        float finalCornerArrivalDistance = 0.15f;
         public NavMeshPath navMeshPath;
         public int pathIndex;
         Transform transform;
@@ -23,14 +25,19 @@ namespace AI {
         HashSet<int> keyIds;
         Door waitForDoor;
         public SpottedHighlight highlight;
-        public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, float arrivalDistance = 0.15f, SpottedHighlight highlight = null) : base() {
+        CharacterController controller;
+        public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, CharacterController controller, float arrivalDistance = 0.15f, SpottedHighlight highlight = null) : base() {
             navMeshPath = new NavMeshPath();
             pathIndex = -1;
             this.transform = transform;
             this.key = key;
-            this.CORNER_ARRIVAL_DISTANCE = arrivalDistance;
+            this.finalCornerArrivalDistance = arrivalDistance;
             this.keyIds = keyIds;
             this.highlight = highlight;
+            this.controller = controller;
+            if (controller == null) {
+                Debug.LogError("NULL CONTROLLER IN TASKMOVE!");
+            }
             SetDestination();
         }
 
@@ -79,13 +86,15 @@ namespace AI {
                 Vector3 inputVector = Vector3.zero;
                 Vector3 nextPoint = navMeshPath.corners[pathIndex];
                 float distance = Vector3.Distance(nextPoint, transform.position);
-                if (distance > CORNER_ARRIVAL_DISTANCE) {
+                float arrivalDistance = (pathIndex < navMeshPath.corners.Length) ? CORNER_ARRIVAL_DISTANCE : finalCornerArrivalDistance;
+                if (distance > arrivalDistance) {
                     Vector3 direction = nextPoint - transform.position;
                     inputVector = direction;
                 } else {
                     pathIndex += 1;
                 }
-
+                // Debug.DrawRay(transform.position, inputVector, Color.yellow);
+                // Debug.DrawLine(transform.position, nextPoint, Color.cyan);
                 inputVector.y = 0;
                 baseLookDirection = inputVector;
                 input.moveDirection = speedCoefficient * inputVector.normalized;
@@ -120,11 +129,21 @@ namespace AI {
                 Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
                 if (doorFound) {
                     Door door = hit.collider.gameObject.GetComponent<Door>();
-                    if (door.state != Door.DoorState.open) {
-                        door.ActivateDoorknob(position, withKeySet: keyIds);
-                        waitForDoor = door;
-                    }
+                    OpenDoor(position, door);
+                    PassThroughDoor(hit.collider.gameObject);
                 }
+            }
+        }
+
+        void OpenDoor(Vector3 position, Door door) {
+            if (door.state != Door.DoorState.open) {
+                door.ActivateDoorknob(position, withKeySet: keyIds);
+                waitForDoor = door;
+            }
+        }
+        void PassThroughDoor(GameObject door) {
+            foreach (Collider doorCollider in door.transform.root.GetComponentsInChildren<Collider>().Where(collider => !collider.isTrigger)) {
+                controller.ignoredColliders.Add(doorCollider);
             }
         }
 
@@ -137,12 +156,13 @@ namespace AI {
             NavMeshQueryFilter filter = new NavMeshQueryFilter {
                 areaMask = LayerUtil.KeySetToNavLayerMask(keyIds)
             };
-            if (NavMesh.SamplePosition(target, out hit, 10f, filter)) {
+            if (NavMesh.SamplePosition(target, out hit, 1f, filter)) {
                 Vector3 destination = hit.position;
                 NavMesh.CalculatePath(transform.position, destination, filter, navMeshPath);
                 pathIndex = 1;
-            } else if (NavMesh.SamplePosition(target, out hit, 100f, filter)) {
+            } else if (NavMesh.SamplePosition(target, out hit, 10f, filter)) {
                 Vector3 destination = hit.position;
+                // Debug.LogWarning($"[NavMesh] delta: {destination.y - target.y}");
                 NavMesh.CalculatePath(transform.position, destination, filter, navMeshPath);
                 pathIndex = 1;
             } else {

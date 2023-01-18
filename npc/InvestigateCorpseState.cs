@@ -10,7 +10,8 @@ public class InvestigateCorpseState : SphereControlState {
     Corpse corpse;
     bool inPosition;
     SuspicionRecord record;
-    public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController) : base(ai) {
+    CharacterController characterController;
+    public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
         this.corpse = corpse;
         this.speechTextController = speechTextController;
         record = new SuspicionRecord {
@@ -26,7 +27,7 @@ public class InvestigateCorpseState : SphereControlState {
         rootTaskNode.SetData(CORPSE_KEY, corpse.transform.position);
     }
     void SetupRootNode() {
-        moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+        moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, characterController, arrivalDistance: 1f) {
             headBehavior = TaskMoveToKey.HeadBehavior.normal,
             speedCoefficient = 0.75f
         };

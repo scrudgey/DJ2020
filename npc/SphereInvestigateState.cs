@@ -19,9 +19,10 @@ public class SphereInvestigateState : SphereControlState {
     float integratedPlayerMovement;
     float totalPlayerMovement;
     float saidHeyTimeout;
-
-    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight) : base(ai) {
+    CharacterController characterController;
+    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight, CharacterController characterController) : base(ai) {
         this.highlight = highlight;
+        this.characterController = characterController;
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
         // SuspicionRecord intruderRecord = new SuspicionRecord {
         //     content = "intruder reported",
@@ -70,7 +71,7 @@ public class SphereInvestigateState : SphereControlState {
         dialogueTask = new TaskOpenDialogue(owner);
 
         alertTaskNode = new Sequence(
-            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 0.5f) {
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 0.5f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
                 speedCoefficient = 1.2f,
                 highlight = highlight
@@ -90,7 +91,7 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1.25f) {
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 1.25f) {
                         speedCoefficient = 0.5f,
                         highlight = highlight
                     },
@@ -100,7 +101,7 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
-                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 1f) {
                             headBehavior = TaskMoveToKey.HeadBehavior.search,
                             highlight = highlight,
                         },

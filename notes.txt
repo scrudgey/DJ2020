@@ -1846,6 +1846,38 @@ note: layer "interactive"
     * orient toward shoot direction
     * fix rocket aim
     * rocket launcher graphic and visibility should belong to item handler
+* door should be destructible
+* burglary tools
+* rocket launcher
+* grenade
+* SpottedHighlight should use full navigation path
+* lose disguise when openly aggressive, or identity is revealed
+* delay after death before fail screen
+* half-width walls
+* basement stairs -> first floor
+* power mains in the basement
+* brick 2
+* brick half
+* light interior
+* place cameras
+* place lasers
+* flickering windows
+* pylon light
+* hide the key above
+* attack surface disappears
+* adjust skybox heights: can skybox scale with y more rapidly?
+* faster fade in / out
+* adjust clearsighter interval
+* do not highlight interactives when player is above
+* attractor zone in building
+* chair, power mains
+* BURGLAR highlights are visible across all levels
+* build rooftop zones
+* NPCs
+* player spawn points
+* generate map data
+
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2091,11 +2123,7 @@ build a test level equivalent to Jack That Data
         camera view bigger
     skybox buildings
     fill out proper texts
-    * ac unit on roof
 
-* SpottedHighlight should use full navigation path
-* lose disguise when openly aggressive, or identity is revealed
-* delay after death before fail screen
 
 code-controlled gun animation
 attack surfaces
@@ -2143,7 +2171,6 @@ graphics
 rocket launcher explosion?
 hand grenade explosion
 check blood pool prefab pooling
-* door should be destructible
 destroyed walls leave decal on the ground (difficult?)
 destructible light pylon
 destructible dumpster
@@ -2155,36 +2182,9 @@ guns:
     silenced pistol
     fix silenced smg
 icons:
-    * burglary tools
-    * rocket launcher
-    * grenade
     redraw others?
         thermals
-
-* half-width walls
-* basement stairs -> first floor
-* power mains in the basement
-* brick 2
-* brick half
-* light interior
-* place cameras
-* place lasers
-* flickering windows
-* pylon light
-* hide the key above
-* attack surface disappears
-* adjust skybox heights: can skybox scale with y more rapidly?
-* faster fade in / out
-* adjust clearsighter interval
-* do not highlight interactives when player is above
-* attractor zone in building
-* chair, power mains
-* BURGLAR highlights are visible across all levels
-* build rooftop zones
-* NPCs
-* player spawn points
-* generate map data
-
+        
 doors
     random doors
         random key range
@@ -2199,8 +2199,6 @@ set up objectives
         this will be done on level initialization.
         level data then should include a map paydata -> cyber
         ensure that all objective data is placed
-
-
 holes for AC ducts 
 elevator
 cameras on map marker
@@ -2218,14 +2216,15 @@ woptimizations:
         this could free up the equivalent of a whole camera render
     static batching / dynamic batching / occlusion culling  / gpu instancing
  
-#indiedev #unity3d #immersivesim #gamedev
 
 
 NPCs problems:
+    * guards do not navigate to correct floor position
+    * guards getting stuck on double doors'
+        solution is currently a hack but it's ok
+    * guards should be moving through the building more quickly
+    
     1. guards should investigate the site of a tripped alarm
-
-    2. guards getting stuck on double doors'
-    3. guards should be moving through the building more quickly
-        pausing less
-        moving more quickly
-    4. guards do not navigate to correct floor position
+    searchDirection is not quite right
+    maybe too much bunching
+    a long way to travel means guards give up too easily

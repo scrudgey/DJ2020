@@ -32,9 +32,9 @@ public class Explosion : MonoBehaviour {
         Vector3 direction = (point - transform.position).normalized;
         float dist = (point - transform.position).magnitude;
         if (dist > radius) {
-            return new ExplosionDamage(0, direction, point);
+            return new ExplosionDamage(0, direction, point, transform.position);
         } else {
-            return new ExplosionDamage((1.0f - dist / radius) * power, direction, point);
+            return new ExplosionDamage((1.0f - dist / radius) * power, direction, point, transform.position);
         }
     }
 

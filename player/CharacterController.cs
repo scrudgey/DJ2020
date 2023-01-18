@@ -177,6 +177,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float aimSwayMagnitude = 0.01f;
     Transform cameraFollowTransform;
     RaycastHit[] rayCastHits;
+    public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -279,6 +280,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
     }
     private void Start() {
+        ignoredColliders = new HashSet<Collider>();
         rayCastHits = new RaycastHit[32];
         PoolManager.I.RegisterPool("prefabs/fx/landImpactFx", poolSize: 2);
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -1302,7 +1304,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     public bool IsColliderValidForCollisions(Collider coll) {
-        return true;
+        return !ignoredColliders.Contains(coll);
+        // return true;
     }
 
     public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {

@@ -7,8 +7,10 @@ public class FollowTheLeaderState : SphereControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
     private TaskNode rootTaskNode;
     public TaskFollowTarget.HeadBehavior headBehavior;
-    public FollowTheLeaderState(SphereRobotAI ai, GameObject leader, TaskFollowTarget.HeadBehavior headBehavior = TaskFollowTarget.HeadBehavior.normal) : base(ai) {
+    CharacterController characterController;
+    public FollowTheLeaderState(SphereRobotAI ai, GameObject leader, CharacterController characterController, TaskFollowTarget.HeadBehavior headBehavior = TaskFollowTarget.HeadBehavior.normal) : base(ai) {
         this.headBehavior = headBehavior;
+        this.characterController = characterController;
         SetupRootNode(leader);
     }
 
@@ -17,7 +19,7 @@ public class FollowTheLeaderState : SphereControlState {
     }
 
     void SetupRootNode(GameObject leader) {
-        rootTaskNode = new TaskFollowTarget(owner.transform, leader, owner.physicalKeys) {
+        rootTaskNode = new TaskFollowTarget(owner.transform, leader, owner.physicalKeys, characterController) {
             headBehavior = headBehavior
         };
     }
