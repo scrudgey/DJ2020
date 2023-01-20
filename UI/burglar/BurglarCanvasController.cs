@@ -119,6 +119,9 @@ public class BurglarCanvasController : MonoBehaviour {
                 jiggleCoroutine = StartCoroutine(JiggleTool());
             }
         } else {
+            if (selectedElement != null) {
+                selectedElement.HandleMouseUp();
+            }
             if (jiggleCoroutine != null) {
                 StopCoroutine(jiggleCoroutine);
                 jiggleCoroutine = null;
@@ -143,7 +146,8 @@ public class BurglarCanvasController : MonoBehaviour {
         BurglarAttackResult result = element.HandleClickHeld(selectedTool, data);
         if (result.success) {
             mouseOverElement = false;
-            selectedElement = null;
+            // selectedElement = null;
+            SetSelectedElement(null);
         }
         HandleAttackResult(result);
     }
@@ -179,7 +183,7 @@ public class BurglarCanvasController : MonoBehaviour {
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
         mouseOverElement = true;
-        selectedElement = element;
+        SetSelectedElement(element);
         if (selectedTool == BurglarToolType.none) {
             captionText.text = $"Use {element.elementName}";
         } else {
@@ -190,7 +194,12 @@ public class BurglarCanvasController : MonoBehaviour {
     public void MouseExitUIElementCallback(AttackSurfaceElement element) {
         captionText.text = "";
         mouseOverElement = false;
-        selectedElement = null;
+        SetSelectedElement(null);
+    }
+    void SetSelectedElement(AttackSurfaceElement newElement) {
+        if (newElement == selectedElement) return;
+        selectedElement?.HandleFocusLost();
+        selectedElement = newElement;
     }
     public void MouseEnterToolButton(string toolName) {
         selectedToolText.text = toolName;

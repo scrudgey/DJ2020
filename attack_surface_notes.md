@@ -39,10 +39,6 @@ security setting plus a random seed will determine the configuration of the door
     3. lock picking difficulty: easy , medium, hard, impossible: based on security
     deadbolt
 
-Request-to-Exit (REX) sensor 
-
-door types:
-
 
 
 ##
@@ -74,52 +70,46 @@ if there are a plethora of tools / attacks and security levels, it makes sense t
     Q: where is the hook / thrill / game in it?
     A: a door is not vulnerable to the few easy attacks you try: they're clever. but you're more clever.
 
-
-
-
 * hide tool from toolbar when in use
 * click down effect?
 * tool click sfx
 * tool over element clicky sound
 * click on empty to put tool away
-feedback when element is not vulnerable
+* draw latch guard
+* deadbolt
+* redraw baseplate
+* randomizing door attack surface:
+    * latch vulnerable / not
+    * latch visible / not
+    * latch guard in place
+    * lockpick difficulty
+    * deadbolt present / not present 
+    * deadbolt difficulty
+    * auto close / not
+* latch guard enable / disable
+* latch guard screws / noscrews
+* deadbolt
+* disable attack surface UI element when latch cover is removed / screw is removed
+
+configuration of keyid and vulnerabilities = a serial number?
 show serial numbers for different elements
 show vulnerabilities of different elements
     callout icons?
 
-* draw latch guard
-* redraw baseplate
 wirecutter
 magnetic probe
-deadbolt
 magnet / trip sensor disable
 REX sensor
 skeleton key
-
-randomizing door attack surface:
-    latch vulnerable / not
-    latch visible / not
-    latch guard in place
-
-    lockpick difficulty
-
-    deadbolt present / not present 
-    deadbolt difficulty
-
-
-    trip sensor
-
-    auto close / not
-
+trip sensor
 electronic access:
     door open without badge -> alarm
     REX sensor
+show tension wrench in keyway
+handle manipulating unlocked lock
+feedback when element is not vulnerable
 
-
-configuration of keyid and vulnerabilities = a serial number?
-
-latch guard enable / disable
-latch guard screws / noscrews
-deadbolt
-
-disable attack surface UI element when latch cover is removed / screw is removed
+lockpick difficulty:
+    * random setbacks
+    * reset stages when lock loses focus / lockpick is changed
+    number of stages, setbacks are controlled by lock difficulty

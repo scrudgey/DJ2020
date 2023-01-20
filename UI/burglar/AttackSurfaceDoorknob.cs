@@ -13,6 +13,8 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public float integratedPickTime;
     bool clickedThisFrame;
     public bool isHandle;
+    public float setbackProb = 1;
+    bool setback;
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
@@ -49,7 +51,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
 
     public override BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleClickHeld(activeTool, data);
-        if (activeTool == BurglarToolType.lockpick) {
+        if (activeTool == BurglarToolType.lockpick && !setback) {
             clickedThisFrame = true;
             integratedPickTime += Time.deltaTime;
             door.PickJiggleKnob(doorLock);
@@ -57,14 +59,41 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                 Toolbox.RandomizeOneShot(audioSource, pickSounds);
             }
 
-            if (integratedPickTime > 2f) {
-                integratedPickTime = 0f;
-                progressPercent = 0f;
+            float roll = Random.Range(0f, 1f);
+            if (integratedPickTime > 0.2f && roll < Time.deltaTime * setbackProb) {
+                setback = true;
+                integratedPickTime *= Random.Range(0.25f, 0.75f);
+                SetProgressPercent();
                 OnValueChanged?.Invoke(this);
-                return DoPick();
+            }
+
+            if (integratedPickTime > 2f) {
+                CompleteProgress();
+                OnValueChanged?.Invoke(this);
+                if (progressStageIndex >= progressStages)
+                    return DoPick();
             }
         }
         return BurglarAttackResult.None;
+    }
+    public override void HandleMouseUp() {
+        base.HandleMouseUp();
+        SetProgressPercent();
+        setback = false;
+        OnValueChanged?.Invoke(this);
+    }
+    public override void HandleFocusLost() {
+        base.HandleFocusLost();
+        setback = false;
+        progressStageIndex = 0;
+        progressPercent = 0;
+        SetProgressPercent();
+        OnValueChanged?.Invoke(this);
+    }
+    void CompleteProgress() {
+        integratedPickTime = 0f;
+        progressPercent = 0f;
+        progressStageIndex += 1;
     }
 
     BurglarAttackResult DoPick() {
@@ -81,11 +110,21 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     void Update() {
         if (integratedPickTime > 0f) {
             if (!clickedThisFrame) {
-                integratedPickTime -= Time.deltaTime;
+                if (setback) {
+                    integratedPickTime -= Time.deltaTime / 3f;
+                } else {
+                    integratedPickTime -= Time.deltaTime;
+                }
             }
-            progressPercent = integratedPickTime / 2f;
+            SetProgressPercent();
             OnValueChanged?.Invoke(this);
         }
         clickedThisFrame = false;
+    }
+
+    void SetProgressPercent() {
+        float baseline = (1.0f * progressStageIndex) / (1.0f * progressStages);
+        float progress = (integratedPickTime / 2f) * (1f / (1.0f * progressStages));
+        progressPercent = baseline + progress;
     }
 }

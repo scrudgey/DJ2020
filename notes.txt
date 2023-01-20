@@ -2208,27 +2208,39 @@ icons:
         thermals
 
 -----------
-
+* both knobs should refer to the same lock
+* randomize deadbolt
+    * remove lock from door locks
+    * disable deadbolt elements
 
 build a test level, 3 storey building infiltration
 build a test level equivalent to Jack That Data
     make level more challenging
         turrets
         camera view bigger
-    skybox buildings
     fill out proper texts
+    
 
-
+skybox buildings
 holes for AC ducts 
 elevator
 cameras on map marker
-    marker icon
 floating head syndrome
-NPCs problems:
-    1. guards should investigate the site of a tripped alarm
-        apply suspicion record in some circumstances (camera? laser?)
-    strike team should come in with a purpose
-        investigate the last position
+using key in lock should spin the keyway
+guard got stuck
+distraction needed
+randomly place lasers
+randomly place cameras
+crawling suspicion
+guard notices disabled / tampered door
+1. guards should investigate the site of a tripped alarm
+    apply suspicion record in some circumstances (camera? laser?)
+strike team should come in with a purpose
+    investigate the last position
+click outside burglar menu to close
+better way of putting a tool away
+self-closing isn't working for NPC
+NPC shouldn't leave door unlocked
  
 clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
@@ -2246,57 +2258,21 @@ clearsighter:
     what about extra-height camera in basement?
         clearsighters should be able to specify extra information
 
-
-
 doors
-    random doors
-        random key range
-            this is handled during initialization, door stores range of key ids, selects one on initialize
-        random attack surfaces
-            random lock pick difficulty: easy / med / hard / impossible
-            latch vulnerable / not
+    random keys:
+        approach 1: level initializer has a set of keyed-alike door groups that have set of keys
+            at start, choose key and apply to all the doors
+            or, choose key from keyset individually for each door
     chainlink fence door
         padlock
-
-how to tackle this?
-    first develop new attack surface elements
-        place these all on the same simple door
-    develop different levels of the elements
-        latch: vulnerable or not
-        lockpick: easy / med / hard / impossible
-    then allow different elements to be turned on and off on initialization
-
-burglar canvas:
-    * better tool selector
-    drill
-
-doors:
     auto close
     can open from the inside
-    hide / don't hide latch
     different knobs?
     random key choice
 
-using key in lock should spin the keyway
-make sure networks are working properly
+right click -> aim first has screwed up orientation
+
+make sure networks are working properly 
     remote hack
     disable alarm terminal
-crawling suspicion
-guard got stuck
-distraction needed
-guard notices disabled / tampered door
-randomly place lasers
-randomly place cameras
-
-random keys:
-    approach 1: level initializer has a set of keyed-alike door groups that have set of keys
-        at start, choose key and apply to all the doors
-        or, choose key from keyset individually for each door
-
-* both knobs should refer to the same lock
-* randomize deadbolt
-    * remove lock from door locks
-    * disable deadbolt elements
-
-click outside burglar menu to close
-better way of putting a tool away
+dialogue changes
