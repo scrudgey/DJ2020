@@ -27,7 +27,7 @@ public class AttackSurfaceLatch : AttackSurfaceElement {
         } else {
             return new BurglarAttackResult {
                 success = false,
-                feedbackText = "Door latch hardened"
+                feedbackText = "Bypass failed"
             };
         }
     }

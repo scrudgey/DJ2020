@@ -20,6 +20,15 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image keyImage;
     public Image screwdriverImage;
     public GameObject keyringButton;
+    [Header("tools")]
+    public GameObject probeToolButton;
+    public GameObject lockpickToolButton;
+    public GameObject screwdriverToolButton;
+    public GameObject keyToolButton;
+    [Header("sfx")]
+    public AudioSource audioSource;
+    public AudioClip[] pickupToolSound;
+    public AudioClip[] toolOverElementSound;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
     bool mouseDown;
@@ -71,6 +80,7 @@ public class BurglarCanvasController : MonoBehaviour {
             cursorImage.enabled = false;
 
             uiElement.Initialize(this, element);
+            element.Initialize(uiElement);
         }
     }
     public void TearDown() {
@@ -123,6 +133,7 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
     public void DoneButtonCallback() {
+        Debug.Log("done button callback");
         GameManager.I.CloseBurglar();
     }
 
@@ -150,19 +161,20 @@ public class BurglarCanvasController : MonoBehaviour {
     }
     void HandleAttackResult(BurglarAttackResult result) {
         if (result != BurglarAttackResult.None) {
-            if (result.success) {
-                feedbackText.text = feedbackText.text + $"\n{result.feedbackText}";
-                string[] lines = feedbackText.text.Split('\n');
-                int numLines = lines.Length;
-                if (numLines > 3) {
-                    feedbackText.text = "";
-                    feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
-                }
-            }
+            AddText(result.feedbackText);
         }
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
+        }
+    }
+    void AddText(string newLine) {
+        feedbackText.text = feedbackText.text + $"\n{newLine}";
+        string[] lines = feedbackText.text.Split('\n');
+        int numLines = lines.Length;
+        if (numLines > 3) {
+            feedbackText.text = "";
+            feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
         }
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
@@ -171,6 +183,7 @@ public class BurglarCanvasController : MonoBehaviour {
         if (selectedTool == BurglarToolType.none) {
             captionText.text = $"Use {element.elementName}";
         } else {
+            Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
             captionText.text = $"Use {selectedTool} on {element.elementName}";
         }
     }
@@ -201,6 +214,14 @@ public class BurglarCanvasController : MonoBehaviour {
     void SetTool(BurglarToolType toolType) {
         selectedTool = toolType;
         selectedToolText.text = toolType.ToString();
+
+        lockpickToolButton.SetActive(true);
+        probeToolButton.SetActive(true);
+        keyToolButton.SetActive(true);
+        screwdriverToolButton.SetActive(true);
+
+        Toolbox.RandomizeOneShot(audioSource, pickupToolSound);
+
         switch (toolType) {
             case BurglarToolType.none:
                 probeImage.enabled = false;
@@ -213,24 +234,28 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = true;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                lockpickToolButton.SetActive(false);
                 break;
             case BurglarToolType.probe:
                 probeImage.enabled = true;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                probeToolButton.SetActive(false);
                 break;
             case BurglarToolType.key:
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = true;
                 screwdriverImage.enabled = false;
+                keyToolButton.SetActive(false);
                 break;
             case BurglarToolType.screwdriver:
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = true;
+                screwdriverToolButton.SetActive(false);
                 break;
         }
     }

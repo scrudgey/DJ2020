@@ -4,39 +4,13 @@ using System.Linq;
 using Easings;
 using UnityEditor;
 using UnityEngine;
-[System.Serializable]
-public class Lock {
-    public enum LockType { physical, electronic }
-    public Door door;
-    public LockType lockType;
-    public bool locked;
-    public int lockId;
-    public AudioClip[] unlockSounds;
-
-    public bool TryKey(LockType keyType, int keyId) {
-        if (keyType == lockType && keyId == lockId) {
-            this.locked = !this.locked;
-            Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
-            return true;
-        }
-        return false;
-    }
-
-    public void PickLock() {
-        if (lockType == LockType.physical) {
-            this.locked = false;
-        }
-    }
-}
-
 
 public class Door : Interactive {
     public enum DoorState { closed, opening, closing, open, ajar }
     public enum DoorParity { twoWay, openIn, openOut }
     public bool autoClose;
     public bool latched;
-    // public bool locked;
-    public Lock doorLock;
+    public List<DoorLock> doorLocks;
     public DoorParity parity;
     private DoorState _state;
     public DoorState state {
@@ -59,13 +33,15 @@ public class Door : Interactive {
     public float autoCloseSpeed = 80f;
     private static readonly float ANGLE_THRESHOLD = 0.1f;
     private Transform lastInteractorTransform;
-    public Transform[] knobs;
-    Coroutine turnKnobCoroutine;
+    // public Transform[] knobs;
+    public Transform[] doorknobs;
+    Dictionary<Transform, Coroutine> knobCoroutines = new Dictionary<Transform, Coroutine>();
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
     Vector3[] parentOriginalPositions;
     void Awake() {
+        knobCoroutines = new Dictionary<Transform, Coroutine>();
         // parentOriginalPositions = parent.position;
         parentOriginalPositions = parents.Select(p => p.position).ToArray();
         orientationPlane = new Plane(transform.forward, hinges[0].position);
@@ -231,13 +207,16 @@ public class Door : Interactive {
         ActivateDoorknob(interactor.transform.position, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
         return ItemUseResult.Empty() with { waveArm = true };
     }
-    public bool IsLocked() => doorLock.locked;
+    public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
     public void ActivateDoorknob(Vector3 position, HashSet<int> withKeySet = null) {
-        if (withKeySet != null && doorLock != null) {
-            foreach (int keyId in withKeySet) {
-                doorLock.TryKey(Lock.LockType.physical, keyId);
+        if (withKeySet != null) {
+            foreach (DoorLock doorLock in doorLocks) {
+                foreach (int keyId in withKeySet) {
+                    doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
+                }
             }
         }
+
         switch (state) {
             case DoorState.ajar:
                 DoApplyOpening(position);
@@ -246,9 +225,11 @@ public class Door : Interactive {
             case DoorState.closed:
                 if (IsLocked()) {
                     Toolbox.RandomizeOneShot(audioSource, lockedSounds);
-                    JiggleKnob();
+                    foreach (Transform doorknob in doorknobs)
+                        JiggleKnob(doorknob);
                 } else {
-                    TurnKnob();
+                    foreach (Transform doorknob in doorknobs)
+                        TurnKnob(doorknob);
                     DoApplyOpening(position);
                 }
                 break;
@@ -310,29 +291,33 @@ public class Door : Interactive {
         ChangeState(DoorState.ajar);
     }
 
-    public void TurnKnob() {
-        if (knobs == null || knobs.Count() == 0)
+    public void TurnKnob(Transform knob) {
+        if (knob == null)
             return;
-        if (turnKnobCoroutine == null) {
-            turnKnobCoroutine = StartCoroutine(DoTurnKnobRoutine());
+        if (!knobCoroutines.ContainsKey(knob)) {
+            knobCoroutines[knob] = StartCoroutine(DoTurnKnobRoutine(knob));
         }
     }
-    public void JiggleKnob() {
-        if (knobs == null || knobs.Count() == 0)
+    public void JiggleKnob(Transform knob) {
+        if (knob == null)
             return;
-        if (turnKnobCoroutine == null) {
-            turnKnobCoroutine = StartCoroutine(JiggleKnobRoutine());
+        if (!knobCoroutines.ContainsKey(knob)) {
+            knobCoroutines[knob] = StartCoroutine(JiggleKnobRoutine(knob));
         }
     }
-    public void PickJiggleKnob() {
-        if (knobs == null || knobs.Count() == 0)
-            return;
-        if (turnKnobCoroutine == null) {
-            turnKnobCoroutine = StartCoroutine(PickJiggleKnobRoutine());
+    public void PickJiggleKnob(DoorLock doorlock) {
+        // if (knobs == null || knobs.Count() == 0)
+        //     return;
+        if (doorlock.rotationElements.Count() == 0) return;
+        foreach (Transform knob in doorlock.rotationElements) {
+            if (knob == null) continue;
+            if (!knobCoroutines.ContainsKey(knob)) {
+                knobCoroutines[knob] = StartCoroutine(PickJiggleKnobRoutine(knob));
+            }
         }
     }
-    IEnumerator DoTurnKnobRoutine() {
-        if (knobs == null || knobs.Count() == 0) {
+    IEnumerator DoTurnKnobRoutine(Transform knob) {
+        if (knob == null) {
             yield return null;
         } else {
             float timer = 0f;
@@ -340,10 +325,7 @@ public class Door : Interactive {
             while (timer < duration) {
                 float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 0f, 90f, duration);
                 Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-                foreach (Transform knob in knobs) {
-                    knob.localRotation = turnRotation;
-
-                }
+                knob.localRotation = turnRotation;
                 timer += Time.deltaTime;
                 yield return null;
             }
@@ -351,54 +333,44 @@ public class Door : Interactive {
             while (timer < duration) {
                 float turnAngle = (float)PennerDoubleAnimation.Linear(timer, 90f, -90f, duration);
                 Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-                foreach (Transform knob in knobs) {
-
-                    knob.localRotation = turnRotation;
-                }
+                knob.localRotation = turnRotation;
                 timer += Time.deltaTime;
                 yield return null;
             }
-            turnKnobCoroutine = null;
+            knobCoroutines.Remove(knob);
         }
     }
-    IEnumerator JiggleKnobRoutine() {
-        float timer = 0f;
-        float duration = 0.25f;
-        while (timer < duration) {
-            float turnAngle = (float)PennerDoubleAnimation.BounceEaseOut(timer, 15f, -15f, duration);
-            Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            foreach (Transform knob in knobs) {
-
-                knob.localRotation = turnRotation;
-            }
-            timer += Time.deltaTime;
+    IEnumerator JiggleKnobRoutine(Transform knob) {
+        if (knob == null) {
             yield return null;
+        } else {
+            float timer = 0f;
+            float duration = 0.25f;
+            while (timer < duration) {
+                float turnAngle = (float)PennerDoubleAnimation.BounceEaseOut(timer, 15f, -15f, duration);
+                Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
+                knob.localRotation = turnRotation;
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            knobCoroutines.Remove(knob);
         }
-        turnKnobCoroutine = null;
     }
-    IEnumerator PickJiggleKnobRoutine() {
+    IEnumerator PickJiggleKnobRoutine(Transform knob) {
         float timer = 0f;
         float duration = Random.Range(0.05f, 0.15f);
-        float startAngle = knobs[0].localRotation.eulerAngles.z;
+        float startAngle = knob.localRotation.eulerAngles.z;
         if (startAngle > 180) startAngle -= 360f;
         float offset = Random.Range(-10f, 10f);
         float finalAngle = Mathf.Clamp(startAngle + offset, -10f, 10f);
         while (timer < duration) {
             float turnAngle = (float)PennerDoubleAnimation.CircEaseIn(timer, startAngle, finalAngle - startAngle, duration);
             Quaternion turnRotation = Quaternion.Euler(0f, 0f, turnAngle);
-            foreach (Transform knob in knobs) {
-                knob.localRotation = turnRotation;
-            }
+            knob.localRotation = turnRotation;
             timer += Time.deltaTime;
             yield return null;
         }
-        turnKnobCoroutine = null;
+        knobCoroutines.Remove(knob);
     }
-
-#if UNITY_EDITOR
-    void OnDrawGizmos() {
-        bool locked = IsLocked();
-        Handles.Label(transform.position, $"Locked: {locked}\nKeyId: {doorLock.lockId}");
-    }
-#endif
 }

@@ -5,16 +5,20 @@ electrical systems
 sensors
 
 ## tools
+definite:
 * power drill through lock
 * keyed-alike
+* wire cutter
+* magnetic probe (detects trip sensors)
+* sensor defeaters
+* lock decoder
+
 * shim
 * bump keys
-* wire cutter
 * fence cutter
 * glass cutter
     to prevent bullet holes: fairly simple
     to allow player to pass through: hard
-* magnetic probe (detects trip sensors)
 * under door attack?
 
 ## configuration
@@ -31,13 +35,17 @@ configuration contains a security rating:
 security setting plus a random seed will determine the configuration of the door attack surface
     1. key code : from configuration, not random
     2. latch present / not, vulnerable / not: based on security
+        latch guard
     3. lock picking difficulty: easy , medium, hard, impossible: based on security
-    
+    deadbolt
+
 Request-to-Exit (REX) sensor 
+
+door types:
+
 
 
 ##
-
 
 maybe there is a difference in suspicion between different kinds of tools?
     certainly lockpicks are less suspicious than power drill
@@ -65,3 +73,53 @@ if there are a plethora of tools / attacks and security levels, it makes sense t
     recognize and assess different types of locks / systems.
     Q: where is the hook / thrill / game in it?
     A: a door is not vulnerable to the few easy attacks you try: they're clever. but you're more clever.
+
+
+
+
+* hide tool from toolbar when in use
+* click down effect?
+* tool click sfx
+* tool over element clicky sound
+* click on empty to put tool away
+feedback when element is not vulnerable
+show serial numbers for different elements
+show vulnerabilities of different elements
+    callout icons?
+
+* draw latch guard
+* redraw baseplate
+wirecutter
+magnetic probe
+deadbolt
+magnet / trip sensor disable
+REX sensor
+skeleton key
+
+randomizing door attack surface:
+    latch vulnerable / not
+    latch visible / not
+    latch guard in place
+
+    lockpick difficulty
+
+    deadbolt present / not present 
+    deadbolt difficulty
+
+
+    trip sensor
+
+    auto close / not
+
+electronic access:
+    door open without badge -> alarm
+    REX sensor
+
+
+configuration of keyid and vulnerabilities = a serial number?
+
+latch guard enable / disable
+latch guard screws / noscrews
+deadbolt
+
+disable attack surface UI element when latch cover is removed / screw is removed

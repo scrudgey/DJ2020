@@ -10,6 +10,13 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
     float totalRotation;
     public SpriteRenderer screwImage;
     public bool unscrewed;
+    public override void Initialize(AttackSurfaceUIElement uIElement) {
+        base.Initialize(uIElement);
+        if (unscrewed) {
+            screwImage.enabled = false;
+            uiElement.gameObject.SetActive(false);
+        }
+    }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (unscrewed)
@@ -22,6 +29,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
                 turnCoroutine = StartCoroutine(TurnScrew(amount));
                 if (totalRotation > 540) {
                     unscrewed = true;
+                    uiElement.gameObject.SetActive(false);
                     return new BurglarAttackResult() {
                         success = true,
                         feedbackText = "Screw removed",
@@ -36,7 +44,13 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
         base.HandleClickHeld(activeTool, data);
         return BurglarAttackResult.None;
     }
-
+    // public override void Initialize(AttackSurfaceUIElement uIElement) {
+    //     base.Initialize(uIElement);
+    //     if (unscrewed) {
+    //         Debug.Log($"disabling ui element {uiElement}");
+    //         uiElement.gameObject.SetActive(false);
+    //     }
+    // }
     IEnumerator TurnScrew(float amount) {
         Vector3 initialEuler = transform.localRotation.eulerAngles;
         float finalZ = initialEuler.z - amount;

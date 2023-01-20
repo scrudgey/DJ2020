@@ -2266,8 +2266,37 @@ how to tackle this?
         lockpick: easy / med / hard / impossible
     then allow different elements to be turned on and off on initialization
 
+burglar canvas:
+    * better tool selector
+    drill
+
 doors:
-    * auto close
-    * can open from the inside
-    * hide / don't hide latch
-    * different knobs?
+    auto close
+    can open from the inside
+    hide / don't hide latch
+    different knobs?
+    random key choice
+
+using key in lock should spin the keyway
+make sure networks are working properly
+    remote hack
+    disable alarm terminal
+crawling suspicion
+guard got stuck
+distraction needed
+guard notices disabled / tampered door
+randomly place lasers
+randomly place cameras
+
+random keys:
+    approach 1: level initializer has a set of keyed-alike door groups that have set of keys
+        at start, choose key and apply to all the doors
+        or, choose key from keyset individually for each door
+
+* both knobs should refer to the same lock
+* randomize deadbolt
+    * remove lock from door locks
+    * disable deadbolt elements
+
+click outside burglar menu to close
+better way of putting a tool away

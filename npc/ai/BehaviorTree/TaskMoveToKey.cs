@@ -136,7 +136,7 @@ namespace AI {
         }
 
         void OpenDoor(Vector3 position, Door door) {
-            if (door.state != Door.DoorState.open && door.state != Door.DoorState.opening) {
+            if (door.state == Door.DoorState.closed) {
                 door.ActivateDoorknob(position, withKeySet: keyIds);
                 waitForDoor = door;
             }

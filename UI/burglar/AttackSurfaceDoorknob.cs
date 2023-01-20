@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public Door door;
+    public DoorLock doorLock;
     public AudioSource audioSource;
     public AudioClip[] pickSounds;
     public AudioClip[] manipulateSounds;
     public AudioClip[] keySounds;
     public float integratedPickTime;
     bool clickedThisFrame;
+    public bool isHandle;
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
@@ -18,17 +21,22 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         } else if (activeTool == BurglarToolType.key) {
             bool success = false;
             foreach (int keyId in GameManager.I.gameData.playerState.physicalKeys) {
-                success |= door.doorLock.TryKey(Lock.LockType.physical, keyId);
+                success |= doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
             }
             Toolbox.RandomizeOneShot(audioSource, keySounds);
             if (success) {
-                bool locked = door.doorLock.locked;
+                bool locked = doorLock.locked;
                 return new BurglarAttackResult {
                     success = true,
-                    feedbackText = locked ? "Door locked" : "Door unlocked"
+                    feedbackText = locked ? $"{elementName} locked" : $"{elementName} unlocked"
+                };
+            } else {
+                return new BurglarAttackResult {
+                    success = false,
+                    feedbackText = "Your keys don't work"
                 };
             }
-        } else if (activeTool == BurglarToolType.none) {
+        } else if (activeTool == BurglarToolType.none && isHandle) {
             bool success = !door.IsLocked();
             door.ActivateDoorknob(data.burglar.transform.position);
             return BurglarAttackResult.None with {
@@ -44,7 +52,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         if (activeTool == BurglarToolType.lockpick) {
             clickedThisFrame = true;
             integratedPickTime += Time.deltaTime;
-            door.PickJiggleKnob();
+            door.PickJiggleKnob(doorLock);
             if (!audioSource.isPlaying) {
                 Toolbox.RandomizeOneShot(audioSource, pickSounds);
             }
@@ -60,8 +68,8 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     }
 
     BurglarAttackResult DoPick() {
-        bool success = door.doorLock.lockType == Lock.LockType.physical && door.doorLock.locked;
-        door.doorLock.PickLock();
+        bool success = doorLock.lockType == DoorLock.LockType.physical && doorLock.locked;
+        doorLock.PickLock();
         if (success) {
             return new BurglarAttackResult {
                 success = true,

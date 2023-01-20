@@ -319,3 +319,8 @@ difficult features:
     * length
     * comes down to a random roll, you can still fail even with good initial results
     * every challenge needs to support every tactic (?)
+
+
+
+
+one roll per lie. each lie increases the credibility threshold.

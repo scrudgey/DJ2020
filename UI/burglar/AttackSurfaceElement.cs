@@ -6,6 +6,10 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public Action<AttackSurfaceElement> OnValueChanged { get; set; }
     public string elementName;
     public float progressPercent;
+    public AttackSurfaceUIElement uiElement;
+    public virtual void Initialize(AttackSurfaceUIElement uiElement) {
+        this.uiElement = uiElement;
+    }
     public virtual BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         return BurglarAttackResult.None;
     }
