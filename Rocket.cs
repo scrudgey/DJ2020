@@ -17,7 +17,6 @@ public class Rocket : MonoBehaviour {
     }
     void OnCollisionEnter(Collision collision) {
         if (didExplosion) return;
-        Debug.Log($"rocket colliding with {collision}");
         explosive.Explode();
         didExplosion = true;
         smokeTrail.SetParent(null, true);

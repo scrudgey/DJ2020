@@ -6,7 +6,9 @@ public class PoweredComponent : GraphNodeComponent<PoweredComponent, PowerNode> 
     public bool power {
         get { return _power; }
         set {
+            bool dirty = _power != value;
             _power = value;
+            // if (dirty)
             OnStateChange?.Invoke(this);
         }
     }

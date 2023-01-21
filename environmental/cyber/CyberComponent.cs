@@ -7,7 +7,9 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
     public virtual bool compromised {
         get { return _compromised; }
         set {
+            bool dirty = _compromised != value;
             _compromised = value;
+            // if (dirty)
             OnStateChange?.Invoke(this);
         }
     }

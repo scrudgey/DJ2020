@@ -16,13 +16,14 @@ public class CyberDataStore : MonoBehaviour {
         cyberComponent.OnStateChange += HandleCyberStateChange;
     }
     public void HandleCyberStateChange(CyberComponent component) {
+        // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");
         if (component.compromised) {
             Open();
         }
     }
     public void Open() {
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        GameManager.I.SetCyberNodeState(cyberComponent, false);
+        // GameManager.I.SetCyberNodeState(cyberComponent, true);
         foreach (PayData payData in payDatas) {
             Debug.Log($"stealing paydata: {payData.filename}");
         }
@@ -33,8 +34,8 @@ public class CyberDataStore : MonoBehaviour {
     }
 
     void OnDestroy() {
+        cyberComponent.OnStateChange -= HandleCyberStateChange;
         // check if we invalidate an objective
-        // List<string> myFileNames = payDatas.Select(data => data.filename).ToList();
         if (GameManager.I == null || GameManager.I.gameData.levelState == null || GameManager.I.gameData.levelState.template == null) return;
         foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {
             if (objective is ObjectiveData) {

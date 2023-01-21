@@ -2276,3 +2276,10 @@ make sure networks are working properly
     remote hack
     disable alarm terminal
 dialogue changes
+rattling door
+better display of paydata 
+move hack indicators to top
+
+
+problem with checking dirty
+    initialization of network depends on 

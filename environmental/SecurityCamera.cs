@@ -49,7 +49,7 @@ public class SecurityCamera : IBinder<SightCone> {
         if (!alarmNodeEnabled) {
             audioSource.Stop();
         }
-        // Debug.Log($"security camera setting alarm state change enabled: {component.nodeEnabled}");
+        // Debug.Log($"{component.idn} security camera setting alarm state change enabled: {alarmNodeEnabled} ");
     }
 
     public override void HandleValueChanged(SightCone t) {

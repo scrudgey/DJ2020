@@ -313,6 +313,8 @@ public partial class GameManager : Singleton<GameManager> {
 
     // TODO: this belongs to level logic, but it's fine to put it here for now
     public void SetNodeEnabled<T, U>(T graphNodeComponent, bool state) where T : GraphNodeComponent<T, U> where U : Node {
+        if (isLoadingLevel) return;
+
         string idn = graphNodeComponent.idn;
 
         Node node = graphNodeComponent switch {
@@ -343,7 +345,7 @@ public partial class GameManager : Singleton<GameManager> {
                     break;
             };
         } else {
-            Debug.Log($"called set node enabled with null node {graphNodeComponent} {idn}");
+            // Debug.Log($"called set node enabled with null node {graphNodeComponent} {idn}");
         }
     }
 
@@ -392,16 +394,17 @@ public partial class GameManager : Singleton<GameManager> {
             SetCyberNodeState(gameData.levelState.delta.cyberGraph.nodes[idn], state);
         }
     }
+    public void SetCyberNodeState(CyberNode node, bool state) {
+        node.compromised = state;
+        RefreshCyberGraph();
+    }
     public void SetAlarmNodeState(AlarmComponent alarmComponent, bool state) {
         string idn = alarmComponent.idn;
         if (gameData.levelState != null && gameData.levelState.delta.alarmGraph != null && gameData.levelState.delta.alarmGraph.nodes.ContainsKey(idn)) {
             SetAlarmNodeState(gameData.levelState.delta.alarmGraph.nodes[idn], state);
         }
     }
-    public void SetCyberNodeState(CyberNode node, bool state) {
-        node.compromised = state;
-        RefreshCyberGraph();
-    }
+
     public void SetAlarmNodeState(AlarmNode node, bool state) {
         if (node.enabled) {
             node.alarmTriggered = state;
