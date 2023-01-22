@@ -59,7 +59,7 @@ public class SphereInvestigateState : SphereControlState {
     public bool seenPlayerRecently() => timeSinceSawPlayer < 2f;
 
     public bool isPlayerNear() {
-        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 1.25f;
+        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 3f;
     }
     public bool isPlayerSuspicious() {
         return integratedPlayerMovement > WARN_THRESHOLD;
@@ -71,7 +71,7 @@ public class SphereInvestigateState : SphereControlState {
         dialogueTask = new TaskOpenDialogue(owner);
 
         alertTaskNode = new Sequence(
-            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 4f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
                 speedCoefficient = 1.2f,
                 highlight = highlight
@@ -91,7 +91,7 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 4f) {
                         speedCoefficient = 0.5f,
                         highlight = highlight
                     },
@@ -101,7 +101,7 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
-                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
+                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 4f) {
                             headBehavior = TaskMoveToKey.HeadBehavior.search,
                             highlight = highlight,
                         },

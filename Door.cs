@@ -158,6 +158,9 @@ public class Door : Interactive {
                 latched = true;
                 Toolbox.RandomizeOneShot(audioSource, closeSounds);
                 break;
+            case DoorState.open:
+                impulse = 0;
+                break;
             default:
                 break;
         }
@@ -202,13 +205,14 @@ public class Door : Interactive {
     }
 
     public override ItemUseResult DoAction(Interactor interactor) {
-        lastInteractorTransform = interactor.transform;
+        // lastInteractorTransform = interactor.transform;
         // NOTE: assumes that only the player can use the door
-        ActivateDoorknob(interactor.transform.position, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
+        ActivateDoorknob(interactor.transform.position, interactor.transform, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
         return ItemUseResult.Empty() with { waveArm = true };
     }
     public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
-    public void ActivateDoorknob(Vector3 position, HashSet<int> withKeySet = null) {
+    public void ActivateDoorknob(Vector3 position, Transform activator, HashSet<int> withKeySet = null) {
+        lastInteractorTransform = activator;
         if (withKeySet != null) {
             foreach (DoorLock doorLock in doorLocks) {
                 foreach (int keyId in withKeySet) {

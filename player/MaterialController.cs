@@ -44,7 +44,7 @@ public class MaterialController {
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             normalMaterials[renderer] = renderer.material;
-            initialSortingLayers[renderer] = renderer.sortingLayerName;
+            initialSortingLayers[renderer] = LayerMask.LayerToName(renderer.gameObject.layer);
             if (renderer.material != null) {
                 Texture albedo = renderer.material.mainTexture;
                 Material interloperMaterial = new Material(renderer.material);
@@ -97,9 +97,7 @@ public class MaterialController {
             if (renderer == null || interloperMaterials[renderer] == null || renderer.CompareTag("donthide"))
                 continue;
             if (renderer is SpriteRenderer) {
-                // Debug.Log($"fadeout sprite renderer: {gameObject}");
-                // renderer.enabled = false;
-                renderer.sortingLayerName = "clearsighterHide";
+                renderer.gameObject.layer = LayerUtil.GetLayer(Layer.clearsighterHide);
                 continue;
             }
             renderer.material = interloperMaterials[renderer];
@@ -123,10 +121,7 @@ public class MaterialController {
             if (renderer == null || normalMaterials[renderer] == null)
                 return;
             if (renderer is SpriteRenderer) {
-                // renderer.enabled = true;
-                renderer.sortingLayerName = initialSortingLayers[renderer];
-
-                // Debug.Log($"enabling sprite renderer: {gameObject}");
+                renderer.gameObject.layer = LayerMask.NameToLayer(initialSortingLayers[renderer]);
                 continue;
             }
             renderer.material = normalMaterials[renderer];
@@ -177,9 +172,7 @@ public class MaterialController {
                 if (renderer == null || !renderer.enabled || renderer.CompareTag("donthide"))
                     continue;
                 if (renderer is SpriteRenderer) {
-                    // Debug.Log($"disable sprite renderer: {gameObject}");
-                    // renderer.enabled = false;
-                    renderer.sortingLayerName = "clearsighterHide";
+                    renderer.gameObject.layer = LayerUtil.GetLayer(Layer.clearsighterHide);
                     continue;
                 }
                 // renderer.material.SetFloat("_TargetAlpha", targetAlpha);

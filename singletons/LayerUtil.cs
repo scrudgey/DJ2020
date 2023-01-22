@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum Layer { def, shell, obj, skybox, shadowprobe, bulletPassThrough, interactive, interactor, bulletOnly }
+public enum Layer { def, shell, obj, skybox, shadowprobe, bulletPassThrough, interactive, interactor, bulletOnly, clearsighterHide }
 public enum NavLayer { def, KeyId1, KeyId2 }
 
 public class LayerUtil {
@@ -18,6 +18,7 @@ public class LayerUtil {
         {Layer.interactive, "interactive"},
         {Layer.interactor, "interactor"},
         {Layer.bulletOnly, "bulletOnly"},
+        {Layer.clearsighterHide, "clearsighterHide"},
     };
 
     private static Dictionary<NavLayer, string> navLayerNames = new Dictionary<NavLayer, string>{
@@ -30,7 +31,7 @@ public class LayerUtil {
         var x = layers.Select(layer => layerNames[layer]).ToArray();
         return LayerMask.GetMask(x);
     }
-
+    public static int GetLayer(Layer layer) => LayerMask.NameToLayer(layerNames[layer]);
     public static int GetNavLayerMask(params NavLayer[] layers) => layers
             .Select(layer => navLayerNames[layer])
             .Select(layerName => NavMesh.GetAreaFromName(layerName))

@@ -40,7 +40,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
             }
         } else if (activeTool == BurglarToolType.none && isHandle) {
             bool success = !door.IsLocked();
-            door.ActivateDoorknob(data.burglar.transform.position);
+            door.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform);
             return BurglarAttackResult.None with {
                 finish = success
             };
@@ -51,7 +51,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
 
     public override BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleClickHeld(activeTool, data);
-        if (activeTool == BurglarToolType.lockpick && !setback) {
+        if (activeTool == BurglarToolType.lockpick && !setback && doorLock.locked) {
             clickedThisFrame = true;
             integratedPickTime += Time.deltaTime;
             door.PickJiggleKnob(doorLock);
@@ -73,6 +73,11 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                 if (progressStageIndex >= progressStages)
                     return DoPick();
             }
+        } else if (!doorLock.locked) {
+            return new BurglarAttackResult {
+                success = true,
+                feedbackText = "Already unlocked"
+            };
         }
         return BurglarAttackResult.None;
     }

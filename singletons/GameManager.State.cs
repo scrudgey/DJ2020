@@ -62,7 +62,7 @@ public partial class GameManager : Singleton<GameManager> {
             OnObjectivesChange?.Invoke(gameData);
         }
         lastObjectivesStatusHashCode = newHashCode;
-        Debug.Log($"level status: {gameData.levelState.delta.objectiveStatus}");
+        // Debug.Log($"level status: {gameData.levelState.delta.objectiveStatus}");
     }
 
     public void HandleAllObjectivesComplete() {

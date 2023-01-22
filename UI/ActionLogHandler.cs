@@ -67,6 +67,7 @@ public class ActionLogHandler : IBinder<Interactor> {
         }
     }
     void DataChanged() {
+        if (!gameObject.activeInHierarchy) return;
         Disable();
         if (data != null) {
             blitTextCoroutine = StartCoroutine(BlitCalloutText(data.target.actionPrompt));

@@ -77,8 +77,9 @@ namespace AI {
             // navigation
             if (waitForDoor != null) {
                 // TODO: more elaborate behavior to navigate to a specific point provided by the door.
-                if (waitForDoor.state != Door.DoorState.opening && waitForDoor.state != Door.DoorState.closing)
+                if (waitForDoor.state != Door.DoorState.opening && waitForDoor.state != Door.DoorState.closing) {
                     waitForDoor = null;
+                }
                 return TaskState.running;
             } else if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
                 return TaskState.running;
@@ -86,7 +87,7 @@ namespace AI {
                 Vector3 inputVector = Vector3.zero;
                 Vector3 nextPoint = navMeshPath.corners[pathIndex];
                 float distance = Vector3.Distance(nextPoint, transform.position);
-                float arrivalDistance = (pathIndex < navMeshPath.corners.Length) ? CORNER_ARRIVAL_DISTANCE : finalCornerArrivalDistance;
+                float arrivalDistance = (pathIndex < navMeshPath.corners.Length - 1) ? CORNER_ARRIVAL_DISTANCE : finalCornerArrivalDistance;
                 if (distance > arrivalDistance) {
                     Vector3 direction = nextPoint - transform.position;
                     inputVector = direction;
@@ -136,8 +137,9 @@ namespace AI {
         }
 
         void OpenDoor(Vector3 position, Door door) {
+            Debug.Log($"open door state: {door.state}");
             if (door.state == Door.DoorState.closed) {
-                door.ActivateDoorknob(position, withKeySet: keyIds);
+                door.ActivateDoorknob(position, transform, withKeySet: keyIds);
                 waitForDoor = door;
             }
         }

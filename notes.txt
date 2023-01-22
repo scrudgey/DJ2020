@@ -2212,6 +2212,21 @@ icons:
 * randomize deadbolt
     * remove lock from door locks
     * disable deadbolt elements
+* make sure networks are working properly 
+    * remote hack
+* enhance readibility:
+* clearsighter interaction with renderers
+* move hack indicators to top
+* screw turning
+* head when crouching
+* right click -> aim first has screwed up orientation
+* crowding investigate state
+* attack surface becomes visible in clearsighter
+* rattling door
+* handle picking / manipulating unlocked
+* floating head syndrome
+* self-closing isn't working for NPC
+
 
 build a test level, 3 storey building infiltration
 build a test level equivalent to Jack That Data
@@ -2225,21 +2240,14 @@ skybox buildings
 holes for AC ducts 
 elevator
 cameras on map marker
-* floating head syndrome
 using key in lock should spin the keyway
-guard got stuck
+guard got stuck?
 distraction needed
 randomly place lasers
 randomly place cameras
-crawling suspicion
-guard notices disabled / tampered door
-1. guards should investigate the site of a tripped alarm
-    apply suspicion record in some circumstances (camera? laser?)
-strike team should come in with a purpose
-    investigate the last position
+
 click outside burglar menu to close
 better way of putting a tool away
-self-closing isn't working for NPC
 NPC shouldn't leave door unlocked
 
 clearsighter:
@@ -2255,27 +2263,28 @@ doors
             or, choose key from keyset individually for each door
     chainlink fence door
         padlock
-    auto close
     can open from the inside
     different knobs?
-    random key choice
 
 
-* make sure networks are working properly 
-    * remote hack
-* enhance readibility:
-* clearsighter interaction with renderers
-* move hack indicators to top
-* screw turning
-* head when crouching
-* right click -> aim first has screwed up orientation
 
-dialogue changes
-rattling door
-better display of paydata, and loot
+crawling suspicion
+guard notices disabled / tampered door
+1. guards should investigate the site of a tripped alarm
+    apply suspicion record in some circumstances (camera? laser?)
+strike team should come in with a purpose
+    investigate the last position
+objective status
+    slide in from right
+    highlight changes
+    only show when something changes
 
 disable alarm terminal (disable radio?)
     public AlarmHQTerminal levelHQTerminal() => alarmComponents.Values
                 .Where(node => node != null & node is AlarmHQTerminal)
                 .Select(component => (AlarmHQTerminal)component)
                 .FirstOrDefault();
+
+better display of paydata, and loot
+
+dialogue

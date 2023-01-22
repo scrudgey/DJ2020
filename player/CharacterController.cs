@@ -193,7 +193,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             default:
                 break;
             case CharacterState.burgle:
-                // GameManager.I.StartBurglar();
                 GameManager.I.TransitionToInputMode(InputMode.burglar);
                 break;
             case CharacterState.wallPress:
@@ -204,7 +203,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.aim:
                 aimCameraRotation = Quaternion.FromToRotation(Vector3.forward, Motor.CharacterForward);
-                Debug.Log($"initial aim camera rotation: {aimCameraRotation}");
                 lookAtDirection = Motor.CharacterForward;
                 _inputTorque = Vector3.zero;
                 GameManager.I.TransitionToInputMode(InputMode.aim);
@@ -1312,6 +1310,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
     public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
         // TODO: consider breaking out by state
+        if (ignoredColliders.Contains(hitCollider)) return;
 
         // We can wall jump only if we are not stable on ground and are moving against an obstruction
         if (AllowWallJump && !Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable) {
