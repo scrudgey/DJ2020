@@ -21,6 +21,7 @@ public class MaterialController {
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, Material> interloperMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
+    Dictionary<Renderer, string> initialSortingLayers = new Dictionary<Renderer, string>();
     public MaterialController(Collider collider, CharacterCamera camera) {
         this.camera = camera;
         this.gameObject = collider.transform.root.gameObject;
@@ -43,6 +44,7 @@ public class MaterialController {
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             normalMaterials[renderer] = renderer.material;
+            initialSortingLayers[renderer] = renderer.sortingLayerName;
             if (renderer.material != null) {
                 Texture albedo = renderer.material.mainTexture;
                 Material interloperMaterial = new Material(renderer.material);
@@ -96,7 +98,8 @@ public class MaterialController {
                 continue;
             if (renderer is SpriteRenderer) {
                 // Debug.Log($"fadeout sprite renderer: {gameObject}");
-                renderer.enabled = false;
+                // renderer.enabled = false;
+                renderer.sortingLayerName = "clearsighterHide";
                 continue;
             }
             renderer.material = interloperMaterials[renderer];
@@ -120,7 +123,9 @@ public class MaterialController {
             if (renderer == null || normalMaterials[renderer] == null)
                 return;
             if (renderer is SpriteRenderer) {
-                renderer.enabled = true;
+                // renderer.enabled = true;
+                renderer.sortingLayerName = initialSortingLayers[renderer];
+
                 // Debug.Log($"enabling sprite renderer: {gameObject}");
                 continue;
             }
@@ -166,16 +171,15 @@ public class MaterialController {
         } else {
             MakeFadeIn();
         }
-        // if (gameObject.name.ToLower().Contains("door") && !gameObject.name.ToLower().Contains("double")) {
         //     Debug.Log($"[update 2] {gameObject} {gameObject.transform.position} {childRenderers.Count} {active()} {state} {targetAlpha}");
-        // }
         if (state == State.fadeIn || state == State.fadeOut) {
             foreach (Renderer renderer in childRenderers) {
                 if (renderer == null || !renderer.enabled || renderer.CompareTag("donthide"))
                     continue;
                 if (renderer is SpriteRenderer) {
                     // Debug.Log($"disable sprite renderer: {gameObject}");
-                    renderer.enabled = false;
+                    // renderer.enabled = false;
+                    renderer.sortingLayerName = "clearsighterHide";
                     continue;
                 }
                 // renderer.material.SetFloat("_TargetAlpha", targetAlpha);

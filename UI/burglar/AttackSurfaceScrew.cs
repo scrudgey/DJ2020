@@ -53,12 +53,13 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
     // }
     IEnumerator TurnScrew(float amount) {
         Vector3 initialEuler = transform.localRotation.eulerAngles;
-        float finalZ = initialEuler.z - amount;
+        float finalZ = initialEuler.z - amount;     // fix this
+        Debug.Log(finalZ);
         float duration = 0.25f;
         float timer = 0f;
         while (timer < duration) {
             timer += Time.deltaTime;
-            float newZ = (float)PennerDoubleAnimation.Linear(timer, initialEuler.z, finalZ, duration);
+            float newZ = (float)PennerDoubleAnimation.Linear(timer, initialEuler.z, -1f * amount, duration);
             Quaternion newRotation = Quaternion.Euler(initialEuler.x, initialEuler.y, newZ);
             transform.localRotation = newRotation;
             yield return null;

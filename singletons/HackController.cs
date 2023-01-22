@@ -39,7 +39,6 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
         Debug.Log($"handle hack input {targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks}");
         if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)
             return;
-
         Debug.Log($"targets any: {targets.Any(t => t.node == input.targetNode)}");
         if (!targets.Any(t => t.node == input.targetNode)) {
             HackData data = new HackData {
@@ -48,7 +47,6 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
                 lifetime = 5f,
                 type = input.type
             };
-            Debug.Log(data);
             targets.Add(data);
             UpdateSuspicion();
             OnValueChanged?.Invoke(this);

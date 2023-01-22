@@ -9,9 +9,11 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     public GameObject nodeIndicatorPrefab;
     protected Graph<U, T> graph;
     public Material lineRendererMaterial;
+    public Material marchingAntsMaterial;
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
+    Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
 
-    Dictionary<U, V> indicators = new Dictionary<U, V>();
+    protected Dictionary<U, V> indicators = new Dictionary<U, V>();
     void Awake() {
         foreach (Transform child in transform) {
             Destroy(child.gameObject);
@@ -22,13 +24,34 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     }
 
     void Update() {
+        Vector3 playerPosition = GameManager.I.playerObject.transform.position;
+
+        Dictionary<U, float> distances = indicators.Keys.ToDictionary(node => node, node => 0f);
+        if (GameManager.I.playerObject != null) {
+            // distances = indicators.Keys.ToDictionary(node => node, node => Vector3.Distance(node.position, camPosition));
+            distances = indicators.Keys.ToDictionary(node => node, node => Mathf.Abs(node.position.y - playerPosition.y));
+            float minDistance = distances.Values.Min();
+            float maxDistance = distances.Values.Max();
+            distances = distances.ToList().ToDictionary(kvp => kvp.Key, kvp => (kvp.Value - minDistance) / maxDistance);
+        }
         foreach (KeyValuePair<U, V> kvp in indicators) {
+            // float distance = Mathf.Clamp(Mathf.Abs(kvp.Key.position.y - playerPosition.y) / 2f, 0f, 1f);
+            float distance = distances[kvp.Key];
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
             kvp.Value.Configure(kvp.Key, graph, this);
             kvp.Value.SetScreenPosition(screenPoint);
+            kvp.Value.ApplyDistanceEffect(distance);
+        }
+        foreach (HashSet<string> edge in graph.edgePairs) {
+            LineRenderer renderer = GetLineRenderer(edge);
+            string[] nodes = edge.ToArray();
+            U node1 = graph.nodes[nodes[0]];
+            // U node2 = graph.nodes[nodes[1]];
+            V indicator1 = indicators[node1];
+            // V indicator2 = indicators[node2];
+            renderer.material.color = indicator1.image.color;
         }
     }
-
     public void Refresh(T graph) {
         this.graph = graph;
         // Debug.Log($"refreshing graph {graph}");
@@ -41,8 +64,8 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
             if (node.sceneName != sceneName)
                 continue;
             V indicator = GetIndicator(node);
-            Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
-            indicator.SetScreenPosition(screenPoint);
+            // Vector3 screenPoint = cam.WorldToScreenPoint(node.position);
+            indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
             indicator.Configure(node, graph, this);
         }
 
@@ -51,18 +74,61 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     public virtual void SetEdgeGraphicState() {
         string sceneName = SceneManager.GetActiveScene().name;
 
-        // Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count} ");
+        Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count}");
         foreach (HashSet<string> edge in graph.edgePairs) {
+            // foreach (string[] edge in graph.edgeArrays) {
             LineRenderer renderer = GetLineRenderer(edge);
             string[] nodes = edge.ToArray();
             U node1 = graph.nodes[nodes[0]];
             U node2 = graph.nodes[nodes[1]];
             if (node1.sceneName != sceneName || node2.sceneName != sceneName)
                 continue;
+            SetLinePositions(renderer, node1, node2);
+            renderer.material.color = colorSet.enabledColor;
 
-            renderer.positionCount = 2;
-            renderer.SetPositions(new Vector3[2] { node1.position, node2.position });
+            // V indicator1 = indicators[node1];
+            // V indicator2 = indicators[node2];
+
+            // Gradient newGradient = new Gradient();
+            // GradientColorKey[] colorKey;
+            // GradientAlphaKey[] alphaKey;
+            // // Populate the color keys at the relative time 0 and 1 (0 and 100%)
+            // colorKey = new GradientColorKey[2];
+            // colorKey[0].color = indicator1.image.color;
+            // colorKey[0].time = 0.0f;
+            // colorKey[1].color = indicator2.image.color;
+            // colorKey[1].time = 1.0f;
+
+            // // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
+            // alphaKey = new GradientAlphaKey[2];
+            // alphaKey[0].alpha = indicator1.image.color.a;
+            // alphaKey[0].time = 0.0f;
+            // alphaKey[1].alpha = indicator2.image.color.a;
+            // alphaKey[1].time = 1.0f;
+
+            // newGradient.SetKeys(colorKey, alphaKey);
+            // renderer.colorGradient = newGradient;
         }
+    }
+
+    void SetLinePositions(LineRenderer renderer, U node1, U node2) {
+        // bool yFlag = Mathf.Abs(node1.position.x - node2.position.x) > 2f;
+        bool xFlag = Mathf.Abs(node1.position.x - node2.position.x) > 1f;
+        bool zFlag = Mathf.Abs(node1.position.z - node2.position.z) > 1f;
+
+        List<Vector3> points = new List<Vector3>();
+        points.Add(node1.position);
+        // if (yFlag)
+        points.Add(new Vector3(node1.position.x, node2.position.y, node1.position.z));
+        if (xFlag)
+            points.Add(new Vector3(node2.position.x, node2.position.y, node1.position.z));
+
+        if (zFlag)
+            points.Add(new Vector3(node2.position.x, node2.position.y, node2.position.z));
+
+        points.Add(node2.position);
+        renderer.positionCount = points.Count;
+        renderer.SetPositions(points.ToArray());
     }
 
     V GetIndicator(U node) {
@@ -87,6 +153,18 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
             // Debug.LogWarning($"{typeof(T).FullName} Initializing line renderer for edge: {string.Join(",", edge)}");
             LineRenderer renderer = InitializeLineRenderer();
             lineRenderers[edge] = renderer;
+            lineRendererArrays[edge.ToArray()] = renderer;
+            return renderer;
+        }
+    }
+    protected LineRenderer GetLineRenderer(string[] edge) {
+        if (lineRendererArrays.ContainsKey(edge)) {
+            return lineRendererArrays[edge];
+        } else {
+            // Debug.LogWarning($"{typeof(T).FullName} Initializing line renderer for edge: {string.Join(",", edge)}");
+            LineRenderer renderer = InitializeLineRenderer();
+            // lineRenderers[edge] = renderer;
+            lineRendererArrays[edge.ToArray()] = renderer;
             return renderer;
         }
     }

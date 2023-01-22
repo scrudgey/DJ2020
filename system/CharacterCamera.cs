@@ -433,6 +433,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             cameraRotation = Quaternion.LookRotation(camDirectionPoint, Vector3.up);
         }
 
+
         // update PlanarDirection to snap to nearest of 4 quadrants
         Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
         PlanarDirection = closestCardinal * Vector3.forward;

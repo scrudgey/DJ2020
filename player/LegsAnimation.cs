@@ -267,7 +267,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         // set position back to the rotated position.
         // this is hacky
 
-        // headAnimation.transform.position = absoluteWorldPosition;
+        headAnimation.transform.position = absoluteWorldPosition;
         torsoAnimation.transform.position += 0.001f * directionToCamera;
         if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.localPosition = Vector3.zero;
 

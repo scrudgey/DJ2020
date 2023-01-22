@@ -11,9 +11,11 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
     public HashSet<HashSet<string>> edgePairs;
+    public HashSet<string[]> edgeArrays;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
         edgePairs = new HashSet<HashSet<string>>(HashSet<string>.CreateSetComparer());
+        edgeArrays = new HashSet<string[]>();
         edges = new SerializableDictionary<string, HashSet<string>>();
     }
 
@@ -21,6 +23,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         AddLink(from, to);
         AddLink(to, from);
         edgePairs.Add(new HashSet<string> { from.idn, to.idn });
+        edgeArrays.Add(new string[2] { from.idn, to.idn });
     }
 
     void AddLink(Node from, Node to) {
@@ -114,6 +117,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         }
         foreach (HashSet<string> edgePair in rhs.edgePairs) {
             lhs.edgePairs.Add(edgePair);
+            lhs.edgeArrays.Add(edgePair.ToArray());
         }
         return lhs;
     }

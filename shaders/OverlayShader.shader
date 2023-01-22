@@ -7,10 +7,12 @@ Shader "Custom/OverlayShader"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        // Tags { "RenderType"="Transparent" }
+        Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+       
         LOD 100
         ZTest Always 
-
+        Blend SrcAlpha OneMinusSrcAlpha
         Color [_Color]
         Pass {}
 

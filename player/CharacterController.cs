@@ -204,7 +204,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.aim:
                 aimCameraRotation = Quaternion.FromToRotation(Vector3.forward, Motor.CharacterForward);
+                Debug.Log($"initial aim camera rotation: {aimCameraRotation}");
                 lookAtDirection = Motor.CharacterForward;
+                _inputTorque = Vector3.zero;
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
             case CharacterState.jumpPrep:
@@ -549,9 +551,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 slewLookVector.y = 0;
 
-                // if (input.Fire.AimPressed) {
-                //     snapToDirection = lookAtDirection;
-                // }
                 if (input.snapToLook) {
                     if (input.lookAtPosition != Vector3.zero) {
                         snapToDirection = input.lookAtPosition - transform.position;
