@@ -317,12 +317,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereHoldAtGunpointState:
                     case StopAndListenState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
-                        SuspicionRecord record = new SuspicionRecord {
-                            content = "someone was shot",
-                            suspiciousness = Suspiciousness.aggressive,
-                            lifetime = 120f,
-                            maxLifetime = 120f
-                        };
+                        SuspicionRecord record = SuspicionRecord.shotSuspicion();
                         GameManager.I.AddSuspicionRecord(record);
                         ChangeState(new ReactToAttackState(this, speechTextController, bulletImpact.damage, characterController, initialPause: 0f));
                         break;
@@ -465,12 +460,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             //     lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
             // }
             lastGunshotHeard = noise;
-            SuspicionRecord record = new SuspicionRecord {
-                content = "gunshots heard",
-                suspiciousness = Suspiciousness.aggressive,
-                lifetime = 60f,
-                maxLifetime = 60f
-            };
+            SuspicionRecord record = SuspicionRecord.gunshotsHeard();
             GameManager.I.AddSuspicionRecord(record);
 
 
@@ -517,12 +507,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         } else if (noise.data.player) {
             lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
             if (noise.data.suspiciousness > Suspiciousness.normal) {
-                SuspicionRecord record = new SuspicionRecord {
-                    content = "a suspicious noise was heard",
-                    suspiciousness = Suspiciousness.suspicious,
-                    lifetime = 10f,
-                    maxLifetime = 10f
-                };
+                SuspicionRecord record = SuspicionRecord.noiseSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
@@ -545,12 +530,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
                 if (noise.data.suspiciousness == Suspiciousness.suspicious) {
-                    SuspicionRecord record = new SuspicionRecord {
-                        content = "a suspicious noise was heard",
-                        suspiciousness = Suspiciousness.suspicious,
-                        lifetime = 10f,
-                        maxLifetime = 10f
-                    };
+                    SuspicionRecord record = SuspicionRecord.noiseSuspicion();
                     GameManager.I.AddSuspicionRecord(record);
 
                     switch (stateMachine.currentState) {
@@ -563,12 +543,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                             break;
                     }
                 } else if (noise.data.suspiciousness == Suspiciousness.aggressive) {
-                    SuspicionRecord record = new SuspicionRecord {
-                        content = "an explosion was heard",
-                        suspiciousness = Suspiciousness.aggressive,
-                        lifetime = 60f,
-                        maxLifetime = 60f
-                    };
+                    SuspicionRecord record = SuspicionRecord.explosionSuspicion();
                     GameManager.I.AddSuspicionRecord(record);
                     switch (stateMachine.currentState) {
                         case SphereMoveState:
@@ -660,18 +635,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // TODO: reset gun state...?!?
     }
 
-    public DialogueInput GetDialogueInput() => new DialogueInput() {
-        NPCAI = this,
-        playerObject = GameManager.I.playerObject,
-        npcObject = this.gameObject,
-        playerState = GameManager.I.gameData.playerState,
-        levelState = GameManager.I.gameData.levelState,
-        suspicionRecords = GameManager.I.suspicionRecords,
-        playerSuspiciousness = GameManager.I.GetTotalSuspicion(),
-        alarmActive = GameManager.I.gameData.levelState.delta.alarmGraph.anyAlarmActive(),
-        playerInDisguise = GameManager.I.gameData.levelState.delta.disguise,
-        playerSpeechSkill = GameManager.I.gameData.playerState.speechSkillLevel
-    };
+    public DialogueInput GetDialogueInput() => GameManager.I.GetDialogueInput(this);
 
 #if UNITY_EDITOR
     void OnDrawGizmos() {

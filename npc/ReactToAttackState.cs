@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-
 
 public class ReactToAttackState : SphereControlState {
     public enum AttackType { none, damage, gunshots }
@@ -52,12 +52,7 @@ public class ReactToAttackState : SphereControlState {
                 AttackType.gunshots => "HQ respond! Shots fired!",
                 _ => "HQ respond! Activate building alarm!"
             };
-            SuspicionRecord intruderRecord = new SuspicionRecord {
-                content = "gunshots reported",
-                maxLifetime = 120,
-                lifetime = 120,
-                suspiciousness = Suspiciousness.suspicious
-            };
+            SuspicionRecord intruderRecord = SuspicionRecord.gunshotsHeard();
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = true,

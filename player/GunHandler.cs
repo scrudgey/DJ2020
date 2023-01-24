@@ -38,10 +38,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool isAimingWeapon;
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
-    static readonly SuspicionRecord BrandishingWeaponRecord = new SuspicionRecord {
-        content = "brandishing weapon",
-        suspiciousness = Suspiciousness.suspicious
-    };
     void Awake() {
         lockOnColliders = new Collider[32];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -278,12 +274,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
             CharacterCamera.Shake(gunInstance.template.noise / 50f, 0.1f);
             if (!gunInstance.template.silencer) {
-                SuspicionRecord record = new SuspicionRecord {
-                    content = "shooting gun",
-                    suspiciousness = Suspiciousness.aggressive,
-                    maxLifetime = 1f,
-                    lifetime = 1f
-                };
+                SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
             }
         }
@@ -391,7 +382,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             PoolManager.I?.RegisterPool(gunInstance.template.shellCasing);
             PoolManager.I?.RegisterPool(gunInstance.template.muzzleFlash);
             if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
-                GameManager.I.AddSuspicionRecord(BrandishingWeaponRecord);
+                GameManager.I.AddSuspicionRecord(SuspicionRecord.brandishingSuspicion());
             }
         }
     }
@@ -400,7 +391,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         gunInstance = null;
         OnValueChanged?.Invoke(this);
         if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            GameManager.I.RemoveSuspicionRecord(BrandishingWeaponRecord);
+            GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
         }
     }
     public void SwitchToGun(int idn) {

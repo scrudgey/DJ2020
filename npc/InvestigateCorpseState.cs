@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
@@ -14,12 +15,7 @@ public class InvestigateCorpseState : SphereControlState {
     public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
         this.corpse = corpse;
         this.speechTextController = speechTextController;
-        record = new SuspicionRecord {
-            content = "A body was discovered",
-            maxLifetime = 120,
-            lifetime = 120,
-            suspiciousness = Suspiciousness.suspicious
-        };
+        record = SuspicionRecord.bodySuspicion();
     }
     public override void Enter() {
         base.Enter();

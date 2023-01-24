@@ -42,4 +42,7 @@ public class LevelState {
         }
         return path;
     }
+
+    public bool PlayerHasID() => plan.activeTactics.Any(tactic => tactic is TacticFakeID);
+
 }

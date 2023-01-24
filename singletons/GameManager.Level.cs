@@ -495,4 +495,19 @@ public partial class GameManager : Singleton<GameManager> {
         PlayerSpawnPoint spawnPoint = GameObject.FindObjectOfType<PlayerSpawnPoint>();
         return spawnPoint.SpawnPlayer(state, plan);
     }
+
+    public DialogueInput GetDialogueInput(SphereRobotAI ai) => new DialogueInput() {
+        NPCAI = ai,
+        npcObject = ai.gameObject,
+
+        playerObject = playerObject,
+        playerState = gameData.playerState,
+        levelState = gameData.levelState,
+        suspicionRecords = suspicionRecords,
+        playerSuspiciousness = GetTotalSuspicion(),
+        alarmActive = gameData.levelState.delta.alarmGraph.anyAlarmActive(),
+        playerInDisguise = gameData.levelState.delta.disguise,
+        playerSpeechSkill = gameData.playerState.speechSkillLevel,
+        playerHasID = gameData.levelState.PlayerHasID()
+    };
 }

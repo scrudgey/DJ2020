@@ -11,6 +11,7 @@ public struct DialogueInput {
     public Dictionary<String, SuspicionRecord> suspicionRecords;
     public Suspiciousness playerSuspiciousness;
     public bool playerInDisguise;
+    public bool playerHasID;
     public bool alarmActive;
     public int playerSpeechSkill;
 }

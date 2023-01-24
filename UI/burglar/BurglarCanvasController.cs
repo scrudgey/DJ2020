@@ -34,12 +34,12 @@ public class BurglarCanvasController : MonoBehaviour {
     bool mouseDown;
     AttackSurfaceElement selectedElement;
     bool finishing;
-    SuspicionRecord suspicionTamper() => new SuspicionRecord {
-        content = "tampering with equipment",
-        suspiciousness = Suspiciousness.suspicious,
-        lifetime = 3f,
-        maxLifetime = 3f
-    };
+    // SuspicionRecord suspicionTamper() => new SuspicionRecord {
+    //     content = "tampering with equipment",
+    //     suspiciousness = Suspiciousness.suspicious,
+    //     lifetime = 3f,
+    //     maxLifetime = 3f
+    // };
     public void Initialize(BurgleTargetData data) {
         this.data = data;
         finishing = false;
@@ -131,7 +131,7 @@ public class BurglarCanvasController : MonoBehaviour {
             case BurglarToolType.lockpick:
             case BurglarToolType.probe:
             case BurglarToolType.screwdriver:
-                GameManager.I.AddSuspicionRecord(suspicionTamper());
+                GameManager.I.AddSuspicionRecord(SuspicionRecord.tamperingSuspicion(data));
                 break;
         }
     }

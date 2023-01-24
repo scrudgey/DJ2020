@@ -2269,8 +2269,9 @@ doors
 
 
 crawling suspicion
+hacking suspicions should last
 guard notices disabled / tampered door
-1. guards should investigate the site of a tripped alarm
+guards should investigate the site of a tripped alarm
     apply suspicion record in some circumstances (camera? laser?)
 strike team should come in with a purpose
     investigate the last position
@@ -2278,7 +2279,6 @@ objective status
     slide in from right
     highlight changes
     only show when something changes
-
 disable alarm terminal (disable radio?)
     public AlarmHQTerminal levelHQTerminal() => alarmComponents.Values
                 .Where(node => node != null & node is AlarmHQTerminal)
@@ -2286,5 +2286,13 @@ disable alarm terminal (disable radio?)
                 .FirstOrDefault();
 
 better display of paydata, and loot
-
+put a light on the roof
 dialogue
+limited number of guards spawn
+easy for guard to lose sight of me in pursuit
+
+
+put gun away and left click on objects to use
+left click on people to talk
+screws are still backwards?
+floor can be shot away!

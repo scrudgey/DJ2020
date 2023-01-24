@@ -274,7 +274,7 @@ public partial class GameManager : Singleton<GameManager> {
             UpdateGraphs();
 
             if (cutsceneIsRunning) {
-                playerCharacterController.ResetInput();
+                playerCharacterController.ResetMovement();
             } else {
                 DoInputs();
             }

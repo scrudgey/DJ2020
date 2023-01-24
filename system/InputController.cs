@@ -281,9 +281,6 @@ public class InputController : MonoBehaviour {
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-        // if (mouseDelta.magnitude > 1f) mouseDelta = Vector2.zero; // HACK!
-        // mouseDelta = Vector3.ClampMagnitude(mouseDelta, 10f);
-        // Debug.Log((mouseDelta - previousMouseDelta).magnitude);
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
 
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);

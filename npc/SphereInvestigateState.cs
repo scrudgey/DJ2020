@@ -24,12 +24,6 @@ public class SphereInvestigateState : SphereControlState {
         this.highlight = highlight;
         this.characterController = characterController;
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
-        // SuspicionRecord intruderRecord = new SuspicionRecord {
-        //     content = "intruder reported",
-        //     maxLifetime = 120,
-        //     lifetime = 120,
-        //     suspiciousness = Suspiciousness.normal
-        // };
         report = new HQReport {
             reporter = owner.gameObject,
             desiredAlarmState = true,
@@ -37,7 +31,6 @@ public class SphereInvestigateState : SphereControlState {
             timeOfLastContact = Time.time,
             lifetime = 6f,
             speechText = "HQ respond. Intruder spotted. Raise the alarm.",
-            // suspicionRecord = intruderRecord
         };
         DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
@@ -59,7 +52,7 @@ public class SphereInvestigateState : SphereControlState {
     public bool seenPlayerRecently() => timeSinceSawPlayer < 2f;
 
     public bool isPlayerNear() {
-        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 3f;
+        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 2f;
     }
     public bool isPlayerSuspicious() {
         return integratedPlayerMovement > WARN_THRESHOLD;
@@ -71,7 +64,7 @@ public class SphereInvestigateState : SphereControlState {
         dialogueTask = new TaskOpenDialogue(owner);
 
         alertTaskNode = new Sequence(
-            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 4f) {
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
                 speedCoefficient = 1.2f,
                 highlight = highlight
@@ -91,7 +84,7 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 4f) {
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                         speedCoefficient = 0.5f,
                         highlight = highlight
                     },
@@ -101,7 +94,7 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
-                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 4f) {
+                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                             headBehavior = TaskMoveToKey.HeadBehavior.search,
                             highlight = highlight,
                         },

@@ -322,5 +322,18 @@ difficult features:
 
 
 
+# first modification
+* one roll per lie. each lie increases the credibility threshold.
+* start with identity challenge
+* increase threshold as we go.
+* give item option only when user has item
+    * fake ID always works
+* fail early
 
-one roll per lie. each lie increases the credibility threshold.
+
+# second modification
+show threshold constantly
+    "suspicion"
+    unify with skill check.
+differentiate tactics
+take into account skill & state (how?)

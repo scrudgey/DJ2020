@@ -107,6 +107,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private Vector3 _internalVelocityAdd = Vector3.zero;
     private Vector3 snapToDirection = Vector2.zero;
     public bool isCrouching = false;
+    public bool crouchStick = false;
     public bool isRunning = false;
     public bool isProne = false;
 
@@ -178,6 +179,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     Transform cameraFollowTransform;
     RaycastHit[] rayCastHits;
     public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
+
+    static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -340,6 +343,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public void ResetInput() {
         SetInputs(PlayerInput.none);
     }
+    public void ResetMovement() {
+        _moveInputVector = Vector3.zero;
+        _moveAxis = Vector2.zero;
+        _inputTorque = Vector3.zero;
+        _jumpRequested = false;
+        slewLookVector = Vector3.zero;
+        snapToDirection = Vector3.zero;
+        crouchStick = true;
+    }
     /// <summary>
     /// This is called every frame by MyPlayer in order to tell the character what its inputs are
     /// </summary>
@@ -379,6 +391,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         // Clamp input
         // TODO: this is weird
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
+        if (moveInputVector != Vector3.zero) {
+            crouchStick = false;
+        }
         if (input.moveDirection != Vector3.zero) {
             moveInputVector = Vector3.ClampMagnitude(input.moveDirection, 1f);
         } else if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -1037,6 +1052,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                             Vector3 initialMovementVelocity = targetMovementVelocity;
                             targetMovementVelocity *= crawlSpeedFraction * Toolbox.SquareWave(crouchMovementInputTimer, dutycycle: 0.75f);
                             targetMovementVelocity += 0.25f * crawlSpeedFraction * initialMovementVelocity;
+                            SetCrawlSuspicion(true);
                         } else {
                             targetMovementVelocity = Vector3.zero;
                         }
@@ -1154,6 +1170,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     void CheckUncrouch() {
+        if (crouchStick) return;
         if (isCrouching && !inputCrouchDown && state != CharacterState.landStun && state != CharacterState.jumpPrep) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
             SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
@@ -1165,9 +1182,21 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 // If no obstructions, uncrouch
                 SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 isCrouching = false;
+                SetCrawlSuspicion(false);
             }
         }
     }
+
+    void SetCrawlSuspicion(bool value) {
+        if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            if (value) {
+                GameManager.I.AddSuspicionRecord(crawlSuspicion);
+            } else {
+                GameManager.I.RemoveSuspicionRecord(crawlSuspicion);
+            }
+        }
+    }
+
     void SetCapsuleDimensions(float radius, float height, float yOffset) {
         Motor.SetCapsuleDimensions(radius, height, yOffset);
         if (targetPoint != null) {

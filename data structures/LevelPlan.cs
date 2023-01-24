@@ -14,7 +14,7 @@ public record LevelPlan {
         // items = new string[4] { "rocket", "deck", "C4", "tools" },
         items = new string[4] { "grenade", "deck", "rocket", "tools" },
         // activeTactics = new List<Tactic>()
-        activeTactics = new List<Tactic>() { new TacticDisguise() }
+        activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
     };
 
     public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);
