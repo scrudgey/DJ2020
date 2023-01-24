@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
     public int credits;
-
+    public SerializableDictionary<LootData, int> loots;
     // skin
     public string legSkin { get; set; }
     public string bodySkin { get; set; }
@@ -83,7 +83,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
             payDatas = new List<PayData>(),
 
-            credits = 10000
+            credits = 10000,
+            loots = new SerializableDictionary<LootData, int>()
         };
     }
 

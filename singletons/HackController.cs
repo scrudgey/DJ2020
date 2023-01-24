@@ -73,6 +73,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             // TODO: abort manual hacks if player moves out of range
             if (data.type == HackType.manual) {
                 UpdateManualHack(data);
+                UpdateSuspicion();
             }
         }
         List<HackData> done = targets.Where(x => x.done).ToList();

@@ -2226,6 +2226,9 @@ icons:
 * handle picking / manipulating unlocked
 * floating head syndrome
 * self-closing isn't working for NPC
+* dialogue
+* crawling suspicion
+* floor can be shot away!
 
 
 build a test level, 3 storey building infiltration
@@ -2234,21 +2237,6 @@ build a test level equivalent to Jack That Data
         turrets
         camera view bigger
     fill out proper texts
-    
-
-skybox buildings
-holes for AC ducts 
-elevator
-cameras on map marker
-using key in lock should spin the keyway
-guard got stuck?
-distraction needed
-randomly place lasers
-randomly place cameras
-
-click outside burglar menu to close
-better way of putting a tool away
-NPC shouldn't leave door unlocked
 
 clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
@@ -2266,33 +2254,44 @@ doors
     can open from the inside
     different knobs?
 
+skybox buildings
+holes for AC ducts 
+elevator
+cameras on map marker
+using key in lock should spin the keyway
+guard got stuck?
+distraction needed
+randomly place lasers
+randomly place cameras
+
+click outside burglar menu to close
+better way of putting a tool away
+NPC shouldn't leave door unlocked
 
 
-crawling suspicion
-hacking suspicions should last
+
+* hacking suspicions should last
 guard notices disabled / tampered door
 guards should investigate the site of a tripped alarm
     apply suspicion record in some circumstances (camera? laser?)
 strike team should come in with a purpose
     investigate the last position
+limited number of guards spawn
+don't dispatch multiple strike teams
+guard gets stuck in hallway.
+easy for guard to lose sight of me in investigate
+don't do multiple investigate cutscenes at once - if alredy under suspicion, just add into the fray
+investigate cutscene, dialogue, and burglar canvas
+
+disable alarm terminal should work (disable radio?) levelHQTerminal()
+put a light on the roof
+put gun away and left click on objects to use?
+left click on people to talk?
+screws are still backwards?
+ensure suspicion indicator is working correctly
+
 objective status
     slide in from right
     highlight changes
     only show when something changes
-disable alarm terminal (disable radio?)
-    public AlarmHQTerminal levelHQTerminal() => alarmComponents.Values
-                .Where(node => node != null & node is AlarmHQTerminal)
-                .Select(component => (AlarmHQTerminal)component)
-                .FirstOrDefault();
-
 better display of paydata, and loot
-put a light on the roof
-dialogue
-limited number of guards spawn
-easy for guard to lose sight of me in pursuit
-
-
-put gun away and left click on objects to use
-left click on people to talk
-screws are still backwards?
-floor can be shot away!

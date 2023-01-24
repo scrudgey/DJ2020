@@ -1,14 +1,17 @@
 # loot
 
 loot has:
-    gameobject
-    portrait
-    value
-    description
-    name
-    categories
+    * gameobject
+    * portrait
+    * value
+    * description
+    * name
+    * categories
     optional modifiers
         extra value?
+
+
+wire up loot collection
 
 ## NPCs drop loot
 
@@ -25,10 +28,11 @@ gold bar
 cryptocurrency stick
 
 high value drug:
-    zyme
-    nuke
-    synthmesc
+    * zyme
+    * nuke
+    * synthmesc
     drencrom
+    tiger tea
     smart drugs
 low value drug:
     caffeine powder

@@ -16,6 +16,16 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.credits += amount;
         CheckObjectives();
     }
+    public void CollectLoot(LootData data) {
+        if (gameData.playerState.loots.ContainsKey(data)) {
+            int oldCount = gameData.playerState.loots[data];
+            gameData.playerState.loots[data] = oldCount + 1;
+            Debug.Log($"collected loot {data.lootName} {oldCount + 1}");
+        } else {
+            gameData.playerState.loots[data] = 1;
+            Debug.Log($"collected loot {data.lootName} {1}");
+        }
+    }
 
     public void AddPhysicalKey(int keyId) {
         gameData.playerState.physicalKeys.Add(keyId);
