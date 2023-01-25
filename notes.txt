@@ -2134,17 +2134,16 @@ networks
     get cyber network working once and for all
     DFS path finding doesn't quite work right for highlighting alarm path
 
-
 optimizations:
     use octree in clearsighter
     optimize the ammo counter
         this could free up the equivalent of a whole camera render
     static batching / dynamic batching / occlusion culling  / gpu instancing
 
-
+put gun away and left click on objects to use?
+left click on people to talk?
 
 -----------------
-
 
 code-controlled gun animation
 attack surfaces
@@ -2161,17 +2160,10 @@ attack surfaces
         clicking on the panel in general replaces item, returns to hand
 loot
     guards can drop keys or loot
-    collect loot
-    loot details: sprite, profile, description, value, category
-    loot can be found: in environment, on shelves, in drawers, on NPCs
-    iconography
-    loot dovetails with data system
-        paydata is good
-        some data is useful in social engineering
-        some data provides keycodes
+    some data is useful in social engineering
+    some data provides keycodes
+
 dialogue
-    use ID status
-    concoct one lie per suspicion against player
     get once lie stratagem per mark from player
 vehicles
     strike team may arrive by vehicle
@@ -2184,7 +2176,6 @@ graphics
     disguise spritesheet (fireman)
     swat team spritesheet
     civ_female portrait could use some work
-    loot
     title screen logo
     title screen animations 
     helicopters for skybox
@@ -2199,7 +2190,6 @@ destructible AC unit
 destructible radio dish tower
 plants can catch on fire
 
-
 guns:
     silenced pistol
     fix silenced smg
@@ -2208,6 +2198,10 @@ icons:
         thermals
 
 -----------
+
+* loot
+* use ID status
+* concoct one lie per suspicion against player
 * both knobs should refer to the same lock
 * randomize deadbolt
     * remove lock from door locks
@@ -2229,7 +2223,10 @@ icons:
 * dialogue
 * crawling suspicion
 * floor can be shot away!
-
+* better display of paydata, and loot
+* hacking suspicions should last
+* slide in from right
+* only show when something changes
 
 build a test level, 3 storey building infiltration
 build a test level equivalent to Jack That Data
@@ -2259,7 +2256,6 @@ holes for AC ducts
 elevator
 cameras on map marker
 using key in lock should spin the keyway
-guard got stuck?
 distraction needed
 randomly place lasers
 randomly place cameras
@@ -2268,9 +2264,6 @@ click outside burglar menu to close
 better way of putting a tool away
 NPC shouldn't leave door unlocked
 
-
-
-* hacking suspicions should last
 guard notices disabled / tampered door
 guards should investigate the site of a tripped alarm
     apply suspicion record in some circumstances (camera? laser?)
@@ -2285,13 +2278,8 @@ investigate cutscene, dialogue, and burglar canvas
 
 disable alarm terminal should work (disable radio?) levelHQTerminal()
 put a light on the roof
-put gun away and left click on objects to use?
-left click on people to talk?
 screws are still backwards?
 ensure suspicion indicator is working correctly
 
 objective status
-    slide in from right
     highlight changes
-    only show when something changes
-better display of paydata, and loot

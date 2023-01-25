@@ -18,13 +18,15 @@ loot has:
 * show total value
 * show data too?
 better reward sound
-crouch to pick up low items, wave arm to pick up high items
+* crouch to pick up low items, wave arm to pick up high items
 
 i think i'm gonna need more categories.
     nuclear
     military
     robotics
     hardware
+    rare
+
 
 ## NPCs drop loot
 
@@ -129,10 +131,12 @@ low value industrial:
 
 ## locations 
 
-loot can be found on ground
+* loot can be found on ground
 loot can be found on shelves
 loot can be found by searching drawers
 loot is dropped when NPC dies
+
+randomized loot placement
 
 ## iconography
 

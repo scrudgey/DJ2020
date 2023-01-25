@@ -70,7 +70,8 @@ public class LootCanvasHandler : MonoBehaviour {
             LootCategory category = counter.category;
             int total = data.playerState.loots.ToList()
                 .Where(kvp => kvp.Key.category == category)
-                .Count();
+                .Select(kvp => kvp.Value)
+                .Sum();
             counter.numberText.text = $"{total}";
         }
         int payDataCount = data.playerState.payDatas.Count;

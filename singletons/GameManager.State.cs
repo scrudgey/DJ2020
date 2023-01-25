@@ -23,10 +23,8 @@ public partial class GameManager : Singleton<GameManager> {
         if (gameData.playerState.loots.ContainsKey(data)) {
             int oldCount = gameData.playerState.loots[data];
             gameData.playerState.loots[data] = oldCount + 1;
-            Debug.Log($"collected loot {data.lootName} {oldCount + 1}");
         } else {
             gameData.playerState.loots[data] = 1;
-            Debug.Log($"collected loot {data.lootName} {1}");
         }
         OnLootChange?.Invoke(data, gameData);
     }
@@ -71,7 +69,10 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        int newHashCode = statuses.GetHashCode();
+        // int newHashCode = statuses.GetHashCode();
+        int newHashCode = Toolbox.ListHashCode<ObjectiveStatus>(statuses);
+        // Debug.Log(statuses);
+        // Debug.Log($"{newHashCode} {lastObjectivesStatusHashCode}");
         if (lastObjectivesStatusHashCode != newHashCode) {
             OnObjectivesChange?.Invoke(gameData);
         }

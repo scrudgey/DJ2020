@@ -258,8 +258,7 @@ public partial class GameManager : Singleton<GameManager> {
         // TODO: this stuff should belong to level state
         reports = new Dictionary<GameObject, HQReport>();
         suspicionRecords = new Dictionary<string, SuspicionRecord>();
-
-        // Debug.Log($"initialized poweredComponents {poweredComponents} {poweredComponents.Count}");
+        lastObjectivesStatusHashCode = -1;
     }
     private void InitializePlayerAndController(LevelPlan plan) {
         ClearSceneData();

@@ -469,5 +469,14 @@ public class Toolbox {
     //     result *= Mathf.Exp(-1f * lambda);
     //     return (float)result;
     // }
+    public static int ListHashCode<T>(List<T> inlist) {
+        unchecked {
+            int hash = 19;
+            foreach (var foo in inlist) {
+                hash = hash * 31 + foo.GetHashCode();
+            }
+            return hash;
+        }
+    }
 }
 

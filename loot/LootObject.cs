@@ -11,7 +11,13 @@ public class LootObject : Interactive {
         GameManager.I.CollectLoot(data);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
-        return ItemUseResult.Empty() with { crouchDown = true };
+        bool waveArm = transform.position.y - interactor.transform.position.y > -0.25f;
+        bool crouchDown = !waveArm;
+        // Debug.Log(transform.position.y - interactor.transform.position.y);
+        return ItemUseResult.Empty() with {
+            crouchDown = crouchDown,
+            waveArm = waveArm
+        };
     }
     public override string ResponseString() {
         return $"picked up {data.lootName}";
