@@ -510,6 +510,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     TransitionToState(CharacterState.normal);
                 }
                 break;
+            case CharacterState.useItem:
+                if (interactor != null) {
+                    ItemUseResult interactorResult = interactor.SetInputs(input);
+                    HandleItemUseResult(interactorResult);
+                }
+                break;
             case CharacterState.normal:
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
@@ -663,7 +669,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     void HandleItemUseResult(ItemUseResult result) {
-        if (result.transitionToUseItem) {
+        if (result.crouchDown) {
             TransitionToState(CharacterState.useItem);
         }
         if (result.waveArm) {

@@ -15,7 +15,7 @@ namespace Items {
             explosive.data = c4Data.explosionData;
             SuspicionRecord record = SuspicionRecord.c4Suspicion();
             GameManager.I.AddSuspicionRecord(record);
-            return ItemUseResult.Empty() with { transitionToUseItem = true };
+            return ItemUseResult.Empty() with { crouchDown = true };
         }
     }
 

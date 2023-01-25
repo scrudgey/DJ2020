@@ -11,7 +11,20 @@ loot has:
         extra value?
 
 
-wire up loot collection
+* wire up loot collection
+* more grabbable loot
+* show loot in popup
+* show counts
+* show total value
+* show data too?
+better reward sound
+crouch to pick up low items, wave arm to pick up high items
+
+i think i'm gonna need more categories.
+    nuclear
+    military
+    robotics
+    hardware
 
 ## NPCs drop loot
 

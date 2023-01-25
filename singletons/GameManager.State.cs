@@ -6,10 +6,13 @@ using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
     public static Action<GameData> OnObjectivesChange;
+    public static Action<LootData, GameData> OnLootChange;
+    public static Action<List<PayData>, GameData> OnPayDataChange;
     int lastObjectivesStatusHashCode;
     public void AddPayDatas(List<PayData> datas) {
         gameData.playerState.payDatas.AddRange(datas);
         CheckObjectives();
+        OnPayDataChange?.Invoke(datas, gameData);
     }
 
     public void AddCredits(int amount) {
@@ -25,6 +28,7 @@ public partial class GameManager : Singleton<GameManager> {
             gameData.playerState.loots[data] = 1;
             Debug.Log($"collected loot {data.lootName} {1}");
         }
+        OnLootChange?.Invoke(data, gameData);
     }
 
     public void AddPhysicalKey(int keyId) {

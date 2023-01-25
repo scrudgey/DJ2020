@@ -5,7 +5,7 @@ using System.Linq;
 using Items;
 using UnityEngine;
 public record ItemUseResult {
-    public bool transitionToUseItem;
+    public bool crouchDown;
     public bool waveArm;
     public static ItemUseResult Empty() => new ItemUseResult {
 

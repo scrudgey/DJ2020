@@ -10,7 +10,7 @@ public class Credstick : Interactive {
         GameManager.I.AddCredits(amount);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
-        return ItemUseResult.Empty() with { transitionToUseItem = true };
+        return ItemUseResult.Empty() with { crouchDown = true };
     }
     public override string ResponseString() {
         return $"picked up {amount} credits";

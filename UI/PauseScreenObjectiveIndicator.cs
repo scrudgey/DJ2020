@@ -35,6 +35,7 @@ public class PauseScreenObjectiveIndicator : MonoBehaviour {
             _ => inProgressColor
         };
 
+        thumbnail.color = color;
         statusText.color = color;
         titleText.color = color;
     }
