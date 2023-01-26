@@ -29,18 +29,25 @@ public class ObjectiveCanvasController : MonoBehaviour {
 
     public void Bind(GameData data) {
         GameManager.OnObjectivesChange += HandleObjectivesChange;
-        HandleObjectivesChange(data);
+        HandleObjectivesChange(data, null);
     }
     void OnDestroy() {
         GameManager.OnObjectivesChange -= HandleObjectivesChange;
     }
-    public void HandleObjectivesChange(GameData data) {
+    public void HandleObjectivesChange(GameData data, Dictionary<Objective, ObjectiveStatus> changedStatuses) {
         int index = 0;
         foreach (KeyValuePair<Objective, ObjectiveIndicatorController> kvp in controllers) {
             kvp.Value.Configure(kvp.Key, data, index);
             index += 1;
         }
         ShowCanvasCoroutine();
+
+        if (changedStatuses != null) {
+            foreach (KeyValuePair<Objective, ObjectiveStatus> kvp in changedStatuses) {
+                Debug.Log($"changed status {kvp.Key} {kvp.Value}");
+                controllers[kvp.Key].IndicateValueChanged();
+            }
+        }
     }
 
     void ShowCanvasCoroutine() {

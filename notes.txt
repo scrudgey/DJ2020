@@ -1894,8 +1894,36 @@ note: layer "interactive"
 * a long way to travel means guards give up too easily
 * set up objectives
     * randomized placement of paydatas
-
-
+* loot
+* use ID status
+* concoct one lie per suspicion against player
+* both knobs should refer to the same lock
+* randomize deadbolt
+    * remove lock from door locks
+    * disable deadbolt elements
+* make sure networks are working properly 
+    * remote hack
+* enhance readibility:
+* clearsighter interaction with renderers
+* move hack indicators to top
+* screw turning
+* head when crouching
+* right click -> aim first has screwed up orientation
+* crowding investigate state
+* attack surface becomes visible in clearsighter
+* rattling door
+* handle picking / manipulating unlocked
+* floating head syndrome
+* self-closing isn't working for NPC
+* dialogue
+* crawling suspicion
+* floor can be shot away!
+* better display of paydata, and loot
+* hacking suspicions should last
+* slide in from right
+* only show when something changes
+* objective status
+    * highlight changes
 
 
 graphical issues:
@@ -2197,36 +2225,11 @@ icons:
     redraw others?
         thermals
 
------------
+level 3:
+    holes for AC ducts 
+    elevator
 
-* loot
-* use ID status
-* concoct one lie per suspicion against player
-* both knobs should refer to the same lock
-* randomize deadbolt
-    * remove lock from door locks
-    * disable deadbolt elements
-* make sure networks are working properly 
-    * remote hack
-* enhance readibility:
-* clearsighter interaction with renderers
-* move hack indicators to top
-* screw turning
-* head when crouching
-* right click -> aim first has screwed up orientation
-* crowding investigate state
-* attack surface becomes visible in clearsighter
-* rattling door
-* handle picking / manipulating unlocked
-* floating head syndrome
-* self-closing isn't working for NPC
-* dialogue
-* crawling suspicion
-* floor can be shot away!
-* better display of paydata, and loot
-* hacking suspicions should last
-* slide in from right
-* only show when something changes
+-----------
 
 build a test level, 3 storey building infiltration
 build a test level equivalent to Jack That Data
@@ -2252,17 +2255,24 @@ doors
     different knobs?
 
 skybox buildings
-holes for AC ducts 
-elevator
 cameras on map marker
 using key in lock should spin the keyway
 distraction needed
 randomly place lasers
 randomly place cameras
+little icon rises up when grabbing loot
 
 click outside burglar menu to close
 better way of putting a tool away
 NPC shouldn't leave door unlocked
+
+disable alarm terminal should work (disable radio?) levelHQTerminal()
+put a light on the roof
+screws are still backwards?
+ensure suspicion indicator is working correctly
+
+
+
 
 guard notices disabled / tampered door
 guards should investigate the site of a tripped alarm
@@ -2275,11 +2285,3 @@ guard gets stuck in hallway.
 easy for guard to lose sight of me in investigate
 don't do multiple investigate cutscenes at once - if alredy under suspicion, just add into the fray
 investigate cutscene, dialogue, and burglar canvas
-
-disable alarm terminal should work (disable radio?) levelHQTerminal()
-put a light on the roof
-screws are still backwards?
-ensure suspicion indicator is working correctly
-
-objective status
-    highlight changes

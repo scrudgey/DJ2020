@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
-    public static Action<GameData> OnObjectivesChange;
+    public static Action<GameData, Dictionary<Objective, ObjectiveStatus>> OnObjectivesChange;
     public static Action<LootData, GameData> OnLootChange;
     public static Action<List<PayData>, GameData> OnPayDataChange;
     int lastObjectivesStatusHashCode;
@@ -37,11 +37,13 @@ public partial class GameManager : Singleton<GameManager> {
 
     }
     public void CheckObjectives() {
+        Dictionary<Objective, ObjectiveStatus> changedObjectiveStatuses = new Dictionary<Objective, ObjectiveStatus>();
+
         foreach (Objective objective in gameData.levelState.template.objectives) {
             ObjectiveStatus oldStatus = gameData.levelState.delta.objectivesState[objective];
             ObjectiveStatus newStatus = objective.Status(gameData);
             if (oldStatus != newStatus) {
-                uiController.LogMessage($"Objective {objective.title}: {newStatus}");
+                changedObjectiveStatuses[objective] = newStatus;
             }
             gameData.levelState.delta.objectivesState[objective] = newStatus;
         }
@@ -69,15 +71,11 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        // int newHashCode = statuses.GetHashCode();
         int newHashCode = Toolbox.ListHashCode<ObjectiveStatus>(statuses);
-        // Debug.Log(statuses);
-        // Debug.Log($"{newHashCode} {lastObjectivesStatusHashCode}");
         if (lastObjectivesStatusHashCode != newHashCode) {
-            OnObjectivesChange?.Invoke(gameData);
+            OnObjectivesChange?.Invoke(gameData, changedObjectiveStatuses);
         }
         lastObjectivesStatusHashCode = newHashCode;
-        // Debug.Log($"level status: {gameData.levelState.delta.objectiveStatus}");
     }
 
     public void HandleAllObjectivesComplete() {
