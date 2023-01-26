@@ -17,7 +17,7 @@ public class DisableAlarmState : SphereControlState {
         if (GameManager.I.levelHQTerminal() != null) {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
-                desiredAlarmState = false,
+                desiredAlarmState = HQReport.AlarmChange.cancelAlarm,
                 locationOfLastDisturbance = owner.getLocationOfInterest(),
                 timeOfLastContact = Time.time,
                 lifetime = 6f,

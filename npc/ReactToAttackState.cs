@@ -55,7 +55,7 @@ public class ReactToAttackState : SphereControlState {
             SuspicionRecord intruderRecord = SuspicionRecord.gunshotsHeard();
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
-                desiredAlarmState = true,
+                desiredAlarmState = HQReport.AlarmChange.raiseAlarm,
                 locationOfLastDisturbance = owner.getLocationOfInterest(),
                 timeOfLastContact = Time.time,
                 lifetime = 6f,

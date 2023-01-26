@@ -376,6 +376,29 @@ public class SuspicionRecord {
                     }
         }
     };
+    public static SuspicionRecord tamperEvidenceSuspicion(TamperEvidence evidence) => new SuspicionRecord {
+        content = "equipment was tampered with",
+        suspiciousness = Suspiciousness.suspicious,
+        lifetime = 120f,
+        maxLifetime = 120f,
+        dialogue = new SuspicionDialogueParameters {
+            challenge = $"Do you know anything about the {evidence.data.target.name} that was tampered with?",
+            tactics = new List<DialogueTactic>{
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.lie,
+                            content = $"No clue.",
+                            successResponse = "Understood.",
+                            failResponse = "Oh yeah? You don't look like one."
+                        },
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.challenge,
+                            content = $"What do I look like, the {evidence.data.target.name} inspector?",
+                            successResponse = "Well, I have to ask.",
+                            failResponse = $"You look like someone who might mess with a {evidence.data.target.name}."
+                        }
+                    }
+        }
+    };
 
     public static SuspicionRecord tamperingSuspicion(HackController.HackData data) => new SuspicionRecord {
         content = "tampering with equipment",

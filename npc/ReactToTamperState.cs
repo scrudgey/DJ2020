@@ -2,25 +2,26 @@ using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class InvestigateCorpseState : SphereControlState {
+
+public class ReactToTamperState : SphereControlState {
     static readonly public string CORPSE_KEY = "corpsePosition";
 
     private TaskNode rootTaskNode;
     private SpeechTextController speechTextController;
     TaskMoveToKey moveTask;
-    Corpse corpse;
+    TamperEvidence evidence;
     bool inPosition;
-    SuspicionRecord record;
+    // SuspicionRecord record;
     CharacterController characterController;
-    public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
-        this.corpse = corpse;
+    public ReactToTamperState(SphereRobotAI ai, TamperEvidence evidence, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
+        this.evidence = evidence;
         this.speechTextController = speechTextController;
-        record = SuspicionRecord.bodySuspicion();
+        // record = SuspicionRecord.bodySuspicion();
     }
     public override void Enter() {
         base.Enter();
         SetupRootNode();
-        rootTaskNode.SetData(CORPSE_KEY, corpse.transform.position);
+        rootTaskNode.SetData(CORPSE_KEY, evidence.transform.position);
     }
     void SetupRootNode() {
         moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
@@ -29,12 +30,12 @@ public class InvestigateCorpseState : SphereControlState {
         };
         HQReport report = new HQReport {
             reporter = owner.gameObject,
-            desiredAlarmState = HQReport.AlarmChange.raiseAlarm,
-            locationOfLastDisturbance = corpse.transform.position,
+            desiredAlarmState = HQReport.AlarmChange.noChange,
+            locationOfLastDisturbance = evidence.transform.position,
             timeOfLastContact = Time.time,
             lifetime = 5f,
-            speechText = "HQ, respond! Man down!",
-            suspicionRecord = record
+            speechText = "HQ, respond. Someone has tampered with a door.",
+            suspicionRecord = SuspicionRecord.tamperEvidenceSuspicion(evidence)
         };
         inPosition = false;
         rootTaskNode = new Sequence(
@@ -59,10 +60,10 @@ public class InvestigateCorpseState : SphereControlState {
         if (inPosition && characterstopped) {
             input.CrouchDown = true;
             input.unCrawl = true;
-            corpse.reported = true;
+            evidence.reported = true;
         }
         if (result == TaskState.success || result == TaskState.failure) {
-            GameManager.I.AddSuspicionRecord(record);
+            // GameManager.I.AddSuspicionRecord(record);
             owner.StateFinished(this);
         }
         return input;

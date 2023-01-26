@@ -33,7 +33,7 @@ public class ReportGunshotsState : SphereControlState {
         SuspicionRecord intruderRecord = SuspicionRecord.gunshotsHeard();
         HQReport report = new HQReport {
             reporter = owner.gameObject,
-            desiredAlarmState = true,
+            desiredAlarmState = HQReport.AlarmChange.raiseAlarm,        // TODO: raise alarm only in certain security levels?
             locationOfLastDisturbance = owner.getLocationOfInterest(),
             timeOfLastContact = Time.time,
             lifetime = 6f,

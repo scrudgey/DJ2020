@@ -74,7 +74,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     public virtual void SetEdgeGraphicState() {
         string sceneName = SceneManager.GetActiveScene().name;
 
-        Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count}");
+        // Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count}");
         foreach (HashSet<string> edge in graph.edgePairs) {
             // foreach (string[] edge in graph.edgeArrays) {
             LineRenderer renderer = GetLineRenderer(edge);

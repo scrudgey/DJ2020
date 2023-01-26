@@ -2274,7 +2274,7 @@ ensure suspicion indicator is working correctly
 
 
 
-guard notices disabled / tampered door
+* guard notices disabled / tampered door
 guards should investigate the site of a tripped alarm
     apply suspicion record in some circumstances (camera? laser?)
 strike team should come in with a purpose

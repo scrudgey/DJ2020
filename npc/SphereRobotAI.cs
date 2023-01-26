@@ -323,6 +323,21 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             }
+            if (other.CompareTag("tamperEvidence")) {
+                TamperEvidence evidence = other.GetComponent<TamperEvidence>();
+                if (!evidence.reported) {
+                    switch (stateMachine.currentState) {
+                        case SphereMoveState:
+                        case SpherePatrolState:
+                        case FollowTheLeaderState:
+                        case PauseState:
+                        case StopAndListenState:
+                            alertHandler.ShowAlert(useWarnMaterial: true);
+                            ChangeState(new ReactToTamperState(this, evidence, speechTextController, characterController));
+                            break;
+                    }
+                }
+            }
             if (stateMachine.currentState != null)
                 stateMachine.currentState.OnObjectPerceived(other);
         }

@@ -37,7 +37,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public bool isAlarmRadioInProgress(GameObject exclude) {
         foreach (HQReport report in reports.Values) {
-            if (report.desiredAlarmState && report.reporter != exclude) {
+            if (report.desiredAlarmState == HQReport.AlarmChange.raiseAlarm && report.reporter != exclude) {
                 return true;
             }
         }
@@ -118,12 +118,15 @@ public partial class GameManager : Singleton<GameManager> {
 
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
         locationOfLastDisturbance = kvp.Value.locationOfLastDisturbance;
-        if (kvp.Value.desiredAlarmState) {
+        if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.raiseAlarm) {
             ActivateHQRadio();
             DisplayHQResponse("HQ: Understood. Dispatching strike team.");
-        } else {
+        } else if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.cancelAlarm) {
             DeactivateAlarm();
             DisplayHQResponse("HQ: Understood. Disabling alarm.");
+        } else if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.noChange) {
+            DeactivateAlarm();
+            DisplayHQResponse("HQ: Understood. Remain vigilant.");
         }
         if (kvp.Value.suspicionRecord != null) {
             GameManager.I.AddSuspicionRecord(kvp.Value.suspicionRecord);

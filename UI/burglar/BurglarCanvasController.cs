@@ -29,6 +29,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] pickupToolSound;
     public AudioClip[] toolOverElementSound;
+    TamperEvidence tamperEvidence;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
     bool mouseDown;
@@ -167,10 +168,22 @@ public class BurglarCanvasController : MonoBehaviour {
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
         }
+        if (result.createTamperEvidence) {
+            if (tamperEvidence == null) {
+                CreateTamperEvidence();
+            }
+        }
+        //
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
+    }
+    void CreateTamperEvidence() {
+        GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;
+        GameObject obj = GameObject.Instantiate(impactPrefab, data.burglar.transform.position, Quaternion.identity);
+        tamperEvidence = obj.GetComponent<TamperEvidence>();
+        tamperEvidence.data = data;
     }
     void AddText(string newLine) {
         feedbackText.text = feedbackText.text + $"\n{newLine}";
