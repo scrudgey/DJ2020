@@ -46,7 +46,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         state.ApplyState(npcObject);
     }
 
-    public void SpawnTemplated() {
-        SpawnNPC(myTemplate, useSpawnEffect: false);
+    public GameObject SpawnTemplated() {
+        return SpawnNPC(myTemplate, useSpawnEffect: false);
     }
 }

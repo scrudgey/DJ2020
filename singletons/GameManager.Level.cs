@@ -74,9 +74,16 @@ public partial class GameManager : Singleton<GameManager> {
 
         // spawn NPC
         if (spawnNpcs) {
-            foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
-                spawnPoint.SpawnTemplated();
+            while (state.delta.npcsSpawned < state.template.maxInitialNPC) {
+                foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+                    if (state.delta.npcsSpawned >= state.template.maxInitialNPC) continue;
+                    GameObject npc = spawnPoint.SpawnTemplated();
+                    CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+                    controller.OnCharacterDead += HandleNPCDead;
+                    state.delta.npcsSpawned += 1;
+                }
             }
+
             foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
                 spawnPoint.SpawnNPC(useSpawnEffect: false);
             }
@@ -94,6 +101,10 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
         // FinishMission();
         StartCoroutine(WaitAndShowMissionFinish());
+    }
+    void HandleNPCDead(CharacterController npc) {
+        gameData.levelState.delta.npcsSpawned -= 1;
+        npc.OnCharacterDead -= HandleNPCDead;
     }
 
     IEnumerator WaitAndShowMissionFinish() {

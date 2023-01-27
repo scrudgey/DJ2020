@@ -199,9 +199,11 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SpawnStrikeTeamMember() {
+        if (gameData.levelState.delta.npcsSpawned >= gameData.levelState.template.maxNPC) return;
         GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
         CharacterController controller = npc.GetComponent<CharacterController>();
+        controller.OnCharacterDead += HandleNPCDead;
 
         if (strikeTeamCount == 0) {
             ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, controller, doIntro: false, speedCoefficient: 1.5f));
@@ -213,6 +215,7 @@ public partial class GameManager : Singleton<GameManager> {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
+        gameData.levelState.delta.npcsSpawned += 1;
         OnNPCSpawn?.Invoke(npc);
     }
 }

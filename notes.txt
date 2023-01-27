@@ -2275,10 +2275,9 @@ ensure suspicion indicator is working correctly
         clearsighter anchor.
 
 * guard notices disabled / tampered door
-guards should investigate the site of a tripped alarm
-    apply suspicion record in some circumstances (camera? laser?)
-strike team should come in with a purpose
-    investigate the last position
+* guards should investigate the site of a tripped alarm
+* strike team should come in with a purpose
+    * investigate the last position
 limited number of guards spawn
 don't dispatch multiple strike teams
 guard gets stuck in hallway.

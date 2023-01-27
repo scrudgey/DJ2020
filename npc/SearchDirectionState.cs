@@ -32,7 +32,6 @@ public class SearchDirectionState : SphereControlState {
         } else {
             RandomSearchDirection();
         }
-        Debug.Log($"start search direction 1: {searchDirection}");
         SetupRootNode(doIntro, speedCoefficient);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, noise.transform.position);
     }

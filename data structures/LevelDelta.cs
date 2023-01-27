@@ -9,6 +9,7 @@ public record LevelDelta {
     public int strikeTeamMaxSize;
     public ObjectiveStatus objectiveStatus;
     public bool disguise;
+    public int npcsSpawned;
 
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
     public HashSet<Objective> failedObjectives;
