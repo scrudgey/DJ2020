@@ -59,7 +59,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
         float timer = 0f;
         while (timer < duration) {
             timer += Time.deltaTime;
-            float newZ = (float)PennerDoubleAnimation.Linear(timer, initialEuler.z, -1f * amount, duration);
+            float newZ = (float)PennerDoubleAnimation.Linear(timer, initialEuler.z, amount, duration);
             Quaternion newRotation = Quaternion.Euler(initialEuler.x, initialEuler.y, newZ);
             transform.localRotation = newRotation;
             yield return null;

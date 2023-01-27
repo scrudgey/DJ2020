@@ -25,6 +25,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartSpottedCutscene(GameObject NPC) {
+        // foreach (SphereRobotAI ai in )
+        if (GameObject.FindObjectsOfType<SphereRobotAI>().Any(ai => ai.stateMachine.currentState is SphereInvestigateState)) return;
         StartCutsceneCoroutine(SpottedCutscene(NPC));
     }
     public void ShowExtractionZoneCutscene(ExtractionZone zone) {

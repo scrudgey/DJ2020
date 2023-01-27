@@ -75,7 +75,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     void EnterDefaultState() {
-        Debug.Log("enter default state");
         if (patrolRoute != null) {
             ChangeState(new SpherePatrolState(this, patrolRoute, characterController));
         } else {
