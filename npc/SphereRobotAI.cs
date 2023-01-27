@@ -53,7 +53,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     RaycastHit[] raycastHits;
     public HashSet<int> physicalKeys;
 
-    public void Start() {
+    public void Awake() {
         raycastHits = new RaycastHit[1];
         nearbyOthers = new Collider[32];
         // sphereController = controllable.GetComponent<CharacterController>();
@@ -62,10 +62,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         navMeshPath = new NavMeshPath();
         stateMachine = new SphereRobotBrain();
         motor = GetComponent<KinematicCharacterMotor>();
-        EnterDefaultState();
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
         }
+    }
+    public void Initialize() {
+        EnterDefaultState();
     }
     override public void OnDestroy() {
         base.OnDestroy();
@@ -73,6 +75,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     void EnterDefaultState() {
+        Debug.Log("enter default state");
         if (patrolRoute != null) {
             ChangeState(new SpherePatrolState(this, patrolRoute, characterController));
         } else {
@@ -628,7 +631,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     public void OnPoolActivate() {
-        Start();
+        Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
     }
     public void OnPoolDectivate() {

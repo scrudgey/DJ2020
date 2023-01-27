@@ -18,6 +18,7 @@ public class MaterialController {
     public float ceilingHeight = 1.75f;
     public float targetAlpha;
     public bool updatedThisLoop;
+    Vector3 anchor;
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, Material> interloperMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
@@ -35,6 +36,10 @@ public class MaterialController {
                                                 )
                                     .ToList();
         this.collider = collider;
+
+        Transform findAnchor = gameObject.transform.Find("clearSighterAnchor");
+        anchor = findAnchor != null ? findAnchor.position : collider.bounds.center;
+
         this.state = State.opaque;
         this.disableRender = false;
         this.disableBecauseInterloper = false;
@@ -48,13 +53,10 @@ public class MaterialController {
             if (renderer.material != null) {
                 Texture albedo = renderer.material.mainTexture;
                 Material interloperMaterial = new Material(renderer.material);
-                // interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
                 interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
                 interloperMaterial.SetTexture("_Texture", albedo);
                 // interloperMaterial.SetFloat("_Smoothness", 0);
                 // interloperMaterial.SetFloat("_Glossiness", 0);
-                // interloperMaterial
-                // Debug.Log("loaded interloper material " + interloperMaterial);
                 interloperMaterials[renderer] = interloperMaterial;
             }
         }
@@ -65,16 +67,17 @@ public class MaterialController {
     }
     public bool CeilingCheck(Vector3 playerPosition, float floorHeight, bool debug = false) {
 
-        float otherFloorY = collider.bounds.center.y - collider.bounds.extents.y;
+        float otherFloorY = anchor.y - collider.bounds.extents.y;
         float directionY = otherFloorY - playerPosition.y;
         if (debug)
-            Debug.Log($"[MaterialController] {gameObject} {directionY} {collider.bounds.center} < {playerPosition.y} = {collider.bounds.center.y < playerPosition.y} ");
+            Debug.Log($"[MaterialController] {gameObject} {directionY} {anchor.y} < {playerPosition.y} = {anchor.y < playerPosition.y} ");
 
-        if (collider.bounds.center.y < playerPosition.y + 0.05f || collider.bounds.center.y < floorHeight) {
+
+
+        if (anchor.y < playerPosition.y + 0.05f || anchor.y < floorHeight) {
             // disableRender = false;
             return false;
         }
-
 
         // between camera and player and above player
         // if (cullingPlane.GetSide(collider.bounds.center) && (collider.bounds.center.y - playerPosition.y > ceilingHeight * 1.5)) {

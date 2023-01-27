@@ -116,8 +116,11 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
+    public void SetLocationOfDisturbance(Vector3 location) {
+        locationOfLastDisturbance = location;
+    }
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
-        locationOfLastDisturbance = kvp.Value.locationOfLastDisturbance;
+        SetLocationOfDisturbance(kvp.Value.locationOfLastDisturbance);
         if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.raiseAlarm) {
             ActivateHQRadio();
             DisplayHQResponse("HQ: Understood. Dispatching strike team.");

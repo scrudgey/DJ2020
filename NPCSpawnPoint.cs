@@ -38,6 +38,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         motor.SetPosition(transform.position, bypassInterpolation: true);
         ApplyNPCState(template, npc);
 
+        ai.Initialize();
         return npc;
     }
     void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
