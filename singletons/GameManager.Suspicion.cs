@@ -82,7 +82,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
         if (applyModifiers) {
-            if (gameData.levelState.anyAlarmActive()) {
+            bool alarmActive = gameData.levelState.anyAlarmActive();
+            bool disguiseActive = gameData.levelState.delta.disguise;
+            if (alarmActive && !disguiseActive) {
                 if (reaction == Reaction.ignore) {
                     reaction = Reaction.investigate;
                 } else if (reaction == Reaction.investigate) {
@@ -92,7 +94,7 @@ public partial class GameManager : Singleton<GameManager> {
                     // GameManager.I.ActivateAlarm();
                 }
             }
-            if (gameData.levelState.delta.disguise) {
+            if (disguiseActive && !alarmActive) {
                 if (reaction == Reaction.investigate) {
                     reaction = Reaction.ignore;
                 } else if (reaction == Reaction.attack) {

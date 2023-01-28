@@ -54,7 +54,6 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
     IEnumerator TurnScrew(float amount) {
         Vector3 initialEuler = transform.localRotation.eulerAngles;
         float finalZ = initialEuler.z - amount;     // fix this
-        Debug.Log(finalZ);
         float duration = 0.25f;
         float timer = 0f;
         while (timer < duration) {

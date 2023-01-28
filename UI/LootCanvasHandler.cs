@@ -54,7 +54,7 @@ public class LootCanvasHandler : MonoBehaviour {
     }
     public void HandleDataChange(List<PayData> newData, GameData data) {
         ConfigureLootCounts(data);
-        ConfigurePayDataDetail(newData.First());
+        ConfigurePayDataDetail(newData.FirstOrDefault(null));
         ShowCanvasCoroutine();
 
     }
@@ -88,6 +88,7 @@ public class LootCanvasHandler : MonoBehaviour {
         };
     }
     void ConfigurePayDataDetail(PayData data) {
+        if (data == null) return;
         lootTitle.text = data.filename;
         valueText.text = $"value: {data.value} credits";
         lootImage.sprite = dataPortrait;

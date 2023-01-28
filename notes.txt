@@ -2259,11 +2259,13 @@ doors
     different knobs?
 
 * screws are still backwards?
+* disable alarm terminal should work (disable radio?) levelHQTerminal()
+* guard gets stuck in hallway.
+* ensure suspicion indicator is working correctly
 
 randomly place lasers
 randomly place cameras
 cameras on map marker
-
 
 skybox buildings
 using key in lock should spin the keyway
@@ -2275,9 +2277,5 @@ NPC shouldn't leave door unlocked
 NPC and lock interaction
 put a light on the roof
 
-
-disable alarm terminal should work (disable radio?) levelHQTerminal()
-guard gets stuck in hallway.
-ensure suspicion indicator is working correctly
 easy for guard to lose sight of me in investigate
 investigate cutscene, dialogue, and burglar canvas
