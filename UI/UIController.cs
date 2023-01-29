@@ -31,6 +31,7 @@ public class UIController : MonoBehaviour {
     public BurglarCanvasController burglarCanvasController;
     public ObjectiveCanvasController objectiveCanvasController;
     public MissionComputerController missionComputerController;
+    bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -103,11 +104,13 @@ public class UIController : MonoBehaviour {
         terminal.gameObject.SetActive(false);
     }
     public void ShowBurglar(BurgleTargetData data) {
+        burglarMode = true;
         HideUI();
         burglarCanvas.enabled = true;
         burglarCanvasController.Initialize(data);
     }
     public void HideBurglar() {
+        burglarMode = false;
         burglarCanvas.enabled = false;
         burglarCanvasController.TearDown();
         ShowUI();
@@ -133,9 +136,12 @@ public class UIController : MonoBehaviour {
     public void HideUI() {
         HideVRStats();
         canvas.enabled = false;
+        burglarCanvas.enabled = false;
     }
     public void ShowUI() {
         // ShowVRStats();
         canvas.enabled = true;
+        if (burglarMode)
+            burglarCanvas.enabled = true;
     }
 }

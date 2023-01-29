@@ -2251,6 +2251,7 @@ build a test level equivalent to Jack That Data
         turrets
         camera view bigger
     fill out proper texts
+    hatch in the rooftop
 
 doors
     chainlink fence door
@@ -2258,24 +2259,35 @@ doors
     can open from the inside
     different knobs?
 
-* screws are still backwards?
-* disable alarm terminal should work (disable radio?) levelHQTerminal()
-* guard gets stuck in hallway.
-* ensure suspicion indicator is working correctly
+skybox buildings
 
 randomly place lasers
 randomly place cameras
 cameras on map marker
 
-skybox buildings
-using key in lock should spin the keyway
+* screws are still backwards?
+* disable alarm terminal should work (disable radio?) levelHQTerminal()
+* guard gets stuck in hallway.
+* ensure suspicion indicator is working correctly
+* easy for guard to lose sight of me in investigate
+* investigate cutscene, dialogue, and burglar canvas
+* "outsideattacksurface"
+* NPC text more readable
+
+
 distraction needed
-little icon rises up when grabbing loot
+
 click outside burglar menu to close
 better way of putting a tool away
-NPC shouldn't leave door unlocked
-NPC and lock interaction
-put a light on the roof
+using key in lock should spin the keyway
 
-easy for guard to lose sight of me in investigate
-investigate cutscene, dialogue, and burglar canvas
+put a light on the roof
+wire up lights to power
+
+
+NPC and doors
+    NPC shouldn't leave door unlocked
+    NPC and lock interaction
+        no point in tracking NPC keys- they can open all doors at all times.
+        they might drop different keys.
+little icon rises up when grabbing loot

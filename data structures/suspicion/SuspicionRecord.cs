@@ -353,11 +353,11 @@ public class SuspicionRecord {
         lifetime = 3f,
         maxLifetime = 3f,
         dialogue = new SuspicionDialogueParameters {
-            challenge = $"What are you doing with that {data.target.name}?",
+            challenge = $"What are you doing with that {data.target.niceName}?",
             tactics = new List<DialogueTactic>{
                         new DialogueTactic{
                             tacticType = DialogueTacticType.lie,
-                            content = $"I'm the {data.target.name} inspector.",
+                            content = $"I'm the {data.target.niceName} inspector.",
                             successResponse = "Carry on.",
                             failResponse = "Oh yeah? You don't look like one."
                         },

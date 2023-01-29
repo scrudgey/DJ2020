@@ -69,6 +69,33 @@ inline float4 calculateLocalPos(float4 vertex)  // billboard
 	return pos;
 }
 
+inline float4 calculateLocalPosTotalBillboard(float4 vertex)  // billboard
+{
+	#ifdef _FLIPX
+		vertex.x *= -1;
+	#endif
+    float4 pos;
+    #ifdef _BILLBOARD
+
+        float xscale = length(unity_ObjectToWorld._m00_m10_m20);
+        float4 view = mul(
+                        UNITY_MATRIX_MV, 
+                        float4(0, 0, 0.0, 1.0)
+                    ) + float4(vertex.x * xscale, vertex.y * xscale, 0.0, 0.0);
+
+        pos = mul(
+            UNITY_MATRIX_P, 
+            view 
+        );
+    #else
+        pos = UnityObjectToClipPos(vertex);
+    #endif
+#ifdef PIXELSNAP_ON
+	pos = UnityPixelSnap(pos);
+#endif
+	return pos;
+}
+
 inline half3 calculateWorldNormal(float3 normal)
 {
 	return UnityObjectToWorldNormal(normal);

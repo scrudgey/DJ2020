@@ -196,6 +196,7 @@ public partial class GameManager : Singleton<GameManager> {
                 if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
                     LoadScene("DialogueMenu", callback, unloadAll: false);
                 }
+                CloseBurglar();
                 break;
             case MenuType.VRMissionFinish:
                 if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {

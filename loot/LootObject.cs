@@ -5,15 +5,20 @@ using UnityEngine;
 public class LootObject : Interactive {
     public LootData data;
     public AudioClip[] pickupSounds;
+    GameObject creditIndicator;
+    override public void Start() {
+        base.Start();
+        creditIndicator = Resources.Load("prefabs/creditIndicator") as GameObject;
+        PoolManager.I.RegisterPool(creditIndicator, poolSize: 20);
+    }
     public override ItemUseResult DoAction(Interactor interactor) {
         Destroy(gameObject);
-        // GameManager.I.AddCredits(amount);
         GameManager.I.CollectLoot(data);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
         bool waveArm = transform.position.y - interactor.transform.position.y > -0.25f;
         bool crouchDown = !waveArm;
-        // Debug.Log(transform.position.y - interactor.transform.position.y);
+        PoolManager.I.GetPool(creditIndicator).GetObject(transform.position);
         return ItemUseResult.Empty() with {
             crouchDown = crouchDown,
             waveArm = waveArm

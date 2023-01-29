@@ -53,6 +53,7 @@ public class LootCanvasHandler : MonoBehaviour {
         ShowCanvasCoroutine();
     }
     public void HandleDataChange(List<PayData> newData, GameData data) {
+        if (newData == null || newData.Count == 0) return;
         ConfigureLootCounts(data);
         ConfigurePayDataDetail(newData.FirstOrDefault(null));
         ShowCanvasCoroutine();

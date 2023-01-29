@@ -33,6 +33,7 @@ public partial class GameManager : Singleton<GameManager> {
         StartCutsceneCoroutine(ExtractionZoneCutscene(zone));
     }
     public IEnumerator SpottedCutscene(GameObject NPC) {
+        uiController?.HideUI();
         float timer = 0f;
         SphereRobotSpeaker speaker = NPC.GetComponentInChildren<SphereRobotSpeaker>();
         float distanceBetweenPeople = (NPC.transform.position - playerObject.transform.position).magnitude;
@@ -80,6 +81,7 @@ public partial class GameManager : Singleton<GameManager> {
         speaker.speechTextController.HideText();
         Time.timeScale = 1f;
         characterCamera.followingSharpnessDefault = 5f;
+        uiController?.ShowUI();
         yield return null;
     }
 
