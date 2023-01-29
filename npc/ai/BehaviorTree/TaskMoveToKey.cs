@@ -120,14 +120,14 @@ namespace AI {
         public void CheckForDoors(Vector3 position, Vector3 nextPoint) {
             Vector3 direction = nextPoint - position;
             Ray ray = new Ray(position, direction);
-            RaycastHit[] hits = Physics.RaycastAll(ray, 2f, LayerUtil.GetLayerMask(Layer.interactive));
-            Debug.DrawRay(position, direction, Color.green, 1f);
+            RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Min(direction.magnitude, 1f), LayerUtil.GetLayerMask(Layer.interactive));
+            // Debug.DrawRay(position, direction, Color.green, 1f);
             foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
                 if (hit.transform.IsChildOf(transform.root))
                     continue;
                 bool doorFound = hit.collider.CompareTag("door");
-                Color color = doorFound ? Color.yellow : Color.red;
-                Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
+                // Color color = doorFound ? Color.yellow : Color.red;
+                // Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
                 if (doorFound) {
                     Door door = hit.collider.gameObject.GetComponent<Door>();
                     OpenDoor(position, door);
@@ -139,7 +139,8 @@ namespace AI {
         void OpenDoor(Vector3 position, Door door) {
             // Debug.Log($"open door state: {door.state}");
             if (door.state == Door.DoorState.closed) {
-                door.ActivateDoorknob(position, transform, withKeySet: keyIds);
+                door.ActivateDoorknob(position, transform, withKeySet: keyIds, bypassKeyCheck: true, openOnly: true);
+                door.StartLockTimer();
                 waitForDoor = door;
             }
         }

@@ -39,6 +39,7 @@ public class Door : Interactive {
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
+    float lockTimer;
     Vector3[] parentOriginalPositions;
     void Awake() {
         knobCoroutines = new Dictionary<Transform, Coroutine>();
@@ -76,6 +77,14 @@ public class Door : Interactive {
                 HandleImpulse();
                 CheckAutoClose();
                 break;
+        }
+        if (lockTimer > 0) {
+            lockTimer -= Time.deltaTime;
+            if (lockTimer <= 0) {
+                foreach (DoorLock doorLock in doorLocks) {
+                    doorLock.Lock();
+                }
+            }
         }
     }
     void HandleImpulse() {
@@ -211,9 +220,16 @@ public class Door : Interactive {
         return ItemUseResult.Empty() with { waveArm = true };
     }
     public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
-    public void ActivateDoorknob(Vector3 position, Transform activator, HashSet<int> withKeySet = null) {
+    public void StartLockTimer() {
+        lockTimer = 1f;
+    }
+    public void ActivateDoorknob(Vector3 position, Transform activator, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
         lastInteractorTransform = activator;
-        if (withKeySet != null) {
+        if (bypassKeyCheck) {
+            foreach (DoorLock doorLock in doorLocks) {
+                doorLock.ForceUnlock();
+            }
+        } else if (withKeySet != null) {
             foreach (DoorLock doorLock in doorLocks) {
                 foreach (int keyId in withKeySet) {
                     doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
@@ -238,9 +254,11 @@ public class Door : Interactive {
                 }
                 break;
             case DoorState.open:
-                ChangeState(DoorState.closing);
-                targetAngle = 0f;
-                angularSpeed = manipulationSpeed;
+                if (!openOnly) {
+                    ChangeState(DoorState.closing);
+                    targetAngle = 0f;
+                    angularSpeed = manipulationSpeed;
+                }
                 break;
         }
     }

@@ -26,6 +26,14 @@ public class DoorLock : MonoBehaviour {
         }
         return false;
     }
+    public void ForceUnlock() {
+        this.locked = false;
+        Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+    }
+    public void Lock() {
+        this.locked = true;
+        Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+    }
     public void PickLock() {
         if (lockType == LockType.physical) {
             this.locked = false;

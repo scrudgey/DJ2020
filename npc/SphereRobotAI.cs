@@ -300,6 +300,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                             case FollowTheLeaderState:
                             case StopAndListenState:
                             case SphereInvestigateState:
+                                corpse.reported = true;
                                 ChangeState(new InvestigateCorpseState(this, corpse, speechTextController, characterController));
                                 break;
                         }
@@ -334,6 +335,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         case FollowTheLeaderState:
                         case PauseState:
                         case StopAndListenState:
+                            evidence.reported = true;
                             alertHandler.ShowAlert(useWarnMaterial: true);
                             ChangeState(new ReactToTamperState(this, evidence, speechTextController, characterController));
                             break;

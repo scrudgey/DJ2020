@@ -1932,6 +1932,16 @@ note: layer "interactive"
 * don't dispatch multiple strike teams
 * don't do multiple investigate cutscenes at once - if alredy under suspicion, just add into the fray
 * what about extra-height camera in basement?
+* screws are still backwards?
+* disable alarm terminal should work (disable radio?) levelHQTerminal()
+* guard gets stuck in hallway.
+* ensure suspicion indicator is working correctly
+* easy for guard to lose sight of me in investigate
+* investigate cutscene, dialogue, and burglar canvas
+* "outsideattacksurface"
+* NPC text more readable
+* little icon rises up when grabbing loot
+
 
 
 graphical issues:
@@ -2245,6 +2255,10 @@ level 3:
 
 -----------
 
+* NPC and doors
+    * NPC shouldn't leave door unlocked
+    * NPC and lock interaction
+
 build a test level, 3 storey building infiltration
 build a test level equivalent to Jack That Data
     make level more challenging
@@ -2264,30 +2278,20 @@ skybox buildings
 randomly place lasers
 randomly place cameras
 cameras on map marker
-
-* screws are still backwards?
-* disable alarm terminal should work (disable radio?) levelHQTerminal()
-* guard gets stuck in hallway.
-* ensure suspicion indicator is working correctly
-* easy for guard to lose sight of me in investigate
-* investigate cutscene, dialogue, and burglar canvas
-* "outsideattacksurface"
-* NPC text more readable
-
+put a light on the roof
+wire up lights to power
 
 distraction needed
 
 click outside burglar menu to close
 better way of putting a tool away
 using key in lock should spin the keyway
+camera / laser trigger should bring nearby NPC
+guards above should disappear
+gun + hand = floating head
+fall damage
+window graphic
+npc text can run off the edge of the screen
+* set invisible walls
+* lots of reporting the same door / corpse
 
-put a light on the roof
-wire up lights to power
-
-
-NPC and doors
-    NPC shouldn't leave door unlocked
-    NPC and lock interaction
-        no point in tracking NPC keys- they can open all doors at all times.
-        they might drop different keys.
-little icon rises up when grabbing loot
