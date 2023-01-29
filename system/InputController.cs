@@ -269,9 +269,11 @@ public class InputController : MonoBehaviour {
             escapePressConsumed = false;
         }
         if (escapePressedThisFrame && !escapePressConsumed) {
-            escapePressedThisFrame = false;
-            GameManager.I.HandleEscapePressed();
-            escapePressConsumed = true;
+            escapePressConsumed = GameManager.I.HandleEscapePressed();
+            if (escapePressConsumed) {
+                escapePressedThisFrame = false;
+            }
+            // escapePressConsumed = true;
         }
         mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;
         if (pointerOverUIElement) {
@@ -313,7 +315,8 @@ public class InputController : MonoBehaviour {
                 rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
                 lookAtDirection = directionToCursor,
                 zoomInput = zoomInput,
-                mouseDown = mouseDown
+                mouseDown = mouseDown,
+                escapePressed = escapePressedThisFrame && !escapePressConsumed
             };
             i.SetInputs(characterInputs);
         }
@@ -336,6 +339,7 @@ public class InputController : MonoBehaviour {
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
         escapePressedThisFrame = false;
+        // escapePressConsumed = false;
         previousMouseDelta = mouseDelta;
         return characterInputs;
     }

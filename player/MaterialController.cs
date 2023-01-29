@@ -18,7 +18,7 @@ public class MaterialController {
     public float ceilingHeight = 1.75f;
     public float targetAlpha;
     public bool updatedThisLoop;
-    Vector3 anchor;
+    Vector3 anchorOffset;
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, Material> interloperMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
@@ -32,13 +32,15 @@ public class MaterialController {
                                     .Where(x => x != null &&
                                                 !(x is ParticleSystemRenderer) &&
                                                 !(x is LineRenderer)
-                                                // !(x is SpriteRenderer) &&
                                                 )
                                     .ToList();
         this.collider = collider;
 
+        anchorOffset = collider.bounds.center - gameObject.transform.position;
         Transform findAnchor = gameObject.transform.Find("clearSighterAnchor");
-        anchor = findAnchor != null ? findAnchor.position : collider.bounds.center;
+        if (findAnchor != null) {
+            anchorOffset = findAnchor.position - gameObject.transform.position;
+        }
 
         this.state = State.opaque;
         this.disableRender = false;
@@ -62,17 +64,18 @@ public class MaterialController {
         }
 
     }
+    Vector3 anchorPosition() {
+        return gameObject.transform.position + anchorOffset;
+    }
     public void InterloperStart() {
         timer = 0.1f;
     }
     public bool CeilingCheck(Vector3 playerPosition, float floorHeight, bool debug = false) {
-
+        Vector3 anchor = anchorPosition();
         float otherFloorY = anchor.y - collider.bounds.extents.y;
         float directionY = otherFloorY - playerPosition.y;
-        if (debug)
-            Debug.Log($"[MaterialController] {gameObject} {directionY} {anchor.y} < {playerPosition.y} = {anchor.y < playerPosition.y} ");
-
-
+        // if (debug)
+        //     Debug.Log($"[MaterialController] {gameObject} {directionY} {anchor.position.y} < {playerPosition.y} = {anchor.position.y < playerPosition.y} {anchor.position.y < playerPosition.y + 0.05f}");
 
         if (anchor.y < playerPosition.y + 0.05f || anchor.y < floorHeight) {
             // disableRender = false;
@@ -169,6 +172,7 @@ public class MaterialController {
         } else {
             MakeFadeIn();
         }
+        // if (gameObject != null && gameObject.name.ToLower().Contains("npc"))
         //     Debug.Log($"[update 2] {gameObject} {gameObject.transform.position} {childRenderers.Count} {active()} {state} {targetAlpha}");
         if (state == State.fadeIn || state == State.fadeOut) {
             foreach (Renderer renderer in childRenderers) {

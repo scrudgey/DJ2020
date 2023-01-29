@@ -37,7 +37,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
             _ => skin.unarmedSpriteData
         };
-        if (input.isProne || input.hitState == HitState.dead) { // crawling
+        if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
         try {

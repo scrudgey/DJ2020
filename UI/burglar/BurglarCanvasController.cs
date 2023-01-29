@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class BurglarCanvasController : MonoBehaviour {
     BurgleTargetData data;
     BurglarToolType selectedTool;
+    public RectTransform mainRect;
     public RawImage rawImage;
     public GameObject UIElementPrefab;
     public Transform uiElementsContainer;
@@ -92,10 +93,7 @@ public class BurglarCanvasController : MonoBehaviour {
             data.target.DisableAttackSurface();
     }
 
-    void PositionTool() {
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-        Vector2 localPoint = Vector2.zero;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, mousePosition, null, out localPoint);
+    void PositionTool(Vector2 localPoint) {
         toolPoint.anchoredPosition = localPoint;
         if (localPoint.x > uiElementsRectTransform.rect.width / -2f && localPoint.x < uiElementsRectTransform.rect.width / 2f &&
             localPoint.y > uiElementsRectTransform.rect.height / -2f && localPoint.y < uiElementsRectTransform.rect.height / 2f) {
@@ -111,8 +109,20 @@ public class BurglarCanvasController : MonoBehaviour {
 
     public void UpdateWithInput(PlayerInput input) {
         mouseDown = input.mouseDown;
-        PositionTool();
-        if (input.mouseDown && mouseOverElement) {
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector2 localPoint = Vector2.zero;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, mousePosition, null, out localPoint);
+        PositionTool(localPoint);
+        bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;
+        if (input.escapePressed) {
+            if (selectedTool == BurglarToolType.none) {
+                DoneButtonCallback();
+            } else {
+                SetTool(BurglarToolType.none);
+            }
+        } else if (input.mouseDown && outOfBounds) {
+            DoneButtonCallback();
+        } else if (input.mouseDown && mouseOverElement) {
             if (selectedElement != null) {
                 ClickHeld(selectedElement);
             }
@@ -137,7 +147,6 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
     public void DoneButtonCallback() {
-        Debug.Log("done button callback");
         GameManager.I.CloseBurglar();
     }
 

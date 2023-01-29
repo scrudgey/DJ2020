@@ -170,11 +170,13 @@ public partial class GameManager : Singleton<GameManager> {
         };
         Cursor.SetCursor(data.mouseCursor, data.hotSpot, data.cursorMode);
     }
-    public void HandleEscapePressed() {
+    public bool HandleEscapePressed() {
         if (inputMode == InputMode.burglar) {
-            CloseBurglar();
+            // CloseBurglar();
+            return false;
         } else {
             GameManager.I.ShowMenu(MenuType.escapeMenu);
+            return true;
         }
     }
     public void ShowMenu(MenuType menuType, Action callback = null) {
@@ -318,7 +320,6 @@ public partial class GameManager : Singleton<GameManager> {
         if (Time.timeScale > 0) {
             PlayerInput playerInput = inputController.HandleCharacterInput(uiclick);
             uiController?.UpdateWithPlayerInput(playerInput);
-
         }
         // still not 100% clean here
         CameraInput input = playerCharacterController.BuildCameraInput();

@@ -1941,6 +1941,15 @@ note: layer "interactive"
 * "outsideattacksurface"
 * NPC text more readable
 * little icon rises up when grabbing loot
+* NPC and doors
+    * NPC shouldn't leave door unlocked
+    * NPC and lock interaction
+* camera / laser trigger should bring nearby NPC
+* window graphic
+* set invisible walls
+* lots of reporting the same door / corpse
+* fall damage
+* guards above should disappear
 
 
 
@@ -2253,45 +2262,39 @@ level 3:
     holes for AC ducts 
     elevator
 
+randomly place lasers
+randomly place cameras
+
+doors
+    can open from the inside
+    different knobs?
+    sometimes unlocked
+
 -----------
 
-* NPC and doors
-    * NPC shouldn't leave door unlocked
-    * NPC and lock interaction
-* camera / laser trigger should bring nearby NPC
-* window graphic
-* set invisible walls
-* lots of reporting the same door / corpse
-* fall damage
+* gun + hand = floating head
+* click outside burglar menu to close
+* screws still wrong at times
+* better way of putting a tool away
+
 
 build a test level, 3 storey building infiltration
+    put a light on the roof
+    wire up lights to power
+    chainlink fence door
+        padlock
 build a test level equivalent to Jack That Data
     make level more challenging
         turrets
         camera view bigger
     fill out proper texts
     hatch in the rooftop
-
-doors
-    chainlink fence door
-        padlock
-    can open from the inside
-    different knobs?
+    wire up lights to power
 
 skybox buildings
-
-randomly place lasers
-randomly place cameras
 cameras on map marker
-put a light on the roof
-wire up lights to power
-
 distraction needed
-
-click outside burglar menu to close
-better way of putting a tool away
+paydata broken
 using key in lock should spin the keyway
-guards above should disappear
-gun + hand = floating head
 npc text can run off the edge of the screen
 
