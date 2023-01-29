@@ -178,6 +178,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float aimSwayMagnitude = 0.01f;
     Transform cameraFollowTransform;
     RaycastHit[] rayCastHits;
+    float fallTime;
+    float fallVelocity;
     public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
 
     static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
@@ -853,6 +855,16 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         return null;
     }
 
+    void TakeFallDamage(float fallVelocity) {
+        if (state == CharacterState.superJump && fallVelocity > -22f) return;
+        if (superJumpEnabled && fallVelocity > -15) return;
+
+        Damage damage = new ExplosionDamage(75f, Vector3.up, transform.position, transform.position);
+        foreach (IDamageReceiver receiver in GetComponentsInChildren<IDamageReceiver>()) {
+            receiver.TakeDamage(damage);
+        }
+    }
+
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
     /// This is where you tell your character what its velocity should be right now. 
@@ -861,6 +873,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
         bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
+
+        if (!Motor.GroundingStatus.IsStableOnGround) {
+            fallTime += Time.deltaTime;
+            fallVelocity = currentVelocity.y;
+        } else {
+            // if (fallTime > 0) {
+            //     Debug.Log($"integrated fall time: {fallTime} {fallVelocity}");
+            // }
+            if (fallVelocity < -10f) {
+                TakeFallDamage(fallVelocity);
+                TransitionToState(CharacterState.landStun);
+            }
+            fallTime = 0;
+            fallVelocity = 0;
+        }
+
         switch (state) {
             case CharacterState.useItem:
                 currentVelocity = currentVelocity * 0.5f;
@@ -931,6 +959,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 currentVelocity += Gravity * deltaTime;
                 // currentVelocity *= (1f / (1f + (Drag * deltaTime)));
                 if (Motor.GroundingStatus.IsStableOnGround && !_jumpedThisFrame) {
+                    fallTime = 0f;
+                    fallVelocity = 0f;
                     if (Motor.Velocity.y < -0.3f) {
                         TransitionToState(CharacterState.landStun);
                     } else {

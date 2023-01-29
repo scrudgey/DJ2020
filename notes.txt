@@ -2258,6 +2258,11 @@ level 3:
 * NPC and doors
     * NPC shouldn't leave door unlocked
     * NPC and lock interaction
+* camera / laser trigger should bring nearby NPC
+* window graphic
+* set invisible walls
+* lots of reporting the same door / corpse
+* fall damage
 
 build a test level, 3 storey building infiltration
 build a test level equivalent to Jack That Data
@@ -2286,12 +2291,7 @@ distraction needed
 click outside burglar menu to close
 better way of putting a tool away
 using key in lock should spin the keyway
-* camera / laser trigger should bring nearby NPC
 guards above should disappear
 gun + hand = floating head
-fall damage
-* window graphic
 npc text can run off the edge of the screen
-* set invisible walls
-* lots of reporting the same door / corpse
 
