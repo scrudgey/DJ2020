@@ -2286,11 +2286,11 @@ distraction needed
 click outside burglar menu to close
 better way of putting a tool away
 using key in lock should spin the keyway
-camera / laser trigger should bring nearby NPC
+* camera / laser trigger should bring nearby NPC
 guards above should disappear
 gun + hand = floating head
 fall damage
-window graphic
+* window graphic
 npc text can run off the edge of the screen
 * set invisible walls
 * lots of reporting the same door / corpse

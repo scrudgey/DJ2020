@@ -33,6 +33,7 @@ public class LaserTripwire : AlarmComponent {
         cooldown = 5f;
         Toolbox.RandomizeOneShot(audioSource, spottedSound);
         GameManager.I.SetLocationOfDisturbance(transform.position);
+        GameManager.I.DispatchGuard(transform.position);
     }
     void Update() {
         if (cooldown > 0f) {

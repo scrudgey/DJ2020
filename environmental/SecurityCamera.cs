@@ -104,6 +104,7 @@ public class SecurityCamera : IBinder<SightCone> {
             cooldown = 5f;
             Toolbox.RandomizeOneShot(audioSource, spottedSound);
             GameManager.I.SetLocationOfDisturbance(other.bounds.center);
+            GameManager.I.DispatchGuard(other.bounds.center);
         }
     }
 

@@ -218,4 +218,12 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.levelState.delta.npcsSpawned += 1;
         OnNPCSpawn?.Invoke(npc);
     }
+
+    public void DispatchGuard(Vector3 position) {
+        SphereRobotAI[] ais = GameObject.FindObjectsOfType<SphereRobotAI>();
+        if (ais.Count() == 0) return;
+        SphereRobotAI closestAI = ais.OrderBy(ai => (ai.transform.position - position).sqrMagnitude).First();
+        CharacterController controller = closestAI.GetComponent<CharacterController>();
+        closestAI.ChangeState(new SearchDirectionState(closestAI, position, controller, doIntro: false, speedCoefficient: 1.5f));
+    }
 }
