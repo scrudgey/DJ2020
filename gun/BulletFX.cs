@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Easings;
+using UnityEngine;
 
 // TODO: pool line objects
 public class BulletFX : MonoBehaviour {

@@ -22,7 +22,8 @@ public class Destructible : Damageable, IPoolable {
     override public DamageResult TakeDamage(Damage damage) {
         DamageResult result = base.TakeDamage(damage);
         if (health <= 0) {
-            doDestruct = true;
+            // doDestruct = true;
+            Destruct(damage);
         }
         return result;
     }
@@ -31,12 +32,12 @@ public class Destructible : Damageable, IPoolable {
         health -= result.damageAmount;
     }
 
-    void FixedUpdate() {
-        if (doDestruct) {
-            doDestruct = false;
-            Destruct(lastDamage);
-        }
-    }
+    // void FixedUpdate() {
+    //     if (doDestruct) {
+    //         doDestruct = false;
+    //         Destruct(lastDamage);
+    //     }
+    // }
 
     protected void Destruct(Damage damage) {
         TagSystemData data = Toolbox.GetTagData(gameObject);

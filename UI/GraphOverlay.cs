@@ -81,13 +81,14 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
             string[] nodes = edge.ToArray();
             U node1 = graph.nodes[nodes[0]];
             U node2 = graph.nodes[nodes[1]];
+            V indicator1 = indicators[node1];
+            V indicator2 = indicators[node2];
             if (node1.sceneName != sceneName || node2.sceneName != sceneName)
                 continue;
             SetLinePositions(renderer, node1, node2);
-            renderer.material.color = colorSet.enabledColor;
+            // renderer.material.color = colorSet.enabledColor;
+            renderer.colorGradient = Toolbox.Gradient2Color(indicator1.image.color, indicator2.image.color);
 
-            // V indicator1 = indicators[node1];
-            // V indicator2 = indicators[node2];
 
             // Gradient newGradient = new Gradient();
             // GradientColorKey[] colorKey;
@@ -182,6 +183,8 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         renderer.textureMode = LineTextureMode.Stretch;
         renderer.shadowBias = 0.5f;
         renderer.generateLightingData = false;
+        renderer.widthCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0f, 0.01f), new Keyframe(1f, 0.01f) });
+        renderer.widthMultiplier = 0.2f;
         renderer.materials = new Material[1] { lineRendererMaterial };
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;

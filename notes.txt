@@ -1966,6 +1966,7 @@ note: layer "interactive"
 * rocket passes through window
 * wire up lights to power
 * better loot sfx
+* camera sound
 
 
 graphical issues:
@@ -2085,7 +2086,7 @@ VR mission designer
     survive x waves of y NPCS
     inventory management
 
-better action log (remove?)
+* better action log (remove?)
     blit the text
     font?
 
@@ -2118,9 +2119,9 @@ weapons
 planning mode
     optional objectives
     HP / def indicators
-    mission select map
-        indicate a point on map
-        move map, zoom
+    * mission select map
+        * indicate a point on map
+        * move map, zoom
     on mouseover picker: change stat viewer
         smooth rolling stat bars when values change
         compare stats +/-
@@ -2130,7 +2131,7 @@ planning mode
         markers gated behind tactical data
     tactics pane
         purchase keycard
-        ativate cyberattack
+        activate cyberattack
         clickable active tactics show description
         buy info
             locate key objectives
@@ -2223,6 +2224,18 @@ npc text can run off the edge of the screen
 
 -------------
 
+
+how to make it more difficult?
+    1. try insert from steet, no disguise
+    2. add receptionist
+    3. add civilians
+
+data stealing needs to be more clean and engaging
+some computers trip honeypots
+intel can tell in advance where the target data is. 
+
+
+
 code-controlled gun animation
 attack surfaces
     more door styles
@@ -2251,9 +2264,16 @@ graphics
     title screen logo
     title screen animations 
     helicopters for skybox
+guns:
+    silenced pistol
+    fix silenced smg
+icons:
+    redraw others?
+        thermals
 
 rocket launcher explosion?
 hand grenade explosion
+    hand grenade sound??
 check blood pool prefab pooling
 destroyed walls leave decal on the ground (difficult?)
 destructible light pylon
@@ -2262,15 +2282,7 @@ destructible AC unit
 destructible radio dish tower
 plants can catch on fire
 
-better network readability
-    needs slicing by floor
 
-guns:
-    silenced pistol
-    fix silenced smg
-icons:
-    redraw others?
-        thermals
 
 level 3:
     holes for AC ducts 
@@ -2286,16 +2298,21 @@ doors
 
 -----------
 build a test level, 3 storey building infiltration
+    vent into the side of the building
+    vent into access into basement
 build a test level equivalent to Jack That Data
     make level more challenging
         turrets
         camera view bigger
     hatch in the rooftop
 
-
-skybox buildings
-
 fill out proper texts
-
+skybox buildings
 chainlink fence door
     padlock
+
+
+better network readability
+    needs slicing by floor
+    highlight connections when mouseover
+    node discoverability?

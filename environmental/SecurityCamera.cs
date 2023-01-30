@@ -31,6 +31,7 @@ public class SecurityCamera : IBinder<SightCone> {
 
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.volume = 0.5f;
         alarmComponent.OnStateChange += HandleAlarmStateChange;
     }
     void Start() {
