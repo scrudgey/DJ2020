@@ -1950,7 +1950,22 @@ note: layer "interactive"
 * lots of reporting the same door / corpse
 * fall damage
 * guards above should disappear
-
+* gun + hand = floating head
+* click outside burglar menu to close
+* screws still wrong at times
+* better way of putting a tool away
+* paydata broken
+* cameras on map marker
+    * screwdriver graphics
+    * interface:
+        * tools are placed on the spread to the right
+        * clicking on the panel in general replaces item, returns to hand----
+        * suscpetible / not to latch attacks
+        * picking more / less difficult
+* put a light on the roof
+* rocket passes through window
+* wire up lights to power
+* better loot sfx
 
 
 graphical issues:
@@ -2166,11 +2181,10 @@ NPC tuning:
         accuracy
         shooting behavior
             quickness, bursts
-    alarm terminal triggering effects
-        notify others of location
+    * alarm terminal triggering effects
+        * notify others of location
     guard HQ potentially notices disabled cameras and sensors
     strike team seems to have a hard time investigating repeated explosions
-
 
 silenced gun is still OP
     seeing corpse or bullets -> high alert, easier to see player
@@ -2198,27 +2212,24 @@ optimizations:
 put gun away and left click on objects to use?
 left click on people to talk?
 
-
 clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
     instead everything should be sliced into y intervals, and all deactivated / activated at once.
 
+distraction needed
+    throw a coin
+using key in lock should spin the keyway
+npc text can run off the edge of the screen
 
------------------
+-------------
 
 code-controlled gun animation
 attack surfaces
     more door styles
-        suscpetible / not to latch attacks
-        picking more / less difficult
         different handles
         electronic access control
     alarm sensors on doors
     padlock
-    screwdriver graphics
-    interface:
-        tools are placed on the spread to the right
-        clicking on the panel in general replaces item, returns to hand
 loot
     guards can drop keys or loot
     some data is useful in social engineering
@@ -2251,6 +2262,9 @@ destructible AC unit
 destructible radio dish tower
 plants can catch on fire
 
+better network readability
+    needs slicing by floor
+
 guns:
     silenced pistol
     fix silenced smg
@@ -2271,30 +2285,17 @@ doors
     sometimes unlocked
 
 -----------
-
-* gun + hand = floating head
-* click outside burglar menu to close
-* screws still wrong at times
-* better way of putting a tool away
-
-
 build a test level, 3 storey building infiltration
-    put a light on the roof
-    wire up lights to power
-    chainlink fence door
-        padlock
 build a test level equivalent to Jack That Data
     make level more challenging
         turrets
         camera view bigger
-    fill out proper texts
     hatch in the rooftop
-    wire up lights to power
+
 
 skybox buildings
-cameras on map marker
-distraction needed
-paydata broken
-using key in lock should spin the keyway
-npc text can run off the edge of the screen
 
+fill out proper texts
+
+chainlink fence door
+    padlock

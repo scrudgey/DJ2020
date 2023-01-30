@@ -316,7 +316,7 @@ public partial class GameManager : Singleton<GameManager> {
         alarmSound = gameData.levelState.template.alarmAudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
 
-        MusicController.I.LoadTrack(MusicTrack.layercake);
+        MusicController.I.LoadTrack(MusicTrack.lethalGlee);
 
         OnSuspicionChange?.Invoke();
     }

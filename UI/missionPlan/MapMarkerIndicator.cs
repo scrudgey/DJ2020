@@ -15,6 +15,7 @@ public class MapMarkerIndicator : MonoBehaviour {
     public Sprite lightningBoltSprite;
     public Sprite arrowSprite;
     public Sprite doorSprite;
+    public Sprite cameraSprite;
     public Image clickPulseIndicator;
     public Image selectedIndicator;
     [Header("Colors")]
@@ -68,6 +69,7 @@ public class MapMarkerIndicator : MonoBehaviour {
             MapMarkerData.MapMarkerIcon.circle => circleSprite,
             MapMarkerData.MapMarkerIcon.lightningBolt => lightningBoltSprite,
             MapMarkerData.MapMarkerIcon.door => doorSprite,
+            MapMarkerData.MapMarkerIcon.camera => cameraSprite,
             _ => circleSprite
         };
 
