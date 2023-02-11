@@ -43,8 +43,8 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         try {
             SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
 
-            Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
-            headAnimation.transform.localPosition = offset;
+            Vector3 headOffset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
+            headAnimation.transform.localPosition = headOffset;
             headAnimation.UpdateView(input, torsoSpriteData);
             return torsoSpriteData;
         }

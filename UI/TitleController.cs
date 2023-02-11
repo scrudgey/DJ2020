@@ -10,7 +10,7 @@ public class TitleController : MonoBehaviour {
         mainMenu.SetActive(true);
         VRDesignMenu.SetActive(false);
         saveDialogCanvas.enabled = false;
-        GameManager.I.TransitionToState(GameState.mainMenu);
+        GameManager.I.TransitionToPhase(GamePhase.mainMenu);
     }
     public void NewVRMissionCallback() {
         mainMenu.SetActive(false);

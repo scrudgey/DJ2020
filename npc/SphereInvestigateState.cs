@@ -52,7 +52,7 @@ public class SphereInvestigateState : SphereControlState {
     public bool seenPlayerRecently() => timeSinceSawPlayer < 2f;
 
     public bool isPlayerNear() {
-        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 2f;
+        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 2.5f;
     }
     public bool isPlayerSuspicious() {
         return integratedPlayerMovement > WARN_THRESHOLD;

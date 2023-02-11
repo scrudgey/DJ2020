@@ -6,8 +6,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public enum GameState { none, levelPlay, mainMenu, afteraction, world } // TODO: different name!
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail }
+public enum GamePhase { none, levelPlay, mainMenu, afteraction, world }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -23,8 +23,12 @@ public partial class GameManager : Singleton<GameManager> {
     public Collider playerCollider;
     public PlayerOutlineHandler playerOutlineHandler;
     public LightLevelProbe playerLightLevelProbe;
+
+    [Header("input actions")]
     // UI input
     public InputActionReference showConsole;
+    public InputActionReference escapeAction;
+
 
     // UI callbacks
     // public static Action OnMenuClosed;
@@ -40,6 +44,8 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<PlayerState> OnEyeVisibilityChange;
     // UI state
     private bool toggleConsoleThisFrame;
+    private bool escapePressedThisFrame;
+
     private bool nextOverlayThisFrame;
     private bool previousOverlayThisFrame;
     public MenuType activeMenuType;
@@ -71,11 +77,16 @@ public partial class GameManager : Singleton<GameManager> {
         cursorType = CursorType.pointer;
         showDebugRays = true;
         showConsole.action.performed += HandleShowConsleAction;
+        escapeAction.action.performed += HandleEscapeAction;
+
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
     void HandleShowConsleAction(InputAction.CallbackContext ctx) {
         toggleConsoleThisFrame = ctx.ReadValueAsButton();
+    }
+    void HandleEscapeAction(InputAction.CallbackContext ctx) {
+        escapePressedThisFrame = ctx.ReadValueAsButton();
     }
     void LateUpdate() {
         // A hack to initialize a level from unity editor? doesn't currently work. 
@@ -91,15 +102,17 @@ public partial class GameManager : Singleton<GameManager> {
     public override void OnDestroy() {
         base.OnDestroy();
         showConsole.action.performed -= HandleShowConsleAction;
+        escapeAction.action.performed -= HandleEscapeAction;
+
         CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
     }
-    public void TransitionToState(GameState newState) {
-        if (newState == gameData.state)
+    public void TransitionToPhase(GamePhase newState) {
+        if (newState == gameData.phase)
             return;
-        GameState tmpInitialState = gameData.state;
+        GamePhase tmpInitialState = gameData.phase;
         OnStateExit(tmpInitialState, newState);
-        gameData.state = newState;
+        gameData.phase = newState;
         OnStateEnter(newState, tmpInitialState);
     }
     public void TransitionToInputMode(InputMode newInputMode) {
@@ -109,15 +122,15 @@ public partial class GameManager : Singleton<GameManager> {
         _inputMode = newInputMode;
         SetOverlay(activeOverlayType);
     }
-    private void OnStateEnter(GameState state, GameState fromState) {
+    private void OnStateEnter(GamePhase state, GamePhase fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
-            case GameState.levelPlay:
+            case GamePhase.levelPlay:
                 Time.timeScale = 1f;
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
                 break;
-            case GameState.world:
+            case GamePhase.world:
                 Time.timeScale = 1f;
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
@@ -125,10 +138,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("UI", () => {
                         uiController = GameObject.FindObjectOfType<UIController>();
                         uiController.InitializeObjectivesController(gameData);
+                        uiController.HideUI();
                     }, unloadAll: false);
                 }
                 break;
-            case GameState.mainMenu:
+            case GamePhase.mainMenu:
                 Time.timeScale = 0f;
                 cursorType = CursorType.pointer;
                 break;
@@ -136,9 +150,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
     }
-    public void OnStateExit(GameState state, GameState toState) {
+    public void OnStateExit(GamePhase state, GamePhase toState) {
         switch (state) {
-            case GameState.none:
+            case GamePhase.none:
                 break;
             default:
                 break;
@@ -170,15 +184,7 @@ public partial class GameManager : Singleton<GameManager> {
         };
         Cursor.SetCursor(data.mouseCursor, data.hotSpot, data.cursorMode);
     }
-    public bool HandleEscapePressed() {
-        if (inputMode == InputMode.burglar) {
-            // CloseBurglar();
-            return false;
-        } else {
-            GameManager.I.ShowMenu(MenuType.escapeMenu);
-            return true;
-        }
-    }
+
     public void ShowMenu(MenuType menuType, Action callback = null) {
         if (activeMenuType != MenuType.none) {
             CloseMenu();
@@ -199,6 +205,8 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("DialogueMenu", callback, unloadAll: false);
                 }
                 CloseBurglar();
+                uiController.HideUI();
+
                 break;
             case MenuType.VRMissionFinish:
                 if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
@@ -213,6 +221,10 @@ public partial class GameManager : Singleton<GameManager> {
             case MenuType.console:
                 uiController.ShowTerminal();
                 callback?.Invoke();
+                break;
+            case MenuType.missionSelect:
+                uiController.HideUI();
+                uiController.ShowMissionSelector(gameData);
                 break;
         }
     }
@@ -231,6 +243,10 @@ public partial class GameManager : Singleton<GameManager> {
             case MenuType.escapeMenu:
                 uiController.ShowUI();
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscapeMenu"));
+                break;
+            case MenuType.missionSelect:
+                uiController.HideMissionSelector();
+                uiController.ShowUI();
                 break;
         }
         Time.timeScale = 1f;
@@ -259,7 +275,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void Update() {
-        // TODO: disable update if we are loading
         if (toggleConsoleThisFrame) {
             if (activeMenuType != MenuType.console) {
                 ShowMenu(MenuType.console);
@@ -267,15 +282,18 @@ public partial class GameManager : Singleton<GameManager> {
                 CloseMenu();
             }
         }
-        toggleConsoleThisFrame = false;
-        if (gameData.state == GameState.world) {
+
+        if (escapePressedThisFrame) {
+            HandleEscapePressed();
+        }
+
+        if (gameData.phase == GamePhase.world) {
             DoInputs();
-        } else if (gameData.state == GameState.levelPlay) {
+        } else if (gameData.phase == GamePhase.levelPlay) {
             UpdateSuspicion();
             UpdateAlarm();
             UpdateReportTickets();
             UpdateGraphs();
-
             if (cutsceneIsRunning) {
                 playerCharacterController.ResetMovement();
             } else {
@@ -288,11 +306,50 @@ public partial class GameManager : Singleton<GameManager> {
                 resetMouseControl = false;
             }
         }
+        toggleConsoleThisFrame = false;
+        escapePressedThisFrame = false;
+    }
+    public void HandleEscapePressed() {
+        if (gameData.phase == GamePhase.world) {
+            if (activeMenuType == MenuType.none) {
+                // TODO: show world pause menu
+            } else {
+                DoEscapeMenus();
+            }
+            escapePressedThisFrame = false;
+        } else if (gameData.phase == GamePhase.levelPlay) {
+            if (inputMode == InputMode.burglar) {
+
+            } else {
+                if (activeMenuType == MenuType.none) {
+                    ShowMenu(MenuType.escapeMenu);
+                } else {
+                    DoEscapeMenus();
+                }
+                escapePressedThisFrame = false;
+            }
+        }
+    }
+    void DoEscapeMenus() {
+        if (activeMenuType == MenuType.console || activeMenuType == MenuType.escapeMenu || activeMenuType == MenuType.missionSelect) {
+            // none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect
+            GameManager.I.CloseMenu();
+        }
     }
 
     void DoInputs() {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
+        UpdateCursor(uiclick);
+        if (Time.timeScale > 0) {
+            PlayerInput playerInput = inputController.HandleCharacterInput(uiclick, escapePressedThisFrame);
+            uiController?.UpdateWithPlayerInput(playerInput);
+        }
+        // still not 100% clean here
+        CameraInput input = playerCharacterController.BuildCameraInput();
+        characterCamera.UpdateWithInput(input);
+    }
 
+    void UpdateCursor(bool uiclick) {
         if (inputMode == InputMode.burglar) {
             if (!uiclick) {
                 cursorType = CursorType.gun;
@@ -316,14 +373,6 @@ public partial class GameManager : Singleton<GameManager> {
                 }
             }
         }
-
-        if (Time.timeScale > 0) {
-            PlayerInput playerInput = inputController.HandleCharacterInput(uiclick);
-            uiController?.UpdateWithPlayerInput(playerInput);
-        }
-        // still not 100% clean here
-        CameraInput input = playerCharacterController.BuildCameraInput();
-        characterCamera.UpdateWithInput(input);
     }
 
     public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
@@ -336,21 +385,24 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartBurglar(BurgleTargetData data) {
+        // TODO: enter menu state
         activeBurgleTargetData = data;
         uiController.ShowBurglar(data);
     }
     public void CloseBurglar() {
         uiController.HideBurglar();
+        uiController.ShowUI();
         playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);
     }
     public void ShowMissionSelectMenu() {
-        TransitionToState(GameState.mainMenu);  // TODO: correct state?
-        uiController.ShowMissionSelector(gameData);
+        ShowMenu(MenuType.missionSelect);
+        // uiController.ShowMissionSelector(gameData);
     }
     public void HideMissionSelectMenu() {
-        TransitionToState(GameState.world);
-        uiController.HideMissionSelector();
+        // TransitionToPhase(GamePhase.world);
+        CloseMenu();
+        // uiController.HideMissionSelector();
     }
     public void ShowMissionPlanner(LevelTemplate template) {
         LoadScene("MissionPlan", () => {

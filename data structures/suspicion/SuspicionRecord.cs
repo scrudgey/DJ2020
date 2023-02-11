@@ -322,7 +322,35 @@ public class SuspicionRecord {
                     }
         }
     };
-
+    public static SuspicionRecord trippedSensor(string sensorName) => new SuspicionRecord {
+        content = "tripped an alarm sensor",
+        suspiciousness = Suspiciousness.suspicious,
+        lifetime = 3f,
+        maxLifetime = 3f,
+        dialogue = new SuspicionDialogueParameters {
+            challenge = $"Do you realize you triggered a {sensorName} sensor?",
+            tactics = new List<DialogueTactic>{
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.lie,
+                            content = $"Of course. I'm the {sensorName} inspector. I was testing it.",
+                            successResponse = "Carry on.",
+                            failResponse = "You must take me for an idiot."
+                        },
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.challenge,
+                            content = $"I don't have time to pay attention to every little {sensorName} around here! Do you know how much I make?",
+                            successResponse = "My apologies, sir.",
+                            failResponse = "I'm not buying it, punk."
+                        },
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.redirect,
+                            content = "That wasn't me, I saw a guy with a moustache running through here!",
+                            successResponse = "Where?!",
+                            failResponse = "You honestly think I'd fall for that?"
+                        }
+                    }
+        }
+    };
     public static SuspicionRecord shotsFiredSuspicion() => new SuspicionRecord {
         content = "shooting gun",
         suspiciousness = Suspiciousness.aggressive,
@@ -350,8 +378,8 @@ public class SuspicionRecord {
     public static SuspicionRecord tamperingSuspicion(BurgleTargetData data) => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,
-        lifetime = 3f,
-        maxLifetime = 3f,
+        lifetime = 8f,
+        maxLifetime = 8f,
         dialogue = new SuspicionDialogueParameters {
             challenge = $"What are you doing with that {data.target.niceName}?",
             tactics = new List<DialogueTactic>{
@@ -371,7 +399,7 @@ public class SuspicionRecord {
                             tacticType = DialogueTacticType.redirect,
                             content = "Look behind you, a three-headed monkey!",
                             successResponse = "Where?!",
-                            failResponse = "You honestly ,think I'd fall for that?"
+                            failResponse = "You honestly think I'd fall for that?"
                         }
                     }
         }

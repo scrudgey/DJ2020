@@ -101,6 +101,9 @@ public partial class GameManager : Singleton<GameManager> {
             foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
                 if (zone.data.idn == gameData.levelState.plan.extractionPointIdn) {
                     zone.EnableExtractionZone();
+                    if (zone.ContainsPlayerLocation(playerObject.transform.position)) {
+                        zone.HandlePlayerActivation();
+                    }
                     return;
                 }
             }

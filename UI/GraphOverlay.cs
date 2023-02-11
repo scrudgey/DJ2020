@@ -24,6 +24,8 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     }
 
     void Update() {
+        if (indicators.Count() == 0) return;
+
         Vector3 playerPosition = GameManager.I.playerObject.transform.position;
 
         Dictionary<U, float> distances = indicators.Keys.ToDictionary(node => node, node => 0f);
@@ -73,6 +75,10 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     }
     public virtual void SetEdgeGraphicState() {
         string sceneName = SceneManager.GetActiveScene().name;
+
+        if (graph.nodes.Count() == 0 || indicators.Count == 0) {
+            return;
+        }
 
         // Debug.LogWarning($"{typeof(T).FullName} setting edge graphic state with size {graph.edgePairs.Count}");
         foreach (HashSet<string> edge in graph.edgePairs) {

@@ -6,5 +6,6 @@ using UnityEngine;
 public class Faction : ScriptableObject {
     public Sprite logo;
     public string factionName;
+    [TextArea(15, 20)]
     public string description;
 }

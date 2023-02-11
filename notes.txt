@@ -1967,6 +1967,29 @@ note: layer "interactive"
 * wire up lights to power
 * better loot sfx
 * camera sound
+* email text scroll faster
+* disable disguise
+* i was unable to complete either mission.
+* active tactics empty bulletholes
+* apply temporary suspicion when a camera / laser is tripped
+* cancel music on mission end
+* fix data objectivees 
+* if in escape point when abort, end mission
+* rearrange mission plan
+* finish menu text & scroll same as mission selector?
+* security description too long in tower
+* dont show completed missions in selector
+* fill out proper texts
+* chainlink fence door    
+* alarm terminal triggering effects
+* notify others of location
+* investigate NPC walked up to me in the dark and then left.
+* ESC when in apartment
+* ESC in mission plan
+* ESC in mission select
+* jack that data starts you out in view of patrolling guard
+* clean up loot and credsticks and keys
+
 
 
 graphical issues:
@@ -2182,10 +2205,11 @@ NPC tuning:
         accuracy
         shooting behavior
             quickness, bursts
-    * alarm terminal triggering effects
-        * notify others of location
+
     guard HQ potentially notices disabled cameras and sensors
     strike team seems to have a hard time investigating repeated explosions
+    guards get stuck in the narrow corridor
+    guards should pause in patrol only not around other guards.
 
 silenced gun is still OP
     seeing corpse or bullets -> high alert, easier to see player
@@ -2223,18 +2247,13 @@ using key in lock should spin the keyway
 npc text can run off the edge of the screen
 
 -------------
-
-
 how to make it more difficult?
     1. try insert from steet, no disguise
     2. add receptionist
     3. add civilians
-
 data stealing needs to be more clean and engaging
 some computers trip honeypots
 intel can tell in advance where the target data is. 
-
-
 
 code-controlled gun animation
 attack surfaces
@@ -2256,21 +2275,6 @@ vehicles
 navigable AC units
     you should be able to crawl through the duct on the ceiling
 
-graphics
-    patrol guard spritesheet
-    disguise spritesheet (fireman)
-    swat team spritesheet
-    civ_female portrait could use some work
-    title screen logo
-    title screen animations 
-    helicopters for skybox
-guns:
-    silenced pistol
-    fix silenced smg
-icons:
-    redraw others?
-        thermals
-
 rocket launcher explosion?
 hand grenade explosion
     hand grenade sound??
@@ -2281,8 +2285,6 @@ destructible dumpster
 destructible AC unit
 destructible radio dish tower
 plants can catch on fire
-
-
 
 level 3:
     holes for AC ducts 
@@ -2296,23 +2298,81 @@ doors
     different knobs?
     sometimes unlocked
 
+better network readability
+    needs slicing by floor
+    highlight connections when mouseover
+    node discoverability?
+    popup box: visibility skill gives you percentage breakdowns of possibilities:
+        50% honeypot
+        50% paydata
+    floppy icon for unopened data nodes
+    a separate screen?
+
+loitering is suspicious but not near a water cooler
+
 -----------
 build a test level, 3 storey building infiltration
     vent into the side of the building
     vent into access into basement
+    populate various other datas, honeypots
 build a test level equivalent to Jack That Data
     make level more challenging
         turrets
         camera view bigger
     hatch in the rooftop
 
-fill out proper texts
-skybox buildings
-chainlink fence door
-    padlock
+graphics
+    patrol guard spritesheet
+        * smg
+        * rifle
+        * shotgun
+        portrait
+    disguise spritesheet (fireman)
+    swat team spritesheet
+        smg run
+        rifle
+        pistol
+        shotgun
+        wire up sprite data system
+    scientist spritesheet
+    civ_female portrait could use some work
+    title screen logo
+    title screen animations 
+    helicopters for skybox
+guns:
+    silenced pistol
+    fix silenced smg
+icons:
+    redraw others?
+        thermals
+padlock
+disguise tactic icon
+fake id tactic icon
+subway entrance
 
+guards spawned invisible
+some sort of automated check when a level starts if objectives are impossible
+* skybox buildings
+* hide ui in world mode
+* when NPC runs, show run animation
+start apartment / world with different rotation
+transition between apartment and street
 
-better network readability
-    needs slicing by floor
-    highlight connections when mouseover
-    node discoverability?
+world:
+    spawn random npcs
+    shopkeeper
+    more trash, random grime
+    burned out car wreck
+    neon signange
+    graffiti
+
+locations:
+    weapons dealer
+    software dealer
+    hardware dealer (the finn)
+    street doc
+    night club 
+    bar (the gentleman loser)
+    arcade?
+
+overworld might have little micro quests to set you up for a new mission.

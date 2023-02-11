@@ -24,7 +24,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public Material isometricSkybox;
     public Material wallPressSkybox;
     public Transform maskCylinder;
-    public Camera[] skyBoxCameras;
+    public Camera[] skyBoxCameras = new Camera[0];
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);

@@ -2,19 +2,21 @@ using System.Collections.Generic;
 using UnityEngine;
 [System.Serializable]
 public record GameData {
-    public GameState state;
+    public GamePhase phase;
     public PlayerState playerState;
     public LevelState levelState;
     public List<string> unlockedLevels;
+    public List<string> completedLevels;
     public SerializableDictionary<string, LevelPlan> levelPlans;
     public List<string> unlockedItems;
 
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
         return new GameData() {
-            state = GameState.none,
+            phase = GamePhase.none,
             playerState = PlayerState.DefaultState(),
             levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
+            completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
                 "Jack That Data",
                 "Tower"

@@ -10,6 +10,7 @@ public class CyberDataStore : MonoBehaviour {
     public ParticleSystem particles;
 
     public List<PayData> payDatas;
+    bool opened;
 
     public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -22,12 +23,14 @@ public class CyberDataStore : MonoBehaviour {
         }
     }
     public void Open() {
+        if (opened) return;
+        PlayParticles();
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        // GameManager.I.SetCyberNodeState(cyberComponent, true);
         foreach (PayData payData in payDatas) {
             Debug.Log($"stealing paydata: {payData.filename}");
         }
         GameManager.I.AddPayDatas(payDatas);
+        opened = true;
     }
     public void PlayParticles() {
         particles.Play();

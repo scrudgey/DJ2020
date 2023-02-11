@@ -11,6 +11,7 @@ public class LevelTemplate : ScriptableObject {
     public string levelName;
     public string sceneName;
     public string sceneDescriptor;
+    public string tagline;
     [Header("text")]
     public TextAsset proposalEmail;
     public TextAsset successEmail;

@@ -55,7 +55,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
         InitializeLevel(LevelPlan.Default());
-        TransitionToState(GameState.levelPlay);
+        TransitionToPhase(GamePhase.levelPlay);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(state);
@@ -90,12 +90,12 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
 
-        TransitionToState(GameState.levelPlay);
+        TransitionToPhase(GamePhase.levelPlay);
     }
     public void StartWorld() {
         Debug.Log($"GameMananger: world scene");
         InitializePlayerAndController(LevelPlan.Default());
-        TransitionToState(GameState.world);
+        TransitionToPhase(GamePhase.world);
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
@@ -127,11 +127,14 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void FinishMissionSuccess() {
         Debug.Log("mission success");
+        MusicController.I.Stop();
+        gameData.completedLevels.Add(gameData.levelState.template.levelName);
         gameData.playerState.credits += gameData.levelState.template.creditReward;
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {
         Debug.Log("mission fail");
+        MusicController.I.Stop();
         GameManager.I.ShowMenu(MenuType.missionFail, () => {
             MissionFailMenuController menuController = GameObject.FindObjectOfType<MissionFailMenuController>();
             menuController.Initialize(gameData);
@@ -148,7 +151,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void LoadAfterActionReport() {
         MusicController.I.Stop();
-        TransitionToState(GameState.afteraction);
+        TransitionToPhase(GamePhase.afteraction);
         LoadScene("AfterAction", () => {
             Debug.Log("start afteraction");
             // activeMenuType = MenuType.none;
@@ -218,7 +221,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         // TODO: better system here
-        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "EscapeMenu")
+        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "EscapeMenu" && targetScene != "cityskybox")
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
 
         foreach (string sceneToUnload in scenesToUnload) {
@@ -282,6 +285,19 @@ public partial class GameManager : Singleton<GameManager> {
 
         // connect player object to input controller
         inputController.SetInputReceivers(playerObj);
+
+        LoadSkyBox();
+    }
+    void LoadSkyBox() {
+        List<Camera> skycams = new List<Camera>();
+        LoadScene("cityskybox", () => {
+            foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
+                skycams.Add(skycam.myCamera);
+                // skycam.Initialize(characterCamera.Camera, new Vector3(0f, 10f, 0f));
+                skycam.Initialize(characterCamera.Camera, new Vector3(0f, 1f, 0f));
+            }
+            characterCamera.skyBoxCameras = skycams.ToArray();
+        }, unloadAll: false);
     }
     private void InitializeLevel(LevelPlan plan) {
         InitializePlayerAndController(plan);

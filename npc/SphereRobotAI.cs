@@ -210,12 +210,14 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         // avoid bunching with boids algorithm
         if (!input.CrouchDown) {
-            float avoidFactor = 0.1f;
-            float avoidRadius = 2f;
-
+            // float avoidFactor = 0.1f;
+            // float avoidRadius = 2f;
 
             // float avoidFactor = 1f;
             // float avoidRadius = 0.5f;
+
+            float avoidFactor = 5f;
+            float avoidRadius = 0.2f;
 
             int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
             Vector3 closeness = Vector3.zero;

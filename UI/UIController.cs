@@ -113,16 +113,16 @@ public class UIController : MonoBehaviour {
         burglarMode = false;
         burglarCanvas.enabled = false;
         burglarCanvasController.TearDown();
-        ShowUI();
+        // ShowUI();
     }
     public void ShowMissionSelector(GameData gameData) {
-        HideUI();
+        // HideUI();
         missionSelectorCanvas.enabled = true;
         missionComputerController.Initialize(gameData);
     }
     public void HideMissionSelector() {
         missionSelectorCanvas.enabled = false;
-        ShowUI();
+        // ShowUI();
     }
     void HandleCaptionChange(string newCaption) {
         caption.text = newCaption;
@@ -134,11 +134,13 @@ public class UIController : MonoBehaviour {
         vRStatHandler.gameObject.SetActive(false);
     }
     public void HideUI() {
+        Debug.Log("hide UI");
         HideVRStats();
         canvas.enabled = false;
         burglarCanvas.enabled = false;
     }
     public void ShowUI() {
+        Debug.Log("show UI");
         // ShowVRStats();
         canvas.enabled = true;
         if (burglarMode)

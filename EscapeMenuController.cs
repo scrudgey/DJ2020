@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class EscapeMenuController : MonoBehaviour {
     public GameObject UIEditorCamera;
-    public InputActionReference escapeAction;
+    // public InputActionReference escapeAction;
 
 
     public Transform objectivesContainer;
@@ -12,7 +12,7 @@ public class EscapeMenuController : MonoBehaviour {
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
-        escapeAction.action.performed += HandleEscapeAction;
+        // escapeAction.action.performed += HandleEscapeAction;
     }
     public void Start() {
         foreach (Transform child in objectivesContainer) {
@@ -29,7 +29,7 @@ public class EscapeMenuController : MonoBehaviour {
     }
 
     void OnDestroy() {
-        escapeAction.action.performed -= HandleEscapeAction;
+        // escapeAction.action.performed -= HandleEscapeAction;
     }
     public void ContinueButtonCallback() {
         GameManager.I.CloseMenu();

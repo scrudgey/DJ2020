@@ -98,7 +98,14 @@ namespace AI {
                 // Debug.DrawLine(transform.position, nextPoint, Color.cyan);
                 inputVector.y = 0;
                 baseLookDirection = inputVector;
-                input.moveDirection = speedCoefficient * inputVector.normalized;
+                // input.moveDirection = speedCoefficient * inputVector.normalized;
+                // input.moveDirection = speedCoefficient * inputVector.normalized;
+                if (speedCoefficient > 1) {
+                    input.moveDirection = inputVector.normalized;
+                    input.runDown = true;
+                } else {
+                    input.moveDirection = speedCoefficient * inputVector.normalized;
+                }
                 for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
                     Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
                 }

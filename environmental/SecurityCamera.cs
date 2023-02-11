@@ -106,6 +106,7 @@ public class SecurityCamera : IBinder<SightCone> {
             Toolbox.RandomizeOneShot(audioSource, spottedSound);
             GameManager.I.SetLocationOfDisturbance(other.bounds.center);
             GameManager.I.DispatchGuard(other.bounds.center);
+            GameManager.I.AddSuspicionRecord(SuspicionRecord.trippedSensor("security camera"));
         }
     }
 
