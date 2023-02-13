@@ -1989,7 +1989,13 @@ note: layer "interactive"
 * ESC in mission select
 * jack that data starts you out in view of patrolling guard
 * clean up loot and credsticks and keys
-
+* skybox buildings
+* hide ui in world mode
+* when NPC runs, show run animation
+* transition between apartment and street
+* broken clearsighter on 
+* broken cutscenes?
+* multiple audiosources
 
 
 graphical issues:
@@ -2349,14 +2355,15 @@ padlock
 disguise tactic icon
 fake id tactic icon
 subway entrance
+random loot spots
+loot drops
 
 guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
-* skybox buildings
-* hide ui in world mode
-* when NPC runs, show run animation
 start apartment / world with different rotation
-transition between apartment and street
+show interactibility on world mode
+highlight is broken on apartment -> street
+start with correct skybox
 
 world:
     spawn random npcs
@@ -2374,5 +2381,3 @@ locations:
     night club 
     bar (the gentleman loser)
     arcade?
-
-overworld might have little micro quests to set you up for a new mission.
