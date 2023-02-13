@@ -17,7 +17,9 @@ public partial class GameManager : Singleton<GameManager> {
 
     List<AsyncOperation> scenesLoading;
     public bool isLoadingLevel;
-
+    void Awake() {
+        InputController.InitializeInstance();
+    }
     public void LoadVRMission(VRMissionTemplate template) {
         Debug.Log("GameMananger: load VR mission");
         LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
@@ -94,8 +96,17 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void StartWorld() {
         Debug.Log($"GameMananger: world scene");
-        InitializePlayerAndController(LevelPlan.Default());
-        TransitionToPhase(GamePhase.world);
+        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+            LoadScene("UI", () => {
+                uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.InitializeObjectivesController(gameData);
+                uiController.HideUI();
+
+                InitializePlayerAndController(LevelPlan.Default());
+                TransitionToPhase(GamePhase.world);
+
+            }, unloadAll: false);
+        }
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
@@ -170,9 +181,7 @@ public partial class GameManager : Singleton<GameManager> {
             int sceneCount = SceneManager.sceneCount;
             for (int i = 0; i < sceneCount; i++) {
                 string activeSceneName = SceneManager.GetSceneAt(i).name;
-                // if (!activeSceneName.ToLower().Contains("ui")) {
                 scenesToUnload.Add(activeSceneName);
-                // }
             }
         }
 
@@ -199,7 +208,6 @@ public partial class GameManager : Singleton<GameManager> {
 
         // if target scene is in scenes to unload, then that means it must be loaded right now, so we want to reload it.
         LoadSceneMode targetSceneLoadMode = scenesToUnload.Contains(targetScene) ? LoadSceneMode.Single : LoadSceneMode.Additive;
-
         foreach (string sceneToLoad in scenesToLoad) {
             if (sceneToLoad == targetScene) {
                 Debug.Log($"loading scene async {sceneToLoad} {targetSceneLoadMode}");
@@ -209,7 +217,6 @@ public partial class GameManager : Singleton<GameManager> {
                 scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive));
             }
         }
-
         // don't unload the scene we just loaded!
         if (scenesToUnload.Contains(targetScene)) {
             scenesToUnload.Remove(targetScene);
@@ -253,8 +260,10 @@ public partial class GameManager : Singleton<GameManager> {
         if (clearSighter == null) {
             // instantiate clearsighter
         }
-        if (clearSighter != null && focus != null)
-            clearSighter.followTransform = focus.transform;
+        if (clearSighter != null && focus != null) {
+            // clearSighter.followTransform = focus.transform;
+            clearSighter.Initialize(focus.transform);
+        }
 
         GunHandler handler = focus.GetComponentInChildren<GunHandler>();
         handler.SetGunAppearanceSuspicion();
@@ -276,21 +285,22 @@ public partial class GameManager : Singleton<GameManager> {
     }
     private void InitializePlayerAndController(LevelPlan plan) {
         ClearSceneData();
-        inputController = GameObject.FindObjectOfType<InputController>();
+        // inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
+        InputController.I.OrbitCamera = characterCamera;
 
-        // spawn player object
+        // spawn player object  
         GameObject playerObj = SpawnPlayer(gameData.playerState, plan);
         SetFocus(playerObj);
 
         // connect player object to input controller
-        inputController.SetInputReceivers(playerObj);
+        InputController.I.SetInputReceivers(playerObj);
 
         LoadSkyBox();
     }
     void LoadSkyBox() {
-        List<Camera> skycams = new List<Camera>();
         LoadScene("cityskybox", () => {
+            List<Camera> skycams = new List<Camera>();
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
                 skycams.Add(skycam.myCamera);
                 // skycam.Initialize(characterCamera.Camera, new Vector3(0f, 10f, 0f));
@@ -407,6 +417,8 @@ public partial class GameManager : Singleton<GameManager> {
         } else return null;
     }
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
+        if (applicationIsQuitting) return;
+
         string idn = poweredComponent.idn;
         if (gameData.levelState != null && gameData.levelState.delta.powerGraph != null && gameData.levelState.delta.powerGraph.nodes.ContainsKey(idn)) {
             // Debug.Log($"setting power node power {idn} {state}");
@@ -415,16 +427,22 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void SetCyberNodeState(CyberComponent cyberComponent, bool state) {
+        if (applicationIsQuitting) return;
+
         string idn = cyberComponent.idn;
         if (gameData.levelState != null && gameData.levelState.delta.cyberGraph != null && gameData.levelState.delta.cyberGraph.nodes.ContainsKey(idn)) {
             SetCyberNodeState(gameData.levelState.delta.cyberGraph.nodes[idn], state);
         }
     }
     public void SetCyberNodeState(CyberNode node, bool state) {
+        if (applicationIsQuitting) return;
+
         node.compromised = state;
         RefreshCyberGraph();
     }
     public void SetAlarmNodeState(AlarmComponent alarmComponent, bool state) {
+        if (applicationIsQuitting) return;
+
         string idn = alarmComponent.idn;
         if (gameData.levelState != null && gameData.levelState.delta.alarmGraph != null && gameData.levelState.delta.alarmGraph.nodes.ContainsKey(idn)) {
             SetAlarmNodeState(gameData.levelState.delta.alarmGraph.nodes[idn], state);
@@ -432,6 +450,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void SetAlarmNodeState(AlarmNode node, bool state) {
+        if (applicationIsQuitting) return;
+
         if (node.enabled) {
             node.alarmTriggered = state;
             node.countdownTimer = 30f;
@@ -439,6 +459,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public bool IsCyberNodeVulnerable(CyberNode node) {
+
         if (node.compromised)
             return false;
         if (gameData.levelState != null && gameData.levelState.delta.cyberGraph != null && gameData.levelState.delta.cyberGraph.nodes.ContainsKey(node.idn)) {
@@ -450,6 +471,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void RefreshCyberGraph() {
+        if (applicationIsQuitting) return;
+
         gameData.levelState.delta.cyberGraph.Refresh();
 
         TransferCyberState();
@@ -458,6 +481,7 @@ public partial class GameManager : Singleton<GameManager> {
         OnCyberGraphChange?.Invoke(gameData.levelState.delta.cyberGraph);
     }
     public void RefreshAlarmGraph() {
+        if (applicationIsQuitting) return;
         // determine if any active alarm object reaches a terminal
         gameData.levelState.delta.alarmGraph.Refresh();
 
@@ -467,6 +491,8 @@ public partial class GameManager : Singleton<GameManager> {
         OnAlarmGraphChange?.Invoke(gameData.levelState.delta.alarmGraph);
     }
     public void RefreshPowerGraph() {
+        if (applicationIsQuitting) return;
+
         // power distribution algorithm
         gameData.levelState.delta.powerGraph.Refresh();
 

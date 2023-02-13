@@ -10,7 +10,6 @@ public class Highlightable : MonoBehaviour {
         outline.color = 1;
         DisableOutline();
     }
-
     public void EnableOutline() {
         outline.enabled = true;
     }

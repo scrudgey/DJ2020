@@ -285,6 +285,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     public void SetSkyBoxCamerasEnabled(bool enabled) {
         foreach (Camera camera in skyBoxCameras) {
+            if (camera == null) continue;
             camera.enabled = enabled;
         }
     }

@@ -416,7 +416,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
 
-
         // Run input
         Motor.MaxStepHeight = stepHeight;
         if (input.runDown) {

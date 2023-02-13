@@ -130,11 +130,9 @@ public class MissionComputerController : MonoBehaviour {
     }
 
     public void CancelButtonCallback() {
-        Debug.Log("cancel");
         GameManager.I.HideMissionSelectMenu();
     }
     public void PlanButtonCallback() {
-        Debug.Log($"Plan {activeLevelTemplate.name}");
         GameManager.I.ShowMissionPlanner(activeLevelTemplate);
     }
 

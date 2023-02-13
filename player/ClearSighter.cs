@@ -21,7 +21,8 @@ public class ClearSighter : MonoBehaviour {
     Coroutine coroutine;
     bool inRooftopZone;
     Collider[] colliderHits;
-    void Start() {
+    public void Initialize(Transform followTransform) {
+        this.followTransform = followTransform;
         colliderHits = new Collider[5000];
         myTransform = transform;
         InitializeMaterialControllerCache();
@@ -46,6 +47,7 @@ public class ClearSighter : MonoBehaviour {
 
             inRooftopZone = false;
             foreach (Collider zone in rooftopZones) {
+                if (zone == null) continue;
                 if (zone.bounds.Contains(myTransform.position)) {
                     inRooftopZone = true;
                 }

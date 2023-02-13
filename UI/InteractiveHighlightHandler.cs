@@ -49,7 +49,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     }
 
     void Update() {
-        timer += Time.deltaTime;
+        timer += Time.unscaledDeltaTime;
         if (data == null) {
             Disable();
             timer = 0f;
@@ -102,7 +102,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         audioSource.Play();
         while (cursorText.text != targetText) {
             while (timer < blitInterval) {
-                timer += Time.deltaTime;
+                timer += Time.unscaledDeltaTime;
                 yield return null;
             }
             timer -= blitInterval;
@@ -114,7 +114,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         blitInterval = 0.5f;
         while (true) {
             while (timer < blitInterval) {
-                timer += Time.deltaTime;
+                timer += Time.unscaledDeltaTime;
                 yield return null;
             }
             timer -= blitInterval;

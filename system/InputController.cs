@@ -8,13 +8,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
-public class InputController : MonoBehaviour {
-    // TODO: input mode could belong to me?
-
+public class InputController : Singleton<InputController> {
     public CharacterCamera OrbitCamera;
-
-    // have to do it this way because unity inspector doesn't know how to expose a list of interfaces
-    public List<GameObject> inputTargets;
     public List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
 
     [Header("Inputs")]
@@ -170,11 +165,12 @@ public class InputController : MonoBehaviour {
         jumpHeld = false;
         jumpReleasedThisFrame = true;
     }
-    public void Awake() {
+    public void Start() {
         RegisterCallbacks();
     }
-    void OnDestroy() {
+    override public void OnDestroy() {
         DeregisterCallbacks();
+        base.OnDestroy();
     }
 
     void RegisterCallbacks() {

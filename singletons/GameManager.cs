@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public enum GamePhase { none, levelPlay, mainMenu, afteraction, world }
+public enum GamePhase { none, levelPlay, mainMenu, plan, afteraction, world }
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
@@ -67,9 +67,9 @@ public partial class GameManager : Singleton<GameManager> {
     public InputMode inputMode {
         get { return _inputMode; }
     }
-    int numberFrames;
+    // int numberFrames;
     public bool showDebugRays;
-    public InputController inputController;
+    // public InputController inputController;
     public UIController uiController;
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
@@ -88,16 +88,9 @@ public partial class GameManager : Singleton<GameManager> {
     void HandleEscapeAction(InputAction.CallbackContext ctx) {
         escapePressedThisFrame = ctx.ReadValueAsButton();
     }
-    void LateUpdate() {
-        // A hack to initialize a level from unity editor? doesn't currently work. 
-        // if (numberFrames == 1 && SceneManager.GetActiveScene().name != "title") {
-        //     // TODO: set level in gamedata
-        //     gameData = GameData.TestInitialData();
-        //     // TODO: a better start of level method?
-        //     TransitionToState(GameState.levelPlay);
-        // }
-        numberFrames += 1;
-    }
+    // void LateUpdate() {
+    //     numberFrames += 1;
+    // }
 
     public override void OnDestroy() {
         base.OnDestroy();
@@ -134,13 +127,6 @@ public partial class GameManager : Singleton<GameManager> {
                 Time.timeScale = 1f;
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
-                if (!SceneManager.GetSceneByName("UI").isLoaded) {
-                    LoadScene("UI", () => {
-                        uiController = GameObject.FindObjectOfType<UIController>();
-                        uiController.InitializeObjectivesController(gameData);
-                        uiController.HideUI();
-                    }, unloadAll: false);
-                }
                 break;
             case GamePhase.mainMenu:
                 Time.timeScale = 0f;
@@ -341,7 +327,7 @@ public partial class GameManager : Singleton<GameManager> {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
         UpdateCursor(uiclick);
         if (Time.timeScale > 0) {
-            PlayerInput playerInput = inputController.HandleCharacterInput(uiclick, escapePressedThisFrame);
+            PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
             uiController?.UpdateWithPlayerInput(playerInput);
         }
         // still not 100% clean here
@@ -396,6 +382,7 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToInputMode(InputMode.gun);
     }
     public void ShowMissionSelectMenu() {
+        // TransitionToPhase(GameP)
         ShowMenu(MenuType.missionSelect);
         // uiController.ShowMissionSelector(gameData);
     }
@@ -405,6 +392,7 @@ public partial class GameManager : Singleton<GameManager> {
         // uiController.HideMissionSelector();
     }
     public void ShowMissionPlanner(LevelTemplate template) {
+        TransitionToPhase(GamePhase.plan);
         LoadScene("MissionPlan", () => {
             MissionPlanController controller = GameObject.FindObjectOfType<MissionPlanController>();
             controller.Initialize(gameData, template);
