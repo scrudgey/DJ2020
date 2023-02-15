@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using cakeslice;
 using Easings;
 using TMPro;
 using UnityEngine;
@@ -99,9 +100,9 @@ public partial class GameManager : Singleton<GameManager> {
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
-                uiController.InitializeObjectivesController(gameData);
+                // uiController.InitializeObjectivesController(gameData);
                 uiController.HideUI();
-
+                uiController.ShowInteractiveHighlight();
                 InitializePlayerAndController(LevelPlan.Default());
                 TransitionToPhase(GamePhase.world);
 
@@ -191,7 +192,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         StartCoroutine(GetSceneLoadProgress(targetScene, scenesToLoad, scenesToUnload, () => {
-            isLoadingLevel = false;
             foreach (LevelBootstrapper bootstrapper in GameObject.FindObjectsOfType<LevelBootstrapper>()) {
                 DestroyImmediate(bootstrapper.gameObject);
             }
@@ -201,6 +201,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
+            isLoadingLevel = false;
         }));
     }
     public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback) {
@@ -288,7 +289,11 @@ public partial class GameManager : Singleton<GameManager> {
         // inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
         InputController.I.OrbitCamera = characterCamera;
-
+        characterCamera.outlineEffect.Initialize();
+        foreach (Outline outline in GameObject.FindObjectsOfType<Outline>()) {
+            outline.OnEnable();
+            outline.OnDisable();
+        }
         // spawn player object  
         GameObject playerObj = SpawnPlayer(gameData.playerState, plan);
         SetFocus(playerObj);

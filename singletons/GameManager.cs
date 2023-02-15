@@ -232,7 +232,7 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
-                uiController.ShowUI();
+                // uiController.ShowUI();
                 break;
         }
         Time.timeScale = 1f;
@@ -261,6 +261,10 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void Update() {
+
+        if (isLoadingLevel)
+            return;
+
         if (toggleConsoleThisFrame) {
             if (activeMenuType != MenuType.console) {
                 ShowMenu(MenuType.console);

@@ -1996,6 +1996,11 @@ note: layer "interactive"
 * broken clearsighter on 
 * broken cutscenes?
 * multiple audiosources
+* show interactibility on world mode
+* highlight is broken on apartment -> street
+* start with correct skybox
+* objectives indicator in world mode
+* start apartment / world with different rotation
 
 
 graphical issues:
@@ -2360,10 +2365,6 @@ loot drops
 
 guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
-start apartment / world with different rotation
-show interactibility on world mode
-highlight is broken on apartment -> street
-start with correct skybox
 
 world:
     spawn random npcs
@@ -2381,3 +2382,20 @@ locations:
     night club 
     bar (the gentleman loser)
     arcade?
+
+
+world NPCs:
+    potentially talkable: leave that for later.
+    moving with purpose around the scene. 
+        up & down streets.
+        in & out of stores.
+    stopping and talking with each other.
+    some are loitering
+        loitering on the street corner
+        leaning up against the wall
+        hanging around the Fire
+    random drug dealers on the corner will buy your drug loot
+
+a new component like SphereRobotAI
+uses a state machine and states
+uses waypoints in the world

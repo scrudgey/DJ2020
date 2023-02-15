@@ -50,11 +50,11 @@ public class MaterialController {
         this.updatedThisLoop = false;
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
-            normalMaterials[renderer] = renderer.material;
+            normalMaterials[renderer] = renderer.sharedMaterial;
             initialSortingLayers[renderer] = LayerMask.LayerToName(renderer.gameObject.layer);
-            if (renderer.material != null) {
-                Texture albedo = renderer.material.mainTexture;
-                Material interloperMaterial = new Material(renderer.material);
+            if (renderer.sharedMaterial != null) {
+                Texture albedo = renderer.sharedMaterial.mainTexture;
+                Material interloperMaterial = new Material(renderer.sharedMaterial);
                 interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
                 interloperMaterial.SetTexture("_Texture", albedo);
                 // interloperMaterial.SetFloat("_Smoothness", 0);
@@ -107,7 +107,11 @@ public class MaterialController {
                 continue;
             }
             renderer.material = interloperMaterials[renderer];
-            renderer.material.SetFloat("_TargetAlpha", 1);
+            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(propBlock);
+            // renderer.material.SetFloat("_TargetAlpha", 1);
+            propBlock.SetFloat("_TargetAlpha", 1);
+            renderer.SetPropertyBlock(propBlock);
             targetAlpha = 1;
         }
     }
@@ -182,14 +186,18 @@ public class MaterialController {
                     renderer.gameObject.layer = LayerUtil.GetLayer(Layer.clearsighterHide);
                     continue;
                 }
-                // renderer.material.SetFloat("_TargetAlpha", targetAlpha);
                 if (targetAlpha <= 0.1) {
                     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
                     renderer.material = normalMaterials[renderer];
                 } else {
                     renderer.shadowCastingMode = initialShadowCastingMode[renderer];
                     renderer.material = interloperMaterials[renderer];
-                    renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+                    // renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                    renderer.GetPropertyBlock(propBlock);
+                    // renderer.material.SetFloat("_TargetAlpha", 1);
+                    propBlock.SetFloat("_TargetAlpha", targetAlpha);
+                    renderer.SetPropertyBlock(propBlock);
                 }
             }
         }

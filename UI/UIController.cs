@@ -10,6 +10,7 @@ public class UIController : MonoBehaviour {
     public Canvas terminalCanvas;
     public Canvas burglarCanvas;
     public Canvas missionSelectorCanvas;
+    public Canvas interactiveHighlightCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
@@ -134,16 +135,18 @@ public class UIController : MonoBehaviour {
         vRStatHandler.gameObject.SetActive(false);
     }
     public void HideUI() {
-        Debug.Log("hide UI");
         HideVRStats();
         canvas.enabled = false;
+        interactiveHighlightCanvas.enabled = false;
         burglarCanvas.enabled = false;
     }
     public void ShowUI() {
-        Debug.Log("show UI");
-        // ShowVRStats();
         canvas.enabled = true;
+        interactiveHighlightCanvas.enabled = true;
         if (burglarMode)
             burglarCanvas.enabled = true;
+    }
+    public void ShowInteractiveHighlight() {
+        interactiveHighlightCanvas.enabled = true;
     }
 }
