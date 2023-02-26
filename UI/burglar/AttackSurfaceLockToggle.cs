@@ -38,7 +38,6 @@ public class AttackSurfaceLockToggle : AttackSurfaceElement {
         } else {
             float currentAngle = knob.localRotation.eulerAngles.z;
             while (!stopCondition(currentAngle)) {
-                Debug.Log($"{currentAngle} {targetAngle} ");
                 currentAngle = knob.localRotation.eulerAngles.z;
                 Quaternion newRotation = Quaternion.Euler(0f, 0f, currentAngle + increment());
                 knob.localRotation = newRotation;

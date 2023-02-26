@@ -50,9 +50,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
 
     public static PlayerState DefaultState() {
-        GunTemplate gun1 = GunTemplate.Load("r1");
-        GunTemplate gun2 = GunTemplate.Load("sh1");
-        GunTemplate gun3 = GunTemplate.Load("sh1");
+        GunTemplate gun1 = GunTemplate.Load("p1");
+        GunTemplate gun2 = GunTemplate.Load("s1");
+        GunTemplate gun3 = GunTemplate.Load("r1");
 
         return new PlayerState() {
             legSkin = "Jack",

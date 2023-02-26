@@ -26,7 +26,7 @@ public class ClearSighter : MonoBehaviour {
         colliderHits = new Collider[5000];
         myTransform = transform;
         InitializeMaterialControllerCache();
-        InvokeRepeating("HandleStaticGeometry", 0f, 0.5f);
+        InvokeRepeating("HandleStaticGeometry", 0f, 1f);
         rooftopZones = GameObject.FindObjectsOfType<RooftopZone>()
             .SelectMany(zone => zone.GetComponentsInChildren<Collider>())
             .ToList();
@@ -97,7 +97,7 @@ public class ClearSighter : MonoBehaviour {
                     yield return waitForFrame;
                 }
                 Vector3 directionToInterloper = interloper.collider.bounds.center - myTransform.position;
-                if (directionToInterloper.y > 0.1f && !detectionPlane.GetSide(interloper.collider.bounds.center)) {
+                if (directionToInterloper.y > 0.2f && !detectionPlane.GetSide(interloper.collider.bounds.center)) {
                     interloper.InterloperStart();
                 }
 

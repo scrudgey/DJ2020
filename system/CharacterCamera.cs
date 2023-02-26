@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using cakeslice;
 using Easings;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,10 +12,14 @@ using UnityEngine.Rendering.PostProcessing;
 public enum CameraState { normal, wallPress, attractor, aim, burgle }
 
 public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
+    public static bool ORTHOGRAPHIC_MODE = true;
+    public enum IsometricOrientation { NE, SE, SW, NW }
+    public IsometricOrientation initialOrientation;
     private CameraState _state;
     public CameraState state {
         get { return _state; }
     }
+    public OutlineEffect outlineEffect;
     public static Quaternion rotationOffset;
     public PostProcessVolume volume;
     public PostProcessProfile isometricProfile;
@@ -113,7 +118,15 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
         // initial planar
         // the initial rotation here will be an offset to all subsequent rotations
-        PlanarDirection = Quaternion.Euler(0, -45, 0) * Vector3.right; // TODO: configurable per level
+        float initialPlanarAngle = initialOrientation switch {
+            IsometricOrientation.NE => 45f,
+            IsometricOrientation.SE => 135f,
+            IsometricOrientation.SW => 225f,
+            IsometricOrientation.NW => 315f,
+            _ => 45f
+        };
+
+        PlanarDirection = Quaternion.Euler(0, initialPlanarAngle, 0) * Vector3.right;
         rotationOffset = Quaternion.Euler(Vector3.up * initialRotationOffset);
         Quaternion rotationFromInput = rotationOffset;
         PlanarDirection = rotationFromInput * PlanarDirection;
@@ -166,6 +179,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Camera.clearFlags = CameraClearFlags.SolidColor;
         switch (state) {
             case CameraState.normal:
+                Camera.clearFlags = CameraClearFlags.Skybox;
                 if (fromState == CameraState.aim || fromState == CameraState.wallPress) {
                     // kind of hacky but w/e
                     _currentDistance = 20f;
@@ -255,7 +269,13 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 break;
             default:
             case CameraState.normal:
-                RenderSettings.skybox = isometricSkybox;
+                if (ORTHOGRAPHIC_MODE) {
+                    RenderSettings.skybox = isometricSkybox;
+                    Camera.clearFlags = CameraClearFlags.SolidColor;
+                } else {
+                    RenderSettings.skybox = wallPressSkybox;
+                    Camera.clearFlags = CameraClearFlags.Skybox;
+                }
                 ApplyTargetParameters(NormalParameters(input));
                 volume.profile = isometricProfile;
                 SetSkyBoxCamerasEnabled(false);
@@ -320,14 +340,25 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             lastTargetPosition = targetPosition;
         }
 
-        float desiredOrthographicSize = 9 * zoomCoefficient;
-        desiredOrthographicSize = Math.Max(1, desiredOrthographicSize);
-        desiredOrthographicSize = Math.Min(10, desiredOrthographicSize);
+        float desiredOrthographicSize = 1f;
+        float fieldOfView = 70f;
+        if (ORTHOGRAPHIC_MODE) {
+            desiredOrthographicSize = 9 * zoomCoefficient;
+            desiredOrthographicSize = Math.Max(1, desiredOrthographicSize);
+            desiredOrthographicSize = Math.Min(10, desiredOrthographicSize);
+        } else {
+            desiredOrthographicSize = zoomCoefficient * 10f;
+            desiredOrthographicSize = Math.Max(3f, desiredOrthographicSize);
+            desiredOrthographicSize = Math.Min(20f, desiredOrthographicSize);
+            // orthographic size is half-size physical length
+            fieldOfView = (float)Mathf.Atan(desiredOrthographicSize / (_currentDistance * Camera.aspect)) * (360f / 6.28f) * 2f;
+            // Debug.Log($"{input.orthographicSize} {Camera.fieldOfView}");
+        }
         currentOrthographicSize = desiredOrthographicSize;
 
         return new CameraTargetParameters() {
-            fieldOfView = 70f,
-            orthographic = true,
+            fieldOfView = fieldOfView,
+            orthographic = ORTHOGRAPHIC_MODE,
             rotation = planarRot * verticalRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
@@ -346,8 +377,13 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         CameraTargetParameters parameters = NormalParameters(input);
         if (currentAttractor != null) {
             parameters.followingSharpness = currentAttractor.movementSharpness;
-            Vector3 delta = input.targetPosition - currentAttractor.sphereCollider.bounds.center;
-            parameters.targetPosition = (currentAttractor.sphereCollider.bounds.center * (zoomCoefficient - 0.25f)) + (parameters.targetPosition * (1.25f - zoomCoefficient));
+            // Vector3 delta = input.targetPosition - currentAttractor.sphereCollider.bounds.center;
+            if (ORTHOGRAPHIC_MODE) {
+                parameters.targetPosition = (currentAttractor.sphereCollider.bounds.center * (zoomCoefficient - 0.25f)) + (parameters.targetPosition * (1.25f - zoomCoefficient));
+            } else {
+                parameters.targetPosition = (currentAttractor.sphereCollider.bounds.center * (zoomCoefficient - 0.25f)) + (parameters.targetPosition * (1f - zoomCoefficient));
+                parameters.targetPosition.y = input.targetPosition.y;
+            }
         }
         return parameters;
     }
@@ -485,13 +521,19 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         TargetDistance = input.targetDistance;
         TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
 
-        // apply FOV
-        Camera.fieldOfView = input.fieldOfView;
 
         // apply orthographic
-        Camera.orthographic = input.orthographic;
-
         Camera.orthographicSize = input.orthographicSize;
+        // if (ORTHOGRAPHIC_MODE) {
+        Camera.orthographic = input.orthographic;
+        Camera.fieldOfView = input.fieldOfView;
+        // } else {
+        //     Camera.orthographic = false;
+        //     // orthographic size is half-size physical length
+        //     Camera.fieldOfView = (float)Mathf.Atan(input.orthographicSize / (_currentDistance * Camera.aspect)) * (360f / 6.28f) * 2f;
+        //     // Camera.fiel
+        //     Debug.Log($"{input.orthographicSize} {Camera.fieldOfView}");
+        // }
 
         // apply rotation
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));

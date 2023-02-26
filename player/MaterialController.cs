@@ -18,6 +18,7 @@ public class MaterialController {
     public float ceilingHeight = 1.75f;
     public float targetAlpha;
     public bool updatedThisLoop;
+    float maxExtent;
     Vector3 anchorOffset;
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, Material> interloperMaterials = new Dictionary<Renderer, Material>();
@@ -35,6 +36,9 @@ public class MaterialController {
                                                 )
                                     .ToList();
         this.collider = collider;
+        maxExtent = collider.bounds.extents.x;
+        maxExtent = Mathf.Max(maxExtent, collider.bounds.extents.y);
+        maxExtent = Mathf.Max(maxExtent, collider.bounds.extents.z);
 
         anchorOffset = collider.bounds.center - gameObject.transform.position;
         Transform findAnchor = gameObject.transform.Find("clearSighterAnchor");
@@ -75,7 +79,7 @@ public class MaterialController {
         float otherFloorY = anchor.y - collider.bounds.extents.y;
         float directionY = otherFloorY - playerPosition.y;
         // if (debug)
-        //     Debug.Log($"[MaterialController] {gameObject} {directionY} {anchor.position.y} < {playerPosition.y} = {anchor.position.y < playerPosition.y} {anchor.position.y < playerPosition.y + 0.05f}");
+        // Debug.Log($"[MaterialController] {gameObject} {directionY} {anchor.position.y} < {playerPosition.y} = {anchor.position.y < playerPosition.y} {anchor.position.y < playerPosition.y + 0.05f}");
 
         if (anchor.y < playerPosition.y + 0.05f || anchor.y < floorHeight) {
             // disableRender = false;
@@ -147,7 +151,7 @@ public class MaterialController {
         } else {
             disableBecauseInterloper = true;
         }
-        float minimumAlpha = disableRender ? 0f : (1f * (offAxisLength / 2f));
+        float minimumAlpha = disableRender ? 0f : (1f * (offAxisLength / (maxExtent * 2)));
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {
                 targetAlpha += Time.unscaledDeltaTime * 10f;

@@ -2359,30 +2359,44 @@ icons:
 padlock
 disguise tactic icon
 fake id tactic icon
-subway entrance
 random loot spots
 loot drops
 
 guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
 
-world:
-    spawn random npcs
-    shopkeeper
-    more trash, random grime
-    burned out car wreck
-    neon signange
-    graffiti
+a new component like SphereRobotAI
+uses a state machine and states
+uses waypoints in the world
+loot popup is not popping up
+unify regular + metallic material
+eliminate cyber_obj_2 material
+* basic floor 2.25 needs to be fixed.
+
+mission:
+    visibility goes too low
+    guards get stuck on each other
+        make NPCs pass through each other with a soft bump
+    swat spritesheet
+        this requires sprite datasystem work:
+            1. positioning torso relative to legs (maybe?)
+                position head relative to torso 
+            2. work on editor
+                updating values when they're updated in the editor? somehow? yes/ no?
+    trees / plants / outside decor
+
+
+
+
 
 locations:
-    weapons dealer
+    * weapons dealer
     software dealer
     hardware dealer (the finn)
     street doc
     night club 
-    bar (the gentleman loser)
+    * bar (the gentleman loser)
     arcade?
-
 
 world NPCs:
     potentially talkable: leave that for later.
@@ -2396,6 +2410,114 @@ world NPCs:
         hanging around the Fire
     random drug dealers on the corner will buy your drug loot
 
-a new component like SphereRobotAI
-uses a state machine and states
-uses waypoints in the world
+
+
+* a bar
+* bar stools
+* table
+* chairs
+* weapons dealer:
+* industrial shelving
+* industrial containers
+bar curve
+subway entrance
+more trash, random grime
+burned out car wreck
+neon signange
+graffiti
+6x6 dirt
+6x6 sidewalk
+
+
+solve camera distance / near clipping plane
+
+* question: what is the first store in the neighbor building?
+    items: could work
+* upstairs:
+    importer / exporter who buys things.
+    also he is a connection that will give you tips or sometimes a deal.
+* bar:
+    the bartender will clue you in on the price of commodities.
+    there is an underworld figure in the corner of the bar who will give you missions.
+akira alley:
+    drug dealers will purchase your drug loot.
+subway:
+    a software hacker 
+* underneath apartment:
+    weapons
+
+tents
+pop-up tent
+
+sprite props
+    guns
+    knives / swords / shuriken
+    rocket launcher
+    * bottles
+    * glasses
+    * dirt
+    * grime
+    ground wires
+
+* decor: replacing the spritesheet is hard.
+    * if we do it programmatically: set the spritesheet and index in a script.
+
+clearsighter can and should be much, much simpler.
+we need more large, imposing, concrete style buildings
+prevent guns in world
+prevent damage in world?
+
+* make
+    * guns for gun shop
+    * item shop
+    * akira alley
+
+neon lights
+    neon ring around the signage name
+    neon sign in the window
+    "GUNS" sign
+    how do i do neon?
+        aesthetic 1: white light, red rim
+        aesthetic 2: bright light, wall behind it is super red
+
+graffiti
+    bört
+    karmadillo
+    lobster
+    Emosido engañado
+    franco
+    no me baño
+https://twitter.com/scrudgey/status/1627911883952099329?s=20
+
+then:
+    NPCs
+    shopowners
+    weapon shop UI
+
+still unknown:
+    street doc
+    weapon upgrades
+    software
+    hardware
+
+NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
+Shopowners do not need to be spawned like this but they do need to be initialized.
+
+storeowner:
+    move to position
+    look in direction
+    look at player
+so, this should be an AI.
+    different from SphereRobot, but still uses a state machine.
+
+
+
+
+stat: 70
+compare: 60
+
+compareGun.clipSize - template.clipSize = -10
+intial width = 0
+easing(0, -10) : width -> -10
+
+first problem: width should go -> 10

@@ -9,6 +9,16 @@ public struct AnimationInput {
         public GunTemplate baseGun;
         public bool shootRequestedThisFrame;
         public bool aimWeapon;
+
+        public static GunAnimationInput None() => new GunAnimationInput {
+            gunType = GunType.unarmed,
+            gunState = GunHandler.GunStateEnum.idle,
+            hasGun = false,
+            holstered = true,
+            baseGun = null,
+            shootRequestedThisFrame = false,
+            aimWeapon = false
+        };
     }
     public GunAnimationInput gunInput;
     public Direction orientation;

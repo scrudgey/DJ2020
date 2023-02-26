@@ -56,6 +56,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     float headAngle;
 
     Coroutine pickerCoroutine;
+    bool initialized;
     public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.data = data;
         this.plan = plan;
@@ -84,6 +85,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         secondaryHighlight.SetActive(false);
         tertiaryHighlight.SetActive(false);
         // InitializeWeaponPicker();
+        initialized = true;
     }
 
     void InitializeItemSlots(LevelPlan plan) {
@@ -114,6 +116,8 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         legsSkin = Skin.LoadSkin(legSkinName);
         bodySkin = Skin.LoadSkin(torsoSkinName);
         headSkin = Skin.LoadSkin(headSkinName);
+        Debug.Log(headSkinName);
+        Debug.Log(headSkin);
 
         Direction headDirection = Direction.rightDown;
 
@@ -290,6 +294,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
     void Update() {
+        if (!initialized) return;
         timer += Time.unscaledDeltaTime;
 
         Vector3 torsoPosition = new Vector3(initialTorsoPosition.x, initialTorsoPosition.y, initialTorsoPosition.z);
@@ -320,7 +325,6 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 break;
         }
         headImage.sprite = headSkin.headIdle[headDirection][0];
-
     }
 
 

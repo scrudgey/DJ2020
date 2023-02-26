@@ -521,13 +521,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
-                    ItemUseResult result = itemHandler.SetInputs(input);
+                    ItemUseResult result = itemHandler?.SetInputs(input);
                     HandleItemUseResult(result);
 
                     // Cyberdeck
                     ManualHackInput manualHackInput = new ManualHackInput {
                         playerInput = input,
-                        activeItem = itemHandler.activeItem
+                        activeItem = itemHandler?.activeItem
                     };
                     manualHacker?.SetInputs(manualHackInput);
                     burglar?.SetInputs(manualHackInput);
@@ -670,6 +670,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     void HandleItemUseResult(ItemUseResult result) {
+        if (result == null) return;
         if (result.crouchDown) {
             TransitionToState(CharacterState.useItem);
         }
@@ -1460,7 +1461,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             wallPressTimer = wallPressTimer,
             state = state,
             playerInputs = _lastInput,
-            gunInput = gunHandler.BuildAnimationInput(),
+            gunInput = gunHandler?.BuildAnimationInput() ?? AnimationInput.GunAnimationInput.None(),
             camDir = camDir,
             cameraRotation = OrbitCamera.transform.rotation,
             lookAtDirection = lookAtDirection,
@@ -1469,7 +1470,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             hitState = hitState,
             velocity = Motor.Velocity,
             wavingArm = waveArmTimer > 0f,
-            activeItem = itemHandler.activeItem
+            activeItem = itemHandler?.activeItem
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);
