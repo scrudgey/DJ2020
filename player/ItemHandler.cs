@@ -60,14 +60,15 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         SwitchToItem(null);
         index = items.IndexOf(null);
     }
-    public void LoadItemState(string[] itemNames) {
-        items = new List<BaseItem>();
-        foreach (string itemName in itemNames) {
-            BaseItem newItem = ItemInstance.LoadItem(itemName);
-            items.Add(newItem);
-        }
+    public void LoadItemState(List<BaseItem> loadItems) {
+        // items = new List<BaseItem>();
+        // foreach (string itemName in itemNames) {
+        // BaseItem newItem = ItemInstance.LoadItem(itemName);
+        // items.Add(newItem);
+        items.AddRange(loadItems);
+        // }
         items.Add(null);
-        items = items.ToHashSet().ToList();
+        // items = items.ToHashSet().ToList();
         ClearItem();
     }
 

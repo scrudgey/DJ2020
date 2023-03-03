@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -209,6 +209,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("GunShop", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.itemshop:
+                if (!SceneManager.GetSceneByName("ItemShop").isLoaded) {
+                    LoadScene("ItemShop", callback, unloadAll: false);
+                }
+                break;
             case MenuType.console:
                 uiController.ShowTerminal();
                 callback?.Invoke();
@@ -237,6 +242,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.gunshop:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("GunShop"));
+                break;
+            case MenuType.itemshop:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("ItemShop"));
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
@@ -394,24 +402,22 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToInputMode(InputMode.gun);
     }
     public void ShowMissionSelectMenu() {
-        // TransitionToPhase(GameP)
         ShowMenu(MenuType.missionSelect);
-        // uiController.ShowMissionSelector(gameData);
     }
     public void HideMissionSelectMenu() {
-        // TransitionToPhase(GamePhase.world);
         CloseMenu();
-        // uiController.HideMissionSelector();
     }
     public void ShowGunShopMenu() {
-        // TransitionToPhase(GameP)
         ShowMenu(MenuType.gunshop);
-        // uiController.ShowMissionSelector(gameData);
     }
     public void HideGunShopMenu() {
-        // TransitionToPhase(GamePhase.world);
         CloseMenu();
-        // uiController.HideMissionSelector();
+    }
+    public void ShowItemShopMenu() {
+        ShowMenu(MenuType.itemshop);
+    }
+    public void HideItemShopMenu() {
+        CloseMenu();
     }
     public void ShowMissionPlanner(LevelTemplate template) {
         TransitionToPhase(GamePhase.plan);

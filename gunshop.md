@@ -48,22 +48,35 @@ dialogue can have gun shop and player portraits
 + player can provide feedback when gun is bought or sold.
 + shop / player on left / right can be used to differentiate buy / sell
 
-initialize all fields properly
-    initialize stats empty 
+* initialize all fields properly
+    * initialize stats empty 
     * clear compare value
-show gun image in selector buttons
-button colors are bad
-include bars
-    bars lerp toward values
-    bars show +/- versus compare
-separate gun lists by gun type with header
-"Buy" button is styled different from bottom butsons
-sfx
+* show gun image in selector buttons
+* button colors are bad
+* include bars
+    * bars lerp toward values
+    * bars show +/- versus compare
+* separate gun lists by gun type with header
+* "Buy" button is styled different from bottom butsons
 
 * seller wares should be bigger
 * spacing
-test with rifle, shotgun, smg, with spacers
-fix inventory 
+* test with rifle, shotgun, smg, with spacers
+* fix inventory 
+* update stats when compare gun is clicked
 
-update stats when compare gun is clicked
+gun shop has a randomized selection of guns for sale each day.
+* player has arsenal of guns to choose from
+    * gun for sale: template and price.
+    * buying a gun 
+        * removes from gun shop inventory
+        * instantiates a new gun instance (GunState)
+        * places gun instance in player arsenal
+    randomized per day: ?
+        the gun shop specifies collection of possible guns for sale and probabilities in some way
+        gun shop has a collection of guns for sale
+    
+
 why are there two recoils and no weight?
+sfx
+sell mode

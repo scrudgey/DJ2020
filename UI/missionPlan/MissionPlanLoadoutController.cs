@@ -91,9 +91,9 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     void InitializeItemSlots(LevelPlan plan) {
         for (int i = 0; i < 4; i++) {
             itemSlots[i].Initialize(this, i);
-            if (i < plan.items.Length) {
-                BaseItem item = ItemInstance.LoadItem(plan.items[i]);
-                SetItemSlot(i, item);
+            if (i < plan.items.Count) {
+                // BaseItem item = ItemInstance.LoadItem(plan.items[i]);
+                SetItemSlot(i, plan.items[i]);
             } else {
                 SetItemSlot(i, null);
             }
@@ -184,7 +184,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
     void WeaponPickerCallback(LoadoutStashPickerButton picker) {
-        Toolbox.RandomizeOneShot(audioSource, picker.template.unholster, randomPitchWidth: 0.05f);
+        Toolbox.RandomizeOneShot(audioSource, picker.gunstate.template.unholster, randomPitchWidth: 0.05f);
 
         primaryHighlight.SetActive(false);
         secondaryHighlight.SetActive(false);
@@ -195,24 +195,24 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             2 => secondaryWeaponButton,
             3 => tertiaryWeaponButton
         };
-        button.ApplyGunTemplate(picker.template);
-        gunStatHandler.DisplayGunTemplate(picker.template);
+        button.ApplyGunTemplate(picker.gunstate.template);
+        // TODO: apply total state, not just template
+        gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
 
         // TODO: change plan, not player state (requires change to VR mission designer too?)
-        GunState newState = picker.template ? GunState.Instantiate(picker.template) : null;
         switch (selectedWeaponSlot) {
             case 1:
-                data.playerState.primaryGun = newState;
+                data.playerState.primaryGun = picker.gunstate;
                 break;
             case 2:
-                data.playerState.secondaryGun = newState;
+                data.playerState.secondaryGun = picker.gunstate;
                 break;
             case 3:
-                data.playerState.tertiaryGun = newState;
+                data.playerState.tertiaryGun = picker.gunstate;
                 break;
         }
 
-        Octet<Sprite[]> octet = picker.template.type switch {
+        Octet<Sprite[]> octet = picker.gunstate.template.type switch {
             GunType.pistol => bodySkin.pistolIdle,
             GunType.smg => bodySkin.smgIdle,
             GunType.rifle => bodySkin.rifleIdle,
@@ -223,7 +223,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     void ItemPickerCallback(LoadoutStashPickerButton picker) {
         SetItemSlot(selectedItemSlot, picker.item);
         // plan.items.Add(picker.item.data.shortName);
-        plan.items[selectedItemSlot] = picker.item.data.shortName;
+        plan.items[selectedItemSlot] = picker.item;
         InitializeItemPicker();
     }
 
@@ -231,10 +231,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
         }
-        foreach (string itemName in data.unlockedItems) {
-            BaseItem item = ItemInstance.LoadItem(itemName);
+        foreach (BaseItem item in data.playerState.allItems) {
+            // BaseItem item = ItemInstance.LoadItem(itemName);
             if (item == null) continue;
-            if (plan.items.Any(planItem => item.data.shortName == planItem)) continue;
+            // if (plan.items.Any(planItem => item.data.shortName == planItem)) continue;
+            if (plan.items.Contains(item)) continue;
             LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
             pickerHandler.Initialize(this, item);
         }
@@ -243,41 +244,48 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
         }
-        GunTemplate[] allGuns = Resources.LoadAll<GunTemplate>("data/guns");
+        // GunTemplate[] allGuns = Resources.LoadAll<GunTemplate>("data/guns");
+        List<GunState> allGuns = GameManager.I.gameData.playerState.allGuns;
+
+        List<GunState> pistols = allGuns.Where(gun => gun.template.type == GunType.pistol).ToList();
+        List<GunState> smgs = allGuns.Where(gun => gun.template.type == GunType.smg).ToList();
+        List<GunState> rifles = allGuns.Where(gun => gun.template.type == GunType.rifle).ToList();
+        List<GunState> shotguns = allGuns.Where(gun => gun.template.type == GunType.shotgun).ToList();
 
         // None button
 
-        // create pistol divider
-        instantiateDivider("Pistol");
-        allGuns.Where(gun => gun.type == GunType.pistol).ToList()
-            .ForEach(gun => {
+        if (pistols.Count > 0) {
+            // create pistol divider
+            instantiateDivider("Pistol");
+            pistols.ForEach(gun => {
                 LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
                 pickerHandler.Initialize(this, gun);
             });
-
-        // create smg divider
-        instantiateDivider("SMG");
-        allGuns.Where(gun => gun.type == GunType.smg).ToList()
-            .ForEach(gun => {
+        }
+        if (smgs.Count > 0) {
+            // create smg divider
+            instantiateDivider("SMG");
+            smgs.ForEach(gun => {
                 LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
                 pickerHandler.Initialize(this, gun);
             });
-
-        // create rifle divider
-        instantiateDivider("Rifle");
-        allGuns.Where(gun => gun.type == GunType.rifle).ToList()
-            .ForEach(gun => {
+        }
+        if (rifles.Count > 0) {
+            // create rifle divider
+            instantiateDivider("Rifle");
+            rifles.ForEach(gun => {
                 LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
                 pickerHandler.Initialize(this, gun);
             });
-
-        // create shotgun divider
-        instantiateDivider("Shotgun");
-        allGuns.Where(gun => gun.type == GunType.shotgun).ToList()
-            .ForEach(gun => {
+        }
+        if (shotguns.Count > 0) {
+            // create shotgun divider
+            instantiateDivider("Shotgun");
+            shotguns.ForEach(gun => {
                 LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
                 pickerHandler.Initialize(this, gun);
             });
+        }
     }
 
     LoadoutStashPickerButton instantiateWeaponPicker() {

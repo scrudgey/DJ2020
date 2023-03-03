@@ -8,6 +8,8 @@ public enum CycleType { manual, semiautomatic, automatic }
 public class GunTemplate : ScriptableObject {
     new public string name;
     public string shortName;
+    [TextArea(15, 20)]
+    public string shopDescription;
 
     // TODO: separate guntype as graphics from gun functionality. allow gun to specify manual cycling, e.g.
     public GunType type;

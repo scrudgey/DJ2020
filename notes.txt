@@ -2510,14 +2510,42 @@ storeowner:
 so, this should be an AI.
     different from SphereRobot, but still uses a state machine.
 
+use allGuns in loadout editor
 
 
+gunshop
+    show little -100 text goes up from credits, lerp credits color from red to white
+    * sfx
+        * clicking items
+        * buying / failing to buy
+        * text blit
+    sell mode
+        can't sell last gun? maybe?
+main game loop
+    save / load game data
 
-stat: 70
-compare: 60
+item shop
+    items:
+        c4
+        rocket
+        grenade
+        thermals
+    select item from a list
+    display:
+        item picture
+        description (dialogue)
+            "1x per mission"
+            "unlimited use"
+            "
+        cost
+        credits
+    player item list
+    buy button
 
-compareGun.clipSize - template.clipSize = -10
-intial width = 0
-easing(0, -10) : width -> -10
 
-first problem: width should go -> 10
+"v" and "^" buttons on scrollbars?
+
+
+items not being set in plan
+
+steam assets / main title / logo

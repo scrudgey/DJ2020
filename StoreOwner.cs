@@ -19,6 +19,9 @@ public class StoreOwner : Interactive {
             case StoreType.gun:
                 GameManager.I.ShowGunShopMenu();
                 break;
+            case StoreType.item:
+                GameManager.I.ShowItemShopMenu();
+                break;
         }
         return ItemUseResult.Empty() with {
             waveArm = true

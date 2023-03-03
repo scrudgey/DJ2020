@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Items;
+using Items;
 using UnityEngine;
-
 
 [System.Serializable]
 public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
@@ -12,6 +13,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public string headSkin { get; set; }
 
     // gun
+    public List<GunState> allGuns;
+    public List<BaseItem> allItems;
     public GunState primaryGun { get; set; }
     public GunState secondaryGun { get; set; }
     public GunState tertiaryGun { get; set; }
@@ -54,6 +57,26 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         GunTemplate gun2 = GunTemplate.Load("s1");
         GunTemplate gun3 = GunTemplate.Load("r1");
 
+        GunTemplate gun4 = GunTemplate.Load("p2");
+
+        GunState gunState1 = GunState.Instantiate(gun1);
+        GunState gunState2 = GunState.Instantiate(gun2);
+        GunState gunState3 = GunState.Instantiate(gun3);
+        GunState gunState4 = GunState.Instantiate(gun4);
+
+        List<GunState> allGuns = new List<GunState>{
+            gunState1,
+            gunState2,
+            gunState3,
+            gunState4
+        };
+
+        List<BaseItem> allItems = new List<BaseItem> {
+            ItemInstance.LoadItem("deck"),
+            ItemInstance.LoadItem("tools"),
+            ItemInstance.LoadItem("C4")
+        };
+
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
@@ -66,7 +89,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // legSkin = "security",
             // bodySkin = "security",
             // headSkin = "security",
-
+            allGuns = allGuns,
+            allItems = allItems,
             primaryGun = GunState.Instantiate(gun1),
             secondaryGun = GunState.Instantiate(gun2),
             tertiaryGun = GunState.Instantiate(gun3),

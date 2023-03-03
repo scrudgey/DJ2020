@@ -8,7 +8,7 @@ public record GameData {
     public List<string> unlockedLevels;
     public List<string> completedLevels;
     public SerializableDictionary<string, LevelPlan> levelPlans;
-    public List<string> unlockedItems;
+    // public List<string> unlockedItems;
 
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
@@ -21,7 +21,7 @@ public record GameData {
                 "Jack That Data",
                 "Tower"
             },
-            unlockedItems = new List<string> { "C4", "deck", "goggles", "tools" },
+            // unlockedItems = new List<string> { "C4", "deck", "goggles", "tools" },
             levelPlans = new SerializableDictionary<string, LevelPlan>()
         };
     }
