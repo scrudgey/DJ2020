@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class ItemShopController : MonoBehaviour {
     public GameObject UIEditorCamera;
     public GameObject itemButtonPrefab;
+    public GameObject bodyContainer;
 
     [Header("lists")]
     public Transform leftGunScrollContainer;
@@ -57,9 +58,10 @@ public class ItemShopController : MonoBehaviour {
         SetShopownerDialogue("Please come in to my underground black market items shop.");
         creditsCost.text = "";
         ClearItemForSale();
+        bodyContainer.SetActive(false);
     }
     public void DoneButtonCallback() {
-        GameManager.I.HideGunShopMenu();
+        GameManager.I.HideShopMenu();
     }
 
     void PopulateStoreInventory() {
@@ -117,6 +119,7 @@ public class ItemShopController : MonoBehaviour {
         return obj;
     }
     public void ShopButtonCallback(ItemShopButton button) {
+        bodyContainer.SetActive(true);
         SetItemForSale(button.saleData);
     }
     void SetItemForSale(ItemSaleData data) {
@@ -144,6 +147,7 @@ public class ItemShopController : MonoBehaviour {
         return obj;
     }
     public void InventoryButtonCallback(ItemShopButton button) {
+        bodyContainer.SetActive(true);
         // SetCompareGun(button.gunState.template);
         ClearItemForSale();
         SetShopownerDialogue(button.item.data.shopDescription);

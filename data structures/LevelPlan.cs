@@ -5,8 +5,10 @@ using UnityEngine;
 public record LevelPlan {
     public string insertionPointIdn;
     public string extractionPointIdn;
+
+    // TODO: converter for list
     public List<Tactic> activeTactics;
-    // public string[] items = new string[4];
+
     public List<BaseItem> items;
     public static LevelPlan Default() => new LevelPlan {
         insertionPointIdn = "",

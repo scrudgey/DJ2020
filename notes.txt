@@ -2001,6 +2001,24 @@ note: layer "interactive"
 * start with correct skybox
 * objectives indicator in world mode
 * start apartment / world with different rotation
+* a bar
+* bar stools
+* table
+* chairs
+* weapons dealer:
+* industrial shelving
+* industrial containers
+* more trash, random grime
+* decor: replacing the spritesheet is hard.
+    * if we do it programmatically: set the spritesheet and index in a script.
+* make
+    * guns for gun shop
+    * item shop
+    * akira alley
+* use allGuns in loadout editor
+
+
+
 
 
 graphical issues:
@@ -2372,6 +2390,7 @@ loot popup is not popping up
 unify regular + metallic material
 eliminate cyber_obj_2 material
 * basic floor 2.25 needs to be fixed.
+fix broken loot items
 
 mission:
     visibility goes too low
@@ -2391,11 +2410,11 @@ mission:
 
 locations:
     * weapons dealer
+    * bar (the gentleman loser)
     software dealer
     hardware dealer (the finn)
     street doc
     night club 
-    * bar (the gentleman loser)
     arcade?
 
 world NPCs:
@@ -2412,87 +2431,8 @@ world NPCs:
 
 
 
-* a bar
-* bar stools
-* table
-* chairs
-* weapons dealer:
-* industrial shelving
-* industrial containers
-bar curve
-subway entrance
-more trash, random grime
-burned out car wreck
-neon signange
-graffiti
-6x6 dirt
-6x6 sidewalk
 
 
-solve camera distance / near clipping plane
-
-* question: what is the first store in the neighbor building?
-    items: could work
-* upstairs:
-    importer / exporter who buys things.
-    also he is a connection that will give you tips or sometimes a deal.
-* bar:
-    the bartender will clue you in on the price of commodities.
-    there is an underworld figure in the corner of the bar who will give you missions.
-akira alley:
-    drug dealers will purchase your drug loot.
-subway:
-    a software hacker 
-* underneath apartment:
-    weapons
-
-tents
-pop-up tent
-
-sprite props
-    guns
-    knives / swords / shuriken
-    rocket launcher
-    * bottles
-    * glasses
-    * dirt
-    * grime
-    ground wires
-
-* decor: replacing the spritesheet is hard.
-    * if we do it programmatically: set the spritesheet and index in a script.
-
-clearsighter can and should be much, much simpler.
-we need more large, imposing, concrete style buildings
-prevent guns in world
-prevent damage in world?
-
-* make
-    * guns for gun shop
-    * item shop
-    * akira alley
-
-neon lights
-    neon ring around the signage name
-    neon sign in the window
-    "GUNS" sign
-    how do i do neon?
-        aesthetic 1: white light, red rim
-        aesthetic 2: bright light, wall behind it is super red
-
-graffiti
-    bört
-    karmadillo
-    lobster
-    Emosido engañado
-    franco
-    no me baño
-https://twitter.com/scrudgey/status/1627911883952099329?s=20
-
-then:
-    NPCs
-    shopowners
-    weapon shop UI
 
 still unknown:
     street doc
@@ -2500,52 +2440,119 @@ still unknown:
     software
     hardware
 
-NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
-Shopowners do not need to be spawned like this but they do need to be initialized.
+world layout:
+    * neighbor building?
+        * items: could work
+    * underneath apartment:
+        * weapons
+    upstairs:
+        importer / exporter who buys things.
+        also he is a connection that will give you tips or sometimes a deal.
+    bar:
+        the bartender will clue you in on the price of commodities.
+        there is an underworld figure in the corner of the bar who will give you missions.
+    akira alley:
+        drug dealers will purchase your drug loot.
+    subway:
+        a software hacker 
 
-storeowner:
-    move to position
-    look in direction
-    look at player
-so, this should be an AI.
-    different from SphereRobot, but still uses a state machine.
-
-use allGuns in loadout editor
-
-
-gunshop
-    show little -100 text goes up from credits, lerp credits color from red to white
-    * sfx
-        * clicking items
-        * buying / failing to buy
-        * text blit
-    sell mode
-        can't sell last gun? maybe?
-main game loop
-    save / load game data
-
-item shop
-    items:
-        c4
-        rocket
-        grenade
-        thermals
-    select item from a list
-    display:
-        item picture
+shop todo:
+    gunshop
+        show little -100 text goes up from credits, lerp credits color from red to white
+        sell mode
+            can't sell last gun? maybe?
+    item shop
         description (dialogue)
             "1x per mission"
             "unlimited use"
-            "
-        cost
-        credits
-    player item list
-    buy button
 
 
+graphics:
+    we need more large, imposing, concrete style buildings
+    tents
+    pop-up tent
+    sprite props
+        knives / swords / shuriken
+        ground wires
+        ground decals
+    bar curve
+    subway entrance
+    burned out car wreck
+    neon signange
+    graffiti
+    6x6 dirt
+    6x6 sidewalk
+    neon lights
+        neon ring around the signage name
+        neon sign in the window
+        "GUNS" sign
+        how do i do neon?
+            aesthetic 1: white light, red rim
+            aesthetic 2: bright light, wall behind it is super red
+    graffiti
+        bört
+        karmadillo
+        lobster
+        Emosido engañado
+        franco
+        no me baño
+    https://twitter.com/scrudgey/status/1627911883952099329?s=20
+
+NPCs
+    NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
+
+show objectives as blit-in text on lower left?
 "v" and "^" buttons on scrollbars?
-
-
 items not being set in plan
+clearsighter can and should be much, much simpler.
+    solve camera distance / near clipping plane
+    use clipping frustrum to simplify clearsighter
+prevent guns in world
+prevent damage in world?
+storeowner AI
+    move to position
+    look in direction
+    look at player
+    different from SphereRobot, but still uses a state machine.
 
-steam assets / main title / logo
+
+main game loop
+    save / load game data
+
+    new game: 
+        choose filename
+            ensure none already exists
+        create new save file:
+            set gamedata: new gamedata. set filename.
+            save gamedata to disk
+    load game:
+        show existing save files
+        choose one
+            set gameData
+            jump to apartment
+    save game:
+        serialize gamedata to filename
+
+
+
+* GameData has filename field
+* save game on level exit
+save game from menu
+set player name field in dialogue
+
+create all shops
+
+serialize lists of references
+hide tertiary slot in loadout editor
+fix vr missions
+upgrade unity
+make a build
+
+mission fail: jump back to apartment
+on level start, zoom out from player spawn
+    show span cutscene
+extraction point is out of bounds
+move key from tower rooftop
+plant material is glitched
+AI still had a hard time closing in on me when i was openly shooting and running around
+maybe fall damage from rooftop should be greater

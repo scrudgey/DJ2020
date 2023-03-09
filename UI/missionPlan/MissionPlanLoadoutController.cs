@@ -65,9 +65,12 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         initialTorsoPosition = torsoImage.transform.localPosition;
         initialHeadPosition = headImage.transform.localPosition;
 
-        primaryWeaponButton.ApplyGunTemplate(data.playerState.primaryGun.template);
-        secondaryWeaponButton.ApplyGunTemplate(data.playerState.secondaryGun.template);
-        tertiaryWeaponButton.ApplyGunTemplate(data.playerState.tertiaryGun.template);
+        ApplyGunTemplate(primaryWeaponButton, data.playerState.primaryGun);
+        ApplyGunTemplate(secondaryWeaponButton, data.playerState.secondaryGun);
+        ApplyGunTemplate(tertiaryWeaponButton, data.playerState.tertiaryGun);
+
+        // hide tertiary box
+
         InitializeItemSlots(plan);
 
         thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
@@ -86,6 +89,14 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         tertiaryHighlight.SetActive(false);
         // InitializeWeaponPicker();
         initialized = true;
+    }
+
+    void ApplyGunTemplate(LoadoutWeaponButton button, GunState gunstate) {
+        if (gunstate != null) {
+            button.ApplyGunTemplate(gunstate.template);
+        } else {
+            button.WeaponClearCallback();
+        }
     }
 
     void InitializeItemSlots(LevelPlan plan) {

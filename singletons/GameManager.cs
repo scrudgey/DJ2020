@@ -82,6 +82,9 @@ public partial class GameManager : Singleton<GameManager> {
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
+    public void SaveGameData() {
+        gameData.Save();
+    }
     void HandleShowConsleAction(InputAction.CallbackContext ctx) {
         toggleConsoleThisFrame = ctx.ReadValueAsButton();
     }
@@ -407,16 +410,14 @@ public partial class GameManager : Singleton<GameManager> {
     public void HideMissionSelectMenu() {
         CloseMenu();
     }
-    public void ShowGunShopMenu() {
-        ShowMenu(MenuType.gunshop);
-    }
-    public void HideGunShopMenu() {
-        CloseMenu();
-    }
-    public void ShowItemShopMenu() {
-        ShowMenu(MenuType.itemshop);
-    }
-    public void HideItemShopMenu() {
+
+    public void ShowShopMenu(StoreType storeType) => ShowMenu(storeType switch {
+        StoreType.gun => MenuType.gunshop,
+        StoreType.item => MenuType.itemshop,
+        _ => MenuType.none
+    });
+
+    public void HideShopMenu() {
         CloseMenu();
     }
     public void ShowMissionPlanner(LevelTemplate template) {
@@ -434,7 +435,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void ReturnToApartment() {
         LoadScene("Apartment", () => {
-            // TODO: move player, open computer
+            Debug.Log("return to apartment callback");
             StartWorld();
         });
     }

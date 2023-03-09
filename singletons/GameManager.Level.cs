@@ -103,11 +103,10 @@ public partial class GameManager : Singleton<GameManager> {
                 // uiController.InitializeObjectivesController(gameData);
                 uiController.HideUI();
                 uiController.ShowInteractiveHighlight();
-                InitializePlayerAndController(LevelPlan.Default());
-                TransitionToPhase(GamePhase.world);
-
             }, unloadAll: false);
         }
+        InitializePlayerAndController(LevelPlan.Default());
+        TransitionToPhase(GamePhase.world);
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
@@ -247,6 +246,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void SetFocus(GameObject focus) {
+        Debug.Log($"setting focus: {focus}");
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();

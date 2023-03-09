@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using Items;
-using Items;
+using Newtonsoft.Json;
 using UnityEngine;
-
 [System.Serializable]
 public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
     public int credits;
+
+    // TODO: serializer for this
     public SerializableDictionary<LootData, int> loots;
     // skin
     public string legSkin { get; set; }
@@ -45,30 +46,31 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
 
     public SpeechEtiquette[] etiquettes;
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite portrait;
 
     public HashSet<int> physicalKeys;
 
+    // TODO: converter for list
     public List<PayData> payDatas;
 
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
-        GunTemplate gun2 = GunTemplate.Load("s1");
-        GunTemplate gun3 = GunTemplate.Load("r1");
-
-        GunTemplate gun4 = GunTemplate.Load("p2");
+        // GunTemplate gun2 = GunTemplate.Load("s1");
+        // GunTemplate gun3 = GunTemplate.Load("r1");
+        // GunTemplate gun4 = GunTemplate.Load("p2");
 
         GunState gunState1 = GunState.Instantiate(gun1);
-        GunState gunState2 = GunState.Instantiate(gun2);
-        GunState gunState3 = GunState.Instantiate(gun3);
-        GunState gunState4 = GunState.Instantiate(gun4);
+        // GunState gunState2 = GunState.Instantiate(gun2);
+        // GunState gunState3 = GunState.Instantiate(gun3);
+        // GunState gunState4 = GunState.Instantiate(gun4);
 
         List<GunState> allGuns = new List<GunState>{
             gunState1,
-            gunState2,
-            gunState3,
-            gunState4
+            // gunState2,
+            // gunState3,
+            // gunState4
         };
 
         List<BaseItem> allItems = new List<BaseItem> {
@@ -92,8 +94,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             allGuns = allGuns,
             allItems = allItems,
             primaryGun = GunState.Instantiate(gun1),
-            secondaryGun = GunState.Instantiate(gun2),
-            tertiaryGun = GunState.Instantiate(gun3),
+            secondaryGun = null,
+            tertiaryGun = null,
             activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },

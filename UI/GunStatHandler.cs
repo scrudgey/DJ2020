@@ -139,12 +139,15 @@ public class GunStatHandler : MonoBehaviour {
         gunImage.enabled = false;
 
         foreach (GunStat stat in Enum.GetValues(typeof(GunStat))) {
-            statBarRects[stat].sizeDelta = Vector2.zero;
-            statBarOffsetRects[stat].sizeDelta = Vector2.zero;
+            if (statBarRects.ContainsKey(stat) && statBarRects[stat] != null) {
+                statBarRects[stat].sizeDelta = Vector2.zero;
+                statBarOffsetRects[stat].sizeDelta = Vector2.zero;
+            }
         }
     }
 
     public void LerpBars(GunTemplate template) {
+        if (shootIntervalBar == null) return;
         if (lerpBarsCoroutine != null) {
             StopCoroutine(lerpBarsCoroutine);
         }

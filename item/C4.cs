@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
     public class C4 : BaseItem {
+        [JsonConverter(typeof(ScriptableObjectJsonConverter<C4Data>))]
         public C4Data c4Data;
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;

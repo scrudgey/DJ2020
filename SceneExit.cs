@@ -12,6 +12,7 @@ public class SceneExit : Interactive {
         }
     }
     public override ItemUseResult DoAction(Interactor interactor) {
+        GameManager.I.SaveGameData();
         GameManager.I.LoadScene(toSceneName, () => {
             GameManager.I.StartWorld();
             Debug.Log($"left to scene {toSceneName}");

@@ -193,7 +193,7 @@ public class GunShopController : MonoBehaviour {
         blitTextRoutine = StartCoroutine(BlitDialogueText(content));
     }
     public void DoneButtonCallback() {
-        GameManager.I.HideGunShopMenu();
+        GameManager.I.HideShopMenu();
     }
     public void SellModeCallback() {
         SetSellMode();

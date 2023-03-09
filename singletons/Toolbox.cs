@@ -434,13 +434,7 @@ public class Toolbox {
         return totalRect;
     }
     public static string AssetRelativePath(UnityEngine.Object asset) {
-        // String rootPath = AssetDatabase.GetAssetPath(asset);
         return ResourceReference.I.GetPath(asset);
-        // String relativePath = rootPath.Replace("Assets/Resources/", "");
-        // int fileExtPos = relativePath.LastIndexOf(".");
-        // if (fileExtPos >= 0)
-        //     relativePath = relativePath.Substring(0, fileExtPos);
-        // return relativePath;
     }
     public static float Sigmoid(float value) {
         return 1.0f / (1.0f + (float)Math.Exp(-value));

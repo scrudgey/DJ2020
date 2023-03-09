@@ -8,6 +8,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class Graph<T, W> where T : Node where W : Graph<T, W> {
+    public string levelName;
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
     public HashSet<HashSet<string>> edgePairs;
@@ -80,11 +81,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
             TextAsset textAsset = (TextAsset)obj;
             if (textAsset.name.ToLower().StartsWith($"graph_{prefix}")) {
                 Debug.Log($"loading {textAsset.name}...");
-                if (graph is null) {
-                    graph = Load(textAsset);
-                } else {
-                    graph = graph + Load(textAsset) as W;
-                }
+                graph = graph == null ? Load(textAsset) : graph + Load(textAsset) as W;
                 graphCount += 1;
             }
 
@@ -92,6 +89,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         if (graphCount == 0) {
             Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");
         }
+        graph.levelName = levelName;
         return graph;
     }
 

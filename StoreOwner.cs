@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum StoreType { none, gun, item }
+public enum StoreType { none, gun, item, loot }
 public class StoreOwner : Interactive {
     public StoreType storeType;
     public Transform lookAtPoint;
@@ -15,14 +15,7 @@ public class StoreOwner : Interactive {
         characterController.SetInputs(playerInput);
     }
     public override ItemUseResult DoAction(Interactor interactor) {
-        switch (storeType) {
-            case StoreType.gun:
-                GameManager.I.ShowGunShopMenu();
-                break;
-            case StoreType.item:
-                GameManager.I.ShowItemShopMenu();
-                break;
-        }
+        GameManager.I.ShowShopMenu(storeType);
         return ItemUseResult.Empty() with {
             waveArm = true
         };
