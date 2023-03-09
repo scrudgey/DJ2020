@@ -37,7 +37,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public bool isAlarmRadioInProgress(GameObject exclude) {
         foreach (HQReport report in reports.Values) {
-            if (report.desiredAlarmState && report.reporter != exclude) {
+            if (report.desiredAlarmState == HQReport.AlarmChange.raiseAlarm && report.reporter != exclude) {
                 return true;
             }
         }
@@ -116,14 +116,20 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
+    public void SetLocationOfDisturbance(Vector3 location) {
+        locationOfLastDisturbance = location;
+    }
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
-        locationOfLastDisturbance = kvp.Value.locationOfLastDisturbance;
-        if (kvp.Value.desiredAlarmState) {
+        SetLocationOfDisturbance(kvp.Value.locationOfLastDisturbance);
+        if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.raiseAlarm) {
             ActivateHQRadio();
             DisplayHQResponse("HQ: Understood. Dispatching strike team.");
-        } else {
+        } else if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.cancelAlarm) {
             DeactivateAlarm();
             DisplayHQResponse("HQ: Understood. Disabling alarm.");
+        } else if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.noChange) {
+            DeactivateAlarm();
+            DisplayHQResponse("HQ: Understood. Remain vigilant.");
         }
         if (kvp.Value.suspicionRecord != null) {
             GameManager.I.AddSuspicionRecord(kvp.Value.suspicionRecord);
@@ -193,19 +199,31 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SpawnStrikeTeamMember() {
+        if (gameData.levelState.delta.npcsSpawned >= gameData.levelState.template.maxNPC) return;
         GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
+        CharacterController controller = npc.GetComponent<CharacterController>();
+        controller.OnCharacterDead += HandleNPCDead;
 
         if (strikeTeamCount == 0) {
-            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, doIntro: false, speedCoefficient: 1.5f));
+            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, controller, doIntro: false, speedCoefficient: 1.5f));
             lastStrikeTeamMember = npc;
         } else if (strikeTeamCount == 1) {
-            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
+            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
             lastStrikeTeamMember = npc;
         } else if (strikeTeamCount == 2) {
-            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
+            ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         strikeTeamCount += 1;
+        gameData.levelState.delta.npcsSpawned += 1;
         OnNPCSpawn?.Invoke(npc);
+    }
+
+    public void DispatchGuard(Vector3 position) {
+        SphereRobotAI[] ais = GameObject.FindObjectsOfType<SphereRobotAI>();
+        if (ais.Count() == 0) return;
+        SphereRobotAI closestAI = ais.OrderBy(ai => (ai.transform.position - position).sqrMagnitude).First();
+        CharacterController controller = closestAI.GetComponent<CharacterController>();
+        closestAI.ChangeState(new SearchDirectionState(closestAI, position, controller, doIntro: false, speedCoefficient: 1.5f));
     }
 }

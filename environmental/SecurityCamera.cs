@@ -31,6 +31,7 @@ public class SecurityCamera : IBinder<SightCone> {
 
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.volume = 0.5f;
         alarmComponent.OnStateChange += HandleAlarmStateChange;
     }
     void Start() {
@@ -49,7 +50,7 @@ public class SecurityCamera : IBinder<SightCone> {
         if (!alarmNodeEnabled) {
             audioSource.Stop();
         }
-        // Debug.Log($"security camera setting alarm state change enabled: {component.nodeEnabled}");
+        // Debug.Log($"{component.idn} security camera setting alarm state change enabled: {alarmNodeEnabled} ");
     }
 
     public override void HandleValueChanged(SightCone t) {
@@ -103,6 +104,9 @@ public class SecurityCamera : IBinder<SightCone> {
             alertHandler.ShowAlert();
             cooldown = 5f;
             Toolbox.RandomizeOneShot(audioSource, spottedSound);
+            GameManager.I.SetLocationOfDisturbance(other.bounds.center);
+            GameManager.I.DispatchGuard(other.bounds.center);
+            GameManager.I.AddSuspicionRecord(SuspicionRecord.trippedSensor("security camera"));
         }
     }
 

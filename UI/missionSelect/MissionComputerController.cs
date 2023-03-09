@@ -46,6 +46,7 @@ public class MissionComputerController : MonoBehaviour {
         }
 
         foreach (string levelName in data.unlockedLevels) {
+            if (data.completedLevels.Contains(levelName)) continue;
             LevelTemplate template = LevelTemplate.LoadAsInstance(levelName);
             CreateMissionButton(template);
             // if (defaultTemplate == null) {
@@ -101,7 +102,7 @@ public class MissionComputerController : MonoBehaviour {
         emailText.text = template.proposalEmail.text;
 
         missionNameText.text = template.levelName;
-        taglineText.text = "covert data exfiltration";
+        taglineText.text = template.tagline;
 
         // foreach (Transform child in objectivesContainer) {
         //     if (child.name == "title") continue;
@@ -129,11 +130,9 @@ public class MissionComputerController : MonoBehaviour {
     }
 
     public void CancelButtonCallback() {
-        Debug.Log("cancel");
         GameManager.I.HideMissionSelectMenu();
     }
     public void PlanButtonCallback() {
-        Debug.Log($"Plan {activeLevelTemplate.name}");
         GameManager.I.ShowMissionPlanner(activeLevelTemplate);
     }
 

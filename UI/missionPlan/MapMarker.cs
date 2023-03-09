@@ -7,7 +7,6 @@ using UnityEngine;
 public class MapMarker : MonoBehaviour {
     public MapMarkerData data;
 
-
     public static string MapPath(string levelName, string sceneName, int floorNumber, bool includeDataPath = true, bool withExtension = true) {
         string scenePath = LevelState.LevelDataPath(levelName, includeDataPath: includeDataPath);
         string filename = withExtension ? $"map_{floorNumber}.png" : $"map_{floorNumber}";
@@ -59,8 +58,8 @@ public class MapMarker : MonoBehaviour {
 
 [System.Serializable]
 public record MapMarkerData {
-    public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard }
-    public enum MapMarkerIcon { circle, arrowUp, arrowRight, arrowDown, arrowLeft, lightningBolt, door }
+    public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard, camera }
+    public enum MapMarkerIcon { circle, arrowUp, arrowRight, arrowDown, arrowLeft, lightningBolt, door, camera }
     public string idn;
     public MapMarkerType markerType;
     public MapMarkerIcon markerIcon;

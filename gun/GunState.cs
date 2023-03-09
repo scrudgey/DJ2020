@@ -1,7 +1,9 @@
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class GunState {
     public GunDelta delta;
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate template;
 
     public void Shoot() {

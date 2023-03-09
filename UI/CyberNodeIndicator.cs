@@ -12,7 +12,7 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public AudioClip mouseOverVulnerable;
 
     protected override void SetGraphicalState(CyberNode node) {
-        // Debug.Log("set cyber graphical state");
+        // Debug.Log($"set cyber graphical state {node.idn} {node.nodeTitle} {node.enabled} {node.compromised}");
         if (node.enabled) {
             if (!node.compromised) {
                 image.color = enabledColor;

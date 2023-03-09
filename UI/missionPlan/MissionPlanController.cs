@@ -128,6 +128,7 @@ public class MissionPlanController : MonoBehaviour {
     public void CancelButtonCallback() {
         Debug.Log("cancel plan");
         // return to apartment
+        GameManager.I.SaveGameData();
         GameManager.I.ReturnToMissionSelector();
     }
 }

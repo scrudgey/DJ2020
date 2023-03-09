@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,15 +11,11 @@ public class InvestigateCorpseState : SphereControlState {
     Corpse corpse;
     bool inPosition;
     SuspicionRecord record;
-    public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController) : base(ai) {
+    CharacterController characterController;
+    public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
         this.corpse = corpse;
         this.speechTextController = speechTextController;
-        record = new SuspicionRecord {
-            content = "A body was discovered",
-            maxLifetime = 120,
-            lifetime = 120,
-            suspiciousness = Suspiciousness.suspicious
-        };
+        record = SuspicionRecord.bodySuspicion();
     }
     public override void Enter() {
         base.Enter();
@@ -26,13 +23,13 @@ public class InvestigateCorpseState : SphereControlState {
         rootTaskNode.SetData(CORPSE_KEY, corpse.transform.position);
     }
     void SetupRootNode() {
-        moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+        moveTask = new TaskMoveToKey(owner.transform, CORPSE_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
             headBehavior = TaskMoveToKey.HeadBehavior.normal,
             speedCoefficient = 0.75f
         };
         HQReport report = new HQReport {
             reporter = owner.gameObject,
-            desiredAlarmState = true,
+            desiredAlarmState = HQReport.AlarmChange.raiseAlarm,
             locationOfLastDisturbance = corpse.transform.position,
             timeOfLastContact = Time.time,
             lifetime = 5f,

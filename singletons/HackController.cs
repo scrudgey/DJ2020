@@ -26,12 +26,12 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     public List<HackData> targets = new List<HackData>();
     public List<CyberNode> vulnerableManualNodes = new List<CyberNode>();
     public CyberNode vulnerableNetworkNode = null;
-    SuspicionRecord suspicionTamper() => new SuspicionRecord {
-        content = "tampering with equipment",
-        suspiciousness = Suspiciousness.suspicious,
-        lifetime = 2f,
-        maxLifetime = 2f
-    };
+    // SuspicionRecord suspicionTamper() => new SuspicionRecord {
+    //     content = "tampering with equipment",
+    //     suspiciousness = Suspiciousness.suspicious,
+    //     lifetime = 2f,
+    //     maxLifetime = 2f
+    // };
     void Awake() {
         vulnerableNetworkNode = null;
     }
@@ -39,7 +39,6 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
         Debug.Log($"handle hack input {targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks}");
         if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)
             return;
-
         Debug.Log($"targets any: {targets.Any(t => t.node == input.targetNode)}");
         if (!targets.Any(t => t.node == input.targetNode)) {
             HackData data = new HackData {
@@ -48,7 +47,6 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
                 lifetime = 5f,
                 type = input.type
             };
-            Debug.Log(data);
             targets.Add(data);
             UpdateSuspicion();
             OnValueChanged?.Invoke(this);
@@ -75,6 +73,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             // TODO: abort manual hacks if player moves out of range
             if (data.type == HackType.manual) {
                 UpdateManualHack(data);
+                UpdateSuspicion();
             }
         }
         List<HackData> done = targets.Where(x => x.done).ToList();
@@ -95,9 +94,9 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     }
     void UpdateSuspicion() {
         if (targets.Count > 0) {
-            GameManager.I.AddSuspicionRecord(suspicionTamper());
+            GameManager.I.AddSuspicionRecord(SuspicionRecord.tamperingSuspicion(targets.ToArray()[0]));
         } else {
-            GameManager.I.RemoveSuspicionRecord(suspicionTamper());
+            GameManager.I.RemoveSuspicionRecord(SuspicionRecord.tamperingSuspicion());
         }
     }
     void UpdateManualHack(HackData data) {

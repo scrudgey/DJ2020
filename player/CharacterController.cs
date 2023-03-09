@@ -107,6 +107,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private Vector3 _internalVelocityAdd = Vector3.zero;
     private Vector3 snapToDirection = Vector2.zero;
     public bool isCrouching = false;
+    public bool crouchStick = false;
     public bool isRunning = false;
     public bool isProne = false;
 
@@ -177,6 +178,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float aimSwayMagnitude = 0.01f;
     Transform cameraFollowTransform;
     RaycastHit[] rayCastHits;
+    float fallTime;
+    float fallVelocity;
+    public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
+
+    static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -192,7 +198,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             default:
                 break;
             case CharacterState.burgle:
-                // GameManager.I.StartBurglar();
                 GameManager.I.TransitionToInputMode(InputMode.burglar);
                 break;
             case CharacterState.wallPress:
@@ -204,6 +209,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.aim:
                 aimCameraRotation = Quaternion.FromToRotation(Vector3.forward, Motor.CharacterForward);
                 lookAtDirection = Motor.CharacterForward;
+                _inputTorque = Vector3.zero;
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
             case CharacterState.jumpPrep:
@@ -279,6 +285,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
     }
     private void Start() {
+        ignoredColliders = new HashSet<Collider>();
         rayCastHits = new RaycastHit[32];
         PoolManager.I.RegisterPool("prefabs/fx/landImpactFx", poolSize: 2);
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -338,6 +345,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public void ResetInput() {
         SetInputs(PlayerInput.none);
     }
+    public void ResetMovement() {
+        _moveInputVector = Vector3.zero;
+        _moveAxis = Vector2.zero;
+        _inputTorque = Vector3.zero;
+        _jumpRequested = false;
+        slewLookVector = Vector3.zero;
+        snapToDirection = Vector3.zero;
+        crouchStick = true;
+    }
     /// <summary>
     /// This is called every frame by MyPlayer in order to tell the character what its inputs are
     /// </summary>
@@ -377,6 +393,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         // Clamp input
         // TODO: this is weird
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
+        if (moveInputVector != Vector3.zero) {
+            crouchStick = false;
+        }
         if (input.moveDirection != Vector3.zero) {
             moveInputVector = Vector3.ClampMagnitude(input.moveDirection, 1f);
         } else if (moveInputVector.y != 0 && moveInputVector.x != 0) {
@@ -396,7 +415,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             _moveInputVector = Quaternion.Inverse(CharacterCamera.rotationOffset) * _moveInputVector;
         }
         _moveAxis = new Vector2(input.MoveAxisRight, input.MoveAxisForward);
-
 
         // Run input
         Motor.MaxStepHeight = stepHeight;
@@ -493,17 +511,23 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     TransitionToState(CharacterState.normal);
                 }
                 break;
+            case CharacterState.useItem:
+                if (interactor != null) {
+                    ItemUseResult interactorResult = interactor.SetInputs(input);
+                    HandleItemUseResult(interactorResult);
+                }
+                break;
             case CharacterState.normal:
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
-                    ItemUseResult result = itemHandler.SetInputs(input);
+                    ItemUseResult result = itemHandler?.SetInputs(input);
                     HandleItemUseResult(result);
 
                     // Cyberdeck
                     ManualHackInput manualHackInput = new ManualHackInput {
                         playerInput = input,
-                        activeItem = itemHandler.activeItem
+                        activeItem = itemHandler?.activeItem
                     };
                     manualHacker?.SetInputs(manualHackInput);
                     burglar?.SetInputs(manualHackInput);
@@ -547,9 +571,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 slewLookVector.y = 0;
 
-                // if (input.Fire.AimPressed) {
-                //     snapToDirection = lookAtDirection;
-                // }
                 if (input.snapToLook) {
                     if (input.lookAtPosition != Vector3.zero) {
                         snapToDirection = input.lookAtPosition - transform.position;
@@ -649,7 +670,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     void HandleItemUseResult(ItemUseResult result) {
-        if (result.transitionToUseItem) {
+        if (result == null) return;
+        if (result.crouchDown) {
             TransitionToState(CharacterState.useItem);
         }
         if (result.waveArm) {
@@ -833,6 +855,16 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         return null;
     }
 
+    void TakeFallDamage(float fallVelocity) {
+        if (state == CharacterState.superJump && fallVelocity > -22f) return;
+        if (superJumpEnabled && fallVelocity > -15) return;
+
+        Damage damage = new ExplosionDamage(75f, Vector3.up, transform.position, transform.position);
+        foreach (IDamageReceiver receiver in GetComponentsInChildren<IDamageReceiver>()) {
+            receiver.TakeDamage(damage);
+        }
+    }
+
     /// <summary>
     /// (Called by KinematicCharacterMotor during its update cycle)
     /// This is where you tell your character what its velocity should be right now. 
@@ -841,6 +873,22 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
         bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
         Vector3 targetMovementVelocity = Vector3.zero;
+
+        if (!Motor.GroundingStatus.IsStableOnGround) {
+            fallTime += Time.deltaTime;
+            fallVelocity = currentVelocity.y;
+        } else {
+            // if (fallTime > 0) {
+            //     Debug.Log($"integrated fall time: {fallTime} {fallVelocity}");
+            // }
+            if (fallVelocity < -10f) {
+                TakeFallDamage(fallVelocity);
+                TransitionToState(CharacterState.landStun);
+            }
+            fallTime = 0;
+            fallVelocity = 0;
+        }
+
         switch (state) {
             case CharacterState.useItem:
                 currentVelocity = currentVelocity * 0.5f;
@@ -911,6 +959,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 currentVelocity += Gravity * deltaTime;
                 // currentVelocity *= (1f / (1f + (Drag * deltaTime)));
                 if (Motor.GroundingStatus.IsStableOnGround && !_jumpedThisFrame) {
+                    fallTime = 0f;
+                    fallVelocity = 0f;
                     if (Motor.Velocity.y < -0.3f) {
                         TransitionToState(CharacterState.landStun);
                     } else {
@@ -1038,6 +1088,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                             Vector3 initialMovementVelocity = targetMovementVelocity;
                             targetMovementVelocity *= crawlSpeedFraction * Toolbox.SquareWave(crouchMovementInputTimer, dutycycle: 0.75f);
                             targetMovementVelocity += 0.25f * crawlSpeedFraction * initialMovementVelocity;
+                            SetCrawlSuspicion(true);
                         } else {
                             targetMovementVelocity = Vector3.zero;
                         }
@@ -1155,6 +1206,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     void CheckUncrouch() {
+        if (crouchStick) return;
         if (isCrouching && !inputCrouchDown && state != CharacterState.landStun && state != CharacterState.jumpPrep) {
             // Do an overlap test with the character's standing height to see if there are any obstructions
             SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
@@ -1166,9 +1218,21 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 // If no obstructions, uncrouch
                 SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
                 isCrouching = false;
+                SetCrawlSuspicion(false);
             }
         }
     }
+
+    void SetCrawlSuspicion(bool value) {
+        if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            if (value) {
+                GameManager.I.AddSuspicionRecord(crawlSuspicion);
+            } else {
+                GameManager.I.RemoveSuspicionRecord(crawlSuspicion);
+            }
+        }
+    }
+
     void SetCapsuleDimensions(float radius, float height, float yOffset) {
         Motor.SetCapsuleDimensions(radius, height, yOffset);
         if (targetPoint != null) {
@@ -1302,7 +1366,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     public bool IsColliderValidForCollisions(Collider coll) {
-        return true;
+        return !ignoredColliders.Contains(coll);
+        // return true;
     }
 
     public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
@@ -1310,6 +1375,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
     public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
         // TODO: consider breaking out by state
+        if (ignoredColliders.Contains(hitCollider)) return;
 
         // We can wall jump only if we are not stable on ground and are moving against an obstruction
         if (AllowWallJump && !Motor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable) {
@@ -1395,7 +1461,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             wallPressTimer = wallPressTimer,
             state = state,
             playerInputs = _lastInput,
-            gunInput = gunHandler.BuildAnimationInput(),
+            gunInput = gunHandler?.BuildAnimationInput() ?? AnimationInput.GunAnimationInput.None(),
             camDir = camDir,
             cameraRotation = OrbitCamera.transform.rotation,
             lookAtDirection = lookAtDirection,
@@ -1404,7 +1470,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             hitState = hitState,
             velocity = Motor.Velocity,
             wavingArm = waveArmTimer > 0f,
-            activeItem = itemHandler.activeItem
+            activeItem = itemHandler?.activeItem
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

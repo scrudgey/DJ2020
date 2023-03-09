@@ -13,10 +13,12 @@ public class StopAndListenState : SphereControlState {
     NoiseComponent lastNoise;
     bool suspicionHeard;
     SpeechTextController speechTextController;
-    public StopAndListenState(SphereRobotAI ai, SphereControlState previousState, SpeechTextController speechTextController) : base(ai) {
+    CharacterController characterController;
+    public StopAndListenState(SphereRobotAI ai, SphereControlState previousState, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
         searchDirection = ai.transform.forward;
         this.previousState = previousState;
         this.speechTextController = speechTextController;
+        this.characterController = characterController;
         SetupRootNode();
     }
     public override void Enter() {
@@ -89,7 +91,7 @@ public class StopAndListenState : SphereControlState {
 
     public SphereControlState getNextState() {
         if (FoundSomethingSuspicious()) {
-            return new SearchDirectionState(owner, lastNoise, doIntro: false);
+            return new SearchDirectionState(owner, lastNoise, characterController, doIntro: false);
         } else {
             // Debug.Log("guess it was nothing");
             speechTextController.Say("Guess it was nothing.");

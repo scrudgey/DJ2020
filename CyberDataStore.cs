@@ -10,37 +10,41 @@ public class CyberDataStore : MonoBehaviour {
     public ParticleSystem particles;
 
     public List<PayData> payDatas;
+    bool opened;
 
     public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         cyberComponent.OnStateChange += HandleCyberStateChange;
     }
     public void HandleCyberStateChange(CyberComponent component) {
+        // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");
         if (component.compromised) {
             Open();
         }
     }
     public void Open() {
+        if (opened) return;
+        PlayParticles();
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        GameManager.I.SetCyberNodeState(cyberComponent, false);
         foreach (PayData payData in payDatas) {
             Debug.Log($"stealing paydata: {payData.filename}");
         }
         GameManager.I.AddPayDatas(payDatas);
+        opened = true;
     }
     public void PlayParticles() {
         particles.Play();
     }
 
     void OnDestroy() {
+        cyberComponent.OnStateChange -= HandleCyberStateChange;
         // check if we invalidate an objective
-        List<string> myFileNames = payDatas.Select(data => data.filename).ToList();
         if (GameManager.I == null || GameManager.I.gameData.levelState == null || GameManager.I.gameData.levelState.template == null) return;
         foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {
             if (objective is ObjectiveData) {
                 ObjectiveData objectiveData = (ObjectiveData)objective;
-                foreach (string targetData in objectiveData.targetFileNames) {
-                    if (myFileNames.Contains(targetData)) {
+                foreach (PayData targetData in objectiveData.targetPaydata) {
+                    if (payDatas.Contains(targetData)) {
                         GameManager.I.FailObjective(objective);
                     }
                 }

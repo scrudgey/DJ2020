@@ -29,25 +29,17 @@ public class ReportGunshotsState : SphereControlState {
     }
 
     void SetupRootNode(float initialPause = 1f) {
-        // TODO: write better code here
-
         string speechText = "HQ, report! Shots fired, investigating.";
-        SuspicionRecord intruderRecord = new SuspicionRecord {
-            content = "gunshots reported",
-            maxLifetime = 120,
-            lifetime = 120,
-            suspiciousness = Suspiciousness.suspicious
-        };
+        SuspicionRecord intruderRecord = SuspicionRecord.gunshotsHeard();
         HQReport report = new HQReport {
             reporter = owner.gameObject,
-            desiredAlarmState = true,
+            desiredAlarmState = HQReport.AlarmChange.raiseAlarm,        // TODO: raise alarm only in certain security levels?
             locationOfLastDisturbance = owner.getLocationOfInterest(),
             timeOfLastContact = Time.time,
             lifetime = 6f,
             speechText = speechText,
             suspicionRecord = intruderRecord
         };
-
         rootTaskNode = new Sequence(
             new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                 lookType = TaskLookAt.LookType.position,

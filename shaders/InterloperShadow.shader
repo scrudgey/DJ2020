@@ -139,5 +139,4 @@ Shader "Custom/InterloperShadow"
 		}
 	}
 	Fallback "Diffuse"
-	CustomEditor "ASEMaterialInspector"
 }

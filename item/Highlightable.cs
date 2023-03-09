@@ -6,15 +6,16 @@ public class Highlightable : MonoBehaviour {
     public int priority;
     protected Outline outline;
     public virtual void Start() {
-        outline = Toolbox.GetOrCreateComponent<Outline>(gameObject, inChildren: true);
-        outline.color = 1;
+        this.outline = Toolbox.GetOrCreateComponent<Outline>(gameObject, inChildren: true);
+        this.outline.color = 1;
         DisableOutline();
     }
-
     public void EnableOutline() {
-        outline.enabled = true;
+        if (outline != null)
+            outline.enabled = true;
     }
     public void DisableOutline() {
-        outline.enabled = false;
+        if (outline != null)
+            outline.enabled = false;
     }
 }

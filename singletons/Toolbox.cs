@@ -245,8 +245,9 @@ public class Toolbox {
         source.rolloffMode = AudioRolloffMode.Logarithmic;
         source.minDistance = 3f;
         source.maxDistance = 23f;
-        source.spatialBlend = 1;
+        source.spatialBlend = 0.6f;
         source.spread = 0.2f;
+        source.volume = 1f;
         return source;
     }
     public static int Moddo(int x, int m) {
@@ -433,13 +434,7 @@ public class Toolbox {
         return totalRect;
     }
     public static string AssetRelativePath(UnityEngine.Object asset) {
-        // String rootPath = AssetDatabase.GetAssetPath(asset);
         return ResourceReference.I.GetPath(asset);
-        // String relativePath = rootPath.Replace("Assets/Resources/", "");
-        // int fileExtPos = relativePath.LastIndexOf(".");
-        // if (fileExtPos >= 0)
-        //     relativePath = relativePath.Substring(0, fileExtPos);
-        // return relativePath;
     }
     public static float Sigmoid(float value) {
         return 1.0f / (1.0f + (float)Math.Exp(-value));
@@ -454,20 +449,40 @@ public class Toolbox {
         return tex;
     }
 
-    // public static double Factorial(int number) {
-    //     // please do not calculate facorials of large numbers
-    //     if (number == 1)
-    //         return 1;
-    //     else
-    //         return number * Factorial(number - 1);
-    // }
-    // public static float PossionCDF(int k, float lambda) {
-    //     double result = 0;
-    //     for (int j = 0; j < k; j++) {
-    //         result += Mathf.Pow(lambda, j) / Factorial(j);
-    //     }
-    //     result *= Mathf.Exp(-1f * lambda);
-    //     return (float)result;
-    // }
+    public static int ListHashCode<T>(List<T> inlist) {
+        unchecked {
+            int hash = 19;
+            foreach (var foo in inlist) {
+                hash = hash * 31 + foo.GetHashCode();
+            }
+            return hash;
+        }
+    }
+
+    public static Gradient Gradient2Color(Color color1, Color color2) {
+        Gradient gradient = new Gradient();
+
+        // TODO: get length of ray from line renderer points
+
+        // Populate the color keys at the relative time 0 and 1 (0 and 100%)
+        GradientColorKey[] colorKey = new GradientColorKey[2];
+        colorKey[0].color = color1;
+        colorKey[0].time = 0.0f;
+
+        colorKey[1].color = color2;
+        colorKey[1].time = 1.0f;
+
+        // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
+        GradientAlphaKey[] alphaKey = new GradientAlphaKey[2];
+        alphaKey[0].alpha = color1.a;
+        alphaKey[0].time = 0.0f;
+
+        alphaKey[1].alpha = color2.a;
+        alphaKey[1].time = 1f;
+
+        gradient.SetKeys(colorKey, alphaKey);
+
+        return gradient;
+    }
 }
 

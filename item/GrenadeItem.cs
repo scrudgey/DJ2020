@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
     public class GrenadeItem : BaseItem {
+        [JsonConverter(typeof(ScriptableObjectJsonConverter<GrenadeData>))]
         public GrenadeData grenadeData;
         public GrenadeItem(GrenadeData grenadeData) : base(grenadeData) {
             this.grenadeData = grenadeData;

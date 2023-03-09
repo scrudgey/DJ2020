@@ -61,6 +61,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     public TextMeshProUGUI summaryText1;
     public TextMeshProUGUI summaryText2;
     [Header("Alarm / disguise modifiers")]
+    public RectTransform col2Mask;
     public GameObject alarmChevronObject;
     public GameObject disguiseChevronObject;
     public GameObject topChevronSpacer;
@@ -177,6 +178,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             Vector2 size = new Vector2(215f, factor * 33f);
             alarmChevronRect.sizeDelta = size;
             topSpacerRect.sizeDelta = size;
+            col2Mask.anchoredPosition = new Vector2(0f, factor * -55f);
         }
         if (easeInDisguiseChevron) {
             float factor = 1f;
@@ -245,7 +247,9 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 suspicionAggressiveLight.color = lightRedActive;
                 break;
         }
-
+        bool alarmActive = GameManager.I.gameData.levelState.anyAlarmActive();
+        bool disguiseActive = GameManager.I.gameData.levelState.delta.disguise;
+        SensitivityLevel sensitivityLevel = GameManager.I.gameData.levelState.template.sensitivityLevel;
         switch (reaction) {
             case Reaction.ignore:
                 reactionIgnoreChevron.color = activeColor;
@@ -254,9 +258,16 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionIgnoreLight.color = lightGreenActive;
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedDisabled;
-                if (GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmActive()) {
-                    reactionIgnoreChevron.color = disabledColor;
-                    reactionIgnoreLight.color = lightGreenDisabled;
+                if (disguiseActive && !alarmActive && sensitivityLevel != SensitivityLevel.restrictedProperty) {
+                    if (netSuspicion == Suspiciousness.suspicious) {
+                        if (sensitivityLevel == SensitivityLevel.semiprivateProperty || sensitivityLevel == SensitivityLevel.publicProperty) {
+                            reactionIgnoreChevron.color = disabledColor;
+                            reactionIgnoreLight.color = lightGreenDisabled;
+                        }
+                    } else {
+                        reactionIgnoreChevron.color = disabledColor;
+                        reactionIgnoreLight.color = lightGreenDisabled;
+                    }
                 }
                 break;
             case Reaction.investigate:
@@ -275,13 +286,19 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 reactionInvestigateLight.color = lightYellowDisabled;
                 reactionAttackLight.color = lightRedActive;
 
-                if (GameManager.I.gameData.levelState.anyAlarmActive() && !GameManager.I.gameData.levelState.delta.disguise) {
-                    reactionAttackChevron.color = disabledColor;
-                    reactionAttackLight.color = lightRedDisabled;
+                if (alarmActive && !disguiseActive) {
+                    if (netSuspicion == Suspiciousness.normal) {
+
+                    } else if (netSuspicion == Suspiciousness.suspicious && sensitivityLevel != SensitivityLevel.privateProperty) {
+                        reactionAttackChevron.color = disabledColor;
+                        reactionAttackLight.color = lightRedDisabled;
+                    } else if (netSuspicion == Suspiciousness.aggressive) {
+                        reactionAttackChevron.color = disabledColor;
+                        reactionAttackLight.color = lightRedDisabled;
+                    }
                 }
                 break;
         }
-
         switch (GameManager.I.GetSuspicionReaction(netSuspicion, applyModifiers: false)) {
             case Reaction.ignore:
                 SetRightLineTargetHeight(145);
@@ -294,7 +311,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 break;
         }
 
-        if (GameManager.I.gameData.levelState.anyAlarmActive()) {
+        if (alarmActive) {
             if (!alarmChevronObject.activeInHierarchy) {
                 easeInAlarmChevron = true;
                 alarmChevronEaseTimer = 0f;
@@ -302,14 +319,14 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             alarmChevronObject.SetActive(true);
         } else {
             alarmChevronObject.SetActive(false);
+            col2Mask.anchoredPosition = Vector2.zero;
         }
 
-        if (GameManager.I.gameData.levelState.delta.disguise) {
+        if (disguiseActive) {
             if (!disguiseChevronObject.activeInHierarchy) {
                 easeInDisguiseChevron = true;
                 disguiseChevronEaseTimer = 0f;
             }
-
             disguiseChevronObject.SetActive(true);
         } else {
             disguiseChevronObject.SetActive(false);

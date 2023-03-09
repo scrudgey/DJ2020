@@ -5,16 +5,28 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
-    public static Action<GameData> OnObjectivesChange;
+    public static Action<GameData, Dictionary<Objective, ObjectiveStatus>> OnObjectivesChange;
+    public static Action<LootData, GameData> OnLootChange;
+    public static Action<List<PayData>, GameData> OnPayDataChange;
     int lastObjectivesStatusHashCode;
     public void AddPayDatas(List<PayData> datas) {
         gameData.playerState.payDatas.AddRange(datas);
         CheckObjectives();
+        OnPayDataChange?.Invoke(datas, gameData);
     }
 
     public void AddCredits(int amount) {
         gameData.playerState.credits += amount;
         CheckObjectives();
+    }
+    public void CollectLoot(LootData data) {
+        if (gameData.playerState.loots.ContainsKey(data)) {
+            int oldCount = gameData.playerState.loots[data];
+            gameData.playerState.loots[data] = oldCount + 1;
+        } else {
+            gameData.playerState.loots[data] = 1;
+        }
+        OnLootChange?.Invoke(data, gameData);
     }
 
     public void AddPhysicalKey(int keyId) {
@@ -25,11 +37,13 @@ public partial class GameManager : Singleton<GameManager> {
 
     }
     public void CheckObjectives() {
+        Dictionary<Objective, ObjectiveStatus> changedObjectiveStatuses = new Dictionary<Objective, ObjectiveStatus>();
+
         foreach (Objective objective in gameData.levelState.template.objectives) {
             ObjectiveStatus oldStatus = gameData.levelState.delta.objectivesState[objective];
             ObjectiveStatus newStatus = objective.Status(gameData);
             if (oldStatus != newStatus) {
-                uiController.LogMessage($"Objective {objective.title}: {newStatus}");
+                changedObjectiveStatuses[objective] = newStatus;
             }
             gameData.levelState.delta.objectivesState[objective] = newStatus;
         }
@@ -57,12 +71,11 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        int newHashCode = statuses.GetHashCode();
+        int newHashCode = Toolbox.ListHashCode<ObjectiveStatus>(statuses);
         if (lastObjectivesStatusHashCode != newHashCode) {
-            OnObjectivesChange?.Invoke(gameData);
+            OnObjectivesChange?.Invoke(gameData, changedObjectiveStatuses);
         }
         lastObjectivesStatusHashCode = newHashCode;
-        Debug.Log($"level status: {gameData.levelState.delta.objectiveStatus}");
     }
 
     public void HandleAllObjectivesComplete() {
@@ -88,6 +101,9 @@ public partial class GameManager : Singleton<GameManager> {
             foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
                 if (zone.data.idn == gameData.levelState.plan.extractionPointIdn) {
                     zone.EnableExtractionZone();
+                    if (zone.ContainsPlayerLocation(playerObject.transform.position)) {
+                        zone.HandlePlayerActivation();
+                    }
                     return;
                 }
             }

@@ -35,6 +35,7 @@ public class AfterActionReportHandler : MonoBehaviour {
     }
 
     public void ContinueButtonCallback() {
+        GameManager.I.SaveGameData();
         GameManager.I.ReturnToApartment();
     }
 

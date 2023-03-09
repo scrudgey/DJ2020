@@ -6,11 +6,11 @@ using UnityEngine;
 public class MusicController : Singleton<MusicController> {
     public static readonly Dictionary<MusicTrack, string[]> MUSIC_PATHS = new Dictionary<MusicTrack, string[]>{
         {MusicTrack.none, new string[0]},
-        {MusicTrack.layercake, new string[]{
-            "LAYER CAKE layer 1 LOW DJ3",
-            "LAYER CAKE layer 2 CADENCE DJ3",
-            "LAYER CAKE layer 3 ATTENTION DJ3",
-            "LAYER CAKE layer 4 DEATH DJ3"
+        {MusicTrack.lethalGlee, new string[]{
+            "Lethal Glee layer 1 LOW DJ3",
+            "Lethal Glee layer 2 CADENCE DJ3",
+            "Lethal Glee layer 3 ATTENTION DJ3",
+            "Lethal Glee layer 4 DEATH DJ3"
         }}
     };
     public AudioSource[] audioSources;

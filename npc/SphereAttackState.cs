@@ -12,9 +12,10 @@ public class SphereAttackState : SphereControlState {
     float changeStateCountDown;
     public GunHandler gunHandler;
     Vector3 lastSeenPlayerPosition;
-
-    public SphereAttackState(SphereRobotAI ai, GunHandler gunHandler) : base(ai) {
+    CharacterController characterController;
+    public SphereAttackState(SphereRobotAI ai, GunHandler gunHandler, CharacterController characterController) : base(ai) {
         this.gunHandler = gunHandler;
+        this.characterController = characterController;
         speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
         if (speaker != null) {
             speaker.DoAttackSpeak();
@@ -41,7 +42,7 @@ public class SphereAttackState : SphereControlState {
                     new TaskConditional(() => isPlayerVisible()),
                     new TaskShoot(gunHandler)
                 ),
-                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys)
+                new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController)
             )
         );
     }

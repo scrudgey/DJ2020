@@ -8,16 +8,19 @@ public class Skycam : MonoBehaviour {
     private Vector3 masterCameraInitialPosition;
     private Vector3 myInitialPosition;
     public Camera masterCamera;
-    private Camera myCamera;
-    void Start() {
+    public Camera myCamera;
+    public void Initialize(Camera masterCamera, Vector3 offset) {
+        this.masterCamera = masterCamera;
         masterCameraTransform = masterCamera.transform;
         masterCameraInitialPosition = masterCameraTransform.position;
-        myInitialPosition = transform.position;
+        myInitialPosition = transform.position + offset;
         myCamera = GetComponent<Camera>();
     }
     void Update() {
-        transform.position = myInitialPosition + (masterCameraTransform.position - masterCameraInitialPosition) * translationRatio;
-        // transform.rotation = masterCameraTransform.rotation;
-        // myCamera.fieldOfView = masterCamera.fieldOfView;
+        if (masterCamera == null || masterCameraTransform == null) return;
+        Vector3 offset = (masterCameraTransform.position - masterCameraInitialPosition);
+        offset.y = 2f * offset.y;
+        transform.position = myInitialPosition + offset * translationRatio;
+        // transform.position = myInitialPosition + (masterCameraTransform.position - masterCameraInitialPosition) * translationRatio;
     }
 }

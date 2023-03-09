@@ -1,17 +1,21 @@
 using System.Collections.Generic;
+using Items;
+using Newtonsoft.Json;
 using UnityEngine;
-
-
 [System.Serializable]
 public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
     public int credits;
 
+    // TODO: serializer for this
+    public SerializableDictionary<LootData, int> loots;
     // skin
     public string legSkin { get; set; }
     public string bodySkin { get; set; }
     public string headSkin { get; set; }
 
     // gun
+    public List<GunState> allGuns;
+    public List<BaseItem> allItems;
     public GunState primaryGun { get; set; }
     public GunState secondaryGun { get; set; }
     public GunState tertiaryGun { get; set; }
@@ -42,26 +46,56 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
 
     public SpeechEtiquette[] etiquettes;
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite portrait;
 
     public HashSet<int> physicalKeys;
 
+    // TODO: converter for list
     public List<PayData> payDatas;
 
 
     public static PlayerState DefaultState() {
-        GunTemplate gun1 = GunTemplate.Load("s1");
-        GunTemplate gun2 = GunTemplate.Load("p1");
-        GunTemplate gun3 = GunTemplate.Load("sh1");
+        GunTemplate gun1 = GunTemplate.Load("p1");
+        // GunTemplate gun2 = GunTemplate.Load("s1");
+        // GunTemplate gun3 = GunTemplate.Load("r1");
+        // GunTemplate gun4 = GunTemplate.Load("p2");
+
+        GunState gunState1 = GunState.Instantiate(gun1);
+        // GunState gunState2 = GunState.Instantiate(gun2);
+        // GunState gunState3 = GunState.Instantiate(gun3);
+        // GunState gunState4 = GunState.Instantiate(gun4);
+
+        List<GunState> allGuns = new List<GunState>{
+            gunState1,
+            // gunState2,
+            // gunState3,
+            // gunState4
+        };
+
+        List<BaseItem> allItems = new List<BaseItem> {
+            ItemInstance.LoadItem("deck"),
+            ItemInstance.LoadItem("tools"),
+            ItemInstance.LoadItem("C4")
+        };
 
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
             headSkin = "Jack",
 
+            // legSkin = "swat",
+            // bodySkin = "swat",
+            // headSkin = "swat",
+
+            // legSkin = "security",
+            // bodySkin = "security",
+            // headSkin = "security",
+            allGuns = allGuns,
+            allItems = allItems,
             primaryGun = GunState.Instantiate(gun1),
-            secondaryGun = GunState.Instantiate(gun2),
-            tertiaryGun = GunState.Instantiate(gun3),
+            secondaryGun = null,
+            tertiaryGun = null,
             activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
@@ -72,8 +106,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             hackRadius = 1.5f,
             thirdWeaponSlot = false,
 
-            health = 100f,
-            fullHealthAmount = 100f,
+            health = 150f,
+            fullHealthAmount = 150f,
 
             speechSkillLevel = 3,
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
@@ -83,7 +117,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
             payDatas = new List<PayData>(),
 
-            credits = 10000
+            credits = 10000,
+            loots = new SerializableDictionary<LootData, int>()
         };
     }
 

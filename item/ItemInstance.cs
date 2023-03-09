@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 
@@ -37,6 +38,7 @@ namespace Items {
     }
 
     public class BaseItem {
+        [JsonConverter(typeof(ScriptableObjectJsonConverter<ItemData>))]
         public ItemData data;
         public BaseItem(ItemData baseData) {
             this.data = baseData;

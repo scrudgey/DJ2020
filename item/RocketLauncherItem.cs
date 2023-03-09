@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
     public class RocketLauncherItem : BaseItem {
+        [JsonConverter(typeof(ScriptableObjectJsonConverter<RocketLauncherData>))]
         public RocketLauncherData rocketData;
         public RocketLauncherItem(RocketLauncherData rocketData) : base(rocketData) {
             this.rocketData = rocketData;

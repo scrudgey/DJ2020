@@ -19,24 +19,18 @@ public class SphereInvestigateState : SphereControlState {
     float integratedPlayerMovement;
     float totalPlayerMovement;
     float saidHeyTimeout;
-
-    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight) : base(ai) {
+    CharacterController characterController;
+    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight, CharacterController characterController) : base(ai) {
         this.highlight = highlight;
+        this.characterController = characterController;
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
-        // SuspicionRecord intruderRecord = new SuspicionRecord {
-        //     content = "intruder reported",
-        //     maxLifetime = 120,
-        //     lifetime = 120,
-        //     suspiciousness = Suspiciousness.normal
-        // };
         report = new HQReport {
             reporter = owner.gameObject,
-            desiredAlarmState = true,
+            desiredAlarmState = HQReport.AlarmChange.raiseAlarm,
             locationOfLastDisturbance = owner.getLocationOfInterest(),
             timeOfLastContact = Time.time,
             lifetime = 6f,
             speechText = "HQ respond. Intruder spotted. Raise the alarm.",
-            // suspicionRecord = intruderRecord
         };
         DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
@@ -58,7 +52,7 @@ public class SphereInvestigateState : SphereControlState {
     public bool seenPlayerRecently() => timeSinceSawPlayer < 2f;
 
     public bool isPlayerNear() {
-        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 1.25f;
+        return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 2.5f;
     }
     public bool isPlayerSuspicious() {
         return integratedPlayerMovement > WARN_THRESHOLD;
@@ -70,7 +64,7 @@ public class SphereInvestigateState : SphereControlState {
         dialogueTask = new TaskOpenDialogue(owner);
 
         alertTaskNode = new Sequence(
-            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 0.5f) {
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
                 speedCoefficient = 1.2f,
                 highlight = highlight
@@ -90,7 +84,7 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1.25f) {
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                         speedCoefficient = 0.5f,
                         highlight = highlight
                     },
@@ -100,7 +94,7 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
-                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                             headBehavior = TaskMoveToKey.HeadBehavior.search,
                             highlight = highlight,
                         },

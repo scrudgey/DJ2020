@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class BurglarCanvasController : MonoBehaviour {
     BurgleTargetData data;
     BurglarToolType selectedTool;
+    public RectTransform mainRect;
     public RawImage rawImage;
     public GameObject UIElementPrefab;
     public Transform uiElementsContainer;
@@ -20,17 +21,27 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image keyImage;
     public Image screwdriverImage;
     public GameObject keyringButton;
+    [Header("tools")]
+    public GameObject probeToolButton;
+    public GameObject lockpickToolButton;
+    public GameObject screwdriverToolButton;
+    public GameObject keyToolButton;
+    [Header("sfx")]
+    public AudioSource audioSource;
+    public AudioClip[] pickupToolSound;
+    public AudioClip[] toolOverElementSound;
+    TamperEvidence tamperEvidence;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
     bool mouseDown;
     AttackSurfaceElement selectedElement;
     bool finishing;
-    SuspicionRecord suspicionTamper() => new SuspicionRecord {
-        content = "tampering with equipment",
-        suspiciousness = Suspiciousness.suspicious,
-        lifetime = 3f,
-        maxLifetime = 3f
-    };
+    // SuspicionRecord suspicionTamper() => new SuspicionRecord {
+    //     content = "tampering with equipment",
+    //     suspiciousness = Suspiciousness.suspicious,
+    //     lifetime = 3f,
+    //     maxLifetime = 3f
+    // };
     public void Initialize(BurgleTargetData data) {
         this.data = data;
         finishing = false;
@@ -71,6 +82,7 @@ public class BurglarCanvasController : MonoBehaviour {
             cursorImage.enabled = false;
 
             uiElement.Initialize(this, element);
+            element.Initialize(uiElement);
         }
     }
     public void TearDown() {
@@ -81,10 +93,7 @@ public class BurglarCanvasController : MonoBehaviour {
             data.target.DisableAttackSurface();
     }
 
-    void PositionTool() {
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-        Vector2 localPoint = Vector2.zero;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, mousePosition, null, out localPoint);
+    void PositionTool(Vector2 localPoint) {
         toolPoint.anchoredPosition = localPoint;
         if (localPoint.x > uiElementsRectTransform.rect.width / -2f && localPoint.x < uiElementsRectTransform.rect.width / 2f &&
             localPoint.y > uiElementsRectTransform.rect.height / -2f && localPoint.y < uiElementsRectTransform.rect.height / 2f) {
@@ -100,8 +109,20 @@ public class BurglarCanvasController : MonoBehaviour {
 
     public void UpdateWithInput(PlayerInput input) {
         mouseDown = input.mouseDown;
-        PositionTool();
-        if (input.mouseDown && mouseOverElement) {
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector2 localPoint = Vector2.zero;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, mousePosition, null, out localPoint);
+        PositionTool(localPoint);
+        bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;
+        if (input.escapePressed) {
+            if (selectedTool == BurglarToolType.none) {
+                DoneButtonCallback();
+            } else {
+                SetTool(BurglarToolType.none);
+            }
+        } else if (input.mouseDown && outOfBounds) {
+            DoneButtonCallback();
+        } else if (input.mouseDown && mouseOverElement) {
             if (selectedElement != null) {
                 ClickHeld(selectedElement);
             }
@@ -109,6 +130,9 @@ public class BurglarCanvasController : MonoBehaviour {
                 jiggleCoroutine = StartCoroutine(JiggleTool());
             }
         } else {
+            if (selectedElement != null) {
+                selectedElement.HandleMouseUp();
+            }
             if (jiggleCoroutine != null) {
                 StopCoroutine(jiggleCoroutine);
                 jiggleCoroutine = null;
@@ -118,7 +142,7 @@ public class BurglarCanvasController : MonoBehaviour {
             case BurglarToolType.lockpick:
             case BurglarToolType.probe:
             case BurglarToolType.screwdriver:
-                GameManager.I.AddSuspicionRecord(suspicionTamper());
+                GameManager.I.AddSuspicionRecord(SuspicionRecord.tamperingSuspicion(data));
                 break;
         }
     }
@@ -132,7 +156,8 @@ public class BurglarCanvasController : MonoBehaviour {
         BurglarAttackResult result = element.HandleClickHeld(selectedTool, data);
         if (result.success) {
             mouseOverElement = false;
-            selectedElement = null;
+            // selectedElement = null;
+            SetSelectedElement(null);
         }
         HandleAttackResult(result);
     }
@@ -150,34 +175,53 @@ public class BurglarCanvasController : MonoBehaviour {
     }
     void HandleAttackResult(BurglarAttackResult result) {
         if (result != BurglarAttackResult.None) {
-            if (result.success) {
-                feedbackText.text = feedbackText.text + $"\n{result.feedbackText}";
-                string[] lines = feedbackText.text.Split('\n');
-                int numLines = lines.Length;
-                if (numLines > 3) {
-                    feedbackText.text = "";
-                    feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
-                }
+            AddText(result.feedbackText);
+        }
+        if (result.createTamperEvidence) {
+            if (tamperEvidence == null) {
+                CreateTamperEvidence();
             }
         }
+        //
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
     }
+    void CreateTamperEvidence() {
+        GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;
+        GameObject obj = GameObject.Instantiate(impactPrefab, data.burglar.transform.position, Quaternion.identity);
+        tamperEvidence = obj.GetComponent<TamperEvidence>();
+        tamperEvidence.data = data;
+    }
+    void AddText(string newLine) {
+        feedbackText.text = feedbackText.text + $"\n{newLine}";
+        string[] lines = feedbackText.text.Split('\n');
+        int numLines = lines.Length;
+        if (numLines > 3) {
+            feedbackText.text = "";
+            feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
+        }
+    }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
         mouseOverElement = true;
-        selectedElement = element;
+        SetSelectedElement(element);
         if (selectedTool == BurglarToolType.none) {
             captionText.text = $"Use {element.elementName}";
         } else {
+            Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
             captionText.text = $"Use {selectedTool} on {element.elementName}";
         }
     }
     public void MouseExitUIElementCallback(AttackSurfaceElement element) {
         captionText.text = "";
         mouseOverElement = false;
-        selectedElement = null;
+        SetSelectedElement(null);
+    }
+    void SetSelectedElement(AttackSurfaceElement newElement) {
+        if (newElement == selectedElement) return;
+        selectedElement?.HandleFocusLost();
+        selectedElement = newElement;
     }
     public void MouseEnterToolButton(string toolName) {
         selectedToolText.text = toolName;
@@ -201,6 +245,14 @@ public class BurglarCanvasController : MonoBehaviour {
     void SetTool(BurglarToolType toolType) {
         selectedTool = toolType;
         selectedToolText.text = toolType.ToString();
+
+        lockpickToolButton.SetActive(true);
+        probeToolButton.SetActive(true);
+        keyToolButton.SetActive(true);
+        screwdriverToolButton.SetActive(true);
+
+        Toolbox.RandomizeOneShot(audioSource, pickupToolSound);
+
         switch (toolType) {
             case BurglarToolType.none:
                 probeImage.enabled = false;
@@ -213,24 +265,28 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = true;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                lockpickToolButton.SetActive(false);
                 break;
             case BurglarToolType.probe:
                 probeImage.enabled = true;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                probeToolButton.SetActive(false);
                 break;
             case BurglarToolType.key:
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = true;
                 screwdriverImage.enabled = false;
+                keyToolButton.SetActive(false);
                 break;
             case BurglarToolType.screwdriver:
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = true;
+                screwdriverToolButton.SetActive(false);
                 break;
         }
     }

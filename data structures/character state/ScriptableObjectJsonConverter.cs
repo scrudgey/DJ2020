@@ -3,11 +3,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 public class ScriptableObjectJsonConverter<T> : JsonConverter<T> where T : UnityEngine.Object {
-
     public static class Constants {
         public static readonly string PATH = "path";
     }
-
     public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer) {
         if (reader.TokenType == JsonToken.Null) return null;
         JObject jo = JObject.Load(reader);

@@ -5,35 +5,42 @@ using UnityEngine.AI;
 
 public class SearchDirectionState : SphereControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
-    readonly float ROUTINE_TIMEOUT = 60f;
+    readonly float ROUTINE_TIMEOUT = 120f;
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
     TaskTimerDectorator lookAround;
-    public SearchDirectionState(SphereRobotAI ai, Damage damage, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
+    CharacterController characterController;
+    public SearchDirectionState(SphereRobotAI ai, Damage damage, CharacterController characterController, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
+        this.characterController = characterController;
         if (damage != null) {
-            searchDirection = -1f * damage.direction;
+            // searchDirection = -1f * damage.direction;
+            searchDirection = -1f * damage.source;
         } else {
             RandomSearchDirection();
         }
+        Debug.Log($"start search direction 3: {searchDirection}");
         SetupRootNode(doIntro, speedCoefficient);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, searchDirection);
     }
-    public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
+    public SearchDirectionState(SphereRobotAI ai, NoiseComponent noise, CharacterController characterController, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
+        this.characterController = characterController;
         if (noise != null) {
-            searchDirection = (noise.transform.position - owner.transform.position).normalized;
-            searchDirection.y = ai.transform.position.y;
+            // searchDirection = (noise.transform.position - owner.transform.position).normalized;
+            // searchDirection.y = ai.transform.position.y;
+            searchDirection = noise.transform.position;
         } else {
             RandomSearchDirection();
         }
         SetupRootNode(doIntro, speedCoefficient);
         rootTaskNode.SetData(SEARCH_POSITION_KEY, noise.transform.position);
-
     }
-    public SearchDirectionState(SphereRobotAI ai, Vector3 position, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
+    public SearchDirectionState(SphereRobotAI ai, Vector3 position, CharacterController characterController, bool doIntro = true, float speedCoefficient = 0.5f) : base(ai) {
+        this.characterController = characterController;
         if (position != Vector3.zero) {
-            searchDirection = (position - owner.transform.position).normalized;
-            searchDirection.y = ai.transform.position.y;
+            // searchDirection = (position - owner.transform.position).normalized;
+            // searchDirection.y = ai.transform.position.y;
+            searchDirection = position;
         } else {
             RandomSearchDirection();
         }
@@ -77,7 +84,7 @@ public class SearchDirectionState : SphereControlState {
                ), 3f);
 
             rootTaskNode = new Sequence(lookAround,
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient,
                 },
@@ -90,7 +97,7 @@ public class SearchDirectionState : SphereControlState {
             );
         } else {
             rootTaskNode = new Sequence(
-                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, arrivalDistance: 1f) {
+                new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = speedCoefficient
                 },

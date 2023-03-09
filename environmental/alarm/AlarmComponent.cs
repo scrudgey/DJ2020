@@ -31,10 +31,12 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public virtual bool alarmTriggered {
         get { return _alarmTriggered; }
         set {
+            bool dirty = _alarmTriggered != value;
             _alarmTriggered = value;
             if (value) {
                 countdownTimer = 30f;
             }
+            // if (dirty)
             OnStateChange?.Invoke(this);
         }
     }

@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-
 
 public class ReactToAttackState : SphereControlState {
     public enum AttackType { none, damage, gunshots }
@@ -12,19 +12,22 @@ public class ReactToAttackState : SphereControlState {
     float changeStateCountDown;
     private TaskNode rootTaskNode;
     private SpeechTextController speechTextController;
+    CharacterController characterController;
 
-    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, Damage damage, float initialPause = 2f) : base(ai) {
+    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, Damage damage, CharacterController characterController, float initialPause = 2f) : base(ai) {
         this.speechTextController = speechTextController;
         this.type = AttackType.damage;
+        this.characterController = characterController;
         Vector3 damageSourcePosition = ai.transform.position + -10f * damage.direction;
         Vector3 coverPosition = ai.transform.position + 10f * damage.direction;
         SetupRootNode(initialPause: initialPause); // enough to time out hitstun
         rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
         rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
     }
-    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, NoiseComponent noise) : base(ai) {
+    public ReactToAttackState(SphereRobotAI ai, SpeechTextController speechTextController, NoiseComponent noise, CharacterController characterController) : base(ai) {
         this.speechTextController = speechTextController;
         this.type = AttackType.gunshots;
+        this.characterController = characterController;
         Vector3 damageSourcePosition = noise.transform.position;
         Vector3 coverPosition = (noise.transform.position - ai.transform.position).normalized;// * -5f;
         coverPosition.y = ai.transform.position.y;
@@ -49,15 +52,10 @@ public class ReactToAttackState : SphereControlState {
                 AttackType.gunshots => "HQ respond! Shots fired!",
                 _ => "HQ respond! Activate building alarm!"
             };
-            SuspicionRecord intruderRecord = new SuspicionRecord {
-                content = "gunshots reported",
-                maxLifetime = 120,
-                lifetime = 120,
-                suspiciousness = Suspiciousness.suspicious
-            };
+            SuspicionRecord intruderRecord = SuspicionRecord.gunshotsHeard();
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
-                desiredAlarmState = true,
+                desiredAlarmState = HQReport.AlarmChange.raiseAlarm,
                 locationOfLastDisturbance = owner.getLocationOfInterest(),
                 timeOfLastContact = Time.time,
                 lifetime = 6f,
@@ -73,7 +71,7 @@ public class ReactToAttackState : SphereControlState {
                     reorient = true
                 }, initialPause),
                 new Selector(
-                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY, owner.physicalKeys) {
+                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY, owner.physicalKeys, characterController) {
                         headBehavior = TaskMoveToKey.HeadBehavior.search,
                         speedCoefficient = 2f
                     },
@@ -100,7 +98,7 @@ public class ReactToAttackState : SphereControlState {
                         useKey = true,
                         reorient = true
                     }, initialPause),
-                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY, owner.physicalKeys) {
+                    new TaskMoveToKey(owner.transform, COVER_POSITION_KEY, owner.physicalKeys, characterController) {
                         headBehavior = TaskMoveToKey.HeadBehavior.search,
                         speedCoefficient = 2f
                     },

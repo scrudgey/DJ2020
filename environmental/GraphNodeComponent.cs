@@ -30,8 +30,7 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     }
 
     void OnDisable() {
-        if (GameManager.I != null && !GameManager.I.isLoadingLevel)
-            DisableSource();
+        DisableSource();
     }
     void OnEnable() {
         // TODO: move this to level initialization!

@@ -63,7 +63,9 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         }
         List<InteractorTargetData> data = new List<InteractorTargetData>();
         foreach (KeyValuePair<Collider, Interactive> kvp in interactives) {
-            data.Add(new InteractorTargetData(kvp.Value, kvp.Key));
+            if (kvp.Key != null && (kvp.Key.bounds.center.y - transform.position.y) > -1) {
+                data.Add(new InteractorTargetData(kvp.Value, kvp.Key));
+            }
         }
         return Interactive.TopTarget(data);
     }

@@ -11,6 +11,8 @@ public class ObjectiveIndicatorController : MonoBehaviour {
     public Color failColor;
     public Color inProgressColor;
     public Image[] images;
+    Coroutine indicateNewRoutine;
+    public Image outlineImage;
     public void Configure(Objective objective, GameData gameData, int index) {
         ObjectiveStatus status = objective.Status(gameData);
         checkBoxText.text = status switch {
@@ -48,4 +50,31 @@ public class ObjectiveIndicatorController : MonoBehaviour {
         titleText.color = color;
     }
 
+    public void IndicateValueChanged() {
+        if (indicateNewRoutine != null) {
+            StopCoroutine(indicateNewRoutine);
+        }
+        Color initialColor = outlineImage.color;
+        indicateNewRoutine = StartCoroutine(FlashRoutine(initialColor));
+    }
+
+    IEnumerator FlashRoutine(Color initialColor) {
+        // float timer = 0f;
+        float interval = 0.1f;
+        int index = 0;
+        int cycles = 10;
+        WaitForSecondsRealtime waiter = new WaitForSecondsRealtime(interval);
+        while (index < cycles) {
+            if (outlineImage.color == initialColor) {
+                outlineImage.color = Color.white;
+            } else {
+                outlineImage.color = initialColor;
+            }
+            index += 1;
+            yield return waiter;
+        }
+        indicateNewRoutine = null;
+        outlineImage.color = initialColor;
+        yield return null;
+    }
 }

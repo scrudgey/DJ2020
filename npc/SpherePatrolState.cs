@@ -12,9 +12,11 @@ public class SpherePatrolState : SphereControlState {
     LoHi waitInterval = new LoHi(3f, 10f);
     float waitCheckInterval = 2.5f;
     SphereRobotAI ai;
-    public SpherePatrolState(SphereRobotAI ai, PatrolRoute patrolRoute) : base(ai) {
+    CharacterController characterController;
+    public SpherePatrolState(SphereRobotAI ai, PatrolRoute patrolRoute, CharacterController characterController) : base(ai) {
         this.patrolRoute = patrolRoute;
         this.ai = ai;
+        this.characterController = characterController;
     }
     public override void Enter() {
         base.Enter();
@@ -26,7 +28,7 @@ public class SpherePatrolState : SphereControlState {
             Alertness.distracted => TaskPatrol.PatrolType.casual,
             Alertness.normal => TaskPatrol.PatrolType.casual
         };
-        rootTaskNode = new TaskPatrol(owner.transform, patrolRoute, patrolType, owner.physicalKeys);
+        rootTaskNode = new TaskPatrol(owner.transform, patrolRoute, patrolType, owner.physicalKeys, characterController);
     }
 
     public override PlayerInput Update(ref PlayerInput input) {

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
 using UnityEngine;
 [System.Serializable]
 public class LevelState {
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<LevelTemplate>))]
     public LevelTemplate template;
     public LevelPlan plan;
     public LevelDelta delta;
@@ -42,4 +44,7 @@ public class LevelState {
         }
         return path;
     }
+
+    public bool PlayerHasID() => plan.activeTactics.Any(tactic => tactic is TacticFakeID);
+
 }

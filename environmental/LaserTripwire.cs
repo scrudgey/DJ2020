@@ -24,8 +24,6 @@ public class LaserTripwire : AlarmComponent {
             data.laser.gameObject.SetActive(data.enabled);
         }
     }
-
-
     public void LaserTripCallback() {
         if (cooldown > 0)
             return;
@@ -34,8 +32,10 @@ public class LaserTripwire : AlarmComponent {
         GameManager.I.SetAlarmNodeState(node, true);
         cooldown = 5f;
         Toolbox.RandomizeOneShot(audioSource, spottedSound);
+        GameManager.I.SetLocationOfDisturbance(transform.position);
+        GameManager.I.DispatchGuard(transform.position);
+        GameManager.I.AddSuspicionRecord(SuspicionRecord.trippedSensor("laser tripwire"));
     }
-
     void Update() {
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;

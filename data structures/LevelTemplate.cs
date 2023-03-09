@@ -11,6 +11,7 @@ public class LevelTemplate : ScriptableObject {
     public string levelName;
     public string sceneName;
     public string sceneDescriptor;
+    public string tagline;
     [Header("text")]
     public TextAsset proposalEmail;
     public TextAsset successEmail;
@@ -32,7 +33,8 @@ public class LevelTemplate : ScriptableObject {
     public AudioClip alarmAudioClip;
     public float strikeTeamResponseTime;
     public NPCTemplate strikeTeamTemplate;
-
+    public int maxInitialNPC;
+    public int maxNPC;
 
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/{name}") as LevelTemplate);

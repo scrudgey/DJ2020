@@ -49,6 +49,16 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         }
 
     }
+    public void ApplyDistanceEffect(float distance) {
+        // float alpha = Mathf.Clamp(1f - (Mathf.Pow(distance, 2)), 0, 1);
+        float alpha = Mathf.Clamp(1f - (distance * 2f), 0, 1);
+        // float alpha = Mathf.Clamp(1f - distance, 0, 1);
+        HSBColor newHSBColor = HSBColor.FromColor(new Color(image.color.r, image.color.g, image.color.b, alpha));
+        newHSBColor.b -= distance;
+        // Color newColor = new Color(image.color.r, image.color.g, image.color.b, alpha);
+        image.color = newHSBColor.ToColor();
+        transform.localScale = alpha * Vector3.one;
+    }
     protected virtual void SetGraphicalState(T node) {
         if (node.enabled) {
             image.color = enabledColor;

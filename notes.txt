@@ -1846,6 +1846,180 @@ note: layer "interactive"
     * orient toward shoot direction
     * fix rocket aim
     * rocket launcher graphic and visibility should belong to item handler
+* door should be destructible
+* burglary tools
+* rocket launcher
+* grenade
+* SpottedHighlight should use full navigation path
+* lose disguise when openly aggressive, or identity is revealed
+* delay after death before fail screen
+* half-width walls
+* basement stairs -> first floor
+* power mains in the basement
+* brick 2
+* brick half
+* light interior
+* place cameras
+* place lasers
+* flickering windows
+* pylon light
+* hide the key above
+* attack surface disappears
+* adjust skybox heights: can skybox scale with y more rapidly?
+* faster fade in / out
+* adjust clearsighter interval
+* do not highlight interactives when player is above
+* attractor zone in building
+* chair, power mains
+* BURGLAR highlights are visible across all levels
+* build rooftop zones
+* NPCs
+* player spawn points
+* generate map data
+* disable skycams when in normal camera mode
+* blood pools should hide
+* shells should hide
+* cameras should hide
+* cameras should not hide that much!
+* railings
+* interrogate distance?
+* remove sphere
+* alarm box hide
+* laser block hide
+* guards do not navigate to correct floor position
+* guards getting stuck on double doors'
+* guards should be moving through the building more quickly
+* searchDirection is not quite right
+* maybe too much bunching
+* a long way to travel means guards give up too easily
+* set up objectives
+    * randomized placement of paydatas
+* loot
+* use ID status
+* concoct one lie per suspicion against player
+* both knobs should refer to the same lock
+* randomize deadbolt
+    * remove lock from door locks
+    * disable deadbolt elements
+* make sure networks are working properly 
+    * remote hack
+* enhance readibility:
+* clearsighter interaction with renderers
+* move hack indicators to top
+* screw turning
+* head when crouching
+* right click -> aim first has screwed up orientation
+* crowding investigate state
+* attack surface becomes visible in clearsighter
+* rattling door
+* handle picking / manipulating unlocked
+* floating head syndrome
+* self-closing isn't working for NPC
+* dialogue
+* crawling suspicion
+* floor can be shot away!
+* better display of paydata, and loot
+* hacking suspicions should last
+* slide in from right
+* only show when something changes
+* objective status
+    * highlight changes
+* guard notices disabled / tampered door
+* guards should investigate the site of a tripped alarm
+* strike team should come in with a purpose
+    * investigate the last position
+* limited number of guards spawn
+* don't dispatch multiple strike teams
+* don't do multiple investigate cutscenes at once - if alredy under suspicion, just add into the fray
+* what about extra-height camera in basement?
+* screws are still backwards?
+* disable alarm terminal should work (disable radio?) levelHQTerminal()
+* guard gets stuck in hallway.
+* ensure suspicion indicator is working correctly
+* easy for guard to lose sight of me in investigate
+* investigate cutscene, dialogue, and burglar canvas
+* "outsideattacksurface"
+* NPC text more readable
+* little icon rises up when grabbing loot
+* NPC and doors
+    * NPC shouldn't leave door unlocked
+    * NPC and lock interaction
+* camera / laser trigger should bring nearby NPC
+* window graphic
+* set invisible walls
+* lots of reporting the same door / corpse
+* fall damage
+* guards above should disappear
+* gun + hand = floating head
+* click outside burglar menu to close
+* screws still wrong at times
+* better way of putting a tool away
+* paydata broken
+* cameras on map marker
+    * screwdriver graphics
+    * interface:
+        * tools are placed on the spread to the right
+        * clicking on the panel in general replaces item, returns to hand----
+        * suscpetible / not to latch attacks
+        * picking more / less difficult
+* put a light on the roof
+* rocket passes through window
+* wire up lights to power
+* better loot sfx
+* camera sound
+* email text scroll faster
+* disable disguise
+* i was unable to complete either mission.
+* active tactics empty bulletholes
+* apply temporary suspicion when a camera / laser is tripped
+* cancel music on mission end
+* fix data objectivees 
+* if in escape point when abort, end mission
+* rearrange mission plan
+* finish menu text & scroll same as mission selector?
+* security description too long in tower
+* dont show completed missions in selector
+* fill out proper texts
+* chainlink fence door    
+* alarm terminal triggering effects
+* notify others of location
+* investigate NPC walked up to me in the dark and then left.
+* ESC when in apartment
+* ESC in mission plan
+* ESC in mission select
+* jack that data starts you out in view of patrolling guard
+* clean up loot and credsticks and keys
+* skybox buildings
+* hide ui in world mode
+* when NPC runs, show run animation
+* transition between apartment and street
+* broken clearsighter on 
+* broken cutscenes?
+* multiple audiosources
+* show interactibility on world mode
+* highlight is broken on apartment -> street
+* start with correct skybox
+* objectives indicator in world mode
+* start apartment / world with different rotation
+* a bar
+* bar stools
+* table
+* chairs
+* weapons dealer:
+* industrial shelving
+* industrial containers
+* more trash, random grime
+* decor: replacing the spritesheet is hard.
+    * if we do it programmatically: set the spritesheet and index in a script.
+* make
+    * guns for gun shop
+    * item shop
+    * akira alley
+* use allGuns in loadout editor
+
+
+
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -1964,7 +2138,7 @@ VR mission designer
     survive x waves of y NPCS
     inventory management
 
-better action log (remove?)
+* better action log (remove?)
     blit the text
     font?
 
@@ -1997,9 +2171,9 @@ weapons
 planning mode
     optional objectives
     HP / def indicators
-    mission select map
-        indicate a point on map
-        move map, zoom
+    * mission select map
+        * indicate a point on map
+        * move map, zoom
     on mouseover picker: change stat viewer
         smooth rolling stat bars when values change
         compare stats +/-
@@ -2009,7 +2183,7 @@ planning mode
         markers gated behind tactical data
     tactics pane
         purchase keycard
-        ativate cyberattack
+        activate cyberattack
         clickable active tactics show description
         buy info
             locate key objectives
@@ -2060,11 +2234,11 @@ NPC tuning:
         accuracy
         shooting behavior
             quickness, bursts
-    alarm terminal triggering effects
-        notify others of location
+
     guard HQ potentially notices disabled cameras and sensors
     strike team seems to have a hard time investigating repeated explosions
-
+    guards get stuck in the narrow corridor
+    guards should pause in patrol only not around other guards.
 
 silenced gun is still OP
     seeing corpse or bullets -> high alert, easier to see player
@@ -2083,52 +2257,46 @@ networks
     get cyber network working once and for all
     DFS path finding doesn't quite work right for highlighting alarm path
 
------------------
-build a test level, 3 storey building infiltration
-build a test level equivalent to Jack That Data
-    make level more challenging
-        turrets
-        camera view bigger
-    skybox buildings
-    fill out proper texts
-    * ac unit on roof
+optimizations:
+    use octree in clearsighter
+    optimize the ammo counter
+        this could free up the equivalent of a whole camera render
+    static batching / dynamic batching / occlusion culling  / gpu instancing
 
-* SpottedHighlight should use full navigation path
-* lose disguise when openly aggressive, or identity is revealed
-* delay after death before fail screen
+put gun away and left click on objects to use?
+left click on people to talk?
+
+clearsighter:
+    it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
+    instead everything should be sliced into y intervals, and all deactivated / activated at once.
+
+distraction needed
+    throw a coin
+using key in lock should spin the keyway
+npc text can run off the edge of the screen
+
+-------------
+how to make it more difficult?
+    1. try insert from steet, no disguise
+    2. add receptionist
+    3. add civilians
+data stealing needs to be more clean and engaging
+some computers trip honeypots
+intel can tell in advance where the target data is. 
 
 code-controlled gun animation
-
 attack surfaces
     more door styles
-        suscpetible / not to latch attacks
-        picking more / less difficult
         different handles
         electronic access control
-        Request-to-Exit (REX) sensor 
     alarm sensors on doors
     padlock
-    screwdriver graphics
-    tools
-        power drill through lock
-        keyed-alike
-        shim
-        bump keys
-    maybe there is a difference in suspicion between differen kinds of tools
-        if everything is vulnerable to lock pick then why bother with other things?
-    interface:
-        tools are placed on the spread to the right
-        clicking on the panel in general replaces item, returns to hand
-
 loot
     guards can drop keys or loot
-    collect loot
-    loot details: sprite, profile, description, value, category
-    loot can be found: in environment, on shelves, in drawers, on NPCs
-    iconography
+    some data is useful in social engineering
+    some data provides keycodes
+
 dialogue
-    use ID status
-    concoct one lie per suspicion against player
     get once lie stratagem per mark from player
 vehicles
     strike team may arrive by vehicle
@@ -2136,34 +2304,255 @@ vehicles
 navigable AC units
     you should be able to crawl through the duct on the ceiling
 
-graphics
-    patrol guard spritesheet
-    disguise spritesheet (fireman)
-    swat team spritesheet
-    civ_female portrait could use some work
-    loot
-    title screen logo
-    title screen animations 
-
 rocket launcher explosion?
 hand grenade explosion
+    hand grenade sound??
 check blood pool prefab pooling
-
-
-* door should be destructible
 destroyed walls leave decal on the ground (difficult?)
 destructible light pylon
 destructible dumpster
 destructible AC unit
 destructible radio dish tower
-#indiedev #unity3d #immersivesim #gamedev
+plants can catch on fire
 
+level 3:
+    holes for AC ducts 
+    elevator
+
+randomly place lasers
+randomly place cameras
+
+doors
+    can open from the inside
+    different knobs?
+    sometimes unlocked
+
+better network readability
+    needs slicing by floor
+    highlight connections when mouseover
+    node discoverability?
+    popup box: visibility skill gives you percentage breakdowns of possibilities:
+        50% honeypot
+        50% paydata
+    floppy icon for unopened data nodes
+    a separate screen?
+
+loitering is suspicious but not near a water cooler
+
+-----------
+build a test level, 3 storey building infiltration
+    vent into the side of the building
+    vent into access into basement
+    populate various other datas, honeypots
+build a test level equivalent to Jack That Data
+    make level more challenging
+        turrets
+        camera view bigger
+    hatch in the rooftop
+
+graphics
+    patrol guard spritesheet
+        * smg
+        * rifle
+        * shotgun
+        portrait
+    disguise spritesheet (fireman)
+    swat team spritesheet
+        smg run
+        rifle
+        pistol
+        shotgun
+        wire up sprite data system
+    scientist spritesheet
+    civ_female portrait could use some work
+    title screen logo
+    title screen animations 
+    helicopters for skybox
 guns:
     silenced pistol
     fix silenced smg
 icons:
-    * burglary tools
-    * rocket launcher
-    * grenade
     redraw others?
         thermals
+padlock
+disguise tactic icon
+fake id tactic icon
+random loot spots
+loot drops
+
+guards spawned invisible
+some sort of automated check when a level starts if objectives are impossible
+
+a new component like SphereRobotAI
+uses a state machine and states
+uses waypoints in the world
+loot popup is not popping up
+unify regular + metallic material
+eliminate cyber_obj_2 material
+* basic floor 2.25 needs to be fixed.
+fix broken loot items
+
+mission:
+    visibility goes too low
+    guards get stuck on each other
+        make NPCs pass through each other with a soft bump
+    swat spritesheet
+        this requires sprite datasystem work:
+            1. positioning torso relative to legs (maybe?)
+                position head relative to torso 
+            2. work on editor
+                updating values when they're updated in the editor? somehow? yes/ no?
+    trees / plants / outside decor
+
+
+
+
+
+locations:
+    * weapons dealer
+    * bar (the gentleman loser)
+    software dealer
+    hardware dealer (the finn)
+    street doc
+    night club 
+    arcade?
+
+world NPCs:
+    potentially talkable: leave that for later.
+    moving with purpose around the scene. 
+        up & down streets.
+        in & out of stores.
+    stopping and talking with each other.
+    some are loitering
+        loitering on the street corner
+        leaning up against the wall
+        hanging around the Fire
+    random drug dealers on the corner will buy your drug loot
+
+
+
+
+
+
+still unknown:
+    street doc
+    weapon upgrades
+    software
+    hardware
+
+world layout:
+    * neighbor building?
+        * items: could work
+    * underneath apartment:
+        * weapons
+    upstairs:
+        importer / exporter who buys things.
+        also he is a connection that will give you tips or sometimes a deal.
+    bar:
+        the bartender will clue you in on the price of commodities.
+        there is an underworld figure in the corner of the bar who will give you missions.
+    akira alley:
+        drug dealers will purchase your drug loot.
+    subway:
+        a software hacker 
+
+shop todo:
+    gunshop
+        show little -100 text goes up from credits, lerp credits color from red to white
+        sell mode
+            can't sell last gun? maybe?
+    item shop
+        description (dialogue)
+            "1x per mission"
+            "unlimited use"
+
+
+graphics:
+    we need more large, imposing, concrete style buildings
+    tents
+    pop-up tent
+    sprite props
+        knives / swords / shuriken
+        ground wires
+        ground decals
+    bar curve
+    subway entrance
+    burned out car wreck
+    neon signange
+    graffiti
+    6x6 dirt
+    6x6 sidewalk
+    neon lights
+        neon ring around the signage name
+        neon sign in the window
+        "GUNS" sign
+        how do i do neon?
+            aesthetic 1: white light, red rim
+            aesthetic 2: bright light, wall behind it is super red
+    graffiti
+        bört
+        karmadillo
+        lobster
+        Emosido engañado
+        franco
+        no me baño
+    https://twitter.com/scrudgey/status/1627911883952099329?s=20
+
+NPCs
+    NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
+
+show objectives as blit-in text on lower left?
+"v" and "^" buttons on scrollbars?
+items not being set in plan
+clearsighter can and should be much, much simpler.
+    solve camera distance / near clipping plane
+    use clipping frustrum to simplify clearsighter
+prevent guns in world
+prevent damage in world?
+storeowner AI
+    move to position
+    look in direction
+    look at player
+    different from SphereRobot, but still uses a state machine.
+
+
+main game loop
+    save / load game data
+
+    new game: 
+        choose filename
+            ensure none already exists
+        create new save file:
+            set gamedata: new gamedata. set filename.
+            save gamedata to disk
+    load game:
+        show existing save files
+        choose one
+            set gameData
+            jump to apartment
+    save game:
+        serialize gamedata to filename
+
+
+
+* GameData has filename field
+* save game on level exit
+save game from menu
+set player name field in dialogue
+
+create all shops
+
+serialize lists of references
+hide tertiary slot in loadout editor
+fix vr missions
+upgrade unity
+make a build
+
+mission fail: jump back to apartment
+on level start, zoom out from player spawn
+    show span cutscene
+extraction point is out of bounds
+move key from tower rooftop
+plant material is glitched
+AI still had a hard time closing in on me when i was openly shooting and running around
+maybe fall damage from rooftop should be greater

@@ -18,14 +18,17 @@ namespace AI {
         PatrolRoute patrolRoute;
         HashSet<int> keyIds;
         bool reverse;
+        CharacterController characterController;
         public TaskPatrol(Transform transform,
                             PatrolRoute patrolRoute,
                             PatrolType patrolType,
-                            HashSet<int> keyIds) : base() {
+                            HashSet<int> keyIds,
+                            CharacterController characterController) : base() {
             this.patrolRoute = patrolRoute;
             this.transform = transform;
             this.keyIds = keyIds;
             this.type = patrolType;
+            this.characterController = characterController;
             setupRootNode();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
@@ -58,11 +61,11 @@ namespace AI {
             }
 
             TaskMoveToKey taskMoveToKey = type switch {
-                PatrolType.casual => new TaskMoveToKey(transform, NAV_POINT_KEY, keyIds) {
+                PatrolType.casual => new TaskMoveToKey(transform, NAV_POINT_KEY, keyIds, characterController) {
                     headBehavior = TaskMoveToKey.HeadBehavior.casual,
                     speedCoefficient = 0.35f
                 },
-                PatrolType.lively => new TaskMoveToKey(transform, NAV_POINT_KEY, keyIds) {
+                PatrolType.lively => new TaskMoveToKey(transform, NAV_POINT_KEY, keyIds, characterController) {
                     headBehavior = TaskMoveToKey.HeadBehavior.search,
                     speedCoefficient = 0.6f
                 }

@@ -14,6 +14,9 @@ public class VRDataStore : MonoBehaviour {
         cyberComponent.OnStateChange += HandleCyberStateChange;
         DeactivateCallout();
     }
+    void OnDestroy() {
+        cyberComponent.OnStateChange -= HandleCyberStateChange;
+    }
     public void HandleCyberStateChange(CyberComponent component) {
         if (component.compromised) {
             Open();

@@ -25,12 +25,15 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartSpottedCutscene(GameObject NPC) {
+        // foreach (SphereRobotAI ai in )
+        if (GameObject.FindObjectsOfType<SphereRobotAI>().Any(ai => ai.stateMachine.currentState is SphereInvestigateState)) return;
         StartCutsceneCoroutine(SpottedCutscene(NPC));
     }
     public void ShowExtractionZoneCutscene(ExtractionZone zone) {
         StartCutsceneCoroutine(ExtractionZoneCutscene(zone));
     }
     public IEnumerator SpottedCutscene(GameObject NPC) {
+        uiController?.HideUI();
         float timer = 0f;
         SphereRobotSpeaker speaker = NPC.GetComponentInChildren<SphereRobotSpeaker>();
         float distanceBetweenPeople = (NPC.transform.position - playerObject.transform.position).magnitude;
@@ -78,6 +81,7 @@ public partial class GameManager : Singleton<GameManager> {
         speaker.speechTextController.HideText();
         Time.timeScale = 1f;
         characterCamera.followingSharpnessDefault = 5f;
+        uiController?.ShowUI();
         yield return null;
     }
 

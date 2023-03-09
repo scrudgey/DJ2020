@@ -16,6 +16,7 @@ public class Footsteps : MonoBehaviour {
     void Start() {
         raycastHits = new RaycastHit[1];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.volume = 0.65f;
         footstepData = Resources.Load("data/footstep/default") as FootstepData;
     }
     public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {
@@ -51,7 +52,9 @@ public class Footsteps : MonoBehaviour {
                     Toolbox.RandomizeOneShot(audioSource, leftFoot, volume: volume);
                 }
 
-                bool player = !GameManager.I.gameData.levelState.delta.disguise && GameManager.I.playerObject;
+                bool player = transform.IsChildOf(GameManager.I.playerObject.transform) &&
+                                !(GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmActive());
+
 
                 NoiseData noise = new NoiseData {
                     player = player,

@@ -6,12 +6,16 @@ public class ExtractionZone : MapMarker {
     public MeshRenderer meshRenderer;
     public bool isActive;
     public bool showCutscene;
+    public Collider myCollider;
     void Awake() {
         if (isActive) {
             EnableExtractionZone();
         } else {
             DisableExtractionZone();
         }
+    }
+    public bool ContainsPlayerLocation(Vector3 location) {
+        return myCollider.bounds.Contains(location);
     }
     public void EnableExtractionZone() {
         isActive = true;
@@ -30,9 +34,12 @@ public class ExtractionZone : MapMarker {
         if (!isActive || other.isTrigger)
             return;
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            Debug.Log("successful extraction");
-            GameManager.I.FinishMission();
+            HandlePlayerActivation();
         }
+    }
+    public void HandlePlayerActivation() {
+        Debug.Log("successful extraction");
+        GameManager.I.FinishMission();
     }
     IEnumerator PulseExtractionZone() {
         float timer = 0f;

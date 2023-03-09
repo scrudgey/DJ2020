@@ -8,12 +8,15 @@ using UnityEngine;
 
 [System.Serializable]
 public class Graph<T, W> where T : Node where W : Graph<T, W> {
+    public string levelName;
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
     public HashSet<HashSet<string>> edgePairs;
+    public HashSet<string[]> edgeArrays;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
         edgePairs = new HashSet<HashSet<string>>(HashSet<string>.CreateSetComparer());
+        edgeArrays = new HashSet<string[]>();
         edges = new SerializableDictionary<string, HashSet<string>>();
     }
 
@@ -21,6 +24,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         AddLink(from, to);
         AddLink(to, from);
         edgePairs.Add(new HashSet<string> { from.idn, to.idn });
+        edgeArrays.Add(new string[2] { from.idn, to.idn });
     }
 
     void AddLink(Node from, Node to) {
@@ -77,11 +81,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
             TextAsset textAsset = (TextAsset)obj;
             if (textAsset.name.ToLower().StartsWith($"graph_{prefix}")) {
                 Debug.Log($"loading {textAsset.name}...");
-                if (graph is null) {
-                    graph = Load(textAsset);
-                } else {
-                    graph = graph + Load(textAsset) as W;
-                }
+                graph = graph == null ? Load(textAsset) : graph + Load(textAsset) as W;
                 graphCount += 1;
             }
 
@@ -89,6 +89,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         if (graphCount == 0) {
             Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");
         }
+        graph.levelName = levelName;
         return graph;
     }
 
@@ -114,6 +115,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         }
         foreach (HashSet<string> edgePair in rhs.edgePairs) {
             lhs.edgePairs.Add(edgePair);
+            lhs.edgeArrays.Add(edgePair.ToArray());
         }
         return lhs;
     }

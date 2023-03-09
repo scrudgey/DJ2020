@@ -5,8 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class MaterialController {
-    enum State { opaque, transparent, fadeOut, fadeIn }
-    State state;
+    public enum State { opaque, transparent, fadeOut, fadeIn }
+    public State state;
     public List<Renderer> childRenderers;
     public GameObject gameObject;
     public Collider collider;
@@ -14,81 +14,108 @@ public class MaterialController {
     public TagSystemData tagSystemData;
     public float timer;
     public bool disableBecauseInterloper;
-    public bool disableBecauseAbove;
-    public float ceilingHeight = 1.5f;
+    public bool disableRender;
+    public float ceilingHeight = 1.75f;
     public float targetAlpha;
     public bool updatedThisLoop;
+    float maxExtent;
+    Vector3 anchorOffset;
     Dictionary<Renderer, Material> normalMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, Material> interloperMaterials = new Dictionary<Renderer, Material>();
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
+    Dictionary<Renderer, string> initialSortingLayers = new Dictionary<Renderer, string>();
     public MaterialController(Collider collider, CharacterCamera camera) {
         this.camera = camera;
-        this.gameObject = collider.gameObject;
+        this.gameObject = collider.transform.root.gameObject;
         this.tagSystemData = Toolbox.GetTagData(collider.gameObject);
         this.childRenderers = new List<Renderer>();
-        this.childRenderers = new List<Renderer>(gameObject.GetComponentsInChildren<Renderer>())
+        this.childRenderers = new List<Renderer>(gameObject.transform.root.GetComponentsInChildren<Renderer>())
                                     .Where(x => x != null &&
                                                 !(x is ParticleSystemRenderer) &&
                                                 !(x is LineRenderer)
-                                                // !(x is SpriteRenderer) &&
                                                 )
                                     .ToList();
         this.collider = collider;
+        maxExtent = collider.bounds.extents.x;
+        maxExtent = Mathf.Max(maxExtent, collider.bounds.extents.y);
+        maxExtent = Mathf.Max(maxExtent, collider.bounds.extents.z);
+
+        anchorOffset = collider.bounds.center - gameObject.transform.position;
+        Transform findAnchor = gameObject.transform.Find("clearSighterAnchor");
+        if (findAnchor != null) {
+            anchorOffset = findAnchor.position - gameObject.transform.position;
+        }
+
         this.state = State.opaque;
-        this.disableBecauseAbove = false;
+        this.disableRender = false;
         this.disableBecauseInterloper = false;
         this.timer = 0f;
         this.targetAlpha = 1f;
         this.updatedThisLoop = false;
         foreach (Renderer renderer in childRenderers) {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
-            normalMaterials[renderer] = renderer.material;
-            if (renderer.material != null) {
-                Texture albedo = renderer.material.mainTexture;
-                Material interloperMaterial = new Material(renderer.material);
-                // interloperMaterial.shader = Resources.Load("Scripts/shaders/Interloper") as Shader;
+            normalMaterials[renderer] = renderer.sharedMaterial;
+            initialSortingLayers[renderer] = LayerMask.LayerToName(renderer.gameObject.layer);
+            if (renderer.sharedMaterial != null) {
+                Texture albedo = renderer.sharedMaterial.mainTexture;
+                Material interloperMaterial = new Material(renderer.sharedMaterial);
                 interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
                 interloperMaterial.SetTexture("_Texture", albedo);
                 // interloperMaterial.SetFloat("_Smoothness", 0);
                 // interloperMaterial.SetFloat("_Glossiness", 0);
-                // interloperMaterial
-                // Debug.Log("loaded interloper material " + interloperMaterial);
                 interloperMaterials[renderer] = interloperMaterial;
             }
         }
 
     }
+    Vector3 anchorPosition() {
+        return gameObject.transform.position + anchorOffset;
+    }
     public void InterloperStart() {
         timer = 0.1f;
     }
-    public void CeilingCheck(Vector3 playerPosition, Plane cullingPlane, float floorHeight) {
-        if (collider.bounds.center.y < playerPosition.y + 0.05f || collider.bounds.center.y < floorHeight) {
-            disableBecauseAbove = false;
-            return;
+    public bool CeilingCheck(Vector3 playerPosition, float floorHeight, bool debug = false) {
+        Vector3 anchor = anchorPosition();
+        float otherFloorY = anchor.y - collider.bounds.extents.y;
+        float directionY = otherFloorY - playerPosition.y;
+        // if (debug)
+        // Debug.Log($"[MaterialController] {gameObject} {directionY} {anchor.position.y} < {playerPosition.y} = {anchor.position.y < playerPosition.y} {anchor.position.y < playerPosition.y + 0.05f}");
+
+        if (anchor.y < playerPosition.y + 0.05f || anchor.y < floorHeight) {
+            // disableRender = false;
+            return false;
         }
 
-        float otherFloorY = collider.bounds.center.y - collider.bounds.extents.y;
-        float directionY = otherFloorY - playerPosition.y;
-        // Debug.Log($"[MaterialController] {gameObject} {direction} {direction.y > ceilingHeight} {collider.bounds.center} {collider.bounds.extents.y} {collider.bounds.center.y < playerPosition.y} ");
-        if (cullingPlane.GetSide(collider.bounds.center) && (collider.bounds.center.y - playerPosition.y > ceilingHeight * 1.5)) {
-            disableBecauseAbove = true;
-        } else if (directionY > ceilingHeight) {
-            disableBecauseAbove = true;
+        // between camera and player and above player
+        // if (cullingPlane.GetSide(collider.bounds.center) && (collider.bounds.center.y - playerPosition.y > ceilingHeight * 1.5)) {
+        //     // disableRender = true;
+        //     return true;
+        // } else 
+        if (directionY > ceilingHeight) {
+            // above player
+            return true;
+
         } else {
-            disableBecauseAbove = false;
+            return false;
         }
     }
     public void MakeFadeOut() {
         if (state == State.transparent || state == State.fadeOut)
             return;
         state = State.fadeOut;
-        // Debug.Log($"fadeout: {gameObject}");
-        // TODO: not working?
         foreach (Renderer renderer in childRenderers) {
             if (renderer == null || interloperMaterials[renderer] == null || renderer.CompareTag("donthide"))
                 continue;
+            if (renderer is SpriteRenderer) {
+                renderer.gameObject.layer = LayerUtil.GetLayer(Layer.clearsighterHide);
+                continue;
+            }
             renderer.material = interloperMaterials[renderer];
-            renderer.material.SetFloat("_TargetAlpha", 1);
+            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(propBlock);
+            // renderer.material.SetFloat("_TargetAlpha", 1);
+            propBlock.SetFloat("_TargetAlpha", 1);
+            renderer.SetPropertyBlock(propBlock);
             targetAlpha = 1;
         }
     }
@@ -103,10 +130,14 @@ public class MaterialController {
         state = State.opaque;
         timer = 0f;
         disableBecauseInterloper = false;
-        disableBecauseAbove = false;
+        disableRender = false;
         foreach (Renderer renderer in childRenderers) {
             if (renderer == null || normalMaterials[renderer] == null)
                 return;
+            if (renderer is SpriteRenderer) {
+                renderer.gameObject.layer = LayerMask.NameToLayer(initialSortingLayers[renderer]);
+                continue;
+            }
             renderer.material = normalMaterials[renderer];
         }
     }
@@ -120,16 +151,16 @@ public class MaterialController {
         } else {
             disableBecauseInterloper = true;
         }
-        float minimumAlpha = disableBecauseAbove ? 0f : (1f * (offAxisLength / 2f));
+        float minimumAlpha = disableRender ? 0f : (1f * (offAxisLength / (maxExtent * 2)));
         if (state == State.fadeIn) {
             if (targetAlpha < 1) {
-                targetAlpha += Time.unscaledDeltaTime * 3f;
+                targetAlpha += Time.unscaledDeltaTime * 10f;
             } else {
                 MakeOpaque();
             }
         } else if (state == State.fadeOut) {
             if (targetAlpha > minimumAlpha) {
-                targetAlpha -= Time.unscaledDeltaTime * 3f;
+                targetAlpha -= Time.unscaledDeltaTime * 10f;
                 targetAlpha = Mathf.Max(targetAlpha, minimumAlpha);
             } else {
                 targetAlpha = minimumAlpha;
@@ -149,24 +180,33 @@ public class MaterialController {
         } else {
             MakeFadeIn();
         }
+        // if (gameObject != null && gameObject.name.ToLower().Contains("npc"))
+        //     Debug.Log($"[update 2] {gameObject} {gameObject.transform.position} {childRenderers.Count} {active()} {state} {targetAlpha}");
         if (state == State.fadeIn || state == State.fadeOut) {
             foreach (Renderer renderer in childRenderers) {
                 if (renderer == null || !renderer.enabled || renderer.CompareTag("donthide"))
                     continue;
-                renderer.material.SetFloat("_TargetAlpha", targetAlpha);
-                if (targetAlpha <= 0.01) {
+                if (renderer is SpriteRenderer) {
+                    renderer.gameObject.layer = LayerUtil.GetLayer(Layer.clearsighterHide);
+                    continue;
+                }
+                if (targetAlpha <= 0.1) {
                     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
                     renderer.material = normalMaterials[renderer];
                 } else {
                     renderer.shadowCastingMode = initialShadowCastingMode[renderer];
                     renderer.material = interloperMaterials[renderer];
-                    renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+                    // renderer.material.SetFloat("_TargetAlpha", targetAlpha);
+                    MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                    renderer.GetPropertyBlock(propBlock);
+                    // renderer.material.SetFloat("_TargetAlpha", 1);
+                    propBlock.SetFloat("_TargetAlpha", targetAlpha);
+                    renderer.SetPropertyBlock(propBlock);
                 }
-                // Debug.Log($"{gameObject} disableBecauseInterloper: {disableBecauseInterloper} disableBecauseAbove: {disableBecauseAbove} targetAlpha: {targetAlpha} shadowcasting: {renderer.shadowCastingMode}");
             }
         }
     }
 
     public bool active() => (disableBecauseInterloper && !tagSystemData.bulletPassthrough && !tagSystemData.dontHideInterloper) ||
-                (disableBecauseAbove && !tagSystemData.dontHideAbove);
+                (disableRender && !tagSystemData.dontHideAbove);
 }

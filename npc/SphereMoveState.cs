@@ -5,8 +5,10 @@ public class SphereMoveState : SphereControlState {
     public static readonly string RANDOM_POSITION_KEY = "randomPosition";
     private TaskNode rootTaskNode;
     private SphereCollider patrolZone;
-    public SphereMoveState(SphereRobotAI ai, SphereCollider sphere) : base(ai) {
+    CharacterController characterController;
+    public SphereMoveState(SphereRobotAI ai, SphereCollider sphere, CharacterController characterController) : base(ai) {
         this.patrolZone = sphere;
+        this.characterController = characterController;
     }
 
     public override void Enter() {
@@ -16,7 +18,7 @@ public class SphereMoveState : SphereControlState {
     }
     void SetupRootNode() {
         rootTaskNode = new TaskRepeaterDecorator(new Sequence(
-            new TaskMoveToKey(owner.transform, RANDOM_POSITION_KEY, owner.physicalKeys),
+            new TaskMoveToKey(owner.transform, RANDOM_POSITION_KEY, owner.physicalKeys, characterController),
             new TaskTimerDectorator(2f),
             new TaskSetKey<Vector3>(RANDOM_POSITION_KEY, randomPoint)
         ));

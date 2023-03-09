@@ -33,12 +33,7 @@ public class SphereHoldAtGunpointState : SphereControlState {
             if (integratedPlayerMovement <= 0) {
                 owner.StateFinished(this);
             } else if (isPlayerSuspicious()) {
-                SuspicionRecord record = new SuspicionRecord() {
-                    content = "fled from questioning",
-                    suspiciousness = Suspiciousness.aggressive,
-                    lifetime = 60f,
-                    maxLifetime = 60f
-                };
+                SuspicionRecord record = SuspicionRecord.fledSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
                 owner.StateFinished(this);
             }
@@ -48,12 +43,7 @@ public class SphereHoldAtGunpointState : SphereControlState {
         } else {
             // apply suspicion record
             // transfer to attack state
-            SuspicionRecord record = new SuspicionRecord() {
-                content = "fled from questioning",
-                suspiciousness = Suspiciousness.aggressive,
-                lifetime = 60f,
-                maxLifetime = 60f
-            };
+            SuspicionRecord record = SuspicionRecord.fledSuspicion();
             GameManager.I.AddSuspicionRecord(record);
             owner.StateFinished(this);
             integratedPlayerMovement += 1.5f * Time.deltaTime;

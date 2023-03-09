@@ -1,16 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class DialogueController : MonoBehaviour {
     public enum DialogueResult { success, fail, stun }
     DialogueResult dialogueResult;
     static public Action<DialogueResult> OnDialogueConclude;
-
+    public float currentThreshold;
     public GameObject UIEditorCamera;
     public Transform responsesContainer;
     public Image leftPortrait;
@@ -39,6 +39,7 @@ public class DialogueController : MonoBehaviour {
     public AudioClip[] nextDialogueSound;
     public AudioClip[] openSkillCheckSound;
     DialogueInput input;
+    Stack<SuspicionRecord> unresolvedSuspicionRecords;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
         ClearResponseContainer();
@@ -81,6 +82,8 @@ public class DialogueController : MonoBehaviour {
     public IEnumerator DoInitialize(DialogueInput input) {
         CharacterController playerController = input.playerObject.GetComponentInChildren<CharacterController>();
         CharacterController npcController = input.npcObject.GetComponentInChildren<CharacterController>();
+        unresolvedSuspicionRecords = new Stack<SuspicionRecord>(input.suspicionRecords.Values);
+        currentThreshold = 25f;
 
         Vector3 playerPosition = input.playerObject.transform.position;
         Vector3 npcPosition = input.npcObject.transform.position;
@@ -103,10 +106,20 @@ public class DialogueController : MonoBehaviour {
 
         this.input = input;
         SetStatusContainers(input);
-        SetInitialDialogueResponses(input);
-        SetInitialNPCDialogue(input);
         SetPortraits(input);
+
+        ClearDialogueContainer();
+        SuspicionRecord identityChallenge = SuspicionRecord.identitySuspicion(input);
+        StartNextChallenge(manualSuspicionRecord: identityChallenge);
+
         yield return null;
+    }
+
+    void StartNextChallenge(SuspicionRecord manualSuspicionRecord = null) {
+        ClearResponseContainer();
+        SuspicionRecord nextRecord = manualSuspicionRecord == null ? unresolvedSuspicionRecords.Pop() : manualSuspicionRecord;
+        SetNPCChallenge(input, nextRecord);
+        SetDialogueResponses(input, nextRecord);
     }
     public void SetPortraits(DialogueInput input) {
         leftPortrait.sprite = input.NPCAI.portrait;
@@ -163,25 +176,46 @@ public class DialogueController : MonoBehaviour {
         SetAppearance(input);
     }
 
-    public void SetInitialDialogueResponses(DialogueInput input) {
-        ClearResponseContainer();
-        // TODO: data driven.
-        StartCoroutine(CreateMultipleDialogues());
+    void SetNPCChallenge(DialogueInput input, SuspicionRecord record) {
+        // SetLeftDialogueText("You there, stop! You're not authorized to be in this area! Show me your identification!");
+        SetLeftDialogueText(record.dialogue.challenge);
     }
-    public IEnumerator CreateMultipleDialogues() {
+    void SetDialogueResponses(DialogueInput input, SuspicionRecord record) {
+        StartCoroutine(CreateMultipleResponses(record.dialogue.tactics));
+    }
+    IEnumerator CreateMultipleResponses(List<DialogueTactic> tactics) {
         float interval = 0.1f;
+        foreach (DialogueTactic tactic in tactics) {
+            CreateResponse(tactic);
+            yield return new WaitForSecondsRealtime(interval);
+        }
         CreateDialogueResponse("<color=#ff4757>[ESCAPE]</color> Excuse me, I think I left my identification in my car.", EscapeDialogueResponseCallback);
-        yield return new WaitForSecondsRealtime(interval);
-        CreateDialogueResponse("<color=#ffa502>[LIE]</color> I am P.J. Pennypacker, security inspector.", LieDialogueResponseCallback);
-        yield return new WaitForSecondsRealtime(interval);
-        CreateDialogueResponse("<color=#ffa502>[BLUFF]</color> Rockwell isn't going to be very happy if you delay our meeting!", BluffDialogueResponseCallback);
-        yield return new WaitForSecondsRealtime(interval);
-        CreateDialogueResponse("<color=#ffa502>[ITEM]</color> Sure, check my ID card.", EndDialogueResponseCallback);
     }
-    public void SetInitialNPCDialogue(DialogueInput input) {
-        ClearDialogueContainer();
-        SetLeftDialogueText("You there, stop! You're not authorized to be in this area! Show me your identification!");
+    void CreateResponse(DialogueTactic tactic) {
+        string colorString = tactic.tacticType switch {
+            DialogueTacticType.bluff or DialogueTacticType.lie or DialogueTacticType.redirect => "<color=#ffa502>",
+            DialogueTacticType.challenge or DialogueTacticType.escape or DialogueTacticType.deny => "<color=#ff4757>",
+            DialogueTacticType.item => "<color=#2ed573>",
+            _ => "<color=#ffa502>"
+        };
+        string prefixString = tactic.tacticType switch {
+            DialogueTacticType.bluff => "[BLUFF]",
+            DialogueTacticType.challenge => "[CHALLENGE]",
+            DialogueTacticType.deny => "[DENY]",
+            DialogueTacticType.escape => "[ESCAPE]",
+            DialogueTacticType.item => "[ITEM]",
+            DialogueTacticType.lie => "[LIE]",
+            DialogueTacticType.redirect => "[REDIRECT]",
+            _ => ""
+        };
+        string content = $"{colorString}{prefixString}</color> {tactic.content}";
+        Action<DialogueResponseButton> callback = tactic.tacticType switch {
+            DialogueTacticType.escape => EscapeDialogueResponseCallback,
+            _ => (DialogueResponseButton dialogueResponseButton) => TacticResponseCallback(dialogueResponseButton, tactic)
+        };
+        CreateDialogueResponse(content, callback);
     }
+
     public void CreateDialogueResponse(string response, Action<DialogueResponseButton> responseCallback) {
         GameObject responseObj = GameObject.Instantiate(responsePrefab);
         responseObj.transform.SetParent(responsesContainer, false);
@@ -192,49 +226,54 @@ public class DialogueController : MonoBehaviour {
         dialogueResult = DialogueResult.stun;
         EndDialogueResponseCallback(dialogueResponseButton);
     }
-    public void LieDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
+    public void TacticResponseCallback(DialogueResponseButton dialogueResponseButton, DialogueTactic tactic) {
         SetRightDialogueText(dialogueResponseButton.response);
         ClearResponseContainer();
+
+        string resultString = tactic.tacticType switch {
+            DialogueTacticType.bluff => "bluff called",
+            DialogueTacticType.challenge => "tried to intimidate a guard",
+            DialogueTacticType.deny => "obvious denial of facts",
+            // DialogueTacticType.escape => "[ESCAPE]",
+            DialogueTacticType.item => "used counterfeit credentials",
+            DialogueTacticType.lie => "caught in a lie",
+            DialogueTacticType.redirect => "shadiness",
+            _ => "general awkwardness"
+        };
+
+        // TODO: responses driven by the specific check
         var input = new SkillCheckDialogue.SkillCheckInput {
-            checkType = "Lie",
-            successResponse = "Yes, that sounds right. Ok then.",
-            failResponse = "I don't think so.",
-            suspicion = "identity discovered"
+            checkType = tactic.tacticType.ToString(),
+            successResponse = tactic.successResponse,
+            failResponse = tactic.failResponse,
+            suspicion = resultString,
+            threshold = currentThreshold
         };
+
         Action<DialogueResponseButton> callback = (DialogueResponseButton button) => {
-            ActivateSkillCheck(input);
+            if (tactic.tacticType == DialogueTacticType.item) {
+                ByPassSkillCheck(input);
+            } else {
+                ActivateSkillCheck(input);
+            }
         };
+
         CreateDialogueResponse("[CONTINUE]", callback);
     }
-    public void BluffDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
-        SetRightDialogueText(dialogueResponseButton.response);
-        ClearResponseContainer();
-        var input = new SkillCheckDialogue.SkillCheckInput {
-            checkType = "Bluff",
-            successResponse = "I'm sorry, I didn't mean to intrude. Carry on.",
-            failResponse = "Rockwell, eh? Let's see what he has to say about it.",
-            suspicion = "bluff called"
-        };
-        Action<DialogueResponseButton> callback = (DialogueResponseButton button) => {
-            ActivateSkillCheck(input);
-        };
-        CreateDialogueResponse("[CONTINUE]", callback);
-    }
+
     public void EndDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
-        SuspicionRecord record = new SuspicionRecord() {
-            content = "fled from questioning",
-            suspiciousness = Suspiciousness.aggressive,
-            lifetime = 60f,
-            maxLifetime = 60f
-        };
+        SuspicionRecord record = SuspicionRecord.fledSuspicion();
         GameManager.I.AddSuspicionRecord(record);
         SetRightDialogueText(dialogueResponseButton.response);
         ClearResponseContainer();
         CreateDialogueResponse("[CONTINUE]", DialogueEndCallback);
     }
     public void DialogueEndCallback(DialogueResponseButton dialogueResponseButton) {
-        Debug.Log("end");
         Conclude();
+    }
+    public void DialogueNextChallengeCallback(DialogueResponseButton dialogueResponseButton) {
+        // Conclude();
+        StartNextChallenge();
     }
     public void SetLeftDialogueText(string content) {
         Toolbox.RandomizeOneShot(audioSource, nextDialogueSound, randomPitchWidth: 0.05f);
@@ -305,6 +344,13 @@ public class DialogueController : MonoBehaviour {
         skillCheckDialogue.Initialize(HandleSkillCheckResult, input);
         StartCoroutine(PulseDoubterColor());
     }
+    public void ByPassSkillCheck(SkillCheckDialogue.SkillCheckInput input) {
+        HandleSkillCheckResult(new SkillCheckDialogue.SkillCheckResult {
+            type = SkillCheckDialogue.SkillCheckResult.ResultType.success,
+            input = input,
+            advanceThreshold = false
+        });
+    }
     void HandleSkillCheckResult(SkillCheckDialogue.SkillCheckResult result) {
         skillCheckDialogue.gameObject.SetActive(false);
         responsesContainer.gameObject.SetActive(true);
@@ -328,7 +374,17 @@ public class DialogueController : MonoBehaviour {
                 break;
         }
         ClearResponseContainer();
-        CreateDialogueResponse("[CONTINUE]", DialogueEndCallback);
+
+        if (result.advanceThreshold) {
+            currentThreshold = (100 + 2f * currentThreshold) / 3f;
+        }
+        if (dialogueResult == DialogueResult.fail) {
+            CreateDialogueResponse("[CONTINUE]", DialogueEndCallback);
+        } else if (unresolvedSuspicionRecords.Count > 0) {
+            CreateDialogueResponse("[CONTINUE]", DialogueNextChallengeCallback);
+        } else {
+            CreateDialogueResponse("[CONTINUE]", DialogueEndCallback);
+        }
     }
     public IEnumerator PulseDoubterColor() {
         doubterText.enabled = true;

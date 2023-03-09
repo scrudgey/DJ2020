@@ -37,14 +37,14 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
             _ => skin.unarmedSpriteData
         };
-        if (input.isProne || input.hitState == HitState.dead) { // crawling
+        if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
             torsoSpriteDatas = skin.unarmedSpriteData;
         }
         try {
             SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
 
-            Vector3 offset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
-            headAnimation.transform.localPosition = offset;
+            Vector3 headOffset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
+            headAnimation.transform.localPosition = headOffset;
             headAnimation.UpdateView(input, torsoSpriteData);
             return torsoSpriteData;
         }

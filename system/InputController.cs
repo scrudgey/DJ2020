@@ -8,17 +8,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
-public class InputController : MonoBehaviour {
-    // TODO: input mode could belong to me?
-
+public class InputController : Singleton<InputController> {
     public CharacterCamera OrbitCamera;
-
-    // have to do it this way because unity inspector doesn't know how to expose a list of interfaces
-    public List<GameObject> inputTargets;
     public List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
 
     [Header("Inputs")]
-    public InputActionReference escapeAction;
+    // public InputActionReference escapeAction;
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
     public InputActionReference AimAction;
@@ -62,9 +57,9 @@ public class InputController : MonoBehaviour {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
-    private bool escapePressedThisFrame;
-    private bool escapePressConsumed;
-
+    // private bool escapePressedThisFrame;
+    // private bool escapePressConsumed;
+    Vector2 previousMouseDelta;
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
     }
@@ -72,9 +67,9 @@ public class InputController : MonoBehaviour {
         firePressedThisFrame = ctx.ReadValueAsButton();
         firePressedHeld = ctx.ReadValueAsButton();
     }
-    public void HandleEscapeAction(InputAction.CallbackContext ctx) {
-        escapePressedThisFrame = ctx.ReadValueAsButton();
-    }
+    // public void HandleEscapeAction(InputAction.CallbackContext ctx) {
+    //     escapePressedThisFrame = ctx.ReadValueAsButton();
+    // }
     public void HandleAimAction(InputAction.CallbackContext ctx) {
         aimPressedThisFrame = ctx.ReadValueAsButton();
     }
@@ -170,16 +165,17 @@ public class InputController : MonoBehaviour {
         jumpHeld = false;
         jumpReleasedThisFrame = true;
     }
-    public void Awake() {
+    public void Start() {
         RegisterCallbacks();
     }
-    void OnDestroy() {
+    override public void OnDestroy() {
         DeregisterCallbacks();
+        base.OnDestroy();
     }
 
     void RegisterCallbacks() {
         // Escape
-        escapeAction.action.performed += HandleEscapeAction;
+        // escapeAction.action.performed += HandleEscapeAction;
         // Move
         MoveAction.action.performed += HandleMoveAction;
         // Fire
@@ -222,7 +218,7 @@ public class InputController : MonoBehaviour {
     }
     void DeregisterCallbacks() {
         // Escape
-        escapeAction.action.performed -= HandleEscapeAction;
+        // escapeAction.action.performed -= HandleEscapeAction;
         // Move
         MoveAction.action.performed -= HandleMoveAction;
         // Fire
@@ -264,15 +260,17 @@ public class InputController : MonoBehaviour {
         JumpAction.action.canceled -= HandleJumpActionCanceled;
     }
 
-    public PlayerInput HandleCharacterInput(bool pointerOverUIElement) {
-        if (!escapePressedThisFrame && escapePressConsumed) {
-            escapePressConsumed = false;
-        }
-        if (escapePressedThisFrame && !escapePressConsumed) {
-            escapePressedThisFrame = false;
-            GameManager.I.HandleEscapePressed();
-            escapePressConsumed = true;
-        }
+    public PlayerInput HandleCharacterInput(bool pointerOverUIElement, bool escapePressedThisFrame) {
+        // if (!escapePressedThisFrame && escapePressConsumed) {
+        //     escapePressConsumed = false;
+        // }
+        // if (escapePressedThisFrame && !escapePressConsumed) {
+        //     escapePressConsumed = GameManager.I.HandleEscapePressed();
+        //     if (escapePressConsumed) {
+        //         escapePressedThisFrame = false;
+        //     }
+        //     // escapePressConsumed = true;
+        // }
         mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;
         if (pointerOverUIElement) {
             firePressedThisFrame = false;
@@ -281,6 +279,8 @@ public class InputController : MonoBehaviour {
 
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+        if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
+
         CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;
         foreach (IInputReceiver i in inputReceivers) {
@@ -311,7 +311,8 @@ public class InputController : MonoBehaviour {
                 rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
                 lookAtDirection = directionToCursor,
                 zoomInput = zoomInput,
-                mouseDown = mouseDown
+                mouseDown = mouseDown,
+                escapePressed = escapePressedThisFrame //&& !escapePressConsumed
             };
             i.SetInputs(characterInputs);
         }
@@ -334,7 +335,8 @@ public class InputController : MonoBehaviour {
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
         escapePressedThisFrame = false;
-
+        // escapePressConsumed = false;
+        previousMouseDelta = mouseDelta;
         return characterInputs;
     }
 

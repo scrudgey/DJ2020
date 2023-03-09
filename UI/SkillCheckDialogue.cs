@@ -10,6 +10,7 @@ public class SkillCheckDialogue : MonoBehaviour {
         public enum ResultType { success, fail }
         public ResultType type;
         public SkillCheckInput input;
+        public bool advanceThreshold;
     }
     public struct SkillCheckInput {
         public string checkType;
@@ -46,8 +47,7 @@ public class SkillCheckDialogue : MonoBehaviour {
     }
 
     IEnumerator ProcessSkillCheck(SkillCheckInput input) {
-        // TODO: set threshold based on state / input
-        float threshold = 25f;
+        float threshold = input.threshold;
         float roll = UnityEngine.Random.Range(0f, 100f);
         // float roll = 20f;
         Debug.Log(roll);
@@ -78,12 +78,13 @@ public class SkillCheckDialogue : MonoBehaviour {
             yield return null;
         }
         SetBarLevel((int)(roll / 10f));
-        Debug.Log($"skill check: {roll} / {threshold}");
+        // Debug.Log($"skill check: {roll} / {threshold}");
 
         // TODO: set response
         SkillCheckResult result = new SkillCheckResult {
             type = roll > threshold ? SkillCheckResult.ResultType.success : SkillCheckResult.ResultType.fail,
             input = input,
+            advanceThreshold = true
         };
         thresholdText.color = disabled;
         switch (result.type) {

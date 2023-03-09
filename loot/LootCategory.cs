@@ -1,0 +1,1 @@
+public enum LootCategory { none, drug, industrial, medical, gem, commercial }
