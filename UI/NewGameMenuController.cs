@@ -22,14 +22,7 @@ public class NewGameMenuController : MonoBehaviour {
 
     void StartNewGame(string filename) {
         // todo: check for collision with existing save file
-        GameData data = GameData.TestInitialData() with {
-            filename = filename
-        };
 
-        GameManager.I.gameData = data;
-
-        GameManager.I.SaveGameData();
-
-        GameManager.I.ReturnToApartment();
+        GameManager.I.StartNewGame(filename);
     }
 }

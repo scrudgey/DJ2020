@@ -8,6 +8,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     // TODO: serializer for this
     public SerializableDictionary<LootData, int> loots;
+    public List<PayData> payDatas;
+
     // skin
     public string legSkin { get; set; }
     public string bodySkin { get; set; }
@@ -51,8 +53,6 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     public HashSet<int> physicalKeys;
 
-    // TODO: converter for list
-    public List<PayData> payDatas;
 
 
     public static PlayerState DefaultState() {
@@ -76,7 +76,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         List<BaseItem> allItems = new List<BaseItem> {
             ItemInstance.LoadItem("deck"),
             ItemInstance.LoadItem("tools"),
-            ItemInstance.LoadItem("C4")
+            // ItemInstance.LoadItem("C4")
         };
 
         return new PlayerState() {

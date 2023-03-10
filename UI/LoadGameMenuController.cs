@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 public class LoadGameMenuController : MonoBehaviour {
     public TitleController titleController;
@@ -22,11 +23,15 @@ public class LoadGameMenuController : MonoBehaviour {
 
         FileInfo[] Files = d.GetFiles(); //Getting Text files
 
-        foreach (FileInfo file in Files) {
-            Debug.Log(file.Name);
-            if (file.Name == ".DS_Store") continue;
-            Debug.Log($"loading {file.FullName}");
-            GameData saveData = GameData.Load(file.Name);
+        List<GameData> saveDatas = Files
+            .Where(file => file.Name != ".DS_Store")
+            .Select(file => GameData.Load(file.Name))
+            .OrderBy(data => data.lastPlayedTime)
+            .Reverse()
+            .ToList();
+
+        foreach (GameData saveData in saveDatas) {
+            // Debug.Log(file.Name);
             GameObject loadButton = GameObject.Instantiate(loadButtonPrefab);
             SaveGameSelectorButton saveGameSelectorButton = loadButton.GetComponent<SaveGameSelectorButton>();
             saveGameSelectorButton.Initialize(this, saveData);
@@ -34,11 +39,7 @@ public class LoadGameMenuController : MonoBehaviour {
         }
     }
     public void LoadButtonCallback(GameData data) {
-        // handle load
-        Debug.Log($"load {data.filename}");
-        GameManager.I.gameData = data;
-        GameManager.I.CloseMenu();
-        GameManager.I.ReturnToApartment();
+        GameManager.I.LoadGame(data);
     }
 
     public void CancelButtonCallback() {

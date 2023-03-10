@@ -2016,6 +2016,21 @@ note: layer "interactive"
     * item shop
     * akira alley
 * use allGuns in loadout editor
+* main game loop
+    * save / load game data
+        * choose filename
+        * create new save file:
+            * set gamedata: new gamedata. set filename.
+            * save gamedata to disk
+    * load game:
+        * show existing save files
+        * choose one
+            * set gameData
+            * jump to apartment
+    * save game:
+        * serialize gamedata to filename
+* GameData has filename field
+* save game on level exit
 
 
 
@@ -2445,6 +2460,7 @@ world layout:
         * items: could work
     * underneath apartment:
         * weapons
+        
     upstairs:
         importer / exporter who buys things.
         also he is a connection that will give you tips or sometimes a deal.
@@ -2516,43 +2532,38 @@ storeowner AI
     different from SphereRobot, but still uses a state machine.
 
 
-main game loop
-    save / load game data
+* track playtime, last played
+* reset timeplayed on newgame, load
+* save game from menu
+* sort load menu by last play time
 
-    new game: 
-        choose filename
-            ensure none already exists
-        create new save file:
-            set gamedata: new gamedata. set filename.
-            save gamedata to disk
-    load game:
-        show existing save files
-        choose one
-            set gameData
-            jump to apartment
-    save game:
-        serialize gamedata to filename
-
-
-
-* GameData has filename field
-* save game on level exit
-save game from menu
-set player name field in dialogue
-
-create all shops
+new game: 
+    ensure none already exists
+    ensure filename nonempty
+    random name?
 
 serialize lists of references
+mission fail: jump back to apartment
+set player name field in dialogue
 hide tertiary slot in loadout editor
+display image or text when saving
+load -> mission controller is broken
+
+extraction point is out of bounds
+move key from tower rooftop
+plant material is glitched
+
+fix steam page and announce it
+create all shops
 fix vr missions
 upgrade unity
 make a build
 
-mission fail: jump back to apartment
 on level start, zoom out from player spawn
     show span cutscene
-extraction point is out of bounds
-move key from tower rooftop
-plant material is glitched
 AI still had a hard time closing in on me when i was openly shooting and running around
 maybe fall damage from rooftop should be greater
+
+better interface for interacting, hacking
+UI between title, shops, planning is different from UI, pause menu
+    inline & bkg colors, buttons

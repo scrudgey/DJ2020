@@ -1,23 +1,28 @@
 using System;
 using System.Collections.Generic;
+
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
-
 [System.Serializable]
 public record GameData {
     public string filename;
+    public DateTime createdAtTime;
+    public DateTime lastPlayedTime;
+    public float timePlayedInSeconds;
     public GamePhase phase;
     public PlayerState playerState;
     public LevelState levelState;
     public List<string> unlockedLevels;
     public List<string> completedLevels;
-
     public SerializableDictionary<string, LevelPlan> levelPlans;
 
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/levels/test/test") as LevelTemplate;
+        // DateTime.Now;
         return new GameData() {
+            createdAtTime = DateTime.Now,
+            timePlayedInSeconds = 0,
             filename = "test",
             phase = GamePhase.none,
             playerState = PlayerState.DefaultState(),

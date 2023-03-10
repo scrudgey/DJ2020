@@ -20,7 +20,7 @@ public record LevelPlan {
         items = new List<BaseItem> {
             ItemInstance.LoadItem("deck"),
             ItemInstance.LoadItem("tools"),
-            ItemInstance.LoadItem("C4"),
+            // ItemInstance.LoadItem("C4"),
         },
         activeTactics = new List<Tactic>()
         // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }

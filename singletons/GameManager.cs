@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop, mainEscapeMenu }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -82,7 +82,30 @@ public partial class GameManager : Singleton<GameManager> {
         CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
         CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
+    public void StartNewGame(string filename) {
+        timePlayed = 0f;
+
+        GameData data = GameData.TestInitialData() with {
+            filename = filename
+        };
+
+        gameData = data;
+
+        SaveGameData();
+
+        ReturnToApartment();
+    }
+    public void LoadGame(GameData loadData) {
+        Debug.Log($"load {loadData.filename}");
+        timePlayed = 0f;
+        GameManager.I.gameData = loadData;
+        GameManager.I.CloseMenu();
+        GameManager.I.ReturnToApartment();
+    }
     public void SaveGameData() {
+        gameData.timePlayedInSeconds += timePlayed;
+        gameData.lastPlayedTime = DateTime.Now;
+        timePlayed = 0f;
         gameData.Save();
     }
     void HandleShowConsleAction(InputAction.CallbackContext ctx) {
@@ -207,6 +230,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("EscapeMenu", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.mainEscapeMenu:
+                if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
+                    LoadScene("MainEscapeMenu", callback, unloadAll: false);
+                }
+                break;
             case MenuType.gunshop:
                 if (!SceneManager.GetSceneByName("GunShop").isLoaded) {
                     LoadScene("GunShop", callback, unloadAll: false);
@@ -242,6 +270,9 @@ public partial class GameManager : Singleton<GameManager> {
             case MenuType.escapeMenu:
                 uiController.ShowUI();
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscapeMenu"));
+                break;
+            case MenuType.mainEscapeMenu:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("MainEscapeMenu"));
                 break;
             case MenuType.gunshop:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("GunShop"));
@@ -284,6 +315,8 @@ public partial class GameManager : Singleton<GameManager> {
         if (isLoadingLevel)
             return;
 
+        timePlayed += Time.unscaledDeltaTime;
+
         if (toggleConsoleThisFrame) {
             if (activeMenuType != MenuType.console) {
                 ShowMenu(MenuType.console);
@@ -322,6 +355,7 @@ public partial class GameManager : Singleton<GameManager> {
         if (gameData.phase == GamePhase.world) {
             if (activeMenuType == MenuType.none) {
                 // TODO: show world pause menu
+                ShowMenu(MenuType.mainEscapeMenu);
             } else {
                 DoEscapeMenus();
             }
@@ -340,8 +374,10 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     void DoEscapeMenus() {
-        if (activeMenuType == MenuType.console || activeMenuType == MenuType.escapeMenu || activeMenuType == MenuType.missionSelect) {
-            // none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect
+        if (activeMenuType == MenuType.console ||
+            activeMenuType == MenuType.escapeMenu ||
+            activeMenuType == MenuType.missionSelect ||
+            activeMenuType == MenuType.mainEscapeMenu) {
             GameManager.I.CloseMenu();
         }
     }

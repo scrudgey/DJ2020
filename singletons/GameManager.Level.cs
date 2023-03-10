@@ -15,7 +15,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Dictionary<string, CyberComponent> cyberComponents;
     public static Dictionary<string, AlarmComponent> alarmComponents;
     NPCSpawnPoint strikeTeamSpawnPoint;
-
+    float timePlayed;
     List<AsyncOperation> scenesLoading;
     public bool isLoadingLevel;
     void Awake() {
