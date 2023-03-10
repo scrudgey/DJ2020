@@ -33,4 +33,8 @@ public class MissionFailMenuController : MonoBehaviour {
         LevelPlan plan = gameData.GetLevelPlan(gameData.levelState.template);
         GameManager.I.LoadMission(gameData.levelState.template, plan);
     }
+    public void ApartmentButtonCallback() {
+        GameManager.I.CloseMenu();
+        GameManager.I.ReturnToApartment();
+    }
 }

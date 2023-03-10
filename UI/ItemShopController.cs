@@ -25,6 +25,8 @@ public class ItemShopController : MonoBehaviour {
     public TextMeshProUGUI dialogueText;
     public LayoutElement dialogueLeftSpacer;
     public LayoutElement dialogueRightSpacer;
+    public TextMeshProUGUI leftDialogueName;
+    public TextMeshProUGUI rightDialogueName;
     [Header("sounds")]
     public AudioSource audioSource;
     public AudioClip[] buySound;
@@ -40,6 +42,8 @@ public class ItemShopController : MonoBehaviour {
         DestroyImmediate(UIEditorCamera);
     }
     public void Start() {
+        rightDialogueName.text = GameManager.I.gameData.filename;
+        leftDialogueName.text = "seller";
         itemSaleData = LoadItemSaleData();
         ClearInitialize();
     }

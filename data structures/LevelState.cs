@@ -33,7 +33,11 @@ public class LevelState {
     };
 
     public bool anyAlarmActive() {
-        return delta.alarmGraph.anyAlarmActive();
+        if (delta == null || delta.alarmGraph == null) {
+            return false;
+        } else {
+            return delta.alarmGraph.anyAlarmActive();
+        }
     }
 
     public static string LevelDataPath(string levelName, bool includeDataPath = true) {

@@ -2536,15 +2536,16 @@ storeowner AI
 * reset timeplayed on newgame, load
 * save game from menu
 * sort load menu by last play time
+* mission fail: jump back to apartment
+* set player name field in dialogue
 
 new game: 
     ensure none already exists
     ensure filename nonempty
     random name?
 
-serialize lists of references
-mission fail: jump back to apartment
-set player name field in dialogue
+? serialize lists of references
+items not making it into mission
 hide tertiary slot in loadout editor
 display image or text when saving
 load -> mission controller is broken
@@ -2554,16 +2555,20 @@ move key from tower rooftop
 plant material is glitched
 
 fix steam page and announce it
+email french guy
 create all shops
 fix vr missions
 upgrade unity
 make a build
 
+enemies hear me easily from below?
 on level start, zoom out from player spawn
     show span cutscene
 AI still had a hard time closing in on me when i was openly shooting and running around
 maybe fall damage from rooftop should be greater
-
 better interface for interacting, hacking
 UI between title, shops, planning is different from UI, pause menu
     inline & bkg colors, buttons
+
+grey button when item view player
+regenerate jack that data map

@@ -14,7 +14,7 @@ public record LevelDelta {
     public ObjectiveStatus objectiveStatus;
     public bool disguise;
     public int npcsSpawned;
-
+    [JsonIgnore]
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
     public HashSet<Objective> failedObjectives;
     public static LevelDelta Empty() => new LevelDelta {

@@ -29,6 +29,8 @@ public class GunShopController : MonoBehaviour {
     public TextMeshProUGUI dialogueText;
     public LayoutElement dialogueLeftSpacer;
     public LayoutElement dialogueRightSpacer;
+    public TextMeshProUGUI leftDialogueName;
+    public TextMeshProUGUI rightDialogueName;
     [Header("buttonbar")]
     public GameObject buyModeButton;
     public GameObject sellModeButton;
@@ -47,6 +49,8 @@ public class GunShopController : MonoBehaviour {
         DestroyImmediate(UIEditorCamera);
     }
     public void Start() {
+        rightDialogueName.text = GameManager.I.gameData.filename;
+        leftDialogueName.text = "seller";
         gunSaleData = LoadGunSaleData();
         ClearInitialize();
         SetBuyMode();
@@ -68,6 +72,7 @@ public class GunShopController : MonoBehaviour {
         };
 
     void ClearInitialize() {
+
         PopulateStoreInventory();
         PopulatePlayerInventory();
         SetPlayerCredits();

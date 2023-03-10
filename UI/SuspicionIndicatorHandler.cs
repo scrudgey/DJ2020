@@ -105,6 +105,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     }
 
     void LateUpdate() {
+        if (GameManager.I.gameData.levelState.template == null) return;
         if (doUpdate) {
             UpdateSensitivity();
 

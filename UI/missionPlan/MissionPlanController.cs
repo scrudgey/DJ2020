@@ -36,7 +36,8 @@ public class MissionPlanController : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, startSound, randomPitchWidth: 0.05f);
         if (debugStart) {
             GameManager.I.gameData = GameData.TestInitialData();
-            LevelTemplate template = LevelTemplate.LoadAsInstance("Jack That Data");
+            // LevelTemplate template = LevelTemplate.LoadAsInstance("Jack That Data");
+            LevelTemplate template = LevelTemplate.LoadResource("Jack That Data");
             Initialize(GameManager.I.gameData, template);
         }
     }

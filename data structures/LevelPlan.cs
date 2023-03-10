@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Items;
+using Newtonsoft.Json;
 using UnityEngine;
 public record LevelPlan {
     public string insertionPointIdn;
     public string extractionPointIdn;
-
     // TODO: converter for list
+    [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> activeTactics;
-
     public List<BaseItem> items;
     public static LevelPlan Default() => new LevelPlan {
         insertionPointIdn = "",

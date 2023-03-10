@@ -387,7 +387,8 @@ public partial class GameManager : Singleton<GameManager> {
         UpdateCursor(uiclick);
         if (Time.timeScale > 0) {
             PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
-            uiController?.UpdateWithPlayerInput(playerInput);
+            if (gameData.levelState != null)
+                uiController?.UpdateWithPlayerInput(playerInput);
         }
         // still not 100% clean here
         CameraInput input = playerCharacterController.BuildCameraInput();

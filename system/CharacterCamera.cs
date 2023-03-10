@@ -248,6 +248,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         } else if (!ignoreAttractor) {
             // check / update Attractor
             foreach (CameraAttractorZone attractor in attractors) {
+                if (attractor == null) continue;
                 if (attractor.sphereCollider.bounds.Contains(input.playerPosition)) {
                     currentAttractor = attractor;
                     camState = CameraState.attractor;

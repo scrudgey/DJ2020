@@ -52,8 +52,11 @@ public class Footsteps : MonoBehaviour {
                     Toolbox.RandomizeOneShot(audioSource, leftFoot, volume: volume);
                 }
 
-                bool player = transform.IsChildOf(GameManager.I.playerObject.transform) &&
+                bool player = false;
+                if (GameManager.I.gameData?.levelState?.delta != null) {
+                    player = transform.IsChildOf(GameManager.I.playerObject.transform) &&
                                 !(GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmActive());
+                }
 
 
                 NoiseData noise = new NoiseData {

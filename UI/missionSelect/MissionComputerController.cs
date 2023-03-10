@@ -47,7 +47,7 @@ public class MissionComputerController : MonoBehaviour {
 
         foreach (string levelName in data.unlockedLevels) {
             if (data.completedLevels.Contains(levelName)) continue;
-            LevelTemplate template = LevelTemplate.LoadAsInstance(levelName);
+            LevelTemplate template = LevelTemplate.LoadResource(levelName);
             CreateMissionButton(template);
             // if (defaultTemplate == null) {
             //     defaultTemplate = template;

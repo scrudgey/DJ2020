@@ -39,4 +39,7 @@ public class LevelTemplate : ScriptableObject {
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/{name}") as LevelTemplate);
     }
+    public static LevelTemplate LoadResource(string name) {
+        return Resources.Load($"data/levels/{name}/{name}") as LevelTemplate;
+    }
 }

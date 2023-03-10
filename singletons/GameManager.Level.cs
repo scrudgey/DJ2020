@@ -23,7 +23,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void LoadVRMission(VRMissionTemplate template) {
         Debug.Log("GameMananger: load VR mission");
-        LevelTemplate levelTemplate = LevelTemplate.LoadAsInstance("test");
+        LevelTemplate levelTemplate = LevelTemplate.LoadResource("test");
 
         // we are modifying an instance here, not the asset on disk.
         // we should perhaps do more to modify the level template based on the vr mission template.
