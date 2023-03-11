@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Items;
 using UnityEngine;
 public class LevelBootstrapper : MonoBehaviour {
     public bool spawnNPCs;
@@ -37,7 +38,10 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapMission() {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
-        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default());
+        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<Items.BaseItem>()));
+
+        level.plan.items.Add(ItemInstance.LoadItem("deck"));
+        level.plan.items.Add(ItemInstance.LoadItem("tools"));
 
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData() with {

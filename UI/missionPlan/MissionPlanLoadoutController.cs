@@ -88,6 +88,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         secondaryHighlight.SetActive(false);
         tertiaryHighlight.SetActive(false);
         // InitializeWeaponPicker();
+        thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
         initialized = true;
     }
 
@@ -258,10 +259,18 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         // GunTemplate[] allGuns = Resources.LoadAll<GunTemplate>("data/guns");
         List<GunState> allGuns = GameManager.I.gameData.playerState.allGuns;
 
-        List<GunState> pistols = allGuns.Where(gun => gun.template.type == GunType.pistol).ToList();
-        List<GunState> smgs = allGuns.Where(gun => gun.template.type == GunType.smg).ToList();
-        List<GunState> rifles = allGuns.Where(gun => gun.template.type == GunType.rifle).ToList();
-        List<GunState> shotguns = allGuns.Where(gun => gun.template.type == GunType.shotgun).ToList();
+        List<GunState> pistols = allGuns.Where(gun => gun.template.type == GunType.pistol)
+            .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
+            .ToList();
+        List<GunState> smgs = allGuns.Where(gun => gun.template.type == GunType.smg)
+            .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
+            .ToList();
+        List<GunState> rifles = allGuns.Where(gun => gun.template.type == GunType.rifle)
+            .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
+            .ToList();
+        List<GunState> shotguns = allGuns.Where(gun => gun.template.type == GunType.shotgun)
+            .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
+            .ToList();
 
         // None button
 

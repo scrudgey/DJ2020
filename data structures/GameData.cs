@@ -20,13 +20,14 @@ public record GameData {
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/levels/test/test") as LevelTemplate;
         // DateTime.Now;
+        PlayerState playerState = PlayerState.DefaultState();
         return new GameData() {
             createdAtTime = DateTime.Now,
             timePlayedInSeconds = 0,
             filename = "test",
             phase = GamePhase.none,
-            playerState = PlayerState.DefaultState(),
-            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
+            playerState = playerState,
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState.allItems)),
             completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
                 "Jack That Data",
@@ -40,7 +41,7 @@ public record GameData {
         if (levelPlans.ContainsKey(template.levelName)) {
             return levelPlans[template.levelName];
         } else {
-            LevelPlan plan = LevelPlan.Default();
+            LevelPlan plan = LevelPlan.Default(playerState.allItems);
             levelPlans[template.levelName] = plan;
             return plan;
         }

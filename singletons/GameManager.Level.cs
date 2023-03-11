@@ -37,7 +37,7 @@ public partial class GameManager : Singleton<GameManager> {
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
             playerState = PlayerState.Instantiate(template.playerState),
-            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default()),
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<Items.BaseItem>())),
         };
 
         // instantiate mission state from template
@@ -47,17 +47,13 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
-
-        gameData = gameData with {
-            levelState = LevelState.Instantiate(template, plan),
-        };
-
+        gameData.levelState = LevelState.Instantiate(template, plan);
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }
 
     public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
-        InitializeLevel(LevelPlan.Default());
+        InitializeLevel(LevelPlan.Default(new List<Items.BaseItem>()));
         TransitionToPhase(GamePhase.levelPlay);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
@@ -105,7 +101,7 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.ShowInteractiveHighlight();
             }, unloadAll: false);
         }
-        InitializePlayerAndController(LevelPlan.Default());
+        InitializePlayerAndController(LevelPlan.Default(new List<Items.BaseItem>()));
         TransitionToPhase(GamePhase.world);
     }
     void HandlePlayerDead(CharacterController npc) {

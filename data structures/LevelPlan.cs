@@ -10,21 +10,26 @@ public record LevelPlan {
     [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> activeTactics;
     public List<BaseItem> items;
-    public static LevelPlan Default() => new LevelPlan {
-        insertionPointIdn = "",
-        extractionPointIdn = "",
-        // items = new string[4] { "deck", "", "", "" },
-        // items = new string[4] { "rocket", "deck", "C4", "tools" },
-        // items = new string[4] { "deck", "C4", "tools", "" },
-        // items = new string[4] { "grenade", "deck", "rocket", "tools" },
-        items = new List<BaseItem> {
-            ItemInstance.LoadItem("deck"),
-            ItemInstance.LoadItem("tools"),
-            // ItemInstance.LoadItem("C4"),
-        },
-        activeTactics = new List<Tactic>()
-        // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
-    };
+    public static LevelPlan Default(List<BaseItem> allItems) {
+        List<BaseItem> itemList = new List<BaseItem>() { null, null, null, null };
+        if (allItems.Count >= 1) {
+            itemList[0] = allItems[0];
+        }
+        if (allItems.Count >= 2) {
+            itemList[1] = allItems[1];
+        }
+        return new LevelPlan {
+            insertionPointIdn = "",
+            extractionPointIdn = "",
+            // items = new string[4] { "deck", "", "", "" },
+            // items = new string[4] { "rocket", "deck", "C4", "tools" },
+            // items = new string[4] { "deck", "C4", "tools", "" },
+            // items = new string[4] { "grenade", "deck", "rocket", "tools" },
+            items = itemList,
+            activeTactics = new List<Tactic>()
+            // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
+        };
+    }
 
     public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);
     public bool startWithFakeID() => activeTactics.Any(tactic => tactic is TacticFakeID);

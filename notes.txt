@@ -2545,8 +2545,10 @@ new game:
     random name?
 
 ? serialize lists of references
-items not making it into mission
-hide tertiary slot in loadout editor
+* items not making it into mission
+* hide tertiary slot in loadout editor
+* initialize level plan using items, guns from gamedata
+
 display image or text when saving
 load -> mission controller is broken
 
@@ -2572,3 +2574,4 @@ UI between title, shops, planning is different from UI, pause menu
 
 grey button when item view player
 regenerate jack that data map
+

@@ -95,7 +95,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // headSkin = "security",
             allGuns = allGuns,
             allItems = allItems,
-            primaryGun = GunState.Instantiate(gun1),
+            primaryGun = gunState1,
             secondaryGun = null,
             tertiaryGun = null,
             activeGun = -1,
