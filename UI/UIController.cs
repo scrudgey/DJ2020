@@ -32,6 +32,7 @@ public class UIController : MonoBehaviour {
     public BurglarCanvasController burglarCanvasController;
     public ObjectiveCanvasController objectiveCanvasController;
     public MissionComputerController missionComputerController;
+    public SaveIndicatorController saveIndicatorController;
     bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -57,6 +58,7 @@ public class UIController : MonoBehaviour {
         HideTerminal();
         HideBurglar();
         HideMissionSelector();
+        saveIndicatorController.HideIndicator();
     }
     public void InitializeObjectivesController(GameData data) {
         objectiveCanvasController.Initialize(data);
@@ -149,4 +151,8 @@ public class UIController : MonoBehaviour {
     public void ShowInteractiveHighlight() {
         interactiveHighlightCanvas.enabled = true;
     }
+    public void ShowSaveIndicator() {
+        // saveIndicatorController.ShowSaveIndicator();
+    }
+
 }

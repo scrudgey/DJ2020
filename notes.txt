@@ -2538,25 +2538,22 @@ storeowner AI
 * sort load menu by last play time
 * mission fail: jump back to apartment
 * set player name field in dialogue
+? serialize lists of references
+* items not making it into mission
+* hide tertiary slot in loadout editor
+* initialize level plan using items, guns from gamedata
+* display image or text when saving
+* load -> mission controller is broken
+* extraction point is out of bounds
+* regenerate jack that data map
+* move key from tower rooftop
+* plant material is glitched
+* fix steam page and announce it
 
 new game: 
     ensure none already exists
     ensure filename nonempty
     random name?
-
-? serialize lists of references
-* items not making it into mission
-* hide tertiary slot in loadout editor
-* initialize level plan using items, guns from gamedata
-
-display image or text when saving
-load -> mission controller is broken
-
-extraction point is out of bounds
-move key from tower rooftop
-plant material is glitched
-
-fix steam page and announce it
 email french guy
 create all shops
 fix vr missions
@@ -2573,5 +2570,4 @@ UI between title, shops, planning is different from UI, pause menu
     inline & bkg colors, buttons
 
 grey button when item view player
-regenerate jack that data map
-
+don't sell items player already has

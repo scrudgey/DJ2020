@@ -107,6 +107,7 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.lastPlayedTime = DateTime.Now;
         timePlayed = 0f;
         gameData.Save();
+        uiController?.ShowSaveIndicator();
     }
     void HandleShowConsleAction(InputAction.CallbackContext ctx) {
         toggleConsoleThisFrame = ctx.ReadValueAsButton();

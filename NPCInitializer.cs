@@ -5,6 +5,13 @@ using UnityEngine;
 public class NPCInitializer : MonoBehaviour {
     public NPCTemplate template;
     void Start() {
+        StartCoroutine(WaitToInitialize());
+    }
+    IEnumerator WaitToInitialize() {
+        WaitForEndOfFrame waiter = new WaitForEndOfFrame();
+        while (GameManager.I.isLoadingLevel) {
+            yield return waiter;
+        }
         InitializeNPC();
     }
     void InitializeNPC() {

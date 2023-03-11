@@ -107,7 +107,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     public void SetBob(int bob) { }
 
     public void UpdateView(AnimationInput input) {
-        if (skin == null)
+        if (skin == null || skin.legsIdle == null)
             return;
         if (input.movementSticking)
             return;
