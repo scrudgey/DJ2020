@@ -81,6 +81,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // ItemInstance.LoadItem("C4")
         };
 
+        List<LootData> loots = new List<LootData>{
+            Resources.Load("data/loot/rush") as LootData,
+            Resources.Load("data/loot/vial") as LootData,
+            Resources.Load("data/loot/zyme") as LootData,
+        };
+
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
@@ -120,7 +126,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             payDatas = new List<PayData>(),
 
             credits = 10000,
-            loots = new List<LootData>()
+            loots = loots
         };
     }
 

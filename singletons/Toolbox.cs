@@ -484,5 +484,13 @@ public class Toolbox {
 
         return gradient;
     }
+
+    public static IEnumerator WaitForSceneLoadingToFinish(Action callback) {
+        WaitForEndOfFrame waiter = new WaitForEndOfFrame();
+        while (GameManager.I.isLoadingLevel) {
+            yield return waiter;
+        }
+        callback();
+    }
 }
 

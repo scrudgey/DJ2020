@@ -6,6 +6,7 @@ public class StoreOwner : Interactive {
     public StoreType storeType;
     public Transform lookAtPoint;
     public CharacterController characterController;
+    public LootBuyerData lootBuyerData;
     void Update() {
         PlayerInput playerInput = new PlayerInput {
             lookAtPosition = lookAtPoint.position,
@@ -15,7 +16,7 @@ public class StoreOwner : Interactive {
         characterController.SetInputs(playerInput);
     }
     public override ItemUseResult DoAction(Interactor interactor) {
-        GameManager.I.ShowShopMenu(storeType);
+        GameManager.I.ShowShopMenu(storeType, lootBuyerData);
         return ItemUseResult.Empty() with {
             waveArm = true
         };

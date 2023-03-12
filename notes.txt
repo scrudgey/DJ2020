@@ -2571,3 +2571,19 @@ UI between title, shops, planning is different from UI, pause menu
 
 grey button when item view player
 don't sell items player already has
+
+
+test loot shop with some loot in inventory
+seller info
+loot preferences
+sell action
+grouping
+break dialogue into its own controller
+show "nothing to sell" if nothing to sell
+hide type icon
+
+
+
+make preferences take effect on sell value
+combine multiple loots into one button
+make global market factors

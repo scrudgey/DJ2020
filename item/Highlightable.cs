@@ -8,13 +8,9 @@ public class Highlightable : MonoBehaviour {
     public int priority;
     protected Outline outline;
     public virtual void Start() {
-        StartCoroutine(WaitToInitialize());
+        StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
     }
-    IEnumerator WaitToInitialize() {
-        WaitForEndOfFrame waiter = new WaitForEndOfFrame();
-        while (GameManager.I.isLoadingLevel) {
-            yield return waiter;
-        }
+    void Initialize() {
         this.outline = Toolbox.GetOrCreateComponent<Outline>(gameObject, inChildren: true);
         this.outline.color = 1;
         DisableOutline();

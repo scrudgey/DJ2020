@@ -5,14 +5,7 @@ using UnityEngine;
 public class NPCInitializer : MonoBehaviour {
     public NPCTemplate template;
     void Start() {
-        StartCoroutine(WaitToInitialize());
-    }
-    IEnumerator WaitToInitialize() {
-        WaitForEndOfFrame waiter = new WaitForEndOfFrame();
-        while (GameManager.I.isLoadingLevel) {
-            yield return waiter;
-        }
-        InitializeNPC();
+        StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(InitializeNPC));
     }
     void InitializeNPC() {
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
