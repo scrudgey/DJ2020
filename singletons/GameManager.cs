@@ -90,10 +90,21 @@ public partial class GameManager : Singleton<GameManager> {
         };
 
         gameData = data;
-
+        StartNewDay();
+    }
+    public void StartNewDay() {
+        SetMarketData();
         SaveGameData();
-
         ReturnToApartment();
+    }
+    public void SetMarketData() {
+        gameData.marketData = new MarketData() {
+            preferences = new List<LootPreferenceData>{
+                new LootPreferenceData(LootCategory.drug, 1),
+                new LootPreferenceData(LootCategory.medical, 2),
+            },
+            description = "big shipment of synthetic biologicals coming in from the mainland tonight."
+        };
     }
     public void LoadGame(GameData loadData) {
         Debug.Log($"load {loadData.filename}");

@@ -11,6 +11,7 @@ public class GunShopController : MonoBehaviour {
     public GameObject gunButtonPrefab;
     public GameObject inventoryButtonPrefab;
     public GameObject gunListDividerPrefab;
+    public StoreDialogueController dialogueController;
     [Header("lists")]
     public Transform leftGunScrollContainer;
     public Transform rightGunScrollContainer;
@@ -22,15 +23,6 @@ public class GunShopController : MonoBehaviour {
     public Image compareBoxImage;
     public TextMeshProUGUI compareGunTitle;
     public GameObject clearButtonObject;
-
-    [Header("dialogue")]
-    public Image leftImage;
-    public Image rightImage;
-    public TextMeshProUGUI dialogueText;
-    public LayoutElement dialogueLeftSpacer;
-    public LayoutElement dialogueRightSpacer;
-    public TextMeshProUGUI leftDialogueName;
-    public TextMeshProUGUI rightDialogueName;
     [Header("buttonbar")]
     public GameObject buyModeButton;
     public GameObject sellModeButton;
@@ -49,8 +41,9 @@ public class GunShopController : MonoBehaviour {
         DestroyImmediate(UIEditorCamera);
     }
     public void Start() {
-        rightDialogueName.text = GameManager.I.gameData.filename;
-        leftDialogueName.text = "seller";
+        // rightDialogueName.text = GameManager.I.gameData.filename;
+        // leftDialogueName.text = "seller";
+        dialogueController.Initialize(GameManager.I.gameData.filename, "honest pete");
         gunSaleData = LoadGunSaleData();
         ClearInitialize();
         SetBuyMode();
@@ -77,7 +70,7 @@ public class GunShopController : MonoBehaviour {
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits
-        SetShopownerDialogue("Please come in to my underground black market weapons shop.");
+        dialogueController.SetShopownerDialogue("Please come in to my underground black market weapons shop.");
         creditsCost.text = "";
 
         // clear compare gun
@@ -166,7 +159,7 @@ public class GunShopController : MonoBehaviour {
     void SetGunForSale(GunSaleData data) {
         gunStatHandler.DisplayGunTemplate(data.template);
         SetSalePrice(data.cost);
-        SetShopownerDialogue(data.template.shopDescription);
+        dialogueController.SetShopownerDialogue(data.template.shopDescription);
         currentGunForSale = data;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound);
         // TODO: grey out Buy button if player has insufficient credits
@@ -178,25 +171,6 @@ public class GunShopController : MonoBehaviour {
         // TODO: grey out Buy button if player has insufficient credits
     }
 
-    void SetShopownerDialogue(string dialogue) {
-        dialogueLeftSpacer.minWidth = 20f;
-        dialogueRightSpacer.minWidth = 150f;
-        // dialogueText.text = dialogue;
-        BlitDialogue(dialogue);
-    }
-    void SetPlayerDialogue(string dialogue) {
-        dialogueLeftSpacer.minWidth = 150f;
-        dialogueRightSpacer.minWidth = 20f;
-        // dialogueText.text = dialogue;
-        BlitDialogue(dialogue);
-
-    }
-    void BlitDialogue(string content) {
-        if (blitTextRoutine != null) {
-            StopCoroutine(blitTextRoutine);
-        }
-        blitTextRoutine = StartCoroutine(BlitDialogueText(content));
-    }
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
     }
@@ -235,26 +209,6 @@ public class GunShopController : MonoBehaviour {
         gunStatHandler.SetCompareGun(template);
     }
 
-    public IEnumerator BlitDialogueText(string content) {
-        dialogueText.text = "";
-        int index = 0;
-        float timer = 0f;
-        float blitInterval = 0.025f;
-        audioSource.clip = blitSound;
-        audioSource.Play();
-        while (timer < blitInterval && index < content.Length) {
-            timer += Time.unscaledDeltaTime;
-            if (timer >= blitInterval) {
-                index += 1;
-                timer -= blitInterval;
-                dialogueText.text = content.Substring(0, index);
-            }
-            yield return null;
-        }
-        audioSource.Stop();
-        dialogueText.text = content;
-        blitTextRoutine = null;
-    }
 
     void BuyGun(GunSaleData data) {
         // remove credits
@@ -274,6 +228,6 @@ public class GunShopController : MonoBehaviour {
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits
-        SetShopownerDialogue("Thank you.");
+        dialogueController.SetShopownerDialogue("Thank you.");
     }
 }

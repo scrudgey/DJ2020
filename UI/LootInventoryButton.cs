@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +9,14 @@ public class LootInventoryButton : MonoBehaviour {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI countText;
     public LootTypeIcon[] typeIcons;
-    LootData lootData;
+    List<LootData> lootData;
     int count;
     LootShopController lootShopController;
-    public void Initialize(LootShopController lootShopController, LootData data, int count) {
+    public void Initialize(LootShopController lootShopController, List<LootData> datas, int count) {
         this.lootShopController = lootShopController;
-        this.lootData = data;
+        this.lootData = datas;
         this.count = count;
+        LootData data = datas.First();
         nameText.text = data.lootName;
         countText.text = $"{count}";
         icon.sprite = data.portrait;
@@ -24,6 +26,6 @@ public class LootInventoryButton : MonoBehaviour {
         typeIcons[3].Hide();
     }
     public void Clicked() {
-        lootShopController.LootButtonCallback(lootData, count);
+        lootShopController.LootButtonCallback(lootData);
     }
 }

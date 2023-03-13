@@ -55,6 +55,7 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapWorld() {
         Debug.Log($"bootstrapping world ...");
         GameManager.I.gameData = GameData.TestInitialData();
+        GameManager.I.SetMarketData();
         GameManager.I.StartWorld();
     }
 

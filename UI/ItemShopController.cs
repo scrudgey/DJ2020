@@ -9,6 +9,7 @@ public class ItemShopController : MonoBehaviour {
     public GameObject UIEditorCamera;
     public GameObject itemButtonPrefab;
     public GameObject bodyContainer;
+    public StoreDialogueController dialogueController;
 
     [Header("lists")]
     public Transform leftGunScrollContainer;
@@ -18,15 +19,6 @@ public class ItemShopController : MonoBehaviour {
     public TextMeshProUGUI creditsCost;
     public TextMeshProUGUI itemNameTitle;
     public Image itemImage;
-
-    [Header("dialogue")]
-    public Image leftImage;
-    public Image rightImage;
-    public TextMeshProUGUI dialogueText;
-    public LayoutElement dialogueLeftSpacer;
-    public LayoutElement dialogueRightSpacer;
-    public TextMeshProUGUI leftDialogueName;
-    public TextMeshProUGUI rightDialogueName;
     [Header("sounds")]
     public AudioSource audioSource;
     public AudioClip[] buySound;
@@ -42,8 +34,7 @@ public class ItemShopController : MonoBehaviour {
         DestroyImmediate(UIEditorCamera);
     }
     public void Start() {
-        rightDialogueName.text = GameManager.I.gameData.filename;
-        leftDialogueName.text = "seller";
+        dialogueController.Initialize(GameManager.I.gameData.filename, "seller");
         itemSaleData = LoadItemSaleData();
         ClearInitialize();
     }
@@ -59,7 +50,7 @@ public class ItemShopController : MonoBehaviour {
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits
-        SetShopownerDialogue("Please come in to my underground black market items shop.");
+        dialogueController.SetShopownerDialogue("Please come in to my underground black market items shop.");
         creditsCost.text = "";
         ClearItemForSale();
         bodyContainer.SetActive(false);
@@ -91,25 +82,6 @@ public class ItemShopController : MonoBehaviour {
             button.transform.SetParent(rightGunScrollContainer, false);
         }
     }
-    void BlitDialogue(string content) {
-        if (blitTextRoutine != null) {
-            StopCoroutine(blitTextRoutine);
-        }
-        blitTextRoutine = StartCoroutine(BlitDialogueText(content));
-    }
-    void SetShopownerDialogue(string dialogue) {
-        dialogueLeftSpacer.minWidth = 20f;
-        dialogueRightSpacer.minWidth = 150f;
-        // dialogueText.text = dialogue;
-        BlitDialogue(dialogue);
-    }
-    void SetPlayerDialogue(string dialogue) {
-        dialogueLeftSpacer.minWidth = 150f;
-        dialogueRightSpacer.minWidth = 20f;
-        // dialogueText.text = dialogue;
-        BlitDialogue(dialogue);
-
-    }
     void CreateShopItemButtons(List<ItemSaleData> saleData) {
         saleData.ForEach(saleData => {
             GameObject button = CreateStoreItemButton(saleData);
@@ -128,7 +100,7 @@ public class ItemShopController : MonoBehaviour {
     }
     void SetItemForSale(ItemSaleData data) {
         SetSalePrice(data.cost);
-        SetShopownerDialogue(data.item.data.shopDescription);
+        dialogueController.SetShopownerDialogue(data.item.data.shopDescription);
         currentItemForSale = data;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound);
 
@@ -154,7 +126,7 @@ public class ItemShopController : MonoBehaviour {
         bodyContainer.SetActive(true);
         // SetCompareGun(button.gunState.template);
         ClearItemForSale();
-        SetShopownerDialogue(button.item.data.shopDescription);
+        dialogueController.SetShopownerDialogue(button.item.data.shopDescription);
         currentItemForSale = null;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound);
 
@@ -193,28 +165,8 @@ public class ItemShopController : MonoBehaviour {
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits
-        SetShopownerDialogue("Thank you.");
+        dialogueController.SetShopownerDialogue("Thank you.");
     }
 
 
-    public IEnumerator BlitDialogueText(string content) {
-        dialogueText.text = "";
-        int index = 0;
-        float timer = 0f;
-        float blitInterval = 0.025f;
-        audioSource.clip = blitSound;
-        audioSource.Play();
-        while (timer < blitInterval && index < content.Length) {
-            timer += Time.unscaledDeltaTime;
-            if (timer >= blitInterval) {
-                index += 1;
-                timer -= blitInterval;
-                dialogueText.text = content.Substring(0, index);
-            }
-            yield return null;
-        }
-        audioSource.Stop();
-        dialogueText.text = content;
-        blitTextRoutine = null;
-    }
 }

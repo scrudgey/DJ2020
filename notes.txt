@@ -2031,7 +2031,33 @@ note: layer "interactive"
         * serialize gamedata to filename
 * GameData has filename field
 * save game on level exit
-
+* track playtime, last played
+* reset timeplayed on newgame, load
+* save game from menu
+* sort load menu by last play time
+* mission fail: jump back to apartment
+* set player name field in dialogue
+? serialize lists of references
+* items not making it into mission
+* hide tertiary slot in loadout editor
+* initialize level plan using items, guns from gamedata
+* display image or text when saving
+* load -> mission controller is broken
+* extraction point is out of bounds
+* regenerate jack that data map
+* move key from tower rooftop
+* plant material is glitched
+* fix steam page and announce it
+* test loot shop with some loot in inventory
+* seller info
+* loot preferences
+* sell action
+* grouping
+* show "nothing to sell" if nothing to sell
+* hide type icon
+* make preferences take effect on sell value
+* combine multiple loots into one button
+* make global market factors
 
 
 
@@ -2460,15 +2486,16 @@ world layout:
         * items: could work
     * underneath apartment:
         * weapons
-        
+    * akira alley:
+        * drug dealers will purchase your drug loot.
+
     upstairs:
         importer / exporter who buys things.
         also he is a connection that will give you tips or sometimes a deal.
     bar:
         the bartender will clue you in on the price of commodities.
         there is an underworld figure in the corner of the bar who will give you missions.
-    akira alley:
-        drug dealers will purchase your drug loot.
+
     subway:
         a software hacker 
 
@@ -2481,6 +2508,8 @@ shop todo:
         description (dialogue)
             "1x per mission"
             "unlimited use"
+        grey button when item view player
+        don't sell items player already has
 
 
 graphics:
@@ -2518,37 +2547,9 @@ NPCs
     NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
 
 show objectives as blit-in text on lower left?
+    show dayss
 "v" and "^" buttons on scrollbars?
-items not being set in plan
-clearsighter can and should be much, much simpler.
-    solve camera distance / near clipping plane
-    use clipping frustrum to simplify clearsighter
-prevent guns in world
-prevent damage in world?
-storeowner AI
-    move to position
-    look in direction
-    look at player
-    different from SphereRobot, but still uses a state machine.
 
-
-* track playtime, last played
-* reset timeplayed on newgame, load
-* save game from menu
-* sort load menu by last play time
-* mission fail: jump back to apartment
-* set player name field in dialogue
-? serialize lists of references
-* items not making it into mission
-* hide tertiary slot in loadout editor
-* initialize level plan using items, guns from gamedata
-* display image or text when saving
-* load -> mission controller is broken
-* extraction point is out of bounds
-* regenerate jack that data map
-* move key from tower rooftop
-* plant material is glitched
-* fix steam page and announce it
 
 new game: 
     ensure none already exists
@@ -2560,6 +2561,7 @@ fix vr missions
 upgrade unity
 make a build
 
+
 enemies hear me easily from below?
 on level start, zoom out from player spawn
     show span cutscene
@@ -2569,21 +2571,21 @@ better interface for interacting, hacking
 UI between title, shops, planning is different from UI, pause menu
     inline & bkg colors, buttons
 
-grey button when item view player
-don't sell items player already has
+clearsighter can and should be much, much simpler.
+    solve camera distance / near clipping plane
+    use clipping frustrum to simplify clearsighter
+prevent guns in world
+prevent damage in world?
+storeowner AI
+    move to position
+    look in direction
+    look at player
+    different from SphereRobot, but still uses a state machine.
+
+upstairs importer exporter
+bartender
+mission guy in the bar
 
 
-test loot shop with some loot in inventory
-seller info
-loot preferences
-sell action
-grouping
-break dialogue into its own controller
-show "nothing to sell" if nothing to sell
-hide type icon
 
-
-
-make preferences take effect on sell value
-combine multiple loots into one button
-make global market factors
+* break dialogue into its own controller

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Items;
 using TMPro;
 using UnityEngine;
@@ -10,13 +11,13 @@ public class LootShopController : MonoBehaviour {
     public GameObject lootButtonPrefab;
     // public GameObject bodyContainer;
     public GameObject lootPreferencePrefab;
+    public StoreDialogueController dialogueController;
 
     [Header("lists")]
     public Transform inventoryContainer;
     public TextMeshProUGUI nothingToSellText;
     [Header("lootpanel")]
     public Image itemImage;
-    public Image lootType;
     public LootTypeIcon lootTypeIcon;
     public TextMeshProUGUI lootNameCaption;
     public TextMeshProUGUI valueText;
@@ -30,41 +31,46 @@ public class LootShopController : MonoBehaviour {
     public TextMeshProUGUI buyerDescriptionText;
     public Transform buyerPreferencesContainer;
 
-    [Header("dialogue")]
-    public Image leftImage;
-    public Image rightImage;
-    public TextMeshProUGUI dialogueText;
-    public LayoutElement dialogueLeftSpacer;
-    public LayoutElement dialogueRightSpacer;
-    public TextMeshProUGUI leftDialogueName;
-    public TextMeshProUGUI rightDialogueName;
     [Header("sounds")]
     public AudioSource audioSource;
     public AudioClip[] sellSound;
     public AudioClip[] selectSound;
-    public AudioClip blitSound;
-    Coroutine blitTextRoutine;
 
-    LootData currentItemForSale;
+
+    List<LootData> currentItemForSale;
     int forSaleTotalPrice;
+    LootBuyerData lootBuyerData;
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
-    public void Start() {
-        rightDialogueName.text = GameManager.I.gameData.filename;
-        leftDialogueName.text = "seller";
-        // ClearInitialize();
-    }
 
     public void Initialize(LootBuyerData lootBuyerData) {
+        this.lootBuyerData = lootBuyerData;
         PopulatePlayerInventory();
         SetPlayerCredits();
         ClearItemForSale();
         ShowSellerData(lootBuyerData);
-
+        dialogueController.Initialize(GameManager.I.gameData.filename, lootBuyerData.buyerName);
         // set portraits
-        SetShopownerDialogue("Please come in to my underground loot shop.");
+        dialogueController.SetShopownerDialogue("Please come in to my underground loot shop.");
+    }
+    void PopulatePlayerInventory() {
+        foreach (Transform child in inventoryContainer) {
+            if (child == nothingToSellText.transform) continue;
+            Destroy(child.gameObject);
+        }
+        nothingToSellText.enabled = GameManager.I.gameData.playerState.loots.Count == 0;
+
+        foreach (IGrouping<string, LootData> grouping in GameManager.I.gameData.playerState.loots.GroupBy(lootData => lootData.lootName)) {
+            int count = grouping.Count();
+            LootData data = grouping.First();
+            GameObject button = CreateLootButton(data);
+            LootInventoryButton script = button.GetComponent<LootInventoryButton>();
+            script.Initialize(this, grouping.ToList(), count);
+            Debug.Log($"group: {data.name} {count}");
+            button.transform.SetParent(inventoryContainer, false);
+        }
     }
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
@@ -72,7 +78,8 @@ public class LootShopController : MonoBehaviour {
     void SetPlayerCredits() {
         playerCreditsText.text = GameManager.I.gameData.playerState.credits.ToString();
     }
-    void SetSaleData(LootData data, int count) {
+    void SetSaleData(List<LootData> datas) {
+        LootData data = datas[0];
         valueText.text = data.value.ToString();
 
         itemImage.enabled = true;
@@ -83,7 +90,8 @@ public class LootShopController : MonoBehaviour {
         foreach (Image image in creditsImages) {
             image.enabled = true;
         }
-        float bonus = 1.4f;
+        float bonus = lootBuyerData.CalculateBonusFactor(data);
+        int count = datas.Count();
         forSaleTotalPrice = (int)(data.value * count * bonus);
         totalText.text = $"{forSaleTotalPrice}";
         factorText.text = $"{bonus}x";
@@ -93,7 +101,7 @@ public class LootShopController : MonoBehaviour {
         foreach (Transform child in buyerPreferencesContainer) {
             Destroy(child.gameObject);
         }
-        buyerNameText.text = data.buyerName;
+        buyerNameText.text = data.buyerName.ToLower();
         buyerDescriptionText.text = data.description;
         foreach (LootPreferenceData preference in data.preferences) {
             GameObject gameObject = GameObject.Instantiate(lootPreferencePrefab);
@@ -116,53 +124,23 @@ public class LootShopController : MonoBehaviour {
         forSaleTotalPrice = 0;
         lootTypeIcon.Hide();
     }
-    void PopulatePlayerInventory() {
-        foreach (Transform child in inventoryContainer) {
-            if (child == nothingToSellText.transform) continue;
-            Destroy(child.gameObject);
-        }
-        nothingToSellText.enabled = GameManager.I.gameData.playerState.loots.Count == 0;
-        foreach (LootData data in GameManager.I.gameData.playerState.loots) {
-            GameObject button = CreateLootButton(data);
-            LootInventoryButton script = button.GetComponent<LootInventoryButton>();
-            script.Initialize(this, data, 1);
-            button.transform.SetParent(inventoryContainer, false);
-        }
-    }
-    void BlitDialogue(string content) {
-        if (blitTextRoutine != null) {
-            StopCoroutine(blitTextRoutine);
-        }
-        blitTextRoutine = StartCoroutine(BlitDialogueText(content));
-    }
-    void SetShopownerDialogue(string dialogue) {
-        dialogueLeftSpacer.minWidth = 20f;
-        dialogueRightSpacer.minWidth = 150f;
-        // dialogueText.text = dialogue;
-        BlitDialogue(dialogue);
-    }
-    void SetPlayerDialogue(string dialogue) {
-        dialogueLeftSpacer.minWidth = 150f;
-        dialogueRightSpacer.minWidth = 20f;
-        // dialogueText.text = dialogue;
-        BlitDialogue(dialogue);
 
-    }
     GameObject CreateLootButton(LootData data) {
         GameObject obj = GameObject.Instantiate(lootButtonPrefab);
         // ItemShopButton button = obj.GetComponent<ItemShopButton>();
         // button.Initialize(data, ShopButtonCallback);
         return obj;
     }
-    public void LootButtonCallback(LootData data, int count) {
+    public void LootButtonCallback(List<LootData> data) {
         // bodyContainer.SetActive(true);
         // SetItemForSale(button.saleData);
-        SetItemForSale(data, count);
+        SetItemForSale(data);
     }
-    void SetItemForSale(LootData data, int count) {
-        SetSaleData(data, count);
-        SetShopownerDialogue(data.lootDescription);
-        currentItemForSale = data;
+    void SetItemForSale(List<LootData> datas) {
+        SetSaleData(datas);
+        LootData data = datas.First();
+        dialogueController.SetShopownerDialogue(data.lootDescription);
+        currentItemForSale = datas;
         Toolbox.RandomizeOneShot(audioSource, selectSound);
         // SetPlayerDialogue(data.lootDescription);
     }
@@ -176,34 +154,15 @@ public class LootShopController : MonoBehaviour {
             SellItem(currentItemForSale);
         }
     }
-    void SellItem(LootData data) {
-        GameManager.I.gameData.playerState.loots.Remove(data);
+    void SellItem(List<LootData> datas) {
+        foreach (LootData data in datas) {
+            GameManager.I.gameData.playerState.loots.Remove(data);
+        }
         GameManager.I.gameData.playerState.credits += forSaleTotalPrice;
         PopulatePlayerInventory();
         ClearItemForSale();
         SetPlayerCredits();
-        SetShopownerDialogue("I'll take it.");
+        dialogueController.SetShopownerDialogue("I'll take it.");
     }
 
-
-    public IEnumerator BlitDialogueText(string content) {
-        dialogueText.text = "";
-        int index = 0;
-        float timer = 0f;
-        float blitInterval = 0.025f;
-        audioSource.clip = blitSound;
-        audioSource.Play();
-        while (timer < blitInterval && index < content.Length) {
-            timer += Time.unscaledDeltaTime;
-            if (timer >= blitInterval) {
-                index += 1;
-                timer -= blitInterval;
-                dialogueText.text = content.Substring(0, index);
-            }
-            yield return null;
-        }
-        audioSource.Stop();
-        dialogueText.text = content;
-        blitTextRoutine = null;
-    }
 }
