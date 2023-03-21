@@ -16,7 +16,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SightCone sightCone;
     public Transform sightOrigin;
     public NavMeshPath navMeshPath; // TODO: remove this
-    public GameObject controllable;
     public KinematicCharacterMotor motor;
     public CharacterController characterController;
     public GunHandler gunHandler;
@@ -179,7 +178,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
     public void ChangeState(SphereControlState routine) {
-
         stateMachine.ChangeState(routine);
         switch (routine) {
             case SphereInvestigateState:

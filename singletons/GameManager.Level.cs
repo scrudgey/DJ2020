@@ -101,6 +101,9 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.ShowInteractiveHighlight();
             }, unloadAll: false);
         }
+        foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
+            zone.SpawnNPCs();
+        }
         InitializePlayerAndController(LevelPlan.Default(new List<Items.BaseItem>()));
         TransitionToPhase(GamePhase.world);
     }
@@ -254,12 +257,17 @@ public partial class GameManager : Singleton<GameManager> {
         playerOutlineHandler?.Bind();
 
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
-        if (clearSighter == null) {
-            // instantiate clearsighter
-        }
+        NeoClearsighter clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
+        // if (clearSighter == null) {
+        //     // instantiate clearsighter
+        // }
         if (clearSighter != null && focus != null) {
-            // clearSighter.followTransform = focus.transform;
-            clearSighter.Initialize(focus.transform);
+            // clearSighter.Initialize(focus.transform);
+            Destroy(clearSighter);
+        }
+        if (clearSighter2 != null) {
+            clearSighter2.Initialize(focus.transform);
+            // Destroy(clearSighter2);
         }
 
         GunHandler handler = focus.GetComponentInChildren<GunHandler>();

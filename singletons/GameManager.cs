@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -262,6 +262,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("LootShop", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.barShop:
+                if (!SceneManager.GetSceneByName("BarShop").isLoaded) {
+                    LoadScene("BarShop", callback, unloadAll: false);
+                }
+                break;
             case MenuType.console:
                 uiController.ShowTerminal();
                 callback?.Invoke();
@@ -299,6 +304,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.lootshop:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("LootShop"));
+                break;
+            case MenuType.barShop:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("BarShop"));
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
@@ -472,11 +480,17 @@ public partial class GameManager : Singleton<GameManager> {
         StoreType.gun => MenuType.gunshop,
         StoreType.item => MenuType.itemshop,
         StoreType.loot => MenuType.lootshop,
+        StoreType.bar => MenuType.barShop,
         _ => MenuType.none
     }, callback: storeType switch {
         StoreType.loot => () => {
             LootShopController lootShopController = GameObject.FindObjectOfType<LootShopController>();
             lootShopController.Initialize(lootBuyerData);
+        }
+        ,
+        StoreType.bar => () => {
+            BarShopController barShopController = GameObject.FindObjectOfType<BarShopController>();
+            barShopController.Initialize();
         }
         ,
         _ => null

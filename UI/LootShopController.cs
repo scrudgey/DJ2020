@@ -95,7 +95,7 @@ public class LootShopController : MonoBehaviour {
         forSaleTotalPrice = (int)(data.value * count * bonus);
         totalText.text = $"{forSaleTotalPrice}";
         factorText.text = $"{bonus}x";
-        countText.text = $"{count}";
+        countText.text = $"{count}x";
     }
     void ShowSellerData(LootBuyerData data) {
         foreach (Transform child in buyerPreferencesContainer) {

@@ -1171,7 +1171,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
 
                 if (!isCrouching && Motor.GroundingStatus.IsStableOnGround)
-                    footsteps.UpdateWithVelocity(currentVelocity, isRunning);
+                    footsteps?.UpdateWithVelocity(currentVelocity, isRunning);
 
                 break;
             case CharacterState.climbing:
@@ -1180,8 +1180,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 switch (_climbingState) {
                     case ClimbingState.Climbing:
                         currentVelocity = (_ladderUpDownInput * _activeLadder.transform.up).normalized * ClimbingSpeed;
-                        footsteps.SetFootstepSounds(_activeLadder.surfaceType);
-                        footsteps.UpdateWithVelocity(currentVelocity, false);
+                        footsteps?.SetFootstepSounds(_activeLadder.surfaceType);
+                        footsteps?.UpdateWithVelocity(currentVelocity, false);
                         break;
                     case ClimbingState.Anchoring:
                     case ClimbingState.DeAnchoring:

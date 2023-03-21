@@ -24,7 +24,6 @@ namespace AI {
             timer += Time.deltaTime;
             if (timer < lifetime) {
                 if (wrapped != null) {
-                    // return wrapped.Evaluate(ref input);
                     wrapped.Evaluate(ref input);
                     return TaskState.running;
                 } else {
@@ -32,7 +31,6 @@ namespace AI {
                 }
             } else {
                 return TaskState.success;
-                // return wrapped.Evaluate(ref input);
             }
         }
         public override void Reset() {

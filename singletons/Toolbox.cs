@@ -492,5 +492,11 @@ public class Toolbox {
         }
         callback();
     }
+
+    public static IEnumerator RunJobRepeatedly(Func<IEnumerator> coroutine) {
+        while (true) {
+            yield return coroutine();
+        }
+    }
 }
 

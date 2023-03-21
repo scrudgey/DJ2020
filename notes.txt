@@ -2058,6 +2058,8 @@ note: layer "interactive"
 * make preferences take effect on sell value
 * combine multiple loots into one button
 * make global market factors
+* basic floor 2.25 needs to be fixed.
+* break dialogue into its own controller
 
 
 
@@ -2430,7 +2432,7 @@ uses waypoints in the world
 loot popup is not popping up
 unify regular + metallic material
 eliminate cyber_obj_2 material
-* basic floor 2.25 needs to be fixed.
+
 fix broken loot items
 
 mission:
@@ -2470,11 +2472,6 @@ world NPCs:
         hanging around the Fire
     random drug dealers on the corner will buy your drug loot
 
-
-
-
-
-
 still unknown:
     street doc
     weapon upgrades
@@ -2488,16 +2485,16 @@ world layout:
         * weapons
     * akira alley:
         * drug dealers will purchase your drug loot.
-
     upstairs:
         importer / exporter who buys things.
         also he is a connection that will give you tips or sometimes a deal.
     bar:
-        the bartender will clue you in on the price of commodities.
+        * the bartender will clue you in on the price of commodities.
         there is an underworld figure in the corner of the bar who will give you missions.
-
     subway:
         a software hacker 
+    tent city:
+        a randomized junk shop
 
 shop todo:
     gunshop
@@ -2510,6 +2507,8 @@ shop todo:
             "unlimited use"
         grey button when item view player
         don't sell items player already has
+    bartender
+        rumors -> faction strength
 
 
 graphics:
@@ -2543,12 +2542,23 @@ graphics:
         no me baño
     https://twitter.com/scrudgey/status/1627911883952099329?s=20
 
-NPCs
-    NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
 
+
+
+
+enemies hear me easily from below?
+on level start, zoom out from player spawn
+    show span cutscene
+AI still had a hard time closing in on me when i was openly shooting and running around
+maybe fall damage from rooftop should be greater
+better interface for interacting, hacking
+UI between title, shops, planning is different from UI, pause menu
+    inline & bkg colors, buttons
+clearsighter
 show objectives as blit-in text on lower left?
     show dayss
 "v" and "^" buttons on scrollbars?
+
 
 
 new game: 
@@ -2561,19 +2571,6 @@ fix vr missions
 upgrade unity
 make a build
 
-
-enemies hear me easily from below?
-on level start, zoom out from player spawn
-    show span cutscene
-AI still had a hard time closing in on me when i was openly shooting and running around
-maybe fall damage from rooftop should be greater
-better interface for interacting, hacking
-UI between title, shops, planning is different from UI, pause menu
-    inline & bkg colors, buttons
-
-clearsighter can and should be much, much simpler.
-    solve camera distance / near clipping plane
-    use clipping frustrum to simplify clearsighter
 prevent guns in world
 prevent damage in world?
 storeowner AI
@@ -2583,9 +2580,33 @@ storeowner AI
     different from SphereRobot, but still uses a state machine.
 
 upstairs importer exporter
-bartender
 mission guy in the bar
 
+NPCs
+    NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
+
+mill about when you reach the location
+    1. meet with other NPCs and talk.
+    2. choose a random location within the store, move there, wait a random amount of time.
+    3. store-specific interactions
+
+walking around:
+    weave, amble, move slowly, slow down, speed up?
+* do not block the door
+better scene load
+
+linger in bar:
+    move to open spot on the bar and get a drink
+    * find someone and talk
+        * cluster up.
+    move to a seat
+
+social group state:
+    * centroid
+    who is talking
+    1. heads move around
 
 
-* break dialogue into its own controller
+talking sprites for head graphics
+talking animation
+    triggered when talking

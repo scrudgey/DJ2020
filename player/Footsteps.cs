@@ -20,6 +20,7 @@ public class Footsteps : MonoBehaviour {
         footstepData = Resources.Load("data/footstep/default") as FootstepData;
     }
     public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {
+        if (footstepData == null) return;
         if (velocity.magnitude <= 0.01) {
             leftFoot = null;
             rightFoot = null;
@@ -89,6 +90,7 @@ public class Footsteps : MonoBehaviour {
         return data.surfaceSoundType;
     }
     public void SetFootstepSounds(SurfaceType surfaceType) {
+        if (footstepData == null) return;
         AudioClip[] soundSet = footstepData.GetSoundSet(surfaceType);
         leftFoot = Toolbox.RandomFromList(soundSet);
         rightFoot = Toolbox.RandomFromList(soundSet);
