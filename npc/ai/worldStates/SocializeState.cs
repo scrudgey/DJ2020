@@ -7,9 +7,15 @@ public class SocializeState : WorldNPCControlState {
     WorldNPCAI ai;
     CharacterController characterController;
     SocialGroup socialGroup;
+    SpeechTextController speechTextController;
     public WalkToStoreState.StoreType location;
-    public SocializeState(WorldNPCAI ai, CharacterController characterController, SocialGroup socialGroup, WalkToStoreState.StoreType location) : base(ai) {
+    public SocializeState(WorldNPCAI ai,
+            CharacterController characterController,
+            SpeechTextController speechTextController,
+            SocialGroup socialGroup,
+            WalkToStoreState.StoreType location) : base(ai) {
         this.ai = ai;
+        this.speechTextController = speechTextController;
         this.characterController = characterController;
         this.socialGroup = socialGroup;
         this.location = location;
@@ -22,17 +28,23 @@ public class SocializeState : WorldNPCControlState {
     public override void Exit() {
         base.Exit();
         socialGroup.RemoveMember(ai);
+        speechTextController.HideText();
     }
     void SetupRootNode() {
+        float speedCoefficient = Random.Range(0.22f, 0.27f);
+        float arrivalDistance = Random.Range(5f, 10f);
         rootTaskNode =
             new Sequence(
-                new TaskMoveToKey(owner.transform, NAV_POINT_KEY, new System.Collections.Generic.HashSet<int>(), characterController, arrivalDistance: 1.5f) {
-                    speedCoefficient = 0.25f
+                new TaskMoveToKey(owner.transform, NAV_POINT_KEY, new System.Collections.Generic.HashSet<int>(), characterController, arrivalDistance: arrivalDistance) {
+                    speedCoefficient = speedCoefficient
                 },
-                new TaskTimerDectorator(new TaskLookAt(socialGroup.transform) {
-                    reorient = true
+                new TaskTimerDectorator(new TaskLookAt(ai.transform) {
+                    lookType = TaskLookAt.LookType.position,
+                    lookAtPoint = socialGroup.transform.position,
+                    reorient = true,
+                    useKey = false
                 }, 0.2f),
-                new TaskTimerDectorator(Random.Range(10f, 20f))
+                new TaskTimerDectorator(new TaskSocialize(ai, speechTextController, socialGroup), Random.Range(10f, 20f))
             );
         rootTaskNode.SetData(NAV_POINT_KEY, socialGroup.transform.position);
     }

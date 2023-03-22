@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using KinematicCharacterController;
 using UnityEngine;
+using UnityEngine.AI;
+
 public class NPCSpawnZone : MonoBehaviour {
+    public WalkToStoreState.StoreType storeType;
     public LoHi number;
     public NPCTemplate[] templates;
     public Collider zone;
@@ -35,22 +38,33 @@ public class NPCSpawnZone : MonoBehaviour {
     }
 
     GameObject SpawnNPC(NPCTemplate template) {
+        NavMeshHit hit = new NavMeshHit();
         Vector3 point = Toolbox.RandomInsideBounds(zone);
-        GameObject npc = NPCPool.GetObject(point);
+        NavMeshQueryFilter filter = new NavMeshQueryFilter {
+            areaMask = LayerUtil.KeySetToNavLayerMask(new HashSet<int>())
+        };
 
-        CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
+        if (NavMesh.SamplePosition(point, out hit, 20f, filter)) {
+            Vector3 destination = hit.position;
 
-        CharacterController controller = npc.GetComponentInChildren<CharacterController>();
-        KinematicCharacterMotor motor = npc.GetComponentInChildren<KinematicCharacterMotor>();
-        controller.OrbitCamera = cam;
+            GameObject npc = NPCPool.GetObject(destination);
 
-        WorldNPCAI ai = npc.GetComponent<WorldNPCAI>();
-        ai.Initialize();
+            CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
 
-        // should be part of apply state?
-        motor.SetPosition(point, bypassInterpolation: true);
-        ApplyNPCState(template, npc);
-        return npc;
+            CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+            KinematicCharacterMotor motor = npc.GetComponentInChildren<KinematicCharacterMotor>();
+            controller.OrbitCamera = cam;
+
+            WorldNPCAI ai = npc.GetComponent<WorldNPCAI>();
+            ai.Initialize(storeType);
+
+            // should be part of apply state?
+            motor.SetPosition(destination, bypassInterpolation: true);
+            ApplyNPCState(template, npc);
+            return npc;
+        } else {
+            return null;
+        }
     }
     void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
         NPCState state = NPCState.Instantiate(template);

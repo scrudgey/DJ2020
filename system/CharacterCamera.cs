@@ -61,6 +61,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     // public Transform FollowTransform { get; private set; }
     public Vector3 PlanarDirection { get; set; }
     public float TargetDistance { get; set; }
+    public bool disableLockOn;
 
     // private bool _distanceIsObstructed;
     private float _currentDistance;
@@ -642,7 +643,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
-        if (prioritySet) {
+        if (prioritySet && !disableLockOn) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
             // TODO: set collider
             return new CursorData {

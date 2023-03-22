@@ -53,7 +53,7 @@ public partial class GameManager : Singleton<GameManager> {
     private CursorType _cursorType;
     bool resetMouseControl;
     public BurgleTargetData activeBurgleTargetData;
-
+    public Vector3 playerPosition;
 
     public CursorType cursorType {
         get { return _cursorType; }
@@ -165,6 +165,7 @@ public partial class GameManager : Singleton<GameManager> {
                 Time.timeScale = 1f;
                 cursorType = CursorType.gun;
                 TransitionToInputMode(InputMode.gun);
+                characterCamera.disableLockOn = true;
                 break;
             case GamePhase.mainMenu:
                 Time.timeScale = 0f;
@@ -378,6 +379,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         toggleConsoleThisFrame = false;
         escapePressedThisFrame = false;
+        playerPosition = playerObject.transform.position;
     }
     public void HandleEscapePressed() {
         if (gameData.phase == GamePhase.world) {

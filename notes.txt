@@ -2582,6 +2582,9 @@ storeowner AI
 upstairs importer exporter
 mission guy in the bar
 
+all shop UIs that are about buying / selling should share as much common interface as possible.
+
+
 NPCs
     NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
 
@@ -2592,21 +2595,28 @@ mill about when you reach the location
 
 walking around:
     weave, amble, move slowly, slow down, speed up?
-* do not block the door
 better scene load
-
 linger in bar:
     move to open spot on the bar and get a drink
-    * find someone and talk
-        * cluster up.
     move to a seat
+linger in item shop
+    make item shop more like a bodega
+linger in alleyway  
+    knife fight
 
-social group state:
-    * centroid
-    who is talking
-    1. heads move around
 
+* adjust speech text visibility based on distance
+* some who spawn stick around in zone
+* disable lock-on in world
+* randomize movement a little bit
 
 talking sprites for head graphics
 talking animation
     triggered when talking
+don't hide heads
+floating chair
+more randomizable NPC
+
+
+randomize path?
+    nudge path vertices?

@@ -296,6 +296,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         characterHurtable.OnHitStateChanged += HandleHurtableChanged;
         characterHurtable.OnTakeDamage += HandleTakeDamage;
         cameraFollowTransform = transform.Find("cameraFollowPoint");
+        SetCapsuleDimensions(defaultRadius, 1.5f, 0.75f);
     }
 
     void OnDestroy() {

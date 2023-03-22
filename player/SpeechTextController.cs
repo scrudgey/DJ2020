@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using TMPro;
 using UnityEngine;
 public class SpeechTextController : MonoBehaviour {
+    public bool scaleWithPlayerDistance;
     public TextMeshProUGUI textMesh;
     // public RectTransform textRect;
     public List<RectTransform> childRects;
@@ -12,6 +14,7 @@ public class SpeechTextController : MonoBehaviour {
     public Camera cam;
     float visibilityTimer;
     float haltSpeechTimeout;
+    readonly static float FALLOFF_DISTANCE = 10f;
     void Start() {
         cam = Camera.main;
         HideText();
@@ -25,13 +28,19 @@ public class SpeechTextController : MonoBehaviour {
             return;
         }
         if (visibilityTimer > 0) {
-            // SetRectPosition();
-            // textRect.position = cam.WorldToScreenPoint(followTransform.position);
-            // childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position));
             SetRectPositions();
             visibilityTimer -= Time.deltaTime;
             if (visibilityTimer <= 0) {
                 HideText();
+            }
+        }
+        if (scaleWithPlayerDistance && IsSpeaking()) {
+            Vector3 displacement = followTransform.position - GameManager.I.playerPosition;
+            float distance = displacement.magnitude;
+            if (distance > FALLOFF_DISTANCE) {
+                textMesh.transform.localScale = Vector3.zero;
+            } else {
+                textMesh.transform.localScale = new Vector3(1f, 1.2f, 1f) * (float)PennerDoubleAnimation.ExpoEaseOut(distance, 2f, -2f, FALLOFF_DISTANCE);
             }
         }
     }
@@ -40,14 +49,9 @@ public class SpeechTextController : MonoBehaviour {
     }
 
     public void Say(string phrase) {
-        // textMesh.color = textColor.GetValueOrDefault(Color.white);
         textMesh.text = phrase;
         visibilityTimer = 5f;
         ShowText();
-        // SetRectPosition();
-        // for (RectTransform )
-        // childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position));
-        // textRect.position = cam.WorldToScreenPoint(followTransform.position);
     }
     void SetRectPositions() {
         childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position));
@@ -59,6 +63,9 @@ public class SpeechTextController : MonoBehaviour {
     }
     public void HideText() {
         textMesh.enabled = false;
+    }
+    public bool IsSpeaking() {
+        return textMesh.enabled;
     }
     // void SetRectPosition() {
     //     Rect camRect = cam.pixelRect;

@@ -266,7 +266,7 @@ public partial class GameManager : Singleton<GameManager> {
             Destroy(clearSighter);
         }
         if (clearSighter2 != null) {
-            clearSighter2.Initialize(focus.transform);
+            clearSighter2.Initialize(focus.transform, characterCamera);
             // Destroy(clearSighter2);
         }
 

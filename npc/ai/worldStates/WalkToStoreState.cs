@@ -4,7 +4,7 @@ using UnityEngine.AI;
 public class WalkToStoreState : WorldNPCControlState {
     public static readonly string NAV_POINT_KEY = "nav_point_key";
 
-    public enum StoreType { bar, item, gun, alley }
+    public enum StoreType { none, bar, item, gun, alley }
     public StoreType destinationStore;
     private TaskNode rootTaskNode;
     WorldNPCAI ai;
@@ -20,10 +20,11 @@ public class WalkToStoreState : WorldNPCControlState {
     }
     void SetupRootNode() {
         Vector3 destination = GetDestination(destinationStore);
+        float speedCoefficient = Random.Range(0.3f, 0.75f);
         rootTaskNode =
         new Sequence(
          new TaskMoveToKey(owner.transform, NAV_POINT_KEY, new System.Collections.Generic.HashSet<int>(), characterController, arrivalDistance: 0.5f) {
-             speedCoefficient = 0.5f
+             speedCoefficient = speedCoefficient
          },
          new TaskTimerDectorator(Random.Range(1f, 3f))
         );

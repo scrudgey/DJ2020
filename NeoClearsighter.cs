@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+
 public class NeoClearsighter : MonoBehaviour {
     enum State { normal, showAll }
     State state;
@@ -14,15 +16,17 @@ public class NeoClearsighter : MonoBehaviour {
     HashSet<Renderer> previousDynamicRendererBatch;
     Dictionary<Renderer, Vector3> rendererPositions;
     Dictionary<Renderer, Transform> rendererTransforms;
+    Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode;
+
     Dictionary<Collider, Renderer[]> colliderToRenderer;
     Collider[] colliderHits;
     CharacterCamera myCamera;
-    void Awake() {
-        GameManager.OnInputModeChange += HandleInputModeChange;
-    }
-    void OnDestroy() {
-        GameManager.OnInputModeChange -= HandleInputModeChange;
-    }
+    // void Awake() {
+    //     GameManager.OnInputModeChange += HandleInputModeChange;
+    // }
+    // void OnDestroy() {
+    //     GameManager.OnInputModeChange -= HandleInputModeChange;
+    // }
 
     public void Initialize(Transform followTransform, CharacterCamera camera) {
         this.followTransform = followTransform;
@@ -39,6 +43,7 @@ public class NeoClearsighter : MonoBehaviour {
         rendererPositions = new Dictionary<Renderer, Vector3>();
         colliderToRenderer = new Dictionary<Collider, Renderer[]>();
         rendererTransforms = new Dictionary<Renderer, Transform>();
+        initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
         previousStaticRendererBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>().Where(renderer => renderer.isPartOfStaticBatch).ToList();
@@ -46,18 +51,25 @@ public class NeoClearsighter : MonoBehaviour {
         foreach (Renderer renderer in staticRenderers) {
             rendererTree.Add(renderer, renderer.transform.position);
             rendererPositions[renderer] = renderer.transform.root.position;
+            initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
         }
     }
 
     IEnumerator HandleGeometry() {
+        if ((myCamera.state == CameraState.normal || myCamera.state == CameraState.attractor)) {
+            state = State.normal;
+        } else {
+            state = State.showAll;
+        }
+
         switch (state) {
             case State.normal:
                 yield return HandleGeometryNormal();
                 break;
             case State.showAll:
+                yield return ShowAllGeometry();
                 break;
         }
-
     }
 
     IEnumerator ShowAllGeometry() {
@@ -69,7 +81,7 @@ public class NeoClearsighter : MonoBehaviour {
                 j = 0;
                 yield return waitForFrame;
             }
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            renderer.shadowCastingMode = initialShadowCastingMode[renderer];
         }
         previousStaticRendererBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
@@ -111,7 +123,7 @@ public class NeoClearsighter : MonoBehaviour {
                 j = 0;
                 yield return waitForFrame;
             }
-            Renderer[] renderers = GetRenderers(collider);
+            Renderer[] renderers = GetDynamicRenderers(collider);
             foreach (Renderer renderer in renderers) {
                 if (rendererTransforms[renderer].position.y > origin.y) {
                     renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
@@ -130,7 +142,7 @@ public class NeoClearsighter : MonoBehaviour {
                 j = 0;
                 yield return waitForFrame;
             }
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            renderer.shadowCastingMode = initialShadowCastingMode[renderer];
         }
 
         previousStaticRendererBatch = nextStaticRenderBatch;
@@ -138,7 +150,7 @@ public class NeoClearsighter : MonoBehaviour {
         yield return waitForFrame;
     }
 
-    public Renderer[] GetRenderers(Collider key) {
+    public Renderer[] GetDynamicRenderers(Collider key) {
         if (colliderToRenderer.ContainsKey(key)) {
             return colliderToRenderer[key];
         } else {
@@ -149,14 +161,13 @@ public class NeoClearsighter : MonoBehaviour {
             colliderToRenderer[key] = renderers;
             foreach (Renderer renderer in renderers) {
                 rendererTransforms[renderer] = renderer.transform;
+                initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             }
             return renderers;
         }
     }
 
     public void HandleInputModeChange(InputMode oldInputMode, InputMode newInputMode) {
-        // if (active() && (camera.state == CameraState.normal || camera.state == CameraState.attractor)) {
 
-        // if (newInputMode == InputMode.aim || newInputMode == InputMode.wallpressAim)
     }
 }
