@@ -2060,6 +2060,13 @@ note: layer "interactive"
 * make global market factors
 * basic floor 2.25 needs to be fixed.
 * break dialogue into its own controller
+* adjust speech text visibility based on distance
+* some who spawn stick around in zone
+* disable lock-on in world
+* randomize movement a little bit
+* don't hide heads
+* talking sprites for head graphics
+* floating chair
 
 
 
@@ -2544,6 +2551,10 @@ graphics:
 
 
 
+* redraw talking sprite sheet so as to not interfere with override head direction sprite data.
+* talking animation
+    * triggered when talking
+
 
 
 enemies hear me easily from below?
@@ -2558,8 +2569,6 @@ clearsighter
 show objectives as blit-in text on lower left?
     show dayss
 "v" and "^" buttons on scrollbars?
-
-
 
 new game: 
     ensure none already exists
@@ -2584,39 +2593,23 @@ mission guy in the bar
 
 all shop UIs that are about buying / selling should share as much common interface as possible.
 
+randomize path?
+    nudge path vertices?
 
-NPCs
-    NPCs need to be spawned / initialized like NPCs in general: initialized, pooled, randomized, etc.
-
-mill about when you reach the location
-    1. meet with other NPCs and talk.
-    2. choose a random location within the store, move there, wait a random amount of time.
-    3. store-specific interactions
-
-walking around:
-    weave, amble, move slowly, slow down, speed up?
-better scene load
 linger in bar:
     move to open spot on the bar and get a drink
     move to a seat
 linger in item shop
-    make item shop more like a bodega
+    make item shop more like a bodega?
 linger in alleyway  
     knife fight
 
-
-* adjust speech text visibility based on distance
-* some who spawn stick around in zone
-* disable lock-on in world
-* randomize movement a little bit
-
-talking sprites for head graphics
-talking animation
-    triggered when talking
-don't hide heads
-floating chair
 more randomizable NPC
+    random selection of head, torso, legs
+    sometimes, torso + legs are set dependently.
 
-
-randomize path?
-    nudge path vertices?
+billboard shader orientation can be set by camera direction?
+    orient sprite transform towards camera
+better scene load
+cars 
+buildings

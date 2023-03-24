@@ -38,6 +38,9 @@ public class NPCSpawnZone : MonoBehaviour {
     }
 
     GameObject SpawnNPC(NPCTemplate template) {
+        if (NPCPool == null) {
+            InitializePools();
+        }
         NavMeshHit hit = new NavMeshHit();
         Vector3 point = Toolbox.RandomInsideBounds(zone);
         NavMeshQueryFilter filter = new NavMeshQueryFilter {

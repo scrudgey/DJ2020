@@ -19,6 +19,7 @@ public class NeoClearsighter : MonoBehaviour {
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode;
 
     Dictionary<Collider, Renderer[]> colliderToRenderer;
+    Dictionary<Collider, Transform> dynamicColliderRoot;
     Collider[] colliderHits;
     CharacterCamera myCamera;
     // void Awake() {
@@ -42,6 +43,7 @@ public class NeoClearsighter : MonoBehaviour {
     void InitializeTree() {
         rendererPositions = new Dictionary<Renderer, Vector3>();
         colliderToRenderer = new Dictionary<Collider, Renderer[]>();
+        dynamicColliderRoot = new Dictionary<Collider, Transform>();
         rendererTransforms = new Dictionary<Renderer, Transform>();
         initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
         previousStaticRendererBatch = new HashSet<Renderer>();
@@ -124,8 +126,9 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             Renderer[] renderers = GetDynamicRenderers(collider);
-            foreach (Renderer renderer in renderers) {
-                if (rendererTransforms[renderer].position.y > origin.y) {
+            Transform root = dynamicColliderRoot[collider];
+            if (root.position.y > origin.y) {
+                foreach (Renderer renderer in renderers) {
                     renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                     nextDynamicRenderBatch.Add(renderer);
                     if (previousDynamicRendererBatch.Contains(renderer)) {
@@ -133,6 +136,15 @@ public class NeoClearsighter : MonoBehaviour {
                     }
                 }
             }
+            // foreach (Renderer renderer in renderers) {
+            //     if (rendererTransforms[renderer].position.y > origin.y) {
+            //         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            //         nextDynamicRenderBatch.Add(renderer);
+            //         if (previousDynamicRendererBatch.Contains(renderer)) {
+            //             previousDynamicRendererBatch.Remove(renderer);
+            //         }
+            //     }
+            // }
         }
 
         // reset previous batch
@@ -159,6 +171,7 @@ public class NeoClearsighter : MonoBehaviour {
                                                 !(x is LineRenderer)
                                                 ).ToArray();
             colliderToRenderer[key] = renderers;
+            dynamicColliderRoot[key] = key.transform.root;
             foreach (Renderer renderer in renderers) {
                 rendererTransforms[renderer] = renderer.transform;
                 initialShadowCastingMode[renderer] = renderer.shadowCastingMode;

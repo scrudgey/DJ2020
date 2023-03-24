@@ -31,6 +31,7 @@ public enum PopoutParity {
 public class CharacterController : MonoBehaviour, ICharacterController, IPlayerStateLoader, IBindable<CharacterController>, IInputReceiver, IHitstateSubscriber, IPoolable {
     public KinematicCharacterMotor Motor;
     public CharacterHurtable characterHurtable;
+    public SpeechTextController speechTextController;
     public CharacterCamera OrbitCamera;
     public Transform targetPoint;
     public JumpIndicatorController jumpIndicatorController;
@@ -1471,7 +1472,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             hitState = hitState,
             velocity = Motor.Velocity,
             wavingArm = waveArmTimer > 0f,
-            activeItem = itemHandler?.activeItem
+            activeItem = itemHandler?.activeItem,
+            isSpeaking = speechTextController?.IsSpeaking() ?? false
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

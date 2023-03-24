@@ -197,11 +197,11 @@ public class Skin {
         Skin skin = new Skin();
 
         // head
-        skin.headIdle[Direction.down] = new Sprite[] { headSprites[0] };
-        skin.headIdle[Direction.rightDown] = new Sprite[] { headSprites[1] };
-        skin.headIdle[Direction.right] = new Sprite[] { headSprites[2] };
-        skin.headIdle[Direction.rightUp] = new Sprite[] { headSprites[3] };
-        skin.headIdle[Direction.up] = new Sprite[] { headSprites[4] };
+        skin.headIdle[Direction.down] = new Sprite[] { headSprites[0], headSprites[5] };
+        skin.headIdle[Direction.rightDown] = new Sprite[] { headSprites[1], headSprites[6] };
+        skin.headIdle[Direction.right] = new Sprite[] { headSprites[2], headSprites[7] };
+        skin.headIdle[Direction.rightUp] = new Sprite[] { headSprites[3], headSprites[8] };
+        skin.headIdle[Direction.up] = new Sprite[] { headSprites[4], headSprites[9] };
         skin.headSprites = headSprites;
 
         // legs

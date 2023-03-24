@@ -44,7 +44,7 @@ public class SocializeState : WorldNPCControlState {
                     reorient = true,
                     useKey = false
                 }, 0.2f),
-                new TaskTimerDectorator(new TaskSocialize(ai, speechTextController, socialGroup), Random.Range(10f, 20f))
+                new TaskTimerDectorator(new TaskSocialize(ai, speechTextController, socialGroup), Random.Range(10f, 45f))
             );
         rootTaskNode.SetData(NAV_POINT_KEY, socialGroup.transform.position);
     }

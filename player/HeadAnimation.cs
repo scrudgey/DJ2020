@@ -7,12 +7,21 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
     public SpriteRenderer spriteRenderer;
     public Skin skin;
     public Direction direction;
-    private int frame;
+    // private int frame;
+    float timer;
+    bool speakParity;
+    float speakInterval = 0.1f;
 
     public void UpdateView(AnimationInput input, SpriteData torsoSpriteData) {
+        timer += Time.deltaTime;
+        if (timer > speakInterval) {
+            timer -= speakInterval;
+            speakParity = !speakParity;
+            speakInterval = UnityEngine.Random.Range(0.05f, 0.15f);
+        }
+
         switch (input.state) {
             case CharacterState.wallPress:
-
                 // TODO: should not belong to animation code
                 transform.localRotation = Quaternion.identity;
                 spriteRenderer.material.DisableKeyword("_BILLBOARD");
@@ -65,7 +74,7 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
         if (torsoSpriteData.overrideHeadDirection) {
             direction = input.orientation;
         }
-        UpdateFrame(torsoSpriteData);
+        UpdateFrame(input, torsoSpriteData);
     }
     public void SpawnTrail() {
         GameObject trail = GameObject.Instantiate(Resources.Load("prefabs/fx/jumpTrail"), transform.position, transform.rotation) as GameObject;
@@ -73,14 +82,20 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
         billboard.skin = skin.headIdle;
     }
 
-    public void UpdateFrame(SpriteData torsoSpriteData) {
+    public void UpdateFrame(AnimationInput input, SpriteData torsoSpriteData) {
         if (skin != null) {
             Octet<Sprite[]> octet = skin.headIdle;
             if (torsoSpriteData.overrideHeadDirection) {
+                int index = torsoSpriteData.headSprite;
+                if (input.isSpeaking)
+                    if (speakParity) index += 5;
                 spriteRenderer.sprite = skin.headSprites[torsoSpriteData.headSprite];
             } else {
                 Sprite[] sprites = octet[direction];
-                frame = Math.Min(frame, sprites.Length - 1);
+                // frame = Math.Min(frame, sprites.Length - 1);
+                int frame = 0;
+                if (input.isSpeaking)
+                    frame = speakParity ? 0 : 1;
                 spriteRenderer.sprite = sprites[frame];
             }
         }

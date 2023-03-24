@@ -12,7 +12,7 @@ namespace AI {
         public HeadBehavior headBehavior;
         readonly float CORNER_ARRIVAL_DISTANCE = 0.15f;
         float finalCornerArrivalDistance = 0.15f;
-        public NavMeshPath navMeshPath;
+        // public NavMeshPath navMeshPath;
         public int pathIndex;
         Transform transform;
         string key;
@@ -26,8 +26,9 @@ namespace AI {
         Door waitForDoor;
         public SpottedHighlight highlight;
         CharacterController controller;
+        Vector3[] path;
         public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, CharacterController controller, float arrivalDistance = 0.15f, SpottedHighlight highlight = null) : base() {
-            navMeshPath = new NavMeshPath();
+            // navMeshPath = new NavMeshPath();
             pathIndex = -1;
             this.transform = transform;
             this.key = key;
@@ -42,8 +43,8 @@ namespace AI {
         }
 
         public Vector3[] GetNavPath() {
-            if (pathIndex <= navMeshPath.corners.Length - 1) {
-                return navMeshPath.corners[pathIndex..^0];
+            if (pathIndex <= path.Length - 1) {
+                return path[pathIndex..^0];
             } else return new Vector3[0];
         }
 
@@ -81,13 +82,13 @@ namespace AI {
                     waitForDoor = null;
                 }
                 return TaskState.running;
-            } else if (pathIndex == -1 || navMeshPath.corners.Length == 0) {
+            } else if (pathIndex == -1 || path.Length == 0) {
                 return TaskState.running;
-            } else if (pathIndex <= navMeshPath.corners.Length - 1) {
+            } else if (pathIndex <= path.Length - 1) {
                 Vector3 inputVector = Vector3.zero;
-                Vector3 nextPoint = navMeshPath.corners[pathIndex];
+                Vector3 nextPoint = path[pathIndex];
                 float distance = Vector3.Distance(nextPoint, transform.position);
-                float arrivalDistance = (pathIndex < navMeshPath.corners.Length - 1) ? CORNER_ARRIVAL_DISTANCE : finalCornerArrivalDistance;
+                float arrivalDistance = (pathIndex < path.Length - 1) ? CORNER_ARRIVAL_DISTANCE : finalCornerArrivalDistance;
                 if (distance > arrivalDistance) {
                     Vector3 direction = nextPoint - transform.position;
                     inputVector = direction;
@@ -106,8 +107,8 @@ namespace AI {
                 } else {
                     input.moveDirection = speedCoefficient * inputVector.normalized;
                 }
-                for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
-                    Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
+                for (int i = 0; i < path.Length - 1; i++) {
+                    Debug.DrawLine(path[i], path[i + 1], Color.white);
                 }
 
                 // check for doors between me and nextPoint
@@ -121,7 +122,7 @@ namespace AI {
         }
 
         public bool AtDestination() {
-            return pathIndex == navMeshPath.corners.Length;
+            return pathIndex == path.Length;
         }
 
         public void CheckForDoors(Vector3 position, Vector3 nextPoint) {
@@ -158,6 +159,7 @@ namespace AI {
         }
 
         public void SetDestination() {
+            NavMeshPath navMeshPath = new NavMeshPath();
             NavMeshHit hit = new NavMeshHit();
             object keyObj = GetData(key);
             if (keyObj == null)
@@ -182,6 +184,27 @@ namespace AI {
             if (highlight != null) {
                 highlight.navMeshPath = navMeshPath;
             }
+            path = navMeshPath.corners;
+            // path = RandomizePath(path, filter);
+        }
+        Vector3[] RandomizePath(Vector3[] inpath, NavMeshQueryFilter filter) {
+            List<Vector3> newPath = new List<Vector3>();
+            int i = 0;
+            foreach (Vector3 point in inpath) {
+                i++;
+                if (i == 1 || i == inpath.Length) {
+                    newPath.Add(point);
+                    continue;
+                }
+                NavMeshHit hit = new NavMeshHit();
+                Vector3 target = point + Random.insideUnitSphere;
+                if (NavMesh.SamplePosition(target, out hit, 1f, filter)) {
+                    newPath.Add(hit.position);
+                } else {
+                    newPath.Add(point);
+                }
+            }
+            return newPath.ToArray();
         }
         public override void Reset() {
             base.Reset();

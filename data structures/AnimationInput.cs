@@ -30,6 +30,7 @@ public struct AnimationInput {
     public bool isRunning;
     public bool isJumping;
     public bool isClimbing;
+    public bool isSpeaking;
     public float wallPressTimer;
     public CharacterState state;
     public Quaternion cameraRotation;
