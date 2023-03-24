@@ -56,6 +56,8 @@ public class NPCSpawnZone : MonoBehaviour {
 
             CharacterController controller = npc.GetComponentInChildren<CharacterController>();
             KinematicCharacterMotor motor = npc.GetComponentInChildren<KinematicCharacterMotor>();
+            LegsAnimation legsAnimation = npc.GetComponentInChildren<LegsAnimation>();
+            legsAnimation.characterCamera = cam;
             controller.OrbitCamera = cam;
 
             WorldNPCAI ai = npc.GetComponent<WorldNPCAI>();

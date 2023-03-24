@@ -9,6 +9,8 @@ public class PlayerSpawnPoint : MapMarker {
         plan.ApplyState(playerObject);
         CharacterController controller = playerObject.GetComponentInChildren<CharacterController>();
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
+        LegsAnimation legsAnimation = playerObject.GetComponentInChildren<LegsAnimation>();
+        legsAnimation.characterCamera = cam;
         controller.OrbitCamera = cam;
         return playerObject;
     }

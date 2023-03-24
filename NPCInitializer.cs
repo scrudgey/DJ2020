@@ -9,20 +9,11 @@ public class NPCInitializer : MonoBehaviour {
     }
     void InitializeNPC() {
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
-
         CharacterController controller = GetComponentInChildren<CharacterController>();
-        // KinematicCharacterMotor motor = GetComponentInChildren<KinematicCharacterMotor>();
-        // SphereRobotAI ai = GetComponentInChildren<SphereRobotAI>();
-
+        LegsAnimation legsAnimation = GetComponentInChildren<LegsAnimation>();
+        legsAnimation.characterCamera = cam;
         controller.OrbitCamera = cam;
-        // ai.patrolRoute = route;
-
-        // should be part of apply state?
-        // ai.etiquettes = template.etiquettes;
-        // ai.portrait = template.portrait;
-        // motor.SetPosition(transform.position, bypassInterpolation: true);
         ApplyNPCState(template, gameObject);
-        // ai.Initialize();
     }
 
     void ApplyNPCState(NPCTemplate template, GameObject npcObject) {

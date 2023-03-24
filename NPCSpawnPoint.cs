@@ -28,7 +28,8 @@ public class NPCSpawnPoint : MonoBehaviour {
         CharacterController controller = npc.GetComponentInChildren<CharacterController>();
         KinematicCharacterMotor motor = npc.GetComponentInChildren<KinematicCharacterMotor>();
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
-
+        LegsAnimation legsAnimation = npc.GetComponentInChildren<LegsAnimation>();
+        legsAnimation.characterCamera = cam;
         controller.OrbitCamera = cam;
         ai.patrolRoute = route;
 

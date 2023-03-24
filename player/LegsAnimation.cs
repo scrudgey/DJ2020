@@ -17,6 +17,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     State state;
     HitState hitState;
     private int frame;
+    public CharacterCamera characterCamera;
     public SpriteRenderer spriteRenderer;
     public Transform shadowCaster;
     public GameObject torso;
@@ -262,7 +263,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         Vector3 absoluteWorldPosition = headAnimation.transform.position;
 
         // set rotation back to identity.
-        transform.localRotation = Quaternion.identity;
+        // transform.localRotation = Quaternion.identity;
+        transform.forward = characterCamera.PlanarDirection;
 
         // set position back to the rotated position.
         // this is hacky
