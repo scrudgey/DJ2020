@@ -44,6 +44,9 @@ public class NPCSpawnPoint : MonoBehaviour {
     }
     void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
         NPCState state = NPCState.Instantiate(template);
+
+        // TODO: driven by level data
+        state.activeGun = 1;
         state.ApplyState(npcObject);
     }
 

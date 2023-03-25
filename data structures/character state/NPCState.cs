@@ -20,7 +20,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
         primaryGun = GunState.Instantiate(template.primaryGun),
         secondaryGun = GunState.Instantiate(template.secondaryGun),
         tertiaryGun = GunState.Instantiate(template.tertiaryGun),
-        activeGun = 1,
+        activeGun = 0,
         health = template.fullHealthAmount,
         fullHealthAmount = template.fullHealthAmount,
         hitState = template.hitState

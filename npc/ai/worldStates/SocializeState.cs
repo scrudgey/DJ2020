@@ -32,7 +32,7 @@ public class SocializeState : WorldNPCControlState {
     }
     void SetupRootNode() {
         float speedCoefficient = Random.Range(0.22f, 0.27f);
-        float arrivalDistance = Random.Range(5f, 10f);
+        float arrivalDistance = Random.Range(1f, 2f);
         rootTaskNode =
             new Sequence(
                 new TaskMoveToKey(owner.transform, NAV_POINT_KEY, new System.Collections.Generic.HashSet<int>(), characterController, arrivalDistance: arrivalDistance) {

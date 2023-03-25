@@ -65,7 +65,6 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         scaleOffset = Vector3.zero;
     }
     void Update() {
-        // TODO: replace this with a coroutine initiated by animation input ?
         if (hitState == HitState.hitstun) {
             hitstunTimer += Time.deltaTime;
             if (hitstunTimer >= 0.01f) {
@@ -92,7 +91,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         } else {
             spriteRenderer.enabled = true;
             torsoAnimation.spriteRenderer.enabled = true;
-            headAnimation.spriteRenderer.enabled = true; // TODO: ok?xs
+            headAnimation.spriteRenderer.enabled = true;
             offset = Vector3.zero;
             scaleOffset = Vector3.zero;
         }
@@ -263,8 +262,11 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         Vector3 absoluteWorldPosition = headAnimation.transform.position;
 
         // set rotation back to identity.
-        // transform.localRotation = Quaternion.identity;
-        transform.forward = characterCamera.PlanarDirection;
+        if (input.state != CharacterState.wallPress && input.wallPressTimer <= 0) {
+            transform.forward = characterCamera.PlanarDirection;
+        } else {
+            transform.localRotation = Quaternion.identity;
+        }
 
         // set position back to the rotated position.
         // this is hacky

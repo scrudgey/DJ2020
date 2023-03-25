@@ -92,7 +92,6 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToPhase(GamePhase.levelPlay);
     }
     public void StartWorld() {
-        Debug.Log($"GameMananger: world scene");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
@@ -101,6 +100,7 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.ShowInteractiveHighlight();
             }, unloadAll: false);
         }
+        // TODO: this should be inside the loading coroutine.
         foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
             zone.SpawnNPCs();
         }
