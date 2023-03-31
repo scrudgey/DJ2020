@@ -10,6 +10,7 @@ public class ItemShopController : MonoBehaviour {
     public GameObject itemButtonPrefab;
     public GameObject bodyContainer;
     public StoreDialogueController dialogueController;
+    public RectTransform bottomRect;
 
     [Header("lists")]
     public Transform leftGunScrollContainer;
@@ -25,6 +26,7 @@ public class ItemShopController : MonoBehaviour {
     public AudioClip[] buyFailSound;
     public AudioClip[] selectGunSound;
     public AudioClip blitSound;
+    public AudioClip[] discloseBottomSound;
     Coroutine blitTextRoutine;
 
     List<ItemSaleData> itemSaleData = new List<ItemSaleData>();
@@ -32,11 +34,13 @@ public class ItemShopController : MonoBehaviour {
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
+        bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
     public void Start() {
         dialogueController.Initialize(GameManager.I.gameData.filename, "seller");
         itemSaleData = LoadItemSaleData();
         ClearInitialize();
+        StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
     List<ItemSaleData> LoadItemSaleData() => new List<ItemSaleData>(){
             new ItemSaleData(ItemInstance.LoadItem("C4"), 600),

@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class GunShopController : MonoBehaviour {
     public GameObject UIEditorCamera;
 
@@ -12,6 +12,7 @@ public class GunShopController : MonoBehaviour {
     public GameObject inventoryButtonPrefab;
     public GameObject gunListDividerPrefab;
     public StoreDialogueController dialogueController;
+    public RectTransform bottomRect;
     [Header("lists")]
     public Transform leftGunScrollContainer;
     public Transform rightGunScrollContainer;
@@ -32,6 +33,7 @@ public class GunShopController : MonoBehaviour {
     public AudioClip[] buyFailSound;
     public AudioClip[] selectGunSound;
     public AudioClip[] mouseOverSound;
+    public AudioClip[] discloseBottomSound;
     public AudioClip blitSound;
     Coroutine blitTextRoutine;
     List<GunSaleData> gunSaleData = new List<GunSaleData>();
@@ -39,6 +41,7 @@ public class GunShopController : MonoBehaviour {
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
+        bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
     public void Start() {
         // rightDialogueName.text = GameManager.I.gameData.filename;
@@ -47,7 +50,9 @@ public class GunShopController : MonoBehaviour {
         gunSaleData = LoadGunSaleData();
         ClearInitialize();
         SetBuyMode();
+        StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
+
 
     List<GunSaleData> LoadGunSaleData() => new List<GunSaleData>(){
             new GunSaleData(GunTemplate.Load("p1"), 600),
@@ -65,7 +70,6 @@ public class GunShopController : MonoBehaviour {
         };
 
     void ClearInitialize() {
-
         PopulateStoreInventory();
         PopulatePlayerInventory();
         SetPlayerCredits();
@@ -161,7 +165,7 @@ public class GunShopController : MonoBehaviour {
         SetSalePrice(data.cost);
         dialogueController.SetShopownerDialogue(data.template.shopDescription);
         currentGunForSale = data;
-        Toolbox.RandomizeOneShot(audioSource, selectGunSound);
+        Toolbox.RandomizeOneShot(audioSource, selectGunSound, randomPitchWidth: 0.02f);
         // TODO: grey out Buy button if player has insufficient credits
     }
     void ClearGunForSale() {
@@ -185,10 +189,10 @@ public class GunShopController : MonoBehaviour {
             return;
         } else {
             if (GameManager.I.gameData.playerState.credits >= currentGunForSale.cost) {
-                Toolbox.RandomizeOneShot(audioSource, buySound);
+                Toolbox.RandomizeOneShot(audioSource, buySound, randomPitchWidth: 0.02f);
                 BuyGun(currentGunForSale);
             } else {
-                Toolbox.RandomizeOneShot(audioSource, buyFailSound);
+                Toolbox.RandomizeOneShot(audioSource, buyFailSound, randomPitchWidth: 0.02f);
             }
         }
     }

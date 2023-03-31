@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Easings;
 using UnityEngine;
 using UnityEngine.Audio;
 // random from list
@@ -497,6 +498,20 @@ public class Toolbox {
         while (true) {
             yield return coroutine();
         }
+    }
+
+    public static IEnumerator OpenStore(RectTransform bottomRect, AudioSource audioSource, AudioClip[] discloseBottomSound) {
+        yield return new WaitForSecondsRealtime(0.5f);
+        RandomizeOneShot(audioSource, discloseBottomSound, randomPitchWidth: 0.02f);
+        float timer = 0f;
+        float duration = 0.5f;
+        while (timer < duration) {
+            timer += Time.unscaledDeltaTime;
+            float height = (float)PennerDoubleAnimation.Linear(timer, 0f, 610f, duration);
+            bottomRect.sizeDelta = new Vector2(1f, height);
+            yield return null;
+        }
+        bottomRect.sizeDelta = new Vector2(1f, 610f);
     }
 }
 

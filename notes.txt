@@ -2558,6 +2558,7 @@ graphics:
     * orient sprite transform towards camera
 * spawning should not cause lots of gun sounds
 * enemies in level spawn with gun, or unholster gun ?
+* don't apply billboard rotation in wallpress
 
 
 an NPC ran down the stairs towards me, got stuck, didn't see me.
@@ -2617,10 +2618,48 @@ more randomizable NPC
     random selection of head, torso, legs
     sometimes, torso + legs are set dependently.
 
-cars 
-buildings
-NPCs can hold beer bottles
+* cars 
+* neon sign
+* car windows
+* separate car doors
+* some large buildings for nearby: taller, more imposing, concrete
+* burned out car
+* pop up tent
+
+another car
 more neon
+buildings
+barrel not on fire
+fire hydrant
+more street electronics
+
+NPCs can hold beer bottles
 fix social group orientation
-don't apply billboard rotation in wallpress
 sound design
+vent grate for steam in street
+
+decals:
+    more grime
+    peeling paint reveals brick
+    splatter
+    tubes
+    vent grate
+    
+bikes
+    guy on bike?
+
+blink emission
+try metallic texture with more channels
+materials: specular?
+
+UI fixes
+    unify the presentation of credits, cost, buy
+
+background color
+headers:
+    smallcaps, font sizes?
+
+
+a puddle:
+    separate material, texture?
+    or: just use existing cyber setup.

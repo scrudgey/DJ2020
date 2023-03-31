@@ -46,7 +46,7 @@ public class StoreDialogueController : MonoBehaviour {
         float blitInterval = 0.025f;
         audioSource.clip = blitSound;
         audioSource.Play();
-        while (timer < blitInterval && index < content.Length) {
+        while (index < content.Length) {
             timer += Time.unscaledDeltaTime;
             if (timer >= blitInterval) {
                 index += 1;

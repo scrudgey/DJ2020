@@ -12,6 +12,8 @@ public class LootShopController : MonoBehaviour {
     // public GameObject bodyContainer;
     public GameObject lootPreferencePrefab;
     public StoreDialogueController dialogueController;
+    public RectTransform bottomRect;
+
 
     [Header("lists")]
     public Transform inventoryContainer;
@@ -35,6 +37,7 @@ public class LootShopController : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] sellSound;
     public AudioClip[] selectSound;
+    public AudioClip[] discloseBottomSound;
 
 
     List<LootData> currentItemForSale;
@@ -43,6 +46,7 @@ public class LootShopController : MonoBehaviour {
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
+        bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
 
     public void Initialize(LootBuyerData lootBuyerData) {
@@ -54,6 +58,7 @@ public class LootShopController : MonoBehaviour {
         dialogueController.Initialize(GameManager.I.gameData.filename, lootBuyerData.buyerName);
         // set portraits
         dialogueController.SetShopownerDialogue("Please come in to my underground loot shop.");
+        StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
     void PopulatePlayerInventory() {
         foreach (Transform child in inventoryContainer) {
