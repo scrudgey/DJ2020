@@ -12,6 +12,9 @@ public class ItemShopController : MonoBehaviour {
     public StoreDialogueController dialogueController;
     public RectTransform bottomRect;
 
+    public GameObject costBar;
+    public GameObject buyButton;
+
     [Header("lists")]
     public Transform leftGunScrollContainer;
     public Transform rightGunScrollContainer;
@@ -111,6 +114,9 @@ public class ItemShopController : MonoBehaviour {
         itemImage.enabled = true;
         itemImage.sprite = data.item.data.image;
         itemNameTitle.text = data.item.data.name;
+
+        costBar.SetActive(true);
+        buyButton.SetActive(true);
     }
     void ClearItemForSale() {
         currentItemForSale = null;
@@ -137,6 +143,11 @@ public class ItemShopController : MonoBehaviour {
         itemImage.enabled = true;
         itemImage.sprite = button.item.data.image;
         itemNameTitle.text = button.item.data.name;
+
+        // hide cost
+        // hide sell button
+        costBar.SetActive(false);
+        buyButton.SetActive(false);
     }
 
     public void BuyCallback() {
