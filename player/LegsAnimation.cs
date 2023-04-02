@@ -45,6 +45,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
     }
 
     override public void HandleValueChanged(CharacterController controller) {
+        if (skin == null || skin.legsIdle[Direction.down] == null || skin.legsIdle[Direction.down].Length == 0) return;
         AnimationInput input = controller.BuildAnimationInput();
         UpdateView(input);
     }

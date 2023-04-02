@@ -100,6 +100,6 @@ public record GameData {
 
 
     static public string SaveGameRootDirectory() => System.IO.Path.Join(Application.persistentDataPath, "saveGames");
-    static public string SaveGamePath(string filename) => System.IO.Path.Join(SaveGameRootDirectory(), filename);
-    string SaveGamePath() => System.IO.Path.Join(SaveGameRootDirectory(), filename);
+    static public string SaveGamePath(string filename) => System.IO.Path.Join(SaveGameRootDirectory(), filename.ToLower());
+    string SaveGamePath() => System.IO.Path.Join(SaveGameRootDirectory(), filename.ToLower());
 }

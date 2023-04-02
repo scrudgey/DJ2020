@@ -16,6 +16,7 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     public Color currentSpriteColor;
     Coroutine coroutine;
     NativeArray<byte> textureData;
+    WaitForSeconds waitForSeconds = new WaitForSeconds(0.1f);
     void Start() {
         textureData = new NativeArray<byte>(lightTextures[0].height * lightTextures[0].width * 4, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
         coroutine = StartCoroutine(RunJobRepeatedly());
@@ -44,13 +45,14 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
                 yield return AsyncRead(lightTextures[3]);
             }
             UpdateLightLevel();
-            yield return new WaitForEndOfFrame();
+            // yield return new WaitForEndOfFrame();
+            yield return waitForSeconds;
         }
     }
     IEnumerator AsyncRead(RenderTexture renderTexture) {
         var asyncRead = AsyncGPUReadback.RequestIntoNativeArray(ref textureData, renderTexture, 0, request => {
             if (request.hasError) {
-                Debug.LogError("GPU readback error detected.");
+                Debug.LogError($"GPU readback error detected: {renderTexture}");
                 return;
             }
         });

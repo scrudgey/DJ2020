@@ -7,12 +7,6 @@ public class ScriptableObjectJsonConverter<T> : JsonConverter<T> where T : Unity
         public static readonly string PATH = "path";
     }
     public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer) {
-        // if (reader.TokenType == JsonToken.Null) return null;
-        // JObject jo = JObject.Load(reader);
-        // string path = (string)jo[Constants.PATH];
-        // var result = Resources.Load<T>(path) as T;
-        // // Debug.Log($"deserializing asset : {path} -> {result}");
-        // return result;
         return DoReadJson(reader, objectType, existingValue, hasExistingValue, serializer);
     }
     public override void WriteJson(JsonWriter writer, T value, JsonSerializer serializer) {

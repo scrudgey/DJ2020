@@ -379,7 +379,8 @@ public partial class GameManager : Singleton<GameManager> {
         }
         toggleConsoleThisFrame = false;
         escapePressedThisFrame = false;
-        playerPosition = playerObject.transform.position;
+        if (playerObject != null)
+            playerPosition = playerObject.transform.position;
     }
     public void HandleEscapePressed() {
         if (gameData.phase == GamePhase.world) {

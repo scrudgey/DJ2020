@@ -20,12 +20,6 @@ public partial class GameManager : Singleton<GameManager> {
         CheckObjectives();
     }
     public void CollectLoot(LootData data) {
-        // if (gameData.playerState.loots.ContainsKey(data)) {
-        //     int oldCount = gameData.playerState.loots[data];
-        //     gameData.playerState.loots[data] = oldCount + 1;
-        // } else {
-        //     gameData.playerState.loots[data] = 1;
-        // }
         gameData.playerState.loots.Add(data);
         OnLootChange?.Invoke(data, gameData);
     }

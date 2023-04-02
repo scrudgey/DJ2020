@@ -11,9 +11,15 @@ public class Highlightable : MonoBehaviour {
         StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
     }
     void Initialize() {
-        this.outline = Toolbox.GetOrCreateComponent<Outline>(gameObject, inChildren: true);
-        this.outline.color = 1;
-        DisableOutline();
+        try {
+
+            this.outline = Toolbox.GetOrCreateComponent<Outline>(gameObject, inChildren: true);
+            this.outline.color = 1;
+            DisableOutline();
+        }
+        catch (Exception e) {
+            Debug.Log($"[highlightable] ******* trying to initialize {gameObject}: {e}");
+        }
     }
     public void EnableOutline() {
         if (outline != null)

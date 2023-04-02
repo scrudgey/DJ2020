@@ -80,7 +80,7 @@ public class LootCanvasHandler : MonoBehaviour {
     void ConfigureLootDetails(LootData data) {
         lootTitle.text = data.lootName;
         lootDescription.text = data.lootDescription;
-        valueText.text = $"value: {data.value} credits";
+        valueText.text = $"{data.value}";
         lootImage.sprite = data.portrait;
         lootCategoryIcon.sprite = data.category switch {
             LootCategory.drug => drugSprite,
@@ -90,7 +90,7 @@ public class LootCanvasHandler : MonoBehaviour {
     void ConfigurePayDataDetail(PayData data) {
         if (data == null) return;
         lootTitle.text = data.filename;
-        valueText.text = $"value: {data.value} credits";
+        valueText.text = $"{data.value}";
         lootImage.sprite = dataPortrait;
         lootCategoryIcon.sprite = dataSprite;
         lootDescription.text = "";

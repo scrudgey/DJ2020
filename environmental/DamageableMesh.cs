@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class DamageableMesh : MonoBehaviour, IDamageReceiver {
     Mesh mesh;
     Vector3[] vertices;
@@ -9,15 +9,24 @@ public class DamageableMesh : MonoBehaviour, IDamageReceiver {
     bool[] hits;
     PrefabPool damagePool;
     private void Start() {
-        mesh = transform.GetComponent<MeshFilter>().mesh;
-        vertices = mesh.vertices;
-        triangles = mesh.triangles;
-        // hits = new bool[triangles.Length * 3];
-        hits = new bool[vertices.Length];
-        for (int i = 0; i < hits.Length; i++) {
-            hits[i] = false;
+        try {
+            mesh = transform.GetComponent<MeshFilter>().mesh;
+            vertices = mesh.vertices;
+            if (vertices == null) {
+                Debug.Log($"[damageable mesh]***** could not initialize mesh: {mesh}");
+            }
+            triangles = mesh.triangles;
+            // hits = new bool[triangles.Length * 3];
+            hits = new bool[vertices.Length];
+            for (int i = 0; i < hits.Length; i++) {
+                hits[i] = false;
+            }
+            damagePool = PoolManager.I.RegisterPool("prefabs/fx/damageDecal");
         }
-        damagePool = PoolManager.I.RegisterPool("prefabs/fx/damageDecal");
+        catch (Exception e) {
+            Debug.Log($"[damageable mesh]***** could not initialize mesh: {mesh} {e}");
+        }
+
         // RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
     }
     public DamageResult TakeDamage(Damage damage) {

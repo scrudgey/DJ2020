@@ -12,6 +12,8 @@ public class TitleController : MonoBehaviour {
     public Canvas saveDialogCanvas;
     public Canvas newGameCanvas;
     public Canvas loadGameCanvas;
+    public Canvas alertCanvas;
+    public AlertCanvasHandler alertCanvasHandler;
     public LoadGameMenuController loadGameMenuController;
     public Canvas vrMenuCanvas;
     public Color logoTintColor;
@@ -37,6 +39,7 @@ public class TitleController : MonoBehaviour {
         loadGameCanvas.enabled = false;
         newGameCanvas.enabled = false;
         saveDialogCanvas.enabled = false;
+        alertCanvas.enabled = false;
         GameManager.I.TransitionToPhase(GamePhase.mainMenu);
     }
 
@@ -79,6 +82,16 @@ public class TitleController : MonoBehaviour {
     public void CancelVRMissionCallback() {
         mainMenu.SetActive(true);
         VRCanvas.enabled = false;
+    }
+
+    public void ShowAlert(string alertContent) {
+        newGameCanvas.enabled = false;
+        alertCanvas.enabled = true;
+        alertCanvasHandler.ShowAlert(alertContent);
+    }
+    public void AlertCancelCallback() {
+        newGameCanvas.enabled = true;
+        alertCanvas.enabled = false;
     }
 
     public IEnumerator DoIntro() {

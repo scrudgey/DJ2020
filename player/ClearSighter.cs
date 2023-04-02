@@ -243,6 +243,7 @@ public class ClearSighter : MonoBehaviour {
     }
 
     void OnDestroy() {
-        StopCoroutine(coroutine);
+        if (coroutine != null)
+            StopCoroutine(coroutine);
     }
 }

@@ -29,6 +29,9 @@ namespace UI {
         PrefabPool ammoSpentPool;
         PrefabPool ammoPipPool;
         void Start() {
+            StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
+        }
+        void Initialize() {
             ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);
             ammoPipPool = PoolManager.I.RegisterPool(ammoPipPrefab, 50);
             liveAmmoPipsTop = new List<AmmoPip>();

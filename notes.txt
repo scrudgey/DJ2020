@@ -2448,14 +2448,6 @@ loot drops
 guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
 
-a new component like SphereRobotAI
-uses a state machine and states
-uses waypoints in the world
-loot popup is not popping up
-unify regular + metallic material
-eliminate cyber_obj_2 material
-
-fix broken loot items
 
 mission:
     visibility goes too low
@@ -2474,8 +2466,6 @@ mission:
 
 
 locations:
-    * weapons dealer
-    * bar (the gentleman loser)
     software dealer
     hardware dealer (the finn)
     street doc
@@ -2534,23 +2524,17 @@ shop todo:
 
 
 graphics:
-    * we need more large, imposing, concrete style buildings
+
     tents
-    * pop-up tent
     sprite props
         knives / swords / shuriken
         ground wires
         ground decals
     bar curve
     subway entrance
-    * burned out car wreck
-    * neon signange
-    * graffiti
-    * 6x6 dirt
-    * 6x6 sidewalk
+
     neon lights
         neon ring around the signage name
-        * neon sign in the window
         "GUNS" sign
         how do i do neon?
             aesthetic 1: white light, red rim
@@ -2563,8 +2547,6 @@ graphics:
         franco
         no me baño
     https://twitter.com/scrudgey/status/1627911883952099329?s=20
-
-
 
 
 
@@ -2587,31 +2569,6 @@ show objectives as blit-in text on lower left?
 "v" and "^" buttons on scrollbars?
 
 
-prevent guns in world
-prevent damage in world?
-storeowner AI
-    move to position
-    look in direction
-    look at player
-    different from SphereRobot, but still uses a state machine.
-
-upstairs importer exporter
-mission guy in the bar
-
-
-linger in bar:
-    move to open spot on the bar and get a drink
-    move to a seat
-linger in item shop
-    make item shop more like a bodega?
-linger in alleyway  
-    knife fight
-
-more randomizable NPC
-    random selection of head, torso, legs
-    sometimes, torso + legs are set dependently.
-
-
 models:
     another car
     more neon
@@ -2628,25 +2585,48 @@ decals:
     tubes
     vent grate
 
+shops:
+    gun shop:
+        indicate selected in the inventory pane
+    item shop
+        after purchase, do something better with item display
 
-NPCs can hold beer bottles
-fix social group orientation
-sound design
+world:
+    NPCs can hold beer bottles
+    fix social group orientation
+    sound design
+    prevent guns in world
+    prevent damage in world?
+    storeowner AI
+        move to position
+        look in direction
+        look at player
+        different from SphereRobot, but still uses a state machine.
+    upstairs importer exporter
+    mission guy in the bar
+    create all shops
+    linger in bar:
+        move to open spot on the bar and get a drink
+        move to a seat
+    linger in item shop
+        make item shop more like a bodega?
+    linger in alleyway  
+        knife fight
+    more randomizable NPC
+        random selection of head, torso, legs
+        sometimes, torso + legs are set dependently.
 
-gun shop:
-    indicate selected in the inventory pane
-item shop
-    after purchase, do something better with item display
+* fix highlights, interactions:
+* fix savegame
+* load savegame has empty / broken head icons?
+    * ensure none already exists
+    * ensure filename nonempty
+* fix broken loot display
 
-
-fix savegame
-new game: 
-    ensure none already exists
-    ensure filename nonempty
-    random name?
-create all shops
 fix vr missions
+complete clearsighter
 upgrade unity
-fix highlights, interactions:
-    click to interact?
 make a build
+credits / cost ordering?
+fix tower clearsight
+click to interact
