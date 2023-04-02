@@ -29,6 +29,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
         }
     }
     public static void InitializeInstance() {
+        // Debug.Log($"********** initialize singleton instance: {typeof(T)}");
         if (_instance != null)
             return;
         _instance = (T)FindObjectOfType(typeof(T));

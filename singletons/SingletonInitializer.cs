@@ -5,8 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class SingletonInitializer : MonoBehaviour {
     void Awake() {
-        GameManager.InitializeInstance();
-        PoolManager.InitializeInstance();
+        // GameManager.InitializeInstance();
+        // PoolManager.InitializeInstance();
+        Debug.Log(GameManager.I);
+        Debug.Log(PoolManager.I);
         Destroy(gameObject);
     }
 }

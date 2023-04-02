@@ -53,8 +53,14 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void StartVRMission(VRMissionState state) {
         Debug.Log("GameMananger: start VR mission");
+        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+            LoadScene("UI", () => {
+                uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.InitializeObjectivesController(gameData);
+            }, unloadAll: false);
+        }
         InitializeLevel(LevelPlan.Default(new List<Items.BaseItem>()));
-        TransitionToPhase(GamePhase.levelPlay);
+        TransitionToPhase(GamePhase.vrMission);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(state);

@@ -87,8 +87,10 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
             string[] nodes = edge.ToArray();
             U node1 = graph.nodes[nodes[0]];
             U node2 = graph.nodes[nodes[1]];
-            V indicator1 = indicators[node1];
-            V indicator2 = indicators[node2];
+            // V indicator1 = indicators[node1];
+            V indicator1 = GetIndicator(node1);
+            V indicator2 = GetIndicator(node2);
+            // V indicator2 = indicators[node2];
             if (node1.sceneName != sceneName || node2.sceneName != sceneName)
                 continue;
             SetLinePositions(renderer, node1, node2);

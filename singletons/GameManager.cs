@@ -6,8 +6,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public enum GamePhase { none, levelPlay, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop }
+public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, burgle, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -156,6 +156,7 @@ public partial class GameManager : Singleton<GameManager> {
     private void OnStateEnter(GamePhase state, GamePhase fromState) {
         // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
+            case GamePhase.vrMission:
             case GamePhase.levelPlay:
                 Time.timeScale = 1f;
                 cursorType = CursorType.gun;
@@ -243,6 +244,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("EscapeMenu", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.VREscapeMenu:
+                if (!SceneManager.GetSceneByName("VREscapeMenu").isLoaded) {
+                    LoadScene("VREscapeMenu", callback, unloadAll: false);
+                }
+                break;
             case MenuType.mainEscapeMenu:
                 if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
                     LoadScene("MainEscapeMenu", callback, unloadAll: false);
@@ -293,6 +299,10 @@ public partial class GameManager : Singleton<GameManager> {
             case MenuType.escapeMenu:
                 uiController.ShowUI();
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscapeMenu"));
+                break;
+            case MenuType.VREscapeMenu:
+                uiController.ShowUI();
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("VREscapeMenu"));
                 break;
             case MenuType.mainEscapeMenu:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("MainEscapeMenu"));
@@ -360,7 +370,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         if (gameData.phase == GamePhase.world) {
             DoInputs();
-        } else if (gameData.phase == GamePhase.levelPlay) {
+        } else if (gameData.phase == GamePhase.levelPlay || gameData.phase == GamePhase.vrMission) {
             UpdateSuspicion();
             UpdateAlarm();
             UpdateReportTickets();
@@ -391,12 +401,13 @@ public partial class GameManager : Singleton<GameManager> {
                 DoEscapeMenus();
             }
             escapePressedThisFrame = false;
-        } else if (gameData.phase == GamePhase.levelPlay) {
+        } else if (gameData.phase == GamePhase.levelPlay || gameData.phase == GamePhase.vrMission) {
             if (inputMode == InputMode.burglar) {
 
             } else {
                 if (activeMenuType == MenuType.none) {
-                    ShowMenu(MenuType.escapeMenu);
+                    MenuType escapeMenuType = gameData.phase == GamePhase.levelPlay ? MenuType.escapeMenu : MenuType.VREscapeMenu;
+                    ShowMenu(escapeMenuType);
                 } else {
                     DoEscapeMenus();
                 }
@@ -407,6 +418,7 @@ public partial class GameManager : Singleton<GameManager> {
     void DoEscapeMenus() {
         if (activeMenuType == MenuType.console ||
             activeMenuType == MenuType.escapeMenu ||
+            activeMenuType == MenuType.VREscapeMenu ||
             activeMenuType == MenuType.missionSelect ||
             activeMenuType == MenuType.mainEscapeMenu) {
             GameManager.I.CloseMenu();

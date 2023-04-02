@@ -2524,7 +2524,6 @@ shop todo:
 
 
 graphics:
-
     tents
     sprite props
         knives / swords / shuriken
@@ -2532,7 +2531,6 @@ graphics:
         ground decals
     bar curve
     subway entrance
-
     neon lights
         neon ring around the signage name
         "GUNS" sign
@@ -2622,11 +2620,21 @@ world:
     * ensure none already exists
     * ensure filename nonempty
 * fix broken loot display
+    * finish and start new: input controller is destroyed?
+    * broken office
+    * abort mission: the problem is, vr mission uses same escape menu as regular mission
 
-fix vr missions
 complete clearsighter
 upgrade unity
 make a build
-credits / cost ordering?
 fix tower clearsight
 click to interact
+
+fix vr missions
+    fix skybox
+    AI is weird: sightcones not orienting properly?
+
+    broken railing: clearsighter? mesh combining?
+
+objectives controller is still being weird
+ammo pips being weird

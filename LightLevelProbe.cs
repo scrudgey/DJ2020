@@ -52,7 +52,7 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     IEnumerator AsyncRead(RenderTexture renderTexture) {
         var asyncRead = AsyncGPUReadback.RequestIntoNativeArray(ref textureData, renderTexture, 0, request => {
             if (request.hasError) {
-                Debug.LogError($"GPU readback error detected: {renderTexture}");
+                Debug.LogWarning($"GPU readback error detected: {renderTexture}");
                 return;
             }
         });

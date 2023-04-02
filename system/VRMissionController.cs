@@ -17,6 +17,7 @@ public class VRMissionController : MonoBehaviour {
     Stack<VRDataStore> datastoreStack;
     VRStatHandler vRStatHandler;
     NPCSpawnPoint[] spawnPoints;
+
     public void StartVRMission(VRMissionState state) {
         Debug.Log("VRMissionController: start VR mission");
         this.data = state;
@@ -73,9 +74,9 @@ public class VRMissionController : MonoBehaviour {
         }
     }
     void SendLogMessage(string message) {
-        if (actionLogHandler == null)
-            actionLogHandler = GameObject.FindObjectOfType<ActionLogHandler>();
-        actionLogHandler.ShowMessage(message);
+        // if (actionLogHandler == null)
+        //     actionLogHandler = GameObject.FindObjectOfType<ActionLogHandler>();
+        // actionLogHandler.ShowMessage(message);
     }
     void TransitionToState(State newState) {
         State tmpInitialState = state;
@@ -97,7 +98,6 @@ public class VRMissionController : MonoBehaviour {
 
                 if (GameManager.I.activeMenuType != MenuType.VRMissionFinish) {
                     GameManager.I.ShowMenu(MenuType.VRMissionFinish, () => {
-                        Debug.Log("loaded vr mission finish callback");
                         VRMissionVictoryMenuController menuController = GameObject.FindObjectOfType<VRMissionVictoryMenuController>();
                         menuController.Initialize(data);
                     });

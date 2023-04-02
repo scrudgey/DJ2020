@@ -55,6 +55,8 @@ public class NPCTemplateJsonConverter : JsonConverter<NPCTemplate> {
         string portraitPath = (string)jo[Constants.PORTRAIT];
         result.portrait = Resources.Load<Sprite>(portraitPath) as Sprite;
 
+        result.physicalKeys = new List<int>();
+
         return result;
     }
     public override void WriteJson(JsonWriter writer, NPCTemplate value, JsonSerializer serializer) {
