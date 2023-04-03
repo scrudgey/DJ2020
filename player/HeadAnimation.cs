@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
+    public Transform sensesTransform;
     public SpriteRenderer spriteRenderer;
     public Skin skin;
     public Direction direction;
@@ -19,6 +20,8 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
             speakParity = !speakParity;
             speakInterval = UnityEngine.Random.Range(0.05f, 0.15f);
         }
+        if (sensesTransform != null)
+            sensesTransform.forward = input.lookAtDirection;
 
         switch (input.state) {
             case CharacterState.wallPress:

@@ -67,6 +67,7 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
             float pixelBrightness = (0.2126f * textureData[i + 0]) + (0.7152f * textureData[i + 1]) + (0.0722f * textureData[i + 2]);
             level = Math.Max(level, pixelBrightness);
         }
+        // Debug.Log($"{renderTexture} {level}");
         targetLightLevel = Math.Max(targetLightLevel, level / (2f));
     }
     public void UpdateLightLevel() {

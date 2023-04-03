@@ -60,6 +60,8 @@ public partial class GameManager : Singleton<GameManager> {
             }, unloadAll: false);
         }
         InitializeLevel(LevelPlan.Default(new List<Items.BaseItem>()));
+        // LoadSkyBox("cityskybox");
+
         TransitionToPhase(GamePhase.vrMission);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
@@ -75,6 +77,8 @@ public partial class GameManager : Singleton<GameManager> {
             }, unloadAll: false);
         }
         InitializeLevel(state.plan);
+        LoadSkyBox("cityskybox");
+
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
         // spawn NPC
@@ -111,6 +115,8 @@ public partial class GameManager : Singleton<GameManager> {
             zone.SpawnNPCs();
         }
         InitializePlayerAndController(LevelPlan.Default(new List<Items.BaseItem>()));
+        LoadSkyBox("cityskybox");
+
         TransitionToPhase(GamePhase.world);
     }
     void HandlePlayerDead(CharacterController npc) {
@@ -311,10 +317,9 @@ public partial class GameManager : Singleton<GameManager> {
         // connect player object to input controller
         InputController.I.SetInputReceivers(playerObj);
 
-        LoadSkyBox();
     }
-    void LoadSkyBox() {
-        LoadScene("cityskybox", () => {
+    void LoadSkyBox(string skyboxSceneName) {
+        LoadScene(skyboxSceneName, () => {
             List<Camera> skycams = new List<Camera>();
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
                 skycams.Add(skycam.myCamera);

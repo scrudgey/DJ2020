@@ -32,6 +32,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     }
     public void CheckObjectives() {
+        if (gameData.phase != GamePhase.levelPlay) return;
         Dictionary<Objective, ObjectiveStatus> changedObjectiveStatuses = new Dictionary<Objective, ObjectiveStatus>();
 
         foreach (Objective objective in gameData.levelState.template.objectives) {

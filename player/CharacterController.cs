@@ -549,6 +549,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
                 // Turn to face cursor or movement direction
                 // TODO: exclude when crawling
+                lookAtDirection = Motor.CharacterForward;
                 if (input.lookAtPosition != Vector3.zero) {
                     lookAtDirection = input.lookAtPosition - transform.position;
                 }

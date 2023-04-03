@@ -2623,18 +2623,24 @@ world:
     * finish and start new: input controller is destroyed?
     * broken office
     * abort mission: the problem is, vr mission uses same escape menu as regular mission
+    * fix skybox
+    * AI is weird: sightcones not orienting properly?
+* fix tower clearsight
+
+
+
+
+fix vr missions
+    broken railing: clearsighter? mesh combining?
+    strike team spawn
+    gun selector
+7/11 world
+    skybox
 
 complete clearsighter
 upgrade unity
 make a build
-fix tower clearsight
 click to interact
-
-fix vr missions
-    fix skybox
-    AI is weird: sightcones not orienting properly?
-
-    broken railing: clearsighter? mesh combining?
-
-objectives controller is still being weird
+xobjectives controller is still being weird
 ammo pips being weird
+try perspective cam

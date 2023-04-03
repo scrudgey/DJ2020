@@ -51,8 +51,10 @@ public class NeoClearsighter : MonoBehaviour {
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>().Where(renderer => renderer.isPartOfStaticBatch).ToList();
         rendererTree = new PointOctree<Renderer>(100, Vector3.zero, 1);
         foreach (Renderer renderer in staticRenderers) {
-            rendererTree.Add(renderer, renderer.transform.position);
-            rendererPositions[renderer] = renderer.transform.root.position;
+            Vector3 position = renderer.bounds.center - new Vector3(0f, renderer.bounds.extents.y, 0f);
+            // TODO: handle anchor
+            rendererTree.Add(renderer, position);
+            rendererPositions[renderer] = position;
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
         }
     }
