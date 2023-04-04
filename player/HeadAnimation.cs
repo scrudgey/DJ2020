@@ -20,7 +20,7 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
             speakParity = !speakParity;
             speakInterval = UnityEngine.Random.Range(0.05f, 0.15f);
         }
-        if (sensesTransform != null)
+        if (sensesTransform != null && input.lookAtDirection != Vector3.zero)
             sensesTransform.forward = input.lookAtDirection;
 
         switch (input.state) {

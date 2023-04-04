@@ -2626,16 +2626,15 @@ world:
     * fix skybox
     * AI is weird: sightcones not orienting properly?
 * fix tower clearsight
-
-
+    * strike team spawn
+    * broken railing: clearsighter? mesh combining?
+    * gun selector
 
 
 fix vr missions
-    broken railing: clearsighter? mesh combining?
-    strike team spawn
-    gun selector
+    VR objective thingy disappears after dialogue?
 7/11 world
-    skybox
+    skybox: skybox should be determined by scene.
 
 complete clearsighter
 upgrade unity
@@ -2644,3 +2643,6 @@ click to interact
 xobjectives controller is still being weird
 ammo pips being weird
 try perspective cam
+
+assign lens flares to lights?
+adjust ambient light in VR missions

@@ -122,7 +122,7 @@ public class VRMissionDesigner : MonoBehaviour {
             Destroy(child.gameObject);
         }
         GunTemplate[] allGuns = Resources.LoadAll<GunTemplate>("data/guns");
-
+        Debug.Log($"all guns: {allGuns.Length}");
         // None button
 
         // create pistol divider
@@ -616,7 +616,6 @@ public class VRMissionDesigner : MonoBehaviour {
     public void Weapon1Callback() {
         selectedWeapon = 1;
         InitializeWeaponPicker();
-
 
         ColorBlock cb = weapon1Button.colors;
         cb.normalColor = weaponHighlightColor;

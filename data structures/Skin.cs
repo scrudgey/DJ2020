@@ -544,7 +544,7 @@ public class Skin {
                 return serializer.Deserialize(reader) as List<SpriteData>;
             }
         } else {
-            Debug.LogError($"sprite data file not found: {path}");
+            Debug.LogError($"sprite data file not found: {path}, skinName: {skinName}, sheetType: {sheetType}");
             return null;
         }
     }

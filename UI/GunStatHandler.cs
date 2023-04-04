@@ -139,7 +139,7 @@ public class GunStatHandler : MonoBehaviour {
         gunImage.enabled = false;
 
         foreach (GunStat stat in Enum.GetValues(typeof(GunStat))) {
-            if (statBarRects.ContainsKey(stat) && statBarRects[stat] != null) {
+            if (statBarRects != null && statBarRects.ContainsKey(stat) && statBarRects[stat] != null) {
                 statBarRects[stat].sizeDelta = Vector2.zero;
                 statBarOffsetRects[stat].sizeDelta = Vector2.zero;
             }

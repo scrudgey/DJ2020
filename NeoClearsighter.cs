@@ -22,6 +22,7 @@ public class NeoClearsighter : MonoBehaviour {
     Dictionary<Collider, Transform> dynamicColliderRoot;
     Collider[] colliderHits;
     CharacterCamera myCamera;
+    bool initialized;
     // void Awake() {
     //     GameManager.OnInputModeChange += HandleInputModeChange;
     // }
@@ -38,6 +39,7 @@ public class NeoClearsighter : MonoBehaviour {
 
         InitializeTree();
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleGeometry));
+        initialized = true;
     }
 
     void InitializeTree() {
@@ -55,25 +57,33 @@ public class NeoClearsighter : MonoBehaviour {
             // TODO: handle anchor
             rendererTree.Add(renderer, position);
             rendererPositions[renderer] = position;
+            // if (renderer.transform.root.name.ToLower().Contains("rail")) {
+            //     Debug.Log($"[NeoClearSighter] initial shadow casting mode: {renderer.shadowCastingMode}");
+            // }
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
         }
     }
 
     IEnumerator HandleGeometry() {
-        if ((myCamera.state == CameraState.normal || myCamera.state == CameraState.attractor)) {
-            state = State.normal;
+        if (initialized) {
+            if ((myCamera.state == CameraState.normal || myCamera.state == CameraState.attractor)) {
+                state = State.normal;
+            } else {
+                state = State.showAll;
+            }
+
+            switch (state) {
+                case State.normal:
+                    yield return HandleGeometryNormal();
+                    break;
+                case State.showAll:
+                    yield return ShowAllGeometry();
+                    break;
+            }
         } else {
-            state = State.showAll;
+            yield return null;
         }
 
-        switch (state) {
-            case State.normal:
-                yield return HandleGeometryNormal();
-                break;
-            case State.showAll:
-                yield return ShowAllGeometry();
-                break;
-        }
     }
 
     IEnumerator ShowAllGeometry() {
@@ -106,6 +116,9 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             Renderer renderer = above[i];
+            // if (renderer.transform.root.name.ToLower().Contains("rail")) {
+            //     Debug.Log($"[NeoClearSighter] static {rendererPositions[renderer].y} > {origin.y}");
+            // }
             if (rendererPositions[renderer].y > origin.y) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextStaticRenderBatch.Add(renderer);
@@ -129,8 +142,12 @@ public class NeoClearsighter : MonoBehaviour {
             }
             Renderer[] renderers = GetDynamicRenderers(collider);
             Transform root = dynamicColliderRoot[collider];
+            // if (root.name.ToLower().Contains("rail")) {
+            //     Debug.Log($"[NeoClearSighter] dynamic: {root.position.y} > {origin.y}");
+            // }
             if (root.position.y > origin.y) {
                 foreach (Renderer renderer in renderers) {
+                    if (nextStaticRenderBatch.Contains(renderer)) continue;
                     renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                     nextDynamicRenderBatch.Add(renderer);
                     if (previousDynamicRendererBatch.Contains(renderer)) {
@@ -138,15 +155,6 @@ public class NeoClearsighter : MonoBehaviour {
                     }
                 }
             }
-            // foreach (Renderer renderer in renderers) {
-            //     if (rendererTransforms[renderer].position.y > origin.y) {
-            //         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            //         nextDynamicRenderBatch.Add(renderer);
-            //         if (previousDynamicRendererBatch.Contains(renderer)) {
-            //             previousDynamicRendererBatch.Remove(renderer);
-            //         }
-            //     }
-            // }
         }
 
         // reset previous batch
@@ -156,6 +164,9 @@ public class NeoClearsighter : MonoBehaviour {
                 j = 0;
                 yield return waitForFrame;
             }
+            // if (renderer.transform.root.name.ToLower().Contains("rail")) {
+            //     Debug.Log($"[NeoClearSighter] previous batch: {renderer} {initialShadowCastingMode[renderer]}");
+            // }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
         }
 
@@ -176,7 +187,8 @@ public class NeoClearsighter : MonoBehaviour {
             dynamicColliderRoot[key] = key.transform.root;
             foreach (Renderer renderer in renderers) {
                 rendererTransforms[renderer] = renderer.transform;
-                initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
+                if (!initialShadowCastingMode.ContainsKey(renderer))
+                    initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             }
             return renderers;
         }
