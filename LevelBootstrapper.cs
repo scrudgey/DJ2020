@@ -9,8 +9,10 @@ public class LevelBootstrapper : MonoBehaviour {
     public bool VRMission;
     public bool world;
     void Start() {
-        if (GameManager.I.isLoadingLevel)
-            return;
+        StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
+    }
+
+    void Initialize() {
         if (world) {
             BootStrapWorld();
         } else if (VRMission) {
@@ -56,7 +58,7 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log($"bootstrapping world ...");
         GameManager.I.gameData = GameData.TestInitialData();
         GameManager.I.SetMarketData();
-        GameManager.I.StartWorld();
+        GameManager.I.StartWorld("Apartment");
     }
 
 }

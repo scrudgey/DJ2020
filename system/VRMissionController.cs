@@ -138,6 +138,7 @@ public class VRMissionController : MonoBehaviour {
         }
 
         // TODO: fix  this ugly hack!!
+        // it could be done via binding VR stat handler to VR mission controller on VR mission start
         if (vRStatHandler == null) {
             if (GameManager.I.uiController != null) {
                 GameManager.I.uiController.ShowVRStats();

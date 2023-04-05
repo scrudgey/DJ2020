@@ -524,13 +524,13 @@ public partial class GameManager : Singleton<GameManager> {
     public void ReturnToMissionSelector() {
         LoadScene("Apartment", () => {
             // TODO: move player, open computer
-            StartWorld();
+            StartWorld("Apartment");
         });
     }
     public void ReturnToApartment() {
         LoadScene("Apartment", () => {
             Debug.Log("return to apartment callback");
-            StartWorld();
+            StartWorld("Apartment");
         });
     }
 

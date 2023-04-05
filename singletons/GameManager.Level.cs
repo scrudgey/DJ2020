@@ -9,6 +9,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
+    public enum SkyBoxType { none, city }
+    static readonly Dictionary<SkyBoxType, string> skyboxSceneNames = new Dictionary<SkyBoxType, string>{
+        {SkyBoxType.city, "cityskybox"}
+    };
+    static readonly Dictionary<string, SkyBoxType> sceneNameToSkyboxType = new Dictionary<string, SkyBoxType>{
+        {"711", SkyBoxType.city},
+        {"JackThatData", SkyBoxType.city},
+        {"Tower", SkyBoxType.city},
+        {"office", SkyBoxType.city},
+        {"park", SkyBoxType.city},
+        {"Apartment", SkyBoxType.city},
+        {"Street", SkyBoxType.city},
+    };
 
     // these things should belong to level delta
     public static Dictionary<string, PoweredComponent> poweredComponents;
@@ -61,14 +74,21 @@ public partial class GameManager : Singleton<GameManager> {
             }, unloadAll: false);
         }
         InitializeLevel(LevelPlan.Default(new List<Items.BaseItem>()));
-        // LoadSkyBox("cityskybox");
+        LoadSkyboxForScene(state.template.sceneName);
+
 
         TransitionToPhase(GamePhase.vrMission);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(state);
     }
-
+    void LoadSkyboxForScene(String sceneName) {
+        SkyBoxType skyBoxType = SkyBoxType.none;
+        if (sceneNameToSkyboxType.ContainsKey(sceneName)) {
+            skyBoxType = sceneNameToSkyboxType[sceneName];
+        }
+        LoadSkyBox(skyBoxType);
+    }
     public void StartMission(LevelState state, bool spawnNpcs = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
@@ -78,7 +98,7 @@ public partial class GameManager : Singleton<GameManager> {
             }, unloadAll: false);
         }
         InitializeLevel(state.plan);
-        LoadSkyBox("cityskybox");
+        LoadSkyboxForScene(state.template.sceneName);
 
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
@@ -102,7 +122,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         TransitionToPhase(GamePhase.levelPlay);
     }
-    public void StartWorld() {
+    public void StartWorld(string sceneName) {
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
@@ -116,7 +136,7 @@ public partial class GameManager : Singleton<GameManager> {
             zone.SpawnNPCs();
         }
         InitializePlayerAndController(LevelPlan.Default(new List<Items.BaseItem>()));
-        LoadSkyBox("cityskybox");
+        LoadSkyboxForScene(sceneName);
 
         TransitionToPhase(GamePhase.world);
     }
@@ -319,7 +339,9 @@ public partial class GameManager : Singleton<GameManager> {
         InputController.I.SetInputReceivers(playerObj);
 
     }
-    void LoadSkyBox(string skyboxSceneName) {
+    public void LoadSkyBox(SkyBoxType skyBoxType) {
+        if (skyBoxType == SkyBoxType.none) return;
+        string skyboxSceneName = skyboxSceneNames[skyBoxType];
         LoadScene(skyboxSceneName, () => {
             List<Camera> skycams = new List<Camera>();
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {

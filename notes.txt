@@ -2629,16 +2629,18 @@ world:
     * strike team spawn
     * broken railing: clearsighter? mesh combining?
     * gun selector
+    * VR objective thingy disappears after dialogue?
+* 7/11 world
+    * skybox: skybox should be determined by scene.
 
 
-fix vr missions
-    VR objective thingy disappears after dialogue?
-7/11 world
-    skybox: skybox should be determined by scene.
 
-complete clearsighter
 upgrade unity
-make a build
+    newtonsoft json is broken??
+
+
+fix 
+complete clearsighter
 click to interact
 xobjectives controller is still being weird
 ammo pips being weird
@@ -2646,3 +2648,7 @@ try perspective cam
 
 assign lens flares to lights?
 adjust ambient light in VR missions
+
+make a build
+    loading savegame did not work 100%
+    start VR did not work

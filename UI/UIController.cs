@@ -147,6 +147,9 @@ public class UIController : MonoBehaviour {
         interactiveHighlightCanvas.enabled = true;
         if (burglarMode)
             burglarCanvas.enabled = true;
+        if (GameManager.I.gameData.phase == GamePhase.vrMission) {
+            ShowVRStats();
+        }
     }
     public void ShowInteractiveHighlight() {
         interactiveHighlightCanvas.enabled = true;
