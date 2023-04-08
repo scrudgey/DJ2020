@@ -8,5 +8,6 @@ using UnityEngine;
 public class PayData : ScriptableObject {
     public string filename;
     public int value;
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<TextAsset>))]
     public TextAsset content;
 }

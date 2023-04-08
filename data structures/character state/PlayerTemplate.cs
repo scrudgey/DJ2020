@@ -7,8 +7,11 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtab
     public int credits;
 
     // skin
+    [field: SerializeField]
     public string legSkin { get; set; }
+    [field: SerializeField]
     public string bodySkin { get; set; }
+    [field: SerializeField]
     public string headSkin { get; set; }
 
     // gun
@@ -20,11 +23,15 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtab
 
     [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate tertiaryGun { get; set; }
+    [field: SerializeField]
     public int activeGun { get; set; }
 
     // health
+    [field: SerializeField]
     public float health { get; set; }
+    [field: SerializeField]
     public float fullHealthAmount { get; set; }
+    [field: SerializeField]
     public HitState hitState { get; set; }
 
     // items
@@ -35,7 +42,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtab
     public bool cyberEyesThermal;
     public bool thirdWeaponSlot;
     public bool cyberEyesThermalBuff;
-    public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
+    public SerializableDictionary<GunType, int> gunSkillLevel = new SerializableDictionary<GunType, int>{
         {GunType.pistol, 1},
         {GunType.smg, 1},
         {GunType.rifle, 1},
@@ -50,6 +57,7 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtab
     public bool disguise;
 
     // speech
+    [field: SerializeField]
     public SpeechEtiquette[] etiquettes;
 
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]

@@ -44,7 +44,7 @@ public class TitleController : MonoBehaviour {
     }
 
     void Update() {
-        if (Keyboard.current.anyKey.isPressed) {
+        if (Keyboard.current.anyKey.isPressed || Mouse.current.leftButton.isPressed || Mouse.current.rightButton.isPressed) {
             if (introCoroutine != null) {
                 StopCoroutine(introCoroutine);
                 introCoroutine = null;
@@ -82,6 +82,9 @@ public class TitleController : MonoBehaviour {
     public void CancelVRMissionCallback() {
         mainMenu.SetActive(true);
         VRCanvas.enabled = false;
+    }
+    public void QuitGameCallback() {
+        Application.Quit();
     }
 
     public void ShowAlert(string alertContent) {

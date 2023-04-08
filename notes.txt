@@ -2641,8 +2641,17 @@ upgrade unity
 
 fix 
 complete clearsighter
+    * use rooftopzone
+        still use interloper in rooftop zone
+    * disable interloper
+    * we don't want to disable sidewalk 
+    * don't disable tables
+    dont disable above ground in jack that data
+    support anchor point
+    why doesn't interloper always work for buildings?
+
 click to interact
-xobjectives controller is still being weird
+objectives controller is still being weird
 ammo pips being weird
 try perspective cam
 
@@ -2652,3 +2661,8 @@ adjust ambient light in VR missions
 make a build
     loading savegame did not work 100%
     start VR did not work
+
+* quit option
+* click to start
+stop people from spawning on the roof
+NPCs can be too fast

@@ -13,6 +13,7 @@ public enum CameraState { normal, wallPress, attractor, aim, burgle }
 
 public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
     public static bool ORTHOGRAPHIC_MODE = true;
+    // public static bool ORTHOGRAPHIC_MODE = false;
     public enum IsometricOrientation { NE, SE, SW, NW }
     public IsometricOrientation initialOrientation;
     private CameraState _state;
@@ -639,7 +640,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 targetCollider = hit.collider;
             }
         }
-        Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);
+        Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
@@ -744,7 +745,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 prioritySet = true;
             }
         }
-        Debug.DrawLine(transform.position, targetPoint, Color.red, 0.1f);
+        Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
         HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
 
