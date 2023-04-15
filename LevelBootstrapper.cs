@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Items;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public class LevelBootstrapper : MonoBehaviour {
     public bool spawnNPCs;
     public LevelTemplate levelTemplate;
@@ -58,7 +59,8 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log($"bootstrapping world ...");
         GameManager.I.gameData = GameData.TestInitialData();
         GameManager.I.SetMarketData();
-        GameManager.I.StartWorld("Apartment");
+        Scene activeScene = SceneManager.GetActiveScene();
+        GameManager.I.StartWorld(activeScene.name);
     }
 
 }

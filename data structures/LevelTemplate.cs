@@ -12,6 +12,7 @@ public class LevelTemplate : ScriptableObject {
     public string sceneName;
     public string sceneDescriptor;
     public string tagline;
+    public MusicTrack musicTrack;
     [Header("text")]
     public TextAsset proposalEmail;
     public TextAsset successEmail;

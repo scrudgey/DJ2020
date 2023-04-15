@@ -519,6 +519,7 @@ public partial class GameManager : Singleton<GameManager> {
         LoadScene("MissionPlan", () => {
             MissionPlanController controller = GameObject.FindObjectOfType<MissionPlanController>();
             controller.Initialize(gameData, template);
+            Debug.Log("controller intialized");
         });
     }
     public void ReturnToMissionSelector() {

@@ -2082,6 +2082,41 @@ note: layer "interactive"
 * some large buildings for nearby: taller, more imposing, concrete
 * burned out car
 * pop up tent
+* fix highlights, interactions:
+* fix savegame
+* load savegame has empty / broken head icons?
+    * ensure none already exists
+    * ensure filename nonempty
+* fix broken loot display
+    * finish and start new: input controller is destroyed?
+    * broken office
+    * abort mission: the problem is, vr mission uses same escape menu as regular mission
+    * fix skybox
+    * AI is weird: sightcones not orienting properly?
+* fix tower clearsight
+    * strike team spawn
+    * broken railing: clearsighter? mesh combining?
+    * gun selector
+    * VR objective thingy disappears after dialogue?
+* 7/11 world
+    * skybox: skybox should be determined by scene.
+* adjust ambient light in VR missions
+* make a build
+    * loading savegame did not work 100%
+    * start VR did not work
+* quit option
+* click to start
+* complete clearsighter
+    * use rooftopzone
+        * still use interloper in rooftop zone
+    * disable interloper
+    * we don't want to disable sidewalk 
+    * don't disable tables
+    * support anchor point
+    * dont disable above ground in jack that data
+* try perspective cam
+* outline multiple rendererers
+* objectives controller is still being weird
 
 
 
@@ -2447,6 +2482,7 @@ loot drops
 
 guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
+assign lens flares to lights?
 
 
 mission:
@@ -2551,8 +2587,6 @@ graphics:
 an NPC ran down the stairs towards me, got stuck, didn't see me.
 an NPC saw me easily in the corner when he'd walked past me.
 what happened to the sphere robot?
-tower walls are broken in clearsighter
-clearsighter hide interlopers
 enemies hear me easily from below?
 on level start, zoom out from player spawn
     show span cutscene
@@ -2614,55 +2648,33 @@ world:
         random selection of head, torso, legs
         sometimes, torso + legs are set dependently.
 
-* fix highlights, interactions:
-* fix savegame
-* load savegame has empty / broken head icons?
-    * ensure none already exists
-    * ensure filename nonempty
-* fix broken loot display
-    * finish and start new: input controller is destroyed?
-    * broken office
-    * abort mission: the problem is, vr mission uses same escape menu as regular mission
-    * fix skybox
-    * AI is weird: sightcones not orienting properly?
-* fix tower clearsight
-    * strike team spawn
-    * broken railing: clearsighter? mesh combining?
-    * gun selector
-    * VR objective thingy disappears after dialogue?
-* 7/11 world
-    * skybox: skybox should be determined by scene.
-
 
 
 upgrade unity
     newtonsoft json is broken??
-
-
-fix 
-complete clearsighter
-    * use rooftopzone
-        still use interloper in rooftop zone
-    * disable interloper
-    * we don't want to disable sidewalk 
-    * don't disable tables
-    dont disable above ground in jack that data
-    support anchor point
-    why doesn't interloper always work for buildings?
-
 click to interact
-objectives controller is still being weird
-ammo pips being weird
-try perspective cam
 
-assign lens flares to lights?
-adjust ambient light in VR missions
 
-make a build
-    loading savegame did not work 100%
-    start VR did not work
+hacking is strange / not clear
+[] between items goes through empty slots
+after action report should be fragmentary, show reward, over a transit cutscene
+guards radio sfx
+tune guard footsteps
+fake ID should be more fun to procure / use
+    can show randomized image and randomized name
+    fake ID is burned after one use
 
-* quit option
-* click to start
+mission plan controllers
+    unify tactics pane with shop design
+adjust the exteriors of the two missions
+    proper insertion points
+    fencing
+    buildings
 stop people from spawning on the roof
+ammo pips being weird
 NPCs can be too fast
+disable cyberlegs
+
+
+ui initialize is broken
+mission select overhaul

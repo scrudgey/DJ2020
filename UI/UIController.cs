@@ -37,7 +37,7 @@ public class UIController : MonoBehaviour {
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
-    public void Start() {
+    public void Initialize() {
         // cameras
         canvas.worldCamera = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
@@ -59,6 +59,8 @@ public class UIController : MonoBehaviour {
         HideBurglar();
         HideMissionSelector();
         saveIndicatorController.HideIndicator();
+        objectiveCanvasController.Initialize();
+        weaponUIHandler.Initialize();
     }
     public void InitializeObjectivesController(GameData data) {
         objectiveCanvasController.Initialize(data);

@@ -43,9 +43,9 @@ public class LevelState {
     public static string LevelDataPath(string levelName, bool includeDataPath = true) {
         string path = includeDataPath ? Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName) :
                                         Path.Combine("data", "levels", levelName);
-        if (!Directory.Exists(path)) {
-            Directory.CreateDirectory(path);
-        }
+        // if (!Directory.Exists(path)) {
+        //     Directory.CreateDirectory(path);
+        // }
         return path;
     }
 

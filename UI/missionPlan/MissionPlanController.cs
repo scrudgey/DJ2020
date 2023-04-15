@@ -33,7 +33,6 @@ public class MissionPlanController : MonoBehaviour {
     public Image tacticsHighlight;
 
     void Start() {
-        Toolbox.RandomizeOneShot(audioSource, startSound, randomPitchWidth: 0.05f);
         if (debugStart) {
             GameManager.I.gameData = GameData.TestInitialData();
             // LevelTemplate template = LevelTemplate.LoadAsInstance("Jack That Data");
@@ -51,6 +50,7 @@ public class MissionPlanController : MonoBehaviour {
         tacticsController.Initialize(data, template, plan);
         overviewController.Initialize(data, template, plan);
         SwitchPanes(PaneType.overview);
+        Toolbox.RandomizeOneShot(audioSource, startSound, randomPitchWidth: 0.05f);
     }
     public void OverviewButtonCallback() {
         Toolbox.RandomizeOneShot(audioSource, buttonSound, randomPitchWidth: 0.05f);

@@ -3,24 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using cakeslice;
 using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
-    public enum SkyBoxType { none, city }
     static readonly Dictionary<SkyBoxType, string> skyboxSceneNames = new Dictionary<SkyBoxType, string>{
         {SkyBoxType.city, "cityskybox"}
-    };
-    static readonly Dictionary<string, SkyBoxType> sceneNameToSkyboxType = new Dictionary<string, SkyBoxType>{
-        {"711", SkyBoxType.city},
-        {"JackThatData", SkyBoxType.city},
-        {"Tower", SkyBoxType.city},
-        {"office", SkyBoxType.city},
-        {"park", SkyBoxType.city},
-        {"Apartment", SkyBoxType.city},
-        {"Street", SkyBoxType.city},
     };
 
     // these things should belong to level delta
@@ -70,12 +61,12 @@ public partial class GameManager : Singleton<GameManager> {
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.Initialize();
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
         InitializeLevel(LevelPlan.Default(new List<Items.BaseItem>()));
         LoadSkyboxForScene(state.template.sceneName);
-
 
         TransitionToPhase(GamePhase.vrMission);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
@@ -83,17 +74,15 @@ public partial class GameManager : Singleton<GameManager> {
         missionController.StartVRMission(state);
     }
     void LoadSkyboxForScene(String sceneName) {
-        SkyBoxType skyBoxType = SkyBoxType.none;
-        if (sceneNameToSkyboxType.ContainsKey(sceneName)) {
-            skyBoxType = sceneNameToSkyboxType[sceneName];
-        }
-        LoadSkyBox(skyBoxType);
+        SceneData sceneData = SceneData.loadSceneData(sceneName);
+        LoadSkyBox(sceneData);
     }
     public void StartMission(LevelState state, bool spawnNpcs = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.Initialize();
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
@@ -119,6 +108,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        MusicController.I.LoadTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);
     }
@@ -127,8 +117,9 @@ public partial class GameManager : Singleton<GameManager> {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
                 // uiController.InitializeObjectivesController(gameData);
-                uiController.HideUI();
+                uiController.Initialize();
                 uiController.ShowInteractiveHighlight();
+                uiController.HideUI();
             }, unloadAll: false);
         }
         // TODO: this should be inside the loading coroutine.
@@ -215,9 +206,7 @@ public partial class GameManager : Singleton<GameManager> {
                 string activeSceneName = SceneManager.GetSceneAt(i).name;
                 scenesToUnload.Add(activeSceneName);
             }
-        }
 
-        if (unloadAll) {
             Debug.Log("show loading screen");
             SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Additive);
         }
@@ -273,8 +262,9 @@ public partial class GameManager : Singleton<GameManager> {
                 yield return null;
             }
         }
-
+        yield return new WaitForEndOfFrame();
         callback();
+        yield return new WaitForEndOfFrame();
     }
 
     public void SetFocus(GameObject focus) {
@@ -339,15 +329,15 @@ public partial class GameManager : Singleton<GameManager> {
         InputController.I.SetInputReceivers(playerObj);
 
     }
-    public void LoadSkyBox(SkyBoxType skyBoxType) {
+    public void LoadSkyBox(SceneData sceneData) {
+        SkyBoxType skyBoxType = sceneData?.skyBoxType ?? SkyBoxType.none;
         if (skyBoxType == SkyBoxType.none) return;
         string skyboxSceneName = skyboxSceneNames[skyBoxType];
         LoadScene(skyboxSceneName, () => {
             List<Camera> skycams = new List<Camera>();
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
                 skycams.Add(skycam.myCamera);
-                // skycam.Initialize(characterCamera.Camera, new Vector3(0f, 10f, 0f));
-                skycam.Initialize(characterCamera.Camera, new Vector3(0f, 1f, 0f));
+                skycam.Initialize(characterCamera.Camera, sceneData.skyboxOffset);
             }
             characterCamera.skyBoxCameras = skycams.ToArray();
         }, unloadAll: false);
@@ -385,7 +375,6 @@ public partial class GameManager : Singleton<GameManager> {
         alarmSound = gameData.levelState.template.alarmAudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
 
-        MusicController.I.LoadTrack(MusicTrack.lethalGlee);
 
         OnSuspicionChange?.Invoke();
     }

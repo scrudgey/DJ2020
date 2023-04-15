@@ -365,7 +365,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             rotation = planarRot * verticalRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
-            targetDistance = 20,
+            targetDistance = MaxDistance,
             targetPosition = targetPosition,
             orthographicSize = currentOrthographicSize, // 8 TODO: set by attractor and/or level
                                                         // orthographicSize = 3, // 8 TODO: set by attractor and/or level

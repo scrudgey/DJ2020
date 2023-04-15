@@ -128,8 +128,6 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         legsSkin = Skin.LoadSkin(legSkinName);
         bodySkin = Skin.LoadSkin(torsoSkinName);
         headSkin = Skin.LoadSkin(headSkinName);
-        Debug.Log(headSkinName);
-        Debug.Log(headSkin);
 
         Direction headDirection = Direction.rightDown;
 

@@ -64,11 +64,18 @@ public class NeoClearsighter : MonoBehaviour {
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
-        List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>().Where(renderer => renderer.isPartOfStaticBatch).ToList();
+        List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
+            .Where(renderer => renderer.isPartOfStaticBatch)
+            .Concat(
+                GameObject.FindObjectsOfType<SpriteRenderer>()
+                    .Where(obj => obj.CompareTag("decor"))
+                    .Select(obj => obj.GetComponent<Renderer>())
+            ).ToList();
         rendererTree = new PointOctree<Renderer>(100, Vector3.zero, 1);
         rendererBoundsTree = new BoundsOctree<Renderer>(100, Vector3.zero, 0.5f, 1);
         foreach (Renderer renderer in staticRenderers) {
-            Vector3 position = renderer.bounds.center - new Vector3(0f, renderer.bounds.extents.y, 0f);
+            // Vector3 position = renderer.bounds.center - new Vector3(0f, renderer.bounds.extents.y, 0f);
+            Vector3 position = renderer.bounds.center;
             // TODO: handle anchor
             rendererTree.Add(renderer, position);
             rendererBoundsTree.Add(renderer, renderer.bounds);
@@ -79,6 +86,10 @@ public class NeoClearsighter : MonoBehaviour {
             //     Debug.Log($"[NeoClearSighter] initial shadow casting mode: {renderer.shadowCastingMode}");
             // }
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
+            Transform findAnchor = renderer.gameObject.transform.Find("clearSighterAnchor");
+            if (findAnchor != null) {
+                rendererPositions[renderer] = findAnchor.position;
+            }
         }
     }
 
@@ -141,8 +152,7 @@ public class NeoClearsighter : MonoBehaviour {
         Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
 
 
-        float interloperSpread = 10f;
-        float interloperDistance = 100f;
+        float interloperSpread = 2f;
 
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
         Ray towardCameraRay = new Ray(origin, cameraTransform.position - origin);
@@ -161,7 +171,8 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             Renderer renderer = above[i];
-            if (rendererPositions[renderer].y > liftedOrigin.y) {
+            Vector3 position = rendererPositions[renderer] - new Vector3(0f, rendererBounds[renderer].extents.y, 0f);
+            if (position.y > liftedOrigin.y) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextAboveRenderBatch.Add(renderer);
                 if (previousAboveRendererBatch.Contains(renderer)) {
@@ -172,11 +183,11 @@ public class NeoClearsighter : MonoBehaviour {
 
         // static geometry interlopers
         List<Renderer> interlopers = new List<Renderer>();
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay2, interloperDistance);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay2);
         // rendererBoundsTree.GetColliding(interlopers, towardCameraRay3, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay4, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay5, interloperDistance);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay4);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay5);
         Debug.DrawRay(origin, towardCameraRay.direction, Color.red, 0.1f);
         Debug.DrawRay(origin, towardCameraRay2.direction, Color.red, 0.1f);
         // Debug.DrawRay(origin, towardCameraRay3.direction, Color.red, 0.1f);
@@ -262,8 +273,7 @@ public class NeoClearsighter : MonoBehaviour {
         HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
         Vector3 origin = followTransform.position;
 
-        float interloperSpread = 10f;
-        float interloperDistance = 100f;
+        float interloperSpread = 2f;
         Ray towardCameraRay = new Ray(origin, cameraTransform.position - origin);
         Ray towardCameraRay2 = new Ray(origin, (interloperSpread * cameraTransform.up + cameraTransform.position) - origin);
         Ray towardCameraRay4 = new Ray(origin, (interloperSpread * cameraTransform.right + cameraTransform.position) - origin);
@@ -272,10 +282,10 @@ public class NeoClearsighter : MonoBehaviour {
         int j = 0;
 
         List<Renderer> interlopers = new List<Renderer>();
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay2, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay4, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay5, interloperDistance);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay2);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay4);
+        rendererBoundsTree.GetColliding(interlopers, towardCameraRay5);
         Debug.DrawRay(origin, towardCameraRay.direction, Color.red, 0.1f);
         Debug.DrawRay(origin, towardCameraRay2.direction, Color.red, 0.1f);
         Debug.DrawRay(origin, towardCameraRay4.direction, Color.red, 0.1f);
@@ -293,7 +303,8 @@ public class NeoClearsighter : MonoBehaviour {
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;
 
-            Vector3 rendererPosition = rendererBounds[renderer].center;
+            // Vector3 rendererPosition = rendererBounds[renderer].center;
+            Vector3 rendererPosition = rendererPositions[renderer];
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
             // if (directionToInterloper.y > 0.2f) { //&& !detectionPlane.GetSide(rendererPosition)
             if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
