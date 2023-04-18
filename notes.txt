@@ -2117,7 +2117,16 @@ note: layer "interactive"
 * try perspective cam
 * outline multiple rendererers
 * objectives controller is still being weird
-
+* disable cyberlegs
+* ui initialize is broken
+* mission select overhaul
+* NPCs can be too fast
+* music track?
+* on level start, zoom out from player spawn
+* camera is not visible
+* UI between title, shops, planning is different from UI, pause menu
+    * inline & bkg colors, buttons
+* clearsighter
 
 
 
@@ -2486,7 +2495,7 @@ assign lens flares to lights?
 
 
 mission:
-    visibility goes too low
+    * visibility goes too low
     guards get stuck on each other
         make NPCs pass through each other with a soft bump
     swat spritesheet
@@ -2495,10 +2504,6 @@ mission:
                 position head relative to torso 
             2. work on editor
                 updating values when they're updated in the editor? somehow? yes/ no?
-    trees / plants / outside decor
-
-
-
 
 
 locations:
@@ -2560,6 +2565,7 @@ shop todo:
 
 
 graphics:
+    trees / plants / outside decor
     tents
     sprite props
         knives / swords / shuriken
@@ -2583,22 +2589,6 @@ graphics:
     https://twitter.com/scrudgey/status/1627911883952099329?s=20
 
 
-
-an NPC ran down the stairs towards me, got stuck, didn't see me.
-an NPC saw me easily in the corner when he'd walked past me.
-what happened to the sphere robot?
-enemies hear me easily from below?
-on level start, zoom out from player spawn
-    show span cutscene
-AI still had a hard time closing in on me when i was openly shooting and running around
-maybe fall damage from rooftop should be greater
-better interface for interacting, hacking
-UI between title, shops, planning is different from UI, pause menu
-    inline & bkg colors, buttons
-clearsighter
-show objectives as blit-in text on lower left?
-    show dayss
-"v" and "^" buttons on scrollbars?
 
 
 models:
@@ -2653,28 +2643,33 @@ world:
 upgrade unity
     newtonsoft json is broken??
 click to interact
+better interface for hacking
 
 
-hacking is strange / not clear
+what happened to the sphere robot?
+AI still had a hard time closing in on me when i was openly shooting and running around
+    NPC wandering away from me shooting at a different guard
+    an NPC ran down the stairs towards me, got stuck, didn't see me.
+    an NPC saw me easily in the corner when he'd walked past me.
+maybe fall damage from rooftop should be greater
+show objectives as blit-in text on lower left?
+    show days
+"v" and "^" buttons on scrollbars?
 [] between items goes through empty slots
 after action report should be fragmentary, show reward, over a transit cutscene
-guards radio sfx
-tune guard footsteps
 fake ID should be more fun to procure / use
     can show randomized image and randomized name
     fake ID is burned after one use
-
-mission plan controllers
-    unify tactics pane with shop design
+unify tactics pane with shop design
 adjust the exteriors of the two missions
     proper insertion points
     fencing
     buildings
 stop people from spawning on the roof
 ammo pips being weird
-NPCs can be too fast
-disable cyberlegs
 
+enemies hear me easily from below?
+guards radio sfx
+tune guard footsteps
 
-ui initialize is broken
-mission select overhaul
+latches should be vulnerable more often

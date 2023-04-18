@@ -70,7 +70,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     private int _obstructionCount;
     private RaycastHit[] _obstructions = new RaycastHit[MaxObstructions];
     private float _obstructionTime;
-    private Vector3 _currentFollowPosition;
+    public Vector3 _currentFollowPosition;
     private const int MaxObstructions = 32;
     private float transitionTime;
     private float currentDistanceMovementSharpness;
@@ -102,9 +102,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             currentRotationInput = CameraInput.RotateInput.left;
         }
         zoomCoefficientTarget -= input.zoomInput.y * Time.unscaledDeltaTime * 0.1f;
-        zoomCoefficientTarget = Math.Max(0.25f, zoomCoefficientTarget);
-        zoomCoefficientTarget = Math.Min(1.0f, zoomCoefficientTarget);
+        zoomCoefficientTarget = Math.Clamp(zoomCoefficientTarget, 0.25f, 1.0f);
         zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f);
+        // Debug.Log($"zoom coefficients: {zoomCoefficientTarget} {zoomCoefficient} {zoomVelocity}");
     }
     void Awake() {
         Transform = this.transform;

@@ -359,6 +359,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
     void StartPickerCoroutine(IEnumerator coroutine) {
+        if (!gameObject.activeInHierarchy) return;
         if (pickerCoroutine != null) {
             StopCoroutine(pickerCoroutine);
         }

@@ -67,6 +67,8 @@ public class Footsteps : MonoBehaviour {
                     isFootsteps = true
                 };
                 Toolbox.Noise(transform.position, noise, transform.root.gameObject);
+                // if (player)
+                //     Debug.Break();
             }
         }
 

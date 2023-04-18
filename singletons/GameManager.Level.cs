@@ -111,6 +111,9 @@ public partial class GameManager : Singleton<GameManager> {
         MusicController.I.LoadTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);
+
+        // TODO: start cutscene
+        StartCutsceneCoroutine(StartMissionCutscene());
     }
     public void StartWorld(string sceneName) {
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
@@ -219,6 +222,7 @@ public partial class GameManager : Singleton<GameManager> {
                 callback();
 
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
+                Debug.Log("remove loading screen");
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
             isLoadingLevel = false;

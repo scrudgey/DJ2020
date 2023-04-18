@@ -85,6 +85,49 @@ public partial class GameManager : Singleton<GameManager> {
         yield return null;
     }
 
+    public IEnumerator StartMissionCutscene() {
+        // uiController?.HideUI();
+        Time.timeScale = 0f;
+        float timer = 0f;
+        float duration = 3f;
+        characterCamera.followingSharpnessDefault = 5f;
+        characterCamera.zoomCoefficient = 0.25f;
+        characterCamera.zoomCoefficientTarget = 0.25f;
+        Vector3 targetPosition = playerObject.transform.position;
+        characterCamera._currentFollowPosition = targetPosition;
+        while (timer < duration) {
+            Time.timeScale = Mathf.Lerp(Time.timeScale, 1f, 0.01f);
+            float coefficient = (float)PennerDoubleAnimation.CircEaseIn(timer, 0f, 10f, duration);
+
+            PlayerInput playerInput = PlayerInput.none;
+            playerInput.zoomInput = new Vector2(0f, -1f) * coefficient;
+            characterCamera.SetInputs(playerInput);
+
+            CameraInput input = new CameraInput {
+                deltaTime = Time.deltaTime,
+                wallNormal = Vector2.zero,
+                lastWallInput = Vector2.zero,
+                crouchHeld = false,
+                playerPosition = targetPosition,
+                state = CharacterState.normal,
+                targetData = CursorData.none,
+                playerDirection = playerCharacterController.direction,
+                playerLookDirection = playerCharacterController.direction,
+                popoutParity = PopoutParity.left,
+                aimCameraRotation = Quaternion.identity,
+                targetPosition = targetPosition
+            };
+            characterCamera.UpdateWithInput(input, ignoreAttractor: true);
+            timer += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Time.timeScale = 1f;
+        // characterCamera.followingSharpnessDefault = 5f;
+        // uiController?.ShowUI();
+        yield return null;
+    }
+
     public IEnumerator ExtractionZoneCutscene(ExtractionZone zone) {
         float timer = 0f;
         // characterCamera.followingSharpnessDefault = 1f;

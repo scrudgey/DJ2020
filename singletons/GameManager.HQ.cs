@@ -200,7 +200,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void SpawnStrikeTeamMember() {
-        Debug.Log($"****** spawn strike member: {gameData.levelState.delta.npcsSpawned} >= {gameData.levelState.template.maxNPC}?");
+        // Debug.Log($"****** spawn strike member: {gameData.levelState.delta.npcsSpawned} >= {gameData.levelState.template.maxNPC}?");
         if (gameData.levelState.delta.npcsSpawned >= gameData.levelState.template.maxNPC) return;
         GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();

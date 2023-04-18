@@ -18,6 +18,7 @@ public class HitIndicatorController : MonoBehaviour {
         this.target = hurtable;
         hurtable.OnDamageTaken += HandleDamageTaken;
         timer = 2f;
+        SetTransparent();
     }
     void OnDestroy() {
         if (target != null) {
@@ -44,6 +45,12 @@ public class HitIndicatorController : MonoBehaviour {
     public void SetColors() {
         float alpha = (float)PennerDoubleAnimation.BackEaseOut(timer, 1, -1, 1);
         Color color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
+        foreach (Image image in indicators) {
+            image.color = color;
+        }
+    }
+    public void SetTransparent() {
+        Color color = new Color(baseColor.r, baseColor.g, baseColor.b, 0);
         foreach (Image image in indicators) {
             image.color = color;
         }

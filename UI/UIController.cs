@@ -38,6 +38,7 @@ public class UIController : MonoBehaviour {
         DestroyImmediate(UIEditorCamera);
     }
     public void Initialize() {
+        Debug.Log("UI Initialize");
         // cameras
         canvas.worldCamera = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
@@ -51,8 +52,6 @@ public class UIController : MonoBehaviour {
 
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnCaptionChange += HandleCaptionChange;
-        if (GameManager.I.playerObject != null)
-            BindToNewTarget(GameManager.I.playerObject);
         canvas.enabled = true;
         HideVRStats();
         HideTerminal();
@@ -61,6 +60,9 @@ public class UIController : MonoBehaviour {
         saveIndicatorController.HideIndicator();
         objectiveCanvasController.Initialize();
         weaponUIHandler.Initialize();
+
+        if (GameManager.I.playerObject != null)
+            BindToNewTarget(GameManager.I.playerObject);
     }
     public void InitializeObjectivesController(GameData data) {
         objectiveCanvasController.Initialize(data);
@@ -75,7 +77,7 @@ public class UIController : MonoBehaviour {
     }
 
     void BindToNewTarget(GameObject target) {
-        // Debug.Log("binding to new target");
+        // Debug.Log($"ui controller binding to new target {target}");
         weaponUIHandler.Bind(target);
 
         itemUIHandler.Bind(target);
@@ -133,10 +135,12 @@ public class UIController : MonoBehaviour {
         caption.text = newCaption;
     }
     public void ShowVRStats() {
-        vRStatHandler.gameObject.SetActive(true);
+        if (vRStatHandler == null) return;
+        vRStatHandler?.gameObject.SetActive(true);
     }
     public void HideVRStats() {
-        vRStatHandler.gameObject.SetActive(false);
+        if (vRStatHandler == null) return;
+        vRStatHandler?.gameObject.SetActive(false);
     }
     public void HideUI() {
         HideVRStats();

@@ -102,7 +102,7 @@ namespace AI {
                 // input.moveDirection = speedCoefficient * inputVector.normalized;
                 // input.moveDirection = speedCoefficient * inputVector.normalized;
                 if (speedCoefficient > 1) {
-                    input.moveDirection = inputVector.normalized;
+                    input.moveDirection = Mathf.Min(1f, speedCoefficient) * inputVector.normalized;
                     input.runDown = true;
                 } else {
                     input.moveDirection = speedCoefficient * inputVector.normalized;

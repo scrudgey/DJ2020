@@ -111,7 +111,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
 
-            cyberlegsLevel = 1,
+            // cyberlegsLevel = 1,
+            cyberlegsLevel = 0,
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,
             hackRadius = 1.5f,

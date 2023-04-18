@@ -51,7 +51,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     Collider[] nearbyOthers;
     RaycastHit[] raycastHits;
     public HashSet<int> physicalKeys;
-
+    Vector3 closeness;
+    List<Transform> otherTransforms = new List<Transform>();
+    static readonly float avoidFactor = 5f;
+    static readonly float avoidRadius = 0.2f;
     public void Awake() {
         raycastHits = new RaycastHit[1];
         nearbyOthers = new Collider[32];
@@ -64,6 +67,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
         }
+    }
+    void Start() {
+        StartCoroutine(Toolbox.RunJobRepeatedly(findNearby));
     }
     public void Initialize() {
         EnterDefaultState();
@@ -198,6 +204,21 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 break;
         }
     }
+    IEnumerator findNearby() {
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0.1f, 0.5f));
+        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
+        closeness = Vector3.zero;
+        otherTransforms = new List<Transform>();
+        for (int i = 0; i < numColliders; i++) {
+            Collider collider = nearbyOthers[i];
+            if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(transform))
+                continue;
+            SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
+            if (otherAI != null) {
+                otherTransforms.Add(otherAI.transform);
+            }
+        }
+    }
     void Update() {
         if (hitState == HitState.dead) {
             return;
@@ -207,31 +228,44 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         input.preventWallPress = true;
 
         // avoid bunching with boids algorithm
+        // if (!input.CrouchDown) {
+        //     // float avoidFactor = 0.1f;
+        //     // float avoidRadius = 2f;
+
+        //     // float avoidFactor = 1f;
+        //     // float avoidRadius = 0.5f;
+
+        //     float avoidFactor = 5f;
+        //     float avoidRadius = 0.2f;
+
+        //     int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
+        //     Vector3 closeness = Vector3.zero;
+        //     for (int i = 0; i < numColliders; i++) {
+        //         Collider collider = nearbyOthers[i];
+        //         if (collider == null || collider.gameObject == null)
+        //             continue;
+        //         if (collider.transform.IsChildOf(transform))
+        //             continue;
+        //         SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
+        //         if (otherAI != null) {
+        //             closeness += transform.position - otherAI.transform.position;
+        //         }
+        //     }
+        //     closeness.y = 0;
+        //     input.moveDirection += avoidFactor * closeness;
+        // }
         if (!input.CrouchDown) {
-            // float avoidFactor = 0.1f;
-            // float avoidRadius = 2f;
-
-            // float avoidFactor = 1f;
-            // float avoidRadius = 0.5f;
-
-            float avoidFactor = 5f;
-            float avoidRadius = 0.2f;
-
-            int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
-            Vector3 closeness = Vector3.zero;
-            for (int i = 0; i < numColliders; i++) {
-                Collider collider = nearbyOthers[i];
-                if (collider == null || collider.gameObject == null)
-                    continue;
-                if (collider.transform.IsChildOf(transform))
-                    continue;
-                SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
-                if (otherAI != null) {
-                    closeness += transform.position - otherAI.transform.position;
-                }
+            Vector3 myPosition = transform.position;
+            closeness = Vector3.zero;
+            foreach (Transform otherTransform in otherTransforms) {
+                Vector3 distance = (myPosition - otherTransform.position);
+                distance = distance.normalized / distance.sqrMagnitude;
+                closeness += distance;
             }
             closeness.y = 0;
+            float magnitude = input.moveDirection.magnitude;
             input.moveDirection += avoidFactor * closeness;
+            input.moveDirection = Vector3.ClampMagnitude(input.moveDirection, magnitude);
         }
 
 

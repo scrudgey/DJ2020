@@ -77,7 +77,7 @@ public class MissionPlanTacticsController : MonoBehaviour {
         activeEntry = entry;
     }
     void SetCreditsText() {
-        creditsText.text = $"{data.playerState.credits.ToString("n2")}";
+        creditsText.text = $"{data.playerState.credits}";
     }
     void ConfigurePurchaseDialogue(Tactic tactic) {
         detailsTitle.text = tactic.title;

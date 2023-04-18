@@ -13,10 +13,10 @@ public class MusicController : Singleton<MusicController> {
             "Lethal Glee layer 4 DEATH DJ3"
         }},
         {MusicTrack.obligateArsonist, new string[]{
-            "Obligate Arsonist VER1.2 layer 1 LOW DJ3",
-            "Obligate Arsonist VER1.2 layer 2 CADENCE DJ3",
-            "Obligate Arsonist VER1.2 layer 3 ATTENTION DJ3",
-            "Obligate Arsonist VER1.2 layer 4 DEATH DJ3"
+            "Obligate Arsonist VER 2.0 layer 1 LOW DJ3",
+            "Obligate Arsonist Ver 2.0 layer 2 CADENCE DJ3",
+            "Obligate Arsonist VER 2.0 layer 3 ATTENTION DJ3",
+            "Obligate Arsonist Ver 2.0 layer 4 DETH DJ3"
         }}
     };
     public AudioSource[] audioSources;
@@ -38,6 +38,7 @@ public class MusicController : Singleton<MusicController> {
             x.Item1.Play();
         }
         // audioSources.ToList().ForEach(audiosource => audiosource.Play());
+        HandleSuspicionChange();
     }
     public void Stop() {
         audioSources.ToList().ForEach(audiosource => audiosource.Stop());
@@ -49,6 +50,7 @@ public class MusicController : Singleton<MusicController> {
 
     public void HandleSuspicionChange() {
         Suspiciousness sus = GameManager.I.GetTotalSuspicion();
+        Debug.Log($"[music] handle suspicious change {sus}");
         // TODO: ease in the volumes
         switch (sus) {
             case Suspiciousness.normal:
@@ -70,6 +72,27 @@ public class MusicController : Singleton<MusicController> {
                 audioSources[3].volume = 1;
                 break;
         }
+
+        // switch (sus) {
+        //     case Suspiciousness.normal:
+        //         audioSources[0].volume = 1;
+        //         audioSources[1].volume = 1;
+        //         audioSources[2].volume = 0;
+        //         audioSources[3].volume = 0;
+        //         break;
+        //     case Suspiciousness.suspicious:
+        //         audioSources[0].volume = 1;
+        //         audioSources[1].volume = 1;
+        //         audioSources[2].volume = 1;
+        //         audioSources[3].volume = 0;
+        //         break;
+        //     case Suspiciousness.aggressive:
+        //         audioSources[0].volume = 1;
+        //         audioSources[1].volume = 1;
+        //         audioSources[2].volume = 1;
+        //         audioSources[3].volume = 1;
+        //         break;
+        // }
     }
 
 

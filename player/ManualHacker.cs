@@ -36,7 +36,7 @@ public class ManualHacker : MonoBehaviour {
     public Material wireUnfurlMaterial;
     public Material wireAttachedMaterial;
     private readonly AnimationCurve fatWidth = AnimationCurve.Constant(0f, 1f, 1f);
-    private readonly AnimationCurve thinWidth = AnimationCurve.Constant(0f, 1f, 0.05f);
+    private readonly AnimationCurve thinWidth = AnimationCurve.Constant(0f, 1f, 0.02f);
     float timer;
     public Color wireColor;
     public AudioSource audioSource;

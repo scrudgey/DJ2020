@@ -86,7 +86,7 @@ public class NeoClearsighter : MonoBehaviour {
             //     Debug.Log($"[NeoClearSighter] initial shadow casting mode: {renderer.shadowCastingMode}");
             // }
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
-            Transform findAnchor = renderer.gameObject.transform.Find("clearSighterAnchor");
+            Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
             if (findAnchor != null) {
                 rendererPositions[renderer] = findAnchor.position;
             }
@@ -341,8 +341,17 @@ public class NeoClearsighter : MonoBehaviour {
                                                 ).ToArray();
             colliderToRenderer[key] = renderers;
             dynamicColliderRoot[key] = key.transform.root;
+
+            Transform findAnchor = key.transform.root.Find("clearSighterAnchor");
+            if (findAnchor != null) {
+                dynamicColliderRoot[key] = findAnchor;
+            }
+
             foreach (Renderer renderer in renderers) {
                 rendererTransforms[renderer] = renderer.transform;
+                if (findAnchor != null) {
+                    rendererTransforms[renderer] = findAnchor;
+                }
                 if (!initialShadowCastingMode.ContainsKey(renderer))
                     initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             }
