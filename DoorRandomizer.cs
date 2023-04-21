@@ -16,9 +16,9 @@ public class DoorRandomizer : MonoBehaviour {
     }
     void ApplyState() {
         bool latchesEnabled = Random.Range(0f, 1f) < 0.75f;
-        bool latchesVulnerable = Random.Range(0f, 1f) < 0.5f;
+        bool latchesVulnerable = Random.Range(0f, 1f) < 0.8f;
         bool latchGuardEnabled = Random.Range(0f, 1f) < 0.5f;
-        bool latchGuardScrews = Random.Range(0f, 1f) < 0.5f;
+        bool latchGuardScrews = Random.Range(0f, 1f) < 0.75f;
         bool deadboltEnabled = Random.Range(0f, 1f) < 0.5f;
         bool autoClose = Random.Range(0f, 1f) < 0.5f;
 

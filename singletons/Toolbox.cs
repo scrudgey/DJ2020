@@ -199,7 +199,8 @@ public class Toolbox {
         component.data = data with {
             source = source
         };
-        component.sphereCollider.radius = data.volume;
+        // component.sphereCollider.radius = data.volume;
+        component.transform.localScale = new Vector3(data.volume, 1f, data.volume);
         return component;
     }
     public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {

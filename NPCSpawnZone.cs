@@ -47,7 +47,7 @@ public class NPCSpawnZone : MonoBehaviour {
             areaMask = LayerUtil.KeySetToNavLayerMask(new HashSet<int>())
         };
 
-        if (NavMesh.SamplePosition(point, out hit, 20f, filter)) {
+        if (NavMesh.SamplePosition(point, out hit, 1f, filter)) {
             Vector3 destination = hit.position;
 
             GameObject npc = NPCPool.GetObject(destination);

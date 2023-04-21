@@ -2127,7 +2127,16 @@ note: layer "interactive"
 * UI between title, shops, planning is different from UI, pause menu
     * inline & bkg colors, buttons
 * clearsighter
-
+* stop people from spawning on the roof
+* enemies hear me easily from below?
+* tune guard footsteps
+* latches should be vulnerable more often
+* regenerate level maps
+* [] between items goes through empty slots
+* adjust the exteriors of the two missions
+    * proper insertion points
+    * fencing
+    * buildings
 
 
 graphical issues:
@@ -2639,37 +2648,36 @@ world:
         sometimes, torso + legs are set dependently.
 
 
+"v" and "^" buttons on scrollbars?
+fake ID should be more fun to procure / use
+    can show randomized image and randomized name
+    fake ID is burned after one use
+after action report should be fragmentary, show reward, over a transit cutscene
+show objectives as blit-in text on lower left?
+    show days
+maybe fall damage from rooftop should be greater
+
+
+* destructible floor in jack that data
+* jackthatdata: camera sees at great distance
+
 
 upgrade unity
     newtonsoft json is broken??
-click to interact
 better interface for hacking
-
 
 what happened to the sphere robot?
 AI still had a hard time closing in on me when i was openly shooting and running around
     NPC wandering away from me shooting at a different guard
     an NPC ran down the stairs towards me, got stuck, didn't see me.
     an NPC saw me easily in the corner when he'd walked past me.
-maybe fall damage from rooftop should be greater
-show objectives as blit-in text on lower left?
-    show days
-"v" and "^" buttons on scrollbars?
-[] between items goes through empty slots
-after action report should be fragmentary, show reward, over a transit cutscene
-fake ID should be more fun to procure / use
-    can show randomized image and randomized name
-    fake ID is burned after one use
 unify tactics pane with shop design
-adjust the exteriors of the two missions
-    proper insertion points
-    fencing
-    buildings
-stop people from spawning on the roof
 ammo pips being weird
-
-enemies hear me easily from below?
 guards radio sfx
-tune guard footsteps
+a guard ran up and reported a door was tampered with as i tampered with it
+reload guns between retries
 
-latches should be vulnerable more often
+
+hide gun panel when holstered
+click to interact
+if mouse over interactive and interactive is nearby, turn cursor to interact

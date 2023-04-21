@@ -29,14 +29,22 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     void Start() {
         OnItemEnter(activeItem);
     }
+    void nextNonNullItem() {
 
+    }
     public ItemUseResult SetInputs(PlayerInput input) {
         if (input.incrementItem != 0) {
-            index += input.incrementItem;
-            if (index < 0) {
-                index = items.Count - 1;
-            } else if (index >= items.Count) {
-                index = 0;
+            int cycles = 0;
+            while (cycles < 6) {
+                cycles += 1;
+                index += input.incrementItem;
+                if (index < 0) {
+                    index = items.Count - 1;
+                } else if (index >= items.Count) {
+                    index = 0;
+                }
+                if (items[index] != null)
+                    break;
             }
             SwitchToItem(items[index]);
         }
@@ -61,14 +69,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         index = items.IndexOf(null);
     }
     public void LoadItemState(List<BaseItem> loadItems) {
-        // items = new List<BaseItem>();
-        // foreach (string itemName in itemNames) {
-        // BaseItem newItem = ItemInstance.LoadItem(itemName);
-        // items.Add(newItem);
         items.AddRange(loadItems);
-        // }
         items.Add(null);
-        // items = items.ToHashSet().ToList();
         ClearItem();
     }
 

@@ -150,16 +150,7 @@ public class NeoClearsighter : MonoBehaviour {
         HashSet<Renderer> nextDynamicRenderBatch = new HashSet<Renderer>();
         Vector3 origin = followTransform.position;
         Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
-
-
-        float interloperSpread = 2f;
-
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
-        Ray towardCameraRay = new Ray(origin, cameraTransform.position - origin);
-        Ray towardCameraRay2 = new Ray(origin, (interloperSpread * cameraTransform.up + cameraTransform.position) - origin);
-        // Ray towardCameraRay3 = new Ray(origin, (-interloperSpread * cameraTransform.up + cameraTransform.position) - origin);
-        Ray towardCameraRay4 = new Ray(origin, (interloperSpread * cameraTransform.right + cameraTransform.position) - origin);
-        Ray towardCameraRay5 = new Ray(origin, (-interloperSpread * cameraTransform.right + cameraTransform.position) - origin);
 
         // static geometry above me
         Renderer[] above = rendererTree.GetNearby(upRay, 20f);
@@ -182,17 +173,7 @@ public class NeoClearsighter : MonoBehaviour {
         }
 
         // static geometry interlopers
-        List<Renderer> interlopers = new List<Renderer>();
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay2);
-        // rendererBoundsTree.GetColliding(interlopers, towardCameraRay3, interloperDistance);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay4);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay5);
-        Debug.DrawRay(origin, towardCameraRay.direction, Color.red, 0.1f);
-        Debug.DrawRay(origin, towardCameraRay2.direction, Color.red, 0.1f);
-        // Debug.DrawRay(origin, towardCameraRay3.direction, Color.red, 0.1f);
-        Debug.DrawRay(origin, towardCameraRay4.direction, Color.red, 0.1f);
-        Debug.DrawRay(origin, towardCameraRay5.direction, Color.red, 0.1f);
+        List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
         Plane detectionPlane = new Plane(cameraTransform.forward, followTransform.position);
         j = 0;
         for (int i = 0; i < interlopers.Count; i++) {
@@ -219,8 +200,6 @@ public class NeoClearsighter : MonoBehaviour {
                 }
             }
         }
-
-
 
         // non-static colliders above me
         int numberHits = Physics.OverlapSphereNonAlloc(liftedOrigin, 20f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell, Layer.bulletOnly, Layer.interactive), QueryTriggerInteraction.Ignore);
@@ -268,7 +247,17 @@ public class NeoClearsighter : MonoBehaviour {
         previousInterloperBatch = nextInterloperBatch;
         yield return waitForFrame;
     }
-
+    Plane[] interloperFrustrum() {
+        // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
+        float size = 2f;
+        Plane left = new Plane(cameraTransform.right, followTransform.position - size * cameraTransform.right);
+        Plane right = new Plane(-1f * cameraTransform.right, followTransform.position + size * cameraTransform.right);
+        Plane down = new Plane(cameraTransform.up, followTransform.position - size * cameraTransform.up);
+        Plane up = new Plane(-1f * cameraTransform.up, followTransform.position + size * cameraTransform.up);
+        Plane near = new Plane(cameraTransform.forward, cameraTransform.position);
+        Plane far = new Plane(-1f * cameraTransform.forward, followTransform.position);
+        return new Plane[] { left, right, down, up, near, far };
+    }
     IEnumerator InterloperOnly() {
         HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
         Vector3 origin = followTransform.position;
@@ -281,15 +270,7 @@ public class NeoClearsighter : MonoBehaviour {
 
         int j = 0;
 
-        List<Renderer> interlopers = new List<Renderer>();
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay2);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay4);
-        rendererBoundsTree.GetColliding(interlopers, towardCameraRay5);
-        Debug.DrawRay(origin, towardCameraRay.direction, Color.red, 0.1f);
-        Debug.DrawRay(origin, towardCameraRay2.direction, Color.red, 0.1f);
-        Debug.DrawRay(origin, towardCameraRay4.direction, Color.red, 0.1f);
-        Debug.DrawRay(origin, towardCameraRay5.direction, Color.red, 0.1f);
+        List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
         Plane detectionPlane = new Plane(cameraTransform.forward, followTransform.position);
         j = 0;
         for (int i = 0; i < interlopers.Count; i++) {
@@ -303,10 +284,8 @@ public class NeoClearsighter : MonoBehaviour {
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;
 
-            // Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 rendererPosition = rendererPositions[renderer];
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
-            // if (directionToInterloper.y > 0.2f) { //&& !detectionPlane.GetSide(rendererPosition)
             if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextInterloperBatch.Add(renderer);
