@@ -28,6 +28,7 @@ public class NeoClearsighter : MonoBehaviour {
     CharacterCamera myCamera;
     Transform cameraTransform;
     bool initialized;
+    Vector3 previousOrigin;
     private List<Collider> rooftopZones = new List<Collider>();
     // void Awake() {
     //     GameManager.OnInputModeChange += HandleInputModeChange;
@@ -149,6 +150,15 @@ public class NeoClearsighter : MonoBehaviour {
         HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
         HashSet<Renderer> nextDynamicRenderBatch = new HashSet<Renderer>();
         Vector3 origin = followTransform.position;
+        if (previousOrigin == null || previousOrigin == Vector3.zero) {
+            previousOrigin = origin;
+        }
+        if (Mathf.Abs(origin.y - previousOrigin.y) > 0.5f) {
+            previousOrigin = origin;
+        } else {
+            origin.y = previousOrigin.y;
+        }
+
         Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
 

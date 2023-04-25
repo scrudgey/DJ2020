@@ -365,6 +365,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         if (waveArmTimer > 0f) {
             waveArmTimer -= Time.deltaTime;
         }
+        if (interactor != null) {
+            interactor.SetCursorData(input.Fire.cursorData);
+        }
         _ladderUpDownInput = input.MoveAxisForward;
         if (input.actionButtonPressed) {
             _probedColliders = new Collider[8];
@@ -515,7 +518,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.useItem:
                 if (interactor != null) {
-                    ItemUseResult interactorResult = interactor.SetInputs(input);
+                    bool gunHolstered = gunHandler.gunInstance == null;
+                    ItemUseResult interactorResult = interactor.SetInputs(input, gunHolstered);
                     HandleItemUseResult(interactorResult);
                 }
                 break;
@@ -533,8 +537,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     };
                     manualHacker?.SetInputs(manualHackInput);
                     burglar?.SetInputs(manualHackInput);
+
+                    bool gunHolstered = gunHandler.gunInstance == null;
                     if (interactor != null) {
-                        ItemUseResult interactorResult = interactor.SetInputs(input);
+                        ItemUseResult interactorResult = interactor.SetInputs(input, gunHolstered);
                         HandleItemUseResult(interactorResult);
                     }
                 }
@@ -672,9 +678,17 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         lastTargetDataInput = cursorData;
     }
 
-    void HandleItemUseResult(ItemUseResult result) {
+    // public void HandleItemUseResult() {
+
+    // }
+
+    public void HandleItemUseResult(ItemUseResult result) {
         if (result == null) return;
-        if (result.crouchDown) {
+        if (result.doBurgle) {
+            BurgleTargetData burgleTargetData = new BurgleTargetData(result.attackSurface, burglar);
+            TransitionToState(CharacterState.burgle);
+            GameManager.I.StartBurglar(burgleTargetData);
+        } else if (result.crouchDown) {
             TransitionToState(CharacterState.useItem);
         }
         if (result.waveArm) {

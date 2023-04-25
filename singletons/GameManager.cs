@@ -321,7 +321,6 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
-                // uiController.ShowUI();
                 break;
         }
         Time.timeScale = 1f;
@@ -427,29 +426,35 @@ public partial class GameManager : Singleton<GameManager> {
 
     void DoInputs() {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
-        UpdateCursor(uiclick);
+        PlayerInput playerInput = PlayerInput.none;
         if (Time.timeScale > 0) {
-            PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
+            playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
             if (gameData.levelState != null)
                 uiController?.UpdateWithPlayerInput(playerInput);
         }
+        UpdateCursor(uiclick, playerInput);
+
         // still not 100% clean here
         CameraInput input = playerCharacterController.BuildCameraInput();
         characterCamera.UpdateWithInput(input);
     }
 
-    void UpdateCursor(bool uiclick) {
+    void UpdateCursor(bool uiclick, PlayerInput playerInput) {
         if (inputMode == InputMode.burglar) {
             if (!uiclick) {
                 cursorType = CursorType.gun;
             }
         } else {
-            // TODO: adjust if we are in burglar mode
-            if (uiclick) {
+            if (playerCharacterController.gunHandler.gunInstance == null) {
+                cursorType = CursorType.pointer;
+                // } else if (playerInput.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false) {
+                //     cursorType = CursorType.pointer;
+            } else if (uiclick) {
                 cursorType = CursorType.pointer;
             } else {
                 cursorType = CursorType.gun;
             }
+
             if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -513,6 +518,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void HideShopMenu() {
         CloseMenu();
+        uiController.ShowInteractiveHighlight();
     }
     public void ShowMissionPlanner(LevelTemplate template) {
         TransitionToPhase(GamePhase.plan);

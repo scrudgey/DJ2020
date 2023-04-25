@@ -612,37 +612,49 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // 2. if not, shoot in the direction indicated by the mouse
         //      this will be in the player's gun's height plane.
 
-        RaycastHit[] hits = Physics.RaycastAll(clickRay, 100, LayerUtil.GetLayerMask(Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+
+        // all objects between me and the player plane
+        // this is *almost* right
+        Plane playerPlane = new Plane(-1f * Transform.forward, GameManager.I.playerPosition);
+
+        RaycastHit[] hits = Physics.RaycastAll(clickRay, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletOnly));
         Vector3 targetPoint = Vector3.zero;
 
         TagSystemData priorityData = null;
         bool prioritySet = false;
         Collider targetCollider = null;
-        HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
+        InteractorTargetData targetData = null;
+
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            Highlightable interactive = hit.collider.GetComponent<Highlightable>();
-            if (interactive != null) {
-                targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
+            Interactive interactive = hit.collider.transform.root.GetComponentInChildren<Interactive>();
+            if (interactive != null && targetData == null) {
+                targetData = new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition);
             }
+
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
-            if (data == null)
-                continue;
-            if (data.targetPriority == -1)
-                continue;
-            if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
-                priorityData = data;
-                if (data.targetPoint != null) {
-                    targetPoint = data.targetPoint.position;
-                } else {
-                    targetPoint = hit.collider.bounds.center;
+            if (data != null && data.targetPriority > -1) {
+                if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
+                    priorityData = data;
+                    if (data.targetPoint != null) {
+                        targetPoint = data.targetPoint.position;
+                    } else {
+                        targetPoint = hit.collider.bounds.center;
+                    }
+                    prioritySet = true;
+                    targetCollider = hit.collider;
                 }
-                prioritySet = true;
-                targetCollider = hit.collider;
+            }
+
+            if (!playerPlane.GetSide(hit.point)) {
+                Debug.Log($"breaking on hit: {hit.collider.gameObject}");
+                break;
             }
         }
+
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
-        HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
+        // InteractorTargetData interactorData = Interactive.TopTarget(targetDatas);
+        InteractorTargetData interactorData = targetData;
 
         if (prioritySet && !disableLockOn) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
@@ -712,20 +724,20 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // Vector3 direction = transform.forward;
 
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+        RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletOnly), QueryTriggerInteraction.Ignore);
         Vector3 targetPoint = projection.GetPoint(100f);
 
         TagSystemData priorityData = null;
         bool targetSet = false;
         bool prioritySet = false;
-        HashSet<HighlightableTargetData> targetDatas = new HashSet<HighlightableTargetData>();
+        HashSet<InteractorTargetData> targetDatas = new HashSet<InteractorTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform.root)) {
                 continue;
             }
-            Highlightable interactive = hit.collider.GetComponent<Highlightable>();
+            Interactive interactive = hit.collider.GetComponent<Interactive>();
             if (interactive != null) {
-                targetDatas.Add(new HighlightableTargetData(interactive, hit.collider));
+                targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data == null || data.targetPriority == -1) {
@@ -747,7 +759,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         }
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
-        HighlightableTargetData interactorData = Interactive.TopTarget(targetDatas);
+        InteractorTargetData interactorData = Interactive.TopTarget(targetDatas);
 
         if (prioritySet) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);

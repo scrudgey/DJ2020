@@ -6,11 +6,11 @@ using UnityEngine;
 public class BurgleTargetData {
     public Burglar burglar;
     public AttackSurface target;
-    public Collider collider;
-    public BurgleTargetData(AttackSurface target, Collider collider, Burglar burglar) {
+    // public Collider collider;
+    public BurgleTargetData(AttackSurface target, Burglar burglar) {
         this.target = target;
         this.burglar = burglar;
-        this.collider = collider;
+        // this.collider = collider;
     }
     static public bool Equality(HighlightableTargetData a, HighlightableTargetData b) {
         if (a == null && b == null) {
@@ -56,8 +56,9 @@ public class Burglar : MonoBehaviour {
         } else return cyberComponents
             .ToList()
             .Where((KeyValuePair<Collider, AttackSurface> kvp) => IsNodeVulnerable(kvp.Value))
-            .Select((KeyValuePair<Collider, AttackSurface> kvp) => new BurgleTargetData(kvp.Value, kvp.Key, this))
-            .OrderBy((BurgleTargetData data) => Vector3.Distance(data.collider.bounds.center, transform.position))
+            .OrderBy((KeyValuePair<Collider, AttackSurface> kvp) => Vector3.Distance(kvp.Key.bounds.center, transform.position))
+            .Select((KeyValuePair<Collider, AttackSurface> kvp) => new BurgleTargetData(kvp.Value, this))
+            // .OrderBy((BurgleTargetData data) => Vector3.Distance(data.collider.bounds.center, transform.position))
             .DefaultIfEmpty(null)
             .First(); // TODO: weigh the targets in some way, return deterministic
     }

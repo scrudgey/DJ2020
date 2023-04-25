@@ -8,8 +8,8 @@ public class CursorData {
     public Vector2 screenPosition;
     public Vector2 screenPositionNormalized;
     public Vector2 screenPixelDimension;
-    public HighlightableTargetData highlightableTargetData;
-    public static CursorData none = new CursorData();
+    public InteractorTargetData highlightableTargetData;
     public Collider targetCollider;
     public Vector2 mousePosition;
+    public static CursorData none = new CursorData();
 }

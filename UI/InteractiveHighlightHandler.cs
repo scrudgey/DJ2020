@@ -9,7 +9,8 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
 
     public Camera cam;
     public RectTransform cursor;
-    public HighlightableTargetData data;
+    // public HighlightableTargetData currentInteractorTarget;
+    public HighlightableTargetData currentInteractorTarget;
     public TextMeshProUGUI cursorText;
     public TextMeshProUGUI dotText;
     Coroutine blitTextCoroutine;
@@ -17,49 +18,60 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public Image cursorImage;
     private float timer;
     public Color color;
+    public Button interactButton;
+    public AttackSurface currentAttackSurface;
+    // public GameObject interactB
     void Awake() {
         blitTextCoroutine = null;
     }
     override public void HandleValueChanged(Interactor interactor) {
-        HighlightableTargetData newData = interactor.highlighted;
-        InteractorTargetData activeTarget = interactor.ActiveTarget();
-        if (newData == null && activeTarget == null) {
-            Disable();
-            data = null;
-        } else if (activeTarget != null) {
-            if (!InteractorTargetData.Equality(data, activeTarget)) {
-                data?.target?.DisableOutline();
-                data = activeTarget;
-                DataChanged();
-            }
-        } else if (newData != null) {
-            if (!InteractorTargetData.Equality(data, newData)) {
-                data?.target?.DisableOutline();
-                data = newData;
-                DataChanged();
+        // \
+        //  activeTarget = interactor.ActiveTarget();
+        // activeTarget = interactor.cursorTarget;
+        // if (activeTarget == null) {
+        //     Disable();
+        //     currentInteractorTarget = null;
+        // } else if (activeTarget != null) {
+        //     if (!InteractorTargetData.Equality(currentInteractorTarget, activeTarget)) {
+        //         currentInteractorTarget?.target?.DisableOutline();
+        //         currentInteractorTarget = activeTarget;
+        //         DataChanged();
+        //     }
+        // }
+
+        if (!InteractorTargetData.Equality(currentInteractorTarget, interactor.cursorTarget)) {
+            currentInteractorTarget?.target?.DisableOutline();
+            currentInteractorTarget = interactor.cursorTarget;
+            currentInteractorTarget?.target?.EnableOutline();
+
+            if (currentInteractorTarget == null) {
+                Disable();
+            } else {
+                Enable(currentInteractorTarget.target.calloutText);
             }
         }
+
     }
     void DataChanged() {
-        if (data == null) {
+        if (currentInteractorTarget == null) {
             Disable();
-        } else if (data.target != null) {
-            Enable(data.target.calloutText);
+        } else if (currentInteractorTarget.target != null) {
+            Enable(currentInteractorTarget.target.calloutText);
         }
     }
 
     void Update() {
         timer += Time.unscaledDeltaTime;
-        if (data == null) {
+        if (currentInteractorTarget == null) {
             Disable();
             timer = 0f;
-        } else if (data?.target == null) {
-            data = null;
+        } else if (currentInteractorTarget?.target == null) {
+            currentInteractorTarget = null;
             timer = 0f;
             DataChanged();
             return;
-        } else if (data != null) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(data.collider.bounds.center);
+        } else if (currentInteractorTarget != null) {
+            Vector3 screenPoint = cam.WorldToScreenPoint(currentInteractorTarget.collider.bounds.center);
             cursor.position = screenPoint;
             cursorText.color = color;
             dotText.color = color;
@@ -77,21 +89,42 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
-        if (data != null) {
-            data.target.DisableOutline();
+        if (currentInteractorTarget != null) {
+            currentInteractorTarget.target.DisableOutline();
         }
+        interactButton.gameObject.SetActive(false);
     }
     void Enable(string actionText) {
+        // Debug.Log($"enable blit text");
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
-        data.target.EnableOutline();
+        currentInteractorTarget.target.EnableOutline();
         cursorText.enabled = true;
 
         cursorImage.enabled = true;
         cursorText.text = "";
         dotText.enabled = true;
         blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
+
+        currentAttackSurface = currentInteractorTarget.target.transform.root.GetComponentInChildren<AttackSurface>();
+        if (currentAttackSurface) {
+            // cyberComponents[other] = component;
+            interactButton.gameObject.SetActive(true);
+            interactButton.interactable = currentInteractorTarget.targetIsInRange;
+            Debug.Log($"interactible: {interactButton.interactable}");
+            // if (currentInteractorTarget.targetIsInRange){
+            //     interactButton.interactable = true;
+            // }
+        } else {
+            interactButton.gameObject.SetActive(false);
+        }
+    }
+    public void InteractButtonCallback() {
+        if (currentAttackSurface) {
+            // new BurgleTargetData(kvp.Value, this)
+            target.HandleInteractButtonCallback(currentAttackSurface);
+        }
     }
     public IEnumerator BlitCalloutText(string actionText) {
         float blitInterval = 0.02f;
@@ -123,10 +156,10 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         }
     }
     public void SetScale() {
-        float distance = Vector3.Distance(cam.transform.position, data.target.transform.position);
+        float distance = Vector3.Distance(cam.transform.position, currentInteractorTarget.target.transform.position);
         float frustumHeight = 2.0f * distance * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-        float inaccuracyLength = data.collider.bounds.size.magnitude / 2f;
+        float inaccuracyLength = currentInteractorTarget.collider.bounds.size.magnitude / 2f;
         float pixelsPerLength = cam.scaledPixelHeight / frustumHeight;
         float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
 

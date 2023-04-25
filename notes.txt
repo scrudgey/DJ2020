@@ -2660,24 +2660,58 @@ maybe fall damage from rooftop should be greater
 
 * destructible floor in jack that data
 * jackthatdata: camera sees at great distance
-
+* click to interact
+    * highlight interactives when mouseover
+    * change cursor when mouseover interactive
+    * click to interact
+    * limit interaction in some way
+* figure out why mouseover only works sometimes
+* if mouse over interactive and interactive is nearby, turn cursor to interact
+* highlight interactive in floors below
+* click to pick up key
+* why is clearsighter not hiding satellite dish light?
+* mouseover:
+    * highlight
+    * show name
+    *if interactible:
+        * show button
+        * button not interactile
+* in range:
+    * gun drawn:
+        * right click: quick action
+    * gun holstered:
+        * left click / right click: quick action
+    * button becomes interactible
+    * button clicked:
+        * interact
+* clearsighter: ease vertical transitions
+* click to burglar tools
 
 upgrade unity
     newtonsoft json is broken??
-better interface for hacking
 
 what happened to the sphere robot?
 AI still had a hard time closing in on me when i was openly shooting and running around
     NPC wandering away from me shooting at a different guard
     an NPC ran down the stairs towards me, got stuck, didn't see me.
     an NPC saw me easily in the corner when he'd walked past me.
+    a guard ran up and reported a door was tampered with as i tampered with it
 unify tactics pane with shop design
 ammo pips being weird
 guards radio sfx
-a guard ran up and reported a door was tampered with as i tampered with it
 reload guns between retries
 
 
+verify how clearsighter works with destructible walls
+larger / more clear crosshairs cursor
+radial menu for selecting guns and items?
+unify items and guns
+enable / disable interaction button dynamically with distance
+
+
+show some information when picking up key
 hide gun panel when holstered
-click to interact
-if mouse over interactive and interactive is nearby, turn cursor to interact
+
+unify burglar tools and hacking
+better interface for hacking
+better interface for burglar tools

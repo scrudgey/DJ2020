@@ -119,10 +119,9 @@ public partial class GameManager : Singleton<GameManager> {
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
-                // uiController.InitializeObjectivesController(gameData);
                 uiController.Initialize();
-                uiController.ShowInteractiveHighlight();
                 uiController.HideUI();
+                uiController.ShowInteractiveHighlight();
             }, unloadAll: false);
         }
         // TODO: this should be inside the loading coroutine.

@@ -50,7 +50,7 @@ public class MusicController : Singleton<MusicController> {
 
     public void HandleSuspicionChange() {
         Suspiciousness sus = GameManager.I.GetTotalSuspicion();
-        Debug.Log($"[music] handle suspicious change {sus}");
+        // Debug.Log($"[music] handle suspicious change {sus}");
         // TODO: ease in the volumes
         switch (sus) {
             case Suspiciousness.normal:

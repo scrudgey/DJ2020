@@ -7,6 +7,8 @@ using UnityEngine;
 public record ItemUseResult {
     public bool crouchDown;
     public bool waveArm;
+    public bool doBurgle;
+    public AttackSurface attackSurface;
     public static ItemUseResult Empty() => new ItemUseResult {
 
     };

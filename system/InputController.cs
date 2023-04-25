@@ -261,16 +261,6 @@ public class InputController : Singleton<InputController> {
     }
 
     public PlayerInput HandleCharacterInput(bool pointerOverUIElement, bool escapePressedThisFrame) {
-        // if (!escapePressedThisFrame && escapePressConsumed) {
-        //     escapePressConsumed = false;
-        // }
-        // if (escapePressedThisFrame && !escapePressConsumed) {
-        //     escapePressConsumed = GameManager.I.HandleEscapePressed();
-        //     if (escapePressConsumed) {
-        //         escapePressedThisFrame = false;
-        //     }
-        //     // escapePressConsumed = true;
-        // }
         mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;
         if (pointerOverUIElement) {
             firePressedThisFrame = false;
