@@ -518,6 +518,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case CharacterState.useItem:
                 if (interactor != null) {
+                    // bool gunHolstered = gunHandler.HasGun();
                     bool gunHolstered = gunHandler.gunInstance == null;
                     ItemUseResult interactorResult = interactor.SetInputs(input, gunHolstered);
                     HandleItemUseResult(interactorResult);
@@ -538,6 +539,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     manualHacker?.SetInputs(manualHackInput);
                     burglar?.SetInputs(manualHackInput);
 
+                    // bool gunHolstered = gunHandler.HasGun();
                     bool gunHolstered = gunHandler.gunInstance == null;
                     if (interactor != null) {
                         ItemUseResult interactorResult = interactor.SetInputs(input, gunHolstered);
@@ -677,10 +679,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         _lastInput = input;
         lastTargetDataInput = cursorData;
     }
-
-    // public void HandleItemUseResult() {
-
-    // }
 
     public void HandleItemUseResult(ItemUseResult result) {
         if (result == null) return;

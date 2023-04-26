@@ -44,7 +44,7 @@ public class LevelBootstrapper : MonoBehaviour {
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<Items.BaseItem>()));
 
         level.plan.items.Add(ItemInstance.LoadItem("deck"));
-        level.plan.items.Add(ItemInstance.LoadItem("tools"));
+        // level.plan.items.Add(ItemInstance.LoadItem("tools"));
 
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData() with {

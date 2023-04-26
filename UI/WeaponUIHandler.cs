@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,7 @@ namespace UI {
         public TextMeshProUGUI gunTitle;
         public TextMeshProUGUI ammoCounter;
         public Image gunImage;
+        public RectTransform gunPanelRect;
 
         public Transform ammoPipContainer;
         public RectTransform ammoPipRect;
@@ -28,10 +30,13 @@ namespace UI {
         int clipsize;
         PrefabPool ammoSpentPool;
         PrefabPool ammoPipPool;
+        bool displayIsOpen;
+        Coroutine openDisplayCoroutine;
         // void Start() {
         //     StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
         // }
         public void Initialize() {
+            displayIsOpen = true;
             ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);
             ammoPipPool = PoolManager.I.RegisterPool(ammoPipPrefab, 50);
             liveAmmoPipsTop = new List<AmmoPip>();
@@ -82,6 +87,11 @@ namespace UI {
                 ammoCounter.text = $"{totalAmmoText} / {gun.gunInstance.MaxAmmo()}";
                 bool createSpentPip = gun.isShooting;
                 RectifyPips(gun.gunInstance.delta.clip, gun.gunInstance.delta.chamber, createSpentPip);
+                if (!displayIsOpen) {
+                    if (openDisplayCoroutine != null)
+                        StopCoroutine(openDisplayCoroutine);
+                    openDisplayCoroutine = StartCoroutine(openDisplay());
+                }
             } else {
                 clipsize = 0;
                 gunImage.enabled = false;
@@ -89,6 +99,11 @@ namespace UI {
                 ammoCounter.text = $"-/-";
                 gunTitle.text = "";
                 RectifyPips(0, 0, false);
+                if (displayIsOpen) {
+                    if (openDisplayCoroutine != null)
+                        StopCoroutine(openDisplayCoroutine);
+                    openDisplayCoroutine = StartCoroutine(closeDisplay());
+                }
             }
 
             lowerAmmoRowObject.SetActive(clipsize > 15);
@@ -97,6 +112,37 @@ namespace UI {
                     ammoPipPool.RecallObject(child.gameObject);
                 }
             }
+        }
+
+        IEnumerator openDisplay() {
+            // displayIsOpen = false;
+            displayIsOpen = true;
+
+            float timer = 0f;
+            float duration = 0.25f;
+            while (timer < duration) {
+                timer += Time.unscaledDeltaTime;
+                float y = (float)PennerDoubleAnimation.Linear(timer, 0f, 1f, duration);
+                gunPanelRect.localScale = new Vector3(1f, y, 1f);
+                yield return null;
+            }
+            gunPanelRect.localScale = Vector3.one;
+            openDisplayCoroutine = null;
+        }
+        IEnumerator closeDisplay() {
+            // displayIsOpen = false;
+            displayIsOpen = false;
+
+            float timer = 0f;
+            float duration = 0.25f;
+            while (timer < duration) {
+                timer += Time.unscaledDeltaTime;
+                float y = (float)PennerDoubleAnimation.Linear(timer, 1f, -1f, duration);
+                gunPanelRect.localScale = new Vector3(1f, y, 1f);
+                yield return null;
+            }
+            gunPanelRect.localScale = new Vector3(1f, 0, 1f);
+            openDisplayCoroutine = null;
         }
 
         void RectifyPips(int clip, int chamber, bool createSpentPip) {

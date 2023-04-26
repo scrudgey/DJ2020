@@ -77,7 +77,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
         List<BaseItem> allItems = new List<BaseItem> {
             ItemInstance.LoadItem("deck"),
-            ItemInstance.LoadItem("tools"),
+            // ItemInstance.LoadItem("tools"),
             // ItemInstance.LoadItem("C4")
         };
 

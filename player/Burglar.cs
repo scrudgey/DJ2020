@@ -6,11 +6,9 @@ using UnityEngine;
 public class BurgleTargetData {
     public Burglar burglar;
     public AttackSurface target;
-    // public Collider collider;
     public BurgleTargetData(AttackSurface target, Burglar burglar) {
         this.target = target;
         this.burglar = burglar;
-        // this.collider = collider;
     }
     static public bool Equality(HighlightableTargetData a, HighlightableTargetData b) {
         if (a == null && b == null) {
@@ -29,24 +27,19 @@ public class BurgleTargetData {
 public class Burglar : MonoBehaviour {
     public CharacterController characterController;
     public SphereCollider sphereCollider;
-    // public CapsuleCollider characterCollider;
-    // bool hackToolDeployed;
     public Dictionary<Collider, AttackSurface> cyberComponents = new Dictionary<Collider, AttackSurface>();
     public void AddInteractive(Collider other) {
-        // Debug.Log($"add burglar target {other}");
         AttackSurface component = other.GetComponent<AttackSurface>();
         if (component) {
             cyberComponents[other] = component;
         }
         RemoveNullCyberComponents();
-        // HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
     public void RemoveInteractive(Collider other) {
         if (cyberComponents.ContainsKey(other)) {
             cyberComponents.Remove(other);
         }
         RemoveNullCyberComponents();
-        // HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
 
     public BurgleTargetData ActiveTarget() {
@@ -58,7 +51,6 @@ public class Burglar : MonoBehaviour {
             .Where((KeyValuePair<Collider, AttackSurface> kvp) => IsNodeVulnerable(kvp.Value))
             .OrderBy((KeyValuePair<Collider, AttackSurface> kvp) => Vector3.Distance(kvp.Key.bounds.center, transform.position))
             .Select((KeyValuePair<Collider, AttackSurface> kvp) => new BurgleTargetData(kvp.Value, this))
-            // .OrderBy((BurgleTargetData data) => Vector3.Distance(data.collider.bounds.center, transform.position))
             .DefaultIfEmpty(null)
             .First(); // TODO: weigh the targets in some way, return deterministic
     }
@@ -79,14 +71,10 @@ public class Burglar : MonoBehaviour {
         // Debug.Log($"{inputs.playerInput.useItem} {GameManager.I.inputMode}");
         if (inputs.activeItem?.EnablesBurglary() ?? false) {
             if (inputs.playerInput.useItem && inputs.activeItem.EnablesBurglary()) {
-                // if (GameManager.I.inputMode != InputMode.burglar) {
                 BurgleTargetData data = ActiveTarget();
                 if (data == null) return;
                 characterController.TransitionToState(CharacterState.burgle);
                 GameManager.I.StartBurglar(data);
-                // } else {
-                //     GameManager.I.CloseBurglar();
-                // }
             }
         }
     }

@@ -115,8 +115,5 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         result.attackSurface = attackSurface;
         result.doBurgle = true;
         characterController.HandleItemUseResult(result);
-        // BurgleTargetData burgleData = new BurgleTargetData(attackSurface, burglar);
-        // characterController.TransitionToState(CharacterState.burgle);
-        // GameManager.I.StartBurglar(data);
     }
 }

@@ -69,6 +69,9 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             currentInteractorTarget = null;
             timer = 0f;
             DataChanged();
+            if (currentAttackSurface != null) {
+                interactButton.interactable = Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
+            }
             return;
         } else if (currentInteractorTarget != null) {
             Vector3 screenPoint = cam.WorldToScreenPoint(currentInteractorTarget.collider.bounds.center);
@@ -79,6 +82,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             SetScale();
             cursorImage.enabled = false;
         }
+
     }
     void Disable() {
         dotText.enabled = false;
@@ -109,13 +113,9 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
 
         currentAttackSurface = currentInteractorTarget.target.transform.root.GetComponentInChildren<AttackSurface>();
         if (currentAttackSurface) {
-            // cyberComponents[other] = component;
             interactButton.gameObject.SetActive(true);
             interactButton.interactable = currentInteractorTarget.targetIsInRange;
             Debug.Log($"interactible: {interactButton.interactable}");
-            // if (currentInteractorTarget.targetIsInRange){
-            //     interactButton.interactable = true;
-            // }
         } else {
             interactButton.gameObject.SetActive(false);
         }

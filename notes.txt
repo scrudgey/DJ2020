@@ -2138,6 +2138,38 @@ note: layer "interactive"
     * fencing
     * buildings
 
+* destructible floor in jack that data
+* jackthatdata: camera sees at great distance
+* click to interact
+    * highlight interactives when mouseover
+    * change cursor when mouseover interactive
+    * click to interact
+    * limit interaction in some way
+* figure out why mouseover only works sometimes
+* if mouse over interactive and interactive is nearby, turn cursor to interact
+* highlight interactive in floors below
+* click to pick up key
+* why is clearsighter not hiding satellite dish light?
+* mouseover:
+    * highlight
+    * show name
+    *if interactible:
+        * show button
+        * button not interactile
+* in range:
+    * gun drawn:
+        * right click: quick action
+    * gun holstered:
+        * left click / right click: quick action
+    * button becomes interactible
+    * button clicked:
+        * interact
+* clearsighter: ease vertical transitions
+* click to burglar tools
+* hide gun panel when holstered
+* enable / disable interaction button dynamically with distance
+* remove burglar tools item
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2162,7 +2194,7 @@ nice to have / future goals:
     glass break fx
     leaves and junk in the street that blows around
     off-screen indicator for active threats?
-    pixel perfect shaders
+    * pixel perfect shaders
     animation shows recoil
     head look around if player has been idle
     make elevator
@@ -2175,11 +2207,9 @@ nice to have / future goals:
             run to the alarm panel if there is no HQ
                 do nothing if there is no alarm panel
             how to decide who to run to alarm panel?
-
-
     dust / smoke shader
     digitized voice for "operation jetlag"
-    highlight item container when item is switched
+    * highlight item container when item is switched
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
     performance tuning: separate canvases, implement octree or smth
@@ -2208,7 +2238,7 @@ graphical embellishments
             PLAYER: STATS
     pulse some element in color in alarm timer, maybe show some bkg
         blink at 00.00 and then ease out
-    switching items graphical effect
+    * switching items graphical effect
     easing in overlay 
     more blink-style transformations
     show thermal goggles on player head?
@@ -2218,7 +2248,6 @@ graphical embellishments
 UI:
     adjust all UI buttons to have consistent semantics for Cancel / OK
     display different UI when in aim mode?
-
     aim lock stats system 
         scan time 
         retain stats after breaking lock up to N 
@@ -2257,8 +2286,6 @@ VR mission designer
     inventory management
 
 * better action log (remove?)
-    blit the text
-    font?
 
 clearsighter
     we want to disable shells when they're newly produced, but hide them when they're static.
@@ -2319,25 +2346,22 @@ minimap
         show sightcone
     indicate player
 
-
 UI
-    adjust all UI buttons to have consistent semantics for Cancel / OK
-    remove action feed?
+    * adjust all UI buttons to have consistent semantics for Cancel / OK
+    * remove action feed?
     show iconography when disguise is lost
     show iconography when optional objective is complete
 
-does VR mission still work?
-    hack target ! indicator only sometimes visible
-    NPC portraits not being set properly
+* does VR mission still work?
+hack target ! indicator only sometimes visible
+NPC portraits not being set properly
 
-level state
-    normalize level / mission / state / detla / template
-    gun state can be moved into plan
+* level state
+    * normalize level / mission / state / detla / template
+    * gun state can be moved into plan
     HQ state can be moved into delta
 
-
 a guy danced on a corpse (I think he was investigating a noise?)
-
 
 ---------------
 
@@ -2376,13 +2400,12 @@ networks
     DFS path finding doesn't quite work right for highlighting alarm path
 
 optimizations:
-    use octree in clearsighter
+    * use octree in clearsighter
+    * static batching / dynamic batching / occlusion culling  / gpu instancing
     optimize the ammo counter
         this could free up the equivalent of a whole camera render
-    static batching / dynamic batching / occlusion culling  / gpu instancing
 
-put gun away and left click on objects to use?
-left click on people to talk?
+* put gun away and left click on objects to use?
 
 clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
@@ -2658,39 +2681,10 @@ show objectives as blit-in text on lower left?
 maybe fall damage from rooftop should be greater
 
 
-* destructible floor in jack that data
-* jackthatdata: camera sees at great distance
-* click to interact
-    * highlight interactives when mouseover
-    * change cursor when mouseover interactive
-    * click to interact
-    * limit interaction in some way
-* figure out why mouseover only works sometimes
-* if mouse over interactive and interactive is nearby, turn cursor to interact
-* highlight interactive in floors below
-* click to pick up key
-* why is clearsighter not hiding satellite dish light?
-* mouseover:
-    * highlight
-    * show name
-    *if interactible:
-        * show button
-        * button not interactile
-* in range:
-    * gun drawn:
-        * right click: quick action
-    * gun holstered:
-        * left click / right click: quick action
-    * button becomes interactible
-    * button clicked:
-        * interact
-* clearsighter: ease vertical transitions
-* click to burglar tools
-
 upgrade unity
     newtonsoft json is broken??
-
 what happened to the sphere robot?
+clearsighter still needs some work
 AI still had a hard time closing in on me when i was openly shooting and running around
     NPC wandering away from me shooting at a different guard
     an NPC ran down the stairs towards me, got stuck, didn't see me.
@@ -2701,17 +2695,19 @@ ammo pips being weird
 guards radio sfx
 reload guns between retries
 
-
 verify how clearsighter works with destructible walls
 larger / more clear crosshairs cursor
 radial menu for selecting guns and items?
 unify items and guns
-enable / disable interaction button dynamically with distance
+
+still having issues with button interactivity and distance
+player in camera?
+camera should slew in faster
 
 
-show some information when picking up key
-hide gun panel when holstered
 
-unify burglar tools and hacking
-better interface for hacking
-better interface for burglar tools
+
+overhaul burglar tools and hacking
+    show some information when picking up key
+    better interface for hacking
+    better interface for burglar tools

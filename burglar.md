@@ -99,3 +99,57 @@ lockpicking takes skill
 suspicion when attacking a door
 
 screw removed sound
+
+
+
+
+
+
+
+# burglar overhaul and unification with hack
+
+open questions:
+* key system
+* interface for burglar tools
+* interface for hack
+* different camera, window
+
+## key system
+
+do we have a separate keyring?
+how do we show keys when keys are picked up?
+
+separate keys:
+    you must try each key in the lock?
+    you can decode, copy, cut new keys
+    realistic approach to using keys?
+    annoying?
+    easier to integrate with keyed-alike
+
+## interface for burglar 
+
+the idea is:
+
+1. upon opening interface, no tools are out.
+    the player can somehow select burglar tools or hack device.
+
+2. the player selects burglar tools
+    the bag appears, unfurls? unzips? 
+    tools are available to use
+    sound effects, animation
+
+3. player uses tools as needed
+
+4. player puts burglar tools away
+
+### top level selection
+
+ideas: burglar bag, laptop peek on bottom of screen
+click one to open it
+how to close it?
+    an "x" appears
+
+button bar on right?
+    not so great. 
+
+how to make the hack tool fit with this?
