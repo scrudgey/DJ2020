@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 public class BurglarCanvasController : MonoBehaviour {
+    enum Mode { none, burglarTool, cyberdeck }
+    Mode mode;
     BurgleTargetData data;
     BurglarToolType selectedTool;
     public RectTransform mainRect;
@@ -30,12 +34,29 @@ public class BurglarCanvasController : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] pickupToolSound;
     public AudioClip[] toolOverElementSound;
+    [Header("selectors")]
+    public RectTransform mainPanelRect;
+    public RectTransform selectorRect;
+    public RectTransform burglarToolsRect;
+    public RectTransform cyberdeckRect;
+    public GameObject burglarSelectorObject;
+    public GameObject cyberdeckSelectorObject;
+    public BurglarSelectorButton[] selectorButtons;
+    [Header("burglarToolBag")]
+    public RectTransform burglarToolMaskRect;
+    public AudioClip[] burglarBagShowSound;
+    public AudioClip[] burglarBagUnzipSound;
     TamperEvidence tamperEvidence;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
     bool mouseDown;
     AttackSurfaceElement selectedElement;
     bool finishing;
+    Coroutine moveMainPanelCoroutine;
+    Coroutine moveSelectorPanelCoroutine;
+    Coroutine exposeBurglarToolsCoroutine;
+    Coroutine exposeCyberdeckCoroutine;
+
     public void Initialize(BurgleTargetData data) {
         this.data = data;
         finishing = false;
@@ -78,6 +99,10 @@ public class BurglarCanvasController : MonoBehaviour {
             uiElement.Initialize(this, element);
             element.Initialize(uiElement);
         }
+
+        foreach (BurglarSelectorButton button in selectorButtons) {
+            button.ResetPosition();
+        }
     }
     public void TearDown() {
         foreach (Transform child in uiElementsContainer) {
@@ -87,8 +112,8 @@ public class BurglarCanvasController : MonoBehaviour {
             data.target.DisableAttackSurface();
     }
 
-    void PositionTool(Vector2 localPoint) {
-        toolPoint.anchoredPosition = localPoint;
+    void PositionTool(Vector2 localPoint, Vector2 cursorPoint) {
+        toolPoint.anchoredPosition = cursorPoint;
         if (localPoint.x > uiElementsRectTransform.rect.width / -2f && localPoint.x < uiElementsRectTransform.rect.width / 2f &&
             localPoint.y > uiElementsRectTransform.rect.height / -2f && localPoint.y < uiElementsRectTransform.rect.height / 2f) {
             if (selectedTool == BurglarToolType.none) {
@@ -103,11 +128,18 @@ public class BurglarCanvasController : MonoBehaviour {
 
     public void UpdateWithInput(PlayerInput input) {
         mouseDown = input.mouseDown;
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        // Vector2 mousePosition = Mouse.current.position.ReadValue();
+        // Debug.Log($"{input.mousePosition} {input.viewPortPoint}");
         Vector2 localPoint = Vector2.zero;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, mousePosition, null, out localPoint);
-        PositionTool(localPoint);
-        bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;
+
+        // TODO: fix
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, input.mousePosition, null, out localPoint);
+
+        PositionTool(-localPoint, input.mousePosition);
+
+        // TODO: fix
+        // bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;
+        bool outOfBounds = false;
         if (input.escapePressed) {
             if (selectedTool == BurglarToolType.none) {
                 DoneButtonCallback();
@@ -287,10 +319,10 @@ public class BurglarCanvasController : MonoBehaviour {
 
     IEnumerator JiggleTool() {
         while (true) {
-            while (Random.Range(0f, 1f) < 0.9f) {
+            while (UnityEngine.Random.Range(0f, 1f) < 0.9f) {
                 yield return new WaitForEndOfFrame();
             }
-            Quaternion jiggle = Quaternion.AngleAxis(Random.Range(-10f, 10f), toolPoint.forward);
+            Quaternion jiggle = Quaternion.AngleAxis(UnityEngine.Random.Range(-10f, 10f), toolPoint.forward);
             jiggle = jiggle * toolPoint.rotation;
             Vector3 euler = jiggle.eulerAngles;
             euler.z = Mathf.Clamp(euler.z, -16f, 16f);
@@ -303,5 +335,136 @@ public class BurglarCanvasController : MonoBehaviour {
     IEnumerator WaitAndCloseMenu(float delay) {
         yield return new WaitForSecondsRealtime(delay);
         DoneButtonCallback();
+    }
+
+    public void BurglarSelectorCallback() {
+        ChangeMode(Mode.burglarTool);
+    }
+    public void CyberdeckSelectorCallback() {
+        ChangeMode(Mode.cyberdeck);
+    }
+    public void BurglarSelectorCancelCallback() {
+        ChangeMode(Mode.none);
+    }
+
+    void ChangeMode(Mode newMode) {
+        OnModeExit(mode);
+        mode = newMode;
+        OnModeEnter(mode);
+    }
+
+    void OnModeExit(Mode oldMode) {
+        switch (oldMode) {
+            case Mode.burglarTool:
+                ShowBurglarTools(false);
+                break;
+            case Mode.cyberdeck:
+                ShowCyberDeck(false);
+                break;
+        }
+    }
+    void OnModeEnter(Mode oldMode) {
+        foreach (BurglarSelectorButton button in selectorButtons) {
+            button.ResetPosition();
+        }
+        switch (oldMode) {
+            case Mode.none:
+                MoveMainPanelToTop(false);
+                HideSelectorPanel(false);
+                ShowBurglarTools(false);
+                ShowCyberDeck(false);
+                burglarSelectorObject.SetActive(true);
+                cyberdeckSelectorObject.SetActive(true);
+                break;
+            case Mode.burglarTool:
+                burglarToolMaskRect.sizeDelta = new Vector2(0, 300);
+                MoveMainPanelToTop(true);
+                ShowBurglarTools(true);
+                HideSelectorPanel(true);
+                burglarSelectorObject.SetActive(false);
+                cyberdeckSelectorObject.SetActive(true);
+                break;
+            case Mode.cyberdeck:
+                MoveMainPanelToTop(true);
+                ShowCyberDeck(true);
+                HideSelectorPanel(true);
+
+                burglarSelectorObject.SetActive(true);
+                cyberdeckSelectorObject.SetActive(false);
+                break;
+        }
+    }
+
+
+    void MoveMainPanelToTop(bool value) {
+        if (moveMainPanelCoroutine != null) {
+            StopCoroutine(moveMainPanelCoroutine);
+        }
+        if (value) {
+            moveMainPanelCoroutine = StartCoroutine(MoveRectY(mainPanelRect, -150, -20, moveMainPanelCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+        } else {
+            moveMainPanelCoroutine = StartCoroutine(MoveRectY(mainPanelRect, -20, -150, moveMainPanelCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+        }
+    }
+    void HideSelectorPanel(bool value) {
+        if (moveSelectorPanelCoroutine != null) {
+            StopCoroutine(moveSelectorPanelCoroutine);
+        }
+        if (value) {
+            moveSelectorPanelCoroutine = StartCoroutine(MoveRectY(selectorRect, 0, -100, moveSelectorPanelCoroutine, PennerDoubleAnimation.Linear));
+        } else {
+            moveSelectorPanelCoroutine = StartCoroutine(MoveRectY(selectorRect, -100, 0, moveSelectorPanelCoroutine, PennerDoubleAnimation.Linear));
+        }
+    }
+    void ShowBurglarTools(bool value) {
+        if (exposeBurglarToolsCoroutine != null) {
+            StopCoroutine(exposeBurglarToolsCoroutine);
+        }
+        if (value) {
+            Toolbox.RandomizeOneShot(audioSource, burglarBagShowSound);
+
+            exposeBurglarToolsCoroutine = StartCoroutine(
+                Toolbox.ChainCoroutines(MoveRectY(burglarToolsRect, -313, -40, exposeBurglarToolsCoroutine, PennerDoubleAnimation.BounceEaseOut), UnzipBurglarKit())
+            );
+        } else {
+            exposeBurglarToolsCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, -40, -313, exposeBurglarToolsCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+        }
+    }
+    void ShowCyberDeck(bool value) {
+        if (exposeCyberdeckCoroutine != null) {
+            StopCoroutine(exposeCyberdeckCoroutine);
+        }
+        if (value) {
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, -313, -40, exposeCyberdeckCoroutine, PennerDoubleAnimation.BounceEaseOut));
+        } else {
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, -40, -313, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+        }
+    }
+    IEnumerator UnzipBurglarKit() {
+        RectTransform rect = burglarToolMaskRect;
+        Toolbox.RandomizeOneShot(audioSource, burglarBagUnzipSound);
+        float timer = 0;
+        float duration = 0.3f;
+        while (timer < duration) {
+            timer += Time.unscaledDeltaTime;
+            float x = (float)PennerDoubleAnimation.Linear(timer, 0, 1256, duration);
+            rect.sizeDelta = new Vector2(x, 300f);
+            yield return null;
+        }
+        rect.sizeDelta = new Vector2(1256, 300);
+    }
+    IEnumerator MoveRectY(RectTransform rect, float startY, float endY, Coroutine routine, Func<double, double, double, double, double> easing) {
+        float timer = 0;
+        float duration = 0.5f;
+        while (timer < duration) {
+            timer += Time.unscaledDeltaTime;
+            float y = (float)easing(timer, startY, endY - startY, duration);
+            Vector2 newPosition = new Vector3(rect.anchoredPosition.x, y);
+            rect.anchoredPosition = newPosition;
+            yield return null;
+        }
+        Vector2 finalPosition = new Vector3(rect.anchoredPosition.x, endY);
+        rect.anchoredPosition = finalPosition;
+        routine = null;
     }
 }

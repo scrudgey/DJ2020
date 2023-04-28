@@ -267,11 +267,12 @@ public class InputController : Singleton<InputController> {
             firePressedHeld = false;
         }
 
-        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector2 viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
 
-        CursorData targetData = OrbitCamera.GetTargetData(cursorPosition, GameManager.I.inputMode);
+        CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
@@ -302,7 +303,9 @@ public class InputController : Singleton<InputController> {
                 lookAtDirection = directionToCursor,
                 zoomInput = zoomInput,
                 mouseDown = mouseDown,
-                escapePressed = escapePressedThisFrame //&& !escapePressConsumed
+                escapePressed = escapePressedThisFrame, //&& !escapePressConsumed
+                mousePosition = mousePosition,
+                viewPortPoint = viewPortPoint
             };
             i.SetInputs(characterInputs);
         }

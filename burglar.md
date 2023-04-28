@@ -153,3 +153,56 @@ button bar on right?
     not so great. 
 
 how to make the hack tool fit with this?
+
+
+on mouseover select button:
+    ease it up slightly
+on mouse exit:
+    ease it down slightly
+
+    start y: -532
+    edn y: -507
+
+on click burglar:
+    move entire selector button panel down
+    start y: 0
+    end y: -100
+
+    move main panel up
+    start y: -150
+    end y: -20
+
+    move burglar toolset up
+    start y: -313
+    end y: -40
+
+// with burglar tools open:
+// main rect y: -20
+// closed: -150
+
+* main menu not moving up and down
+* selector canvas not moving up and down
+* burglar canvas in wrong position
+* mask for tools outside of screen
+* initialize
+* aspect ratio of render texture
+    * new size is: 1250 x 750
+
+* buttons not moving up and down
+* sound effects
+* burglar bag should bounce up & land, play a sound, then unzip sound, then open left to right
+
+what other tools?
+wirecutters
+lockpick gun
+advanced screwdriver
+
+strap in the current tools
+draw the exterior of the case
+
+what are some outstanding issues with attack surfaces?
+    button sizes, positions, movement re: doorknob
+    inside vs outside
+    appearance of button is twitchy
+    character in camera
+    feedback text could be better

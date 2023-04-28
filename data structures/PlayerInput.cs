@@ -42,6 +42,8 @@ public struct PlayerInput {
     public bool aimWeapon;
     public bool mouseDown;
     public bool escapePressed;
+    public Vector2 mousePosition;
+    public Vector2 viewPortPoint;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };

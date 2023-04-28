@@ -501,6 +501,12 @@ public class Toolbox {
         }
     }
 
+    public static IEnumerator ChainCoroutines(params IEnumerator[] coroutines) {
+        foreach (IEnumerator coroutine in coroutines) {
+            yield return coroutine;
+        }
+    }
+
     public static IEnumerator OpenStore(RectTransform bottomRect, AudioSource audioSource, AudioClip[] discloseBottomSound) {
         yield return new WaitForSecondsRealtime(0.5f);
         RandomizeOneShot(audioSource, discloseBottomSound, randomPitchWidth: 0.02f);

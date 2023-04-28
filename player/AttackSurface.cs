@@ -12,7 +12,7 @@ public class AttackSurface : MonoBehaviour {
     public Outline outline;
     public Transform attackElementRoot;
     public void Start() {
-        renderTexture = new RenderTexture(640, 480, 16, RenderTextureFormat.Default);
+        renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         attackCam.targetTexture = renderTexture;
         attackCam.enabled = false;
         DisableOutline();

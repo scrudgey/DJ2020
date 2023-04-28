@@ -645,10 +645,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 }
             }
 
-            if (!playerPlane.GetSide(hit.point)) {
-                Debug.Log($"breaking on hit: {hit.collider.gameObject}");
-                break;
-            }
+            // if (!playerPlane.GetSide(hit.point)) {
+            //     Debug.Log($"breaking on hit: {hit.collider.gameObject}");
+            //     break;
+            // }
         }
 
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
