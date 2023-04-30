@@ -122,7 +122,8 @@ public class Toolbox {
         }
     }
     public static void DrawPlane(Vector3 position, Plane plane) {
-
+        // Debug.Log($"draw plane: {position} {plane}");
+        // Debug.DrawLine(position, position + plane.normal * 10f, Color.cyan, 10f);
         Vector3 normal = plane.normal;
 
         Vector3 v3;
@@ -139,12 +140,12 @@ public class Toolbox {
         var corner1 = position + v3;
         var corner3 = position - v3;
 
-        Debug.DrawLine(corner0, corner2, Color.green);
-        Debug.DrawLine(corner1, corner3, Color.green);
-        Debug.DrawLine(corner0, corner1, Color.green);
-        Debug.DrawLine(corner1, corner2, Color.green);
-        Debug.DrawLine(corner2, corner3, Color.green);
-        Debug.DrawLine(corner3, corner0, Color.green);
+        Debug.DrawLine(corner0, corner2, Color.cyan, 10f);
+        Debug.DrawLine(corner1, corner3, Color.cyan, 10f);
+        Debug.DrawLine(corner0, corner1, Color.cyan, 10f);
+        Debug.DrawLine(corner1, corner2, Color.cyan, 10f);
+        Debug.DrawLine(corner2, corner3, Color.cyan, 10f);
+        Debug.DrawLine(corner3, corner0, Color.cyan, 10f);
         Debug.DrawRay(position, normal, Color.red);
     }
     static public TagSystemData GetTagData(GameObject target) {

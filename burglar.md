@@ -191,18 +191,29 @@ on click burglar:
 * buttons not moving up and down
 * sound effects
 * burglar bag should bounce up & land, play a sound, then unzip sound, then open left to right
+* strap in the current tools
+* draw the exterior of the case
+* x button
+* click toolbox with none -> play no sound
+* allow attack surface to specify world location of button
+* make exiting burglar view easier
 
-what other tools?
-wirecutters
-lockpick gun
-advanced screwdriver
-
-strap in the current tools
-draw the exterior of the case
+what other tools? add them as a need arises
+    wirecutters
+    lockpick gun
+    advanced screwdriver
+    shim
+    glass cutter
 
 what are some outstanding issues with attack surfaces?
     button sizes, positions, movement re: doorknob
     inside vs outside
-    appearance of button is twitchy
+    * appearance of button is twitchy
     character in camera
     feedback text could be better
+    position, size, appearance of button and text
+
+add attack surfaces to:
+    ATM
+    transformer
+    electrical mains

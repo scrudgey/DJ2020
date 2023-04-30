@@ -3,17 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public class HighlightableTargetData {
-    public Highlightable target;
+
+public class InteractorTargetData {
     public Collider collider;
     public bool targetIsInRange;
-
-    public HighlightableTargetData(Highlightable target, Collider collider, Vector3 playerPosition) {
+    public Interactive target;
+    public InteractorTargetData(Interactive target, Collider collider, Vector3 playerPosition) {
         this.target = target;
         this.collider = collider;
         this.targetIsInRange = Vector3.Distance(target.transform.position, playerPosition) < 2f;
+        this.target = target;
     }
-    static public bool Equality(HighlightableTargetData a, HighlightableTargetData b) {
+    static public bool Equality(InteractorTargetData a, InteractorTargetData b) {
         if (a == null && b == null) {
             return true;
         } else if (a == null || b == null) {
@@ -23,16 +24,10 @@ public class HighlightableTargetData {
         }
     }
 }
-public class InteractorTargetData : HighlightableTargetData {
-    new public Interactive target;
-    public InteractorTargetData(Interactive target, Collider collider, Vector3 playerPosition) : base(target, collider, playerPosition) {
-        this.target = target;
-    }
-}
 public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
     public Action<InteractorTargetData> OnActionDone;
-    public HighlightableTargetData cursorTarget;
+    public InteractorTargetData cursorTarget;
     public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
     public CharacterController characterController;
     public void AddInteractive(Collider other) {
@@ -93,6 +88,11 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         bool doAction = gunIsHolstered ? inputs.actionButtonPressed || inputs.Fire.FirePressed : inputs.actionButtonPressed;
         if (doAction && (inputs.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false)) {
             Interactive cursorInteractive = cursorTarget?.target.GetComponent<Interactive>();
+
+            // Interactive cursorInteractive = cursorTarget?.target.transform.root.GetComponentsInChildren<Interactive>()
+            //     .OrderBy(interactive => Vector3.Distance(interactive.transform.position, transform.position))
+            //     .First();
+
             if (cursorInteractive != null) {
                 return cursorInteractive.DoAction(this);
             }

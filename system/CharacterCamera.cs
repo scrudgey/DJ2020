@@ -338,6 +338,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
+            screenOffset *= screenOffset.sqrMagnitude;
             Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y) * followCursorCoefficient;
             targetPosition = input.targetPosition + worldOffset;
             lastTargetPosition = targetPosition;
@@ -598,37 +599,20 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     private CursorData CursorToTarget(Vector2 cursorPosition) {
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
-        // Debug.Log(Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
-        Vector3 direction = transform.forward;
-        // Debug.Log(projection);
-        if (GameManager.I.showDebugRays)
-            Debug.DrawRay(projection.origin, direction * 100, Color.magenta);
-        Ray clickRay = new Ray(projection.origin, direction);
-
-        // 1. determine if the click ray is hovering over a targetable object
-        //      if so, determine the priority targetable and highlight it
-        //      this can aim up or down as necessary
-        // 2. if not, shoot in the direction indicated by the mouse
-        //      this will be in the player's gun's height plane.
-
-
-        // all objects between me and the player plane
-        // this is *almost* right
+        Ray clickRay = new Ray(projection.origin, transform.forward);
         Plane playerPlane = new Plane(-1f * Transform.forward, GameManager.I.playerPosition);
-
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletOnly));
         Vector3 targetPoint = Vector3.zero;
 
         TagSystemData priorityData = null;
         bool prioritySet = false;
         Collider targetCollider = null;
-        InteractorTargetData targetData = null;
+        HashSet<InteractorTargetData> targetDatas = new HashSet<InteractorTargetData>();
 
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            Interactive interactive = hit.collider.transform.root.GetComponentInChildren<Interactive>();
-            if (interactive != null && targetData == null) {
-                targetData = new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition);
+            foreach (Interactive interactive in hit.collider.transform.root.GetComponentsInChildren<Interactive>()) {
+                targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
 
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
@@ -645,16 +629,15 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 }
             }
 
-            // if (!playerPlane.GetSide(hit.point)) {
-            //     Debug.Log($"breaking on hit: {hit.collider.gameObject}");
-            //     break;
-            // }
+            if (!playerPlane.GetSide(hit.point)) {
+                // Debug.Log($"breaking on hit: {hit.collider.gameObject}");
+                break;
+            }
         }
 
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
-        // InteractorTargetData interactorData = Interactive.TopTarget(targetDatas);
-        InteractorTargetData interactorData = targetData;
+        InteractorTargetData interactorData = Interactive.ClosestTarget(targetDatas);
 
         if (prioritySet && !disableLockOn) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
@@ -735,10 +718,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             if (hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform.root)) {
                 continue;
             }
-            Interactive interactive = hit.collider.GetComponent<Interactive>();
-            if (interactive != null) {
-                targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
-            }
+            // Interactive interactive = hit.collider.GetComponent<Interactive>();
+            foreach (Interactive interactive in hit.collider.transform.root.GetComponentsInChildren<Interactive>())
+                if (interactive != null) {
+                    targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
+                }
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data == null || data.targetPriority == -1) {
                 if (!prioritySet && !targetSet) {
@@ -759,7 +743,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         }
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
-        InteractorTargetData interactorData = Interactive.TopTarget(targetDatas);
+        InteractorTargetData interactorData = Interactive.ClosestTarget(targetDatas);
 
         if (prioritySet) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);

@@ -10,19 +10,6 @@ public class BurgleTargetData {
         this.target = target;
         this.burglar = burglar;
     }
-    static public bool Equality(HighlightableTargetData a, HighlightableTargetData b) {
-        if (a == null && b == null) {
-            return true;
-        } else if (a == null || b == null) {
-            return false;
-        } else {
-            return a.target == b.target && a.collider == b.collider;
-        }
-    }
-    // public HackInput ToManualHackInput() => new HackInput {
-    //     targetNode = GameManager.I.GetCyberNode(target.idn),
-    //     type = HackType.manual
-    // };
 }
 public class Burglar : MonoBehaviour {
     public CharacterController characterController;

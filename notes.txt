@@ -2619,10 +2619,6 @@ graphics:
         franco
         no me baño
     https://twitter.com/scrudgey/status/1627911883952099329?s=20
-
-
-
-
 models:
     another car
     more neon
@@ -2704,10 +2700,14 @@ still having issues with button interactivity and distance
 player in camera?
 camera should slew in faster
 
-
-
-
 overhaul burglar tools and hacking
     show some information when picking up key
     better interface for hacking
     better interface for burglar tools
+
+* planes X, Z: only hide things on side of camera.
+* bump camera less when mouse close to player
+
+hidden above interact surface is interactible
+doubledoor should have a highlight
+use interloper material

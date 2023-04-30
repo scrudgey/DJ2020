@@ -269,6 +269,9 @@ public class BurglarCanvasController : MonoBehaviour {
     }
 
     void SetTool(BurglarToolType toolType) {
+        if (selectedTool != BurglarToolType.none || toolType != BurglarToolType.none)
+            Toolbox.RandomizeOneShot(audioSource, pickupToolSound);
+
         selectedTool = toolType;
         selectedToolText.text = toolType.ToString();
 
@@ -277,7 +280,6 @@ public class BurglarCanvasController : MonoBehaviour {
         keyToolButton.SetActive(true);
         screwdriverToolButton.SetActive(true);
 
-        Toolbox.RandomizeOneShot(audioSource, pickupToolSound);
 
         switch (toolType) {
             case BurglarToolType.none:

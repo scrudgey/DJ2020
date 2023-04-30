@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public Camera cam;
     public RectTransform cursor;
     // public HighlightableTargetData currentInteractorTarget;
-    public HighlightableTargetData currentInteractorTarget;
+    public InteractorTargetData currentInteractorTarget;
     public TextMeshProUGUI cursorText;
     public TextMeshProUGUI dotText;
     Coroutine blitTextCoroutine;
@@ -19,6 +20,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     private float timer;
     public Color color;
     public Button interactButton;
+    public RectTransform interactButtonRect;
     public AttackSurface currentAttackSurface;
     // public GameObject interactB
     void Awake() {
@@ -69,18 +71,21 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             currentInteractorTarget = null;
             timer = 0f;
             DataChanged();
-            if (currentAttackSurface != null) {
-                interactButton.interactable = Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
-            }
             return;
         } else if (currentInteractorTarget != null) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(currentInteractorTarget.collider.bounds.center);
+            Vector3 screenPoint = cam.WorldToScreenPoint(currentInteractorTarget.target.transform.position);
             cursor.position = screenPoint;
             cursorText.color = color;
             dotText.color = color;
             cursorImage.color = color;
             SetScale();
             cursorImage.enabled = false;
+        }
+
+        if (currentAttackSurface) {
+            Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);
+            interactButtonRect.position = screenPoint;
+            interactButton.interactable = Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
         }
 
     }
@@ -99,7 +104,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         interactButton.gameObject.SetActive(false);
     }
     void Enable(string actionText) {
-        // Debug.Log($"enable blit text");
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
@@ -111,11 +115,17 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         dotText.enabled = true;
         blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
 
-        currentAttackSurface = currentInteractorTarget.target.transform.root.GetComponentInChildren<AttackSurface>();
+        AttackSurface[] childAttackSurfaces = currentInteractorTarget.target.transform.root.GetComponentsInChildren<AttackSurface>();
+        if (childAttackSurfaces.Length > 0) {
+            currentAttackSurface = childAttackSurfaces
+                        .OrderBy(attackSurface => Vector3.Distance(attackSurface.transform.position, target.transform.position))
+                        .First();
+        } else {
+            currentAttackSurface = null;
+        }
+
         if (currentAttackSurface) {
             interactButton.gameObject.SetActive(true);
-            interactButton.interactable = currentInteractorTarget.targetIsInRange;
-            Debug.Log($"interactible: {interactButton.interactable}");
         } else {
             interactButton.gameObject.SetActive(false);
         }

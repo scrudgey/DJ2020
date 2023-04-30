@@ -184,7 +184,17 @@ public class NeoClearsighter : MonoBehaviour {
 
         // static geometry interlopers
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
-        Plane detectionPlane = new Plane(cameraTransform.forward, followTransform.position);
+        Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
+
+        Plane XPlane = new Plane(Vector3.right, followTransform.position);
+        Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
+
+        Toolbox.DrawPlane(followTransform.position, XPlane);
+        Toolbox.DrawPlane(followTransform.position, ZPlane);
+
+        bool cameraXSide = XPlane.GetSide(cameraTransform.position);
+        bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
+
         j = 0;
         for (int i = 0; i < interlopers.Count; i++) {
             j++;
@@ -200,8 +210,14 @@ public class NeoClearsighter : MonoBehaviour {
 
             Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
+
+            float xParity = cameraXSide ? 1f : -1f;
+            float zParity = cameraZSide ? 1f : -1f;
+            bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
+            bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
+            // bool rendererDetectionSide = detectionPlane.GetSide(rendererPosition);
             // if (directionToInterloper.y > 0.2f) { //&& !detectionPlane.GetSide(rendererPosition)
-            if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
+            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
                 if (nextAboveRenderBatch.Contains(renderer)) continue;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextInterloperBatch.Add(renderer);
