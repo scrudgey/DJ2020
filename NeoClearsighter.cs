@@ -16,6 +16,7 @@ public class NeoClearsighter : MonoBehaviour {
     HashSet<Renderer> previousAboveRendererBatch;
     HashSet<Renderer> previousInterloperBatch;
     HashSet<Renderer> previousDynamicRendererBatch;
+    HashSet<Transform> hiddenTransforms;
     Dictionary<Renderer, Vector3> rendererPositions;
     Dictionary<Renderer, Bounds> rendererBounds;
     Dictionary<Renderer, Transform> rendererTransforms;
@@ -65,6 +66,7 @@ public class NeoClearsighter : MonoBehaviour {
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
+        hiddenTransforms = new HashSet<Transform>();
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
             .Where(renderer => renderer.isPartOfStaticBatch)
             .Concat(
@@ -142,6 +144,7 @@ public class NeoClearsighter : MonoBehaviour {
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
+        hiddenTransforms.Clear();
         yield return waitForFrame;
     }
 
@@ -176,6 +179,7 @@ public class NeoClearsighter : MonoBehaviour {
             if (position.y > liftedOrigin.y) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextAboveRenderBatch.Add(renderer);
+                hiddenTransforms.Add(renderer.transform.root);
                 if (previousAboveRendererBatch.Contains(renderer)) {
                     previousAboveRendererBatch.Remove(renderer);
                 }
@@ -221,6 +225,7 @@ public class NeoClearsighter : MonoBehaviour {
                 if (nextAboveRenderBatch.Contains(renderer)) continue;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextInterloperBatch.Add(renderer);
+                hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {
                     previousInterloperBatch.Remove(renderer);
                 }
@@ -240,14 +245,13 @@ public class NeoClearsighter : MonoBehaviour {
             }
             Renderer[] renderers = GetDynamicRenderers(collider);
             Transform root = dynamicColliderRoot[collider];
-            // if (root.name.ToLower().Contains("rail")) {
-            //     Debug.Log($"[NeoClearSighter] dynamic: {root.position.y} > {origin.y}");
-            // }
+
             if (root.position.y > liftedOrigin.y) {
                 foreach (Renderer renderer in renderers) {
                     if (nextAboveRenderBatch.Contains(renderer) || nextInterloperBatch.Contains(renderer)) continue;
                     renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                     nextDynamicRenderBatch.Add(renderer);
+                    hiddenTransforms.Add(root);
                     if (previousDynamicRendererBatch.Contains(renderer)) {
                         previousDynamicRendererBatch.Remove(renderer);
                     }
@@ -266,6 +270,7 @@ public class NeoClearsighter : MonoBehaviour {
             //     Debug.Log($"[NeoClearSighter] previous batch: {renderer} {initialShadowCastingMode[renderer]}");
             // }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            hiddenTransforms.Remove(renderer.transform.root);
         }
 
         previousAboveRendererBatch = nextAboveRenderBatch;
@@ -315,6 +320,7 @@ public class NeoClearsighter : MonoBehaviour {
             if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextInterloperBatch.Add(renderer);
+                hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {
                     previousInterloperBatch.Remove(renderer);
                 }
@@ -329,6 +335,7 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            hiddenTransforms.Remove(renderer.transform.root);
         }
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = nextInterloperBatch;
@@ -366,5 +373,9 @@ public class NeoClearsighter : MonoBehaviour {
 
     public void HandleInputModeChange(InputMode oldInputMode, InputMode newInputMode) {
 
+    }
+
+    public bool IsObjectVisible(GameObject obj) {
+        return !hiddenTransforms.Contains(obj.transform.root);
     }
 }

@@ -276,6 +276,8 @@ public partial class GameManager : Singleton<GameManager> {
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
+        this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
+
         if (playerOutlineHandler != null) {
             playerOutlineHandler.UnBind();
         }
@@ -283,7 +285,6 @@ public partial class GameManager : Singleton<GameManager> {
         playerOutlineHandler?.Bind();
 
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
-        NeoClearsighter clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
         // if (clearSighter == null) {
         //     // instantiate clearsighter
         // }
@@ -301,6 +302,9 @@ public partial class GameManager : Singleton<GameManager> {
 
         OnFocusChanged?.Invoke(focus);
         OnEyeVisibilityChange?.Invoke(gameData.playerState);
+    }
+    public bool IsObjectVisible(GameObject obj) {
+        return clearSighter2?.IsObjectVisible(obj) ?? true;
     }
     void ClearSceneData() {
         // this stuff should all belong to level delta

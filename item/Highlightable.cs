@@ -22,8 +22,9 @@ public class Highlightable : MonoBehaviour {
         }
     }
     public void EnableOutline() {
-        if (outline != null)
+        if (outline != null) {
             outline.enabled = true;
+        }
     }
     public void DisableOutline() {
         if (outline != null)

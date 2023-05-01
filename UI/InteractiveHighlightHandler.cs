@@ -49,7 +49,11 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             if (currentInteractorTarget == null) {
                 Disable();
             } else {
-                Enable(currentInteractorTarget.target.calloutText);
+                if (GameManager.I.IsObjectVisible(currentInteractorTarget.target.gameObject)) {
+                    Enable(currentInteractorTarget.target.calloutText);
+                } else {
+                    Disable();
+                }
             }
         }
 
@@ -58,7 +62,11 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (currentInteractorTarget == null) {
             Disable();
         } else if (currentInteractorTarget.target != null) {
-            Enable(currentInteractorTarget.target.calloutText);
+            if (GameManager.I.IsObjectVisible(currentInteractorTarget.target.gameObject)) {
+                Enable(currentInteractorTarget.target.calloutText);
+            } else {
+                Disable();
+            }
         }
     }
 

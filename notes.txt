@@ -2169,6 +2169,11 @@ note: layer "interactive"
 * hide gun panel when holstered
 * enable / disable interaction button dynamically with distance
 * remove burglar tools item
+* still having issues with button interactivity and distance
+* planes X, Z: only hide things on side of camera.
+* bump camera less when mouse close to player
+* hidden above interact surface is interactible
+* doubledoor should have a highlight
 
 
 graphical issues:
@@ -2675,39 +2680,44 @@ after action report should be fragmentary, show reward, over a transit cutscene
 show objectives as blit-in text on lower left?
     show days
 maybe fall damage from rooftop should be greater
-
-
-upgrade unity
-    newtonsoft json is broken??
-what happened to the sphere robot?
-clearsighter still needs some work
-AI still had a hard time closing in on me when i was openly shooting and running around
-    NPC wandering away from me shooting at a different guard
-    an NPC ran down the stairs towards me, got stuck, didn't see me.
-    an NPC saw me easily in the corner when he'd walked past me.
-    a guard ran up and reported a door was tampered with as i tampered with it
-unify tactics pane with shop design
-ammo pips being weird
-guards radio sfx
-reload guns between retries
-
-verify how clearsighter works with destructible walls
-larger / more clear crosshairs cursor
 radial menu for selecting guns and items?
 unify items and guns
-
-still having issues with button interactivity and distance
-player in camera?
-camera should slew in faster
-
+larger / more clear crosshairs cursor
 overhaul burglar tools and hacking
     show some information when picking up key
     better interface for hacking
     better interface for burglar tools
+upgrade unity
+    newtonsoft json is broken??
 
-* planes X, Z: only hide things on side of camera.
-* bump camera less when mouse close to player
 
-hidden above interact surface is interactible
-doubledoor should have a highlight
-use interloper material
+
+    
+what happened to the sphere robot?
+unify tactics pane with shop design
+ammo pips being weird
+guards radio sfx
+reload guns between retries
+show "F" on item selector
+allow selecting no item
+
+3 major initiatives:
+    clearsighter
+        use interloper material
+        why desk hides but not computers
+        verify how clearsighter works with destructible walls
+    AI
+        NPC wandering away from me shooting at a different guard
+        an NPC ran down the stairs towards me, got stuck, didn't see me.
+        an NPC saw me easily in the corner when he'd walked past me.
+        a guard ran up and reported a door was tampered with as i tampered with it
+        strike team not very effective
+        gun shots not heard
+    interaction
+        * hidden interactives
+        * doubledoor should have highlight
+        * player in camera?
+        interactors in floor?
+        camera should slew in faster
+        i was using wrong side of attack surface
+        latch explot should prop door more so doable from other side

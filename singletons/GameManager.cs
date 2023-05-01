@@ -23,6 +23,7 @@ public partial class GameManager : Singleton<GameManager> {
     public Collider playerCollider;
     public PlayerOutlineHandler playerOutlineHandler;
     public LightLevelProbe playerLightLevelProbe;
+    public NeoClearsighter clearSighter2;
 
     [Header("input actions")]
     // UI input
