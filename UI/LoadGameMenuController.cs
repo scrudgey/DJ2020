@@ -35,7 +35,7 @@ public class LoadGameMenuController : MonoBehaviour {
             GameObject loadButton = GameObject.Instantiate(loadButtonPrefab);
             SaveGameSelectorButton saveGameSelectorButton = loadButton.GetComponent<SaveGameSelectorButton>();
             saveGameSelectorButton.Initialize(this, saveData);
-            loadButton.transform.SetParent(loadButtonContainer);
+            loadButton.transform.SetParent(loadButtonContainer, false);
         }
     }
     public void LoadButtonCallback(GameData data) {

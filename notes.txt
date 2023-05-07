@@ -2174,6 +2174,29 @@ note: layer "interactive"
 * bump camera less when mouse close to player
 * hidden above interact surface is interactible
 * doubledoor should have a highlight
+✓ 3 major initiatives:
+    ✓ clearsighter
+        ✓ use interloper material
+        ✓ why desk hides but not computers
+        ✓ verify how clearsighter works with destructible walls
+    ✓ interaction
+        ✓ hidden interactives
+        ✓ doubledoor should have highlight
+        ✓ player in camera?
+        ✓ camera should slew in faster
+        ✓ latch explot should prop door more so doable from other side
+        ✓ interactors in floor?
+        ✓ i was using wrong side of attack surface
+    ✓ AI
+        ✓ NPC wandering away from me shooting at a different guard
+        ✓ strike team not very effective
+        ✓ gun shots not heard
+* why is VR mission broken?
+* tools view is broken in build
+* new game menu
+* fix world
+    * block off exits
+    * prevent weapons, items, cyberlegs in world
 
 
 graphical issues:
@@ -2526,29 +2549,15 @@ fake id tactic icon
 random loot spots
 loot drops
 
-guards spawned invisible
+* guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
 
 
 mission:
     * visibility goes too low
-    guards get stuck on each other
-        make NPCs pass through each other with a soft bump
-    swat spritesheet
-        this requires sprite datasystem work:
-            1. positioning torso relative to legs (maybe?)
-                position head relative to torso 
-            2. work on editor
-                updating values when they're updated in the editor? somehow? yes/ no?
-
-
-locations:
-    software dealer
-    hardware dealer (the finn)
-    street doc
-    night club 
-    arcade?
+    * guards get stuck on each other
+        * make NPCs pass through each other with a soft bump
 
 world NPCs:
     potentially talkable: leave that for later.
@@ -2567,6 +2576,12 @@ still unknown:
     weapon upgrades
     software
     hardware
+locations:
+    software dealer
+    hardware dealer (the finn)
+    street doc
+    night club 
+    arcade?
 
 world layout:
     * neighbor building?
@@ -2677,47 +2692,40 @@ fake ID should be more fun to procure / use
     can show randomized image and randomized name
     fake ID is burned after one use
 after action report should be fragmentary, show reward, over a transit cutscene
-show objectives as blit-in text on lower left?
+show objectives as blit-in text on lower left?  
     show days
 maybe fall damage from rooftop should be greater
 radial menu for selecting guns and items?
 unify items and guns
 larger / more clear crosshairs cursor
+
 overhaul burglar tools and hacking
     show some information when picking up key
     better interface for hacking
-    better interface for burglar tools
+    * better interface for burglar tools
+
 upgrade unity
     newtonsoft json is broken??
 
-
-
-    
 what happened to the sphere robot?
 unify tactics pane with shop design
-ammo pips being weird
-guards radio sfx
-reload guns between retries
-show "F" on item selector
-allow selecting no item
+jack that data: can destroy walls that should not be destroyed
+    an NPC ran down the stairs towards me, got stuck, didn't see me.
+    an NPC saw me easily in the corner when he'd walked past me.
+    a guard ran up and reported a door was tampered with as i tampered with it
 
-3 major initiatives:
-    clearsighter
-        use interloper material
-        why desk hides but not computers
-        verify how clearsighter works with destructible walls
-    AI
-        NPC wandering away from me shooting at a different guard
-        an NPC ran down the stairs towards me, got stuck, didn't see me.
-        an NPC saw me easily in the corner when he'd walked past me.
-        a guard ran up and reported a door was tampered with as i tampered with it
-        strike team not very effective
-        gun shots not heard
-    interaction
-        * hidden interactives
-        * doubledoor should have highlight
-        * player in camera?
-        interactors in floor?
-        camera should slew in faster
-        i was using wrong side of attack surface
-        latch explot should prop door more so doable from other side
+
+
+swat spritesheet
+    this requires sprite datasystem work:
+        1. positioning torso relative to legs (maybe?)
+            position head relative to torso 
+        2. work on editor
+            updating values when they're updated in the editor? somehow? yes/ no?
+guards radio sfx
+allow selecting no item
+show "F" on item selector
+ammo pips being weird
+reload guns between retries
+announce when mission objectives complete or failed
+footsteps too loud / reach too far through floors

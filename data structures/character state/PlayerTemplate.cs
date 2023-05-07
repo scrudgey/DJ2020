@@ -82,7 +82,6 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtab
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,
             hackRadius = 1.5f,
-            thirdWeaponSlot = false,
 
             health = 250f,
             fullHealthAmount = 250f,

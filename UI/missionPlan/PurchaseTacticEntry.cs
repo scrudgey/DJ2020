@@ -12,7 +12,7 @@ public class PurchaseTacticEntry : MonoBehaviour {
         this.controller = controller;
         this.tactic = tactic;
         nameText.text = $" {tactic.title}";
-        costText.text = $" {tactic.cost.ToString("n2")}";
+        costText.text = $" {tactic.cost}";
     }
 
     public void Click() {

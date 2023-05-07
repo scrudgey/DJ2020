@@ -90,7 +90,7 @@ public partial class GameManager : Singleton<GameManager> {
         Time.timeScale = 0f;
         float timer = 0f;
         float duration = 3f;
-        characterCamera.followingSharpnessDefault = 5f;
+        // characterCamera.followingSharpnessDefault = 5f;
         characterCamera.zoomCoefficient = 0.25f;
         characterCamera.zoomCoefficientTarget = 0.25f;
         Vector3 targetPosition = playerObject.transform.position;
@@ -123,14 +123,11 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         Time.timeScale = 1f;
-        // characterCamera.followingSharpnessDefault = 5f;
-        // uiController?.ShowUI();
         yield return null;
     }
 
     public IEnumerator ExtractionZoneCutscene(ExtractionZone zone) {
         float timer = 0f;
-        // characterCamera.followingSharpnessDefault = 1f;
         characterCamera.followCursorCoefficient = 1f;
         while (timer < 2f) {
             timer += Time.unscaledDeltaTime;

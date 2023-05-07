@@ -274,6 +274,13 @@ public class InputController : Singleton<InputController> {
 
         CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;
+        if (GameManager.I.gameData.phase == GamePhase.world) {
+            selectGunThisFrame = 0;
+            reloadPressedThisFrame = false;
+            incrementItemThisFrame = 0;
+            useItemThisFrame = false;
+            incrementOverlayThisFrame = 0;
+        }
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
             characterInputs = new PlayerInput() {

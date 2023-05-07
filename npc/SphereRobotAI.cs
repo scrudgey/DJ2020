@@ -516,16 +516,17 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             SuspicionRecord record = SuspicionRecord.gunshotsHeard();
             GameManager.I.AddSuspicionRecord(record);
 
-
             Ray ray = noise.data.ray;
             Vector3 rayDirection = ray.direction;
             Vector3 directionToNoise = transform.position - noise.transform.position;
             rayDirection.y = 0;
             directionToNoise.y = 0;
             float dotFactor = Vector3.Dot(rayDirection, directionToNoise);
-
-            // ReportToHQState
+            // Debug.Log($"hear gunshot: {stateMachine.currentState}");
             switch (stateMachine.currentState) {
+                case ReportToHQState:
+                case ReactToTamperState:
+                case StunState:
                 case SphereMoveState:
                 case SpherePatrolState:
                 case FollowTheLeaderState:
@@ -554,7 +555,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     }
                     break;
                 case SearchDirectionState:
-                    ChangeState(new SearchDirectionState(this, noise, characterController, doIntro: false));
+                    ChangeState(new SearchDirectionState(this, noise, characterController, doIntro: false, speedCoefficient: 1f));
                     break;
             }
         } else if (noise.data.player) {

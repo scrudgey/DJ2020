@@ -9,7 +9,7 @@ public class EdgeDetectMap : MonoBehaviour {
         QualitySettings.shadowDistance = 0;
     }
     void OnPostRender() {
-        QualitySettings.shadowDistance = storedShadowDistance;
+        QualitySettings.shadowDistance = 1000;
     }
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
         Graphics.Blit(source, destination, material);

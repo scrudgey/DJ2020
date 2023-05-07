@@ -11,6 +11,7 @@ public class NeoClearsighter : MonoBehaviour {
     PointOctree<Renderer> rendererTree;
     BoundsOctree<Renderer> rendererBoundsTree;
     public Transform followTransform;
+    public Shader interloperShader;
     Transform myTransform;
     WaitForEndOfFrame waitForFrame = new WaitForEndOfFrame();
     HashSet<Renderer> previousAboveRendererBatch;
@@ -22,14 +23,17 @@ public class NeoClearsighter : MonoBehaviour {
     Dictionary<Renderer, Transform> rendererTransforms;
     Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode;
     Dictionary<Renderer, TagSystemData> rendererTagData;
-
-    Dictionary<Collider, Renderer[]> colliderToRenderer;
+    Dictionary<Renderer, Material> initialMaterials;
+    Dictionary<Renderer, Material> interloperMaterials;
+    Dictionary<Collider, Renderer[]> dynamicColliderToRenderer;
     Dictionary<Collider, Transform> dynamicColliderRoot;
     Collider[] colliderHits;
     CharacterCamera myCamera;
     Transform cameraTransform;
     bool initialized;
     Vector3 previousOrigin;
+    MaterialPropertyBlock propBlock;
+
     private List<Collider> rooftopZones = new List<Collider>();
     // void Awake() {
     //     GameManager.OnInputModeChange += HandleInputModeChange;
@@ -58,7 +62,7 @@ public class NeoClearsighter : MonoBehaviour {
     void InitializeTree() {
         rendererPositions = new Dictionary<Renderer, Vector3>();
         rendererBounds = new Dictionary<Renderer, Bounds>();
-        colliderToRenderer = new Dictionary<Collider, Renderer[]>();
+        dynamicColliderToRenderer = new Dictionary<Collider, Renderer[]>();
         dynamicColliderRoot = new Dictionary<Collider, Transform>();
         rendererTransforms = new Dictionary<Renderer, Transform>();
         initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
@@ -67,6 +71,10 @@ public class NeoClearsighter : MonoBehaviour {
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
         hiddenTransforms = new HashSet<Transform>();
+        initialMaterials = new Dictionary<Renderer, Material>();
+        interloperMaterials = new Dictionary<Renderer, Material>();
+        propBlock = new MaterialPropertyBlock();
+
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
             .Where(renderer => renderer.isPartOfStaticBatch)
             .Concat(
@@ -77,23 +85,28 @@ public class NeoClearsighter : MonoBehaviour {
         rendererTree = new PointOctree<Renderer>(100, Vector3.zero, 1);
         rendererBoundsTree = new BoundsOctree<Renderer>(100, Vector3.zero, 0.5f, 1);
         foreach (Renderer renderer in staticRenderers) {
-            // Vector3 position = renderer.bounds.center - new Vector3(0f, renderer.bounds.extents.y, 0f);
             Vector3 position = renderer.bounds.center;
-            // TODO: handle anchor
             rendererTree.Add(renderer, position);
             rendererBoundsTree.Add(renderer, renderer.bounds);
             rendererPositions[renderer] = position;
             rendererBounds[renderer] = renderer.bounds;
             rendererTagData[renderer] = Toolbox.GetTagData(renderer.gameObject);
-            // if (renderer.transform.root.name.ToLower().Contains("rail")) {
-            //     Debug.Log($"[NeoClearSighter] initial shadow casting mode: {renderer.shadowCastingMode}");
-            // }
+            initialMaterials[renderer] = renderer.sharedMaterial;
+            interloperMaterials[renderer] = NewInterloperMaterial(renderer);
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
             if (findAnchor != null) {
                 rendererPositions[renderer] = findAnchor.position;
             }
         }
+    }
+
+    Material NewInterloperMaterial(Renderer renderer) {
+        Material interloperMaterial = new Material(renderer.sharedMaterial);
+        Texture albedo = renderer.sharedMaterial.mainTexture;
+        interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
+        interloperMaterial.SetTexture("_Texture", albedo);
+        return interloperMaterial;
     }
 
     IEnumerator HandleGeometry() {
@@ -140,6 +153,7 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            renderer.material = initialMaterials[renderer];
         }
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
@@ -153,14 +167,17 @@ public class NeoClearsighter : MonoBehaviour {
         HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
         HashSet<Renderer> nextDynamicRenderBatch = new HashSet<Renderer>();
         Vector3 origin = followTransform.position;
-        if (previousOrigin == null || previousOrigin == Vector3.zero) {
-            previousOrigin = origin;
-        }
-        if (Mathf.Abs(origin.y - previousOrigin.y) > 0.5f) {
-            previousOrigin = origin;
-        } else {
-            origin.y = previousOrigin.y;
-        }
+
+        // if (previousOrigin == null || previousOrigin == Vector3.zero) {
+        //     previousOrigin = origin;
+        // }
+        // if (Mathf.Abs(origin.y - previousOrigin.y) > 0.5f) {
+        //     previousOrigin = origin;
+        // } else {
+        //     origin.y = previousOrigin.y;
+        // }
+
+        origin.y = Mathf.Round(origin.y * 10f) / 10f;
 
         Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
@@ -175,6 +192,7 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             Renderer renderer = above[i];
+            if (renderer == null) continue;
             Vector3 position = rendererPositions[renderer] - new Vector3(0f, rendererBounds[renderer].extents.y, 0f);
             if (position.y > liftedOrigin.y) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
@@ -192,9 +210,6 @@ public class NeoClearsighter : MonoBehaviour {
 
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
         Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
-
-        Toolbox.DrawPlane(followTransform.position, XPlane);
-        Toolbox.DrawPlane(followTransform.position, ZPlane);
 
         bool cameraXSide = XPlane.GetSide(cameraTransform.position);
         bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
@@ -222,8 +237,10 @@ public class NeoClearsighter : MonoBehaviour {
             // bool rendererDetectionSide = detectionPlane.GetSide(rendererPosition);
             // if (directionToInterloper.y > 0.2f) { //&& !detectionPlane.GetSide(rendererPosition)
             if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
+                if (renderer == null) continue;
                 if (nextAboveRenderBatch.Contains(renderer)) continue;
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                MakeTransparent(renderer);
                 nextInterloperBatch.Add(renderer);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {
@@ -248,6 +265,7 @@ public class NeoClearsighter : MonoBehaviour {
 
             if (root.position.y > liftedOrigin.y) {
                 foreach (Renderer renderer in renderers) {
+                    if (renderer == null) continue;
                     if (nextAboveRenderBatch.Contains(renderer) || nextInterloperBatch.Contains(renderer)) continue;
                     renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                     nextDynamicRenderBatch.Add(renderer);
@@ -266,10 +284,8 @@ public class NeoClearsighter : MonoBehaviour {
                 j = 0;
                 yield return waitForFrame;
             }
-            // if (renderer.transform.root.name.ToLower().Contains("rail")) {
-            //     Debug.Log($"[NeoClearSighter] previous batch: {renderer} {initialShadowCastingMode[renderer]}");
-            // }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            renderer.material = initialMaterials[renderer];
             hiddenTransforms.Remove(renderer.transform.root);
         }
 
@@ -278,6 +294,15 @@ public class NeoClearsighter : MonoBehaviour {
         previousInterloperBatch = nextInterloperBatch;
         yield return waitForFrame;
     }
+
+    void MakeTransparent(Renderer renderer) {
+        renderer.material = interloperMaterials[renderer];
+        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+        renderer.GetPropertyBlock(propBlock);
+        propBlock.SetFloat("_TargetAlpha", 0.5f);
+        renderer.SetPropertyBlock(propBlock);
+    }
+
     Plane[] interloperFrustrum() {
         // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
         float size = 2f;
@@ -311,6 +336,7 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             Renderer renderer = interlopers[i];
+            if (renderer == null) continue;
 
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;
@@ -318,7 +344,8 @@ public class NeoClearsighter : MonoBehaviour {
             Vector3 rendererPosition = rendererPositions[renderer];
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
             if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                MakeTransparent(renderer);
                 nextInterloperBatch.Add(renderer);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {
@@ -335,6 +362,7 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            renderer.material = initialMaterials[renderer];
             hiddenTransforms.Remove(renderer.transform.root);
         }
         previousAboveRendererBatch = new HashSet<Renderer>();
@@ -344,14 +372,14 @@ public class NeoClearsighter : MonoBehaviour {
     }
 
     public Renderer[] GetDynamicRenderers(Collider key) {
-        if (colliderToRenderer.ContainsKey(key)) {
-            return colliderToRenderer[key];
+        if (dynamicColliderToRenderer.ContainsKey(key)) {
+            return dynamicColliderToRenderer[key];
         } else {
             Renderer[] renderers = key.transform.root.GetComponentsInChildren<Renderer>().Where(x => x != null &&
                                                 !(x is ParticleSystemRenderer) &&
                                                 !(x is LineRenderer)
                                                 ).ToArray();
-            colliderToRenderer[key] = renderers;
+            dynamicColliderToRenderer[key] = renderers;
             dynamicColliderRoot[key] = key.transform.root;
 
             Transform findAnchor = key.transform.root.Find("clearSighterAnchor");
@@ -363,6 +391,12 @@ public class NeoClearsighter : MonoBehaviour {
                 rendererTransforms[renderer] = renderer.transform;
                 if (findAnchor != null) {
                     rendererTransforms[renderer] = findAnchor;
+                }
+                if (!initialMaterials.ContainsKey(renderer)) {
+                    initialMaterials[renderer] = renderer.sharedMaterial;
+                }
+                if (!interloperMaterials.ContainsKey(renderer)) {
+                    interloperMaterials[renderer] = NewInterloperMaterial(renderer);
                 }
                 if (!initialShadowCastingMode.ContainsKey(renderer))
                     initialShadowCastingMode[renderer] = renderer.shadowCastingMode;

@@ -301,14 +301,14 @@ public class Door : Interactive {
     public void PushOpenSlightly(Transform opener) {
         if (parity == DoorParity.twoWay) {
             if (orientationPlane.GetSide(opener.position)) {
-                impulse = 10;
+                impulse = 30;
             } else {
-                impulse = -10;
+                impulse = -30;
             }
         } else if (parity == DoorParity.openIn) {
-            impulse = -10f;
+            impulse = -30f;
         } else if (parity == DoorParity.openOut) {
-            impulse = 10f;
+            impulse = 30f;
         }
         ChangeState(DoorState.ajar);
     }

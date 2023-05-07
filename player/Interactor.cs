@@ -88,11 +88,6 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         bool doAction = gunIsHolstered ? inputs.actionButtonPressed || inputs.Fire.FirePressed : inputs.actionButtonPressed;
         if (doAction && (inputs.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false)) {
             Interactive cursorInteractive = cursorTarget?.target.GetComponent<Interactive>();
-
-            // Interactive cursorInteractive = cursorTarget?.target.transform.root.GetComponentsInChildren<Interactive>()
-            //     .OrderBy(interactive => Vector3.Distance(interactive.transform.position, transform.position))
-            //     .First();
-
             if (cursorInteractive != null) {
                 return cursorInteractive.DoAction(this);
             }
@@ -114,6 +109,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         ItemUseResult result = ItemUseResult.Empty();
         result.attackSurface = attackSurface;
         result.doBurgle = true;
+        Debug.Log($"doburgle: {attackSurface}");
         characterController.HandleItemUseResult(result);
     }
 }

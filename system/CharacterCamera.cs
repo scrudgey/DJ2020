@@ -34,7 +34,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
-    public float followingSharpnessDefault = 10000f;
+    public float followingSharpnessDefault = 5f;
     public Quaternion isometricRotation;
     public float followCursorCoefficient = 5f;
 
@@ -47,7 +47,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
     [Header("Rotation")]
     public float RotationSpeed = 1f;
-    public float RotationSharpness = 10000f;
+    // public float RotationSharpness = 100000f;
+    public float RotationSharpness = 1f;
     Quaternion targetRotation = Quaternion.identity;
     public float initialRotationOffset = 20f;
     public float verticalRotationOffset = 30f;
@@ -212,6 +213,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                     currentDistanceMovementSharpness = 1;
                     currentDistanceMovementSpeed = 0.1f;
                 }
+                break;
+            case CameraState.burgle:
+                currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 10f;
                 break;
             default:
                 Camera.clearFlags = CameraClearFlags.SolidColor;
@@ -509,7 +513,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             targetDistance = 1.5f,
             targetPosition = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.position,
             orthographicSize = 4f,
-            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 200, -199, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,
             state = input.state,
@@ -601,7 +605,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         Ray clickRay = new Ray(projection.origin, transform.forward);
-        Plane playerPlane = new Plane(-1f * Transform.forward, GameManager.I.playerPosition);
+        // Plane playerPlane = new Plane(-1f * Transform.forward, GameManager.I.playerPosition);
+        Plane playerPlane = new Plane(Vector3.up, GameManager.I.playerPosition);
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletOnly));
         Vector3 targetPoint = Vector3.zero;
 

@@ -11,7 +11,8 @@ public class BurglarCanvasController : MonoBehaviour {
     Mode mode;
     BurgleTargetData data;
     BurglarToolType selectedTool;
-    public RectTransform mainRect;
+    public RectTransform mainCanvas;
+    // public RectTransform mainRect;
     public RawImage rawImage;
     public GameObject UIElementPrefab;
     public Transform uiElementsContainer;
@@ -112,8 +113,16 @@ public class BurglarCanvasController : MonoBehaviour {
             data.target.DisableAttackSurface();
     }
 
-    void PositionTool(Vector2 localPoint, Vector2 cursorPoint) {
-        toolPoint.anchoredPosition = cursorPoint;
+    void PositionTool(Vector2 cursorPoint) {
+        Vector2 localPoint = Vector2.zero;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mainCanvas,
+            cursorPoint, null,
+            out localPoint);
+
+        toolPoint.anchoredPosition = localPoint;
+
         if (localPoint.x > uiElementsRectTransform.rect.width / -2f && localPoint.x < uiElementsRectTransform.rect.width / 2f &&
             localPoint.y > uiElementsRectTransform.rect.height / -2f && localPoint.y < uiElementsRectTransform.rect.height / 2f) {
             if (selectedTool == BurglarToolType.none) {
@@ -128,14 +137,7 @@ public class BurglarCanvasController : MonoBehaviour {
 
     public void UpdateWithInput(PlayerInput input) {
         mouseDown = input.mouseDown;
-        // Vector2 mousePosition = Mouse.current.position.ReadValue();
-        // Debug.Log($"{input.mousePosition} {input.viewPortPoint}");
-        Vector2 localPoint = Vector2.zero;
-
-        // TODO: fix
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(uiElementsRectTransform, input.mousePosition, null, out localPoint);
-
-        PositionTool(-localPoint, input.mousePosition);
+        PositionTool(input.mousePosition);
 
         // TODO: fix
         // bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;

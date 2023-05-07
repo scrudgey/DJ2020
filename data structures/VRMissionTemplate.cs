@@ -14,7 +14,6 @@ public record VRMissionTemplate {
     public int maxNumberNPCs;
     public float NPCspawnInterval = 5f;
     public int numberConcurrentNPCs;
-    // [JsonConverter(typeof(PlayerTemplateJsonConverter))]
     public PlayerTemplate playerState;
     public bool alarmHQEnabled;
     [JsonConverter(typeof(NPCTemplateJsonConverter))]
@@ -36,6 +35,7 @@ public record VRMissionTemplate {
         playerState = PlayerTemplate.Default(),
         npc1State = ScriptableObject.Instantiate(Resources.Load("data/npc/guard1") as NPCTemplate),
         npc2State = ScriptableObject.Instantiate(Resources.Load("data/npc/guard2") as NPCTemplate),
+
     };
 
     public static void SaveVRMissionTemplate(VRMissionTemplate template, string filename) {
