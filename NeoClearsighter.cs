@@ -240,7 +240,7 @@ public class NeoClearsighter : MonoBehaviour {
                 if (renderer == null) continue;
                 if (nextAboveRenderBatch.Contains(renderer)) continue;
                 // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                MakeTransparent(renderer);
+                MakeTransparent(renderer, directionToInterloper);
                 nextInterloperBatch.Add(renderer);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {
@@ -295,12 +295,20 @@ public class NeoClearsighter : MonoBehaviour {
         yield return waitForFrame;
     }
 
-    void MakeTransparent(Renderer renderer) {
-        renderer.material = interloperMaterials[renderer];
-        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-        renderer.GetPropertyBlock(propBlock);
-        propBlock.SetFloat("_TargetAlpha", 0.5f);
-        renderer.SetPropertyBlock(propBlock);
+    void MakeTransparent(Renderer renderer, Vector3 directionToInterloper) {
+        if (directionToInterloper.sqrMagnitude < 100f) {
+            renderer.material = interloperMaterials[renderer];
+            // float targetAlpha = Math.Min(0.5f, 1 / (directionToInterloper.sqrMagnitude / 10fs));
+            float targetAlpha = 0.5f;
+            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(propBlock);
+            propBlock.SetFloat("_TargetAlpha", targetAlpha);
+            renderer.SetPropertyBlock(propBlock);
+            renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+        } else {
+            renderer.material = initialMaterials[renderer];
+            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        }
     }
 
     Plane[] interloperFrustrum() {
@@ -345,7 +353,7 @@ public class NeoClearsighter : MonoBehaviour {
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
             if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
                 // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                MakeTransparent(renderer);
+                MakeTransparent(renderer, directionToInterloper);
                 nextInterloperBatch.Add(renderer);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {

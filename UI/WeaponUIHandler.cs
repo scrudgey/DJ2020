@@ -177,27 +177,20 @@ namespace UI {
             spentPip.transform.SetParent(transform, true);
         }
         void RemoveBulletPip(bool createSpentPip) {
+            AmmoPip topPip = liveAmmoPipsTop[0];
+            liveAmmoPipsTop.Remove(topPip);
+            topPip.Disappear(ammoPipPool);
             if (totalAmmoPips() > 15) {
-                AmmoPip pip1 = liveAmmoPipsTop[0];
-                liveAmmoPipsTop.Remove(pip1);
-                pip1.Disappear(ammoPipPool);
-
-                // if (liveAmmoPipsBottom.Count > 0) {
                 AmmoPip pip2 = liveAmmoPipsBottom[0];
                 liveAmmoPipsBottom.Remove(pip2);
                 pip2.Disappear(ammoPipPool);
-                // }
 
                 GameObject newPip = ammoPipPool.GetObject(ammoPipContainer.transform.position);
-                AmmoPip pip = newPip.GetComponent<AmmoPip>();
-                pip.SetSprite(target.gunInstance.template.type);
+                AmmoPip pip1 = newPip.GetComponent<AmmoPip>();
+                pip1.SetSprite(target.gunInstance.template.type);
                 newPip.transform.SetParent(ammoPipContainer, false);
-                pip.layoutRect = ammoPipRect;
-                liveAmmoPipsTop.Add(pip);
-            } else {
-                AmmoPip pip = liveAmmoPipsTop[0];
-                liveAmmoPipsTop.Remove(pip);
-                pip.Disappear(ammoPipPool);
+                pip1.layoutRect = ammoPipRect;
+                liveAmmoPipsTop.Add(pip1);
             }
             if (createSpentPip)
                 CreateSpentPip();

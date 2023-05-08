@@ -5,6 +5,7 @@ using UnityEngine;
 public class NoiseComponent : MonoBehaviour {
     public NoiseData data;
     public SphereCollider sphereCollider;
+    public MeshCollider meshCollider;
     float timer;
     void Update() {
         timer += Time.deltaTime;

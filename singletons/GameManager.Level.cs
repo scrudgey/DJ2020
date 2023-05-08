@@ -19,7 +19,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Dictionary<string, CyberComponent> cyberComponents;
     public static Dictionary<string, AlarmComponent> alarmComponents;
     NPCSpawnPoint strikeTeamSpawnPoint;
-    float timePlayed;
+    public float timePlayed;
     List<AsyncOperation> scenesLoading;
     public bool isLoadingLevel;
     void Awake() {
@@ -53,6 +53,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan);
+        gameData.playerState.ResetTemporaryState();
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }
 

@@ -45,7 +45,7 @@ public class Footsteps : MonoBehaviour {
                 // if (isRunning) {
                 //     volume *= 3f;
                 // }
-                volume *= velocity.magnitude / 2f;
+                volume *= velocity.magnitude / 1.25f;
 
                 if (onRightFoot) {
                     Toolbox.RandomizeOneShot(audioSource, rightFoot, volume: volume / 2f);
@@ -66,9 +66,11 @@ public class Footsteps : MonoBehaviour {
                     volume = volume,
                     isFootsteps = true
                 };
-                Toolbox.Noise(transform.position, noise, transform.root.gameObject);
-                // if (player)
+                Toolbox.Noise(transform.position, noise, transform.root.gameObject, spherical: false);
+                // if (player && GameManager.I.timePlayed > 3f) {
+                //     Debug.Log(volume);
                 //     Debug.Break();
+                // }
             }
         }
 

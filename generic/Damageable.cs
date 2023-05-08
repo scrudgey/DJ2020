@@ -34,16 +34,6 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
             damageHandlers[tType] = wrapper;
         }
     }
-    // probably unnecessary: all references here are internal to the gameobject.
-    // void OnDestroy() {
-    //     List<KeyValuePair<Type, Func<Damage, DamageResult>>> kvps = new List<KeyValuePair<Type, Func<Damage, DamageResult>>>();
-    //     foreach (KeyValuePair<Type, Func<Damage, DamageResult>> kvp in damageHandlers) {
-    //         kvps.Add(kvp);
-    //     }
-    //     foreach (KeyValuePair<Type, Func<Damage, DamageResult>> kvp in kvps) {
-    //         damageHandlers[kvp.Key] -= kvp.Value;
-    //     }
-    // }
     public virtual DamageResult TakeDamage(Damage damage) {
         DamageResult result1 = HandleDamage(damage, damage.GetType());
         DamageResult result2 = HandleDamage(damage, typeof(Damage));
@@ -58,6 +48,7 @@ public abstract class Damageable : MonoBehaviour, IDamageReceiver {
             DamageResult result = damageHandlers[type](damage);
             ApplyDamageResult(result);
             lastDamage = damage;
+            // Debug.Log($"{this} handling damage {type} {damage.amount} {result}");
             return result;
         } else return DamageResult.NONE;
     }

@@ -128,8 +128,9 @@ public partial class GameManager : Singleton<GameManager> {
 
     public IEnumerator ExtractionZoneCutscene(ExtractionZone zone) {
         float timer = 0f;
+        float duration = 4f;
         characterCamera.followCursorCoefficient = 1f;
-        while (timer < 2f) {
+        while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             Time.timeScale = Mathf.Lerp(Time.timeScale, 0f, 0.01f);
             PlayerInput playerInput = PlayerInput.none;
@@ -140,14 +141,14 @@ public partial class GameManager : Singleton<GameManager> {
                 wallNormal = Vector2.zero,
                 lastWallInput = Vector2.zero,
                 crouchHeld = false,
-                playerPosition = transform.position,
+                playerPosition = zone.myCollider.bounds.center,
                 state = CharacterState.normal,
                 targetData = CursorData.none,
                 playerDirection = playerCharacterController.direction,
                 playerLookDirection = playerCharacterController.direction,
                 popoutParity = PopoutParity.left,
                 aimCameraRotation = Quaternion.identity,
-                targetPosition = zone.transform.position
+                targetPosition = zone.myCollider.bounds.center
             };
             characterCamera.UpdateWithInput(input, ignoreAttractor: true);
             yield return null;

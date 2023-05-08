@@ -9,11 +9,7 @@ public class ObjectiveCanvasController : MonoBehaviour {
     Coroutine showCoroutine;
     public Dictionary<Objective, ObjectiveIndicatorController> controllers;
     public RectTransform containerRect;
-    // public void Start() {
-    //     StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(ClearContainer));
-    // }
     public void Initialize() {
-        // if (objectivesContainer == null) return;
         foreach (Transform child in objectivesContainer) {
             if (child.gameObject.name == "image") continue;
             Destroy(child.gameObject);

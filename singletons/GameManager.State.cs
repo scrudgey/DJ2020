@@ -79,6 +79,7 @@ public partial class GameManager : Singleton<GameManager> {
         uiController.LogMessage($"Objectives complete, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionSuccess;
         ActivateExtractionPoint();
+        uiController.DisplayObjectiveCompleteMessage("Objectives\ncomplete", "proceed to\nextraction point");
     }
     public void FailObjective(Objective objective) {
         if (GameManager.I.isLoadingLevel) return;
@@ -90,6 +91,7 @@ public partial class GameManager : Singleton<GameManager> {
         uiController.LogMessage($"Objectives failed, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionFail;
         ActivateExtractionPoint();
+        uiController.DisplayObjectiveCompleteMessage("Objectives\nfailed", "proceed to\nextraction point");
     }
 
     void ActivateExtractionPoint() {

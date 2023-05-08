@@ -55,11 +55,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     public HashSet<int> physicalKeys;
 
-
-
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
-        // GunTemplate gun2 = GunTemplate.Load("s1");
+        GunTemplate gun2 = GunTemplate.Load("s1");
         // GunTemplate gun3 = GunTemplate.Load("r1");
         // GunTemplate gun4 = GunTemplate.Load("p2");
 
@@ -161,4 +159,19 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         etiquettes = template.etiquettes,
         portrait = template.portrait
     };
+
+    public void ResetTemporaryState() {
+        if (primaryGun != null) {
+            primaryGun.delta.chamber = 0;
+            primaryGun.ClipIn();
+        }
+        if (secondaryGun != null) {
+            secondaryGun.delta.chamber = 0;
+            secondaryGun.ClipIn();
+        }
+        if (tertiaryGun != null) {
+            tertiaryGun.delta.chamber = 0;
+            tertiaryGun.ClipIn();
+        }
+    }
 }

@@ -194,14 +194,20 @@ public class Toolbox {
         }
         return GameObject.Instantiate(explosiveRadiusPrefab, position, Quaternion.identity).GetComponent<Explosion>();
     }
-    public static NoiseComponent Noise(Vector3 position, NoiseData data, GameObject source) {
+    public static NoiseComponent Noise(Vector3 position, NoiseData data, GameObject source, bool spherical = true) {
         GameObject noiseObject = PoolManager.I.GetPool("prefabs/noise").GetObject(position);
         NoiseComponent component = noiseObject.GetComponent<NoiseComponent>();
         component.data = data with {
             source = source
         };
-        component.sphereCollider.radius = data.volume;
-        component.transform.localScale = new Vector3(data.volume, 1f, data.volume);
+        if (spherical) {
+            component.meshCollider.enabled = false;
+            component.sphereCollider.radius = data.volume;
+        } else {
+            component.meshCollider.enabled = true;
+            component.sphereCollider.enabled = false;
+            component.transform.localScale = new Vector3(data.volume, 2f, data.volume);
+        }
         return component;
     }
     public static float CalculateExplosionValue(Vector3 source, Vector3 target, float range, float power) {
@@ -248,7 +254,8 @@ public class Toolbox {
         source.rolloffMode = AudioRolloffMode.Logarithmic;
         source.minDistance = 3f;
         source.maxDistance = 23f;
-        source.spatialBlend = 0.6f;
+        // source.spatialBlend = 0.6f;
+        source.spatialBlend = 1f;
         source.spread = 0.2f;
         source.volume = 1f;
         return source;

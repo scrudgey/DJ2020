@@ -39,6 +39,14 @@ public class NPCSpawnPoint : MonoBehaviour {
         motor.SetPosition(transform.position, bypassInterpolation: true);
         ApplyNPCState(template, npc);
 
+        LevelRandomSound randomSound = npc.GetComponent<LevelRandomSound>();
+        randomSound.enabled = template.radioChatter;
+        // if (template.radioChatter){
+
+        // } else {
+
+        // }
+
         ai.Initialize();
         return npc;
     }

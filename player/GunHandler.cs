@@ -286,7 +286,12 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         emitShell = true;
     }
     public void DoEmitShell() {
-        Vector3 targetPosition = gunPosition() + 0.2f * transform.right + 0.2f * transform.forward;
+        Debug.Log(transform.root.right);
+        Vector3 right = transform.root.right;
+        Vector3 forward = transform.root.forward;
+        Vector3 up = transform.root.up;
+
+        Vector3 targetPosition = gunPosition() + 0.2f * right + 0.2f * forward;
         GameObject shell = PoolManager.I.GetPool(gunInstance.template.shellCasing).GetObject();
         Rigidbody body = shell.GetComponent<Rigidbody>();
         if (body != null) {
@@ -294,9 +299,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             body.MoveRotation(Quaternion.identity);
             body.velocity = Vector3.zero;
             body.AddRelativeForce(
-                        UnityEngine.Random.Range(0.5f, 1.5f) * transform.up +
-                        UnityEngine.Random.Range(0.1f, 1f) * transform.right +
-                        UnityEngine.Random.Range(-0.3f, 0.3f) * transform.forward,
+                        UnityEngine.Random.Range(0.5f, 1.5f) * up +
+                        UnityEngine.Random.Range(0.1f, 1f) * right +
+                        UnityEngine.Random.Range(-0.3f, 0.3f) * forward,
                         ForceMode.Impulse);
             body.AddRelativeTorque(UnityEngine.Random.Range(100f, 600f) * shell.transform.forward);
         }

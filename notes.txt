@@ -2197,6 +2197,57 @@ note: layer "interactive"
 * fix world
     * block off exits
     * prevent weapons, items, cyberlegs in world
+* overhaul burglar tools and hacking
+    * better interface for hacking
+    * better interface for burglar tools
+✓ jack that data: can destroy walls that should not be destroyed
+✓ guards radio sfx
+✓ allow selecting no item
+✓ neoclearsighter: large buildings in foreground should be fully transparent.
+✓ show "F" on item selector 
+✓ restrict how and when interact surfaces can be used
+    ✓ e.g. not when you are dead / dying
+✓ different icon for interact surface
+✓ ammo pips being weird
+✓ reload guns between level retries
+✓ announce when mission objectives complete or failed
+✓ footsteps too loud / reach too far through floors
+✓ shells ejecting in wrong direction
+* better action log (remove?)
+* patrol guard spritesheet
+    * smg
+    * rifle
+    * shotgun
+    * portrait
+* guards spawned invisible
+* mission:
+    * visibility goes too low
+    * guards get stuck on each other
+        * make NPCs pass through each other with a soft bump
+* put gun away and left click on objects to use?
+* clearsighter
+    * we want to disable shells when they're newly produced, but hide them when they're static.
+    * clearsighter optimization
+        * restrict computation to only the visible
+        * octree
+    * pixel perfect shaders
+        * highlight item container when item is switched
+        * switching items graphical effect
+        * NPC when an aggressive noise is heard, do a quick visibility check.
+        * mission select map
+        * indicate a point on map
+        * move map, zoom
+    * multiple floors of map
+    * adjust all UI buttons to have consistent semantics for Cancel / OK
+    * remove action feed?
+* does VR mission still work?
+* level state
+    * normalize level / mission / state / detla / template
+    * gun state can be moved into plan
+    * use octree in clearsighter
+    * static batching / dynamic batching / occlusion culling  / gpu instancing
+* optimizations:
+    * optimize the ammo counter
 
 
 graphical issues:
@@ -2208,8 +2259,19 @@ uncertain:
     creep button (crawling is?)
         slow walk?
     apply skin graphics to corpse?
+    "v" and "^" buttons on scrollbars?
+    show objectives as blit-in text on lower left?  
+        show days
+    maybe fall damage from rooftop should be greater
+    larger / more clear crosshairs cursor
+    upgrade unity
+        newtonsoft json is broken??
 
 nice to have / future goals:
+    after action report should be fragmentary, show reward, over a transit cutscene
+    fake ID should be more fun to procure / use
+        can show randomized image and randomized name
+        fake ID is burned after one use
     ambient sounds
         room tone
     first level should set the tone
@@ -2222,7 +2284,7 @@ nice to have / future goals:
     glass break fx
     leaves and junk in the street that blows around
     off-screen indicator for active threats?
-    * pixel perfect shaders
+
     animation shows recoil
     head look around if player has been idle
     make elevator
@@ -2237,7 +2299,7 @@ nice to have / future goals:
             how to decide who to run to alarm panel?
     dust / smoke shader
     digitized voice for "operation jetlag"
-    * highlight item container when item is switched
+
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
     performance tuning: separate canvases, implement octree or smth
@@ -2266,7 +2328,7 @@ graphical embellishments
             PLAYER: STATS
     pulse some element in color in alarm timer, maybe show some bkg
         blink at 00.00 and then ease out
-    * switching items graphical effect
+
     easing in overlay 
     more blink-style transformations
     show thermal goggles on player head?
@@ -2304,7 +2366,7 @@ stealth:
     silencers affect graphic
     more / better sequences besides alarm / no alarm; search level state.
     NPC should look in direction of last noise
-    * NPC when an aggressive noise is heard, do a quick visibility check.
+
     stealth kill?
     be able to shoot out lights
 
@@ -2313,13 +2375,6 @@ VR mission designer
     survive x waves of y NPCS
     inventory management
 
-* better action log (remove?)
-
-clearsighter
-    we want to disable shells when they're newly produced, but hide them when they're static.
-    clearsighter optimization
-        1. restrict computation to only the visible
-        2. octree
 
 code-controlled shoot animation
     fix shooting animation and automatic interval
@@ -2344,9 +2399,7 @@ weapons
 planning mode
     optional objectives
     HP / def indicators
-    * mission select map
-        * indicate a point on map
-        * move map, zoom
+
     on mouseover picker: change stat viewer
         smooth rolling stat bars when values change
         compare stats +/-
@@ -2368,26 +2421,21 @@ planning mode
         when map data is bought, show notification on map tab
 
 minimap
-    * multiple floors of map
+
     orient relative to main camera
     highlight enemies in red
         show sightcone
     indicate player
 
 UI
-    * adjust all UI buttons to have consistent semantics for Cancel / OK
-    * remove action feed?
     show iconography when disguise is lost
     show iconography when optional objective is complete
 
-* does VR mission still work?
 hack target ! indicator only sometimes visible
 NPC portraits not being set properly
 
-* level state
-    * normalize level / mission / state / detla / template
-    * gun state can be moved into plan
-    HQ state can be moved into delta
+
+HQ state can be moved into delta
 
 a guy danced on a corpse (I think he was investigating a noise?)
 
@@ -2426,14 +2474,6 @@ networks
         can we do this programmatically?
     get cyber network working once and for all
     DFS path finding doesn't quite work right for highlighting alarm path
-
-optimizations:
-    * use octree in clearsighter
-    * static batching / dynamic batching / occlusion culling  / gpu instancing
-    optimize the ammo counter
-        this could free up the equivalent of a whole camera render
-
-* put gun away and left click on objects to use?
 
 clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
@@ -2484,6 +2524,11 @@ destructible AC unit
 destructible radio dish tower
 plants can catch on fire
 
+an NPC ran down the stairs towards me, got stuck, didn't see me.
+an NPC saw me easily in the corner when he'd walked past me.
+a guard ran up and reported a door was tampered with as i tampered with it
+
+
 level 3:
     holes for AC ducts 
     elevator
@@ -2520,11 +2565,6 @@ build a test level equivalent to Jack That Data
     hatch in the rooftop
 
 graphics
-    patrol guard spritesheet
-        * smg
-        * rifle
-        * shotgun
-        portrait
     disguise spritesheet (fireman)
     swat team spritesheet
         smg run
@@ -2549,15 +2589,9 @@ fake id tactic icon
 random loot spots
 loot drops
 
-* guards spawned invisible
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
 
-
-mission:
-    * visibility goes too low
-    * guards get stuck on each other
-        * make NPCs pass through each other with a soft bump
 
 world NPCs:
     potentially talkable: leave that for later.
@@ -2571,17 +2605,7 @@ world NPCs:
         hanging around the Fire
     random drug dealers on the corner will buy your drug loot
 
-still unknown:
-    street doc
-    weapon upgrades
-    software
-    hardware
-locations:
-    software dealer
-    hardware dealer (the finn)
-    street doc
-    night club 
-    arcade?
+
 
 world layout:
     * neighbor building?
@@ -2600,6 +2624,17 @@ world layout:
         a software hacker 
     tent city:
         a randomized junk shop
+still unknown:
+    street doc
+    weapon upgrades
+    software
+    hardware
+locations:
+    software dealer
+    hardware dealer (the finn)
+    street doc
+    night club 
+    arcade?
 
 shop todo:
     gunshop
@@ -2687,45 +2722,18 @@ world:
         sometimes, torso + legs are set dependently.
 
 
-"v" and "^" buttons on scrollbars?
-fake ID should be more fun to procure / use
-    can show randomized image and randomized name
-    fake ID is burned after one use
-after action report should be fragmentary, show reward, over a transit cutscene
-show objectives as blit-in text on lower left?  
-    show days
-maybe fall damage from rooftop should be greater
 radial menu for selecting guns and items?
 unify items and guns
-larger / more clear crosshairs cursor
 
-overhaul burglar tools and hacking
-    show some information when picking up key
-    better interface for hacking
-    * better interface for burglar tools
-
-upgrade unity
-    newtonsoft json is broken??
+hack in interact mode
+show some information when picking up key
 
 what happened to the sphere robot?
 unify tactics pane with shop design
-jack that data: can destroy walls that should not be destroyed
-    an NPC ran down the stairs towards me, got stuck, didn't see me.
-    an NPC saw me easily in the corner when he'd walked past me.
-    a guard ran up and reported a door was tampered with as i tampered with it
-
-
-
 swat spritesheet
     this requires sprite datasystem work:
         1. positioning torso relative to legs (maybe?)
             position head relative to torso 
         2. work on editor
             updating values when they're updated in the editor? somehow? yes/ no?
-guards radio sfx
-allow selecting no item
-show "F" on item selector
-ammo pips being weird
-reload guns between retries
-announce when mission objectives complete or failed
-footsteps too loud / reach too far through floors
+

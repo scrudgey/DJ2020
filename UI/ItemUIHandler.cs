@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
 
 namespace UI {
     public class ItemUIHandler : IBinder<ItemHandler> {
@@ -11,8 +13,19 @@ namespace UI {
         public TextMeshProUGUI itemTitle;
         public TextMeshProUGUI itemCaption;
         public GameObject parent;
-
+        public TextMeshProUGUI buttonText;
+        // public InputAction useItem;
+        public InputActionReference actionReference;
+        public int bindingIndex;
         override public void HandleValueChanged(ItemHandler itemHandler) {
+            InputAction action = actionReference.action;
+            var displayString = string.Empty;
+            var deviceLayoutName = default(string);
+            var controlPath = default(string);
+            if (action != null) {
+                buttonText.text = action.GetBindingDisplayString(bindingIndex, out deviceLayoutName, out controlPath);
+            }
+            // Debug.Log(buttonText.text);
             if (itemHandler.activeItem == null || itemHandler.activeItem.data == null) {
                 itemImage.sprite = null;
                 itemImage.enabled = false;

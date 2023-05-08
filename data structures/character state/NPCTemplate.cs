@@ -41,4 +41,5 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public List<int> physicalKeys;
 
     public Alertness alertness;
+    public bool radioChatter;
 }

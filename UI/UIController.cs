@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 public class UIController : MonoBehaviour {
     public Canvas canvas;
+    public Canvas gunDisplayCanvas;
     public Canvas terminalCanvas;
     public Canvas burglarCanvas;
     public Canvas missionSelectorCanvas;
@@ -31,6 +32,7 @@ public class UIController : MonoBehaviour {
     public VRStatHandler vRStatHandler;
     public BurglarCanvasController burglarCanvasController;
     public ObjectiveCanvasController objectiveCanvasController;
+    public ObjectivesCompleteController objectivesCompleteController;
     public MissionComputerController missionComputerController;
     public SaveIndicatorController saveIndicatorController;
     bool burglarMode;
@@ -53,12 +55,14 @@ public class UIController : MonoBehaviour {
         GameManager.OnFocusChanged += BindToNewTarget;
         GameManager.OnCaptionChange += HandleCaptionChange;
         canvas.enabled = true;
+        gunDisplayCanvas.enabled = true;
         HideVRStats();
         HideTerminal();
         HideBurglar();
         HideMissionSelector();
         saveIndicatorController.HideIndicator();
         objectiveCanvasController.Initialize();
+        objectivesCompleteController.Initialize();
         weaponUIHandler.Initialize();
 
         if (GameManager.I.playerObject != null)
@@ -66,6 +70,9 @@ public class UIController : MonoBehaviour {
     }
     public void InitializeObjectivesController(GameData data) {
         objectiveCanvasController.Initialize(data);
+    }
+    public void DisplayObjectiveCompleteMessage(params string[] messages) {
+        objectivesCompleteController.DisplayMessage(messages);
     }
     public void UpdateWithPlayerInput(PlayerInput input) {
         if (burglarCanvas != null && burglarCanvas.enabled)
@@ -145,11 +152,13 @@ public class UIController : MonoBehaviour {
     public void HideUI() {
         HideVRStats();
         canvas.enabled = false;
+        gunDisplayCanvas.enabled = false;
         interactiveHighlightCanvas.enabled = false;
         burglarCanvas.enabled = false;
     }
     public void ShowUI() {
         canvas.enabled = true;
+        gunDisplayCanvas.enabled = true;
         interactiveHighlightCanvas.enabled = true;
         if (burglarMode)
             burglarCanvas.enabled = true;

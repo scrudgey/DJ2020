@@ -35,6 +35,7 @@ public class DoorRandomizer : MonoBehaviour {
             }
         } else {
             foreach (AttackSurfaceLatch latch in latches) {
+                if (latch == null) continue;
                 latch.gameObject.SetActive(false);
             }
             foreach (AttackSurfaceLatchGuard guard in latchGuards) {

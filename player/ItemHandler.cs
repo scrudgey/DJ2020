@@ -45,7 +45,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 } else if (index >= items.Count) {
                     index = 0;
                 }
-                if (items[index] != null)
+                if (activeItem != null)
+                    break;
+                if (activeItem == null && items[index] != null)
                     break;
             }
             SwitchToItem(items[index]);
@@ -63,6 +65,12 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     void SwitchToItem(BaseItem item) {
         OnItemExit(this.activeItem);
         this.activeItem = item;
+        // Debug.Log($"switch to item: {activeItem} {index}");
+        // int i = 0;
+        // foreach (BaseItem x in items) {
+        //     i++;
+        //     Debug.Log($"{i}: {x}");
+        // }
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
@@ -71,8 +79,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         index = items.IndexOf(null);
     }
     public void LoadItemState(List<BaseItem> loadItems) {
+        items = new List<BaseItem>();
         items.AddRange(loadItems);
-        items.Add(null);
+        // items.Add(null);
         ClearItem();
     }
 

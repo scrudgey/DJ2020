@@ -93,8 +93,10 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (currentAttackSurface) {
             Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);
             interactButtonRect.position = screenPoint;
-            interactButton.interactable = Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
-            // interactButton.interactable = currentAttackSurface.actionArea.bounds.Contains(GameManager.I.playerPosition);
+            bool interactible = GameManager.I.playerCharacterController.state == CharacterState.normal ||
+                                GameManager.I.playerCharacterController.state == CharacterState.wallPress;
+            interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
+            interactButton.interactable = interactible;
         }
 
     }
@@ -129,7 +131,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             currentAttackSurface = childAttackSurfaces
                         .OrderBy(attackSurface => Vector3.Distance(attackSurface.transform.position, target.transform.position))
                         .First();
-            Debug.Log($"enable interactive highlight: {currentAttackSurface}");
+            // Debug.Log($"enable interactive highlight: {currentAttackSurface}");
         } else {
             currentAttackSurface = null;
         }
