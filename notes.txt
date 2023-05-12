@@ -2434,7 +2434,6 @@ UI
 hack target ! indicator only sometimes visible
 NPC portraits not being set properly
 
-
 HQ state can be moved into delta
 
 a guy danced on a corpse (I think he was investigating a noise?)
@@ -2566,15 +2565,15 @@ build a test level equivalent to Jack That Data
 
 graphics
     disguise spritesheet (fireman)
-    swat team spritesheet
+    * swat team spritesheet
         smg run
         rifle
         pistol
         shotgun
-        wire up sprite data system
+        * wire up sprite data system
     scientist spritesheet
     civ_female portrait could use some work
-    title screen logo
+    * title screen logo
     title screen animations 
     helicopters for skybox
 guns:
@@ -2582,7 +2581,6 @@ guns:
     fix silenced smg
 icons:
     redraw others?
-        thermals
 padlock
 disguise tactic icon
 fake id tactic icon
@@ -2591,7 +2589,6 @@ loot drops
 
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
-
 
 world NPCs:
     potentially talkable: leave that for later.
@@ -2604,8 +2601,6 @@ world NPCs:
         leaning up against the wall
         hanging around the Fire
     random drug dealers on the corner will buy your drug loot
-
-
 
 world layout:
     * neighbor building?
@@ -2641,7 +2636,9 @@ shop todo:
         show little -100 text goes up from credits, lerp credits color from red to white
         sell mode
             can't sell last gun? maybe?
+        indicate selected in the inventory pane
     item shop
+        after purchase, do something better with item display
         description (dialogue)
             "1x per mission"
             "unlimited use"
@@ -2650,8 +2647,8 @@ shop todo:
     bartender
         rumors -> faction strength
 
-
 graphics:
+    swat spritesheet finish
     trees / plants / outside decor
     tents
     sprite props
@@ -2690,17 +2687,11 @@ decals:
     tubes
     vent grate
 
-shops:
-    gun shop:
-        indicate selected in the inventory pane
-    item shop
-        after purchase, do something better with item display
-
 world:
     NPCs can hold beer bottles
     fix social group orientation
     sound design
-    prevent guns in world
+    * prevent guns in world
     prevent damage in world?
     storeowner AI
         move to position
@@ -2730,10 +2721,3 @@ show some information when picking up key
 
 what happened to the sphere robot?
 unify tactics pane with shop design
-swat spritesheet
-    this requires sprite datasystem work:
-        1. positioning torso relative to legs (maybe?)
-            position head relative to torso 
-        2. work on editor
-            updating values when they're updated in the editor? somehow? yes/ no?
-

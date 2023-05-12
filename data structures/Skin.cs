@@ -188,11 +188,11 @@ public class Skin {
 
         Sprite[] headSprites = loadSprites(name, "head");
 
-        List<SpriteData> torsoSpriteData = LoadSpriteData(name, "Torso");
-        List<SpriteData> pistolSpriteData = LoadSpriteData(name, "pistol");
-        List<SpriteData> smgSpriteData = LoadSpriteData(name, "smg");
-        List<SpriteData> rifleSpriteData = LoadSpriteData(name, "rifle");
-        List<SpriteData> shotgunSpriteData = LoadSpriteData(name, "shotgun");
+        List<SpriteData> torsoSpriteData = LoadTorsoSpriteData(name, "Torso");
+        List<SpriteData> pistolSpriteData = LoadTorsoSpriteData(name, "pistol");
+        List<SpriteData> smgSpriteData = LoadTorsoSpriteData(name, "smg");
+        List<SpriteData> rifleSpriteData = LoadTorsoSpriteData(name, "rifle");
+        List<SpriteData> shotgunSpriteData = LoadTorsoSpriteData(name, "shotgun");
 
         Skin skin = new Skin();
 
@@ -527,6 +527,7 @@ public class Skin {
     public static void SaveSpriteData(string skinName, List<SpriteData> spriteData, string sheetType) {
         XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
         string path = Path.Combine(Application.dataPath, "Resources", Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
+        Debug.Log($"saving torso sprite data to {path}...");
         if (File.Exists(path)) {
             File.Delete(path);
         }
@@ -534,7 +535,19 @@ public class Skin {
             serializer.Serialize(sceneStream, spriteData);
         }
     }
-    public static List<SpriteData> LoadSpriteData(string skinName, string sheetType) {
+    public static void SaveLegSpriteData(string skinName, List<SpriteDataLegs> spriteData) {
+        XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteDataLegs>));
+        string path = Path.Combine(Application.dataPath, "Resources", Skin.PathToSkinDirectory(skinName), $"LegSpriteData.xml");
+        Debug.Log($"saving leg sprite data to {path}...");
+        if (File.Exists(path)) {
+            File.Delete(path);
+        }
+        using (FileStream sceneStream = File.Create(path)) {
+            serializer.Serialize(sceneStream, spriteData);
+        }
+    }
+
+    public static List<SpriteData> LoadTorsoSpriteData(string skinName, string sheetType) {
         XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteData>));
         // string path = Path.Combine(Application.dataPath, "Resources", Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
         string path = Path.Combine(Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData");
@@ -545,6 +558,20 @@ public class Skin {
             }
         } else {
             Debug.LogError($"sprite data file not found: {path}, skinName: {skinName}, sheetType: {sheetType}");
+            return null;
+        }
+    }
+    public static List<SpriteDataLegs> LoadLegSpriteData(string skinName) {
+        XmlSerializer serializer = new XmlSerializer(typeof(List<SpriteDataLegs>));
+        // string path = Path.Combine(Application.dataPath, "Resources", Skin.PathToSkinDirectory(skinName), $"{sheetType}SpriteData.xml");
+        string path = Path.Combine(Skin.PathToSkinDirectory(skinName), $"LegSpriteData");
+        TextAsset textAsset = Resources.Load<TextAsset>(path) as TextAsset;
+        if (textAsset != null) {
+            using (var reader = new System.IO.StringReader(textAsset.text)) {
+                return serializer.Deserialize(reader) as List<SpriteDataLegs>;
+            }
+        } else {
+            Debug.LogError($"leg sprite data file not found: {path}, skinName: {skinName}");
             return null;
         }
     }

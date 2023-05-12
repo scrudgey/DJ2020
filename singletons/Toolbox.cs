@@ -528,5 +528,13 @@ public class Toolbox {
         }
         bottomRect.sizeDelta = new Vector2(1f, 610f);
     }
+
+    public static int ClampWrap(int value, int min, int max) {
+        if (value > max) {
+            return 0;
+        } else if (value < min) {
+            return max;
+        } else return value;
+    }
 }
 

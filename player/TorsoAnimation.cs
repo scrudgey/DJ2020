@@ -27,32 +27,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     // bool isCrawling;
     GunType gunType;
 
-    SpriteData ApplyTorsoSpriteData(AnimationInput input) {
-        int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
-        SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
-            GunType.unarmed => skin.unarmedSpriteData,
-            GunType.pistol => skin.pistolSpriteData,
-            GunType.smg => skin.smgSpriteData,
-            GunType.rifle => input.isRunning ? skin.smgSpriteData : skin.rifleSpriteData,
-            GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
-            _ => skin.unarmedSpriteData
-        };
-        if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
-            torsoSpriteDatas = skin.unarmedSpriteData;
-        }
-        try {
-            SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
 
-            Vector3 headOffset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
-            headAnimation.transform.localPosition = headOffset;
-            headAnimation.UpdateView(input, torsoSpriteData);
-            return torsoSpriteData;
-        }
-        catch (Exception) {
-            Debug.LogError($"**** index:{sheetIndex} name:{spriteRenderer.sprite.name} prone:{input.isProne} dead:{input.hitState == HitState.dead} guntype:{input.gunInput.gunType}");
-            return null;
-        }
-    }
     void SetState(GunHandler.GunStateEnum newState) {
         state = newState;
         // Debug.Log("set gunstate: " + state);
@@ -151,6 +126,32 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         UpdateFrame(input);
         SetItemSprite(input);
         return ApplyTorsoSpriteData(input);
+    }
+    SpriteData ApplyTorsoSpriteData(AnimationInput input) {
+        int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
+        SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
+            GunType.unarmed => skin.unarmedSpriteData,
+            GunType.pistol => skin.pistolSpriteData,
+            GunType.smg => skin.smgSpriteData,
+            GunType.rifle => input.isRunning ? skin.smgSpriteData : skin.rifleSpriteData,
+            GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
+            _ => skin.unarmedSpriteData
+        };
+        if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
+            torsoSpriteDatas = skin.unarmedSpriteData;
+        }
+        try {
+            SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
+
+            Vector3 headOffset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
+            headAnimation.transform.localPosition = headOffset;
+            headAnimation.UpdateView(input, torsoSpriteData);
+            return torsoSpriteData;
+        }
+        catch (Exception) {
+            Debug.LogError($"**** index:{sheetIndex} name:{spriteRenderer.sprite.name} prone:{input.isProne} dead:{input.hitState == HitState.dead} guntype:{input.gunInput.gunType}");
+            return null;
+        }
     }
 
     void SetItemSprite(AnimationInput input) {

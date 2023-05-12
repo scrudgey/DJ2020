@@ -8,21 +8,18 @@ public class SpriteDataSystem : MonoBehaviour {
     [Header("Display")]
     public SpriteRenderer torsoSpriteRenderer;
     public SpriteRenderer headSpriteRenderer;
+    public SpriteRenderer legSpriteRenderer;
     [Header("Sprite Data")]
-    public Sprite torsoSprite;
-    public Sprite headSprite;
     public int headOffsetX;
     public int headOffsetY;
-    public bool overrideHeadDirection;
-    public bool headInFrontOfTorso;
-    [Header("Data Model")]
-    public List<SpriteData> spriteData;
-
-    [HideInInspector]
-    public Sprite[] torsoSprites;
-    [HideInInspector]
-    public Sprite[] headSprites;
+    public int torsoOffsetX;
+    public int torsoOffsetY;
+    public int legIndex;
     public int torsoIndex;
     public int headIndex;
-    public int dataIndex;
+    // public int torsoDataIndex;
+    [Header("Data Model")]
+    public List<SpriteData> torsoSpriteData;
+    public List<SpriteDataLegs> legSpriteData;
+
 }
