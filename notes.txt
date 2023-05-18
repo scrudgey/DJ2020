@@ -2248,6 +2248,11 @@ note: layer "interactive"
     * static batching / dynamic batching / occlusion culling  / gpu instancing
 * optimizations:
     * optimize the ammo counter
+* mission computer:
+    * show map, faction, etc.
+    * change ddetails on mouseover
+
+
 
 
 graphical issues:
@@ -2590,6 +2595,7 @@ loot drops
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
 
+
 world NPCs:
     potentially talkable: leave that for later.
     moving with purpose around the scene. 
@@ -2713,11 +2719,59 @@ world:
         sometimes, torso + legs are set dependently.
 
 
-radial menu for selecting guns and items?
-unify items and guns
 
+* fix broken swat response in jack that data
+* fix guard response in jack that data
+
+radial menu for selecting guns and items?
+    unify items and guns
 hack in interact mode
 show some information when picking up key
-
 what happened to the sphere robot?
-unify tactics pane with shop design
+tactics pane should look like calling people up and haggling with them
+
+map pane:
+    isometric pixel art city buildings 
+        show type of location? city view? territory?
+        show view of terrain?
+    cursor tracks in, box narrows down to target, texts pop up
+    faction and target?
+
+
+basic game:
+progression:
+1. restrict weapons at gun shop
+3. adjust the pay / rewards
+gameplay:
+2. hack in interact mode / change / fix / improve hack
+4. more levels
+5. stealth kills
+
+
+interaction testbed level has:
+    * door
+    * vent
+    * fence door
+    * camera
+    * datastore
+    * alarm box
+
+make interactive:
+    * door
+    * vent
+    fence door
+    camera
+    datastore
+    alarm box
+
+lockpicking: discrete pins
+hacking: there should be more data to steal
+    some data is paydata
+    some is useful for social engineering
+    network hacking: limited range, hacking restricted by software
+    hacking should indicate ahead of time the potential outcomes?
+        hack camera to disable
+        hack datastore to get data
+you should be able to hack laser grid
+hack the alarm system: 
+    pick the lock, open the door, tamper with the wiring

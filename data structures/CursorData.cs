@@ -9,6 +9,7 @@ public class CursorData {
     public Vector2 screenPositionNormalized;
     public Vector2 screenPixelDimension;
     public InteractorTargetData highlightableTargetData;
+    public AttackSurface attackSurface;
     public Collider targetCollider;
     public Vector2 mousePosition;
     public static CursorData none = new CursorData();

@@ -56,6 +56,19 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
                 }
             }
         }
+        currentAttackSurface = interactor.selectedAttackSurface;
+        if (currentAttackSurface != null) {
+            interactButton.gameObject.SetActive(true);
+
+            Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);
+            interactButtonRect.position = screenPoint;
+            bool interactible = GameManager.I.playerCharacterController.state == CharacterState.normal ||
+                                GameManager.I.playerCharacterController.state == CharacterState.wallPress;
+            interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
+            interactButton.interactable = interactible;
+        } else {
+            interactButton.gameObject.SetActive(false);
+        }
 
     }
     void DataChanged() {
@@ -90,14 +103,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             cursorImage.enabled = false;
         }
 
-        if (currentAttackSurface) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);
-            interactButtonRect.position = screenPoint;
-            bool interactible = GameManager.I.playerCharacterController.state == CharacterState.normal ||
-                                GameManager.I.playerCharacterController.state == CharacterState.wallPress;
-            interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
-            interactButton.interactable = interactible;
-        }
+
 
     }
     void Disable() {
@@ -112,7 +118,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (currentInteractorTarget != null) {
             currentInteractorTarget.target.DisableOutline();
         }
-        interactButton.gameObject.SetActive(false);
+        // interactButton.gameObject.SetActive(false);
     }
     void Enable(string actionText) {
         if (blitTextCoroutine != null) {
@@ -125,22 +131,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         cursorText.text = "";
         dotText.enabled = true;
         blitTextCoroutine = StartCoroutine(BlitCalloutText(actionText));
-
-        AttackSurface[] childAttackSurfaces = currentInteractorTarget.target.transform.root.GetComponentsInChildren<AttackSurface>();
-        if (childAttackSurfaces.Length > 0) {
-            currentAttackSurface = childAttackSurfaces
-                        .OrderBy(attackSurface => Vector3.Distance(attackSurface.transform.position, target.transform.position))
-                        .First();
-            // Debug.Log($"enable interactive highlight: {currentAttackSurface}");
-        } else {
-            currentAttackSurface = null;
-        }
-
-        if (currentAttackSurface) {
-            interactButton.gameObject.SetActive(true);
-        } else {
-            interactButton.gameObject.SetActive(false);
-        }
     }
     public void InteractButtonCallback() {
         if (currentAttackSurface) {

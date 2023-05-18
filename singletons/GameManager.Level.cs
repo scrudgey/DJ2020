@@ -381,7 +381,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         alarmSoundInterval = 2f;
         alarmSound = gameData.levelState.template.alarmAudioClip;
-        strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => spawn.isStrikeTeamSpawn).First();
+        strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().FirstOrDefault(spawn => spawn.isStrikeTeamSpawn);
 
 
         OnSuspicionChange?.Invoke();

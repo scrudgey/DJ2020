@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Easings;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 // random from list
@@ -535,6 +536,21 @@ public class Toolbox {
         } else if (value < min) {
             return max;
         } else return value;
+    }
+
+    public static IEnumerator BlitText(TextMeshProUGUI textMesh, string content) {
+        float timer = 0f;
+        float interval = 0.05f;
+        int index = 0;
+        while (index < content.Length) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > interval) {
+                timer -= interval;
+                index += 1;
+            }
+            textMesh.text = content.Substring(0, index);
+            yield return null;
+        }
     }
 }
 

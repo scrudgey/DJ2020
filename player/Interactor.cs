@@ -28,6 +28,8 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<Interactor> OnValueChanged { get; set; }
     public Action<InteractorTargetData> OnActionDone;
     public InteractorTargetData cursorTarget;
+    public AttackSurface selectedAttackSurface;
+
     public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
     public CharacterController characterController;
     public void AddInteractive(Collider other) {
@@ -82,6 +84,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
 
     public void SetCursorData(CursorData cursorData) {
         cursorTarget = cursorData.highlightableTargetData;
+        selectedAttackSurface = cursorData.attackSurface;
         OnValueChanged?.Invoke(this);
     }
     public ItemUseResult SetInputs(PlayerInput inputs, bool gunIsHolstered) {

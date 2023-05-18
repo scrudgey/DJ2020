@@ -615,10 +615,33 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Collider targetCollider = null;
         HashSet<InteractorTargetData> targetDatas = new HashSet<InteractorTargetData>();
 
+        HashSet<AttackSurface> attackSurfaces = new HashSet<AttackSurface>();
+
+        // AttackSurface[] childAttackSurfaces = currentInteractorTarget.target.transform.root.GetComponentsInChildren<AttackSurface>();
+        // if (childAttackSurfaces.Length > 0) {
+        //     currentAttackSurface = childAttackSurfaces
+        //                 .OrderBy(attackSurface => Vector3.Distance(attackSurface.transform.position, target.transform.position))
+        //                 .First();
+        //     // Debug.Log($"enable interactive highlight: {currentAttackSurface}");
+        // } else {
+        //     currentAttackSurface = null;
+        // }
+
+        float closestAttackSurfaceDistance = float.MaxValue;
+        AttackSurface currentAttackSurface = null;
+
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             foreach (Interactive interactive in hit.collider.transform.root.GetComponentsInChildren<Interactive>()) {
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
+            hit.collider.transform.root.GetComponentsInChildren<AttackSurface>().ToList().ForEach(attackSurface => {
+                Debug.Log($"raycast hit: {attackSurface}");
+                float distanceToCursor = Vector3.Distance(hit.point, attackSurface.transform.position);
+                if (distanceToCursor < closestAttackSurfaceDistance) {
+                    currentAttackSurface = attackSurface;
+                    closestAttackSurfaceDistance = distanceToCursor;
+                }
+            });
 
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data != null && data.targetPriority > -1) {
@@ -635,28 +658,25 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             }
 
             if (!playerPlane.GetSide(hit.point)) {
-                // Debug.Log($"breaking on hit: {hit.collider.gameObject}");
                 break;
             }
         }
 
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
-
         InteractorTargetData interactorData = Interactive.ClosestTarget(targetDatas);
-
         if (prioritySet && !disableLockOn) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
             // TODO: set collider
             return new CursorData {
-                type = CursorData.TargetType.objectLock,
-                // clickRay = clickRay,
-                screenPosition = pointPosition,
+                type = CursorData.TargetType.objectLock,    // diff
+                screenPosition = pointPosition,             // diff
                 screenPositionNormalized = normalizeScreenPosition(pointPosition),
                 screenPixelDimension = new Vector2(Camera.pixelWidth, Camera.pixelHeight),
                 highlightableTargetData = interactorData,
                 worldPosition = targetPoint,
-                targetCollider = targetCollider,
-                mousePosition = cursorPosition
+                targetCollider = targetCollider,            // diff
+                mousePosition = cursorPosition,
+                attackSurface = currentAttackSurface
             };
         } else {
             // find the intersection between the ray and a plane whose normal is the player's up, and height is the gun height
@@ -685,10 +705,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 screenPixelDimension = new Vector2(Camera.pixelWidth, Camera.pixelHeight),
                 screenPositionNormalized = normalizeScreenPosition(cursorPosition),
                 highlightableTargetData = interactorData,
-                // clickRay = clickRay,
                 worldPosition = targetPoint,
                 mousePosition = cursorPosition,
-                groundPosition = groundPoint
+                groundPosition = groundPoint,
+                attackSurface = currentAttackSurface
                 // targetCollider = interactorData.collider
             };
         }

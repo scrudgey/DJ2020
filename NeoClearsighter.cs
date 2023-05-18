@@ -183,7 +183,7 @@ public class NeoClearsighter : MonoBehaviour {
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
 
         // static geometry above me
-        Renderer[] above = rendererTree.GetNearby(upRay, 20f);
+        Renderer[] above = rendererTree.GetNearby(upRay, 50f);
         int j = 0;
         for (int i = 0; i < above.Length; i++) {
             j++;
@@ -204,53 +204,11 @@ public class NeoClearsighter : MonoBehaviour {
             }
         }
 
-        // static geometry interlopers
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
-        Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
-
-        Plane XPlane = new Plane(Vector3.right, followTransform.position);
-        Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
-
-        bool cameraXSide = XPlane.GetSide(cameraTransform.position);
-        bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
-
-        j = 0;
-        for (int i = 0; i < interlopers.Count; i++) {
-            j++;
-            if (j > 100) {
-                j = 0;
-                yield return waitForFrame;
-            }
-
-            Renderer renderer = interlopers[i];
-
-            TagSystemData tagSystemData = rendererTagData[renderer];
-            if (tagSystemData.dontHideInterloper) continue;
-
-            Vector3 rendererPosition = rendererBounds[renderer].center;
-            Vector3 directionToInterloper = rendererPosition - followTransform.position;
-
-            float xParity = cameraXSide ? 1f : -1f;
-            float zParity = cameraZSide ? 1f : -1f;
-            bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
-            bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
-            // bool rendererDetectionSide = detectionPlane.GetSide(rendererPosition);
-            // if (directionToInterloper.y > 0.2f) { //&& !detectionPlane.GetSide(rendererPosition)
-            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
-                if (renderer == null) continue;
-                if (nextAboveRenderBatch.Contains(renderer)) continue;
-                // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                MakeTransparent(renderer, directionToInterloper);
-                nextInterloperBatch.Add(renderer);
-                hiddenTransforms.Add(renderer.transform.root);
-                if (previousInterloperBatch.Contains(renderer)) {
-                    previousInterloperBatch.Remove(renderer);
-                }
-            }
-        }
+        yield return HandleInterlopers(interlopers, nextInterloperBatch, nextAboveRenderBatch);
 
         // non-static colliders above me
-        int numberHits = Physics.OverlapSphereNonAlloc(liftedOrigin, 20f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell, Layer.bulletOnly, Layer.interactive), QueryTriggerInteraction.Ignore);
+        int numberHits = Physics.OverlapSphereNonAlloc(liftedOrigin, 40f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell, Layer.bulletOnly, Layer.interactive), QueryTriggerInteraction.Ignore);
         for (int k = 0; k < numberHits; k++) {
             Collider collider = colliderHits[k];
             if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
@@ -296,7 +254,7 @@ public class NeoClearsighter : MonoBehaviour {
     }
 
     void MakeTransparent(Renderer renderer, Vector3 directionToInterloper) {
-        if (directionToInterloper.sqrMagnitude < 100f) {
+        if (directionToInterloper.sqrMagnitude < 100f && directionToInterloper.y < 1.5) {
             renderer.material = interloperMaterials[renderer];
             // float targetAlpha = Math.Min(0.5f, 1 / (directionToInterloper.sqrMagnitude / 10fs));
             float targetAlpha = 0.5f;
@@ -312,14 +270,30 @@ public class NeoClearsighter : MonoBehaviour {
     }
 
     Plane[] interloperFrustrum() {
-        // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
         float size = 2f;
-        Plane left = new Plane(cameraTransform.right, followTransform.position - size * cameraTransform.right);
-        Plane right = new Plane(-1f * cameraTransform.right, followTransform.position + size * cameraTransform.right);
+
+        // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
+        float distance = (cameraTransform.position - followTransform.position).magnitude;
+        float angle = (float)Math.Atan((myCamera.Camera.orthographicSize) / distance) * (180f / (float)Math.PI) * 5f;
+
+        // Debug.Log(angle);
+
+        Vector3 leftNormal = Quaternion.AngleAxis(1f * angle, cameraTransform.up) * cameraTransform.right;
+        Vector3 rightNormal = Quaternion.AngleAxis(-1f * angle, cameraTransform.up) * (-1f * cameraTransform.right);
+
+        // Plane left = new Plane(cameraTransform.right, followTransform.position - size * cameraTransform.right);
+        Plane left = new Plane(leftNormal, followTransform.position - size * cameraTransform.right);
+        // Plane right = new Plane(-1f * cameraTransform.right, followTransform.position + size * cameraTransform.right);
+        Plane right = new Plane(rightNormal, followTransform.position + size * cameraTransform.right);
+
         Plane down = new Plane(cameraTransform.up, followTransform.position - size * cameraTransform.up);
         Plane up = new Plane(-1f * cameraTransform.up, followTransform.position + size * cameraTransform.up);
         Plane near = new Plane(cameraTransform.forward, cameraTransform.position);
         Plane far = new Plane(-1f * cameraTransform.forward, followTransform.position);
+
+
+        // Toolbox.DrawPlane(followTransform.position - size * cameraTransform.right, left);
+        // Toolbox.DrawPlane(followTransform.position + size * cameraTransform.right, right);
         return new Plane[] { left, right, down, up, near, far };
     }
     IEnumerator InterloperOnly() {
@@ -335,32 +309,7 @@ public class NeoClearsighter : MonoBehaviour {
         int j = 0;
 
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
-        Plane detectionPlane = new Plane(cameraTransform.forward, followTransform.position);
-        j = 0;
-        for (int i = 0; i < interlopers.Count; i++) {
-            j++;
-            if (j > 100) {
-                j = 0;
-                yield return waitForFrame;
-            }
-            Renderer renderer = interlopers[i];
-            if (renderer == null) continue;
-
-            TagSystemData tagSystemData = rendererTagData[renderer];
-            if (tagSystemData.dontHideInterloper) continue;
-
-            Vector3 rendererPosition = rendererPositions[renderer];
-            Vector3 directionToInterloper = rendererPosition - followTransform.position;
-            if (!detectionPlane.GetSide(rendererPosition) && directionToInterloper.y > 0.2f) {
-                // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-                MakeTransparent(renderer, directionToInterloper);
-                nextInterloperBatch.Add(renderer);
-                hiddenTransforms.Add(renderer.transform.root);
-                if (previousInterloperBatch.Contains(renderer)) {
-                    previousInterloperBatch.Remove(renderer);
-                }
-            }
-        }
+        yield return HandleInterlopers(interlopers, nextInterloperBatch, null);
 
         // reset previous batch
         foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
@@ -377,6 +326,51 @@ public class NeoClearsighter : MonoBehaviour {
         previousInterloperBatch = nextInterloperBatch;
         previousDynamicRendererBatch = new HashSet<Renderer>();
         yield return waitForFrame;
+    }
+
+    IEnumerator HandleInterlopers(List<Renderer> interlopers, HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
+        Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
+
+        Plane XPlane = new Plane(Vector3.right, followTransform.position);
+        Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
+
+        bool cameraXSide = XPlane.GetSide(cameraTransform.position);
+        bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
+
+        int j = 0;
+        for (int i = 0; i < interlopers.Count; i++) {
+            j++;
+            if (j > 100) {
+                j = 0;
+                yield return waitForFrame;
+            }
+
+            Renderer renderer = interlopers[i];
+            if (renderer == null) continue;
+
+            TagSystemData tagSystemData = rendererTagData[renderer];
+            if (tagSystemData.dontHideInterloper) continue;
+
+            Vector3 rendererPosition = rendererBounds[renderer].center;
+            Vector3 directionToInterloper = rendererPosition - followTransform.position;
+
+            float xParity = cameraXSide ? 1f : -1f;
+            float zParity = cameraZSide ? 1f : -1f;
+            bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
+            bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
+            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
+                if (renderer == null) continue;
+                if (nextAboveRenderBatch?.Contains(renderer) ?? false) continue;
+                MakeTransparent(renderer, directionToInterloper);
+                nextInterloperBatch.Add(renderer);
+                hiddenTransforms.Add(renderer.transform.root);
+                if (previousInterloperBatch.Contains(renderer)) {
+                    previousInterloperBatch.Remove(renderer);
+                }
+            }
+        }
+
+
     }
 
     public Renderer[] GetDynamicRenderers(Collider key) {

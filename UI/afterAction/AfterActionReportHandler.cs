@@ -29,9 +29,9 @@ public class AfterActionReportHandler : MonoBehaviour {
         }
         emailText.text = data.levelState.template.successEmail.text;
 
-        rewardAmountText.text = data.levelState.template.creditReward.ToString("n2");
+        rewardAmountText.text = data.levelState.template.creditReward.ToString("#,#");
         bonusAmountText.text = "0";
-        balanceAmountText.text = data.playerState.credits.ToString("n2");
+        balanceAmountText.text = data.playerState.credits.ToString("#,#");
     }
 
     public void ContinueButtonCallback() {

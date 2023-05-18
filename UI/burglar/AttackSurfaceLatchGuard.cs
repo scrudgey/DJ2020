@@ -41,7 +41,7 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
             if (IsLocked()) {
                 return new BurglarAttackResult() {
                     success = false,
-                    feedbackText = "Screwed",
+                    feedbackText = "Latch guard is secured",
                 };
             } else {
                 Toolbox.AudioSpeaker(transform.position, openSounds);
