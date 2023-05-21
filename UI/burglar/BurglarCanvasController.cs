@@ -34,15 +34,19 @@ public class BurglarCanvasController : MonoBehaviour {
     public GameObject usbToolButton;
 
     [Header("cyber")]
+    public CyberdeckCanvasController cyberdeckController;
     public RectTransform usbRectTransform;
     public GameObject usbCable;
     public bool usbCableAttached;
     public CanvasGroup usbCableCanvasGroup;
     public USBCordTool uSBCordTool;
+    public AudioClip[] cyberdeckShowSound;
 
     [Header("sfx")]
     public AudioSource audioSource;
     public AudioClip[] pickupToolSound;
+    public AudioClip[] cableRetractSound;
+    public AudioClip[] cablePickupSound;
     public AudioClip[] toolOverElementSound;
     [Header("selectors")]
     public RectTransform mainPanelRect;
@@ -66,6 +70,8 @@ public class BurglarCanvasController : MonoBehaviour {
     Coroutine moveSelectorPanelCoroutine;
     Coroutine exposeBurglarToolsCoroutine;
     Coroutine exposeCyberdeckCoroutine;
+
+    float mouseOverTimeout;
 
     public void Initialize(BurgleTargetData data) {
         this.data = data;
@@ -158,6 +164,11 @@ public class BurglarCanvasController : MonoBehaviour {
                 return false;
         }
     }
+    void Update() {
+        if (mouseOverTimeout > 0) {
+            mouseOverTimeout -= Time.unscaledDeltaTime;
+        }
+    }
     public void UpdateWithInput(PlayerInput input) {
         mouseDown = input.mouseDown;
         PositionTool(input.mousePosition);
@@ -234,6 +245,8 @@ public class BurglarCanvasController : MonoBehaviour {
             usbCableCanvasGroup.enabled = false;
             cyberdeckRect.transform.SetAsLastSibling();
             uSBCordTool.Slacken(true);
+
+            cyberdeckController.HandleConnection(true);
         }
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
@@ -270,7 +283,10 @@ public class BurglarCanvasController : MonoBehaviour {
         if (selectedTool == BurglarToolType.none) {
             captionText.text = $"Use {element.elementName}";
         } else {
-            Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
+            if (selectedTool != BurglarToolType.usb && mouseOverTimeout <= 0) {
+                mouseOverTimeout = 0.2f;
+                Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
+            }
             captionText.text = $"Use {selectedTool} on {element.elementName}";
         }
     }
@@ -303,10 +319,27 @@ public class BurglarCanvasController : MonoBehaviour {
         };
         SetTool(toolType);
     }
-
+    public AudioClip[] ToolPickupSound(BurglarToolType toolType) {
+        switch (toolType) {
+            default:
+            case BurglarToolType.none:
+                return null;
+            case BurglarToolType.lockpick:
+            case BurglarToolType.key:
+            case BurglarToolType.probe:
+            case BurglarToolType.screwdriver:
+                return pickupToolSound;
+            case BurglarToolType.usb:
+                return cablePickupSound;
+        }
+    }
     void SetTool(BurglarToolType toolType) {
-        if (selectedTool != BurglarToolType.none || toolType != BurglarToolType.none)
-            Toolbox.RandomizeOneShot(audioSource, pickupToolSound);
+        // if (selectedTool != BurglarToolType.none || toolType != BurglarToolType.none)
+        Toolbox.RandomizeOneShot(audioSource, ToolPickupSound(toolType));
+
+        if (selectedTool == BurglarToolType.usb && toolType == BurglarToolType.none && !usbCableAttached) {
+            Toolbox.RandomizeOneShot(audioSource, cableRetractSound);
+        }
 
         selectedTool = toolType;
         selectedToolText.text = toolType.ToString();
@@ -364,6 +397,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
 
+                cyberdeckController.HandleConnection(false);
                 usbCableAttached = false;
 
                 usbCable.transform.SetParent(toolPoint, true);
@@ -493,6 +527,8 @@ public class BurglarCanvasController : MonoBehaviour {
             StopCoroutine(exposeCyberdeckCoroutine);
         }
         if (value) {
+            Toolbox.RandomizeOneShot(audioSource, cyberdeckShowSound);
+
             exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -515, 170, exposeCyberdeckCoroutine, PennerDoubleAnimation.BounceEaseOut));
         } else {
             exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, 170, -515, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));

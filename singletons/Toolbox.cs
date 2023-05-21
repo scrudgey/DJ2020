@@ -59,7 +59,7 @@ public class Toolbox {
             Debug.LogWarning("Randomize oneshot called with null audiosource");
             return;
         }
-        if (audioClips.Length == 0) {
+        if (audioClips == null || audioClips.Length == 0) {
             // Debug.LogWarning("Randomize oneshot called with empty clips");
             return;
         }

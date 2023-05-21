@@ -55,12 +55,13 @@ public class USBCordTool : MonoBehaviour {
         start.y -= 40f;
 
         slackFactor = 1000f / (toolTip.position - anchor.position).magnitude;
-        Debug.Log($"{slackFactor}");
 
         catenary.slack = slack * slackFactor;
         catenary.start = start;
-        catenary.end = (anchor.position / 2f) + (toolTip.position / 2f);
-
+        // catenary.end = (anchor.position / 2f) + (toolTip.position / 2f);
+        catenary.end = anchor.position;
+        // catenary.end = anchor.position + toolTip.position;
+        // 
         List<Vector2> points = catenary.Points()
             .Select(point => new Vector2(point.x - toolTip.position.x, point.y - toolTip.position.y))
             .ToList();

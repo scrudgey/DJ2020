@@ -48,10 +48,7 @@ some consistent iconography on the object displays avaialable interactions.
 * attached usb cable is behind cyberdeck
 * slacken on usb connect
 * slack should depend on distance from anchor
-
-sound for picking up usb cable
-mouseover usb cable tool
-
-
-sound for deck appear
+* sound for picking up usb cable
+* mouseover usb cable tool
+* sound for deck appear
 animation for deck appear
