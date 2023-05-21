@@ -25,12 +25,21 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image lockpickImage;
     public Image keyImage;
     public Image screwdriverImage;
-    public GameObject keyringButton;
     [Header("tools")]
+    public GameObject keyringButton;
     public GameObject probeToolButton;
     public GameObject lockpickToolButton;
     public GameObject screwdriverToolButton;
     public GameObject keyToolButton;
+    public GameObject usbToolButton;
+
+    [Header("cyber")]
+    public RectTransform usbRectTransform;
+    public GameObject usbCable;
+    public bool usbCableAttached;
+    public CanvasGroup usbCableCanvasGroup;
+    public USBCordTool uSBCordTool;
+
     [Header("sfx")]
     public AudioSource audioSource;
     public AudioClip[] pickupToolSound;
@@ -135,6 +144,20 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
 
+    bool ToolIsJiggly(BurglarToolType tool) {
+        switch (tool) {
+            case BurglarToolType.lockpick:
+            case BurglarToolType.key:
+            case BurglarToolType.probe:
+            case BurglarToolType.screwdriver:
+                return true;
+            case BurglarToolType.none:
+            case BurglarToolType.usb:
+                return false;
+            default:
+                return false;
+        }
+    }
     public void UpdateWithInput(PlayerInput input) {
         mouseDown = input.mouseDown;
         PositionTool(input.mousePosition);
@@ -154,7 +177,7 @@ public class BurglarCanvasController : MonoBehaviour {
             if (selectedElement != null) {
                 ClickHeld(selectedElement);
             }
-            if (jiggleCoroutine == null) {
+            if (ToolIsJiggly(selectedTool) && jiggleCoroutine == null) {
                 jiggleCoroutine = StartCoroutine(JiggleTool());
             }
         } else {
@@ -202,6 +225,16 @@ public class BurglarCanvasController : MonoBehaviour {
         // HandleAttackResult(result);
     }
     void HandleAttackResult(BurglarAttackResult result) {
+        if (selectedTool == BurglarToolType.usb && result.success) {
+            usbCableAttached = true;
+            ToolSelectCallback("none");
+            // usbCable.transform.position = result.element.transform.position;
+            usbRectTransform.position = result.element.uiElement.rectTransform.position;
+            usbCable.transform.SetParent(transform, true);
+            usbCableCanvasGroup.enabled = false;
+            cyberdeckRect.transform.SetAsLastSibling();
+            uSBCordTool.Slacken(true);
+        }
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
         }
@@ -265,6 +298,7 @@ public class BurglarCanvasController : MonoBehaviour {
             "probe" => BurglarToolType.probe,
             "key" => BurglarToolType.key,
             "screwdriver" => BurglarToolType.screwdriver,
+            "usb" => BurglarToolType.usb,
             _ => BurglarToolType.none
         };
         SetTool(toolType);
@@ -281,7 +315,8 @@ public class BurglarCanvasController : MonoBehaviour {
         probeToolButton.SetActive(true);
         keyToolButton.SetActive(true);
         screwdriverToolButton.SetActive(true);
-
+        usbToolButton.SetActive(!usbCableAttached);
+        usbCableCanvasGroup.enabled = (!usbCableAttached);
 
         switch (toolType) {
             case BurglarToolType.none:
@@ -289,6 +324,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.lockpick:
                 probeImage.enabled = false;
@@ -296,6 +332,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
                 lockpickToolButton.SetActive(false);
+                usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.probe:
                 probeImage.enabled = true;
@@ -303,6 +340,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
                 probeToolButton.SetActive(false);
+                usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.key:
                 probeImage.enabled = false;
@@ -310,6 +348,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = true;
                 screwdriverImage.enabled = false;
                 keyToolButton.SetActive(false);
+                usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.screwdriver:
                 probeImage.enabled = false;
@@ -317,6 +356,22 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = true;
                 screwdriverToolButton.SetActive(false);
+                usbCable.SetActive(usbCableAttached);
+                break;
+            case BurglarToolType.usb:
+                probeImage.enabled = false;
+                lockpickImage.enabled = false;
+                keyImage.enabled = false;
+                screwdriverImage.enabled = false;
+
+                usbCableAttached = false;
+
+                usbCable.transform.SetParent(toolPoint, true);
+                // usbCable.transform.set
+                usbToolButton.SetActive(false);
+                usbCable.SetActive(true);
+                usbCableCanvasGroup.enabled = true;
+                uSBCordTool.Slacken(false);
                 break;
         }
     }
@@ -392,7 +447,6 @@ public class BurglarCanvasController : MonoBehaviour {
                 MoveMainPanelToTop(true);
                 ShowCyberDeck(true);
                 HideSelectorPanel(true);
-
                 burglarSelectorObject.SetActive(true);
                 cyberdeckSelectorObject.SetActive(false);
                 break;
@@ -439,9 +493,9 @@ public class BurglarCanvasController : MonoBehaviour {
             StopCoroutine(exposeCyberdeckCoroutine);
         }
         if (value) {
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, -313, -40, exposeCyberdeckCoroutine, PennerDoubleAnimation.BounceEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -515, 170, exposeCyberdeckCoroutine, PennerDoubleAnimation.BounceEaseOut));
         } else {
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, -40, -313, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, 170, -515, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));
         }
     }
     IEnumerator UnzipBurglarKit() {

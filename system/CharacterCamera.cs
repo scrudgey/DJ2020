@@ -501,13 +501,16 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     }
     public CameraTargetParameters BurgleParameters(CameraInput input) {
         Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
-        Vector3 camDirection = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.forward;
-        camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
-        Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+
+        // Vector3 camDirection = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.forward;
+        // camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
+        // Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
-            rotation = planarRot,
+            // rotation = planarRot,
+            rotation = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.rotation,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
@@ -635,7 +638,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
             hit.collider.transform.root.GetComponentsInChildren<AttackSurface>().ToList().ForEach(attackSurface => {
-                Debug.Log($"raycast hit: {attackSurface}");
                 float distanceToCursor = Vector3.Distance(hit.point, attackSurface.transform.position);
                 if (distanceToCursor < closestAttackSurfaceDistance) {
                     currentAttackSurface = attackSurface;

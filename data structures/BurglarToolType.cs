@@ -1,1 +1,1 @@
-public enum BurglarToolType { none, lockpick, probe, key, screwdriver }
+public enum BurglarToolType { none, lockpick, probe, key, screwdriver, usb }

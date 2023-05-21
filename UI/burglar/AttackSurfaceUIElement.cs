@@ -6,6 +6,7 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     BurglarCanvasController controller;
     AttackSurfaceElement element;
     public GameObject progressBarObject;
+    public RectTransform rectTransform;
     public RectTransform progressBarParentRect;
     public RectTransform progressRect;
     public Image divider1;

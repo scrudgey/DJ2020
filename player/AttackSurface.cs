@@ -7,6 +7,7 @@ using UnityEngine;
 public class AttackSurface : MonoBehaviour {
     public string niceName;
     public Camera attackCam;
+    [HideInInspector]
     public RenderTexture renderTexture;
     public Transform mainCameraPosition;
     public Outline outline;

@@ -491,7 +491,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void SetAlarmNodeState(AlarmNode node, bool state) {
         if (applicationIsQuitting) return;
-
+        if (node == null) return;
         if (node.enabled) {
             node.alarmTriggered = state;
             node.countdownTimer = 30f;

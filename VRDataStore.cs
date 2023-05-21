@@ -2,14 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class VRDataStore : MonoBehaviour {
+public class VRDataStore : Interactive {
     public AudioSource audioSource;
     public AudioClip openSound;
     public CyberComponent cyberComponent;
     public Action<VRDataStore> OnDataStoreOpened;
     public SpriteRenderer calloutSprite;
     public ParticleSystem particles;
-    public void Start() {
+    public override void Start() {
+        base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         cyberComponent.OnStateChange += HandleCyberStateChange;
         DeactivateCallout();
@@ -35,5 +36,9 @@ public class VRDataStore : MonoBehaviour {
     }
     public void DeactivateCallout() {
         calloutSprite.enabled = false;
+    }
+    public override ItemUseResult DoAction(Interactor interactor) {
+        // throw new System.NotImplementedException();
+        return ItemUseResult.Empty() with { waveArm = true };
     }
 }
