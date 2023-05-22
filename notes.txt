@@ -2776,3 +2776,8 @@ you should be able to hack laser grid
 hack the alarm system: 
     pick the lock, open the door, tamper with the wiring
 
+both credstick and keys can pop up in loot display
+
+redo networks:
+    remove transferState. instead, every cyber component should bind to the state of the cyber node.
+    enable progress 

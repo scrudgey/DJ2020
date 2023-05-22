@@ -14,6 +14,15 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
         }
     }
 
+    private float _progress;
+    public float progress {
+        get { return _progress; }
+        set {
+            _progress = value;
+            OnStateChange?.Invoke(this);
+        }
+    }
+
     public override CyberNode GetNode() => GameManager.I.GetCyberNode(idn);
 
 

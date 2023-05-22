@@ -30,7 +30,7 @@ public class HackDisplay : IBinder<HackController> {
 
         if (hackController?.targets?.Count > 0) {
             // TODO: iterate
-            foreach (HackController.HackData data in hackController.targets) {
+            foreach (HackData data in hackController.targets) {
                 indicators[index].Configure(data.node, vulnerable: false, hacking: true);
                 indicators[index].gameObject.SetActive(true);
                 index++;

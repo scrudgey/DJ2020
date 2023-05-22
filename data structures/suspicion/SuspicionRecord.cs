@@ -428,7 +428,7 @@ public class SuspicionRecord {
         }
     };
 
-    public static SuspicionRecord tamperingSuspicion(HackController.HackData data) => new SuspicionRecord {
+    public static SuspicionRecord tamperingSuspicion(HackData data) => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,
         lifetime = 3f,

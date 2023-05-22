@@ -246,7 +246,9 @@ public class BurglarCanvasController : MonoBehaviour {
             cyberdeckRect.transform.SetAsLastSibling();
             uSBCordTool.Slacken(true);
 
-            cyberdeckController.HandleConnection(true);
+            // this is where we provide the cyberdeck the connected cyberware
+            if (result.attachedDataStore != null)
+                cyberdeckController.HandleConnection(result.attachedDataStore);
         }
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
@@ -397,7 +399,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
 
-                cyberdeckController.HandleConnection(false);
+                cyberdeckController.HandleConnection(null);
                 usbCableAttached = false;
 
                 usbCable.transform.SetParent(toolPoint, true);

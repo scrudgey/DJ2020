@@ -9,7 +9,7 @@ public class HackPanelEntry : MonoBehaviour {
     public void Clear() {
         textMesh.text = "";
     }
-    public void Configure(HackController.HackData data) {
+    public void Configure(HackData data) {
         textMesh.text = data.node.nodeTitle;
         float width = parent.rect.width * (data.timer / data.lifetime);
         progressBar.sizeDelta = new Vector2(width, 1f);

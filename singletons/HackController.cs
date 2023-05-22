@@ -3,19 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public class HackInput {
-    public CyberNode targetNode;
-    public HackType type;
-}
+
 public enum HackType { none, network, manual }
 public class HackController : Singleton<HackController>, IBindable<HackController> {
-    public class HackData {
-        public CyberNode node;
-        public float timer;
-        public float lifetime;
-        public HackType type;
-        public bool done;
-    }
+    // public class HackData {
+    //     public CyberNode node;
+    //     public float timer;
+    //     public float lifetime;
+    //     public HackType type;
+    //     public bool done;
+    // }
 
     public AudioSource audioSource;
     public AudioClip hackStarted;
@@ -35,11 +32,11 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     void Awake() {
         vulnerableNetworkNode = null;
     }
-    public void HandleHackInput(HackInput input) {
+    public HackData HandleHackInput(HackInput input) {
         Debug.Log($"handle hack input {targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks}");
         if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)
-            return;
-        Debug.Log($"targets any: {targets.Any(t => t.node == input.targetNode)}");
+            return null;
+        // Debug.Log($"targets any: {targets.Any(t => t.node == input.targetNode)}");
         if (!targets.Any(t => t.node == input.targetNode)) {
             HackData data = new HackData {
                 node = input.targetNode,
@@ -51,7 +48,9 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             UpdateSuspicion();
             OnValueChanged?.Invoke(this);
             audioSource.PlayOneShot(hackStarted);
+            return data;
         }
+        return null;
     }
     public void HandleVulnerableNetworkNode(CyberNode input) {
         vulnerableNetworkNode = input;
@@ -65,6 +64,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     void Update() {
         foreach (HackData data in targets) {
             data.timer += Time.deltaTime * GameManager.I.gameData.playerState.hackSpeedCoefficient;
+            // data.
             if (data.timer > data.lifetime) {
                 GameManager.I.SetCyberNodeState(data.node, true);
                 data.done = true;
@@ -102,7 +102,6 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
     void UpdateManualHack(HackData data) {
         // really ugly
         Vector3 playerPos = GameManager.I.playerObject.transform.position + new Vector3(0f, 1f, 0f);
-        // Vector3[] points = new Vector3[2];
         Vector3[] points = new Vector3[]{
                     data.node.position,
                     playerPos

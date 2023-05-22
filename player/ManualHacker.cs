@@ -7,9 +7,9 @@ public class ManualHackInput {
     public PlayerInput playerInput;
     public Items.BaseItem activeItem;
 }
-public class HackTargetData {
+public class ManualHackTargetData {
     public CyberComponent target;
-    public HackTargetData(CyberComponent target, Collider collider) {
+    public ManualHackTargetData(CyberComponent target) {
         this.target = target;
     }
     public HackInput ToManualHackInput() => new HackInput {
@@ -20,7 +20,7 @@ public class HackTargetData {
 public class ManualHacker : MonoBehaviour {
     public SphereCollider sphereCollider;
     public CapsuleCollider characterCollider;
-    public Action<HackTargetData> OnActionDone;
+    public Action<ManualHackTargetData> OnActionDone;
     public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
     bool hackToolDeployed;
     public LineRenderer lineRenderer;
@@ -54,7 +54,7 @@ public class ManualHacker : MonoBehaviour {
         HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
     }
 
-    public HackTargetData ActiveTarget() {
+    public ManualHackTargetData ActiveTarget() {
         RemoveNullCyberComponents();
         if (!hackToolDeployed) {
             return null;
@@ -64,7 +64,7 @@ public class ManualHacker : MonoBehaviour {
         } else return cyberComponents
             .ToList()
             .Where((KeyValuePair<Collider, CyberComponent> kvp) => IsNodeVulnerable(kvp.Value.GetNode()))
-            .Select((KeyValuePair<Collider, CyberComponent> kvp) => new HackTargetData(kvp.Value, kvp.Key))
+            .Select((KeyValuePair<Collider, CyberComponent> kvp) => new ManualHackTargetData(kvp.Value))
             .DefaultIfEmpty(null)
             .First(); // TODO: weigh the targets in some way, return deterministic
     }
@@ -92,7 +92,7 @@ public class ManualHacker : MonoBehaviour {
             HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
         }
         if (inputs.playerInput.useItem) {
-            HackTargetData data = ActiveTarget();
+            ManualHackTargetData data = ActiveTarget();
             // Debug.Log($"active target: {data}");
             if (data == null) return;
             HackController.I.HandleHackInput(data.ToManualHackInput());

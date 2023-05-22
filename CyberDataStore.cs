@@ -10,6 +10,8 @@ public class CyberDataStore : MonoBehaviour {
     public ParticleSystem particles;
 
     public List<PayData> payDatas;
+
+    public GameObject datafileIndicator;
     bool opened;
 
     public void Start() {
@@ -20,6 +22,7 @@ public class CyberDataStore : MonoBehaviour {
         // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");
         if (component.compromised) {
             Open();
+            datafileIndicator.SetActive(false);
         }
     }
     public void Open() {

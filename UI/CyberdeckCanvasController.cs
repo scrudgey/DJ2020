@@ -11,23 +11,58 @@ public class CyberdeckCanvasController : MonoBehaviour {
     public GameObject bodyText;
     public GameObject bodyDetect;
     public GameObject bodyMenu;
+    public GameObject bodyProgress;
+    [Header("progress")]
+    public RectTransform progressBarParent;
+    public RectTransform progressBar;
+    public TextMeshProUGUI progressText1;
+    public TextMeshProUGUI progressText2;
+
+    CyberDataStore attachedDataStore;
+    HackData currentHackData;
     void Start() {
         bodyText.SetActive(true);
         bodyDetect.SetActive(false);
         bodyMenu.SetActive(false);
+        bodyProgress.SetActive(false);
         StartCoroutine(AnimateMainText());
+        progressText2.enabled = false;
+        progressText1.enabled = true;
     }
 
-    public void HandleConnection(bool connected) {
-        if (connected) {
+    void Update() {
+        if (currentHackData != null) {
+            float totalWidth = progressBarParent.rect.width;
+            float progress = currentHackData.timer / currentHackData.lifetime;
+            float width = progress * totalWidth;
+            progressBar.sizeDelta = new Vector2(width, 1f);
+            if (progress >= 1) {
+                progressBarParent.gameObject.SetActive(false);
+                progressText1.enabled = true;
+                progressText1.text = "Downloaded file:";
+                progressText2.enabled = true;
+                progressText2.text = attachedDataStore.payDatas[0].filename;
+
+                currentHackData = null;
+            }
+        } else {
+            progressBar.sizeDelta = new Vector2(0f, 1f);
+        }
+    }
+
+    public void HandleConnection(CyberDataStore dataStore) {
+        attachedDataStore = dataStore;
+        if (dataStore != null) {
             bodyText.SetActive(false);
             bodyDetect.SetActive(true);
             bodyMenu.SetActive(false);
-            StartCoroutine(BlinkDetect(ShowBodyMenu));
+            bodyProgress.SetActive(false);
+            StartCoroutine(BlinkDetect((bool value) => bodyDetect.SetActive(value), ShowBodyMenu));
         } else {
             bodyText.SetActive(true);
             bodyDetect.SetActive(false);
             bodyMenu.SetActive(false);
+            bodyProgress.SetActive(false);
         }
     }
 
@@ -35,20 +70,32 @@ public class CyberdeckCanvasController : MonoBehaviour {
         bodyText.SetActive(false);
         bodyDetect.SetActive(false);
         bodyMenu.SetActive(true);
+        bodyProgress.SetActive(false);
+
     }
 
-    IEnumerator BlinkDetect(Action callback) {
+    void ShowDownloadProgress() {
+        bodyText.SetActive(false);
+        bodyDetect.SetActive(false);
+        bodyMenu.SetActive(false);
+        bodyProgress.SetActive(true);
+    }
+
+    IEnumerator BlinkDetect(Action<bool> handleValue, Action callback) {
         float timer = 0f;
         float duration = 0.5f;
         float blinkTimer = 0f;
         float blinkInterval = 0.03f;
         float hangtime = 1f;
+        bool value = true;
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             blinkTimer += Time.unscaledDeltaTime;
             if (blinkTimer > blinkInterval) {
                 blinkTimer -= blinkInterval;
-                bodyDetect.SetActive(!bodyDetect.activeInHierarchy);
+                // bodyDetect.SetActive(!bodyDetect.activeInHierarchy);
+                value = !value;
+                handleValue(value);
             }
             yield return null;
         }
@@ -60,6 +107,7 @@ public class CyberdeckCanvasController : MonoBehaviour {
         }
         callback?.Invoke();
     }
+
     IEnumerator AnimateMainText() {
         float timer = 0f;
         float duration = 0.5f;
@@ -80,5 +128,21 @@ public class CyberdeckCanvasController : MonoBehaviour {
             }
             yield return null;
         }
+    }
+
+
+    public void DataThiefButtonCallback() {
+        HackInput hackInput = new HackInput() {
+            targetNode = attachedDataStore.cyberComponent.GetNode(),
+            type = HackType.manual
+        };
+
+        currentHackData = HackController.I.HandleHackInput(hackInput);
+
+        progressBarParent.gameObject.SetActive(true);
+        progressText1.enabled = true;
+        progressText1.text = "Downloading...";
+        progressText2.enabled = false;
+        ShowDownloadProgress();
     }
 }

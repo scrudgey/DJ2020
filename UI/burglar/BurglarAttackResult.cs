@@ -5,6 +5,7 @@ public record BurglarAttackResult {
     public bool createTamperEvidence;
     public NoiseData noiseData;
     public AttackSurfaceElement element;
+    public CyberDataStore attachedDataStore;
     public static BurglarAttackResult None => new BurglarAttackResult {
         success = false,
         feedbackText = ""

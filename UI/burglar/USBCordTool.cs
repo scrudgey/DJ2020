@@ -10,19 +10,21 @@ public class USBCordTool : MonoBehaviour {
     public RectTransform toolTip;
     public RectTransform anchor;
     Catenary catenary;
-    Coroutine slackRoutine;
-
     float slack;
     float slackFactor;
+    bool extraSlack;
+
+    public float originalSlack = 100f;
+    public float slackDelta = 50f;
 
     void Start() {
-        slack = 100f;
+        slack = originalSlack;
         slackFactor = 1f;
         catenary = new Catenary {
             start = toolTip.position,
             end = anchor.position,
             steps = 10,
-            slack = 100
+            slack = originalSlack
         };
     }
     void Update() {
@@ -30,24 +32,7 @@ public class USBCordTool : MonoBehaviour {
     }
 
     public void Slacken(bool value) {
-        if (slackRoutine != null) {
-            StopCoroutine(slackRoutine);
-        }
-        slackRoutine = StartCoroutine(DoSlack(value));
-    }
-    IEnumerator DoSlack(bool value) {
-        float timer = 0f;
-        float duration = 0.5f;
-        while (timer < duration) {
-            timer += Time.unscaledDeltaTime;
-            if (value) {
-                slack = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 100f, 100f, duration);
-            } else {
-                slack = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 200f, -100f, duration);
-            }
-            yield return null;
-        }
-        slackRoutine = null;
+        extraSlack = value;
     }
 
     Vector2[] GetPoints() {
@@ -55,13 +40,15 @@ public class USBCordTool : MonoBehaviour {
         start.y -= 40f;
 
         slackFactor = 1000f / (toolTip.position - anchor.position).magnitude;
+        slackFactor = Mathf.Clamp(slackFactor, 0.3f, 5f);
+        float targetSlack = extraSlack ? (originalSlack + slackDelta) * slackFactor : originalSlack * slackFactor;
 
-        catenary.slack = slack * slackFactor;
+        slack = Mathf.Lerp(slack, targetSlack, 0.05f);
+
+        catenary.slack = slack;
         catenary.start = start;
-        // catenary.end = (anchor.position / 2f) + (toolTip.position / 2f);
         catenary.end = anchor.position;
-        // catenary.end = anchor.position + toolTip.position;
-        // 
+
         List<Vector2> points = catenary.Points()
             .Select(point => new Vector2(point.x - toolTip.position.x, point.y - toolTip.position.y))
             .ToList();
