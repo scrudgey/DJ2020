@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using UnityEngine;
-public class AttackSurfacePanelHandle : AttackSurfaceElement {
+public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
     public Transform hingeTransform;
     public LoHi hingeAngles;
     public Coroutine swingRoutine;
@@ -10,6 +11,7 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement {
     public AudioSource audioSource;
     public AudioClip[] openSound;
     public AudioClip[] shutSound;
+    public List<DoorLock> doorLocks;
 
     void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -17,12 +19,20 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement {
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.none) {
-            ToggleDoor();
-            return new BurglarAttackResult {
-                success = true,
-                feedbackText = "opened access door",
-                element = this
-            };
+            if (!IsLocked()) {
+                ToggleDoor();
+                return new BurglarAttackResult {
+                    success = true,
+                    feedbackText = "opened access door",
+                    element = this
+                };
+            } else {
+                return new BurglarAttackResult {
+                    success = false,
+                    feedbackText = "door is locked",
+                    element = this
+                };
+            }
         }
         return BurglarAttackResult.None;
     }
@@ -54,5 +64,23 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement {
         if (conclusionSound != null)
             Toolbox.RandomizeOneShot(audioSource, conclusionSound);
         swingRoutine = null;
+    }
+
+    public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
+
+    public void ActivateDoorknob(Vector3 position, Transform activator, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
+
+    }
+
+    public void PickJiggleKnob(DoorLock doorlock) {
+        // if (knobs == null || knobs.Count() == 0)
+        //     return;
+        if (doorlock.rotationElements.Length == 0) return;
+        foreach (Transform knob in doorlock.rotationElements) {
+            if (knob == null) continue;
+            if (!Door.knobCoroutines.ContainsKey(knob)) {
+                Door.knobCoroutines[knob] = StartCoroutine(Door.PickJiggleKnobRoutine(knob));
+            }
+        }
     }
 }

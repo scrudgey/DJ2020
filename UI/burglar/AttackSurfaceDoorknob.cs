@@ -4,7 +4,8 @@ using UnityEditor;
 using UnityEngine;
 
 public class AttackSurfaceDoorknob : AttackSurfaceElement {
-    public Door door;
+    public GameObject door;
+    IDoor idoor;
     public DoorLock doorLock;
     public AudioSource audioSource;
     public AudioClip[] pickSounds;
@@ -15,7 +16,10 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public bool isHandle;
     public float setbackProb = 1;
     bool setback;
-
+    void Start() {
+        // only required because unity doesn't support interfaces in editor
+        idoor = door.GetComponent<IDoor>();
+    }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.probe) {
@@ -39,8 +43,8 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                 };
             }
         } else if (activeTool == BurglarToolType.none && isHandle) {
-            bool success = !door.IsLocked();
-            door.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform);
+            bool success = !idoor.IsLocked();
+            idoor.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform);
             return BurglarAttackResult.None with {
                 finish = success
             };
@@ -54,7 +58,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         if (activeTool == BurglarToolType.lockpick && !setback && doorLock.locked) {
             clickedThisFrame = true;
             integratedPickTime += Time.deltaTime;
-            door.PickJiggleKnob(doorLock);
+            idoor.PickJiggleKnob(doorLock);
             if (!audioSource.isPlaying) {
                 Toolbox.RandomizeOneShot(audioSource, pickSounds);
             }

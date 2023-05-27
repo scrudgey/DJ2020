@@ -5,7 +5,7 @@ using Easings;
 using UnityEditor;
 using UnityEngine;
 
-public class Door : Interactive {
+public class Door : Interactive, IDoor {
     public enum DoorState { closed, opening, closing, open, ajar }
     public enum DoorParity { twoWay, openIn, openOut }
     public bool autoClose;
@@ -35,7 +35,7 @@ public class Door : Interactive {
     private Transform lastInteractorTransform;
     // public Transform[] knobs;
     public Transform[] doorknobs;
-    Dictionary<Transform, Coroutine> knobCoroutines = new Dictionary<Transform, Coroutine>();
+    public static Dictionary<Transform, Coroutine> knobCoroutines = new Dictionary<Transform, Coroutine>();
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
@@ -379,7 +379,7 @@ public class Door : Interactive {
             knobCoroutines.Remove(knob);
         }
     }
-    IEnumerator PickJiggleKnobRoutine(Transform knob) {
+    public static IEnumerator PickJiggleKnobRoutine(Transform knob) {
         float timer = 0f;
         float duration = Random.Range(0.05f, 0.15f);
         float startAngle = knob.localRotation.eulerAngles.z;
