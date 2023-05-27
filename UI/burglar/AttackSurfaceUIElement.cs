@@ -13,11 +13,14 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     public Image divider2;
     public RectTransform dividerRect1;
     public RectTransform dividerRect2;
+    public RectTransform containerRectTransform;
+    public BurgleTargetData data;
 
     public void Initialize(BurglarCanvasController controller, AttackSurfaceElement element) {
         this.controller = controller;
         this.element = element;
         HideProgress();
+        SetPosition();
     }
     public void ClickCallback() {
         controller.ClickCallback(element);
@@ -66,11 +69,30 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
         }
     }
     public override void HandleValueChanged(AttackSurfaceElement element) {
+        SetPosition();
         if (element.progressPercent > 0) {
             ShowProgress();
             SetProgress(element.progressPercent, element.progressStages, element.progressStageIndex);
         } else {
             HideProgress();
         }
+    }
+
+    void SetPosition() {
+        // RectTransform elementRectTransform = obj.GetComponent<RectTransform>();
+        Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
+
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.zero;
+
+        Vector3 center = Toolbox.GetBoundsCenter(element.transform);
+        Vector3 position = data.target.attackCam.WorldToViewportPoint(center);
+        position.x *= containerRectTransform.rect.width;
+        position.y *= containerRectTransform.rect.height;
+
+        // containerRectTransform.
+        rectTransform.anchoredPosition = position;
+        rectTransform.sizeDelta = new Vector2(bounds.width, bounds.height);
+
     }
 }

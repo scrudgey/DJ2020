@@ -2781,3 +2781,17 @@ both credstick and keys can pop up in loot display
 redo networks:
     remove transferState. instead, every cyber component should bind to the state of the cyber node.
     enable progress 
+
+* why door bounding box is wrong?
+* move door bounding box as it opens
+* interactible wires
+* wire cutters
+
+* cut on animation
+* snip once
+* sound effect for snip
+* sound effect for cut
+on cutting wire, disable alarm
+button for disabling alarm
+wafer lock for panel
+rope don't retract so much (mass?)

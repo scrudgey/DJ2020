@@ -380,7 +380,14 @@ public class Toolbox {
     static public Quaternion SnapToClosestRotation(Quaternion input, List<Quaternion> lattice) =>
         lattice.Aggregate((curMin, x) => (curMin == null || (Quaternion.Angle(input, x)) < Quaternion.Angle(input, curMin) ? x : curMin));
 
-
+    static public Vector3 GetBoundsCenter(Transform root) {
+        Vector3 center = root.position;
+        Renderer renderer = root.GetComponentInChildren<Renderer>();
+        if (renderer != null) {
+            center = renderer.bounds.center;
+        }
+        return center;
+    }
     static public Rect GetTotalRenderBoundingBox(Transform root, Camera UICamera, bool adjustYScale = true) {
         float total_min_x = float.MaxValue;
         float total_max_x = float.MinValue;

@@ -41,6 +41,7 @@ public class InputController : Singleton<InputController> {
     private Vector2 inputVector;
     private bool firePressedHeld;
     private bool mouseDown;
+    private bool mouseClickedThisFrame;
     private bool firePressedThisFrame;
     private bool aimPressedThisFrame;
     private bool crouchHeld;
@@ -262,6 +263,11 @@ public class InputController : Singleton<InputController> {
 
     public PlayerInput HandleCharacterInput(bool pointerOverUIElement, bool escapePressedThisFrame) {
         mouseDown = mouseDown || firePressedThisFrame || firePressedHeld;
+        bool mouseClick = false;
+        if (mouseDown && !mouseClickedThisFrame) {
+            mouseClick = true;
+            mouseClickedThisFrame = true;
+        }
         if (pointerOverUIElement) {
             firePressedThisFrame = false;
             firePressedHeld = false;
@@ -310,6 +316,7 @@ public class InputController : Singleton<InputController> {
                 lookAtDirection = directionToCursor,
                 zoomInput = zoomInput,
                 mouseDown = mouseDown,
+                mouseClicked = mouseClick,
                 escapePressed = escapePressedThisFrame, //&& !escapePressConsumed
                 mousePosition = mousePosition,
                 viewPortPoint = viewPortPoint
@@ -319,6 +326,9 @@ public class InputController : Singleton<InputController> {
 
         if (incrementOverlayThisFrame != 0) {
             GameManager.I.IncrementOverlay(incrementOverlayThisFrame);
+        }
+        if (!mouseDown) {
+            mouseClickedThisFrame = false;
         }
 
         firePressedThisFrame = false;

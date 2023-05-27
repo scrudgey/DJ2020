@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum Layer { def, shell, obj, skybox, shadowprobe, bulletPassThrough, interactive, interactor, bulletOnly, clearsighterHide }
+public enum Layer { def, shell, obj, skybox, shadowprobe, bulletPassThrough, interactive, interactor, bulletOnly, clearsighterHide, attackSurface }
 public enum NavLayer { def, KeyId1, KeyId2 }
 
 public class LayerUtil {
@@ -19,6 +19,7 @@ public class LayerUtil {
         {Layer.interactor, "interactor"},
         {Layer.bulletOnly, "bulletOnly"},
         {Layer.clearsighterHide, "clearsighterHide"},
+        {Layer.attackSurface, "attackSurface"},
     };
 
     private static Dictionary<NavLayer, string> navLayerNames = new Dictionary<NavLayer, string>{

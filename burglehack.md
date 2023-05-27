@@ -54,11 +54,12 @@ some consistent iconography on the object displays avaialable interactions.
 animation for deck appear
 
 
-0. datathief to steal data
+* datathief to steal data
     * integrate with existing hack system now, adjust it later
     * display download progress on cyberdeck
     * when download is finished, show text file name
-    make data vanish from computer when done
+    * make data vanish from computer when done
 1. password system
 2. multiple targets
+
 

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
+using Obi;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +16,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public RectTransform mainCanvas;
     // public RectTransform mainRect;
     public RawImage rawImage;
+    public RectTransform camImageTransform;
     public GameObject UIElementPrefab;
     public Transform uiElementsContainer;
     public RectTransform uiElementsRectTransform;
@@ -25,6 +28,8 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image lockpickImage;
     public Image keyImage;
     public Image screwdriverImage;
+    // public 
+    public WireCutterToolIndicator wireCutterImage;
     [Header("tools")]
     public GameObject keyringButton;
     public GameObject probeToolButton;
@@ -32,6 +37,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public GameObject screwdriverToolButton;
     public GameObject keyToolButton;
     public GameObject usbToolButton;
+    public GameObject wireCutterButton;
 
     [Header("cyber")]
     public CyberdeckCanvasController cyberdeckController;
@@ -92,28 +98,34 @@ public class BurglarCanvasController : MonoBehaviour {
         rawImage.color = Color.white;
         RectTransform containerRectTransform = uiElementsContainer.GetComponent<RectTransform>();
         foreach (AttackSurfaceElement element in data.target.attackElementRoot.GetComponentsInChildren<AttackSurfaceElement>()) {
-            Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
+            // Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
 
             GameObject obj = GameObject.Instantiate(UIElementPrefab);
             AttackSurfaceUIElement uiElement = obj.GetComponent<AttackSurfaceUIElement>();
-            uiElement.Bind(element.gameObject);
             obj.transform.SetParent(uiElementsContainer);
+            uiElement.containerRectTransform = containerRectTransform;
+            uiElement.data = data;
+            uiElement.Initialize(this, element);
+            element.Initialize(uiElement);
+            // uiElement.ele
+            uiElement.Bind(element.gameObject);
+            // RectTransform elementRectTransform = obj.GetComponent<RectTransform>();
 
-            RectTransform cursorRect = obj.GetComponent<RectTransform>();
-            cursorRect.anchorMin = Vector2.zero;
-            cursorRect.anchorMax = Vector2.zero;
+            // elementRectTransform.anchorMin = Vector2.zero;
+            // elementRectTransform.anchorMax = Vector2.zero;
+
+            // Vector3 center = Toolbox.GetBoundsCenter(element.transform);
+            // Vector3 position = data.target.attackCam.WorldToViewportPoint(center);
+            // position.x *= containerRectTransform.rect.width;
+            // position.y *= containerRectTransform.rect.height;
+
+            // elementRectTransform.anchoredPosition = position;
+            // elementRectTransform.sizeDelta = new Vector2(bounds.width, bounds.height);
+
             Image cursorImage = obj.GetComponent<Image>();
-
-            Vector3 position = data.target.attackCam.WorldToViewportPoint(element.transform.position);
-            position.x *= containerRectTransform.rect.width;
-            position.y *= containerRectTransform.rect.height;
-            cursorRect.anchoredPosition = position;
-            cursorRect.sizeDelta = new Vector2(bounds.width, bounds.height);
             cursorImage.color = Color.red;
             cursorImage.enabled = false;
 
-            uiElement.Initialize(this, element);
-            element.Initialize(uiElement);
         }
 
         foreach (BurglarSelectorButton button in selectorButtons) {
@@ -136,7 +148,8 @@ public class BurglarCanvasController : MonoBehaviour {
             cursorPoint, null,
             out localPoint);
 
-        toolPoint.anchoredPosition = localPoint;
+        toolPoint.anchoredPosition = localPoint + new Vector2(mainCanvas.rect.width / 2f, mainCanvas.rect.height / 2f);
+        // toolPoint.position = localPoint;
 
         if (localPoint.x > uiElementsRectTransform.rect.width / -2f && localPoint.x < uiElementsRectTransform.rect.width / 2f &&
             localPoint.y > uiElementsRectTransform.rect.height / -2f && localPoint.y < uiElementsRectTransform.rect.height / 2f) {
@@ -176,6 +189,16 @@ public class BurglarCanvasController : MonoBehaviour {
         // TODO: fix
         // bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;
         bool outOfBounds = false;
+
+        if (input.mouseClicked && selectedTool == BurglarToolType.wirecutter) {
+            wireCutterImage.DoSnip(data.target);
+            // Vector3 cursorPoint = new Vector3(input.mousePosition.x, input.mousePosition.y, data.target.attackCam.nearClipPlane);
+            // cursorPoint -= camImageTransform.position;
+            // cursorPoint.z = data.target.attackCam.nearClipPlane;
+            // Ray projection = data.target.attackCam.ScreenPointToRay(cursorPoint);
+            // data.target.HandleRopeCutting(projection);
+        }
+
         if (input.escapePressed) {
             if (selectedTool == BurglarToolType.none) {
                 DoneButtonCallback();
@@ -317,6 +340,7 @@ public class BurglarCanvasController : MonoBehaviour {
             "key" => BurglarToolType.key,
             "screwdriver" => BurglarToolType.screwdriver,
             "usb" => BurglarToolType.usb,
+            "wirecutter" => BurglarToolType.wirecutter,
             _ => BurglarToolType.none
         };
         SetTool(toolType);
@@ -351,6 +375,7 @@ public class BurglarCanvasController : MonoBehaviour {
         keyToolButton.SetActive(true);
         screwdriverToolButton.SetActive(true);
         usbToolButton.SetActive(!usbCableAttached);
+        wireCutterButton.SetActive(true);
         usbCableCanvasGroup.enabled = (!usbCableAttached);
 
         switch (toolType) {
@@ -359,6 +384,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                wireCutterImage.gameObject.SetActive(false);
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.lockpick:
@@ -367,6 +393,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
                 lockpickToolButton.SetActive(false);
+                wireCutterImage.gameObject.SetActive(false);
+
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.probe:
@@ -375,6 +403,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
                 probeToolButton.SetActive(false);
+                wireCutterImage.gameObject.SetActive(false);
+
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.key:
@@ -383,6 +413,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = true;
                 screwdriverImage.enabled = false;
                 keyToolButton.SetActive(false);
+                wireCutterImage.gameObject.SetActive(false);
+
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.screwdriver:
@@ -391,6 +423,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = true;
                 screwdriverToolButton.SetActive(false);
+                wireCutterImage.gameObject.SetActive(false);
+
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.usb:
@@ -398,6 +432,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                wireCutterImage.gameObject.SetActive(false);
+
 
                 cyberdeckController.HandleConnection(null);
                 usbCableAttached = false;
@@ -408,6 +444,16 @@ public class BurglarCanvasController : MonoBehaviour {
                 usbCable.SetActive(true);
                 usbCableCanvasGroup.enabled = true;
                 uSBCordTool.Slacken(false);
+                break;
+            case BurglarToolType.wirecutter:
+                probeImage.enabled = false;
+                lockpickImage.enabled = false;
+                keyImage.enabled = false;
+                screwdriverImage.enabled = false;
+
+                usbCable.SetActive(usbCableAttached);
+                wireCutterButton.SetActive(false);
+                wireCutterImage.gameObject.SetActive(true);
                 break;
         }
     }

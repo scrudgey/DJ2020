@@ -41,6 +41,7 @@ public struct PlayerInput {
     public Vector2 zoomInput;
     public bool aimWeapon;
     public bool mouseDown;
+    public bool mouseClicked;
     public bool escapePressed;
     public Vector2 mousePosition;
     public Vector2 viewPortPoint;
