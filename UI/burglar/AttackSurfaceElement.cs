@@ -26,4 +26,7 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public virtual void HandleFocusLost() {
         OnValueChanged?.Invoke(this);
     }
+    public void ForceUpdate() {
+        OnValueChanged?.Invoke(this);
+    }
 }

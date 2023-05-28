@@ -191,12 +191,7 @@ public class BurglarCanvasController : MonoBehaviour {
         bool outOfBounds = false;
 
         if (input.mouseClicked && selectedTool == BurglarToolType.wirecutter) {
-            wireCutterImage.DoSnip(data.target);
-            // Vector3 cursorPoint = new Vector3(input.mousePosition.x, input.mousePosition.y, data.target.attackCam.nearClipPlane);
-            // cursorPoint -= camImageTransform.position;
-            // cursorPoint.z = data.target.attackCam.nearClipPlane;
-            // Ray projection = data.target.attackCam.ScreenPointToRay(cursorPoint);
-            // data.target.HandleRopeCutting(projection);
+            wireCutterImage.DoSnip(this, data.target);
         }
 
         if (input.escapePressed) {
@@ -258,7 +253,7 @@ public class BurglarCanvasController : MonoBehaviour {
         // BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
         // HandleAttackResult(result);
     }
-    void HandleAttackResult(BurglarAttackResult result) {
+    public void HandleAttackResult(BurglarAttackResult result) {
         if (selectedTool == BurglarToolType.usb && result.success) {
             usbCableAttached = true;
             ToolSelectCallback("none");

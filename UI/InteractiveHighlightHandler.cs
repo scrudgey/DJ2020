@@ -22,25 +22,10 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public Button interactButton;
     public RectTransform interactButtonRect;
     public AttackSurface currentAttackSurface;
-    // public GameObject interactB
     void Awake() {
         blitTextCoroutine = null;
     }
     override public void HandleValueChanged(Interactor interactor) {
-        // \
-        //  activeTarget = interactor.ActiveTarget();
-        // activeTarget = interactor.cursorTarget;
-        // if (activeTarget == null) {
-        //     Disable();
-        //     currentInteractorTarget = null;
-        // } else if (activeTarget != null) {
-        //     if (!InteractorTargetData.Equality(currentInteractorTarget, activeTarget)) {
-        //         currentInteractorTarget?.target?.DisableOutline();
-        //         currentInteractorTarget = activeTarget;
-        //         DataChanged();
-        //     }
-        // }
-
         if (!InteractorTargetData.Equality(currentInteractorTarget, interactor.cursorTarget)) {
             currentInteractorTarget?.target?.DisableOutline();
             currentInteractorTarget = interactor.cursorTarget;
@@ -64,7 +49,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             interactButtonRect.position = screenPoint;
             bool interactible = GameManager.I.playerCharacterController.state == CharacterState.normal ||
                                 GameManager.I.playerCharacterController.state == CharacterState.wallPress;
-            interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < 2f;
+            interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < currentAttackSurface.interactionDistance;
             interactButton.interactable = interactible;
         } else {
             interactButton.gameObject.SetActive(false);
@@ -118,7 +103,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (currentInteractorTarget != null) {
             currentInteractorTarget.target.DisableOutline();
         }
-        // interactButton.gameObject.SetActive(false);
     }
     void Enable(string actionText) {
         if (blitTextCoroutine != null) {
@@ -134,7 +118,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     }
     public void InteractButtonCallback() {
         if (currentAttackSurface) {
-            // new BurgleTargetData(kvp.Value, this)
             target.HandleInteractButtonCallback(currentAttackSurface);
         }
     }
@@ -174,7 +157,6 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         float inaccuracyLength = currentInteractorTarget.collider.bounds.size.magnitude / 2f;
         float pixelsPerLength = cam.scaledPixelHeight / frustumHeight;
         float pixelScale = 2f * inaccuracyLength * pixelsPerLength;
-
         // float dynamicCoefficient = 1.0f + 0.05f * Mathf.Sin(timer);
         // float dynamicCoefficient = Toolbox.Triangle(0.95f, 1.05f, 5f, 0f, timer);
         float dynamicCoefficient = 1f;

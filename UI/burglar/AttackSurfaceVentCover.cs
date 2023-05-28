@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Obi;
 using UnityEngine;
 public class AttackSurfaceVentCover : AttackSurfaceElement {
     public AudioSource audioSource;
@@ -9,6 +10,17 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
     public List<AttackSurfaceScrew> screws;
     public GameObject parentVentObject;
     public SpriteRenderer ventSprite;
+    public bool finishing;
+    public GameObject[] obscuredElements;
+    public MeshRenderer[] obscuredRenderers;
+    void Start() {
+        foreach (GameObject element in obscuredElements) {
+            element.SetActive(false);
+        }
+        foreach (MeshRenderer renderer in obscuredRenderers) {
+            renderer.enabled = false;
+        }
+    }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
 
@@ -19,10 +31,16 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
                 Toolbox.AudioSpeaker(parentVentObject.transform.position, openSounds);
                 ventSprite.enabled = false;
                 parentVentObject.SetActive(false);
+                foreach (GameObject element in obscuredElements) {
+                    element.SetActive(true);
+                }
+                foreach (MeshRenderer renderer in obscuredRenderers) {
+                    renderer.enabled = true;
+                }
                 return new BurglarAttackResult() {
                     success = true,
                     feedbackText = "Vent cover open",
-                    finish = true
+                    finish = finishing
                 };
             }
         }

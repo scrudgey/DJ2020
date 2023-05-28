@@ -14,17 +14,17 @@ public class WireCutterToolIndicator : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] snipSound;
     public AudioClip[] wireCutSound;
-    // public LoHi rightAngles;
     Coroutine snipRoutine;
     Quaternion initialLeftRotation;
     Quaternion initialRightRotation;
-
+    BurglarCanvasController canvasController;
     void Start() {
         initialLeftRotation = leftHandle.rotation;
         initialRightRotation = rightHandle.rotation;
     }
 
-    public void DoSnip(AttackSurface attackSurface) {
+    public void DoSnip(BurglarCanvasController canvasController, AttackSurface attackSurface) {
+        this.canvasController = canvasController;
         if (snipRoutine != null) {
             StopCoroutine(snipRoutine);
         }
@@ -77,11 +77,12 @@ public class WireCutterToolIndicator : MonoBehaviour {
 
         cursorPoint.z = attackSurface.attackCam.nearClipPlane;
         Ray projection = attackSurface.attackCam.ScreenPointToRay(cursorPoint);
-        List<ObiRope> affectedRopes = attackSurface.HandleRopeCutting(projection);
-        if (affectedRopes.Count > 0) {
+        BurglarAttackResult result = attackSurface.HandleRopeCutting(projection);
+        if (result != BurglarAttackResult.None) {
             Toolbox.RandomizeOneShot(audioSource, wireCutSound);
         } else {
             Toolbox.RandomizeOneShot(audioSource, snipSound);
         }
+        canvasController.HandleAttackResult(result);
     }
 }

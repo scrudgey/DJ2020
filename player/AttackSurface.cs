@@ -13,18 +13,23 @@ public class AttackSurface : MonoBehaviour {
     public Transform mainCameraPosition;
     public Outline outline;
     public Transform attackElementRoot;
+    public float interactionDistance = 2f;
     // public List<ObiRope> obiRopes;
     // Dictionary<ObiRope, MeshCollider>
     Dictionary<MeshCollider, MeshFilter> ropeMeshes;
+    Dictionary<MeshCollider, MeshRenderer> ropeRenderers;
     public void Start() {
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         attackCam.targetTexture = renderTexture;
         attackCam.enabled = false;
         ropeMeshes = new Dictionary<MeshCollider, MeshFilter>();
+        ropeRenderers = new Dictionary<MeshCollider, MeshRenderer>();
         foreach (ObiRope rope in GetComponentsInChildren<ObiRope>()) {
             MeshCollider collider = rope.GetComponent<MeshCollider>();
             MeshFilter filter = rope.GetComponent<MeshFilter>();
+            MeshRenderer renderer = rope.GetComponent<MeshRenderer>();
             ropeMeshes[collider] = filter;
+            ropeRenderers[collider] = renderer;
         }
         DisableOutline();
     }
@@ -53,13 +58,15 @@ public class AttackSurface : MonoBehaviour {
         }
     }
 
-    public List<ObiRope> HandleRopeCutting(Ray projection) {
+    public BurglarAttackResult HandleRopeCutting(Ray projection) {
         RefreshRopeColliders();
-        List<ObiRope> cutRopes = new List<ObiRope>();
-        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.attackSurface));
+        BurglarAttackResult result = BurglarAttackResult.None;
+        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.attackSurface, Layer.bulletOnly));
         foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
             ObiRope rope = hit.collider.gameObject.GetComponent<ObiRope>();
             if (rope != null) {
+                MeshRenderer meshRenderer = rope.GetComponent<MeshRenderer>();
+                if (!meshRenderer.enabled) continue;
                 float closestDistance = float.MaxValue;
                 ObiStructuralElement targetElement = null;
                 int index = 0;
@@ -78,16 +85,12 @@ public class AttackSurface : MonoBehaviour {
 
                 rope.Tear(rope.elements[index]);
                 rope.RebuildConstraintsFromElements();
-                cutRopes.Add(rope);
-
                 AttackSurfaceWire wireElement = rope.GetComponent<AttackSurfaceWire>();
-                if (wireElement != null) {
-                    wireElement.DoCut();
-                }
+                result = wireElement?.DoCut();
             }
-            Debug.Log($"break on: {hit.collider.gameObject}");
+            // Debug.Log($"break on: {hit.collider.gameObject}");
             break;
         }
-        return cutRopes;
+        return result;
     }
 }

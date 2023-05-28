@@ -21,12 +21,15 @@ public class SecurityCamera : IBinder<SightCone> {
     [Header("Rotation")]
     float timer;
     public LoHi angleBounds;
+    public bool doRotate = true;
     float angle;
     Quaternion initialRotation;
     Quaternion rotation;
     public float turnDuration;
     public float lookDuration;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
+
+    public AttackSurfaceElement[] attachedElements;
     bool alarmNodeEnabled;
 
     void Awake() {
@@ -116,40 +119,48 @@ public class SecurityCamera : IBinder<SightCone> {
         }
         if (!alarmNodeEnabled)
             return;
-        timer += Time.deltaTime;
-        switch (state) {
-            case State.rotateLeft:
-                angle = (float)PennerDoubleAnimation.Linear(timer, angleBounds.low, angleBounds.high - angleBounds.low, turnDuration);
-                rotation = Quaternion.AngleAxis(angle, Vector3.up);
-                cameraTransform.rotation = initialRotation * rotation;
-                if (timer > turnDuration) {
-                    timer = 0f;
-                    state = State.lookLeft;
-                }
-                break;
-            case State.lookLeft:
-                if (timer > lookDuration) {
-                    timer = 0f;
-                    state = State.rotateRight;
-                    Toolbox.RandomizeOneShot(audioSource, rotateSound, randomPitchWidth: 0.05f);
-                }
-                break;
-            case State.rotateRight:
-                angle = (float)PennerDoubleAnimation.Linear(timer, angleBounds.high, angleBounds.low - angleBounds.high, turnDuration);
-                rotation = Quaternion.AngleAxis(angle, Vector3.up);
-                cameraTransform.rotation = initialRotation * rotation;
-                if (timer > turnDuration) {
-                    timer = 0f;
-                    state = State.lookRight;
-                }
-                break;
-            case State.lookRight:
-                if (timer > lookDuration) {
-                    timer = 0f;
-                    state = State.rotateLeft;
-                    Toolbox.RandomizeOneShot(audioSource, rotateSound, randomPitchWidth: 0.05f);
-                }
-                break;
+        if (doRotate) {
+            timer += Time.deltaTime;
+            switch (state) {
+                case State.rotateLeft:
+                    angle = (float)PennerDoubleAnimation.Linear(timer, angleBounds.low, angleBounds.high - angleBounds.low, turnDuration);
+                    rotation = Quaternion.AngleAxis(angle, Vector3.up);
+                    cameraTransform.rotation = initialRotation * rotation;
+                    if (timer > turnDuration) {
+                        timer = 0f;
+                        state = State.lookLeft;
+                    }
+                    foreach (AttackSurfaceElement element in attachedElements) {
+                        element.ForceUpdate();
+                    }
+                    break;
+                case State.lookLeft:
+                    if (timer > lookDuration) {
+                        timer = 0f;
+                        state = State.rotateRight;
+                        Toolbox.RandomizeOneShot(audioSource, rotateSound, randomPitchWidth: 0.05f);
+                    }
+                    break;
+                case State.rotateRight:
+                    angle = (float)PennerDoubleAnimation.Linear(timer, angleBounds.high, angleBounds.low - angleBounds.high, turnDuration);
+                    rotation = Quaternion.AngleAxis(angle, Vector3.up);
+                    cameraTransform.rotation = initialRotation * rotation;
+                    if (timer > turnDuration) {
+                        timer = 0f;
+                        state = State.lookRight;
+                    }
+                    foreach (AttackSurfaceElement element in attachedElements) {
+                        element.ForceUpdate();
+                    }
+                    break;
+                case State.lookRight:
+                    if (timer > lookDuration) {
+                        timer = 0f;
+                        state = State.rotateLeft;
+                        Toolbox.RandomizeOneShot(audioSource, rotateSound, randomPitchWidth: 0.05f);
+                    }
+                    break;
+            }
         }
     }
 
