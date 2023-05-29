@@ -10,7 +10,7 @@ public class AttackSurfaceDataPort : AttackSurfaceElement {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.usb) {
             Toolbox.RandomizeOneShot(audioSource, attachSound);
-            return new BurglarAttackResult {
+            return BurglarAttackResult.None with {
                 success = true,
                 feedbackText = "connected dataport",
                 element = this,

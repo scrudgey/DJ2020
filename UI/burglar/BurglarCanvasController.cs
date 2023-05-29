@@ -18,6 +18,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public RawImage rawImage;
     public RectTransform camImageTransform;
     public GameObject UIElementPrefab;
+    public GameObject lockIndicatorPrefab;
     public Transform uiElementsContainer;
     public RectTransform uiElementsRectTransform;
     public TextMeshProUGUI selectedToolText;
@@ -276,11 +277,25 @@ public class BurglarCanvasController : MonoBehaviour {
                 CreateTamperEvidence();
             }
         }
+        foreach (Vector3 lockPosition in result.lockPositions) {
+            CreateLockIndicator(lockPosition);
+        }
         //
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
+    }
+
+    void CreateLockIndicator(Vector3 lockPosition) {
+        GameObject lockIndicatorObject = GameObject.Instantiate(lockIndicatorPrefab);
+        lockIndicatorObject.transform.SetParent(uiElementsContainer, false);
+        RectTransform rectTransform = lockIndicatorObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.zero;
+        rectTransform.anchoredPosition = data.target.attackCam.WorldToScreenPoint(lockPosition);
+        Debug.Log($"{rectTransform.anchoredPosition} {lockPosition}");
+        rectTransform.sizeDelta = 100f * Vector2.one;
     }
     void CreateTamperEvidence() {
         GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;

@@ -11,7 +11,10 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
     public AudioSource audioSource;
     public AudioClip[] openSound;
     public AudioClip[] shutSound;
+    public AudioClip[] lockedSound;
     public List<DoorLock> doorLocks;
+
+    public List<DoorLock> getDoorLocks() => doorLocks;
 
     void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -21,16 +24,22 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
         if (activeTool == BurglarToolType.none) {
             if (!IsLocked()) {
                 ToggleDoor();
-                return new BurglarAttackResult {
+                return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "opened access door",
                     element = this
                 };
             } else {
-                return new BurglarAttackResult {
+                HandleLockedDoor();
+                return BurglarAttackResult.None with {
                     success = false,
                     feedbackText = "door is locked",
-                    element = this
+                    element = this,
+                    lockPositions = doorLocks
+                        .Where(doorLock => doorLock.locked)
+                        .SelectMany(doorLock => doorLock.rotationElements)
+                        .Select(transform => transform.position)
+                        .ToList()
                 };
             }
         }
@@ -49,6 +58,10 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
         }
         shut = !shut;
     }
+    void HandleLockedDoor() {
+        Toolbox.RandomizeOneShot(audioSource, lockedSound);
+        swingRoutine = StartCoroutine(Rattle());
+    }
 
     IEnumerator SwingHinge(float startAngle, float targetAngle, AudioClip[] conclusionSound = null) {
         float delta = targetAngle - startAngle;
@@ -63,6 +76,28 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
         }
         if (conclusionSound != null)
             Toolbox.RandomizeOneShot(audioSource, conclusionSound);
+        swingRoutine = null;
+    }
+
+    IEnumerator Rattle() {
+        float timer = 0f;
+        float duration = 0.5f;
+        float startAngle = shut ? hingeAngles.high : hingeAngles.low;
+        while (timer < duration / 2f) {
+            timer += Time.unscaledDeltaTime;
+            float angle = (float)PennerDoubleAnimation.BounceEaseOut(timer, startAngle, -3, duration / 2f);
+            Quaternion newRotation = Quaternion.Euler(0f, angle, 0f);
+            hingeTransform.localRotation = newRotation;
+            yield return null;
+        }
+        timer = 0f;
+        while (timer < duration / 2f) {
+            timer += Time.unscaledDeltaTime;
+            float angle = (float)PennerDoubleAnimation.BounceEaseOut(timer, startAngle - 3, 3, duration / 2f);
+            Quaternion newRotation = Quaternion.Euler(0f, angle, 0f);
+            hingeTransform.localRotation = newRotation;
+            yield return null;
+        }
         swingRoutine = null;
     }
 

@@ -131,6 +131,7 @@ public class SecurityCamera : IBinder<SightCone> {
                         state = State.lookLeft;
                     }
                     foreach (AttackSurfaceElement element in attachedElements) {
+                        if (element == null) continue;
                         element.ForceUpdate();
                     }
                     break;
@@ -150,6 +151,7 @@ public class SecurityCamera : IBinder<SightCone> {
                         state = State.lookRight;
                     }
                     foreach (AttackSurfaceElement element in attachedElements) {
+                        if (element == null) continue;
                         element.ForceUpdate();
                     }
                     break;

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public bool isHandle;
     public float setbackProb = 1;
     bool setback;
-    void Start() {
+    public virtual void Start() {
         // only required because unity doesn't support interfaces in editor
         idoor = door.GetComponent<IDoor>();
     }
@@ -32,12 +33,12 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
             Toolbox.RandomizeOneShot(audioSource, keySounds);
             if (success) {
                 bool locked = doorLock.locked;
-                return new BurglarAttackResult {
+                return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = locked ? $"{elementName} locked" : $"{elementName} unlocked"
                 };
             } else {
-                return new BurglarAttackResult {
+                return BurglarAttackResult.None with {
                     success = false,
                     feedbackText = "Your keys don't work"
                 };
@@ -45,9 +46,23 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         } else if (activeTool == BurglarToolType.none && isHandle) {
             bool success = !idoor.IsLocked();
             idoor.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform);
-            return BurglarAttackResult.None with {
-                finish = success
-            };
+            if (success) {
+                return BurglarAttackResult.None with {
+                    finish = success,
+                };
+            } else {
+                return BurglarAttackResult.None with {
+                    finish = success,
+                    success = false,
+                    feedbackText = "locked",
+                    lockPositions = idoor.getDoorLocks()
+                        .Where(doorLock => doorLock.locked)
+                        .SelectMany(doorLock => doorLock.rotationElements)
+                        .Select(transform => transform.position)
+                        .ToList()
+                };
+            }
+
         }
 
         return BurglarAttackResult.None;
@@ -78,7 +93,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                     return DoPick();
             }
         } else if (!doorLock.locked) {
-            return new BurglarAttackResult {
+            return BurglarAttackResult.None with {
                 success = true,
                 feedbackText = "Already unlocked"
             };
@@ -109,7 +124,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         bool success = doorLock.lockType == DoorLock.LockType.physical && doorLock.locked;
         doorLock.PickLock();
         if (success) {
-            return new BurglarAttackResult {
+            return BurglarAttackResult.None with {
                 success = true,
                 feedbackText = "Door unlocked"
             };

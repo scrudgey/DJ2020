@@ -37,7 +37,7 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
                 foreach (MeshRenderer renderer in obscuredRenderers) {
                     renderer.enabled = true;
                 }
-                return new BurglarAttackResult() {
+                return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Vent cover open",
                     finish = finishing

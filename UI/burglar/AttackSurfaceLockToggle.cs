@@ -15,7 +15,7 @@ public class AttackSurfaceLockToggle : AttackSurfaceElement {
             Toolbox.RandomizeOneShot(audioSource, toggleSounds);
             StartCoroutine();
             doorLock.locked = !doorLock.locked;
-            return new BurglarAttackResult {
+            return BurglarAttackResult.None with {
                 success = true,
                 feedbackText = doorLock.locked ? $"{doorLock.gameObject.name} locked" : $"{doorLock.gameObject.name} unlocked"
             };

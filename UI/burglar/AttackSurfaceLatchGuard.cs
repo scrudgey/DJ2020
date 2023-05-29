@@ -39,7 +39,7 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.none) {
             if (IsLocked()) {
-                return new BurglarAttackResult() {
+                return BurglarAttackResult.None with {
                     success = false,
                     feedbackText = "Latch guard is secured",
                 };
@@ -48,7 +48,7 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
                 defeated = true;
                 coverSprite.enabled = false;
                 uiElement.gameObject.SetActive(false);
-                return new BurglarAttackResult() {
+                return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Latch guard removed",
                     createTamperEvidence = true

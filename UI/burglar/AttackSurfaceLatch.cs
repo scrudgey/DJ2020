@@ -19,13 +19,13 @@ public class AttackSurfaceLatch : AttackSurfaceElement {
             bool doPush = door.state == Door.DoorState.closed;
             if (doPush) {
                 door.PushOpenSlightly(data.burglar.transform);
-                return new BurglarAttackResult {
+                return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Door latch bypassed"
                 };
             } else return BurglarAttackResult.None;
         } else {
-            return new BurglarAttackResult {
+            return BurglarAttackResult.None with {
                 success = false,
                 feedbackText = "Bypass failed"
             };

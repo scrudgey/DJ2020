@@ -23,9 +23,11 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
             AlarmComponent component = GameManager.I.GetAlarmComponent(node.idn);
             if (component == null)
                 continue;
-            if (component is AlarmTerminal) {
-                node.alarmTriggered = false;
-            }
+
+            // ???
+            // if (component is AlarmTerminal) {
+            //     node.alarmTriggered = false;
+            // }
             component.nodeEnabled = node.enabled;
         }
 

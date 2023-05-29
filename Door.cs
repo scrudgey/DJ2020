@@ -57,6 +57,8 @@ public class Door : Interactive, IDoor {
         latched = true;
         ChangeState(DoorState.closed);
     }
+    public List<DoorLock> getDoorLocks() => doorLocks;
+
     void Update() {
         switch (state) {
             case DoorState.closing:

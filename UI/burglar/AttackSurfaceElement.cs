@@ -29,4 +29,10 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public void ForceUpdate() {
         OnValueChanged?.Invoke(this);
     }
+    public virtual void OnMouseOver() {
+
+    }
+    public virtual void OnMouseExit() {
+
+    }
 }

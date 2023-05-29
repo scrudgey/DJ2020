@@ -30,9 +30,11 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
     public void MouseOverCallback() {
         controller.MouseOverUIElementCallback(element);
+        element.OnMouseOver();
     }
     public void MouseExitCallback() {
         controller.MouseExitUIElementCallback(element);
+        element.OnMouseExit();
     }
     public void ShowProgress() {
         progressBarObject.SetActive(true);

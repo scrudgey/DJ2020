@@ -30,7 +30,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
                 if (totalRotation > 540) {
                     unscrewed = true;
                     uiElement.gameObject.SetActive(false);
-                    return new BurglarAttackResult() {
+                    return BurglarAttackResult.None with {
                         success = true,
                         feedbackText = "Screw removed",
                     };

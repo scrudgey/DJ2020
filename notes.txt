@@ -2795,23 +2795,31 @@ redo networks:
 * rope don't retract so much (mass?)
 * camera
     * hide wire when panel shut
-
 * show feedback when wires snipped
+* show lock indicator when trying to open locked thing
+* rattle panel when locked
+* play rattle sound when locked
 
-show lock indicator when trying to open locked thing
-rattle panel when locked
-play rattle sound when locked
 
-snipping wrong wire activates alarm
-button for disabling alarm?
+
+wire cutter tool selector
+lockpicking
+
+door lock indicator
+alarm central:
+    * snipping wrong wire activates alarm
+    button for disabling alarm?
+
 padlock
+    * move slightly up and down on shackle
+    shackle pop open and remove lock
+    padlock sounds
+    click to jerk the lock
 
 fence door
 router
 laser grid
 power unit
-
-
 
 tampering evidence is visible when door is open
 alarm components that are active blink a red light, sound an alarm
