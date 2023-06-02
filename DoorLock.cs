@@ -3,7 +3,8 @@ using UnityEngine;
 [System.Serializable]
 public class DoorLock : MonoBehaviour {
     public enum LockType { physical, electronic }
-    public Door door;
+    // public Door door;
+    public AudioSource audioSource;
     public LockType lockType;
     public bool locked;
     public int lockId;
@@ -13,7 +14,7 @@ public class DoorLock : MonoBehaviour {
     public bool TryKeyToggle(LockType keyType, int keyId) {
         if (keyType == lockType && keyId == lockId) {
             this.locked = !this.locked;
-            Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+            Toolbox.RandomizeOneShot(audioSource, unlockSounds);
             return true;
         }
         return false;
@@ -21,18 +22,18 @@ public class DoorLock : MonoBehaviour {
     public bool TryKeyUnlock(LockType keyType, int keyId) {
         if (keyType == lockType && keyId == lockId) {
             this.locked = false;
-            Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+            Toolbox.RandomizeOneShot(audioSource, unlockSounds);
             return true;
         }
         return false;
     }
     public void ForceUnlock() {
         this.locked = false;
-        Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+        Toolbox.RandomizeOneShot(audioSource, unlockSounds);
     }
     public void Lock() {
         this.locked = true;
-        Toolbox.RandomizeOneShot(door.audioSource, unlockSounds);
+        Toolbox.RandomizeOneShot(audioSource, unlockSounds);
     }
     public void PickLock() {
         if (lockType == LockType.physical) {

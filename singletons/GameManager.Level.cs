@@ -78,7 +78,7 @@ public partial class GameManager : Singleton<GameManager> {
         SceneData sceneData = SceneData.loadSceneData(sceneName);
         LoadSkyBox(sceneData);
     }
-    public void StartMission(LevelState state, bool spawnNpcs = true) {
+    public void StartMission(LevelState state, bool spawnNpcs = true, bool doCutscene = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
@@ -113,8 +113,8 @@ public partial class GameManager : Singleton<GameManager> {
 
         TransitionToPhase(GamePhase.levelPlay);
 
-        // TODO: start cutscene
-        StartCutsceneCoroutine(StartMissionCutscene());
+        if (doCutscene)
+            StartCutsceneCoroutine(StartMissionCutscene());
     }
     public void StartWorld(string sceneName) {
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
@@ -494,8 +494,13 @@ public partial class GameManager : Singleton<GameManager> {
         if (applicationIsQuitting) return;
         if (node == null) return;
         if (node.enabled) {
+            Debug.Log($"setting alarm node {node}->{state}");
             node.alarmTriggered = state;
-            node.countdownTimer = 30f;
+            if (state) {
+                node.countdownTimer = 30f;
+            } else {
+                node.countdownTimer = 0f;
+            }
             RefreshAlarmGraph();
         }
     }
@@ -530,6 +535,14 @@ public partial class GameManager : Singleton<GameManager> {
 
         // propagate changes to UI
         OnAlarmGraphChange?.Invoke(gameData.levelState.delta.alarmGraph);
+
+        bool alarmActive = gameData.levelState.anyAlarmActive();
+        Debug.Log($"alarm active: {alarmActive}");
+        if (alarmActive) {
+            SetLevelAlarmActive();
+        } else {
+            DeactivateAlarm();
+        }
     }
     public void RefreshPowerGraph() {
         if (applicationIsQuitting) return;

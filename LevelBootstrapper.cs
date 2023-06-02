@@ -43,7 +43,8 @@ public class LevelBootstrapper : MonoBehaviour {
 
         List<BaseItem> allItems = new List<BaseItem> {
             ItemInstance.LoadItem("deck"),
-            ItemInstance.LoadItem("C4")
+            ItemInstance.LoadItem("C4"),
+            ItemInstance.LoadItem("goggles"),
         };
 
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems));
@@ -54,7 +55,7 @@ public class LevelBootstrapper : MonoBehaviour {
         };
 
         // start the game state
-        GameManager.I.StartMission(level, spawnNpcs: spawnNPCs);
+        GameManager.I.StartMission(level, spawnNpcs: spawnNPCs, doCutscene: false);
     }
 
     void BootStrapWorld() {

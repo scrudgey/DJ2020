@@ -2251,7 +2251,63 @@ note: layer "interactive"
 * mission computer:
     * show map, faction, etc.
     * change ddetails on mouseover
-
+* why door bounding box is wrong?
+* move door bounding box as it opens
+* interactible wires
+* wire cutters
+* cut on animation
+* snip once
+* sound effect for snip
+* sound effect for cut
+* on cutting wire, disable alarm
+* wafer lock for panel
+* rope don't retract so much (mass?)
+* camera
+    * hide wire when panel shut
+* show feedback when wires snipped
+* show lock indicator when trying to open locked thing
+* rattle panel when locked
+* play rattle sound when locked
+* padlock
+    * move slightly up and down on shackle
+    * shackle pop open and remove lock
+    * padlock sounds
+    * click to jerk the lock
+* wire cutter tool selector
+* alarm central:
+    * snipping wrong wire activates alarm
+    *button for disabling alarm?
+* door lock indicator
+* don't reset padlock state 
+* fence door
+    * padlock
+* router
+* laser grid
+    * a unit next to sensor
+    * cutting wire disables alarm node
+    * pushing button cancels alarm node
+* power unit
+    * unscrew a panel, reveal interiors
+    * cuttable power line
+* fix broken swat response in jack that data
+* fix guard response in jack that data
+* you should be able to hack laser grid
+* hack the alarm system: 
+    * pick the lock, open the door, tamper with the wiring
+* interaction testbed level has:
+    * door
+    * vent
+    * fence door
+    * camera
+    * datastore
+    * alarm box
+* make interactive:
+    * door
+    * vent
+    * fence door
+    * camera
+    * datastore
+    * alarm box
 
 
 
@@ -2720,13 +2776,11 @@ world:
 
 
 
-* fix broken swat response in jack that data
-* fix guard response in jack that data
+
 
 radial menu for selecting guns and items?
     unify items and guns
-hack in interact mode
-show some information when picking up key
+* hack in interact mode
 what happened to the sphere robot?
 tactics pane should look like calling people up and haggling with them
 
@@ -2737,7 +2791,6 @@ map pane:
     cursor tracks in, box narrows down to target, texts pop up
     faction and target?
 
-
 basic game:
 progression:
 1. restrict weapons at gun shop
@@ -2747,24 +2800,6 @@ gameplay:
 4. more levels
 5. stealth kills
 
-
-interaction testbed level has:
-    * door
-    * vent
-    * fence door
-    * camera
-    * datastore
-    * alarm box
-
-make interactive:
-    * door
-    * vent
-    fence door
-    camera
-    * datastore
-    alarm box
-
-lockpicking: discrete pins
 hacking: there should be more data to steal
     some data is paydata
     some is useful for social engineering
@@ -2772,9 +2807,6 @@ hacking: there should be more data to steal
     hacking should indicate ahead of time the potential outcomes?
         hack camera to disable
         hack datastore to get data
-you should be able to hack laser grid
-hack the alarm system: 
-    pick the lock, open the door, tamper with the wiring
 
 both credstick and keys can pop up in loot display
 
@@ -2782,45 +2814,29 @@ redo networks:
     remove transferState. instead, every cyber component should bind to the state of the cyber node.
     enable progress 
 
-* why door bounding box is wrong?
-* move door bounding box as it opens
-* interactible wires
-* wire cutters
-* cut on animation
-* snip once
-* sound effect for snip
-* sound effect for cut
-* on cutting wire, disable alarm
-* wafer lock for panel
-* rope don't retract so much (mass?)
-* camera
-    * hide wire when panel shut
-* show feedback when wires snipped
-* show lock indicator when trying to open locked thing
-* rattle panel when locked
-* play rattle sound when locked
-
-
-
-wire cutter tool selector
 lockpicking
+    discrete units
+hack router
+hack camera
 
-door lock indicator
-alarm central:
-    * snipping wrong wire activates alarm
-    button for disabling alarm?
-
-padlock
-    * move slightly up and down on shackle
-    shackle pop open and remove lock
-    padlock sounds
-    click to jerk the lock
-
-fence door
-router
-laser grid
-power unit
+in alarm graph refresh, updating alarm terminal state doesn't work 100% when we are trying to modify alarm terminal directly.
 
 tampering evidence is visible when door is open
 alarm components that are active blink a red light, sound an alarm
 guards can notice the blinking light / hear the sound
+way to hack camera without opening panel?
+way to replace panel?
+cutting the wrong wire can zap
+fix audiosource on all doorknobs (previously was door reference)
+blink lasers when player trips them
+shooting the objects
+clicking button through panel
+
+bolt cutter?
+router panel conceals a second port?
+
+
+how is lockpicking going to work?
+    discrete units indicate pins
+    blinking pin indicates a pin in progress?
+    setback: stop pin in progress, hold at previous pins

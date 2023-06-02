@@ -24,10 +24,11 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
             if (component == null)
                 continue;
 
-            // ???
-            // if (component is AlarmTerminal) {
-            //     node.alarmTriggered = false;
-            // }
+            // TODO: this is required to stop the central alarm when a triggering node is disabled, but it
+            // means that we cannot set the central alarm state directly from e.g. interaction mode ???
+            if (component is AlarmTerminal) {
+                node.alarmTriggered = false;
+            }
             component.nodeEnabled = node.enabled;
         }
 
@@ -35,14 +36,6 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
         foreach (AlarmNode source in sources) {
             if (source.enabled)
                 DFS(source, new HashSet<HashSet<string>>(), new HashSet<string>());
-        }
-
-        bool alarmActive = anyAlarmActive();
-
-        if (alarmActive) {
-            GameManager.I.SetLevelAlarmActive();
-        } else {
-            GameManager.I.DeactivateAlarm();
         }
     }
 

@@ -87,6 +87,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
             }
 
             if (integratedPickTime > 2f) {
+                audioSource.Stop();
                 CompleteProgress();
                 OnValueChanged?.Invoke(this);
                 if (progressStageIndex >= progressStages)
@@ -120,7 +121,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         progressStageIndex += 1;
     }
 
-    BurglarAttackResult DoPick() {
+    protected virtual BurglarAttackResult DoPick() {
         bool success = doorLock.lockType == DoorLock.LockType.physical && doorLock.locked;
         doorLock.PickLock();
         if (success) {

@@ -448,7 +448,7 @@ public class Toolbox {
             total_max_y = Mathf.Max(total_max_y, max_y);
             total_min_y = Mathf.Min(total_min_y, min_y);
         }
-        Rect totalRect = new Rect(total_min_x, total_min_y, total_max_x - total_min_x, total_max_y - total_min_y);
+        Rect totalRect = new Rect(total_min_x, total_min_y, (total_max_x - total_min_x) * root.lossyScale.x, (total_max_y - total_min_y) * root.lossyScale.y);
         return totalRect;
     }
     public static string AssetRelativePath(UnityEngine.Object asset) {

@@ -97,4 +97,8 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
         rectTransform.sizeDelta = new Vector2(bounds.width, bounds.height);
 
     }
+
+    public void HandleElementDestroyed() {
+        Destroy(gameObject);
+    }
 }

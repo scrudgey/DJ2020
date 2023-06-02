@@ -35,4 +35,8 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public virtual void OnMouseExit() {
 
     }
+
+    void OnDestroy() {
+        uiElement.HandleElementDestroyed();
+    }
 }

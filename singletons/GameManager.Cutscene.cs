@@ -86,11 +86,9 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public IEnumerator StartMissionCutscene() {
-        // uiController?.HideUI();
         Time.timeScale = 0f;
         float timer = 0f;
         float duration = 3f;
-        // characterCamera.followingSharpnessDefault = 5f;
         characterCamera.zoomCoefficient = 0.25f;
         characterCamera.zoomCoefficientTarget = 0.25f;
         Vector3 targetPosition = playerObject.transform.position;

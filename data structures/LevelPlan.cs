@@ -18,13 +18,12 @@ public record LevelPlan {
         if (allItems.Count >= 2) {
             itemList[1] = allItems[1];
         }
+        if (allItems.Count >= 3) {
+            itemList[2] = allItems[2];
+        }
         return new LevelPlan {
             insertionPointIdn = "",
             extractionPointIdn = "",
-            // items = new string[4] { "deck", "", "", "" },
-            // items = new string[4] { "rocket", "deck", "C4", "tools" },
-            // items = new string[4] { "deck", "C4", "tools", "" },
-            // items = new string[4] { "grenade", "deck", "rocket", "tools" },
             items = itemList,
             activeTactics = new List<Tactic>()
             // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }

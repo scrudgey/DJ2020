@@ -620,16 +620,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
         HashSet<AttackSurface> attackSurfaces = new HashSet<AttackSurface>();
 
-        // AttackSurface[] childAttackSurfaces = currentInteractorTarget.target.transform.root.GetComponentsInChildren<AttackSurface>();
-        // if (childAttackSurfaces.Length > 0) {
-        //     currentAttackSurface = childAttackSurfaces
-        //                 .OrderBy(attackSurface => Vector3.Distance(attackSurface.transform.position, target.transform.position))
-        //                 .First();
-        //     // Debug.Log($"enable interactive highlight: {currentAttackSurface}");
-        // } else {
-        //     currentAttackSurface = null;
-        // }
-
         float closestAttackSurfaceDistance = float.MaxValue;
         AttackSurface currentAttackSurface = null;
 
