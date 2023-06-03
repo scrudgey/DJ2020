@@ -50,12 +50,12 @@ public class DoorRandomizer : MonoBehaviour {
         door.autoClose = autoClose;
 
         if (deadboltEnabled) {
-            innerDeadbolt.SetActive(true);
-            outerDeadbolt.SetActive(true);
+            innerDeadbolt?.SetActive(true);
+            outerDeadbolt?.SetActive(true);
         } else {
-            door.doorLocks.Remove(deadboltLock);
-            innerDeadbolt.SetActive(false);
-            outerDeadbolt.SetActive(false);
+            door.doorLocks?.Remove(deadboltLock);
+            innerDeadbolt?.SetActive(false);
+            outerDeadbolt?.SetActive(false);
         }
     }
 }

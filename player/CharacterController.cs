@@ -18,7 +18,8 @@ public enum CharacterState {
     aim,
     popout,
     burgle,
-    useItem
+    useItem,
+    zapped
 }
 public enum ClimbingState {
     Anchoring,
@@ -194,7 +195,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         timeInState = 0f;
     }
     private void OnStateEnter(CharacterState state, CharacterState fromState) {
-        // Debug.Log($"entering state {state} from {fromState}");
+        Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             default:
                 break;
@@ -326,22 +327,29 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case HitState.hitstun:
                 TransitionToState(CharacterState.hitstun);
                 break;
+            case HitState.zapped:
+                Debug.Log("transition to state zapped");
+                TransitionToState(CharacterState.zapped);
+                break;
             case HitState.dead:
                 TransitionToState(CharacterState.dead);
-
+                break;
+            case HitState.normal:
+                TransitionToState(CharacterState.normal);
                 break;
         }
         OnValueChanged?.Invoke(this);
     }
     public void OnHitStateExit(HitState state, HitState toState) {
-        switch (state) {
-            default:
-                break;
-            case HitState.hitstun:
-                TransitionToState(CharacterState.normal);
-                break;
-        }
-        OnValueChanged?.Invoke(this);
+        // switch (state) {
+        //     default:
+        //         break;
+        //     case HitState.zapped:
+        //     case HitState.hitstun:
+        //         TransitionToState(CharacterState.normal);
+        //         break;
+        // }
+        // OnValueChanged?.Invoke(this);
     }
 
     public void ResetInput() {
@@ -466,6 +474,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         switch (state) {
             case CharacterState.hitstun:
             case CharacterState.dead:
+            case CharacterState.zapped:
                 break;
             case CharacterState.burgle:
                 if (input.useItem) {
@@ -905,6 +914,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
 
         switch (state) {
+            case CharacterState.zapped:
+                Debug.Log("zapped");
+                break;
             case CharacterState.useItem:
                 currentVelocity = currentVelocity * 0.5f;
                 break;

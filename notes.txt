@@ -2826,12 +2826,17 @@ in alarm graph refresh, updating alarm terminal state doesn't work 100% when we 
 * alarm components that are active blink a red light, sound an alarm
 * guards can notice the blinking light / hear the sound
 * way to replace panel?
-cutting the wrong wire can zap
-fix audiosource on all doorknobs (previously was door reference)
-blink lasers when player trips them
-shooting the objects
+* cutting the wrong wire can zap
+* fix audiosource on all doorknobs (previously was door reference)
+* blink lasers when player trips them
+
+
 clicking button through panel
+    new approach is very good, except it fails in a few places with multiple or no sprite renderers
+    attack surface elements should specify sprite.
+
 better wire materials
+stop buzzing sound on transformer when power is disabled
 
 electrical zap effect around broken wires?
 
@@ -2839,10 +2844,14 @@ electrical zap effect around broken wires?
 bolt cutter?
 router panel conceals a second port?
 way to hack camera without opening panel?
+shooting the objects
+    shoot laser tripwire to disable?
+    shoot alarm box to disable?
 
 
 how is lockpicking going to work?
     discrete units indicate pins
     blinking pin indicates a pin in progress?
     setback: stop pin in progress, hold at previous pins
+
 

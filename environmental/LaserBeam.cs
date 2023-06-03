@@ -7,6 +7,8 @@ public class LaserBeam : MonoBehaviour {
     public CapsuleCollider capsule;
     public float maxLaserLength = 6f;
     public LaserTripwire tripWire;
+    public MeshRenderer laserMesh;
+    float tempVisibleTimer;
     void Start() {
         DetermineMaxLength(beam);
         SetLaserLength(beam);
@@ -70,5 +72,18 @@ public class LaserBeam : MonoBehaviour {
         if (tripWire != null) {
             tripWire.LaserTripCallback();
         }
+    }
+
+    void Update() {
+        if (tempVisibleTimer > 0) {
+            tempVisibleTimer -= Time.unscaledDeltaTime;
+            if (tempVisibleTimer <= 0) {
+                laserMesh.gameObject.layer = LayerUtil.GetLayer(Layer.laser);
+            }
+        }
+    }
+    public void ShowLaserTemporarily(float timeout = 1f) {
+        tempVisibleTimer = 1f;
+        laserMesh.gameObject.layer = LayerUtil.GetLayer(Layer.def);
     }
 }

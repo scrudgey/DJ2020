@@ -81,7 +81,6 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
 
     void SetPosition() {
-        // RectTransform elementRectTransform = obj.GetComponent<RectTransform>();
         Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
 
         rectTransform.anchorMin = Vector2.zero;

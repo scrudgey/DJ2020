@@ -33,6 +33,9 @@ public class LaserTripwire : AlarmComponent {
         GameManager.I.SetAlarmNodeState(node, true);
         cooldown = 5f;
         Toolbox.RandomizeOneShot(audioSource, spottedSound);
+        foreach (LaserData data in laserData) {
+            data.laser.ShowLaserTemporarily();
+        }
         GameManager.I.SetLocationOfDisturbance(transform.position);
         GameManager.I.DispatchGuard(transform.position);
         GameManager.I.AddSuspicionRecord(SuspicionRecord.trippedSensor("laser tripwire"));

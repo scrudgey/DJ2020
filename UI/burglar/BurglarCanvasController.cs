@@ -101,8 +101,6 @@ public class BurglarCanvasController : MonoBehaviour {
         rawImage.color = Color.white;
         RectTransform containerRectTransform = uiElementsContainer.GetComponent<RectTransform>();
         foreach (AttackSurfaceElement element in data.target.attackElementRoot.GetComponentsInChildren<AttackSurfaceElement>()) {
-            // Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
-
             GameObject obj = GameObject.Instantiate(UIElementPrefab);
             AttackSurfaceUIElement uiElement = obj.GetComponent<AttackSurfaceUIElement>();
             obj.transform.SetParent(uiElementsContainer);
@@ -110,25 +108,15 @@ public class BurglarCanvasController : MonoBehaviour {
             uiElement.data = data;
             uiElement.Initialize(this, element);
             element.Initialize(uiElement);
-            // uiElement.ele
             uiElement.Bind(element.gameObject);
-            // RectTransform elementRectTransform = obj.GetComponent<RectTransform>();
-
-            // elementRectTransform.anchorMin = Vector2.zero;
-            // elementRectTransform.anchorMax = Vector2.zero;
-
-            // Vector3 center = Toolbox.GetBoundsCenter(element.transform);
-            // Vector3 position = data.target.attackCam.WorldToViewportPoint(center);
-            // position.x *= containerRectTransform.rect.width;
-            // position.y *= containerRectTransform.rect.height;
-
-            // elementRectTransform.anchoredPosition = position;
-            // elementRectTransform.sizeDelta = new Vector2(bounds.width, bounds.height);
-
             Image cursorImage = obj.GetComponent<Image>();
             cursorImage.color = Color.red;
-            cursorImage.enabled = false;
-
+            SpriteRenderer spriteRenderer = element.GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer != null) {
+                cursorImage.sprite = spriteRenderer.sprite;
+                cursorImage.alphaHitTestMinimumThreshold = 0.5f;
+            }
+            // cursorImage.enabled = false;
         }
 
         foreach (BurglarSelectorButton button in selectorButtons) {
@@ -298,7 +286,7 @@ public class BurglarCanvasController : MonoBehaviour {
             foreach (IDamageReceiver receiver in data.burglar.transform.root.GetComponentsInChildren<IDamageReceiver>()) {
                 receiver.TakeDamage(result.electricDamage);
             }
-            DoneButtonCallback();
+            GameManager.I.CloseBurglar(transitionCharacter: false);
         }
         if (result.finish) {
             finishing = true;
@@ -319,7 +307,6 @@ public class BurglarCanvasController : MonoBehaviour {
         rectTransform.anchorMin = Vector2.zero;
         rectTransform.anchorMax = Vector2.zero;
         rectTransform.anchoredPosition = data.target.attackCam.WorldToScreenPoint(lockPosition);
-        Debug.Log($"{rectTransform.anchoredPosition} {lockPosition}");
         rectTransform.sizeDelta = 100f * Vector2.one;
     }
 

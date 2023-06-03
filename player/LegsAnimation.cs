@@ -79,15 +79,19 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             if (hitstunTimer >= 0.05f) {
                 hitstunTimer -= 0.05f;
                 hitstunEffect = !hitstunEffect;
-                if (hitstunEffect) {
-                    spriteRenderer.enabled = false;
-                    torsoAnimation.spriteRenderer.enabled = false;
-                    headAnimation.spriteRenderer.enabled = false;
-                } else {
-                    spriteRenderer.enabled = true;
-                    torsoAnimation.spriteRenderer.enabled = true;
-                    headAnimation.spriteRenderer.enabled = true;
-                }
+                spriteRenderer.enabled = hitstunEffect;
+                torsoAnimation.spriteRenderer.enabled = hitstunEffect;
+                headAnimation.spriteRenderer.enabled = hitstunEffect;
+            }
+        } else if (hitState == HitState.zapped) {
+            hitstunTimer += Time.deltaTime;
+            if (hitstunTimer >= 0.05f) {
+                hitstunTimer -= 0.05f;
+                hitstunEffect = !hitstunEffect;
+                spriteRenderer.enabled = true;
+                torsoAnimation.spriteRenderer.enabled = false;
+                headAnimation.spriteRenderer.enabled = false;
+                frame = hitstunEffect ? 0 : 1;
             }
         } else {
             spriteRenderer.enabled = true;
@@ -130,6 +134,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         Vector3 scale = new Vector3(1f, scaleFactor, 1f) * 2.5f;
         transform.localScale = scale + scaleOffset;
         switch (input.state) {
+            case CharacterState.zapped:
             case CharacterState.dead:
                 break;
             case CharacterState.superJump:
@@ -170,8 +175,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         } else {
             spriteRenderer.transform.localPosition = new Vector3(0f, 0.85f, 0f);
         }
+
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
-        if (input.hitState == HitState.dead) {
+        if (input.hitState == HitState.dead || input.hitState == HitState.zapped) {
             animator.Stop();
         } else if (input.state == CharacterState.superJump) {
             state = State.jump;

@@ -78,10 +78,12 @@ public class WireCutterToolIndicator : MonoBehaviour {
         cursorPoint.z = attackSurface.attackCam.nearClipPlane;
         Ray projection = attackSurface.attackCam.ScreenPointToRay(cursorPoint);
         BurglarAttackResult result = attackSurface.HandleRopeCutting(projection);
-        if (result.success) {
-            Toolbox.RandomizeOneShot(audioSource, wireCutSound);
-        } else {
-            Toolbox.RandomizeOneShot(audioSource, snipSound);
+        if (result.electricDamage == null) {
+            if (result.success) {
+                Toolbox.RandomizeOneShot(audioSource, wireCutSound);
+            } else {
+                Toolbox.RandomizeOneShot(audioSource, snipSound);
+            }
         }
         canvasController.HandleAttackResult(result);
     }

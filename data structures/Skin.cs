@@ -62,6 +62,8 @@ public class Skin {
     public Octet<Sprite[]> rifleShoot = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
+    // skeleton
+    public Octet<Sprite[]> skeletonSprites = new Octet<Sprite[]>();
 
     // data
     public SpriteData[] unarmedSpriteData;
@@ -69,6 +71,7 @@ public class Skin {
     public SpriteData[] smgSpriteData;
     public SpriteData[] rifleSpriteData;
     public SpriteData[] shotgunSpriteData;
+
 
 
     public Octet<Sprite[]> gunIdleSprites(GunType type) {
@@ -188,6 +191,8 @@ public class Skin {
 
         Sprite[] headSprites = loadSprites(name, "head");
 
+        Sprite[] skeletonSprites = Resources.LoadAll<Sprite>("sprites/spritesheets/Skeleton") as Sprite[];
+
         List<SpriteData> torsoSpriteData = LoadTorsoSpriteData(name, "Torso");
         List<SpriteData> pistolSpriteData = LoadTorsoSpriteData(name, "pistol");
         List<SpriteData> smgSpriteData = LoadTorsoSpriteData(name, "smg");
@@ -195,6 +200,12 @@ public class Skin {
         List<SpriteData> shotgunSpriteData = LoadTorsoSpriteData(name, "shotgun");
 
         Skin skin = new Skin();
+
+        skin.skeletonSprites[Direction.down] = skeletonSprites;
+        skin.skeletonSprites[Direction.rightDown] = skeletonSprites;
+        skin.skeletonSprites[Direction.right] = skeletonSprites;
+        skin.skeletonSprites[Direction.rightUp] = skeletonSprites;
+        skin.skeletonSprites[Direction.up] = skeletonSprites;
 
         // head
         skin.headIdle[Direction.down] = new Sprite[] { headSprites[0], headSprites[5] };
@@ -447,6 +458,8 @@ public class Skin {
             return legsKeelOver;
         } else if (input.hitState == HitState.dead) {
             return legsDead;
+        } else if (input.hitState == HitState.zapped) {
+            return skeletonSprites;
         } else if (input.state == CharacterState.jumpPrep || input.state == CharacterState.landStun) {
             return legsCrouch;
         } else if (input.state == CharacterState.superJump || state == LegsAnimation.State.jump) {
@@ -464,8 +477,6 @@ public class Skin {
                 return legsCrouch;
             case LegsAnimation.State.run:
                 return legsRun;
-            // case LegsAnimation.State.jump:
-            //     return legsJump;
             case LegsAnimation.State.climb:
                 return legsClimb;
             default:
@@ -479,6 +490,8 @@ public class Skin {
             return unarmedKeelOver;
         } else if (input.hitState == HitState.dead) {
             return unarmedDead;
+        } else if (input.hitState == HitState.zapped) {
+            return skeletonSprites;
         } else if (input.isClimbing) {
             return unarmedClimb;
         } else if (input.state == CharacterState.superJump) {

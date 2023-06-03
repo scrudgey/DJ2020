@@ -484,10 +484,11 @@ public partial class GameManager : Singleton<GameManager> {
         activeBurgleTargetData = data;
         uiController.ShowBurglar(data);
     }
-    public void CloseBurglar() {
+    public void CloseBurglar(bool transitionCharacter = true) {
         uiController.HideBurglar();
         uiController.ShowUI();
-        playerCharacterController.TransitionToState(CharacterState.normal);
+        if (transitionCharacter)
+            playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);
     }
     public void ShowMissionSelectMenu() {

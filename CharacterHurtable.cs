@@ -4,21 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum HitState { normal, hitstun, dead, invulnerable }
+public enum HitState { normal, hitstun, zapped, dead, invulnerable }
 
 public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPoolable, ICharacterHurtableStateLoader {
     public enum HitStunType { timer, invulnerable }
     public HitStunType hitstunType;
-    // private HitState _hitState;
     public float wallDecalDistance = 1f;
     public float wallDecalProbability = 0.2f;
     public CharacterController controller;
     private float hitstunCountdown;
     public float hitstunAmount = 0.1f;
+    public AudioSource audioSource;
     public Action<CharacterHurtable> OnValueChanged { get; set; }
     public Action<Damage> OnDamageTaken;
     public AudioClip[] zapSound;
-    public AudioSource audioSource;
     public override void Awake() {
         base.Awake();
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
@@ -35,13 +34,8 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         return result;
     }
     public DamageResult TakeElectricalDamage(ElectricalDamage damage) {
-        if (hitstunType == HitStunType.timer) {
-            hitstunCountdown = hitstunAmount;
-            hitState = Toolbox.Max(hitState, HitState.hitstun);
-        } else if (hitstunType == HitStunType.invulnerable) {
-            hitstunCountdown = hitstunAmount * 2f;
-            hitState = Toolbox.Max(hitState, HitState.invulnerable);
-        }
+        hitstunCountdown = hitstunAmount * 2f;
+        hitState = Toolbox.Max(hitState, HitState.zapped);
         Toolbox.RandomizeOneShot(audioSource, zapSound);
         return new DamageResult {
             damageAmount = damage.amount,
@@ -97,7 +91,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         if (hitstunCountdown > 0f) {
             hitstunCountdown -= Time.deltaTime;
             if (hitstunCountdown <= 0) {
-                if (hitState == HitState.hitstun || hitState == HitState.invulnerable) {
+                if (hitState == HitState.hitstun || hitState == HitState.invulnerable || hitState == HitState.zapped) {
                     hitState = HitState.normal;
                 }
             }
