@@ -55,6 +55,7 @@ namespace AI {
 
             // possibly fail
             if (navFailures >= 2) {
+                Debug.Log("nav failure");
                 return TaskState.failure;
             }
 

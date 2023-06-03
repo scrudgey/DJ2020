@@ -17,7 +17,8 @@ public class LaserTripwire : AlarmComponent {
     AudioSource audioSource;
     public AudioSource buzzSoundSource;
 
-    public void Start() {
+    public override void Start() {
+        base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         foreach (LaserData data in laserData) {
             data.laser.tripWire = this;

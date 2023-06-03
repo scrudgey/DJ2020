@@ -24,6 +24,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void AddSuspicionRecord(SuspicionRecord record) {
+        if (record == null) return;
         if (record.suspiciousness == Suspiciousness.aggressive) {
             if (gameData.levelState.delta.disguise) {
                 // TODO: display feedback iconography

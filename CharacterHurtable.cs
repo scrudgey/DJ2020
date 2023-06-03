@@ -17,10 +17,13 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
     public float hitstunAmount = 0.1f;
     public Action<CharacterHurtable> OnValueChanged { get; set; }
     public Action<Damage> OnDamageTaken;
+    public AudioClip[] zapSound;
+    public AudioSource audioSource;
     public override void Awake() {
         base.Awake();
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
         RegisterDamageCallback<ExplosionDamage>(TakeExplosionDamage);
+        RegisterDamageCallback<ElectricalDamage>(TakeElectricalDamage);
     }
     public override DamageResult TakeDamage(Damage damage) {
         DamageResult result = DamageResult.NONE;
@@ -30,6 +33,20 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         OnValueChanged?.Invoke(this);
         OnDamageTaken?.Invoke(damage);
         return result;
+    }
+    public DamageResult TakeElectricalDamage(ElectricalDamage damage) {
+        if (hitstunType == HitStunType.timer) {
+            hitstunCountdown = hitstunAmount;
+            hitState = Toolbox.Max(hitState, HitState.hitstun);
+        } else if (hitstunType == HitStunType.invulnerable) {
+            hitstunCountdown = hitstunAmount * 2f;
+            hitState = Toolbox.Max(hitState, HitState.invulnerable);
+        }
+        Toolbox.RandomizeOneShot(audioSource, zapSound);
+        return new DamageResult {
+            damageAmount = damage.amount,
+            damage = damage
+        };
     }
     public DamageResult TakeBulletDamage(BulletDamage damage) {
         PlayerInput snapInput = new PlayerInput {

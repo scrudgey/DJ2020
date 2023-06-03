@@ -26,6 +26,7 @@ namespace AI {
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             if (GameManager.I.levelHQTerminal() == null) {
+                GameManager.I.AddSuspicionRecord(report.suspicionRecord);
                 return TaskState.failure;
             } else if (!started) {
                 alertHandler.ShowRadio();

@@ -537,7 +537,6 @@ public partial class GameManager : Singleton<GameManager> {
         OnAlarmGraphChange?.Invoke(gameData.levelState.delta.alarmGraph);
 
         bool alarmActive = gameData.levelState.anyAlarmActive();
-        Debug.Log($"alarm active: {alarmActive}");
         if (alarmActive) {
             SetLevelAlarmActive();
         } else {

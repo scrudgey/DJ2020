@@ -107,6 +107,6 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         Debug.Log("[extraction] defaulting random extraction point");
-        GameObject.FindObjectOfType<ExtractionZone>().EnableExtractionZone();
+        GameObject.FindObjectOfType<ExtractionZone>()?.EnableExtractionZone();
     }
 }

@@ -16,6 +16,7 @@ public class ReactToTamperState : SphereControlState {
     public ReactToTamperState(SphereRobotAI ai, TamperEvidence evidence, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
         this.evidence = evidence;
         this.speechTextController = speechTextController;
+        this.characterController = characterController;
         // record = SuspicionRecord.bodySuspicion();
     }
     public override void Enter() {

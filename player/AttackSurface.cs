@@ -14,10 +14,12 @@ public class AttackSurface : MonoBehaviour {
     public Outline outline;
     public Transform attackElementRoot;
     public float interactionDistance = 2f;
+    public TamperEvidence tamperEvidence;
     // public List<ObiRope> obiRopes;
     // Dictionary<ObiRope, MeshCollider>
     Dictionary<MeshCollider, MeshFilter> ropeMeshes;
     Dictionary<MeshCollider, MeshRenderer> ropeRenderers;
+    public AttackSurfaceVentCover replaceablePanel;
     public void Start() {
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         attackCam.targetTexture = renderTexture;
@@ -32,6 +34,18 @@ public class AttackSurface : MonoBehaviour {
             ropeRenderers[collider] = renderer;
         }
         DisableOutline();
+    }
+    public void CreateTamperEvidence(BurgleTargetData data) {
+        if (tamperEvidence != null) return;
+        GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;
+        GameObject obj = GameObject.Instantiate(impactPrefab, data.burglar.transform.position, Quaternion.identity);
+        tamperEvidence = obj.GetComponent<TamperEvidence>();
+        tamperEvidence.targetName = data.target.name;
+        obj.SetActive(false);
+    }
+    public void ReplacePanel() {
+        replaceablePanel?.ReplacePanel();
+        replaceablePanel = null;
     }
     public void EnableAttackSurface() {
         attackCam.enabled = true;
@@ -83,10 +97,17 @@ public class AttackSurface : MonoBehaviour {
                     }
                 }
 
-                rope.Tear(rope.elements[index]);
-                rope.RebuildConstraintsFromElements();
                 AttackSurfaceWire wireElement = rope.GetComponent<AttackSurfaceWire>();
-                result = wireElement?.DoCut();
+                if (wireElement != null) {
+                    result = wireElement?.DoCut();
+                    if (result.success) {
+                        rope.Tear(rope.elements[index]);
+                        rope.RebuildConstraintsFromElements();
+                    }
+                } else {
+                    rope.Tear(rope.elements[index]);
+                    rope.RebuildConstraintsFromElements();
+                }
             }
             // Debug.Log($"break on: {hit.collider.gameObject}");
             break;

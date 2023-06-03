@@ -2775,6 +2775,7 @@ world:
         sometimes, torso + legs are set dependently.
 
 
+hacking / viruses should be dynamic: detected and fixed in realtime by ICE
 
 
 
@@ -2821,22 +2822,27 @@ hack camera
 
 in alarm graph refresh, updating alarm terminal state doesn't work 100% when we are trying to modify alarm terminal directly.
 
-tampering evidence is visible when door is open
-alarm components that are active blink a red light, sound an alarm
-guards can notice the blinking light / hear the sound
-way to hack camera without opening panel?
-way to replace panel?
+* tampering evidence is visible when door is open
+* alarm components that are active blink a red light, sound an alarm
+* guards can notice the blinking light / hear the sound
+* way to replace panel?
 cutting the wrong wire can zap
 fix audiosource on all doorknobs (previously was door reference)
 blink lasers when player trips them
 shooting the objects
 clicking button through panel
+better wire materials
+
+electrical zap effect around broken wires?
+
 
 bolt cutter?
 router panel conceals a second port?
+way to hack camera without opening panel?
 
 
 how is lockpicking going to work?
     discrete units indicate pins
     blinking pin indicates a pin in progress?
     setback: stop pin in progress, hold at previous pins
+

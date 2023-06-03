@@ -11,24 +11,38 @@ public class PulseLight : MonoBehaviour {
     private Color[] startColors;
     private float[] startAlphas;
     private Vector3[] startScales;
+    public bool randomizeInitialScale = true;
+    private bool _doPulse = true;
+    public bool doPulse {
+        get { return _doPulse; }
+        set {
+            _doPulse = value;
+            foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
+                spriteRenderer.enabled = _doPulse;
+            }
+        }
+    }
     void Start() {
-        transform.localScale = Random.Range(0.9f, 1.3f) * Vector3.one;
+        if (randomizeInitialScale)
+            transform.localScale = Random.Range(0.9f, 1.3f) * Vector3.one;
         startColors = spriteRenderers.Select(s => s.color).ToArray();
         startAlphas = spriteRenderers.Select(s => s.color.a).ToArray();
         startScales = spriteRenderers.Select(s => s.transform.localScale).ToArray();
     }
     void Update() {
-        timer += Time.deltaTime;
-        float intensity = 0f;
-        if (type == PulseType.fadeInOut) {
-            intensity = Mathf.Sin(timer * (2 * Mathf.PI / period));
-        } else if (type == PulseType.triangle) {
-            if (timer > period) {
-                timer -= period;
+        if (doPulse) {
+            timer += Time.deltaTime;
+            float intensity = 0f;
+            if (type == PulseType.fadeInOut) {
+                intensity = Mathf.Sin(timer * (2 * Mathf.PI / period));
+            } else if (type == PulseType.triangle) {
+                if (timer > period) {
+                    timer -= period;
+                }
+                intensity = (timer * (-1f / period)) + 1f;
             }
-            intensity = (timer * (-1f / period)) + 1f;
+            SetIntensity(intensity);
         }
-        SetIntensity(intensity);
     }
 
     void SetIntensity(float intensity) {

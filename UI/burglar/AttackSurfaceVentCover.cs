@@ -28,25 +28,40 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
             if (IsLocked()) {
                 Toolbox.RandomizeOneShot(audioSource, lockedSounds);
             } else {
-                Toolbox.AudioSpeaker(parentVentObject.transform.position, openSounds);
-                ventSprite.enabled = false;
-                parentVentObject.SetActive(false);
-                foreach (GameObject element in obscuredElements) {
-                    element.SetActive(true);
-                }
-                foreach (MeshRenderer renderer in obscuredRenderers) {
-                    renderer.enabled = true;
-                }
+                RemovePanel();
                 return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Vent cover open",
-                    finish = finishing
+                    finish = finishing,
+                    panel = this
                 };
             }
         }
         return BurglarAttackResult.None;
     }
 
+    public void RemovePanel() {
+        Toolbox.AudioSpeaker(parentVentObject.transform.position, openSounds);
+        ventSprite.enabled = false;
+        parentVentObject.SetActive(false);
+        foreach (GameObject element in obscuredElements) {
+            element.SetActive(true);
+        }
+        foreach (MeshRenderer renderer in obscuredRenderers) {
+            renderer.enabled = true;
+        }
+    }
+    public void ReplacePanel() {
+        Toolbox.AudioSpeaker(parentVentObject.transform.position, openSounds);
+        ventSprite.enabled = true;
+        parentVentObject.SetActive(true);
+        foreach (GameObject element in obscuredElements) {
+            element.SetActive(false);
+        }
+        foreach (MeshRenderer renderer in obscuredRenderers) {
+            renderer.enabled = false;
+        }
+    }
     public override BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleClickHeld(activeTool, data);
         return BurglarAttackResult.None;

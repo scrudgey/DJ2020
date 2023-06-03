@@ -51,7 +51,8 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
                 return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Latch guard removed",
-                    createTamperEvidence = true
+                    makeTamperEvidenceSuspicious = true,
+                    revealTamperEvidence = true
                 };
             }
         }

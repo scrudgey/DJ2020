@@ -27,7 +27,9 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
                 return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "opened access door",
-                    element = this
+                    element = this,
+                    revealTamperEvidence = !shut,
+                    hideTamperEvidence = shut
                 };
             } else {
                 HandleLockedDoor();

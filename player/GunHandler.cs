@@ -286,7 +286,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         emitShell = true;
     }
     public void DoEmitShell() {
-        Debug.Log(transform.root.right);
         Vector3 right = transform.root.right;
         Vector3 forward = transform.root.forward;
         Vector3 up = transform.root.up;

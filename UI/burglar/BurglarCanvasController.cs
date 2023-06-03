@@ -31,6 +31,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image screwdriverImage;
     // public 
     public WireCutterToolIndicator wireCutterImage;
+    public GameObject panelButton;
     [Header("tools")]
     public GameObject keyringButton;
     public GameObject probeToolButton;
@@ -67,7 +68,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public RectTransform burglarToolMaskRect;
     public AudioClip[] burglarBagShowSound;
     public AudioClip[] burglarBagUnzipSound;
-    TamperEvidence tamperEvidence;
+    // TamperEvidence tamperEvidence;
     Coroutine jiggleCoroutine;
     bool mouseOverElement;
     bool mouseDown;
@@ -88,6 +89,7 @@ public class BurglarCanvasController : MonoBehaviour {
         captionText.text = "";
         feedbackText.text = "";
         foreach (Transform child in uiElementsContainer) {
+            if (child.name == "panelButton") continue;
             Destroy(child.gameObject);
         }
         SetTool(BurglarToolType.none);
@@ -132,9 +134,14 @@ public class BurglarCanvasController : MonoBehaviour {
         foreach (BurglarSelectorButton button in selectorButtons) {
             button.ResetPosition();
         }
+
+        data.target.CreateTamperEvidence(data);
+
+        panelButton.SetActive(data.target.replaceablePanel != null);
     }
     public void TearDown() {
         foreach (Transform child in uiElementsContainer) {
+            if (child.name == "panelButton") continue;
             Destroy(child.gameObject);
         }
         if (data != null)
@@ -272,19 +279,37 @@ public class BurglarCanvasController : MonoBehaviour {
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
         }
-        if (result.createTamperEvidence) {
-            if (tamperEvidence == null) {
-                CreateTamperEvidence();
-            }
+        if (result.hideTamperEvidence) {
+            data.target.tamperEvidence.gameObject.SetActive(false);
+        } else if (result.revealTamperEvidence) {
+            data.target.tamperEvidence.gameObject.SetActive(true);
+        }
+        if (result.makeTamperEvidenceSuspicious) {
+            data.target.tamperEvidence.suspicious = true;
         }
         foreach (Vector3 lockPosition in result.lockPositions) {
             CreateLockIndicator(lockPosition);
         }
-        //
+        if (result.panel != null) {
+            data.target.replaceablePanel = result.panel;
+            panelButton.SetActive(true);
+        }
+        if (result.electricDamage != null) {
+            foreach (IDamageReceiver receiver in data.burglar.transform.root.GetComponentsInChildren<IDamageReceiver>()) {
+                receiver.TakeDamage(result.electricDamage);
+            }
+            DoneButtonCallback();
+        }
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
+    }
+
+    public void ReplacePanelButtonCallback() {
+        data.target.ReplacePanel();
+        panelButton.SetActive(data.target.replaceablePanel != null);
+        data.target.tamperEvidence.gameObject.SetActive(false);
     }
 
     void CreateLockIndicator(Vector3 lockPosition) {
@@ -297,12 +322,7 @@ public class BurglarCanvasController : MonoBehaviour {
         Debug.Log($"{rectTransform.anchoredPosition} {lockPosition}");
         rectTransform.sizeDelta = 100f * Vector2.one;
     }
-    void CreateTamperEvidence() {
-        GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;
-        GameObject obj = GameObject.Instantiate(impactPrefab, data.burglar.transform.position, Quaternion.identity);
-        tamperEvidence = obj.GetComponent<TamperEvidence>();
-        tamperEvidence.data = data;
-    }
+
     void AddText(string newLine) {
         feedbackText.text = feedbackText.text + $"\n{newLine}";
         string[] lines = feedbackText.text.Split('\n');

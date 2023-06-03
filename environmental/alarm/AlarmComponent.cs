@@ -7,6 +7,8 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
     public float countdownTimer;
     public CyberComponent cyberComponent;
     public PoweredComponent powerComponent;
+    public PulseLight pulseLight;
+    private TamperEvidence sensorTripIndicator;
     bool cyberCompromised;
     bool powerPowered;
     public void Awake() {
@@ -17,6 +19,13 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
         }
         if (powerComponent != null) {
             powerComponent.OnStateChange += OnPowerChange;
+        }
+    }
+    public virtual void Start() {
+        if (pulseLight != null) {
+            GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/tamperEvidence"), pulseLight.transform.position, Quaternion.identity) as GameObject;
+            sensorTripIndicator = obj.GetComponent<TamperEvidence>();
+            sensorTripIndicator.suspicious = false;
         }
     }
     public override void OnDestroy() {
@@ -36,7 +45,12 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
             if (value) {
                 countdownTimer = 30f;
             }
-            // if (dirty)
+            if (pulseLight != null) {
+                pulseLight.doPulse = value;
+            }
+            if (sensorTripIndicator != null) {
+                sensorTripIndicator.suspicious = value;
+            }
             OnStateChange?.Invoke(this);
         }
     }

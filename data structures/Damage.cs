@@ -27,3 +27,7 @@ public class Damage {
 public class ExplosionDamage : Damage {
     public ExplosionDamage(float amount, Vector3 direction, Vector3 position, Vector3 source) : base(amount, direction, position, source) { }
 }
+
+public class ElectricalDamage : Damage {
+    public ElectricalDamage(float amount, Vector3 direction, Vector3 position, Vector3 source) : base(amount, direction, position, source) { }
+}

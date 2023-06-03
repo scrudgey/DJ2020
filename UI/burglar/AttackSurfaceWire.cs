@@ -8,36 +8,51 @@ public class AttackSurfaceWire : MonoBehaviour {
     public PoweredComponent[] poweredComponentsToDisable;
     public SecurityCamera securityCamera;
     public string resultText;
+    public bool electricalDamage;
     public BurglarAttackResult DoCut() {
         BurglarAttackResult result = BurglarAttackResult.None;
+
+        if (electricalDamage) {
+            result = BurglarAttackResult.None with {
+                success = false,
+                electricDamage = new ElectricalDamage(10f, Vector3.up, transform.position, transform.position)
+            };
+            return result;
+        }
+
         foreach (AlarmComponent component in alarmComponentsToDisable) {
             GameManager.I.SetNodeEnabled<AlarmComponent, AlarmNode>(component, false);
-            result = BurglarAttackResult.None with {
+            result = result with {
                 success = true,
-                feedbackText = resultText
+                feedbackText = resultText,
+                makeTamperEvidenceSuspicious = true
             };
         }
         foreach (AlarmComponent component in alarmComponentsToActivate) {
             GameManager.I.SetAlarmNodeState(component, true);
-            result = BurglarAttackResult.None with {
+            result = result with {
                 success = true,
-                feedbackText = resultText
+                feedbackText = resultText,
+                makeTamperEvidenceSuspicious = true
             };
         }
         foreach (PoweredComponent component in poweredComponentsToDisable) {
             GameManager.I.SetNodeEnabled<PoweredComponent, PowerNode>(component, false);
-            result = BurglarAttackResult.None with {
+            result = result with {
                 success = true,
-                feedbackText = resultText
+                feedbackText = resultText,
+                makeTamperEvidenceSuspicious = true
             };
         }
         if (securityCamera != null) {
             securityCamera.doRotate = false;
-            result = BurglarAttackResult.None with {
+            result = result with {
                 success = true,
-                feedbackText = resultText
+                feedbackText = resultText,
+                makeTamperEvidenceSuspicious = true
             };
         }
+
 
         return result;
     }

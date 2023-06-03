@@ -362,7 +362,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
             if (other.CompareTag("tamperEvidence")) {
                 TamperEvidence evidence = other.GetComponent<TamperEvidence>();
-                if (!evidence.reported) {
+                if (evidence.suspicious && !evidence.reported) {
                     switch (stateMachine.currentState) {
                         case SphereMoveState:
                         case SpherePatrolState:
@@ -376,6 +376,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     }
                 }
             }
+            
             if (stateMachine.currentState != null)
                 stateMachine.currentState.OnObjectPerceived(other);
         }

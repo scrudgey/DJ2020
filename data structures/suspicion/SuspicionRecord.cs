@@ -410,19 +410,19 @@ public class SuspicionRecord {
         lifetime = 120f,
         maxLifetime = 120f,
         dialogue = new SuspicionDialogueParameters {
-            challenge = $"Do you know anything about the {evidence.data.target.name} that was tampered with?",
+            challenge = $"Do you know anything about the {evidence.targetName} that was tampered with?",
             tactics = new List<DialogueTactic>{
-                        new DialogueTactic{
+                        new DialogueTactic {
                             tacticType = DialogueTacticType.lie,
                             content = $"No clue.",
                             successResponse = "Understood.",
                             failResponse = "Oh yeah? You don't look like one."
                         },
-                        new DialogueTactic{
+                        new DialogueTactic {
                             tacticType = DialogueTacticType.challenge,
-                            content = $"What do I look like, the {evidence.data.target.name} inspector?",
+                            content = $"What do I look like, the {evidence.targetName} inspector?",
                             successResponse = "Well, I have to ask.",
-                            failResponse = $"You look like someone who might mess with a {evidence.data.target.name}."
+                            failResponse = $"You look like someone who might mess with a {evidence.targetName}."
                         }
                     }
         }

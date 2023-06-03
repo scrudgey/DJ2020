@@ -37,6 +37,6 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     }
 
     void OnDestroy() {
-        uiElement.HandleElementDestroyed();
+        uiElement?.HandleElementDestroyed();
     }
 }

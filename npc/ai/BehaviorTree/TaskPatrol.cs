@@ -42,9 +42,6 @@ namespace AI {
         }
 
         void setupRootNode() {
-
-
-
             if (reverse) {
                 navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position).Reverse());
             } else {
@@ -57,6 +54,7 @@ namespace AI {
                 .First();
 
             while (navPoints.Peek() != closestPoint && navPoints.Count > 0) {
+                // Debug.Log($"pop: {navPoints.Count} {navPoints.Peek()} {closestPoint}");
                 navPoints.Pop();
             }
 
