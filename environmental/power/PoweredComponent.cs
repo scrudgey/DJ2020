@@ -10,10 +10,11 @@ public class PoweredComponent : GraphNodeComponent<PoweredComponent, PowerNode> 
             _power = value;
             // if (dirty)
             OnStateChange?.Invoke(this);
+            OnPowerChange();
         }
     }
     public override PowerNode GetNode() => GameManager.I.GetPowerNode(idn);
-
+    protected virtual void OnPowerChange() { }
 #if UNITY_EDITOR
     protected override void OnDrawGizmos() {
         foreach (PoweredComponent other in edges) {

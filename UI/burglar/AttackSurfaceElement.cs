@@ -10,6 +10,8 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public int progressStages = 1;
     public int progressStageIndex = 0;
     public AttackSurfaceUIElement uiElement;
+    public Sprite buttonSprite;
+
     public virtual void Initialize(AttackSurfaceUIElement uiElement) {
         this.uiElement = uiElement;
     }

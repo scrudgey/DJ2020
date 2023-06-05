@@ -415,6 +415,7 @@ public class Toolbox {
                 SpriteRenderer spriteRenderer = (SpriteRenderer)renderer;
                 if (spriteRenderer.sprite != null) {
                     bounds = spriteRenderer.sprite.bounds;
+                    // bounds = spriteRenderer.bounds;
 
                     // weird hack. maybe because billboarding? i.e. should be camera angle dependent?
                     Vector3 extents = bounds.extents;

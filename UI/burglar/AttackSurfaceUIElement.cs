@@ -15,6 +15,7 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     public RectTransform dividerRect2;
     public RectTransform containerRectTransform;
     public BurgleTargetData data;
+    public Image[] buttonImages;
 
     public void Initialize(BurglarCanvasController controller, AttackSurfaceElement element) {
         this.controller = controller;

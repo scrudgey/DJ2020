@@ -112,11 +112,20 @@ public class BurglarCanvasController : MonoBehaviour {
             Image cursorImage = obj.GetComponent<Image>();
             cursorImage.color = Color.red;
             SpriteRenderer spriteRenderer = element.GetComponentInChildren<SpriteRenderer>();
-            if (spriteRenderer != null) {
-                cursorImage.sprite = spriteRenderer.sprite;
-                cursorImage.alphaHitTestMinimumThreshold = 0.5f;
+            if (element.buttonSprite != null) {
+                foreach (Image image in uiElement.buttonImages) {
+                    image.sprite = element.buttonSprite;
+                    // image.alphaHitTestMinimumThreshold = 0.5f;
+                    image.type = Image.Type.Simple;
+                    image.color = Color.clear;
+                }
+            } else {
+                foreach (Image image in uiElement.buttonImages) {
+                    image.type = Image.Type.Simple;
+                    image.color = Color.clear;
+                }
             }
-            // cursorImage.enabled = false;
+            cursorImage.enabled = false;
         }
 
         foreach (BurglarSelectorButton button in selectorButtons) {

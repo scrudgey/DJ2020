@@ -2308,6 +2308,15 @@ note: layer "interactive"
     * camera
     * datastore
     * alarm box
+* tampering evidence is visible when door is open
+* alarm components that are active blink a red light, sound an alarm
+* guards can notice the blinking light / hear the sound
+* way to replace panel?
+* cutting the wrong wire can zap
+* fix audiosource on all doorknobs (previously was door reference)
+* blink lasers when player trips them
+* stop buzzing sound on transformer when power is disabled
+
 
 
 
@@ -2327,6 +2336,17 @@ uncertain:
     larger / more clear crosshairs cursor
     upgrade unity
         newtonsoft json is broken??
+        bolt cutter?
+    router panel conceals a second port?
+    way to hack camera without opening panel?
+    electrical zap effect around broken wires?
+    shooting the objects
+        shoot laser tripwire to disable?
+        shoot alarm box to disable?
+    redo networks:
+        remove transferState. instead, every cyber component should bind to the state of the cyber node.
+        enable progress 
+
 
 nice to have / future goals:
     after action report should be fragmentary, show reward, over a transit cutscene
@@ -2775,7 +2795,6 @@ world:
         sometimes, torso + legs are set dependently.
 
 
-hacking / viruses should be dynamic: detected and fixed in realtime by ICE
 
 
 
@@ -2801,57 +2820,22 @@ gameplay:
 4. more levels
 5. stealth kills
 
-hacking: there should be more data to steal
-    some data is paydata
-    some is useful for social engineering
-    network hacking: limited range, hacking restricted by software
-    hacking should indicate ahead of time the potential outcomes?
-        hack camera to disable
-        hack datastore to get data
+
 
 both credstick and keys can pop up in loot display
-
-redo networks:
-    remove transferState. instead, every cyber component should bind to the state of the cyber node.
-    enable progress 
 
 lockpicking
     discrete units
 hack router
 hack camera
-
+size of connecting port
 in alarm graph refresh, updating alarm terminal state doesn't work 100% when we are trying to modify alarm terminal directly.
-
-* tampering evidence is visible when door is open
-* alarm components that are active blink a red light, sound an alarm
-* guards can notice the blinking light / hear the sound
-* way to replace panel?
-* cutting the wrong wire can zap
-* fix audiosource on all doorknobs (previously was door reference)
-* blink lasers when player trips them
-
+better wire materials
 
 clicking button through panel
-    new approach is very good, except it fails in a few places with multiple or no sprite renderers
-    attack surface elements should specify sprite.
-
-better wire materials
-stop buzzing sound on transformer when power is disabled
-
-electrical zap effect around broken wires?
 
 
-bolt cutter?
-router panel conceals a second port?
-way to hack camera without opening panel?
-shooting the objects
-    shoot laser tripwire to disable?
-    shoot alarm box to disable?
 
 
-how is lockpicking going to work?
-    discrete units indicate pins
-    blinking pin indicates a pin in progress?
-    setback: stop pin in progress, hold at previous pins
 
 
