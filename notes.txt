@@ -2316,7 +2316,20 @@ note: layer "interactive"
 * fix audiosource on all doorknobs (previously was door reference)
 * blink lasers when player trips them
 * stop buzzing sound on transformer when power is disabled
-
+*lockpicking
+    * discrete units
+* choose a number of indexes: 1 through 4, say
+* progress increases 0-1, when it reaches one, we increase index by 1
+* if we hit a setback, progress goes to 0, but index stays.
+    * play setback sound
+    * play sound on reaching progress
+    * stop pick wiggle
+* do not start full alpha
+* reset pip status on setback
+* pulse an effect on pick hit
+* faster pulsing
+* on setback:
+    * don't hide at 0 progress
 
 
 
@@ -2824,8 +2837,6 @@ gameplay:
 
 both credstick and keys can pop up in loot display
 
-lockpicking
-    discrete units
 hack router
 hack camera
 size of connecting port
@@ -2834,8 +2845,5 @@ better wire materials
 
 clicking button through panel
 
-
-
-
-
+we should change all interactions to be based on raycasting- like with the wirecutter.
 

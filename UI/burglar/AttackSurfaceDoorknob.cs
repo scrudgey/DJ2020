@@ -12,6 +12,8 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public AudioClip[] pickSounds;
     public AudioClip[] manipulateSounds;
     public AudioClip[] keySounds;
+    public AudioClip[] pinSetSound;
+    public AudioClip[] setbackSound;
     public float integratedPickTime;
     bool clickedThisFrame;
     public bool isHandle;
@@ -81,9 +83,12 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
             float roll = Random.Range(0f, 1f);
             if (integratedPickTime > 0.2f && roll < Time.deltaTime * setbackProb) {
                 setback = true;
-                integratedPickTime *= Random.Range(0.25f, 0.75f);
+                resetToolJiggle = true;
+                integratedPickTime = 0;
                 SetProgressPercent();
+                audioSource.Stop();
                 OnValueChanged?.Invoke(this);
+                Toolbox.RandomizeOneShot(audioSource, setbackSound);
             }
 
             if (integratedPickTime > 2f) {
@@ -103,6 +108,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     }
     public override void HandleMouseUp() {
         base.HandleMouseUp();
+        this.resetToolJiggle = false;
         SetProgressPercent();
         setback = false;
         OnValueChanged?.Invoke(this);
@@ -119,6 +125,8 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         integratedPickTime = 0f;
         progressPercent = 0f;
         progressStageIndex += 1;
+        // TODO: play sound
+        Toolbox.RandomizeOneShot(audioSource, pinSetSound);
     }
 
     protected virtual BurglarAttackResult DoPick() {
@@ -136,7 +144,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         if (integratedPickTime > 0f) {
             if (!clickedThisFrame) {
                 if (setback) {
-                    integratedPickTime -= Time.deltaTime / 3f;
+                    // integratedPickTime -= Time.deltaTime / 3f;
                 } else {
                     integratedPickTime -= Time.deltaTime;
                 }
@@ -148,8 +156,9 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     }
 
     void SetProgressPercent() {
-        float baseline = (1.0f * progressStageIndex) / (1.0f * progressStages);
-        float progress = (integratedPickTime / 2f) * (1f / (1.0f * progressStages));
-        progressPercent = baseline + progress;
+        // float baseline = (1.0f * progressStageIndex) / (1.0f * progressStages);
+        // float progress = (integratedPickTime / 2f) * (1f / (1.0f * progressStages));
+        // progressPercent = baseline + progress;
+        progressPercent = (integratedPickTime / 2f);
     }
 }

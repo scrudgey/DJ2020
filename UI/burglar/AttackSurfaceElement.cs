@@ -11,14 +11,18 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public int progressStageIndex = 0;
     public AttackSurfaceUIElement uiElement;
     public Sprite buttonSprite;
+    public bool resetToolJiggle;
+    public bool engaged;
 
     public virtual void Initialize(AttackSurfaceUIElement uiElement) {
         this.uiElement = uiElement;
     }
     public virtual BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
+        engaged = true;
         return BurglarAttackResult.None;
     }
     public virtual BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
+        engaged = true;
         return BurglarAttackResult.None;
     }
 
@@ -26,6 +30,8 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
 
     }
     public virtual void HandleFocusLost() {
+        engaged = false;
+        resetToolJiggle = false;
         OnValueChanged?.Invoke(this);
     }
     public void ForceUpdate() {

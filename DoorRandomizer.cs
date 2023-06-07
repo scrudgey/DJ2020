@@ -45,7 +45,7 @@ public class DoorRandomizer : MonoBehaviour {
 
         foreach (AttackSurfaceDoorknob knob in knobs) {
             knob.setbackProb = Random.Range(0f, 0.6f);
-            knob.progressStages = Random.Range(1, 4);
+            knob.progressStages = Random.Range(3, 4);
         }
         door.autoClose = autoClose;
 

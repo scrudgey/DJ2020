@@ -211,7 +211,7 @@ public class BurglarCanvasController : MonoBehaviour {
             if (selectedElement != null) {
                 ClickHeld(selectedElement);
             }
-            if (ToolIsJiggly(selectedTool) && jiggleCoroutine == null) {
+            if (ToolIsJiggly(selectedTool) && jiggleCoroutine == null && !selectedElement.resetToolJiggle) {
                 jiggleCoroutine = StartCoroutine(JiggleTool());
             }
         } else {
@@ -222,6 +222,11 @@ public class BurglarCanvasController : MonoBehaviour {
                 StopCoroutine(jiggleCoroutine);
                 jiggleCoroutine = null;
             }
+        }
+
+        if (jiggleCoroutine != null && selectedElement.resetToolJiggle) {
+            StopCoroutine(jiggleCoroutine);
+            jiggleCoroutine = null;
         }
         switch (selectedTool) {
             case BurglarToolType.lockpick:

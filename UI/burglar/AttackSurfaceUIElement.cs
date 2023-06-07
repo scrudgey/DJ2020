@@ -16,6 +16,7 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     public RectTransform containerRectTransform;
     public BurgleTargetData data;
     public Image[] buttonImages;
+    public UIProgressPip[] progressPips;
 
     public void Initialize(BurglarCanvasController controller, AttackSurfaceElement element) {
         this.controller = controller;
@@ -42,6 +43,10 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
     public void HideProgress() {
         progressBarObject.SetActive(false);
+        for (int i = 0; i < progressPips.Length; i++) {
+            progressPips[i].gameObject.SetActive(false);
+            progressPips[i].SetProgress(false, false);
+        }
     }
     public void SetProgress(float percent, int progressStages, int stageIndex) {
         SetProgressDimensions(progressStages, stageIndex);
@@ -73,9 +78,11 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
     public override void HandleValueChanged(AttackSurfaceElement element) {
         SetPosition();
-        if (element.progressPercent > 0) {
-            ShowProgress();
-            SetProgress(element.progressPercent, element.progressStages, element.progressStageIndex);
+        if (element.progressPercent > 0 || element.progressStageIndex > 0 || element.engaged) {
+            SetPipVisibility(element.progressStages);
+            SetPipProgress(element.progressPercent, element.progressStages, element.progressStageIndex);
+            // ShowProgress();
+            // SetProgress(element.progressPercent, element.progressStages, element.progressStageIndex);
         } else {
             HideProgress();
         }
@@ -96,6 +103,29 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
         rectTransform.anchoredPosition = position;
         rectTransform.sizeDelta = new Vector2(bounds.width, bounds.height);
 
+    }
+
+    void SetPipVisibility(int number) {
+        for (int i = 0; i < progressPips.Length; i++) {
+            progressPips[i].gameObject.SetActive(i < number);
+            // progressPips[i].SetProgress(false, false);
+        }
+    }
+
+    void SetPipProgress(float percent, int progressStages, int stageIndex) {
+        Debug.Log($"{percent} {progressStages} {stageIndex}");
+        for (int i = 0; i < stageIndex; i++) {
+            progressPips[i].SetProgress(false, true);
+        }
+        if (percent > 0) {
+            progressPips[stageIndex].SetProgress(true, false);
+        } else {
+            progressPips[stageIndex].SetProgress(false, false);
+        }
+
+        for (int i = stageIndex + 1; i < progressPips.Length; i++) {
+            progressPips[i].SetProgress(false, false);
+        }
     }
 
     public void HandleElementDestroyed() {
