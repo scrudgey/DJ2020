@@ -494,7 +494,6 @@ public partial class GameManager : Singleton<GameManager> {
         if (applicationIsQuitting) return;
         if (node == null) return;
         if (node.enabled) {
-            Debug.Log($"setting alarm node {node}->{state}");
             node.alarmTriggered = state;
             if (state) {
                 node.countdownTimer = 30f;

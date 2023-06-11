@@ -12,6 +12,7 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
     [Header("sfx")]
     public AudioSource audioSource;
     public AudioClip[] openSounds;
+    public BoxCollider boxCollider;
 
     bool defeated;
 
@@ -48,6 +49,7 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
                 defeated = true;
                 coverSprite.enabled = false;
                 uiElement.gameObject.SetActive(false);
+                boxCollider.enabled = false;
                 return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Latch guard removed",

@@ -100,7 +100,7 @@ public class BurglarCanvasController : MonoBehaviour {
         rawImage.texture = data.target.renderTexture;
         rawImage.color = Color.white;
         RectTransform containerRectTransform = uiElementsContainer.GetComponent<RectTransform>();
-        foreach (AttackSurfaceElement element in data.target.attackElementRoot.GetComponentsInChildren<AttackSurfaceElement>()) {
+        foreach (AttackSurfaceElement element in data.target.attackElementRoot.GetComponentsInChildren<AttackSurfaceElement>(true)) {
             GameObject obj = GameObject.Instantiate(UIElementPrefab);
             AttackSurfaceUIElement uiElement = obj.GetComponent<AttackSurfaceUIElement>();
             obj.transform.SetParent(uiElementsContainer);
@@ -186,9 +186,46 @@ public class BurglarCanvasController : MonoBehaviour {
         if (mouseOverTimeout > 0) {
             mouseOverTimeout -= Time.unscaledDeltaTime;
         }
+        if (data != null && data.target != null)
+            RaycastToolPosition();
+    }
+    void RaycastToolPosition() {
+        Vector3 cursorPoint = toolPoint.anchoredPosition;
+        cursorPoint -= camImageTransform.position;
+        cursorPoint.z = data.target.attackCam.nearClipPlane;
+        Ray projection = data.target.attackCam.ScreenPointToRay(cursorPoint);
+        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.interactive, Layer.attackSurface, Layer.bulletOnly));
+        bool noHitFound = true;
+        foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
+            AttackSurfaceElement element = hit.collider.GetComponentInChildren<AttackSurfaceElement>();
+            if (element != null) {
+                noHitFound = false;
+                if (element != null && element != selectedElement) {
+                    noHitFound = false;
+                    // Debug.Log($"happening: {element} {selectedElement} ");
+                    if (selectedElement != null) {
+                        MouseExitUIElementCallback(selectedElement);
+                    }
+                    MouseOverUIElementCallback(element);
+                }
+                break;
+            }
+
+        }
+        if (noHitFound && selectedElement != null) {
+            MouseExitUIElementCallback(selectedElement);
+        }
+        if (hits.Length == 0 && selectedElement != null) {
+            MouseExitUIElementCallback(selectedElement);
+        }
+        // key is to find AttackSurfaceElement
     }
     public void UpdateWithInput(PlayerInput input) {
-        mouseDown = input.mouseDown;
+        bool newMouseDown = input.mouseDown;
+        if (newMouseDown != mouseDown && newMouseDown) {
+            ClickDownCallback(selectedElement);
+        }
+        mouseDown = newMouseDown;
         PositionTool(input.mousePosition);
 
         // TODO: fix
@@ -252,31 +289,24 @@ public class BurglarCanvasController : MonoBehaviour {
         HandleAttackResult(result);
     }
     public void ClickDownCallback(AttackSurfaceElement element) {
-        if (finishing)
+        if (element == null || finishing)
             return;
         BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
         HandleAttackResult(result);
     }
-    public void ClickCallback(AttackSurfaceElement element) {
-        // if (finishing)
-        //     return;
-        // BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
-        // HandleAttackResult(result);
-    }
+
     public void HandleAttackResult(BurglarAttackResult result) {
         if (selectedTool == BurglarToolType.usb && result.success) {
             usbCableAttached = true;
             ToolSelectCallback("none");
-            // usbCable.transform.position = result.element.transform.position;
             usbRectTransform.position = result.element.uiElement.rectTransform.position;
             usbCable.transform.SetParent(transform, true);
             usbCableCanvasGroup.enabled = false;
             cyberdeckRect.transform.SetAsLastSibling();
             uSBCordTool.Slacken(true);
-
-            // this is where we provide the cyberdeck the connected cyberware
-            if (result.attachedDataStore != null)
-                cyberdeckController.HandleConnection(result.attachedDataStore);
+            Rect bounds = Toolbox.GetTotalRenderBoundingBox(result.element.transform, data.target.attackCam);
+            uSBCordTool.SetSize(bounds.width / 1.8f);
+            cyberdeckController.HandleConnection(result);
         }
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
@@ -289,9 +319,10 @@ public class BurglarCanvasController : MonoBehaviour {
         if (result.makeTamperEvidenceSuspicious) {
             data.target.tamperEvidence.suspicious = true;
         }
-        foreach (Vector3 lockPosition in result.lockPositions) {
-            CreateLockIndicator(lockPosition);
-        }
+        if (result.lockPositions != null)
+            foreach (Vector3 lockPosition in result.lockPositions) {
+                CreateLockIndicator(lockPosition);
+            }
         if (result.panel != null) {
             data.target.replaceablePanel = result.panel;
             panelButton.SetActive(true);
@@ -335,21 +366,24 @@ public class BurglarCanvasController : MonoBehaviour {
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
         mouseOverElement = true;
+        if (selectedElement != element && selectedTool != BurglarToolType.usb && selectedTool != BurglarToolType.none && mouseOverTimeout <= 0) {
+            mouseOverTimeout = 0.75f;
+            Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
+        }
         SetSelectedElement(element);
         if (selectedTool == BurglarToolType.none) {
             captionText.text = $"Use {element.elementName}";
         } else {
-            if (selectedTool != BurglarToolType.usb && mouseOverTimeout <= 0) {
-                mouseOverTimeout = 0.2f;
-                Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
-            }
             captionText.text = $"Use {selectedTool} on {element.elementName}";
         }
+        element.OnMouseOver();
     }
     public void MouseExitUIElementCallback(AttackSurfaceElement element) {
         captionText.text = "";
         mouseOverElement = false;
         SetSelectedElement(null);
+        if (element != null)
+            element.OnMouseExit();
     }
     void SetSelectedElement(AttackSurfaceElement newElement) {
         if (newElement == selectedElement) return;
@@ -475,6 +509,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 usbCable.SetActive(true);
                 usbCableCanvasGroup.enabled = true;
                 uSBCordTool.Slacken(false);
+                Debug.Log(usbCable);
                 break;
             case BurglarToolType.wirecutter:
                 probeImage.enabled = false;

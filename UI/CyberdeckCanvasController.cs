@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,8 +18,12 @@ public class CyberdeckCanvasController : MonoBehaviour {
     public RectTransform progressBar;
     public TextMeshProUGUI progressText1;
     public TextMeshProUGUI progressText2;
-
+    [Header("software")]
+    public GameObject virusButton;
+    public GameObject downloadButton;
     CyberDataStore attachedDataStore;
+    CyberComponent targetComponent;
+    // CyberDataStore attachedDataStore;
     HackData currentHackData;
     void Start() {
         bodyText.SetActive(true);
@@ -34,36 +39,70 @@ public class CyberdeckCanvasController : MonoBehaviour {
         if (currentHackData != null) {
             float totalWidth = progressBarParent.rect.width;
             float progress = currentHackData.timer / currentHackData.lifetime;
+            progress = (float)PennerDoubleAnimation.QuintEaseInOut(progress, 0f, 1f, 1f);
             float width = progress * totalWidth;
             progressBar.sizeDelta = new Vector2(width, 1f);
+            int progressInt = (int)(progress * 100);
+            progressText2.text = $"{progressInt} %";
             if (progress >= 1) {
-                progressBarParent.gameObject.SetActive(false);
-                progressText1.enabled = true;
-                progressText1.text = "Downloaded file:";
-                progressText2.enabled = true;
-                progressText2.text = attachedDataStore.payDatas[0].filename;
-
-                currentHackData = null;
+                ShowAttackComplete();
             }
         } else {
             progressBar.sizeDelta = new Vector2(0f, 1f);
         }
     }
 
-    public void HandleConnection(CyberDataStore dataStore) {
-        attachedDataStore = dataStore;
-        if (dataStore != null) {
-            bodyText.SetActive(false);
-            bodyDetect.SetActive(true);
-            bodyMenu.SetActive(false);
-            bodyProgress.SetActive(false);
+    void ShowAttackComplete() {
+        if (attachedDataStore != null) {
+            ShowDownloadComplete();
+        } else {
+            ShowUploadComplete();
+        }
+        currentHackData = null;
+        attachedDataStore = null;
+        targetComponent = null;
+    }
+
+    void ShowDownloadComplete() {
+        progressBarParent.gameObject.SetActive(false);
+        progressText1.enabled = true;
+        progressText2.enabled = true;
+        progressText1.text = "Downloaded file:";
+        if (attachedDataStore != null)
+            progressText2.text = attachedDataStore.payDatas[0].filename;
+    }
+    void ShowUploadComplete() {
+        progressBarParent.gameObject.SetActive(false);
+        progressText1.enabled = true;
+        progressText2.enabled = true;
+        progressText1.text = "Payload complete";
+        progressText2.text = "virus.exe";
+    }
+
+    public void HandleConnection(BurglarAttackResult result) {
+        if (result != null) {
+            attachedDataStore = result.attachedDataStore;
+            targetComponent = result.attachedCyberComponent;
+        }
+        if (attachedDataStore != null || targetComponent != null) {
             StartCoroutine(BlinkDetect((bool value) => bodyDetect.SetActive(value), ShowBodyMenu));
         } else {
-            bodyText.SetActive(true);
-            bodyDetect.SetActive(false);
-            bodyMenu.SetActive(false);
-            bodyProgress.SetActive(false);
+            ShowBodyText();
         }
+    }
+
+    void ShowBodyText() {
+        bodyText.SetActive(true);
+        bodyDetect.SetActive(false);
+        bodyMenu.SetActive(false);
+        bodyProgress.SetActive(false);
+    }
+
+    void ShowDetectText() {
+        bodyText.SetActive(false);
+        bodyDetect.SetActive(true);
+        bodyMenu.SetActive(false);
+        bodyProgress.SetActive(false);
     }
 
     void ShowBodyMenu() {
@@ -71,7 +110,17 @@ public class CyberdeckCanvasController : MonoBehaviour {
         bodyDetect.SetActive(false);
         bodyMenu.SetActive(true);
         bodyProgress.SetActive(false);
+        ShowSoftwareButtons();
+    }
 
+    void ShowSoftwareButtons() {
+        if (attachedDataStore != null) {
+            virusButton.SetActive(false);
+            downloadButton.SetActive(true);
+        } else if (targetComponent != null) {
+            virusButton.SetActive(true);
+            downloadButton.SetActive(false);
+        }
     }
 
     void ShowDownloadProgress() {
@@ -82,6 +131,8 @@ public class CyberdeckCanvasController : MonoBehaviour {
     }
 
     IEnumerator BlinkDetect(Action<bool> handleValue, Action callback) {
+        ShowDetectText();
+
         float timer = 0f;
         float duration = 0.5f;
         float blinkTimer = 0f;
@@ -132,8 +183,16 @@ public class CyberdeckCanvasController : MonoBehaviour {
 
 
     public void DataThiefButtonCallback() {
+        SetUpProgressBar("Downloading...", attachedDataStore.cyberComponent.GetNode());
+    }
+
+    public void CameraHackButtonCallback() {
+        SetUpProgressBar("Uploading virus...", targetComponent.GetNode());
+    }
+
+    void SetUpProgressBar(string progressTitle, CyberNode targetNode) {
         HackInput hackInput = new HackInput() {
-            targetNode = attachedDataStore.cyberComponent.GetNode(),
+            targetNode = targetNode,
             type = HackType.manual
         };
 
@@ -141,8 +200,10 @@ public class CyberdeckCanvasController : MonoBehaviour {
 
         progressBarParent.gameObject.SetActive(true);
         progressText1.enabled = true;
-        progressText1.text = "Downloading...";
-        progressText2.enabled = false;
+        progressText1.text = progressTitle;
+        // progressText2.enabled = false;
+        progressText2.enabled = true;
+        progressText2.text = "0%";
         ShowDownloadProgress();
     }
 }

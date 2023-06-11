@@ -2810,10 +2810,17 @@ world:
 
 
 
+* clicking button through panel
+* we should change all interactions to be based on raycasting- like with the wirecutter.
+* possibly: use a tag for attack surface.
+* put colliders on all attack surface elements
+* fix clicking repeatedly on mousedown
+* play and effect on pick complete
+* door latch
+* hack in interact mode
 
 radial menu for selecting guns and items?
     unify items and guns
-* hack in interact mode
 what happened to the sphere robot?
 tactics pane should look like calling people up and haggling with them
 
@@ -2837,13 +2844,13 @@ gameplay:
 
 both credstick and keys can pop up in loot display
 
-hack router
-hack camera
-size of connecting port
+* hack router
+* hack camera
+* fix broken usb attach
+* show different outcome for virus upload
+* show download percentage
+* size of connecting port
+
+check that mouse is within burglarcam before doing raycast
 in alarm graph refresh, updating alarm terminal state doesn't work 100% when we are trying to modify alarm terminal directly.
 better wire materials
-
-clicking button through panel
-
-we should change all interactions to be based on raycasting- like with the wirecutter.
-

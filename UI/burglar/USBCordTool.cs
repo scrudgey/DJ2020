@@ -9,6 +9,7 @@ public class USBCordTool : MonoBehaviour {
     public UILineRenderer uILineRenderer;
     public RectTransform toolTip;
     public RectTransform anchor;
+    public RectTransform graphicRect;
     Catenary catenary;
     float slack;
     float slackFactor;
@@ -33,6 +34,10 @@ public class USBCordTool : MonoBehaviour {
 
     public void Slacken(bool value) {
         extraSlack = value;
+    }
+
+    public void SetSize(float scale) {
+        graphicRect.sizeDelta = scale * Vector2.one;
     }
 
     Vector2[] GetPoints() {

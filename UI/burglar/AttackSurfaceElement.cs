@@ -13,6 +13,7 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public Sprite buttonSprite;
     public bool resetToolJiggle;
     public bool engaged;
+    public bool complete;
 
     public virtual void Initialize(AttackSurfaceUIElement uiElement) {
         this.uiElement = uiElement;
@@ -25,7 +26,6 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
         engaged = true;
         return BurglarAttackResult.None;
     }
-
     public virtual void HandleMouseUp() {
 
     }
@@ -43,7 +43,6 @@ public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElemen
     public virtual void OnMouseExit() {
 
     }
-
     void OnDestroy() {
         uiElement?.HandleElementDestroyed();
     }

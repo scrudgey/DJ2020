@@ -112,7 +112,6 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         ItemUseResult result = ItemUseResult.Empty();
         result.attackSurface = attackSurface;
         result.doBurgle = true;
-        Debug.Log($"doburgle: {attackSurface}");
         characterController.HandleItemUseResult(result);
     }
 }

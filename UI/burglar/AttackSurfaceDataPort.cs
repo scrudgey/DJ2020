@@ -6,6 +6,7 @@ public class AttackSurfaceDataPort : AttackSurfaceElement {
     public AudioSource audioSource;
     public AudioClip attachSound;
     public CyberDataStore dataStore;
+    public CyberComponent cyberComponent;
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.usb) {
@@ -14,7 +15,8 @@ public class AttackSurfaceDataPort : AttackSurfaceElement {
                 success = true,
                 feedbackText = "connected dataport",
                 element = this,
-                attachedDataStore = dataStore
+                attachedDataStore = dataStore,
+                attachedCyberComponent = cyberComponent
             };
         }
         return BurglarAttackResult.None;

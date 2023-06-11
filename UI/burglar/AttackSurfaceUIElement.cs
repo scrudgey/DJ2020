@@ -24,28 +24,30 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
         HideProgress();
         SetPosition();
     }
-    public void ClickCallback() {
-        controller.ClickCallback(element);
-    }
-    public void ClickDownCallback() {
-        controller.ClickDownCallback(element);
-    }
-    public void MouseOverCallback() {
-        controller.MouseOverUIElementCallback(element);
-        element.OnMouseOver();
-    }
-    public void MouseExitCallback() {
-        controller.MouseExitUIElementCallback(element);
-        element.OnMouseExit();
-    }
+
+    // TO CHANGE
+    // public void ClickCallback() {
+    //     controller.ClickCallback(element);
+    // }
+    // public void ClickDownCallback() {
+    //     controller.ClickDownCallback(element);
+    // }
+    // public void MouseOverCallback() {
+    //     controller.MouseOverUIElementCallback(element);
+    // }
+    // public void MouseExitCallback() {
+    //     controller.MouseExitUIElementCallback(element);
+    // }
+
     public void ShowProgress() {
         progressBarObject.SetActive(true);
     }
     public void HideProgress() {
         progressBarObject.SetActive(false);
         for (int i = 0; i < progressPips.Length; i++) {
-            progressPips[i].gameObject.SetActive(false);
-            progressPips[i].SetProgress(false, false);
+            // progressPips[i].gameObject.SetActive(false);
+            // progressPips[i].SetProgress(false, false);
+            progressPips[i].Hide();
         }
     }
     public void SetProgress(float percent, int progressStages, int stageIndex) {
@@ -77,6 +79,12 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
         }
     }
     public override void HandleValueChanged(AttackSurfaceElement element) {
+        if (element == null || gameObject == null) return;
+        if (element.complete) {
+            BlinkCompletePips();
+            element.complete = false;
+            return;
+        }
         SetPosition();
         if (element.progressPercent > 0 || element.progressStageIndex > 0 || element.engaged) {
             SetPipVisibility(element.progressStages);
@@ -89,6 +97,7 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
 
     void SetPosition() {
+        if (element == null) return;
         Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, data.target.attackCam, adjustYScale: false);
 
         rectTransform.anchorMin = Vector2.zero;
@@ -113,7 +122,7 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
 
     void SetPipProgress(float percent, int progressStages, int stageIndex) {
-        Debug.Log($"{percent} {progressStages} {stageIndex}");
+        // Debug.Log($"{percent} {progressStages} {stageIndex}");
         for (int i = 0; i < stageIndex; i++) {
             progressPips[i].SetProgress(false, true);
         }
@@ -130,5 +139,11 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
 
     public void HandleElementDestroyed() {
         Destroy(gameObject);
+    }
+
+    public void BlinkCompletePips() {
+        foreach (UIProgressPip pip in progressPips) {
+            pip.BlinkComplete();
+        }
     }
 }

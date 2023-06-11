@@ -14,6 +14,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public AudioClip[] keySounds;
     public AudioClip[] pinSetSound;
     public AudioClip[] setbackSound;
+    public AudioClip[] finishSound;
     public float integratedPickTime;
     bool clickedThisFrame;
     public bool isHandle;
@@ -64,7 +65,13 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                         .ToList()
                 };
             }
-
+        } else if (activeTool == BurglarToolType.lockpick) {
+            if (!doorLock.locked) {
+                return BurglarAttackResult.None with {
+                    success = true,
+                    feedbackText = "Already unlocked"
+                };
+            }
         }
 
         return BurglarAttackResult.None;
@@ -98,12 +105,13 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                 if (progressStageIndex >= progressStages)
                     return DoPick();
             }
-        } else if (!doorLock.locked) {
-            return BurglarAttackResult.None with {
-                success = true,
-                feedbackText = "Already unlocked"
-            };
         }
+        // else if (!doorLock.locked) {
+        //     return BurglarAttackResult.None with {
+        //         success = true,
+        //         feedbackText = "Already unlocked"
+        //     };
+        // }
         return BurglarAttackResult.None;
     }
     public override void HandleMouseUp() {
@@ -133,6 +141,10 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         bool success = doorLock.lockType == DoorLock.LockType.physical && doorLock.locked;
         doorLock.PickLock();
         if (success) {
+            complete = true;
+            audioSource.Stop();
+            Toolbox.AudioSpeaker(transform.position, finishSound);
+            OnValueChanged?.Invoke(this);
             return BurglarAttackResult.None with {
                 success = true,
                 feedbackText = "Door unlocked"

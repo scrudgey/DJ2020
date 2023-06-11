@@ -11,6 +11,7 @@ public class UIProgressPip : MonoBehaviour {
     Coroutine pulseRoutine;
     public RectTransform pulserImage;
     public bool complete;
+    bool finishing;
     void Start() {
         pulserImage.gameObject.SetActive(false);
     }
@@ -55,6 +56,15 @@ public class UIProgressPip : MonoBehaviour {
         pulseRoutine = null;
     }
 
+    public void BlinkComplete() {
+        finishing = true;
+        if (pulseRoutine != null) {
+            StopCoroutine(pulseRoutine);
+            pulseRoutine = null;
+        }
+        StartCoroutine(BlinkCompleteRoutine());
+    }
+
     IEnumerator PulseColor() {
         float timer = 0f;
         float duration = 0.25f;
@@ -62,7 +72,6 @@ public class UIProgressPip : MonoBehaviour {
             timer += Time.unscaledDeltaTime;
             float alpha = (float)PennerDoubleAnimation.ExpoEaseInOut(timer, 0.2f, 0.6f, duration);
             Color newColor = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
-            Debug.Log(newColor);
             fillPip.color = newColor;
             if (timer > duration) {
                 timer -= duration;
@@ -82,5 +91,36 @@ public class UIProgressPip : MonoBehaviour {
             yield return null;
         }
         pulserImage.gameObject.SetActive(false);
+    }
+
+    IEnumerator BlinkCompleteRoutine() {
+        StartCoroutine(PulseIndicator());
+        float timer = 0f;
+        float duration = 0.5f;
+        int cycles = 3;
+        int index = 0;
+        while (index < cycles) {
+            while (timer < duration) {
+                timer += Time.unscaledDeltaTime;
+                float alpha = (float)PennerDoubleAnimation.BackEaseInOut(timer, 0.2f, 0.8f, duration);
+                Color newColor = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
+                fillPip.color = newColor;
+                yield return null;
+            }
+            timer = 0f;
+            index++;
+            yield return null;
+        }
+        fillPip.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1);
+        yield return new WaitForSecondsRealtime(1f);
+        finishing = false;
+        Hide();
+        yield return null;
+    }
+
+    public void Hide() {
+        if (finishing) return;
+        gameObject.SetActive(false);
+        SetProgress(false, false);
     }
 }
