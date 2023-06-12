@@ -2818,6 +2818,17 @@ world:
 * play and effect on pick complete
 * door latch
 * hack in interact mode
+* hack router
+* hack camera
+* fix broken usb attach
+* show different outcome for virus upload
+* show download percentage
+* size of connecting port
+* reset wire when clicking outside of target?
+* disconnect datastore when resetting usb connection
+* check that mouse is within burglarcam before doing raycast
+* reset wire properly when closing burglar mode
+* disconnecting while upload / download in progress cancels
 
 radial menu for selecting guns and items?
     unify items and guns
@@ -2843,14 +2854,5 @@ gameplay:
 
 
 both credstick and keys can pop up in loot display
-
-* hack router
-* hack camera
-* fix broken usb attach
-* show different outcome for virus upload
-* show download percentage
-* size of connecting port
-
-check that mouse is within burglarcam before doing raycast
 in alarm graph refresh, updating alarm terminal state doesn't work 100% when we are trying to modify alarm terminal directly.
 better wire materials

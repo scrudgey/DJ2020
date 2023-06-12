@@ -83,6 +83,9 @@ public class CyberdeckCanvasController : MonoBehaviour {
         if (result != null) {
             attachedDataStore = result.attachedDataStore;
             targetComponent = result.attachedCyberComponent;
+        } else {
+            attachedDataStore = null;
+            targetComponent = null;
         }
         if (attachedDataStore != null || targetComponent != null) {
             StartCoroutine(BlinkDetect((bool value) => bodyDetect.SetActive(value), ShowBodyMenu));
@@ -205,5 +208,15 @@ public class CyberdeckCanvasController : MonoBehaviour {
         progressText2.enabled = true;
         progressText2.text = "0%";
         ShowDownloadProgress();
+    }
+
+    public void CancelHackInProgress() {
+        if (currentHackData != null) {
+            // HackInput hackInput = new HackInput() {
+            //     targetNode = targetNode,
+            //     type = HackType.manual
+            // };
+            HackController.I.RemoveHack(currentHackData);
+        }
     }
 }

@@ -145,16 +145,21 @@ public class BurglarCanvasController : MonoBehaviour {
             data.target.DisableAttackSurface();
     }
 
-    void PositionTool(Vector2 cursorPoint) {
+    bool PositionTool(Vector2 cursorPoint) {
         Vector2 localPoint = Vector2.zero;
+        Vector2 localToolPoint = Vector2.zero;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            uiElementsRectTransform,
+            cursorPoint, null,
+            out localPoint);
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             mainCanvas,
             cursorPoint, null,
-            out localPoint);
+            out localToolPoint);
 
-        toolPoint.anchoredPosition = localPoint + new Vector2(mainCanvas.rect.width / 2f, mainCanvas.rect.height / 2f);
-        // toolPoint.position = localPoint;
+
+        toolPoint.anchoredPosition = localToolPoint + new Vector2(mainCanvas.rect.width / 2f, mainCanvas.rect.height / 2f);
 
         if (localPoint.x > uiElementsRectTransform.rect.width / -2f && localPoint.x < uiElementsRectTransform.rect.width / 2f &&
             localPoint.y > uiElementsRectTransform.rect.height / -2f && localPoint.y < uiElementsRectTransform.rect.height / 2f) {
@@ -163,8 +168,10 @@ public class BurglarCanvasController : MonoBehaviour {
             } else {
                 GameManager.I.cursorType = CursorType.gun;
             }
+            return false;
         } else {
             GameManager.I.cursorType = CursorType.pointer;
+            return true;
         }
     }
 
@@ -186,8 +193,7 @@ public class BurglarCanvasController : MonoBehaviour {
         if (mouseOverTimeout > 0) {
             mouseOverTimeout -= Time.unscaledDeltaTime;
         }
-        if (data != null && data.target != null)
-            RaycastToolPosition();
+
     }
     void RaycastToolPosition() {
         Vector3 cursorPoint = toolPoint.anchoredPosition;
@@ -221,18 +227,17 @@ public class BurglarCanvasController : MonoBehaviour {
         // key is to find AttackSurfaceElement
     }
     public void UpdateWithInput(PlayerInput input) {
+        bool outOfBounds = PositionTool(input.mousePosition);
+        if (data != null && data.target != null && !outOfBounds)
+            RaycastToolPosition();
+
         bool newMouseDown = input.mouseDown;
-        if (newMouseDown != mouseDown && newMouseDown) {
+        if (newMouseDown != mouseDown && newMouseDown && !outOfBounds) {
             ClickDownCallback(selectedElement);
         }
         mouseDown = newMouseDown;
-        PositionTool(input.mousePosition);
 
-        // TODO: fix
-        // bool outOfBounds = localPoint.x > mainRect.rect.width / 2f || localPoint.x < mainRect.rect.width / -2f || localPoint.y > mainRect.rect.height / 2f || localPoint.y < mainRect.rect.height / -2f;
-        bool outOfBounds = false;
-
-        if (input.mouseClicked && selectedTool == BurglarToolType.wirecutter) {
+        if (input.mouseClicked && selectedTool == BurglarToolType.wirecutter && !outOfBounds) {
             wireCutterImage.DoSnip(this, data.target);
         }
 
@@ -243,7 +248,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 SetTool(BurglarToolType.none);
             }
         } else if (input.mouseDown && outOfBounds) {
-            DoneButtonCallback();
+            SetTool(BurglarToolType.none);
         } else if (input.mouseDown && mouseOverElement) {
             if (selectedElement != null) {
                 ClickHeld(selectedElement);
@@ -274,7 +279,7 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
     public void DoneButtonCallback() {
-        GameManager.I.CloseBurglar();
+        CloseBurglar();
     }
 
     public void ClickHeld(AttackSurfaceElement element) {
@@ -298,7 +303,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public void HandleAttackResult(BurglarAttackResult result) {
         if (selectedTool == BurglarToolType.usb && result.success) {
             usbCableAttached = true;
-            ToolSelectCallback("none");
+            SetTool(BurglarToolType.none);
             usbRectTransform.position = result.element.uiElement.rectTransform.position;
             usbCable.transform.SetParent(transform, true);
             usbCableCanvasGroup.enabled = false;
@@ -331,12 +336,18 @@ public class BurglarCanvasController : MonoBehaviour {
             foreach (IDamageReceiver receiver in data.burglar.transform.root.GetComponentsInChildren<IDamageReceiver>()) {
                 receiver.TakeDamage(result.electricDamage);
             }
-            GameManager.I.CloseBurglar(transitionCharacter: false);
+            CloseBurglar(transitionCharacter: false);
         }
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
+    }
+
+    void CloseBurglar(bool transitionCharacter = true) {
+        ResetUSBTool();
+        cyberdeckController.CancelHackInProgress();
+        GameManager.I.CloseBurglar(transitionCharacter: transitionCharacter);
     }
 
     public void ReplacePanelButtonCallback() {
@@ -499,17 +510,11 @@ public class BurglarCanvasController : MonoBehaviour {
                 screwdriverImage.enabled = false;
                 wireCutterImage.gameObject.SetActive(false);
 
-
-                cyberdeckController.HandleConnection(null);
-                usbCableAttached = false;
+                ResetUSBTool();
 
                 usbCable.transform.SetParent(toolPoint, true);
-                // usbCable.transform.set
-                usbToolButton.SetActive(false);
                 usbCable.SetActive(true);
                 usbCableCanvasGroup.enabled = true;
-                uSBCordTool.Slacken(false);
-                Debug.Log(usbCable);
                 break;
             case BurglarToolType.wirecutter:
                 probeImage.enabled = false;
@@ -522,6 +527,15 @@ public class BurglarCanvasController : MonoBehaviour {
                 wireCutterImage.gameObject.SetActive(true);
                 break;
         }
+    }
+
+    void ResetUSBTool() {
+        usbCable.transform.SetParent(toolPoint, false);
+        usbCable.transform.localPosition = Vector2.zero;
+        cyberdeckController.HandleConnection(null);
+        usbCableAttached = false;
+        usbToolButton.SetActive(false);
+        uSBCordTool.Slacken(false);
     }
 
     IEnumerator JiggleTool() {

@@ -16,6 +16,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
 
     public AudioSource audioSource;
     public AudioClip hackStarted;
+    public AudioClip hackCancel;
     public AudioClip hackFinished;
     public AudioClip hackInProgress;
     public Action<HackController> OnValueChanged { get; set; }
@@ -33,7 +34,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
         vulnerableNetworkNode = null;
     }
     public HackData HandleHackInput(HackInput input) {
-        Debug.Log($"handle hack input {targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks}");
+        // Debug.Log($"handle hack input {targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks}");
         if (targets.Count >= GameManager.I.gameData.playerState.maxConcurrentNetworkHacks)
             return null;
         // Debug.Log($"targets any: {targets.Any(t => t.node == input.targetNode)}");
@@ -51,6 +52,12 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             return data;
         }
         return null;
+    }
+    public void RemoveHack(HackData data) {
+        targets.Remove(data);
+        UpdateSuspicion();
+        OnValueChanged?.Invoke(this);
+        audioSource.PlayOneShot(hackCancel);
     }
     public void HandleVulnerableNetworkNode(CyberNode input) {
         vulnerableNetworkNode = input;
