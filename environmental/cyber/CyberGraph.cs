@@ -11,7 +11,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         foreach (CyberNode node in nodes.Values) {
             CyberComponent component = GameManager.I.GetCyberComponent(node.idn);
             if (component != null)
-                component.nodeEnabled = node.enabled;
+                component.nodeEnabled = node.getEnabled();
         }
     }
 }

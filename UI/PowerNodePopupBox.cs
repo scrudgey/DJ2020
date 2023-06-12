@@ -17,7 +17,7 @@ public class PowerNodePopupBox : NodePopupBox<PowerNode, PowerGraph> {
             poweredText.text = $"Power: N";
         }
         Color activeColor = enabledColor;
-        if (node.enabled) {
+        if (node.getEnabled()) {
             enabledText.text = $"Enabled: Y";
             if (node.powered) {
                 activeColor = enabledColor;

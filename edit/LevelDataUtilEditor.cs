@@ -94,9 +94,10 @@ public class LevelDataUtilEditor : Editor {
                 sceneName = sceneName,
                 idn = idn,
                 position = position,
-                enabled = true,
+                // enabled = true,
                 icon = NodeIcon.normal
             };
+            node.setEnabled(true);
             graph.nodes[idn] = node;
 
             foreach (V component in group) {

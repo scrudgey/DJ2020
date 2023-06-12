@@ -12,7 +12,7 @@ public class PowerGraph : Graph<PowerNode, PowerGraph> {
         nodes.Values.ToList().ForEach(node => node.powered = false);
 
         // run the algorithm
-        PowerNode[] sources = nodes.Values.Where(node => node.type == NodeType.powerSource && node.enabled).ToArray();
+        PowerNode[] sources = nodes.Values.Where(node => node.type == NodeType.powerSource && node.getEnabled()).ToArray();
 
         foreach (PowerNode source in sources) {
             // Debug.Log($"power source: {source.idn}");
@@ -21,12 +21,12 @@ public class PowerGraph : Graph<PowerNode, PowerGraph> {
         foreach (PowerNode node in nodes.Values) {
             PoweredComponent component = GameManager.I.GetPowerComponent(node.idn);
             if (component != null)
-                component.nodeEnabled = node.enabled;
+                component.nodeEnabled = node.getEnabled();
         }
     }
     void DFS(PowerNode node) {
         node.powered = true;
-        if (node.enabled && edges.ContainsKey(node.idn))
+        if (node.getEnabled() && edges.ContainsKey(node.idn))
             foreach (string neighborID in edges[node.idn]) {
                 if (!nodes[neighborID].powered) {
                     // Debug.Log($"propagating from {node.idn} to {neighborID}");

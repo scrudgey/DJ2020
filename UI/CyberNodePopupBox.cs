@@ -17,7 +17,7 @@ public class CyberNodePopupBox : NodePopupBox<CyberNode, CyberGraph> {
             compromisedText.text = $"uncompromised";
         }
         Color activeColor = enabledColor;
-        if (node.enabled) {
+        if (node.getEnabled()) {
             enabledText.text = $"Enabled: Y";
             if (node.compromised) {
                 activeColor = compromisedColor;

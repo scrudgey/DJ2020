@@ -60,7 +60,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         transform.localScale = alpha * Vector3.one;
     }
     protected virtual void SetGraphicalState(T node) {
-        if (node.enabled) {
+        if (node.getEnabled()) {
             image.color = enabledColor;
         } else {
             image.color = disabledColor;

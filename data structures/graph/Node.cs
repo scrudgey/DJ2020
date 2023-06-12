@@ -13,6 +13,12 @@ public class Node {
     public NodeIcon icon;
     public NodeType type;
     public Node() { }
+    public virtual bool getEnabled() {
+        return enabled;
+    }
+    public void setEnabled(bool value) {
+        enabled = value;
+    }
 }
 
 

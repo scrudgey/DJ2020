@@ -21,6 +21,7 @@ public class AttackSurfaceWire : MonoBehaviour {
         }
 
         foreach (AlarmComponent component in alarmComponentsToDisable) {
+            GameManager.I.SetAlarmOverride(component);
             GameManager.I.SetNodeEnabled<AlarmComponent, AlarmNode>(component, false);
             result = result with {
                 success = true,

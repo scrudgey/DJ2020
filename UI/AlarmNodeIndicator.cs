@@ -12,7 +12,7 @@ public class AlarmNodeIndicator : NodeIndicator<AlarmNode, AlarmGraph> {
     public RectTransform bkgRect;
 
     protected override void SetGraphicalState(AlarmNode node) {
-        if (!node.enabled) {
+        if (!node.getEnabled()) {
             image.color = deadColor;
         } else if (node.alarmTriggered) {
             image.color = enabledColor;

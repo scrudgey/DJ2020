@@ -404,7 +404,8 @@ public partial class GameManager : Singleton<GameManager> {
         };
 
         if (node != null) {
-            node.enabled = state;
+            // node.enabled = state;
+            node.setEnabled(state);
             graphNodeComponent.nodeEnabled = state;
             switch (graphNodeComponent) {
                 case PoweredComponent:
@@ -424,6 +425,12 @@ public partial class GameManager : Singleton<GameManager> {
         } else {
             // Debug.Log($"called set node enabled with null node {graphNodeComponent} {idn}");
         }
+    }
+
+    public void SetAlarmOverride(AlarmComponent component) {
+        string idn = component.idn;
+        AlarmNode node = GetAlarmNode(idn);
+        node.overrideState = AlarmNode.AlarmOverrideState.disabled;
     }
 
     // TODO: these methods could belong to the graphs?
@@ -493,7 +500,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void SetAlarmNodeState(AlarmNode node, bool state) {
         if (applicationIsQuitting) return;
         if (node == null) return;
-        if (node.enabled) {
+        if (node.getEnabled()) {
             node.alarmTriggered = state;
             if (state) {
                 node.countdownTimer = 30f;
@@ -560,7 +567,7 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelState.delta.powerGraph.nodes) {
             if (poweredComponents.ContainsKey(kvp.Key)) {
                 poweredComponents[kvp.Key].power = kvp.Value.powered;
-                poweredComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
+                poweredComponents[kvp.Key].nodeEnabled = kvp.Value.getEnabled();
                 // Debug.Log($"transfer power to {kvp.Key}: {kvp.Value.powered}");
             }
         }
@@ -571,7 +578,7 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelState.delta.cyberGraph.nodes) {
             if (cyberComponents.ContainsKey(kvp.Key)) {
                 cyberComponents[kvp.Key].compromised = kvp.Value.compromised;
-                cyberComponents[kvp.Key].nodeEnabled = kvp.Value.enabled;
+                cyberComponents[kvp.Key].nodeEnabled = kvp.Value.getEnabled();
                 // Debug.Log($"transfer cyber to {kvp.Key}: {kvp.Value.enabled}");
             }
         }
@@ -584,7 +591,7 @@ public partial class GameManager : Singleton<GameManager> {
                 AlarmComponent component = alarmComponents[kvp.Key];
                 component.alarmTriggered = kvp.Value.alarmTriggered;
                 component.countdownTimer = kvp.Value.countdownTimer;
-                component.nodeEnabled = kvp.Value.enabled;
+                component.nodeEnabled = kvp.Value.getEnabled();
             }
         }
     }

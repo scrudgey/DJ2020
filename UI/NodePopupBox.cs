@@ -53,7 +53,7 @@ public class NodePopupBox<T, U> : MonoBehaviour where T : Node where U : Graph<T
         nameText.text = node.nodeTitle;
 
         Color activeColor = enabledColor;
-        if (node.enabled) {
+        if (node.getEnabled()) {
             enabledText.text = $"Enabled: Y";
             activeColor = enabledColor;
         } else {

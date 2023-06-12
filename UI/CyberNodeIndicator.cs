@@ -13,7 +13,7 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
 
     protected override void SetGraphicalState(CyberNode node) {
         // Debug.Log($"set cyber graphical state {node.idn} {node.nodeTitle} {node.enabled} {node.compromised}");
-        if (node.enabled) {
+        if (node.getEnabled()) {
             if (!node.compromised) {
                 image.color = enabledColor;
             } else {

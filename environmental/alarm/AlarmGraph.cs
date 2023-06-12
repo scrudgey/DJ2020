@@ -24,17 +24,12 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
             if (component == null)
                 continue;
 
-            // TODO: this is required to stop the central alarm when a triggering node is disabled, but it
-            // means that we cannot set the central alarm state directly from e.g. interaction mode ???
-            if (component is AlarmTerminal) {
-                node.alarmTriggered = false;
-            }
-            component.nodeEnabled = node.enabled;
+            component.nodeEnabled = node.getEnabled();
         }
 
         AlarmNode[] sources = nodes.Values.Where(node => node.alarmTriggered).ToArray();
         foreach (AlarmNode source in sources) {
-            if (source.enabled)
+            if (source.getEnabled())
                 DFS(source, new HashSet<HashSet<string>>(), new HashSet<string>());
         }
     }
@@ -52,7 +47,7 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
                 visitedEdges.Add(new HashSet<string> { node.idn, neighborID });
                 AlarmComponent neighborComponent = GameManager.I.GetAlarmComponent(neighborID);
                 AlarmNode terminalNode = GameManager.I.GetAlarmNode(neighborID);
-                if (!terminalNode.enabled)
+                if (!terminalNode.getEnabled())
                     continue;
                 if (neighborComponent is AlarmTerminal) {
                     terminalNode.alarmTriggered = true;

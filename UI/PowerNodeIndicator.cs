@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class PowerNodeIndicator : NodeIndicator<PowerNode, PowerGraph> {
     public Color unpoweredColor;
     protected override void SetGraphicalState(PowerNode node) {
-        if (node.enabled) {
+        if (node.getEnabled()) {
             if (node.powered) {
                 image.color = enabledColor;
             } else {
