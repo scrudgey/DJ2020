@@ -17,6 +17,12 @@ public class MusicController : Singleton<MusicController> {
             "Obligate Arsonist Ver 2.0 layer 2 CADENCE DJ3",
             "Obligate Arsonist VER 2.0 layer 3 ATTENTION DJ3",
             "Obligate Arsonist Ver 2.0 layer 4 DETH DJ3"
+        }},
+        {MusicTrack.antiAnecdote, new string[]{
+            "Anti-Anecdote [Ver 2.0] layer 1 LOW DJ3 2023",
+            "Anti-Anecdote [Ver 2.0] layer 2 CADENCE DJ3 2023",
+            "Anti-Anecdote [Ver 2.0] layer 3 ATTENTION DJ3 2023",
+            "Anti-Anecdote [Ver 2.0] layer 4 DEATH DJ3 2023"
         }}
     };
     public AudioSource[] audioSources;

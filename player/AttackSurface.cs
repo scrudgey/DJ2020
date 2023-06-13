@@ -20,6 +20,7 @@ public class AttackSurface : MonoBehaviour {
     Dictionary<MeshCollider, MeshFilter> ropeMeshes;
     Dictionary<MeshCollider, MeshRenderer> ropeRenderers;
     public AttackSurfaceVentCover replaceablePanel;
+    public ObiSolver obiSolver;
     public void Start() {
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         attackCam.targetTexture = renderTexture;
@@ -32,6 +33,9 @@ public class AttackSurface : MonoBehaviour {
             MeshRenderer renderer = rope.GetComponent<MeshRenderer>();
             ropeMeshes[collider] = filter;
             ropeRenderers[collider] = renderer;
+        }
+        if (obiSolver != null) {
+            obiSolver.enabled = false;
         }
         DisableOutline();
     }

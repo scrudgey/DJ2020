@@ -10,7 +10,6 @@ public class AlarmNode : Node {
     public bool alarmTriggered;
     public float countdownTimer;
     public override bool getEnabled() {
-        Debug.Log(overrideState);
         if (overrideState == AlarmOverrideState.disabled) {
             return false;
         } else if (overrideState == AlarmOverrideState.enabled) {

@@ -15,7 +15,7 @@ public class Listener : MonoBehaviour {
         // Debug.Log(other);
         NoiseComponent noiseComponent = other.GetComponent<NoiseComponent>();
         if (noiseComponent != null) {
-            Debug.Log(other);
+            // Debug.Log(other);
             noiseHandler.HearNoise(noiseComponent);
         }
     }

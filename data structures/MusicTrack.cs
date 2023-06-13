@@ -1,1 +1,6 @@
-public enum MusicTrack { none, lethalGlee, obligateArsonist }
+public enum MusicTrack {
+    none,
+    lethalGlee,
+    obligateArsonist,
+    antiAnecdote
+}

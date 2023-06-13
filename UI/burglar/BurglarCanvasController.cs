@@ -85,6 +85,10 @@ public class BurglarCanvasController : MonoBehaviour {
         this.data = data;
         finishing = false;
 
+        if (data.target.obiSolver != null) {
+            data.target.obiSolver.enabled = true;
+        }
+
         // initialize display
         captionText.text = "";
         feedbackText.text = "";
@@ -256,6 +260,7 @@ public class BurglarCanvasController : MonoBehaviour {
             if (ToolIsJiggly(selectedTool) && jiggleCoroutine == null && !selectedElement.resetToolJiggle) {
                 jiggleCoroutine = StartCoroutine(JiggleTool());
             }
+
         } else {
             if (selectedElement != null) {
                 selectedElement.HandleMouseUp();
@@ -266,7 +271,7 @@ public class BurglarCanvasController : MonoBehaviour {
             }
         }
 
-        if (jiggleCoroutine != null && selectedElement.resetToolJiggle) {
+        if (jiggleCoroutine != null && (selectedElement?.resetToolJiggle ?? false)) {
             StopCoroutine(jiggleCoroutine);
             jiggleCoroutine = null;
         }
@@ -348,6 +353,9 @@ public class BurglarCanvasController : MonoBehaviour {
     void CloseBurglar(bool transitionCharacter = true) {
         ResetUSBTool();
         cyberdeckController.CancelHackInProgress();
+        if (data.target.obiSolver != null) {
+            data.target.obiSolver.enabled = false;
+        }
         GameManager.I.CloseBurglar(transitionCharacter: transitionCharacter);
     }
 
@@ -439,6 +447,7 @@ public class BurglarCanvasController : MonoBehaviour {
     void SetTool(BurglarToolType toolType) {
         // if (selectedTool != BurglarToolType.none || toolType != BurglarToolType.none)
         Toolbox.RandomizeOneShot(audioSource, ToolPickupSound(toolType));
+        toolPoint.rotation = Quaternion.identity;
 
         if (selectedTool == BurglarToolType.usb && toolType == BurglarToolType.none && !usbCableAttached) {
             Toolbox.RandomizeOneShot(audioSource, cableRetractSound);
@@ -537,6 +546,7 @@ public class BurglarCanvasController : MonoBehaviour {
         usbCableAttached = false;
         usbToolButton.SetActive(false);
         uSBCordTool.Slacken(false);
+        uSBCordTool.SetSize(100f);
     }
 
     IEnumerator JiggleTool() {

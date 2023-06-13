@@ -2868,9 +2868,11 @@ gameplay:
 * remove cyberdeck item
 * objectives complete should kick you out of burglar mode
 * gunshots are easily not heard
+* disable obi rope inside attack surfaces when not in use
+* usb cable goes weird
 
-usb cable goes weird
-disable obi rope inside attack surfaces when not in use
 stolen data from tower carried over into jtd, leading to mission success
+tamper evidence in closed laser panel
+datastores could show filename
 interactive mains connection
-
+transitioning between cyberdeck and toolbag
