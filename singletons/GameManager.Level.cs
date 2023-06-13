@@ -167,6 +167,7 @@ public partial class GameManager : Singleton<GameManager> {
         MusicController.I.Stop();
         gameData.completedLevels.Add(gameData.levelState.template.levelName);
         gameData.playerState.credits += gameData.levelState.template.creditReward;
+        gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {

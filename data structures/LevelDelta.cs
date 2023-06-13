@@ -17,8 +17,10 @@ public record LevelDelta {
     [JsonIgnore]
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
     public HashSet<Objective> failedObjectives;
+    public List<PayData> levelAcquiredPaydata;
     public static LevelDelta Empty() => new LevelDelta {
         objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
-        failedObjectives = new HashSet<Objective>()
+        failedObjectives = new HashSet<Objective>(),
+        levelAcquiredPaydata = new List<PayData>()
     };
 }

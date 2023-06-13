@@ -2870,9 +2870,12 @@ gameplay:
 * gunshots are easily not heard
 * disable obi rope inside attack surfaces when not in use
 * usb cable goes weird
+* stolen data from tower carried over into jtd, leading to mission success
 
-stolen data from tower carried over into jtd, leading to mission success
 tamper evidence in closed laser panel
+transitioning between cyberdeck and toolbag
+proper highlighting of interactives
+
+
 datastores could show filename
 interactive mains connection
-transitioning between cyberdeck and toolbag

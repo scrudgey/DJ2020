@@ -12,7 +12,8 @@ public partial class GameManager : Singleton<GameManager> {
     int lastObjectivesStatusHashCode;
 
     public void AddPayDatas(List<PayData> datas) {
-        gameData.playerState.payDatas.AddRange(datas);
+        // gameData.playerState.payDatas.AddRange(datas);
+        gameData.levelState.delta.levelAcquiredPaydata.AddRange(datas);
         CheckObjectives();
         OnPayDataChange?.Invoke(datas, gameData);
     }
