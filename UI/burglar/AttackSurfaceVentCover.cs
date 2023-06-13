@@ -41,9 +41,10 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
     }
 
     public void RemovePanel() {
-        Toolbox.AudioSpeaker(parentVentObject.transform.position, openSounds);
+        Toolbox.AudioSpeaker(transform.position, openSounds);
         ventSprite.enabled = false;
-        parentVentObject.SetActive(false);
+        if (parentVentObject != null)
+            parentVentObject.SetActive(false);
         foreach (GameObject element in obscuredElements) {
             element.SetActive(true);
         }
@@ -52,9 +53,10 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
         }
     }
     public void ReplacePanel() {
-        Toolbox.AudioSpeaker(parentVentObject.transform.position, openSounds);
+        Toolbox.AudioSpeaker(transform.position, openSounds);
         ventSprite.enabled = true;
-        parentVentObject.SetActive(true);
+        if (parentVentObject != null)
+            parentVentObject.SetActive(true);
         foreach (GameObject element in obscuredElements) {
             element.SetActive(false);
         }

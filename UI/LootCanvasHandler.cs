@@ -34,6 +34,9 @@ public class LootCanvasHandler : MonoBehaviour {
     public Sprite gemSprite;
     public Sprite commercialSprite;
     public Sprite dataPortrait;
+    [Header("special loot data")]
+    public LootData keyData;
+    public LootData creditData;
 
     public void Start() {
         Bind(GameManager.I.gameData);
@@ -41,11 +44,13 @@ public class LootCanvasHandler : MonoBehaviour {
     public void Bind(GameData data) {
         GameManager.OnLootChange += HandleLootChange;
         GameManager.OnPayDataChange += HandleDataChange;
+        GameManager.OnItemPickup += HandleItemPickup;
         ConfigureLootCounts(data);
     }
     void OnDestroy() {
         GameManager.OnLootChange -= HandleLootChange;
         GameManager.OnPayDataChange -= HandleDataChange;
+        GameManager.OnItemPickup -= HandleItemPickup;
     }
     public void HandleLootChange(LootData loot, GameData data) {
         ConfigureLootCounts(data);
@@ -57,7 +62,20 @@ public class LootCanvasHandler : MonoBehaviour {
         ConfigureLootCounts(data);
         ConfigurePayDataDetail(newData.FirstOrDefault());
         ShowCanvasCoroutine();
-
+    }
+    public void HandleItemPickup(int index, string caption) {
+        LootData data = index switch {
+            0 => keyData,
+            1 => creditData,
+        };
+        ConfigureLootDetails(data);
+        lootCategoryIcon.enabled = false;
+        if (index == 0) {
+            valueText.enabled = false;
+        } else if (index == 1) {
+            valueText.text = caption;
+        }
+        ShowCanvasCoroutine();
     }
 
     void ShowCanvasCoroutine() {
@@ -82,6 +100,8 @@ public class LootCanvasHandler : MonoBehaviour {
         lootDescription.text = data.lootDescription;
         valueText.text = $"{data.value}";
         lootImage.sprite = data.portrait;
+        valueText.enabled = true;
+        lootCategoryIcon.enabled = true;
         lootCategoryIcon.sprite = data.category switch {
             LootCategory.drug => drugSprite,
             _ => dataSprite
@@ -92,6 +112,7 @@ public class LootCanvasHandler : MonoBehaviour {
         lootTitle.text = data.filename;
         valueText.text = $"{data.value}";
         lootImage.sprite = dataPortrait;
+        lootCategoryIcon.enabled = true;
         lootCategoryIcon.sprite = dataSprite;
         lootDescription.text = "";
     }

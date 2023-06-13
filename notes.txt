@@ -2350,6 +2350,20 @@ note: layer "interactive"
 * reset wire properly when closing burglar mode
 * disconnecting while upload / download in progress cancels
 * in alarm graph refresh, updating alarm terminal state doesn't work 100% when we are trying to modify alarm terminal directly.
+* adjust all cam positions
+    * alarm panel camera position
+    * transformer cam position
+* put cyberware in tower
+* replace AC unit with new one
+* add nodes to new cyber datastore
+* cyberware in jackthatdata
+* transformer in jackthatdata
+* cam position on alarm central in jackthatdata
+* refresh nav meshes
+* turn down light a little
+* better wire materials
+* both credstick and keys can pop up in loot display
+
 
 
 
@@ -2829,9 +2843,6 @@ world:
 
 
 
-
-
-
 radial menu for selecting guns and items?
     unify items and guns
 what happened to the sphere robot?
@@ -2853,7 +2864,13 @@ gameplay:
 4. more levels
 5. stealth kills
 
-both credstick and keys can pop up in loot display
-better wire materials
+* putting cyber away should disconnect usb cable
+* remove cyberdeck item
+* objectives complete should kick you out of burglar mode
+* gunshots are easily not heard
 
+usb cable goes weird
+disable obi rope inside attack surfaces when not in use
+stolen data from tower carried over into jtd, leading to mission success
+interactive mains connection
 

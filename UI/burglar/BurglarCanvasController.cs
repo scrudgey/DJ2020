@@ -279,6 +279,7 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
     public void DoneButtonCallback() {
+
         CloseBurglar();
     }
 
@@ -613,6 +614,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 cyberdeckSelectorObject.SetActive(false);
                 break;
         }
+        ResetUSBTool();
+        SetTool(BurglarToolType.none);
     }
 
 

@@ -6,11 +6,12 @@ public class PowerSource : PoweredComponent {
     public AudioSource buzzSoundSource;
     protected override void OnPowerChange() {
         base.OnPowerChange();
-        if (!power) {
-            buzzSoundSource?.Stop();
-
-        } else {
-            buzzSoundSource?.Play();
+        if (buzzSoundSource != null) {
+            if (!power) {
+                buzzSoundSource?.Stop();
+            } else {
+                buzzSoundSource?.Play();
+            }
         }
     }
     public override void EnableSource() {

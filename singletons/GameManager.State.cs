@@ -8,7 +8,9 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<GameData, Dictionary<Objective, ObjectiveStatus>> OnObjectivesChange;
     public static Action<LootData, GameData> OnLootChange;
     public static Action<List<PayData>, GameData> OnPayDataChange;
+    public static Action<int, String> OnItemPickup;
     int lastObjectivesStatusHashCode;
+
     public void AddPayDatas(List<PayData> datas) {
         gameData.playerState.payDatas.AddRange(datas);
         CheckObjectives();
@@ -18,6 +20,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void AddCredits(int amount) {
         gameData.playerState.credits += amount;
         CheckObjectives();
+        OnItemPickup?.Invoke(1, $"{amount}");
     }
     public void CollectLoot(LootData data) {
         gameData.playerState.loots.Add(data);
@@ -27,6 +30,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void AddPhysicalKey(int keyId) {
         gameData.playerState.physicalKeys.Add(keyId);
         CheckObjectives();
+        OnItemPickup?.Invoke(0, $"{keyId}");
     }
     public void CompleteAllObjectives() {
 
@@ -76,6 +80,8 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void HandleAllObjectivesComplete() {
         if (GameManager.I.isLoadingLevel) return;
+        if (playerCharacterController.state == CharacterState.burgle)
+            CloseBurglar();
         uiController.LogMessage($"Objectives complete, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionSuccess;
         ActivateExtractionPoint();
@@ -88,6 +94,9 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void HandleObjectiveFailed() {
         if (GameManager.I.isLoadingLevel) return;
+        if (playerCharacterController.state == CharacterState.burgle) {
+            CloseBurglar();
+        }
         uiController.LogMessage($"Objectives failed, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionFail;
         ActivateExtractionPoint();

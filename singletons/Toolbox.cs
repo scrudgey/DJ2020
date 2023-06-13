@@ -203,7 +203,9 @@ public class Toolbox {
         };
         if (spherical) {
             component.meshCollider.enabled = false;
+            component.sphereCollider.enabled = true;
             component.sphereCollider.radius = data.volume;
+            component.transform.localScale = Vector3.one;
         } else {
             component.meshCollider.enabled = true;
             component.sphereCollider.enabled = false;

@@ -11,4 +11,3 @@ public class LootData : ScriptableObject {
     public LootCategory category;
 }
 
-

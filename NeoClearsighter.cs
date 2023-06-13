@@ -242,6 +242,7 @@ public class NeoClearsighter : MonoBehaviour {
                 j = 0;
                 yield return waitForFrame;
             }
+            if (renderer == null) continue;
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
             renderer.material = initialMaterials[renderer];
             hiddenTransforms.Remove(renderer.transform.root);

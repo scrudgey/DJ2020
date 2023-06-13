@@ -12,8 +12,10 @@ public class Listener : MonoBehaviour {
         mySphereCollider = gameObject.GetComponent<SphereCollider>();
     }
     private void OnTriggerEnter(Collider other) {
+        // Debug.Log(other);
         NoiseComponent noiseComponent = other.GetComponent<NoiseComponent>();
         if (noiseComponent != null) {
+            Debug.Log(other);
             noiseHandler.HearNoise(noiseComponent);
         }
     }
