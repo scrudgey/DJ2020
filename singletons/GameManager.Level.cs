@@ -419,7 +419,7 @@ public partial class GameManager : Singleton<GameManager> {
                     AlarmNode alarmNode = (AlarmNode)node;
                     alarmNode.alarmTriggered = false;
                     alarmNode.countdownTimer = 0f;
-                    Debug.Log($"disabling alarm node {graphNodeComponent} {node}");
+                    // Debug.Log($"disabling alarm node {graphNodeComponent} {node}");
                     RefreshAlarmGraph();
                     break;
             };

@@ -7,4 +7,5 @@ public class TamperEvidence : MonoBehaviour {
     public string targetName;
     public bool suspicious;
     public bool reported;
+    public string reportText;
 }

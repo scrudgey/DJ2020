@@ -199,11 +199,38 @@ public class BurglarCanvasController : MonoBehaviour {
         }
 
     }
-    void RaycastToolPosition() {
-        Vector3 cursorPoint = toolPoint.anchoredPosition;
+
+    public Ray MousePositionToAttackCamRay(Vector2 mousePosition) {
+        // Vector3 cursorPoint = input.mousePosition;
+        Vector3 cursorPoint = mousePosition;
+
+        float pixelToCanvasRatio = Screen.height / mainCanvas.rect.height;
+
+        // Debug.Log($"cursorpoint original: {cursorPoint}\nmouseposition: {input.mousePosition}\ninput viewportpoint; {input.viewPortPoint}");
+        // Debug.Log($"main camera: {Camera.main.pixelWidth} x {Camera.main.pixelHeight}");
+        // Debug.Log($"screen: {Screen.width} x {Screen.height}");
+        // Debug.Log($"attack cam: {data.target.attackCam.pixelWidth} x {data.target.attackCam.pixelHeight}");
+        // Debug.Log($"main canvas: {mainCanvas.rect.width} x {mainCanvas.rect.height}");
+
         cursorPoint -= camImageTransform.position;
-        cursorPoint.z = data.target.attackCam.nearClipPlane;
-        Ray projection = data.target.attackCam.ScreenPointToRay(cursorPoint);
+
+        // float rectWidth = (uiElementsRectTransform.anchorMax.x - uiElementsRectTransform.anchorMin.x) * Screen.width;
+        // float rectHeight = (uiElementsRectTransform.anchorMax.y - uiElementsRectTransform.anchorMin.y) * Screen.height;
+
+        float rectWidth = (uiElementsRectTransform.anchorMax.x - uiElementsRectTransform.anchorMin.x) * data.target.attackCam.pixelWidth * pixelToCanvasRatio;
+        float rectHeight = (uiElementsRectTransform.anchorMax.y - uiElementsRectTransform.anchorMin.y) * data.target.attackCam.pixelHeight * pixelToCanvasRatio;
+
+        Vector3 viewPortPoint = new Vector3(cursorPoint.x / rectWidth, cursorPoint.y / rectHeight, data.target.attackCam.nearClipPlane);
+        // Debug.Log($"camImageTransform position: {camImageTransform.position}\ncursorpoint translated: {cursorPoint}\nnew viewportpoint: {viewPortPoint}\n rect: {rectWidth} x {rectHeight}");
+
+        Ray projection = data.target.attackCam.ViewportPointToRay(viewPortPoint);
+
+        return projection;
+    }
+
+    void RaycastToolPosition(Vector2 mousePosition) {
+        Ray projection = MousePositionToAttackCamRay(mousePosition);
+
         RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.interactive, Layer.attackSurface, Layer.bulletOnly));
         bool noHitFound = true;
         foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
@@ -233,7 +260,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public void UpdateWithInput(PlayerInput input) {
         bool outOfBounds = PositionTool(input.mousePosition);
         if (data != null && data.target != null && !outOfBounds)
-            RaycastToolPosition();
+            RaycastToolPosition(input.mousePosition);
 
         bool newMouseDown = input.mouseDown;
         if (newMouseDown != mouseDown && newMouseDown && !outOfBounds) {
@@ -242,7 +269,7 @@ public class BurglarCanvasController : MonoBehaviour {
         mouseDown = newMouseDown;
 
         if (input.mouseClicked && selectedTool == BurglarToolType.wirecutter && !outOfBounds) {
-            wireCutterImage.DoSnip(this, data.target);
+            wireCutterImage.DoSnip(this, data.target, input.mousePosition);
         }
 
         if (input.escapePressed) {
@@ -329,6 +356,9 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         if (result.makeTamperEvidenceSuspicious) {
             data.target.tamperEvidence.suspicious = true;
+        }
+        if (result.tamperEvidenceReportString != "") {
+            data.target.tamperEvidence.reportText = result.tamperEvidenceReportString;
         }
         if (result.lockPositions != null)
             foreach (Vector3 lockPosition in result.lockPositions) {
@@ -655,12 +685,11 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         if (value) {
             Toolbox.RandomizeOneShot(audioSource, burglarBagShowSound);
-
             exposeBurglarToolsCoroutine = StartCoroutine(
                 Toolbox.ChainCoroutines(MoveRectY(burglarToolsRect, -313, -40, exposeBurglarToolsCoroutine, PennerDoubleAnimation.BounceEaseOut), UnzipBurglarKit())
             );
         } else {
-            exposeBurglarToolsCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, -40, -313, exposeBurglarToolsCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+            exposeBurglarToolsCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, burglarToolsRect.anchoredPosition.y, -313, exposeBurglarToolsCoroutine, PennerDoubleAnimation.ExpoEaseOut));
         }
     }
     void ShowCyberDeck(bool value) {
@@ -669,10 +698,9 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         if (value) {
             Toolbox.RandomizeOneShot(audioSource, cyberdeckShowSound);
-
             exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -515, 170, exposeCyberdeckCoroutine, PennerDoubleAnimation.BounceEaseOut));
         } else {
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, 170, -515, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, cyberdeckRect.anchoredPosition.y, -515, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));
         }
     }
     IEnumerator UnzipBurglarKit() {

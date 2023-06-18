@@ -6,6 +6,7 @@ using UnityEngine;
 
 
 public class WireCutterToolIndicator : MonoBehaviour {
+    public BurglarCanvasController burglarCanvasController;
     public LoHi leftAngles;
     public RectTransform toolTip;
     public RectTransform camImageTransform;
@@ -23,15 +24,15 @@ public class WireCutterToolIndicator : MonoBehaviour {
         initialRightRotation = rightHandle.rotation;
     }
 
-    public void DoSnip(BurglarCanvasController canvasController, AttackSurface attackSurface) {
+    public void DoSnip(BurglarCanvasController canvasController, AttackSurface attackSurface, Vector2 position) {
         this.canvasController = canvasController;
         if (snipRoutine != null) {
             StopCoroutine(snipRoutine);
         }
-        snipRoutine = StartCoroutine(Snip(attackSurface));
+        snipRoutine = StartCoroutine(Snip(attackSurface, position));
     }
 
-    IEnumerator Snip(AttackSurface attackSurface) {
+    IEnumerator Snip(AttackSurface attackSurface, Vector2 position) {
         float timer = 0f;
         int repetitions = 1;
         int index = 0;
@@ -61,7 +62,15 @@ public class WireCutterToolIndicator : MonoBehaviour {
                 rightHandle.rotation = rightRotation * initialRightRotation;
                 yield return null;
             }
-            CutWires(attackSurface);
+            BurglarAttackResult result = CutWires(attackSurface, position);
+            if (result.electricDamage == null) {
+                if (result.success) {
+                    Toolbox.RandomizeOneShot(audioSource, wireCutSound);
+                } else {
+                    Toolbox.RandomizeOneShot(audioSource, snipSound);
+                }
+            }
+            canvasController.HandleAttackResult(result);
             timer = 0f;
             index += 1;
             yield return null;
@@ -70,21 +79,10 @@ public class WireCutterToolIndicator : MonoBehaviour {
         snipRoutine = null;
     }
 
-    void CutWires(AttackSurface attackSurface) {
-        // Vector3 cursorPoint = new Vector3(input.mousePosition.x, input.mousePosition.y, data.target.attackCam.nearClipPlane);
-        Vector3 cursorPoint = toolTip.anchoredPosition;
-        cursorPoint -= camImageTransform.position;
 
-        cursorPoint.z = attackSurface.attackCam.nearClipPlane;
-        Ray projection = attackSurface.attackCam.ScreenPointToRay(cursorPoint);
+    BurglarAttackResult CutWires(AttackSurface attackSurface, Vector2 position) {
+        Ray projection = burglarCanvasController.MousePositionToAttackCamRay(position);
         BurglarAttackResult result = attackSurface.HandleRopeCutting(projection);
-        if (result.electricDamage == null) {
-            if (result.success) {
-                Toolbox.RandomizeOneShot(audioSource, wireCutSound);
-            } else {
-                Toolbox.RandomizeOneShot(audioSource, snipSound);
-            }
-        }
-        canvasController.HandleAttackResult(result);
+        return result;
     }
 }

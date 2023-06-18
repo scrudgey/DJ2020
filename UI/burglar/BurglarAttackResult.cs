@@ -8,6 +8,7 @@ public record BurglarAttackResult {
     public bool makeTamperEvidenceSuspicious;
     public bool revealTamperEvidence;
     public bool hideTamperEvidence;
+    public string tamperEvidenceReportString;
     public NoiseData noiseData;
 
     public AttackSurfaceElement element;

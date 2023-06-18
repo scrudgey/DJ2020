@@ -500,22 +500,27 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         };
     }
     public CameraTargetParameters BurgleParameters(CameraInput input) {
-        Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
+        // Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
 
-        // Vector3 camDirection = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.forward;
-        // camDirection = Vector3.Cross(Vector3.up, Vector3.Cross(camDirection, Vector3.up));
-        // Quaternion planarRot = Quaternion.LookRotation(camDirection, Vector3.up);
+        // Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
+        // PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
+        // Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
 
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
+            // orthographic = true,
             // rotation = planarRot,
             rotation = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.rotation,
+            // rotation = planarRot * verticalRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
+            // targetDistance = MaxDistance,
             targetPosition = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.position,
+            // targetPosition = lastTargetPosition,
             orthographicSize = 4f,
+            // orthographicSize = currentOrthographicSize,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 200, -199, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,

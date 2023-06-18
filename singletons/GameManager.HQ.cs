@@ -8,10 +8,10 @@ public partial class GameManager : Singleton<GameManager> {
     public AudioClip alarmSound;
     public float alarmSoundTimer;
     public float alarmSoundInterval;
-    int strikeTeamCount = 0;
+    // int strikeTeamCount = 0;
     float strikeTeamSpawnInterval = 0.5f;
-    float strikeTeamSpawnTimer = 0f;
-    float strikeTeamResponseTimer = 0f;
+    // float strikeTeamSpawnTimer = 0f;
+    // float strikeTeamResponseTimer = 0f;
     Vector3 locationOfLastDisturbance;
     public GameObject lastStrikeTeamMember;
     // this should be part of level state.
@@ -58,7 +58,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void DeactivateAlarm() {
         if (applicationIsQuitting || isLoadingLevel)
             return;
-        strikeTeamResponseTimer = 0f;
+        gameData.levelState.delta.strikeTeamResponseTimer = 0f;
         OnSuspicionChange?.Invoke();
 
         // reset strike team 
@@ -66,7 +66,7 @@ public partial class GameManager : Singleton<GameManager> {
         PrefabPool pool = PoolManager.I?.GetPool("prefabs/NPC");
         if (pool != null)
             gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
-        strikeTeamCount = 0;
+        gameData.levelState.delta.strikeTeamCount = 0;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (levelHQTerminal() != null) {
@@ -186,13 +186,13 @@ public partial class GameManager : Singleton<GameManager> {
 
     void UpdateStrikeTeamSpawn() {
         // Debug.Log($"{strikeTeamCount} < {gameData.levelState.delta.strikeTeamMaxSize} {strikeTeamResponseTimer} < {gameData.levelState.template.strikeTeamResponseTime}");
-        if (strikeTeamCount < gameData.levelState.delta.strikeTeamMaxSize) {
-            if (strikeTeamResponseTimer < gameData.levelState.template.strikeTeamResponseTime) {
-                strikeTeamResponseTimer += Time.deltaTime;
+        if (gameData.levelState.delta.strikeTeamCount < gameData.levelState.delta.strikeTeamMaxSize) {
+            if (gameData.levelState.delta.strikeTeamResponseTimer < gameData.levelState.template.strikeTeamResponseTime) {
+                gameData.levelState.delta.strikeTeamResponseTimer += Time.deltaTime;
             } else {
-                strikeTeamSpawnTimer += Time.deltaTime;
-                if (strikeTeamSpawnTimer > strikeTeamSpawnInterval) {
-                    strikeTeamSpawnTimer -= strikeTeamSpawnInterval;
+                gameData.levelState.delta.strikeTeamSpawnTimer += Time.deltaTime;
+                if (gameData.levelState.delta.strikeTeamSpawnTimer > strikeTeamSpawnInterval) {
+                    gameData.levelState.delta.strikeTeamSpawnTimer -= strikeTeamSpawnInterval;
                     SpawnStrikeTeamMember();
                 }
             }
@@ -207,16 +207,16 @@ public partial class GameManager : Singleton<GameManager> {
         CharacterController controller = npc.GetComponent<CharacterController>();
         controller.OnCharacterDead += HandleNPCDead;
 
-        if (strikeTeamCount == 0) {
+        if (gameData.levelState.delta.strikeTeamCount == 0) {
             ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, controller, doIntro: false, speedCoefficient: 1.5f));
             lastStrikeTeamMember = npc;
-        } else if (strikeTeamCount == 1) {
+        } else if (gameData.levelState.delta.strikeTeamCount == 1) {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
             lastStrikeTeamMember = npc;
-        } else if (strikeTeamCount == 2) {
+        } else if (gameData.levelState.delta.strikeTeamCount == 2) {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
-        strikeTeamCount += 1;
+        gameData.levelState.delta.strikeTeamCount += 1;
         gameData.levelState.delta.npcsSpawned += 1;
         OnNPCSpawn?.Invoke(npc);
     }

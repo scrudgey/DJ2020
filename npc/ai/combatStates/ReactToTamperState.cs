@@ -35,7 +35,7 @@ public class ReactToTamperState : SphereControlState {
             locationOfLastDisturbance = evidence.transform.position,
             timeOfLastContact = Time.time,
             lifetime = 5f,
-            speechText = "HQ, respond. Someone has tampered with a door.",
+            speechText = evidence.reportText,
             suspicionRecord = SuspicionRecord.tamperEvidenceSuspicion(evidence)
         };
         inPosition = false;

@@ -2363,7 +2363,17 @@ note: layer "interactive"
 * turn down light a little
 * better wire materials
 * both credstick and keys can pop up in loot display
-
+* putting cyber away should disconnect usb cable
+* remove cyberdeck item
+* objectives complete should kick you out of burglar mode
+* gunshots are easily not heard
+* disable obi rope inside attack surfaces when not in use
+* usb cable goes weird
+* stolen data from tower carried over into jtd, leading to mission success
+* tamper evidence in closed laser panel
+* transitioning between cyberdeck and toolbag
+* try not moving main cam
+* proper highlighting of interactives
 
 
 
@@ -2427,10 +2437,12 @@ nice to have / future goals:
             how to decide who to run to alarm panel?
     dust / smoke shader
     digitized voice for "operation jetlag"
-
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
     performance tuning: separate canvases, implement octree or smth
+    datastores could show filename
+
+
 
 deep save system:
     serialize the complete level state
@@ -2679,6 +2691,7 @@ better network readability
     a separate screen?
 
 loitering is suspicious but not near a water cooler
+interactive mains connection
 
 -----------
 build a test level, 3 storey building infiltration
@@ -2841,8 +2854,6 @@ world:
         random selection of head, torso, legs
         sometimes, torso + legs are set dependently.
 
-
-
 radial menu for selecting guns and items?
     unify items and guns
 what happened to the sphere robot?
@@ -2860,22 +2871,47 @@ progression:
 1. restrict weapons at gun shop
 3. adjust the pay / rewards
 gameplay:
-2. hack in interact mode / change / fix / improve hack
 4. more levels
 5. stealth kills
+    silenced pistol
+        gun upgrades
+        silencer affects graphic
+        headshots
 
-* putting cyber away should disconnect usb cable
-* remove cyberdeck item
-* objectives complete should kick you out of burglar mode
-* gunshots are easily not heard
-* disable obi rope inside attack surfaces when not in use
-* usb cable goes weird
-* stolen data from tower carried over into jtd, leading to mission success
+pistol recoil should be higher to dissuade spamming
+* next fix wirecutting by unifying with raycast code.
+* hack in interact mode / change / fix / improve hack
 
-tamper evidence in closed laser panel
-transitioning between cyberdeck and toolbag
-proper highlighting of interactives
+guy above the shop: data merchant? wheeling and dealing?
 
 
-datastores could show filename
-interactive mains connection
+
+
+
+
+
+cursorpoint original: (1401.00, 257.00, 0.00)
+mouseposition: (1401.00, 257.00)
+input viewportpoint; (0.73, 0.24)
+main camera: 1920 x 1080
+screen: 1920 x 1080
+attack cam: 1250 x 750
+main canvas: 1920 x 1080
+camImageTransform position: (642.00, 153.00, 0.00)
+cursorpoint translated: (759.00, 104.00, 0.00)
+new viewportpoint: (0.40, 0.10, 0.30)
+rect: 1920 x 1080
+
+cursorpoint original: (2495.00, 747.00, 0.00)
+mouseposition: (2495.00, 747.00)
+input viewportpoint; (0.72, 0.33)
+main camera: 3456 x 2234
+screen: 3456 x 2234
+attack cam: 1250 x 750
+main canvas: 1920 x 1241.111
+camImageTransform position: (1155.60, 565.40, 0.00)
+cursorpoint translated: (1339.40, 181.60, 0.00)
+new viewportpoint: (0.39, 0.08, 0.30)
+ rect: 3456 x 2234
+
+* solution: convert attack cam dimensions to resolution pixels, multiply by resolution pixels per screen unit

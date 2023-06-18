@@ -26,6 +26,7 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
             GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/tamperEvidence"), pulseLight.transform.position, Quaternion.identity) as GameObject;
             sensorTripIndicator = obj.GetComponent<TamperEvidence>();
             sensorTripIndicator.suspicious = false;
+            sensorTripIndicator.reportText = "HQ, respond. An alarm sensor was tripped.";
         }
     }
     public override void OnDestroy() {

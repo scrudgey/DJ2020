@@ -41,8 +41,12 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
                 }
             }
         }
+        if (currentAttackSurface != interactor.selectedAttackSurface) {
+            currentAttackSurface?.DisableOutline();
+        }
         currentAttackSurface = interactor.selectedAttackSurface;
         if (currentAttackSurface != null) {
+            currentAttackSurface.EnableOutline();
             interactButton.gameObject.SetActive(true);
 
             Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);

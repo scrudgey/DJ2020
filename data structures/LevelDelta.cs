@@ -11,6 +11,9 @@ public record LevelDelta {
     [JsonConverter(typeof(AlarmGraphConverter))]
     public AlarmGraph alarmGraph;
     public int strikeTeamMaxSize;
+    public int strikeTeamCount = 0;
+    public float strikeTeamSpawnTimer = 0f;
+    public float strikeTeamResponseTimer = 0f;
     public ObjectiveStatus objectiveStatus;
     public bool disguise;
     public int npcsSpawned;

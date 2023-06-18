@@ -54,7 +54,8 @@ public class AttackSurfaceLatchGuard : AttackSurfaceElement {
                     success = true,
                     feedbackText = "Latch guard removed",
                     makeTamperEvidenceSuspicious = true,
-                    revealTamperEvidence = true
+                    revealTamperEvidence = true,
+                    tamperEvidenceReportString = "HQ respond. Someone has tampered with a door."
                 };
             }
         }

@@ -26,7 +26,8 @@ public class AttackSurfaceWire : MonoBehaviour {
             result = result with {
                 success = true,
                 feedbackText = resultText,
-                makeTamperEvidenceSuspicious = true
+                makeTamperEvidenceSuspicious = true,
+                tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
         foreach (AlarmComponent component in alarmComponentsToActivate) {
@@ -34,7 +35,8 @@ public class AttackSurfaceWire : MonoBehaviour {
             result = result with {
                 success = true,
                 feedbackText = resultText,
-                makeTamperEvidenceSuspicious = true
+                makeTamperEvidenceSuspicious = true,
+                tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
         foreach (PoweredComponent component in poweredComponentsToDisable) {
@@ -42,7 +44,8 @@ public class AttackSurfaceWire : MonoBehaviour {
             result = result with {
                 success = true,
                 feedbackText = resultText,
-                makeTamperEvidenceSuspicious = true
+                makeTamperEvidenceSuspicious = true,
+                tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
         if (securityCamera != null) {
@@ -50,7 +53,8 @@ public class AttackSurfaceWire : MonoBehaviour {
             result = result with {
                 success = true,
                 feedbackText = resultText,
-                makeTamperEvidenceSuspicious = true
+                makeTamperEvidenceSuspicious = true,
+                tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
 
