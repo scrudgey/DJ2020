@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class AttackSurfaceDisplayCanvas : MonoBehaviour {
     public TextMeshProUGUI displayText;
-    public Image dataIcon;
+    // public Image dataIcon;
     void Start() {
         StartCoroutine(BlinkTextCursor());
     }

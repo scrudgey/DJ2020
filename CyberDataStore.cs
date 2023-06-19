@@ -11,18 +11,25 @@ public class CyberDataStore : MonoBehaviour {
 
     public List<PayData> payDatas;
 
-    public GameObject datafileIndicator;
+    // public GameObject datafileIndicator;
+    public DataFileIndicator dataFileIndicator;
     bool opened;
 
     public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         cyberComponent.OnStateChange += HandleCyberStateChange;
+        if (payDatas.Count == 0) {
+            dataFileIndicator.Initialize(null);
+        } else {
+            dataFileIndicator.Initialize(payDatas[0]);
+        }
     }
     public void HandleCyberStateChange(CyberComponent component) {
         // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");
         if (component.compromised) {
             Open();
-            datafileIndicator.SetActive(false);
+            // datafileIndicator.SetActive(false);
+            dataFileIndicator.SetIconVisibility(false);
         }
     }
     public void Open() {

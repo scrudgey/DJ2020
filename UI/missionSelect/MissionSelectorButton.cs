@@ -14,7 +14,7 @@ public class MissionSelectorButton : MonoBehaviour {
         this.controller = controller;
         this.template = template;
         missionName.text = template.levelName;
-        faction.text = template.faction.ToString();
+        faction.text = template.faction.name;
         reward.text = template.creditReward.ToString("#,#");
     }
     public void OnClick() {

@@ -562,5 +562,30 @@ public class Toolbox {
             yield return null;
         }
     }
+
+    public static IEnumerator Ease(Coroutine routine,
+                                    float duration,
+                                    float start,
+                                    float end,
+                                    Func<double, double, double, double, double> easing,
+                                    Action<float> update,
+                                    bool unscaledTime = false) {
+        float timer = 0;
+        update(start);
+        while (timer < duration) {
+            timer += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            float value = (float)easing(timer, start, end - start, duration);
+            update(value);
+            yield return null;
+        }
+        update(end);
+        // Vector2 finalPosition = new Vector3(rect.anchoredPosition.x, endY);
+        // rect.anchoredPosition = finalPosition;
+        routine = null;
+    }
+    public static IEnumerator CoroutineFunc(Action action) {
+        action();
+        yield return null;
+    }
 }
 

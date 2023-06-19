@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class MissionComputerController : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] openMenuSound;
@@ -24,15 +24,21 @@ public class MissionComputerController : MonoBehaviour {
     public RectTransform detailsRect;
     public TextMeshProUGUI rewardAmountText;
     public TextMeshProUGUI creditAmountText;
-    public Image factionLogo;
     public TextMeshProUGUI factionText;
     public TextMeshProUGUI emailText;
     public TextMeshProUGUI missionNameText;
     public TextMeshProUGUI taglineText;
     public Transform objectivesContainer;
 
+    [Header("faction")]
+    bool factionIsShowing;
+    public GameObject factionPanel;
+    public RectTransform factionRect;
+    public Image factionLogo;
 
     [Header("map")]
+    public GameObject mapPanel;
+    public RectTransform mapRect;
     public Image mapImage;
     public Color mapColor1;
     public Color mapColor2;
@@ -44,9 +50,7 @@ public class MissionComputerController : MonoBehaviour {
 
     [Header("objects")]
     public GameObject rewardBox;
-    // public GameObject factionBox;
     [Header("easing")]
-    // public GameObject bottomPanel;
     public LayoutElement bottomLayoutElement;
     bool bottomIsShowing;
     List<Coroutine> blitRoutines;
@@ -55,6 +59,9 @@ public class MissionComputerController : MonoBehaviour {
         // bottomPanel.SetActive(false);
         blitRoutines = new List<Coroutine>();
         bottomIsShowing = false;
+        factionIsShowing = false;
+        mapPanel.SetActive(false);
+        factionPanel.SetActive(false);
         detailsPanel.SetActive(false);
         Toolbox.RandomizeOneShot(audioSource, openMenuSound);
         selectorButtons = new List<MissionSelectorButton>();
@@ -94,7 +101,7 @@ public class MissionComputerController : MonoBehaviour {
     }
     public void MissionButtonCallback(MissionSelectorButton button) {
         if (!bottomIsShowing) {
-            ShowBottomPanel();
+            ShowDetailsDialogue();
         }
         Toolbox.RandomizeOneShot(audioSource, missionButtonClickSound);
         LoadTemplate(button.template);
@@ -104,6 +111,11 @@ public class MissionComputerController : MonoBehaviour {
         GUI.FocusControl(null);
     }
     public void MissionButtonMouseover(MissionSelectorButton button) {
+
+        if (!factionIsShowing) {
+            ShowMapAndFaction();
+        }
+
         // set texts
         factionLogo.enabled = true;
         factionLogo.sprite = button.template.faction.logo;
@@ -118,7 +130,7 @@ public class MissionComputerController : MonoBehaviour {
         blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionBody, "Pop: 2,654,776\n42°21′37″N\n71°3′28″W")));
         blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTarget, $"TARGET: {button.template.sceneDescriptor}")));
     }
-    void ShowBottomPanel() {
+    void ShowDetailsDialogue() {
         bottomIsShowing = true;
         detailsPanel.SetActive(true);
         StartCoroutine(EaseInDetailsPanel());
@@ -126,12 +138,29 @@ public class MissionComputerController : MonoBehaviour {
             selectorButton.button.interactable = false;
         }
     }
-    void HideBottomPanel() {
+    void HideDetailsDialogue() {
         bottomIsShowing = false;
         detailsPanel.SetActive(false);
         foreach (MissionSelectorButton selectorButton in selectorButtons) {
             selectorButton.button.interactable = true;
         }
+    }
+
+    void ShowMapAndFaction() {
+        factionIsShowing = true;
+        mapRect.sizeDelta = new Vector2(530f, 35f);
+        factionRect.sizeDelta = new Vector2(330f, 35f);
+        mapPanel.SetActive(true);
+        StartCoroutine(Toolbox.Ease(null, 0.5f, 35f, 550f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+            mapRect.sizeDelta = new Vector2(530f, height);
+        }, unscaledTime: true));
+        StartCoroutine(Toolbox.ChainCoroutines(
+            new WaitForSecondsRealtime(0.2f),
+            Toolbox.CoroutineFunc(() => factionPanel.SetActive(true)),
+            Toolbox.Ease(null, 0.5f, 35f, 275f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+                factionRect.sizeDelta = new Vector2(330f, height);
+            }, unscaledTime: true))
+        );
     }
     IEnumerator EaseInPanel() {
         float timer = 0f;
@@ -157,11 +186,11 @@ public class MissionComputerController : MonoBehaviour {
         timer = 0f;
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
-            float height = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 750, duration);
+            float height = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 940, duration);
             detailsRect.sizeDelta = new Vector2(1800f, height);
             yield return null;
         }
-        detailsRect.sizeDelta = new Vector2(1800f, 800f);
+        detailsRect.sizeDelta = new Vector2(1800f, 990f);
     }
 
     public void LoadTemplate(LevelTemplate template) {
@@ -221,7 +250,7 @@ public class MissionComputerController : MonoBehaviour {
     }
 
     public void DetailPanelCloseCallback() {
-        HideBottomPanel();
+        HideDetailsDialogue();
     }
 
     void Update() {
