@@ -220,7 +220,7 @@ public class DialogueController : MonoBehaviour {
         GameObject responseObj = GameObject.Instantiate(responsePrefab);
         responseObj.transform.SetParent(responsesContainer, false);
         DialogueResponseButton button = responseObj.GetComponent<DialogueResponseButton>();
-        button.Initialize(responseCallback, response, 0f);
+        button.Initialize(responseCallback, "", response, 0f);
     }
     public void EscapeDialogueResponseCallback(DialogueResponseButton dialogueResponseButton) {
         dialogueResult = DialogueResult.stun;

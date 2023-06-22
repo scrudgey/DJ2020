@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,6 +36,28 @@ public class MissionPlanController : MonoBehaviour {
     void Start() {
         if (debugStart) {
             GameManager.I.gameData = GameData.TestInitialData();
+            GunTemplate gun1 = GunTemplate.Load("p1");
+            GunTemplate gun2 = GunTemplate.Load("s1");
+            GunTemplate gun3 = GunTemplate.Load("r1");
+            GunTemplate gun4 = GunTemplate.Load("p2");
+            GunState gunState1 = GunState.Instantiate(gun1);
+            GunState gunState2 = GunState.Instantiate(gun2);
+            GunState gunState3 = GunState.Instantiate(gun3);
+            GunState gunState4 = GunState.Instantiate(gun4);
+
+            GameManager.I.gameData.playerState.allGuns.Add(gunState1);
+            GameManager.I.gameData.playerState.allGuns.Add(gunState2);
+            GameManager.I.gameData.playerState.allGuns.Add(gunState3);
+            GameManager.I.gameData.playerState.allGuns.Add(gunState4);
+
+            BaseItem item1 = ItemInstance.LoadItem("C4");
+            BaseItem item2 = ItemInstance.LoadItem("rocket");
+            BaseItem item3 = ItemInstance.LoadItem("grenade");
+
+            GameManager.I.gameData.playerState.allItems.Add(item1);
+            GameManager.I.gameData.playerState.allItems.Add(item2);
+            GameManager.I.gameData.playerState.allItems.Add(item3);
+
             // LevelTemplate template = LevelTemplate.LoadAsInstance("Jack That Data");
             LevelTemplate template = LevelTemplate.LoadResource("Jack That Data");
             Initialize(GameManager.I.gameData, template);

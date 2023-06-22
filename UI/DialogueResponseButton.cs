@@ -6,16 +6,22 @@ using TMPro;
 using UnityEngine;
 public class DialogueResponseButton : MonoBehaviour {
     public string response;
+    public string prefix;
     public TextMeshProUGUI text;
     public RectTransform myRectTransform;
     public Action<DialogueResponseButton> responseCallback;
-    public void Initialize(Action<DialogueResponseButton> responseCallback, string response, float easeOffset) {
+    public AudioSource audioSource;
+    public AudioClip[] clickSound;
+    public void Initialize(Action<DialogueResponseButton> responseCallback, string prefix, string response, float easeOffset) {
         this.responseCallback = responseCallback;
         this.response = response;
-        text.text = response;
+        text.text = $"{prefix} {response}";
         StartCoroutine(waitAndThen(easeOffset, easeInSize()));
     }
     public void OnClick() {
+        if (audioSource != null) {
+            Toolbox.RandomizeOneShot(audioSource, clickSound);
+        }
         responseCallback(this);
     }
     public IEnumerator waitAndThen(float delay, IEnumerator wrapped) {

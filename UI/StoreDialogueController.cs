@@ -16,6 +16,15 @@ public class StoreDialogueController : MonoBehaviour {
     public TextMeshProUGUI rightDialogueName;
     public AudioClip blitSound;
     Coroutine blitTextRoutine;
+
+    public void SetImages(Sprite left) {
+        // if (left != null) {
+        leftImage.sprite = left;
+        // }
+        // if (right != null) {
+        // rightImage.sprite = right;
+        // }
+    }
     public void Initialize(string buyerName, string storeName) {
         rightDialogueName.text = buyerName.ToLower();
         leftDialogueName.text = storeName.ToLower();
@@ -32,14 +41,30 @@ public class StoreDialogueController : MonoBehaviour {
         // dialogueText.text = dialogue;
         BlitDialogue(dialogue);
     }
+    public void MoveDialogueBox(bool playerSide) {
+        if (playerSide) {
+            dialogueLeftSpacer.minWidth = 150f;
+            dialogueRightSpacer.minWidth = 20f;
+        } else {
+            dialogueLeftSpacer.minWidth = 20f;
+            dialogueRightSpacer.minWidth = 150f;
+        }
+    }
     void BlitDialogue(string content) {
         if (blitTextRoutine != null) {
             StopCoroutine(blitTextRoutine);
         }
         blitTextRoutine = StartCoroutine(BlitDialogueText(content));
     }
+    public void Clear() {
+        if (blitTextRoutine != null) {
+            StopCoroutine(blitTextRoutine);
+        }
+        dialogueText.text = "";
+    }
 
     public IEnumerator BlitDialogueText(string content) {
+        Debug.Log($"blit dialogue text {content}");
         dialogueText.text = "";
         int index = 0;
         float timer = 0f;

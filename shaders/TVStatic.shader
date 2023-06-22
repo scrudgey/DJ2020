@@ -10,6 +10,7 @@ Shader "Custom/TVStatic"
  
     Properties
     {
+        _MainTex ("Particle Texture", 2D) = "white" {}
         _ColorA ("Color A", Color) = (1,1,1,1)
         _ColorB ("Color B", Color) = (0,0,0,0)
        

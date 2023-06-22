@@ -2374,7 +2374,47 @@ note: layer "interactive"
 * transitioning between cyberdeck and toolbag
 * try not moving main cam
 * proper highlighting of interactives
-
+* pistol recoil should be higher to dissuade spamming
+    3.5 inaccuracy
+    3-5 recoil
+* next fix wirecutting by unifying with raycast code.
+* hack in interact mode / change / fix / improve hack
+* show data file in hack indicator
+* pickers:
+    * auto hide weapon picker when not in use
+    * auto hide weapon stats when not in use
+    * some way of getting out of item picking
+* show stats when:
+    * weapon slot is selected
+* on mouse exit picker: return to display selected weapon slot
+* mouse over a slot, no button active: show picker, show stats
+* mouse exit a slot, no button active: hide picker
+* close button for picker
+* don't show if button is empty
+* clearing weapons doesn't work quite right:
+    * returning things to stash is bad
+    * clearing when item is selected is bad
+* show lines from slots to player
+* item selector icons too big
+* twitchiness when mousing over multiple slots
+* update / compare stats when mouseover weapon picker
+* allow different contacts
+* have the dialogue panel open up first
+    * static on contact 
+    * contact image eases in
+    * opening dialogue
+        * what do you got for me, stacks?
+        * [continue]
+        * stacks: i can roll you a fake id for omnigen data center.
+        * [buy] / [no buy]
+* record tactics that are active
+* proper left/right dialogue boxes, remove [BUY] from response
+* show credits somewhere
+* show favors as well
+* why blit sound plays?
+* sound for open dialogue
+* sound for button choice
+* sound for dialing phone
 
 
 graphical issues:
@@ -2860,11 +2900,16 @@ what happened to the sphere robot?
 tactics pane should look like calling people up and haggling with them
 
 map pane:
-    isometric pixel art city buildings 
+    * isometric pixel art city buildings 
         show type of location? city view? territory?
         show view of terrain?
     cursor tracks in, box narrows down to target, texts pop up
-    faction and target?
+    * faction and target?
+guy above the shop: data merchant? wheeling and dealing?
+better sounds for wire, attach
+better sounds for mission computer
+colors for item selector
+display information about items
 
 basic game:
 progression:
@@ -2878,19 +2923,28 @@ gameplay:
         silencer affects graphic
         headshots
 
-* pistol recoil should be higher to dissuade spamming
-    3.5 inaccuracy
-    3-5 recoil
-* next fix wirecutting by unifying with raycast code.
-* hack in interact mode / change / fix / improve hack
-* show data file in hack indicator
-
-guy above the shop: data merchant? wheeling and dealing?
 
 
+revamped tactics panel:
+1. show contacts and their tactics
+    world map?
+2. show active tactics.
+unify these: show all, indicate if active or not
 
+when you click on a tactic for sale: pop up a dialogue box.
+    dealer: what do you need?
+    respond: a disguise / a cyberattack / information on
+        a. dealer: my fee is 15,000 credits
+        b. dealer: seems like a tough one. 30,000 credits
+        c. dealer: "I'm not sure this profiles as good business," the pirate
+                said, angling for better money. "Target specs on a com-
+                sat that isn't in the book-
+        "get off my board! you're too hot. you're a hit waiting to happen."
+        "So maybe you want to buy your microwaves somewhere else?"
+    respond: 
+        a. accept / haggle
+dealer responses can match up with particular speech skills to negate, affecting price.
+owing favors: unlocked from bonus objectives
 
+credits in mission details view
 
-
-better sounds for wire, attach
-better sounds for mission computer

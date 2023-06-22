@@ -9,6 +9,7 @@ public class LoadoutWeaponButton : MonoBehaviour {
     public Image weaponImage;
     public TextMeshProUGUI nameText;
     public GunTemplate gunTemplate;
+    public Image line;
     public void OnClick() {
         loadoutController.WeaponSlotClicked(weaponIndex, gunTemplate);
     }
@@ -18,10 +19,12 @@ public class LoadoutWeaponButton : MonoBehaviour {
         nameText.text = "";
         weaponImage.enabled = false;
         loadoutController.WeaponSlotClicked(weaponIndex, gunTemplate, clear: true);
+        line.enabled = false;
     }
 
     public void ApplyGunTemplate(GunTemplate template) {
         this.gunTemplate = template;
+        line.enabled = template != null;
         if (template == null)
             return;
         nameText.text = template.name;

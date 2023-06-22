@@ -579,8 +579,6 @@ public class Toolbox {
             yield return null;
         }
         update(end);
-        // Vector2 finalPosition = new Vector3(rect.anchoredPosition.x, endY);
-        // rect.anchoredPosition = finalPosition;
         routine = null;
     }
     public static IEnumerator CoroutineFunc(Action action) {

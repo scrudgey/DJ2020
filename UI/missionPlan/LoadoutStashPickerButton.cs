@@ -26,4 +26,10 @@ public class LoadoutStashPickerButton : MonoBehaviour {
     public void OnClick() {
         loadoutController.StashPickerCallback(this);
     }
+    public void OnMouseOver() {
+        loadoutController.StashPickerMouseOverCallback(this);
+    }
+    public void OnMouseExit() {
+        loadoutController.StashPickerMouseExitCallback(this);
+    }
 }

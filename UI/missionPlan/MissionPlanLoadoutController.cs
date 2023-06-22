@@ -34,10 +34,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     [Header("item slots")]
     public LoadoutGearSlotButton[] itemSlots;
     [Header("picker")]
+    public GameObject pickerObject;
     public RectTransform statsRect;
     public RectTransform pickerRect;
-    public GameObject pickerHeader;
     bool pickerOpen;
+    bool statsOpen;
 
     int selectedWeaponSlot;
     int selectedItemSlot;
@@ -56,6 +57,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     float headAngle;
 
     Coroutine pickerCoroutine;
+    Coroutine statsCoroutine;
     bool initialized;
     public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.data = data;
@@ -75,22 +77,58 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
         thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
 
-        // data.playerState.items
-        selectedWeaponSlot = 1;
-        // gunStatHandler.DisplayGunTemplate(data.playerState.primaryGun.template);
+        selectedWeaponSlot = 0;
 
-
-        pickerRect.gameObject.SetActive(false);
-        pickerHeader.SetActive(false);
+        pickerObject.SetActive(false);
         pickerOpen = false;
+        statsOpen = false;
+        statsRect.gameObject.SetActive(false);
+        gunStatHandler.ClearStats();
 
         primaryHighlight.SetActive(false);
         secondaryHighlight.SetActive(false);
         tertiaryHighlight.SetActive(false);
-        // InitializeWeaponPicker();
+
         thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
+
         initialized = true;
     }
+
+
+    void ShowStatsView() {
+        if (statsOpen) return;
+        if (statsCoroutine != null) {
+            StopCoroutine(statsCoroutine);
+        }
+        statsOpen = true;
+        statsRect.gameObject.SetActive(true);
+        statsRect.sizeDelta = new Vector2(440f, 35f);
+        statsCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
+            Toolbox.Ease(null, 0.5f, 35f, 375f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+                statsRect.sizeDelta = new Vector2(440f, height);
+            }, unscaledTime: true),
+            Toolbox.CoroutineFunc(() => statsCoroutine = null)
+        ));
+    }
+
+    void HideStatsView() {
+        if (!statsOpen) return;
+        if (statsCoroutine != null) {
+            StopCoroutine(statsCoroutine);
+        }
+        statsOpen = false;
+        statsCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
+            Toolbox.Ease(null, 0.5f, 375, 35, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+                statsRect.sizeDelta = new Vector2(440f, height);
+            }, unscaledTime: true),
+            Toolbox.CoroutineFunc(() => {
+                statsRect.gameObject.SetActive(false);
+                gunStatHandler.ClearStats();
+                statsCoroutine = null;
+            })
+        ));
+    }
+
 
     void ApplyGunTemplate(LoadoutWeaponButton button, GunState gunstate) {
         if (gunstate != null) {
@@ -138,6 +176,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
 
     public void WeaponSlotClicked(int slotIndex, GunTemplate template, bool clear = false) {
+        if (!clear)
+            ShowStatsView();
+        gunStatHandler.DisplayGunTemplate(template);
+        gunStatHandler.SetCompareGun(template);
+
         selectedWeaponSlot = slotIndex;
         switch (slotIndex) {
             case 1:
@@ -156,13 +199,27 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 tertiaryHighlight.SetActive(true);
                 break;
         }
-        gunStatHandler.DisplayGunTemplate(template);
         InitializeWeaponPicker();
         if (template == null) {
             torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
         }
         if (clear) {
+            selectedWeaponSlot = 0;
+            primaryHighlight.SetActive(false);
+            secondaryHighlight.SetActive(false);
+            tertiaryHighlight.SetActive(false);
             StartPickerCoroutine(ClosePicker());
+            switch (slotIndex) {
+                case 1:
+                    data.playerState.primaryGun = null;
+                    break;
+                case 2:
+                    data.playerState.secondaryGun = null;
+                    break;
+                case 3:
+                    data.playerState.tertiaryGun = null;
+                    break;
+            }
         } else if (!pickerOpen) {
             Toolbox.RandomizeOneShot(audioSource, openPickerSounds, randomPitchWidth: 0.05f);
             StartPickerCoroutine(OpenPicker());
@@ -170,7 +227,10 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
     }
     public void ItemSlotClicked(int slotIndex, LoadoutGearSlotButton button) {
-        Debug.Log($"item slot {slotIndex} {button.item}");
+        // Debug.Log($"item slot {slotIndex} {button.item}");
+        HideStatsView();
+        selectedWeaponSlot = 0;
+
         selectedItemSlot = slotIndex;
         InitializeItemPicker();
 
@@ -190,7 +250,29 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             case LoadoutStashPickerButton.PickerType.item: ItemPickerCallback(picker); break;
         }
         StartPickerCoroutine(ClosePicker());
-
+        HideStatsView();
+        selectedWeaponSlot = 0;
+    }
+    public void StashPickerMouseOverCallback(LoadoutStashPickerButton picker) {
+        switch (picker.type) {
+            case LoadoutStashPickerButton.PickerType.gun:
+                // gunStatHandler.SetCompareGun(picker.gunstate.template);
+                gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
+                break;
+        }
+    }
+    public void StashPickerMouseExitCallback(LoadoutStashPickerButton picker) {
+        switch (picker.type) {
+            case LoadoutStashPickerButton.PickerType.gun:
+                // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
+                LoadoutWeaponButton button = selectedWeaponSlot switch {
+                    1 => primaryWeaponButton,
+                    2 => secondaryWeaponButton,
+                    3 => tertiaryWeaponButton
+                };
+                gunStatHandler.DisplayGunTemplate(button.gunTemplate);
+                break;
+        }
     }
 
     void WeaponPickerCallback(LoadoutStashPickerButton picker) {
@@ -207,8 +289,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         };
         button.ApplyGunTemplate(picker.gunstate.template);
         // TODO: apply total state, not just template
-        gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
-
+        // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
         // TODO: change plan, not player state (requires change to VR mission designer too?)
         switch (selectedWeaponSlot) {
             case 1:
@@ -355,7 +436,15 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
 
     public void OnWeaponSlotMouseOver(LoadoutWeaponButton button) {
-        gunStatHandler.DisplayGunTemplate(button.gunTemplate);
+        if (button.gunTemplate != null) {
+            ShowStatsView();
+            gunStatHandler.DisplayGunTemplate(button.gunTemplate);
+        }
+    }
+    public void OnWeaponSlotMouseExit(LoadoutWeaponButton button) {
+        if (selectedWeaponSlot == 0) {
+            HideStatsView();
+        }
     }
 
     void StartPickerCoroutine(IEnumerator coroutine) {
@@ -367,8 +456,8 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
     IEnumerator OpenPicker() {
         pickerOpen = true;
-        pickerRect.gameObject.SetActive(true);
-        pickerHeader.SetActive(true);
+        pickerObject.SetActive(true);
+        // pickerHeader.SetActive(true);
         float timer = 0f;
         float duration = 0.15f;
         float width = pickerRect.rect.width;
@@ -391,9 +480,19 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             pickerRect.sizeDelta = new Vector2(width, height);
             yield return null;
         }
-        pickerRect.gameObject.SetActive(false);
-        pickerHeader.SetActive(false);
+        pickerObject.SetActive(false);
+        // pickerHeader.SetActive(false);
         pickerCoroutine = null;
+    }
+
+    public void ClosePickerButtonCallback() {
+        StartPickerCoroutine(ClosePicker());
+        HideStatsView();
+        selectedWeaponSlot = 0;
+        selectedItemSlot = 0;
+        primaryHighlight.SetActive(false);
+        secondaryHighlight.SetActive(false);
+        tertiaryHighlight.SetActive(false);
     }
 
 }
