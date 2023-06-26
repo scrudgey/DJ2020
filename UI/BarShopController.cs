@@ -25,7 +25,6 @@ public class BarShopController : MonoBehaviour {
         }
         dialogueController.SetShopownerDialogue("come in to my underground black market bar.");
         marketData = GameManager.I.gameData.marketData;
-        // StartCoroutine(OpenStore());
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
 

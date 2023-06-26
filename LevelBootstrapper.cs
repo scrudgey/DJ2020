@@ -62,6 +62,7 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log($"bootstrapping world ...");
         GameManager.I.gameData = GameData.TestInitialData();
         GameManager.I.SetMarketData();
+        GameManager.I.SetDealData();
         Scene activeScene = SceneManager.GetActiveScene();
         GameManager.I.StartWorld(activeScene.name);
     }

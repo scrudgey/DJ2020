@@ -2415,7 +2415,24 @@ note: layer "interactive"
 * sound for open dialogue
 * sound for button choice
 * sound for dialing phone
-
+    * faction and target?
+    * isometric pixel art city buildings 
+* credits in mission details view
+* deal dialogue
+    * populate details
+    * allow player to select trade objects
+    * don't allow trade until requirements met
+* initialize text
+* close out deal on accept
+* implement unset
+* initial dialogue
+* sound effects
+* properly initialize deals
+* clear deal when done
+* say something different if no deals are left
+* flavor text for deals
+    * say something on deal accept
+    * say something on deal select
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2771,7 +2788,6 @@ loot drops
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
 
-
 world NPCs:
     potentially talkable: leave that for later.
     moving with purpose around the scene. 
@@ -2897,54 +2913,52 @@ world:
 radial menu for selecting guns and items?
     unify items and guns
 what happened to the sphere robot?
-tactics pane should look like calling people up and haggling with them
+* tactics pane should look like calling people up and haggling with them
 
+
+guards can see through doors
 map pane:
-    * isometric pixel art city buildings 
-        show type of location? city view? territory?
-        show view of terrain?
+    show type of location? city view? territory?
+    show view of terrain?
     cursor tracks in, box narrows down to target, texts pop up
-    * faction and target?
 guy above the shop: data merchant? wheeling and dealing?
 better sounds for wire, attach
 better sounds for mission computer
 colors for item selector
+item selector cancel
 display information about items
 
 basic game:
-progression:
-1. restrict weapons at gun shop
-3. adjust the pay / rewards
-gameplay:
-4. more levels
-5. stealth kills
-    silenced pistol
-        gun upgrades
-        silencer affects graphic
-        headshots
 
+    progression:
+        1. restrict weapons at gun shop
+        3. adjust the pay / rewards
+    gameplay:
+        create more loot
+        place more loot in levels   
+        4. more levels
+        5. stealth kills
+            silenced pistol
+                gun upgrades
+                silencer affects graphic
+                headshots
 
+world:
+    street doc
+    gun upgrades 
+    data merchant
 
-revamped tactics panel:
-1. show contacts and their tactics
-    world map?
-2. show active tactics.
-unify these: show all, indicate if active or not
+    * import-export
+    
+    telephone sales contact
+    guns sign
+    doc sign
 
-when you click on a tactic for sale: pop up a dialogue box.
-    dealer: what do you need?
-    respond: a disguise / a cyberattack / information on
-        a. dealer: my fee is 15,000 credits
-        b. dealer: seems like a tough one. 30,000 credits
-        c. dealer: "I'm not sure this profiles as good business," the pirate
-                said, angling for better money. "Target specs on a com-
-                sat that isn't in the book-
-        "get off my board! you're too hot. you're a hit waiting to happen."
-        "So maybe you want to buy your microwaves somewhere else?"
-    respond: 
-        a. accept / haggle
-dealer responses can match up with particular speech skills to negate, affecting price.
-owing favors: unlocked from bonus objectives
+skins:
+    civ_female
+    civ_female
+    generic64
+    Jack
+    security
 
-credits in mission details view
-
+    

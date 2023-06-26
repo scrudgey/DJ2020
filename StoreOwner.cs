@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum StoreType { none, gun, item, loot, bar }
+public enum StoreType { none, gun, item, loot, bar, importer }
 public class StoreOwner : Interactive {
     public StoreType storeType;
     public Transform lookAtPoint;

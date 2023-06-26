@@ -17,6 +17,7 @@ public record GameData {
     public List<string> completedLevels;
     public SerializableDictionary<string, LevelPlan> levelPlans;
     public MarketData marketData;
+    public List<DealData> dealData;
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/levels/test/test") as LevelTemplate;
         // DateTime.Now;

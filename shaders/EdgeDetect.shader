@@ -24,6 +24,7 @@ Shader "Custom/EdgeDetect"
 			sampler2D _MainTex;
 			float2 _MainTex_TexelSize;
             float _Threshold;
+            sampler2D _CameraDepthTexture;
 
 			float3 sobel(float2 uv)
 			{
@@ -31,21 +32,21 @@ Shader "Custom/EdgeDetect"
 				float y = 0;
 
 				float2 texelSize = _MainTex_TexelSize;
-                x += tex2D(_MainTex, uv + float2(-texelSize.x, -texelSize.y)) * -1.0;
-                x += tex2D(_MainTex, uv + float2(-texelSize.x,            0)) * -2.0;
-                x += tex2D(_MainTex, uv + float2(-texelSize.x,  texelSize.y)) * -1.0;
+                x += tex2D(_CameraDepthTexture, uv + float2(-texelSize.x, -texelSize.y)) * -1.0;
+                x += tex2D(_CameraDepthTexture, uv + float2(-texelSize.x,            0)) * -2.0;
+                x += tex2D(_CameraDepthTexture, uv + float2(-texelSize.x,  texelSize.y)) * -1.0;
 
-                x += tex2D(_MainTex, uv + float2( texelSize.x, -texelSize.y)) *  1.0;
-                x += tex2D(_MainTex, uv + float2( texelSize.x,            0)) *  2.0;
-                x += tex2D(_MainTex, uv + float2( texelSize.x,  texelSize.y)) *  1.0;
+                x += tex2D(_CameraDepthTexture, uv + float2( texelSize.x, -texelSize.y)) *  1.0;
+                x += tex2D(_CameraDepthTexture, uv + float2( texelSize.x,            0)) *  2.0;
+                x += tex2D(_CameraDepthTexture, uv + float2( texelSize.x,  texelSize.y)) *  1.0;
 
-                y += tex2D(_MainTex, uv + float2(-texelSize.x, -texelSize.y)) * -1.0;
-                y += tex2D(_MainTex, uv + float2(           0, -texelSize.y)) * -2.0;
-                y += tex2D(_MainTex, uv + float2( texelSize.x, -texelSize.y)) * -1.0;
+                y += tex2D(_CameraDepthTexture, uv + float2(-texelSize.x, -texelSize.y)) * -1.0;
+                y += tex2D(_CameraDepthTexture, uv + float2(           0, -texelSize.y)) * -2.0;
+                y += tex2D(_CameraDepthTexture, uv + float2( texelSize.x, -texelSize.y)) * -1.0;
 
-                y += tex2D(_MainTex, uv + float2(-texelSize.x,  texelSize.y)) *  1.0;
-                y += tex2D(_MainTex, uv + float2(           0,  texelSize.y)) *  2.0;
-                y += tex2D(_MainTex, uv + float2( texelSize.x,  texelSize.y)) *  1.0;
+                y += tex2D(_CameraDepthTexture, uv + float2(-texelSize.x,  texelSize.y)) *  1.0;
+                y += tex2D(_CameraDepthTexture, uv + float2(           0,  texelSize.y)) *  2.0;
+                y += tex2D(_CameraDepthTexture, uv + float2( texelSize.x,  texelSize.y)) *  1.0;
 				return sqrt(x * x + y * y) > _Threshold;
 			}
 
