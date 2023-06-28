@@ -6,6 +6,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 public class ImporterShopController : MonoBehaviour {
+    public RectTransform bottomRect;
     public GameObject UIEditorCamera;
     public AudioSource audioSource;
     public StoreDialogueController storeDialogueController;
@@ -21,13 +22,14 @@ public class ImporterShopController : MonoBehaviour {
     public DealDialogueController dealDialogueController;
     [Header("sounds")]
     public AudioClip[] showDialogueSounds;
+    public AudioClip[] discloseBottomSound;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
 
     public void Initialize() {
         dealDialogueObject.SetActive(false);
-
+        StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         ClearDealButtons();
         ClearPlayerInventoryDisplay();
         PopulateDealButtons();

@@ -60,13 +60,17 @@ public class GunStatHandler : MonoBehaviour {
 
     public Image gunImage;
 
-    GunTemplate compareGun;
-    GunTemplate currentGun;
+    GunStats compareGun;
+    GunStats currentGun;
     Coroutine lerpBarsCoroutine;
     Dictionary<GunStat, RectTransform> statBarRects;
     Dictionary<GunStat, RectTransform> statBarOffsetRects;
-    public void SetCompareGun(GunTemplate compareGun) {
-        this.compareGun = compareGun;
+    public void SetCompareGun(IGunStatProvider compareGun) {
+        if (compareGun == null) {
+            this.compareGun = null;
+        } else {
+            this.compareGun = compareGun.GetGunStats();
+        }
         if (currentGun != null) {
             LerpBars(currentGun);
         }
@@ -95,18 +99,36 @@ public class GunStatHandler : MonoBehaviour {
     }
     public void DisplayGunTemplate(GunTemplate template) {
         if (template == null) {
-            currentGun = null;
-            ClearStats();
+            ClearGunTemplate();
         } else {
-            currentGun = template;
-            PopulateStats(template);
-            LerpBars(template);
+            SetTemplateTexts(template);
+            DisplayStats(template.GetGunStats());
         }
     }
-    public void PopulateStats(GunTemplate template) {
+    public void DisplayGunTemplate(GunState gunState) {
+        if (gunState == null) {
+            ClearGunTemplate();
+        } else {
+            SetTemplateTexts(gunState.template);
+            DisplayStats(gunState.GetGunStats());
+        }
+    }
+    public void ClearGunTemplate() {
+        currentGun = null;
+        ClearStats();
+    }
+    public void DisplayStats(GunStats newStats) {
+        currentGun = newStats;
+        PopulateStats(currentGun);
+        LerpBars(currentGun);
+    }
+    void SetTemplateTexts(GunTemplate template) {
         nameText.text = template.name;
         typeText.text = template.type.ToString();
         cycleText.text = template.cycle.ToString();
+        gunImage.sprite = template.image;
+    }
+    public void PopulateStats(GunStats template) {
         shootIntervalText.text = (template.shootInterval * 10).ToString();
         noiseText.text = template.noise.ToString();
         clipSizeText.text = template.clipSize.ToString();
@@ -119,7 +141,6 @@ public class GunStatHandler : MonoBehaviour {
         recoilLowText.text = (template.recoil.low * 10).ToString();
         recoilHighText.text = (template.recoil.high * 10).ToString();
         gunImage.enabled = true;
-        gunImage.sprite = template.image;
     }
     public void ClearStats() {
         nameText.text = "";
@@ -146,7 +167,7 @@ public class GunStatHandler : MonoBehaviour {
         }
     }
 
-    public void LerpBars(GunTemplate template) {
+    public void LerpBars(GunStats template) {
         if (shootIntervalBar == null) return;
         if (lerpBarsCoroutine != null) {
             StopCoroutine(lerpBarsCoroutine);
@@ -154,7 +175,7 @@ public class GunStatHandler : MonoBehaviour {
         lerpBarsCoroutine = StartCoroutine(LerpBarsRoutine(template));
     }
 
-    public IEnumerator LerpBarsRoutine(GunTemplate template) {
+    public IEnumerator LerpBarsRoutine(GunStats template) {
         float duration = 1f;
         float timer = 0f;
 

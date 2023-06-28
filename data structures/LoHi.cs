@@ -12,4 +12,6 @@ public class LoHi {
     public float GetRandomInsideBound() => UnityEngine.Random.Range(low, high);
 
     public float Average() => (low + high) / 2f;
+
+    public static LoHi operator +(LoHi a, LoHi b) => new LoHi(a.low + b.low, a.high + b.high);
 }

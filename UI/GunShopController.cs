@@ -169,7 +169,7 @@ public class GunShopController : MonoBehaviour {
         // TODO: grey out Buy button if player has insufficient credits
     }
     void ClearGunForSale() {
-        gunStatHandler.DisplayGunTemplate(null);
+        gunStatHandler.ClearGunTemplate();
         currentGunForSale = null;
         creditsCost.text = "";
         // TODO: grey out Buy button if player has insufficient credits

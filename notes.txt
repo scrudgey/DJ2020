@@ -2433,6 +2433,25 @@ note: layer "interactive"
 * flavor text for deals
     * say something on deal accept
     * say something on deal select
+* ease in mod shop
+* mod shop
+* mod system for weapons
+    * each gun template specifies a number of available mods
+    * gun instance has a list of active mod instances
+* subtract credits on purchase
+* hide mod purchasing, show active mods on gun select
+* set initial dialogue
+* working gun sprite in active mods
+* ease in importer shop
+* draw sprites
+* sound effects
+    * select gun
+    * select mod
+    * purchase
+* when mod is selected, show delta
+* at least one more mod of different type
+
+
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -2807,8 +2826,8 @@ world layout:
         * weapons
     * akira alley:
         * drug dealers will purchase your drug loot.
-    upstairs:
-        importer / exporter who buys things.
+    * upstairs:
+        * importer / exporter who buys things.
         also he is a connection that will give you tips or sometimes a deal.
     bar:
         * the bartender will clue you in on the price of commodities.
@@ -2896,7 +2915,7 @@ world:
         look in direction
         look at player
         different from SphereRobot, but still uses a state machine.
-    upstairs importer exporter
+    * upstairs importer exporter
     mission guy in the bar
     create all shops
     linger in bar:
@@ -2921,7 +2940,7 @@ map pane:
     show type of location? city view? territory?
     show view of terrain?
     cursor tracks in, box narrows down to target, texts pop up
-guy above the shop: data merchant? wheeling and dealing?
+* guy above the shop: data merchant? wheeling and dealing?
 better sounds for wire, attach
 better sounds for mission computer
 colors for item selector
@@ -2929,7 +2948,6 @@ item selector cancel
 display information about items
 
 basic game:
-
     progression:
         1. restrict weapons at gun shop
         3. adjust the pay / rewards
@@ -2945,20 +2963,33 @@ basic game:
 
 world:
     street doc
-    gun upgrades 
+    * gun upgrades 
     data merchant
-
     * import-export
-    
     telephone sales contact
     guns sign
     doc sign
 
-skins:
-    civ_female
-    civ_female
-    generic64
-    Jack
-    security
 
-    
+mods take effect in gameplay
+silencer shows in gun image
+    must apply anywhere a gun image is shown: selector, inventory, gun display, etc
+        enumerate all places:
+            gun selector buttons:
+                gunshop left and right
+                gunmodshop right
+                UI gun display
+                loadout editor
+                VR mission editor
+            gun stats:
+                1. VR mission
+                2. gun shop
+                3. gun mod
+                4. loadout
+    a new mechanism for gun display
+        change overlayed images in response to mods
+        displayGun(GunState state)
+        it feels like the gun should be made of swappable parts
+
+silencer shows in gameplay
+mods on different guns

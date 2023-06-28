@@ -5,7 +5,7 @@ public enum GunType { unarmed, pistol, smg, shotgun, rifle, sword }
 public enum CycleType { manual, semiautomatic, automatic }
 
 [CreateAssetMenu(menuName = "ScriptableObjects/GunTemplate")]
-public class GunTemplate : ScriptableObject {
+public class GunTemplate : ScriptableObject, IGunStatProvider {
     new public string name;
     public string shortName;
     [TextArea(15, 20)]
@@ -30,7 +30,7 @@ public class GunTemplate : ScriptableObject {
     public bool silencer;
     public float weight;
     public LoHi recoil;
-
+    public List<GunMod> availableMods;
 
     [Header("Resources")]
     public AudioClip[] shootSounds;
@@ -74,4 +74,15 @@ public class GunTemplate : ScriptableObject {
     public AudioClip[] GetShootSounds() {
         return silencer ? silencedSounds : shootSounds;
     }
+
+    public GunStats GetGunStats() => new GunStats {
+        shootInterval = shootInterval,
+        noise = noise,
+        clipSize = clipSize,
+        spread = spread,
+        shootInaccuracy = shootInaccuracy,
+        lockOnSize = lockOnSize,
+        baseDamage = baseDamage,
+        recoil = recoil
+    };
 }

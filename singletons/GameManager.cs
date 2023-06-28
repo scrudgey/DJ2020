@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -113,7 +113,7 @@ public partial class GameManager : Singleton<GameManager> {
             DealData.FromLootData(Resources.Load("data/loot/rush") as LootData, 10, LootCategory.drug, 3,
                 "Somehow I ended up with too much of this stuff. Can you take it off my hands?"),
             DealData.FromLootData(Resources.Load("data/loot/zyme") as LootData, 3, LootCategory.drug, 2,
-                "A big crate of zyme fell off the truck at the docks. Now I have to move it."
+                "A big crate of zyme fell off the truck at the docks. Now I have to move it, pronto."
             ),
         };
     }
@@ -290,6 +290,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("ImporterShop", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.gunModShop:
+                if (!SceneManager.GetSceneByName("GunModShop").isLoaded) {
+                    LoadScene("GunModShop", callback, unloadAll: false);
+                }
+                break;
             case MenuType.console:
                 uiController.ShowTerminal();
                 callback?.Invoke();
@@ -337,6 +342,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.importerShop:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("ImporterShop"));
+                break;
+            case MenuType.gunModShop:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("GunModShop"));
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
@@ -522,6 +530,7 @@ public partial class GameManager : Singleton<GameManager> {
         StoreType.loot => MenuType.lootshop,
         StoreType.bar => MenuType.barShop,
         StoreType.importer => MenuType.importerShop,
+        StoreType.gunmod => MenuType.gunModShop,
         _ => MenuType.none
     }, callback: storeType switch {
         StoreType.loot => () => {
@@ -537,6 +546,11 @@ public partial class GameManager : Singleton<GameManager> {
         StoreType.importer => () => {
             ImporterShopController importerShopController = GameObject.FindObjectOfType<ImporterShopController>();
             importerShopController.Initialize();
+        }
+        ,
+        StoreType.gunmod => () => {
+            GunModShopController gunModShopController = GameObject.FindObjectOfType<GunModShopController>();
+            gunModShopController.Initialize();
         }
         ,
         _ => null

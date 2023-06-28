@@ -195,7 +195,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         timeInState = 0f;
     }
     private void OnStateEnter(CharacterState state, CharacterState fromState) {
-        Debug.Log($"entering state {state} from {fromState}");
+        // Debug.Log($"entering state {state} from {fromState}");
         switch (state) {
             default:
                 break;

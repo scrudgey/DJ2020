@@ -527,6 +527,7 @@ public class Toolbox {
     }
 
     public static IEnumerator OpenStore(RectTransform bottomRect, AudioSource audioSource, AudioClip[] discloseBottomSound) {
+        bottomRect.sizeDelta = new Vector2(1f, 0f);
         yield return new WaitForSecondsRealtime(0.5f);
         RandomizeOneShot(audioSource, discloseBottomSound, randomPitchWidth: 0.02f);
         float timer = 0f;

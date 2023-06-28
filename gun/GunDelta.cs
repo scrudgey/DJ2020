@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
-
 [System.Serializable]
 public record GunDelta {
     public int clip;
     public int chamber;
     public float cooldownTimer;
+    public List<GunMod> activeMods;
 
     public static GunDelta From(GunTemplate template) {
         if (template != null) {
@@ -42,11 +43,11 @@ public record GunDelta {
         clip = 0;
     }
 
-
     public static GunDelta Empty() => new GunDelta {
         clip = 0,
         chamber = 0,
-        cooldownTimer = 0
+        cooldownTimer = 0,
+        activeMods = new List<GunMod>()
     };
 
     // Save

@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using UnityEngine;
 
-public class GunState {
+public class GunState : IGunStatProvider {
     public GunDelta delta;
     [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate template;
@@ -66,4 +66,18 @@ public class GunState {
     //     // load delta
     //     // return instantiate
     // }
+
+
+    public GunStats GetGunStats() {
+        GunStats templateStats = template.GetGunStats();
+        foreach (GunMod mod in delta.activeMods) {
+            templateStats += mod.GetGunStats();
+        }
+        return templateStats;
+    }
+
+    public GunState Copy() => new GunState() {
+        template = template,
+        delta = delta with { activeMods = new System.Collections.Generic.List<GunMod>(delta.activeMods) }
+    };
 }
