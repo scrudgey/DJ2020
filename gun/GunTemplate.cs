@@ -26,7 +26,7 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public float shootInaccuracy;
     public float lockOnSize = 1f;
     public LoHi baseDamage;
-    public Sprite image;
+    public List<Sprite> images;
     public bool silencer;
     public float weight;
     public LoHi recoil;
@@ -50,30 +50,13 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public static GunTemplate Load(string name) {
         return Resources.Load($"data/guns/{name}") as GunTemplate;
     }
-    public float getBaseDamage() {
-        return Random.Range(baseDamage.low, baseDamage.high);
-    }
-    public NoiseData shootNoise() {
-        if (silencer) {
-            return new NoiseData() {
-                volume = noise / 10f,
-                suspiciousness = Suspiciousness.suspicious,
-                pitch = pitch,
-                isGunshot = true
-            };
-        } else {
-            return new NoiseData() {
-                volume = noise,
-                suspiciousness = Suspiciousness.aggressive,
-                pitch = pitch,
-                isGunshot = true
-            };
-        }
+    // public float getBaseDamage() {
+    //     return Random.Range(baseDamage.low, baseDamage.high);
+    // }
 
-    }
-    public AudioClip[] GetShootSounds() {
-        return silencer ? silencedSounds : shootSounds;
-    }
+    // public AudioClip[] GetShootSounds() {
+    //     return silencer ? silencedSounds : shootSounds;
+    // }
 
     public GunStats GetGunStats() => new GunStats {
         shootInterval = shootInterval,

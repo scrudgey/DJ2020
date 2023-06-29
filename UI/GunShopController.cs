@@ -157,7 +157,7 @@ public class GunShopController : MonoBehaviour {
         SetGunForSale(button.saleData);
     }
     public void InventoryButtonCallback(GunShopButton button) {
-        SetCompareGun(button.gunState.template);
+        SetCompareGun(button.gunState);
     }
 
     void SetGunForSale(GunSaleData data) {
@@ -206,11 +206,11 @@ public class GunShopController : MonoBehaviour {
         compareBoxImage.enabled = false;
         gunStatHandler.SetCompareGun(null);
     }
-    void SetCompareGun(GunTemplate template) {
-        compareGunTitle.text = template.name;
+    void SetCompareGun(GunState state) {
+        compareGunTitle.text = state.template.name;
         clearButtonObject.SetActive(true);
         compareBoxImage.enabled = true;
-        gunStatHandler.SetCompareGun(template);
+        gunStatHandler.SetCompareGun(state);
     }
 
 

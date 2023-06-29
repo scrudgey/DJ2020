@@ -8,27 +8,27 @@ public class LoadoutWeaponButton : MonoBehaviour {
     public MissionPlanLoadoutController loadoutController;
     public Image weaponImage;
     public TextMeshProUGUI nameText;
-    public GunTemplate gunTemplate;
+    public GunState gunState;
     public Image line;
     public void OnClick() {
-        loadoutController.WeaponSlotClicked(weaponIndex, gunTemplate);
+        loadoutController.WeaponSlotClicked(weaponIndex, gunState);
     }
 
     public void WeaponClearCallback() {
-        this.gunTemplate = null;
+        this.gunState = null;
         nameText.text = "";
         weaponImage.enabled = false;
-        loadoutController.WeaponSlotClicked(weaponIndex, gunTemplate, clear: true);
+        loadoutController.WeaponSlotClicked(weaponIndex, gunState, clear: true);
         line.enabled = false;
     }
 
-    public void ApplyGunTemplate(GunTemplate template) {
-        this.gunTemplate = template;
-        line.enabled = template != null;
-        if (template == null)
+    public void ApplyGunTemplate(GunState gunState) {
+        this.gunState = gunState;
+        line.enabled = gunState != null;
+        if (gunState == null)
             return;
-        nameText.text = template.name;
-        weaponImage.sprite = template.image;
+        nameText.text = gunState.getShortName();
+        weaponImage.sprite = gunState.GetSprite();
         weaponImage.enabled = true;
     }
 }

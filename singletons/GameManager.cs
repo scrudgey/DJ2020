@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -531,6 +531,7 @@ public partial class GameManager : Singleton<GameManager> {
         StoreType.bar => MenuType.barShop,
         StoreType.importer => MenuType.importerShop,
         StoreType.gunmod => MenuType.gunModShop,
+        StoreType.paydata => MenuType.payDataShop,
         _ => MenuType.none
     }, callback: storeType switch {
         StoreType.loot => () => {

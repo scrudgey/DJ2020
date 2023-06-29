@@ -48,9 +48,9 @@ public class Footsteps : MonoBehaviour {
                 volume *= velocity.magnitude / 1.25f;
 
                 if (onRightFoot) {
-                    Toolbox.RandomizeOneShot(audioSource, rightFoot, volume: volume / 2f);
+                    Toolbox.RandomizeOneShot(audioSource, rightFoot, volume: volume / 3f);
                 } else {
-                    Toolbox.RandomizeOneShot(audioSource, leftFoot, volume: volume / 2f);
+                    Toolbox.RandomizeOneShot(audioSource, leftFoot, volume: volume / 3f);
                 }
 
                 bool player = false;

@@ -22,16 +22,15 @@ public class GunShopButton : MonoBehaviour {
         titleText.text = saleData.template.shortName;
         costText.text = saleData.cost.ToString();
         innerDescriptionText.text = saleData.template.name;
-        gunImage.sprite = saleData.template.image;
+        gunImage.sprite = saleData.template.images[0];
     }
     public void Initialize(GunState state, Action<GunShopButton> callback) {
         this.gunState = state;
         this.callback = callback;
-        titleText.text = state.template.shortName;
+        titleText.text = state.getShortName();
         costText.text = "";
         innerDescriptionText.text = state.template.name;
-        gunImage.sprite = state.template.image;
-
+        gunImage.sprite = state.GetSprite();
         creditsImage.enabled = false;
     }
     public void Clicked() {

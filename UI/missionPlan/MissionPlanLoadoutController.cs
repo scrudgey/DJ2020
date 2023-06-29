@@ -132,7 +132,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
     void ApplyGunTemplate(LoadoutWeaponButton button, GunState gunstate) {
         if (gunstate != null) {
-            button.ApplyGunTemplate(gunstate.template);
+            button.ApplyGunTemplate(gunstate);
         } else {
             button.WeaponClearCallback();
         }
@@ -175,11 +175,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
 
-    public void WeaponSlotClicked(int slotIndex, GunTemplate template, bool clear = false) {
+    public void WeaponSlotClicked(int slotIndex, GunState gunState, bool clear = false) {
         if (!clear)
             ShowStatsView();
-        gunStatHandler.DisplayGunTemplate(template);
-        gunStatHandler.SetCompareGun(template);
+        gunStatHandler.DisplayGunTemplate(gunState);
+        gunStatHandler.SetCompareGun(gunState);
 
         selectedWeaponSlot = slotIndex;
         switch (slotIndex) {
@@ -200,7 +200,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 break;
         }
         InitializeWeaponPicker();
-        if (template == null) {
+        if (gunState == null) {
             torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
         }
         if (clear) {
@@ -270,7 +270,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                     2 => secondaryWeaponButton,
                     3 => tertiaryWeaponButton
                 };
-                gunStatHandler.DisplayGunTemplate(button.gunTemplate);
+                gunStatHandler.DisplayGunTemplate(button.gunState);
                 break;
         }
     }
@@ -287,7 +287,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             2 => secondaryWeaponButton,
             3 => tertiaryWeaponButton
         };
-        button.ApplyGunTemplate(picker.gunstate.template);
+        button.ApplyGunTemplate(picker.gunstate);
         // TODO: apply total state, not just template
         // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
         // TODO: change plan, not player state (requires change to VR mission designer too?)
@@ -436,9 +436,9 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
 
     public void OnWeaponSlotMouseOver(LoadoutWeaponButton button) {
-        if (button.gunTemplate != null) {
+        if (button.gunState != null) {
             ShowStatsView();
-            gunStatHandler.DisplayGunTemplate(button.gunTemplate);
+            gunStatHandler.DisplayGunTemplate(button.gunState);
         }
     }
     public void OnWeaponSlotMouseExit(LoadoutWeaponButton button) {

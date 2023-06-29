@@ -79,11 +79,11 @@ namespace UI {
                 ClearAllPips();
             }
             if (gun.HasGun()) {
-                clipsize = gun.gunInstance.template.clipSize;
+                clipsize = gun.gunInstance.getClipSize();
                 gunImage.enabled = true;
-                gunImage.sprite = gun.gunInstance.template.image;
-                gunTitle.text = gun.gunInstance.template.name;
-                string totalAmmoText = gun.gunInstance.template.clipSize > 9 ? gun.gunInstance.TotalAmmo().ToString("D2") : gun.gunInstance.TotalAmmo().ToString();
+                gunImage.sprite = gun.gunInstance.GetSprite();
+                gunTitle.text = gun.gunInstance.getShortName();
+                string totalAmmoText = clipsize > 9 ? gun.gunInstance.TotalAmmo().ToString("D2") : gun.gunInstance.TotalAmmo().ToString();
                 ammoCounter.text = $"{totalAmmoText} / {gun.gunInstance.MaxAmmo()}";
                 bool createSpentPip = gun.isShooting;
                 RectifyPips(gun.gunInstance.delta.clip, gun.gunInstance.delta.chamber, createSpentPip);

@@ -257,7 +257,7 @@ public class VRMissionDesigner : MonoBehaviour {
 
             if (gun3 != null) {
 
-                tertiaryWeaponImage.sprite = gun3.image;
+                tertiaryWeaponImage.sprite = gun3.images[0];
                 tertiaryWeaponCaption.text = gun3.name;
             } else {
                 tertiaryWeaponImage.sprite = null;
@@ -271,7 +271,7 @@ public class VRMissionDesigner : MonoBehaviour {
         }
 
         if (gun1 != null) {
-            primaryWeaponImage.sprite = gun1.image;
+            primaryWeaponImage.sprite = gun1.images[0];
             primaryWeaponCaption.text = gun1.name;
         } else {
             primaryWeaponImage.sprite = null;
@@ -279,7 +279,7 @@ public class VRMissionDesigner : MonoBehaviour {
         }
 
         if (gun2 != null) {
-            secondaryWeaponImage.sprite = gun2.image;
+            secondaryWeaponImage.sprite = gun2.images[0];
             secondaryWeaponCaption.text = gun2.name;
         } else {
             secondaryWeaponImage.sprite = null;

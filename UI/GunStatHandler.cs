@@ -102,6 +102,8 @@ public class GunStatHandler : MonoBehaviour {
             ClearGunTemplate();
         } else {
             SetTemplateTexts(template);
+            nameText.text = template.name;
+            gunImage.sprite = template.images[0];
             DisplayStats(template.GetGunStats());
         }
     }
@@ -110,6 +112,8 @@ public class GunStatHandler : MonoBehaviour {
             ClearGunTemplate();
         } else {
             SetTemplateTexts(gunState.template);
+            nameText.text = gunState.getName();
+            gunImage.sprite = gunState.GetSprite();
             DisplayStats(gunState.GetGunStats());
         }
     }
@@ -123,13 +127,13 @@ public class GunStatHandler : MonoBehaviour {
         LerpBars(currentGun);
     }
     void SetTemplateTexts(GunTemplate template) {
-        nameText.text = template.name;
+        // nameText.text = template.name;
         typeText.text = template.type.ToString();
         cycleText.text = template.cycle.ToString();
-        gunImage.sprite = template.image;
+        // gunImage.sprite = template.image;
     }
     public void PopulateStats(GunStats template) {
-        shootIntervalText.text = (template.shootInterval * 10).ToString();
+        shootIntervalText.text = (template.shootInterval * 50).ToString();
         noiseText.text = template.noise.ToString();
         clipSizeText.text = template.clipSize.ToString();
         spreadText.text = (template.spread * 10).ToString();
@@ -190,7 +194,7 @@ public class GunStatHandler : MonoBehaviour {
             {GunStat.lockSize, TargetBarWidth(template.lockOnSize, 3f)},
             {GunStat.noise, TargetBarWidth(template.noise, 50f)},
             {GunStat.recoil, TargetBarWidth(template.recoil.Average(), 10f)},
-            {GunStat.shootInterval, TargetBarWidth(template.shootInterval, 1f)},
+            {GunStat.shootInterval, TargetBarWidth(template.shootInterval * 50 , 8f)},
             {GunStat.spread, TargetBarWidth(template.spread, 2f)},
             // {GunStat.weight, TargetBarWidth(template.spread, 20f)},
         };
@@ -208,7 +212,7 @@ public class GunStatHandler : MonoBehaviour {
                 {GunStat.lockSize, TargetBarWidth(compareGun.lockOnSize - template.lockOnSize, 3f)},
                 {GunStat.noise, TargetBarWidth(compareGun.noise - template.noise, 50f)},
                 {GunStat.recoil, TargetBarWidth(compareGun.recoil.Average() - template.recoil.Average(), 10f)},
-                {GunStat.shootInterval, TargetBarWidth(compareGun.shootInterval - template.shootInterval, 1f)},
+                {GunStat.shootInterval, TargetBarWidth((compareGun.shootInterval - template.shootInterval)*50f, 8f)},
                 {GunStat.spread, TargetBarWidth(compareGun.spread - template.spread, 2f)},
                 // {GunStat.weight, TargetBarWidth(template.spread, 20f)},
             };

@@ -2450,6 +2450,9 @@ note: layer "interactive"
     * purchase
 * when mod is selected, show delta
 * at least one more mod of different type
+* datastores could show filename
+* performance tuning: separate canvases, implement octree or smth
+* fake ID should be more fun to procure / use
 
 
 
@@ -2483,9 +2486,6 @@ uncertain:
 
 nice to have / future goals:
     after action report should be fragmentary, show reward, over a transit cutscene
-    fake ID should be more fun to procure / use
-        can show randomized image and randomized name
-        fake ID is burned after one use
     ambient sounds
         room tone
     first level should set the tone
@@ -2515,8 +2515,7 @@ nice to have / future goals:
     digitized voice for "operation jetlag"
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
-    performance tuning: separate canvases, implement octree or smth
-    datastores could show filename
+    allow renaming gun?
 
 
 
@@ -2944,8 +2943,12 @@ map pane:
 better sounds for wire, attach
 better sounds for mission computer
 colors for item selector
-item selector cancel
-display information about items
+item selector clear slot
+display information about items in loadout
+silencer shows in gameplay
+mods on more guns
+guard hearing other guard gunshot
+
 
 basic game:
     progression:
@@ -2961,35 +2964,35 @@ basic game:
                 silencer affects graphic
                 headshots
 
+
+* show pips to indicate number of mods on gun
+* clip mod not showing?
+* mods take effect in gameplay
+* some places to add ++ in display
+* silencer shows in gun image
+* jittery window
+* start small 
+* rate mod?
+* seller responds 
+
 world:
-    street doc
-    * gun upgrades 
-    data merchant
     * import-export
+    * gun upgrades 
+    street doc
+    data merchant
+        a tent in the subway
     telephone sales contact
     guns sign
     doc sign
 
 
-mods take effect in gameplay
-silencer shows in gun image
-    must apply anywhere a gun image is shown: selector, inventory, gun display, etc
-        enumerate all places:
-            gun selector buttons:
-                gunshop left and right
-                gunmodshop right
-                UI gun display
-                loadout editor
-                VR mission editor
-            gun stats:
-                1. VR mission
-                2. gun shop
-                3. gun mod
-                4. loadout
-    a new mechanism for gun display
-        change overlayed images in response to mods
-        displayGun(GunState state)
-        it feels like the gun should be made of swappable parts
 
-silencer shows in gameplay
-mods on different guns
+data merchant:
+    sell paydata
+    buy hacking software
+    buy hacking hardware
+    commission a virus?
+
+street doc:
+    health
+    buy cyberware

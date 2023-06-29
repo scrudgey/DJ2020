@@ -42,16 +42,17 @@ public class GunModShopController : MonoBehaviour {
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
+        bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
     public void Initialize() {
         selectedGunButton = null;
         currentGunModButton = null;
 
-        ClearPlayerInventory();
         ClearGunForSale();
         ClearModInformation();
         ClearModButtons();
         ClearActiveModDisplay();
+        ClearPlayerInventory();
         PopulatePlayerInventory();
         SetPlayerCredits();
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
@@ -88,6 +89,7 @@ public class GunModShopController : MonoBehaviour {
         GunState compareState = selectedGunButton.gunState.Copy();
         compareState.delta.activeMods.Add(button.gunMod);
         gunStatHandler.SetCompareGun(compareState);
+
     }
     public static string ModSummary(GunMod mod) => mod.type switch {
         GunModType.silencer => "+silencer",
@@ -213,6 +215,12 @@ public class GunModShopController : MonoBehaviour {
         InventoryButtonCallback(selectedGunButton);
         gunStatHandler.SetCompareGun(null);
         gunStatHandler.DisplayGunTemplate(selectedGunButton.gunState);
+
+        ClearPlayerInventory();
+        SetPlayerCredits();
+        PopulatePlayerInventory();
+
+        storeDialogueController.SetShopownerDialogue("I'll get that fixed right up for you.");
     }
 
     public void DoneButtonCallback() {

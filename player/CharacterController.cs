@@ -307,8 +307,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         gunHandler.OnShoot -= HandleOnShoot;
     }
     void HandleOnShoot(GunHandler target) {
-        float recoilMagnitudeY = target.gunInstance.template.recoil.GetRandomInsideBound();
-        float recoilMagnitudeX = target.gunInstance.template.recoil.GetRandomInsideBound() * UnityEngine.Random.Range(-0.5f, 0.5f);
+        float recoilMagnitudeY = target.gunInstance.getRecoil().GetRandomInsideBound();
+        float recoilMagnitudeX = target.gunInstance.getRecoil().GetRandomInsideBound() * UnityEngine.Random.Range(-0.5f, 0.5f);
         recoil = new Vector3(recoilMagnitudeX, recoilMagnitudeY, 0f);
     }
     private void HandleHurtableChanged(Destructible hurtable) {

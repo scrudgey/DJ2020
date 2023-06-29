@@ -101,7 +101,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         // TODO: inaccuracy decrease based on weapon weight and skill
-        float weightCoefficient = 10f / gunInstance.template.weight;
+        float weightCoefficient = 10f / gunInstance.getWeight();
 
         if (movementInaccuracy > 0) {
             // lighter weapons recover accuracy faster
@@ -138,7 +138,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         // when displaying, it is shown at that distance
         float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
         // inaccuracy += gunInstance.template.spread * (distance / 10f);
-        inaccuracy += gunInstance.template.spread;
+        inaccuracy += gunInstance.getSpread();
 
         // movement
         inaccuracy += movementInaccuracy;
@@ -175,11 +175,11 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Vector3 jitterPoint = aimpoint + jitter;
 
         Vector3 direction = jitterPoint - gunPosition;
-        Vector3 endPosition = gunPosition + (gunInstance.template.range * direction);
+        Vector3 endPosition = gunPosition + (gunInstance.getRange() * direction);
 
         Bullet bullet = new Bullet(new Ray(gunPosition, direction)) {
-            damage = gunInstance.template.getBaseDamage(),
-            range = gunInstance.template.range,
+            damage = gunInstance.getBaseDamage(),
+            range = gunInstance.getRange(),
             gunPosition = gunPosition,
             source = transform.position
         };
@@ -236,10 +236,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         };
         noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
-        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.template.GetShootSounds()));
+        audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.GetShootSounds()));
         Toolbox.Noise(gunPosition(), noiseData, transform.root.gameObject);
         // flash
-        if (!gunInstance.template.silencer) {
+        if (!gunInstance.getSilencer()) {
             muzzleFlashLight.enabled = true;
             StartCoroutine(Toolbox.RunAfterTime(0.1f, () => {
                 muzzleFlashLight.enabled = false;
@@ -250,10 +250,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         GameObject muzzleFlashObj = PoolManager.I
             .GetPool(gunInstance.template.muzzleFlash)
             .GetObject(gunPosition() + (0.5f * motor.CharacterForward) - new Vector3(0, 0.1f, 0));
-        if (gunInstance.template.silencer) {
-            muzzleFlashObj.transform.localScale = gunInstance.template.muzzleflashSize * Vector3.one * 0.1f;
+        if (gunInstance.getSilencer()) {
+            muzzleFlashObj.transform.localScale = gunInstance.getMuzzleFlashSize() * Vector3.one * 0.1f;
         } else {
-            muzzleFlashObj.transform.localScale = gunInstance.template.muzzleflashSize * Vector3.one;
+            muzzleFlashObj.transform.localScale = gunInstance.getMuzzleFlashSize() * Vector3.one;
         }
         muzzleFlashObj.transform.rotation = Quaternion.LookRotation(transform.up, gunDirection(input));
         GameObject.Destroy(muzzleFlashObj, 0.05f);
@@ -265,14 +265,14 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         // accuracy effect
-        shootingInaccuracy += gunInstance.template.shootInaccuracy / 2f;
+        shootingInaccuracy += gunInstance.getShootInaccuracy() / 2f;
 
         // state change callbacks
         OnValueChanged?.Invoke(this);
 
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            CharacterCamera.Shake(gunInstance.template.noise / 50f, 0.1f);
-            if (!gunInstance.template.silencer) {
+            CharacterCamera.Shake(gunInstance.getNoise() / 50f, 0.1f);
+            if (!gunInstance.getSilencer()) {
                 SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
             }
@@ -425,7 +425,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public void DoReload() {
         if (gunInstance == null || gunInstance.template == null)
             return;
-        if (gunInstance.template.type == GunType.shotgun && gunInstance.delta.clip < gunInstance.template.clipSize) {
+        if (gunInstance.template.type == GunType.shotgun && gunInstance.delta.clip < gunInstance.getClipSize()) {
             ReloadShell();
         } else if (gunInstance.template.type != GunType.shotgun) {
             Reload();
@@ -440,7 +440,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (HasGun()) {
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
             // TODO: if priority is not set, try lock 
-            float lockRadius = gunInstance.template.lockOnSize;
+            float lockRadius = gunInstance.getLockOnSize();
             int numColliders = Physics.OverlapSphereNonAlloc(targetPoint, lockRadius, lockOnColliders, LayerUtil.GetLayerMask(Layer.obj));
             Collider nearestOther = null;
             for (int i = 0; i < numColliders; i++) {

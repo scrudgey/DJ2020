@@ -43,7 +43,7 @@ namespace AI {
 
                 // TODO: skill based
                 volley += 1;
-                shootPressedResetInterval = Random.Range(gunHandler.gunInstance.template.shootInterval * 4f, gunHandler.gunInstance.template.shootInterval * 5f);
+                shootPressedResetInterval = Random.Range(gunHandler.gunInstance.getShootInterval() * 4f, gunHandler.gunInstance.getShootInterval() * 5f);
                 if (Random.Range(0f, 1f) < 0.35f) {
                     volley = 0;
                     shootPressedResetInterval = Random.Range(1f, 2f);

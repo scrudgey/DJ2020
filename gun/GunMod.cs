@@ -11,8 +11,7 @@ public class GunMod : ScriptableObject, IGunStatProvider {
     [TextArea(15, 20)]
     public string description;
     public int cost;
-
-
+    public string requiredSpriteSuffix;
     [Header("stats")]
     public float shootInterval;
     public float noise;
@@ -21,6 +20,7 @@ public class GunMod : ScriptableObject, IGunStatProvider {
     public float shootInaccuracy;
     public float lockOnSize;
     public LoHi baseDamage;
+
 
     public GunStats GetGunStats() => new GunStats {
         shootInterval = shootInterval,
