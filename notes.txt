@@ -2453,7 +2453,52 @@ note: layer "interactive"
 * datastores could show filename
 * performance tuning: separate canvases, implement octree or smth
 * fake ID should be more fun to procure / use
-
+* tactics pane should look like calling people up and haggling with them
+* show pips to indicate number of mods on gun
+* clip mod not showing?
+* mods take effect in gameplay
+* some places to add ++ in display
+* silencer shows in gun image
+* jittery window
+* start small 
+* rate mod?
+* seller responds 
+* scroll speed on left
+* colors
+* button speed
+* click sound
+* sell button jumps around
+* hard to sell multiple
+* done button
+* sell paydata
+* health
+* neighbor building?
+    * items: could work
+* underneath apartment:
+    * weapons
+* akira alley:
+    * drug dealers will purchase your drug loot.
+* upstairs:
+    * importer / exporter who buys things.
+    also he is a connection that will give you tips or sometimes a deal.
+* prevent guns in world
+    * guy above the shop: data merchant? wheeling and dealing?
+    * upstairs importer exporter
+        * subway:
+    * a software hacker 
+* street doc
+* weapon upgrades
+    * the bartender will clue you in on the price of commodities.
+* title screen logo
+    * smg run
+    * wire up sprite data system
+* world:
+    * import-export
+    * gun upgrades 
+    * data merchant
+    * street doc
+    * guns sign
+    * doc sign
 
 
 graphical issues:
@@ -2781,15 +2826,12 @@ build a test level equivalent to Jack That Data
 
 graphics
     disguise spritesheet (fireman)
-    * swat team spritesheet
-        smg run
+    swat team spritesheet
         rifle
         pistol
         shotgun
-        * wire up sprite data system
     scientist spritesheet
     civ_female portrait could use some work
-    * title screen logo
     title screen animations 
     helicopters for skybox
 guns:
@@ -2817,33 +2859,13 @@ world NPCs:
         leaning up against the wall
         hanging around the Fire
     random drug dealers on the corner will buy your drug loot
-
 world layout:
-    * neighbor building?
-        * items: could work
-    * underneath apartment:
-        * weapons
-    * akira alley:
-        * drug dealers will purchase your drug loot.
-    * upstairs:
-        * importer / exporter who buys things.
-        also he is a connection that will give you tips or sometimes a deal.
     bar:
-        * the bartender will clue you in on the price of commodities.
         there is an underworld figure in the corner of the bar who will give you missions.
-    subway:
-        a software hacker 
     tent city:
         a randomized junk shop
-still unknown:
-    street doc
-    weapon upgrades
-    software
-    hardware
 locations:
-    software dealer
     hardware dealer (the finn)
-    street doc
     night club 
     arcade?
 
@@ -2858,10 +2880,15 @@ shop todo:
         description (dialogue)
             "1x per mission"
             "unlimited use"
-        grey button when item view player
+        * grey button when item view player
         don't sell items player already has
     bartender
         rumors -> faction strength
+    data merchant:
+        buy hacking software
+        buy hacking hardware
+        commission a virus?
+    street doc buy cyberware
 
 graphics:
     swat spritesheet finish
@@ -2902,19 +2929,16 @@ decals:
     splatter
     tubes
     vent grate
-
 world:
     NPCs can hold beer bottles
     fix social group orientation
     sound design
-    * prevent guns in world
     prevent damage in world?
     storeowner AI
         move to position
         look in direction
         look at player
         different from SphereRobot, but still uses a state machine.
-    * upstairs importer exporter
     mission guy in the bar
     create all shops
     linger in bar:
@@ -2927,72 +2951,53 @@ world:
     more randomizable NPC
         random selection of head, torso, legs
         sometimes, torso + legs are set dependently.
+world:
+    telephone sales contact
+        world map with telephone numbers.
+        choose your contact and pop up a trade dialogue
+fix transformer door
 
 radial menu for selecting guns and items?
     unify items and guns
 what happened to the sphere robot?
-* tactics pane should look like calling people up and haggling with them
+ladders
+
+* a tent in the subway
+* finish out subway
 
 
 guards can see through doors
+guard saw me as he walked around the other corner: lock on?
+better sounds for wire, attach
+better sounds for mission computer
+guard hearing other guard gunshot
+
+silencer shows in gameplay
+ensure all shops and menus are idiot proof: 
+    if the player can take no action, tell them explicitly.
+    if you can't make the deal, make that explicit
+health persists between missions
+
 map pane:
     show type of location? city view? territory?
     show view of terrain?
     cursor tracks in, box narrows down to target, texts pop up
-* guy above the shop: data merchant? wheeling and dealing?
-better sounds for wire, attach
-better sounds for mission computer
 colors for item selector
 item selector clear slot
 display information about items in loadout
-silencer shows in gameplay
-mods on more guns
-guard hearing other guard gunshot
-
+anderson portrait
 
 basic game:
     progression:
         1. restrict weapons at gun shop
         3. adjust the pay / rewards
     gameplay:
-        create more loot
-        place more loot in levels   
-        4. more levels
+        more loot
+        more fences
+        more levels
+        more mods
         5. stealth kills
-            silenced pistol
-                gun upgrades
+            * silenced pistol
+                * gun upgrades
                 silencer affects graphic
                 headshots
-
-
-* show pips to indicate number of mods on gun
-* clip mod not showing?
-* mods take effect in gameplay
-* some places to add ++ in display
-* silencer shows in gun image
-* jittery window
-* start small 
-* rate mod?
-* seller responds 
-
-world:
-    * import-export
-    * gun upgrades 
-    street doc
-    data merchant
-        a tent in the subway
-    telephone sales contact
-    guns sign
-    doc sign
-
-
-
-data merchant:
-    sell paydata
-    buy hacking software
-    buy hacking hardware
-    commission a virus?
-
-street doc:
-    health
-    buy cyberware

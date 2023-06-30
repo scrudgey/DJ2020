@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -295,6 +295,16 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("GunModShop", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.payDataShop:
+                if (!SceneManager.GetSceneByName("PayDataShop").isLoaded) {
+                    LoadScene("PayDataShop", callback, unloadAll: false);
+                }
+                break;
+            case MenuType.medicalShop:
+                if (!SceneManager.GetSceneByName("MedicalShop").isLoaded) {
+                    LoadScene("MedicalShop", callback, unloadAll: false);
+                }
+                break;
             case MenuType.console:
                 uiController.ShowTerminal();
                 callback?.Invoke();
@@ -345,6 +355,12 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.gunModShop:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("GunModShop"));
+                break;
+            case MenuType.payDataShop:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("PayDataShop"));
+                break;
+            case MenuType.medicalShop:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("MedicalShop"));
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
@@ -532,6 +548,7 @@ public partial class GameManager : Singleton<GameManager> {
         StoreType.importer => MenuType.importerShop,
         StoreType.gunmod => MenuType.gunModShop,
         StoreType.paydata => MenuType.payDataShop,
+        StoreType.medical => MenuType.medicalShop,
         _ => MenuType.none
     }, callback: storeType switch {
         StoreType.loot => () => {
@@ -552,6 +569,16 @@ public partial class GameManager : Singleton<GameManager> {
         StoreType.gunmod => () => {
             GunModShopController gunModShopController = GameObject.FindObjectOfType<GunModShopController>();
             gunModShopController.Initialize();
+        }
+        ,
+        StoreType.paydata => () => {
+            PayDataShopController payDataShopController = GameObject.FindObjectOfType<PayDataShopController>();
+            payDataShopController.Initialize();
+        }
+        ,
+        StoreType.medical => () => {
+            MedicalShopController medicalShopController = GameObject.FindObjectOfType<MedicalShopController>();
+            medicalShopController.Initialize();
         }
         ,
         _ => null

@@ -30,14 +30,18 @@ public class HealthIndicatorController : IBinder<CharacterHurtable> {
         }
     }
     public override void HandleValueChanged(CharacterHurtable characterHurtable) {
-        valueText.text = ((int)characterHurtable.health).ToString();
-        maxText.text = ((int)characterHurtable.fullHealthAmount).ToString();
+        SetHealthDisplay(characterHurtable.health, characterHurtable.fullHealthAmount);
+    }
+
+    public void SetHealthDisplay(float health, float fullHealthAmount) {
+        valueText.text = ((int)health).ToString();
+        maxText.text = ((int)fullHealthAmount).ToString();
 
         // 500 health = 10 pips
         // 1 pip per 50 health
 
-        int livePips = (int)(characterHurtable.health / 50);
-        int maxpips = (int)(characterHurtable.fullHealthAmount / 50);
+        int livePips = (int)(health / 50);
+        int maxpips = (int)(fullHealthAmount / 50);
 
         int topMaxPips = Mathf.Min(10, maxpips);
         int bottomMaxPips = (topMaxPips > 10) ? maxpips % 10 : 0;
