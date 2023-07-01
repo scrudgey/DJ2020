@@ -317,6 +317,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
     void Perceive(Collider other, bool byPassVisibilityCheck = false) {
+        if (hitState == HitState.dead) {
+            return;
+        }
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
             PerceivePlayerObject(other, byPassVisibilityCheck: byPassVisibilityCheck);
         } else {
@@ -376,7 +379,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     }
                 }
             }
-            
+
             if (stateMachine.currentState != null)
                 stateMachine.currentState.OnObjectPerceived(other);
         }

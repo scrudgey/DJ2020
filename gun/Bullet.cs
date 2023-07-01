@@ -94,7 +94,6 @@ public class Bullet {
                 GameObject sparkObject = pool.GetObject(hit.point + (hit.normal * 0.025f));
                 sparkObject.transform.rotation = Quaternion.LookRotation(hit.normal);
             }
-
             return true;
         }
         return false;

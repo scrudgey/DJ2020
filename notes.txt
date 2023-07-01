@@ -2499,6 +2499,12 @@ note: layer "interactive"
     * street doc
     * guns sign
     * doc sign
+* a tent in the subway
+* finish out subway
+* stealth kills
+    * silenced pistol
+        * gun upgrades
+        * headshots
 
 
 graphical issues:
@@ -2962,9 +2968,6 @@ radial menu for selecting guns and items?
 what happened to the sphere robot?
 ladders
 
-* a tent in the subway
-* finish out subway
-
 
 guards can see through doors
 guard saw me as he walked around the other corner: lock on?
@@ -2986,6 +2989,7 @@ colors for item selector
 item selector clear slot
 display information about items in loadout
 anderson portrait
+hiding affects bodies
 
 basic game:
     progression:
@@ -2996,8 +3000,6 @@ basic game:
         more fences
         more levels
         more mods
-        5. stealth kills
-            * silenced pistol
-                * gun upgrades
-                silencer affects graphic
-                headshots
+
+habilitate the 7-11 episode
+smooth mouse aim

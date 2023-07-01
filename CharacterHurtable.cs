@@ -8,6 +8,7 @@ public enum HitState { normal, hitstun, zapped, dead, invulnerable }
 
 public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPoolable, ICharacterHurtableStateLoader {
     public enum HitStunType { timer, invulnerable }
+    public Collider headCollider;
     public HitStunType hitstunType;
     public float wallDecalDistance = 1f;
     public float wallDecalProbability = 0.2f;
@@ -74,6 +75,14 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
                 isFootsteps = false
             };
             Toolbox.Noise(transform.position, noise, transform.root.gameObject);
+        }
+
+        if (headCollider != null) {
+            RaycastHit raycastHit = new RaycastHit();
+            if (headCollider.Raycast(damage.bullet.ray, out raycastHit, 100f)) {
+                // Debug.LogError("Headshot!");
+                damage.amount *= 10f;
+            }
         }
 
         return new DamageResult {

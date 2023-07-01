@@ -748,20 +748,21 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data == null || data.targetPriority == -1) {
                 if (!prioritySet && !targetSet) {
-                    targetPoint = hit.point;
+                    // targetPoint = hit.point;
                     targetSet = true;
                 }
                 continue;
             }
             if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
                 priorityData = data;
-                if (data.targetPoint != null) {
-                    targetPoint = data.targetPoint.position;
-                } else {
-                    targetPoint = hit.collider.bounds.center;
-                }
+                // if (data.targetPoint != null) {
+                //     targetPoint = data.targetPoint.position;
+                // } else {
+                //     targetPoint = hit.collider.bounds.center;
+                // }
                 prioritySet = true;
             }
+            targetPoint = hit.point;
         }
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
