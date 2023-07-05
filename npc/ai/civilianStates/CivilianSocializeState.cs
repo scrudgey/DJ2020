@@ -1,24 +1,22 @@
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class SocializeState : WorldNPCControlState {
+public class CivilianSocializeState : CivilianNPCControlState {
     public static readonly string NAV_POINT_KEY = "nav_point_key";
     private TaskNode rootTaskNode;
-    WorldNPCAI ai;
+    CivilianNPCAI ai;
     CharacterController characterController;
     SocialGroup socialGroup;
     SpeechTextController speechTextController;
     public WalkToStoreState.StoreType location;
-    public SocializeState(WorldNPCAI ai,
+    public CivilianSocializeState(CivilianNPCAI ai,
             CharacterController characterController,
             SpeechTextController speechTextController,
-            SocialGroup socialGroup,
-            WalkToStoreState.StoreType location) : base(ai) {
+            SocialGroup socialGroup) : base(ai) {
         this.ai = ai;
         this.speechTextController = speechTextController;
         this.characterController = characterController;
         this.socialGroup = socialGroup;
-        this.location = location;
     }
     public override void Enter() {
         base.Enter();

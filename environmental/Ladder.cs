@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Easings;
-public class Ladder : MonoBehaviour {
+using UnityEngine;
+public class Ladder : Interactive {
     public SurfaceType surfaceType;
     // Ladder segment
     public Vector3 LadderSegmentBottom;
@@ -55,6 +55,13 @@ public class Ladder : MonoBehaviour {
     private void OnDrawGizmos() {
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(BottomAnchorPoint, TopAnchorPoint);
+    }
+
+
+    public override ItemUseResult DoAction(Interactor interactor) {
+        return new ItemUseResult() {
+            useLadder = this
+        };
     }
 
 }

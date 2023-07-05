@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class SocialGroup : MonoBehaviour {
 
-    public HashSet<WorldNPCAI> members = new HashSet<WorldNPCAI>();
-    public WorldNPCAI currentSpeaker;
+    public HashSet<MonoBehaviour> members = new HashSet<MonoBehaviour>();
+    public MonoBehaviour currentSpeaker;
 
-    public bool ShouldISpeak(WorldNPCAI ai) {
+    public bool ShouldISpeak(MonoBehaviour ai) {
         if (currentSpeaker == null && members.Count > 1) {
             return Random.Range(0f, 1f) < 0.02f;
         } else {
@@ -17,15 +17,15 @@ public class SocialGroup : MonoBehaviour {
     public void DeregisterSpeaker() {
         currentSpeaker = null;
     }
-    public void RegisterSpeaker(WorldNPCAI ai) {
+    public void RegisterSpeaker(MonoBehaviour ai) {
         currentSpeaker = ai;
     }
 
-    public void AddMember(WorldNPCAI member) {
+    public void AddMember(MonoBehaviour member) {
         members.Add(member);
     }
 
-    public void RemoveMember(WorldNPCAI member) {
+    public void RemoveMember(MonoBehaviour member) {
         if (currentSpeaker == member) {
             DeregisterSpeaker();
         }

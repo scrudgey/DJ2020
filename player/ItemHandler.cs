@@ -8,6 +8,7 @@ public record ItemUseResult {
     public bool crouchDown;
     public bool waveArm;
     public bool doBurgle;
+    public Ladder useLadder;
     public AttackSurface attackSurface;
     public static ItemUseResult Empty() => new ItemUseResult {
 

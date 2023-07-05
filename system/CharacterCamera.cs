@@ -657,6 +657,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             if (!playerPlane.GetSide(hit.point)) {
                 break;
             }
+            if (hit.collider.CompareTag("interactBlocker")) {
+                break;
+            }
         }
 
         Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
@@ -737,6 +740,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         bool prioritySet = false;
         HashSet<InteractorTargetData> targetDatas = new HashSet<InteractorTargetData>();
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+
             if (hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform.root)) {
                 continue;
             }

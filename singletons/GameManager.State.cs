@@ -24,8 +24,9 @@ public partial class GameManager : Singleton<GameManager> {
         OnItemPickup?.Invoke(1, $"{amount}");
     }
     public void CollectLoot(LootData data) {
-        gameData.playerState.loots.Add(data);
+        gameData.levelState.delta.levelAcquiredLoot.Add(data);
         OnLootChange?.Invoke(data, gameData);
+        CheckObjectives();
     }
 
     public void AddPhysicalKey(int keyId) {

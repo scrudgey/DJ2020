@@ -7,17 +7,17 @@ using UnityEngine;
 namespace AI {
 
     public class TaskSocialize : TaskNode {
-        WorldNPCAI ai;
+        // WorldNPCAI ai;
         SpeechTextController speechTextController;
         SocialGroup socialGroup;
         float headSwivelOffset;
         Vector3 baseLookDirection;
         Grammar grammar;
-        public TaskSocialize(WorldNPCAI ai, SpeechTextController speechTextController, SocialGroup socialGroup) : base() {
-            this.ai = ai;
+        public TaskSocialize(SpeechTextController speechTextController, SocialGroup socialGroup) : base() {
+            // this.ai = ai;
             this.socialGroup = socialGroup;
             this.speechTextController = speechTextController;
-            baseLookDirection = ai.transform.forward;
+            baseLookDirection = speechTextController.transform.forward;
             grammar = new Grammar();
             grammar.Load("socialize");
         }
@@ -31,12 +31,12 @@ namespace AI {
             if (speechTextController.IsSpeaking()) {
 
             } else {
-                if (socialGroup.currentSpeaker == ai) {
+                if (socialGroup.currentSpeaker == speechTextController) {
                     socialGroup.DeregisterSpeaker();
                 } else {
-                    bool shouldISpeak = socialGroup.ShouldISpeak(ai);
+                    bool shouldISpeak = socialGroup.ShouldISpeak(speechTextController);
                     if (shouldISpeak) {
-                        socialGroup.RegisterSpeaker(ai);
+                        socialGroup.RegisterSpeaker(speechTextController);
                         speechTextController.Say(GetPhrase());
                     }
                 }

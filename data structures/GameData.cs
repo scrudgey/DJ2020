@@ -32,7 +32,8 @@ public record GameData {
             completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
                 "Jack That Data",
-                "Tower"
+                "Tower",
+                "711"
             },
             levelPlans = new SerializableDictionary<string, LevelPlan>()
         };

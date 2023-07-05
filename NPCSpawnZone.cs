@@ -9,6 +9,7 @@ public class NPCSpawnZone : MonoBehaviour {
     public LoHi number;
     public NPCTemplate[] templates;
     public Collider zone;
+    public bool world;
     PrefabPool NPCPool;
     WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.01f);
 
@@ -16,7 +17,11 @@ public class NPCSpawnZone : MonoBehaviour {
         InitializePools();
     }
     void InitializePools() {
-        NPCPool = PoolManager.I?.RegisterPool("prefabs/WorldNPC", poolSize: 100);
+        if (world) {
+            NPCPool = PoolManager.I?.RegisterPool("prefabs/WorldNPC", poolSize: 100);
+        } else {
+            NPCPool = PoolManager.I?.RegisterPool("prefabs/CivilianNPC", poolSize: 100);
+        }
         // effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
     public void SpawnNPCs() {
@@ -60,8 +65,13 @@ public class NPCSpawnZone : MonoBehaviour {
             legsAnimation.characterCamera = cam;
             controller.OrbitCamera = cam;
 
-            WorldNPCAI ai = npc.GetComponent<WorldNPCAI>();
-            ai.Initialize(storeType);
+            if (world) {
+                WorldNPCAI ai = npc.GetComponent<WorldNPCAI>();
+                ai.Initialize(storeType);
+            } else {
+                CivilianNPCAI ai = npc.GetComponent<CivilianNPCAI>();
+                ai.Initialize();
+            }
 
             // should be part of apply state?
             motor.SetPosition(destination, bypassInterpolation: true);

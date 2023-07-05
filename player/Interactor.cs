@@ -11,7 +11,8 @@ public class InteractorTargetData {
     public InteractorTargetData(Interactive target, Collider collider, Vector3 playerPosition) {
         this.target = target;
         this.collider = collider;
-        this.targetIsInRange = Vector3.Distance(target.transform.position, playerPosition) < 2f;
+        Vector3 position = collider.ClosestPoint(playerPosition);
+        this.targetIsInRange = Vector3.Distance(position, playerPosition) < 2f;
         this.target = target;
     }
     static public bool Equality(InteractorTargetData a, InteractorTargetData b) {
@@ -92,7 +93,7 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         if (doAction && (inputs.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false)) {
             Interactive cursorInteractive = cursorTarget?.target.GetComponent<Interactive>();
             if (cursorInteractive != null) {
-                return cursorInteractive.DoAction(this);
+                return cursorInteractive.DoActionAndUpdateState(this);
             }
             return ItemUseResult.Empty();
         } else

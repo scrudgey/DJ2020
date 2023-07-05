@@ -11,6 +11,7 @@ public class LevelTemplate : ScriptableObject {
     public string levelName;
     public string sceneName;
     public string sceneDescriptor;
+    public int mapviewInitialFloor = 1;
     public string tagline;
     public MusicTrack musicTrack;
     [Header("text")]

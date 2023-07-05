@@ -2505,6 +2505,38 @@ note: layer "interactive"
     * silenced pistol
         * gun upgrades
         * headshots
+* enable music
+* change spawnpoint in street
+* grass
+* buildings to surround
+* ladders
+    * climb down?
+    * adjust all ladders to have meshes etc
+* bounds
+* doors
+* insert points:
+    * park
+    * office building
+* extraction:
+    * park
+    * street
+* map starts on floor 1?
+* rob registers
+* fix patrol
+* safe
+* rob safe
+* zealous objective indicator
+* skybox blinkenlights
+* civilians
+    * move around at random
+    * socialize
+    * interact with player
+        * run from gunshots
+        * hide / crouch
+    
+* run from attack->
+    * cower
+    * run at random
 
 
 graphical issues:
@@ -2990,16 +3022,61 @@ item selector clear slot
 display information about items in loadout
 anderson portrait
 hiding affects bodies
+trees, bushes, etc
 
 basic game:
     progression:
         1. restrict weapons at gun shop
         3. adjust the pay / rewards
     gameplay:
-        more loot
-        more fences
         more levels
         more mods
+    make loot mechanics playable:
+        randomized deals
+        randomized bar markets
+        more loot
+        more fences
+
+smooth mouse aim
+
+players face in dialogue controller is stretched
+"insideAttackSurface"
+health does not carry over
+rocket launcher not fully done
+can do a deal multiple times
+some way to distract guards
+
+major initiatives:
+    loot and loot store mechanics
+    portraits, character art, spritesheets
+    music
+        auto leveling, balance, ducking
+    missions
+        7-11 to start
+        some basic combat, sneakiness
+    after mission reports, skill tree
+    pause screen status report
+        loot, data
+        weapons, loadout, 
+        character stats, skills
+    system:
+        controls, audio
+unresolved mechanics:
+    skill tree
+    dialogue
+    hacking
+shops:
+    sell guns
+    market and deals
 
 habilitate the 7-11 episode
-smooth mouse aim
+    sphere robot
+    NPCs
+        an alarm can go off, drawing patrols from outside / the back
+        patrols
+        guard response?
+    civilian startle when seeing gun
+
+worker AI
+    can be: employee, technician, etc.
+    raises the alarm when things are going down

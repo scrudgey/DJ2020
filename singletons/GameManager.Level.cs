@@ -95,7 +95,7 @@ public partial class GameManager : Singleton<GameManager> {
         // spawn NPC
         if (spawnNpcs) {
             while (state.delta.npcsSpawned < state.template.maxInitialNPC) {
-                foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
+                foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).OrderBy(a => Guid.NewGuid()).ToList()) {
                     if (state.delta.npcsSpawned >= state.template.maxInitialNPC) continue;
                     GameObject npc = spawnPoint.SpawnTemplated();
                     CharacterController controller = npc.GetComponentInChildren<CharacterController>();
@@ -107,11 +107,20 @@ public partial class GameManager : Singleton<GameManager> {
             foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
                 spawnPoint.SpawnNPC(useSpawnEffect: false);
             }
+
+            foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
+                zone.SpawnNPCs();
+            }
         }
+
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);
+
+        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.template.objectives
+            .Where(objective => !objective.isOptional)
+            .Select(objective => objective.Status(gameData)).ToList());
 
         if (doCutscene)
             StartCutsceneCoroutine(StartMissionCutscene());
@@ -131,6 +140,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         InitializePlayerAndController(LevelPlan.Default(new List<Items.BaseItem>()));
         LoadSkyboxForScene(sceneName);
+        // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
 
         TransitionToPhase(GamePhase.world);
     }
@@ -168,6 +178,7 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.completedLevels.Add(gameData.levelState.template.levelName);
         gameData.playerState.credits += gameData.levelState.template.creditReward;
         gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
+        gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot);
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {
@@ -383,7 +394,6 @@ public partial class GameManager : Singleton<GameManager> {
         alarmSoundInterval = 2f;
         alarmSound = gameData.levelState.template.alarmAudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().FirstOrDefault(spawn => spawn.isStrikeTeamSpawn);
-
 
         OnSuspicionChange?.Invoke();
     }

@@ -377,31 +377,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             interactor.SetCursorData(input.Fire.cursorData);
         }
         _ladderUpDownInput = input.MoveAxisForward;
-        if (input.actionButtonPressed) {
-            _probedColliders = new Collider[8];
-            if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
-                foreach (Collider collider in _probedColliders) {
-                    // Handle ladders
-                    if (collider == null || collider.gameObject == null)
-                        continue;
-                    Ladder ladder = collider.gameObject.GetComponent<Ladder>();
-                    if (ladder) {
-                        // Transition to ladder climbing state
-                        if (state == CharacterState.normal) {
-                            _activeLadder = ladder;
-                            TransitionToState(CharacterState.climbing);
-                        }
-                        // Transition back to default movement state
-                        else if (state == CharacterState.climbing) {
-                            _climbingState = ClimbingState.DeAnchoring;
-                            _ladderTargetPosition = Motor.TransientPosition;
-                            _ladderTargetRotation = _rotationBeforeClimbing;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
 
         // Clamp input
         // TODO: this is weird
@@ -549,7 +524,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     burglar?.SetInputs(manualHackInput);
 
                     // bool gunHolstered = gunHandler.HasGun();
-                    bool gunHolstered = gunHandler.gunInstance == null;
+                    bool gunHolstered = gunHandler?.gunInstance == null;
                     if (interactor != null) {
                         ItemUseResult interactorResult = interactor.SetInputs(input, gunHolstered);
                         HandleItemUseResult(interactorResult);
@@ -690,6 +665,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     public void HandleItemUseResult(ItemUseResult result) {
+        // TODO: handle ladder
         if (result == null) return;
         if (result.doBurgle) {
             BurgleTargetData burgleTargetData = new BurgleTargetData(result.attackSurface, burglar);
@@ -700,6 +676,43 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
         if (result.waveArm) {
             waveArmTimer = 0.5f;
+        }
+
+        // _ladderUpDownInput = input.MoveAxisForward;
+        if (result.useLadder != null) {
+
+            if (state == CharacterState.normal) {
+                _activeLadder = result.useLadder;
+                TransitionToState(CharacterState.climbing);
+            } else if (state == CharacterState.climbing) {
+                _climbingState = ClimbingState.DeAnchoring;
+                _ladderTargetPosition = Motor.TransientPosition;
+                _ladderTargetRotation = _rotationBeforeClimbing;
+            }
+
+            // _probedColliders = new Collider[8];
+            // if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
+            //     foreach (Collider collider in _probedColliders) {
+            //         // Handle ladders
+            //         if (collider == null || collider.gameObject == null)
+            //             continue;
+            //         // Ladder ladder = collider.gameObject.GetComponent<Ladder>();
+            //         if (ladder) {
+            //             // Transition to ladder climbing state
+            //             if (state == CharacterState.normal) {
+            //                 _activeLadder = ladder;
+            //                 TransitionToState(CharacterState.climbing);
+            //             }
+            //             // Transition back to default movement state
+            //             else if (state == CharacterState.climbing) {
+            //                 _climbingState = ClimbingState.DeAnchoring;
+            //                 _ladderTargetPosition = Motor.TransientPosition;
+            //                 _ladderTargetRotation = _rotationBeforeClimbing;
+            //             }
+            //             break;
+            //         }
+            //     }
+            // }
         }
     }
 

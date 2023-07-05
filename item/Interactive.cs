@@ -5,9 +5,15 @@ using UnityEngine;
 public abstract class Interactive : Highlightable {
     public string actionPrompt;
     public Interactor interactor;
+    public string interactiveId;
 
     public virtual string ResponseString() {
         return $"did {actionPrompt}";
+    }
+    public ItemUseResult DoActionAndUpdateState(Interactor interactor) {
+        GameManager.I.gameData.levelState.delta.levelInteractedObjects.Add(interactiveId);
+        GameManager.I.CheckObjectives();
+        return DoAction(interactor);
     }
     public abstract ItemUseResult DoAction(Interactor interactor);
     public static T TopTarget<T>(IEnumerable<T> interactives) where T : InteractorTargetData {

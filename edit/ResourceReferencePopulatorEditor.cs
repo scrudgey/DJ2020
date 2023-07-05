@@ -98,7 +98,10 @@ public class ResourceReferencePopulatorEditor : Editor {
                     continue;
                 if (path.Contains("/Scripts/"))
                     continue;
+                if (path.Contains("/Obi/"))
+                    continue;
                 int startIndex = path.IndexOf(RESOURCES);
+                Debug.Log($"{startIndex} {path}");
                 string resourcePath = path.Substring(startIndex + RESOURCES.Length + 1, path.Length - startIndex - RESOURCES.Length - 1);
                 string finalpath = resourcePath.Substring(0, resourcePath.Length - file.Extension.Length);
                 // Debug.Log($"resource: {finalpath}");
@@ -113,7 +116,7 @@ public class ResourceReferencePopulatorEditor : Editor {
                     // ThisList.GetArrayElementAtIndex(ThisList.arraySize).objectReferenceValue = entry;
                     entries.Add(entry);
                 } else {
-                    Debug.LogError("Failed to load resource");
+                    Debug.LogError($"Failed to load resource: {file.FullName}");
                 }
             }
         }

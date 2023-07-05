@@ -42,10 +42,13 @@ namespace AI {
         }
 
         void setupRootNode() {
+            navPoints = new Stack<Vector3>();
             if (reverse) {
-                navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position).Reverse());
+                patrolRoute.points.Select((transform) => transform.position).Reverse().ToList().ForEach(point => navPoints.Push(point));
+                patrolRoute.points.Select((transform) => transform.position).Reverse().ToList().ForEach(point => navPoints.Push(point));
             } else {
-                navPoints = new Stack<Vector3>(patrolRoute.points.Select((transform) => transform.position));
+                patrolRoute.points.Select((transform) => transform.position).ToList().ForEach(point => navPoints.Push(point));
+                patrolRoute.points.Select((transform) => transform.position).ToList().ForEach(point => navPoints.Push(point));
             }
 
             Vector3 closestPoint = patrolRoute.points
@@ -54,8 +57,7 @@ namespace AI {
                 .First();
 
             while (navPoints.Peek() != closestPoint && navPoints.Count > 0) {
-                // Debug.Log($"pop: {navPoints.Count} {navPoints.Peek()} {closestPoint}");
-                navPoints.Pop();
+                Vector3 position = navPoints.Pop();
             }
 
             TaskMoveToKey taskMoveToKey = type switch {

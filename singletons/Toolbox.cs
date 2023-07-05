@@ -26,6 +26,7 @@ public class Toolbox {
         yield return null;
     }
     static public T RandomFromList<T>(IReadOnlyList<T> list) {
+        if (list.Count == 0) return default(T);
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
     static public void RandomizeOneShot(AudioSource audioSource, AudioClip audioClip, float randomPitchWidth = 0.1f, float volume = 1f) {

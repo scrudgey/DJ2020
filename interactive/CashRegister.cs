@@ -23,6 +23,7 @@ public class CashRegister : Interactive {
     public void Open() {
         if (opened)
             return;
+        opened = true;
         Toolbox.RandomizeOneShot(audioSource, openSound);
         GameObject credstickObject = GameObject.Instantiate(credstickPrefab, transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity);
         Rigidbody rigidbody = credstickObject.GetComponent<Rigidbody>();

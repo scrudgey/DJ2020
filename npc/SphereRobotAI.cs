@@ -34,7 +34,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public Alertness alertness = Alertness.normal;
     public bool recentlyInCombat;
     public Suspiciousness recentHeardSuspicious;
-    public Suspiciousness recentlySawSuspicious;
+    public Suspiciousness lastSuspicionLevel;
     public PatrolRoute patrolRoute;
     public bool skipShootAnimation;
     NoiseComponent lastGunshotHeard;
@@ -275,6 +275,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             perceptionCountdown += PERCEPTION_INTERVAL;
             PerceiveFieldOfView();
         }
+
+        // TODO: only lock when direction is closely aligned with direction to player
         if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
             SightCheckPlayer();
         }
@@ -656,10 +658,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         Suspiciousness totalSuspicion = GameManager.I.GetTotalSuspicion();
         SensitivityLevel sensitivityLevel = GameManager.I.GetCurrentSensitivity();
 
-        recentlySawSuspicious = Toolbox.Max(recentlySawSuspicious, totalSuspicion);
-        Reaction reaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious);
+        lastSuspicionLevel = Toolbox.Max(lastSuspicionLevel, totalSuspicion);
+        Reaction reaction = GameManager.I.GetSuspicionReaction(lastSuspicionLevel);
 
-        Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(recentlySawSuspicious, applyModifiers: false);
+        Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(lastSuspicionLevel, applyModifiers: false);
         if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelState.anyAlarmActive()) {
             GameManager.I.ActivateHQRadio();
         }
@@ -686,7 +688,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // alertness = Alertness.normal;
         recentlyInCombat = false;
         recentHeardSuspicious = Suspiciousness.normal;
-        recentlySawSuspicious = Suspiciousness.normal;
+        lastSuspicionLevel = Suspiciousness.normal;
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;

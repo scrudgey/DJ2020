@@ -23,8 +23,10 @@ public class PulseLight : MonoBehaviour {
         }
     }
     void Start() {
-        if (randomizeInitialScale)
+        if (randomizeInitialScale) {
             transform.localScale = Random.Range(0.9f, 1.3f) * Vector3.one;
+            timer = Random.Range(0, period);
+        }
         startColors = spriteRenderers.Select(s => s.color).ToArray();
         startAlphas = spriteRenderers.Select(s => s.color.a).ToArray();
         startScales = spriteRenderers.Select(s => s.transform.localScale).ToArray();

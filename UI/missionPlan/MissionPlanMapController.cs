@@ -41,7 +41,7 @@ public class MissionPlanMapController : MonoBehaviour {
         initialRectSize = new Vector2(mapRect.rect.width, mapRect.rect.height);
         InitializeMapMarkers();
         PopulateColumns();
-        ChangeFloorView(1);
+        ChangeFloorView(template.mapviewInitialFloor);
     }
     void InitializeMapMarkers() {
         foreach (Transform child in mapImage.transform) {

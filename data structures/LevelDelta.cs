@@ -21,9 +21,13 @@ public record LevelDelta {
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
     public HashSet<Objective> failedObjectives;
     public List<PayData> levelAcquiredPaydata;
+    public HashSet<string> levelInteractedObjects;
+    public List<LootData> levelAcquiredLoot;
     public static LevelDelta Empty() => new LevelDelta {
         objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
         failedObjectives = new HashSet<Objective>(),
-        levelAcquiredPaydata = new List<PayData>()
+        levelAcquiredPaydata = new List<PayData>(),
+        levelInteractedObjects = new HashSet<string>(),
+        levelAcquiredLoot = new List<LootData>()
     };
 }
