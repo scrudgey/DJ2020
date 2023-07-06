@@ -2537,6 +2537,15 @@ note: layer "interactive"
 * run from attack->
     * cower
     * run at random
+* spawn worker NPC
+* worker AI
+* guard position
+* panic / cower
+        * patrols
+        * run for alarm
+* raises the alarm when things are going down
+
+
 
 
 graphical issues:
@@ -3045,6 +3054,8 @@ health does not carry over
 rocket launcher not fully done
 can do a deal multiple times
 some way to distract guards
+saving/loading breaks deals
+raycast to interactive when using
 
 major initiatives:
     loot and loot store mechanics
@@ -3070,23 +3081,17 @@ shops:
     market and deals
 
 
-* spawn worker NPC
-* worker AI
-* guard position
-* panic / cower
-        * patrols
 
 habilitate the 7-11 episode
     sphere robot
     NPCs
         an alarm can go off, drawing patrols from outside / the back
         guard response?
-    states:
-        run for alarm
+
+worker activates alarm when player is suspicious
+draw an alarm button
+wave arms when panicking
+
 
 civilian startle when seeing gun
 generalize "findNearBy"
-wave arms when panicking
-saving/loading breaks deals
-raises the alarm when things are going down
-raycast to interactive when using

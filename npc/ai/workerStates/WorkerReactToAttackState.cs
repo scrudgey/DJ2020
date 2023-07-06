@@ -9,6 +9,7 @@ public class WorkerReactToAttackState : WorkerNPCControlState {
     readonly static HashSet<int> myKeys = new HashSet<int>();
     static readonly public string DAMAGE_SOURCE_KEY = "damageSourceKey";
     static readonly public string COVER_POSITION_KEY = "coverPositionKey";
+    static readonly public string BUTTON_POSITION_KEY = "buttonPositionKey";
     public enum AttackType { none, damage, gunshots }
     AttackType type;
     float changeStateCountDown;
@@ -50,7 +51,26 @@ public class WorkerReactToAttackState : WorkerNPCControlState {
     void SetupRootNode(float initialPause = 1f) {
         AlarmButton button = GameObject.FindObjectsOfType<AlarmButton>().OrderByDescending(button => Vector3.Distance(button.transform.position, owner.transform.position)).FirstOrDefault();
 
-        rootTaskNode = new Sequence(
+        TaskNode buttonTask = new Sequence(
+            new TaskConditional(() => button != null && !button.IsAlarmActive()),
+            new TaskMoveToKey(owner.transform, BUTTON_POSITION_KEY, myKeys, characterController) {
+                headBehavior = TaskMoveToKey.HeadBehavior.search,
+                speedCoefficient = 2f
+            },
+            new TaskTimerDectorator(new TaskLookAt(owner.transform) {
+                lookType = TaskLookAt.LookType.position,
+                key = BUTTON_POSITION_KEY,
+                useKey = true,
+                reorient = true
+            }, 0.2f),
+            new TaskLambda(() => {
+                Debug.Log("press button");
+                button.PressButton();
+                button = null;
+            })
+        );
+
+        TaskNode moveNode = new Sequence(
                 new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                     lookType = TaskLookAt.LookType.position,
                     key = DAMAGE_SOURCE_KEY,
@@ -68,6 +88,14 @@ public class WorkerReactToAttackState : WorkerNPCControlState {
                     reorient = true
                 }, 1.5f)
             );
+
+        rootTaskNode = new Selector(
+            buttonTask,
+            moveNode
+        );
+        if (button != null) {
+            rootTaskNode.SetData(BUTTON_POSITION_KEY, button.transform.position);
+        }
     }
 
     public override PlayerInput Update(ref PlayerInput input) {

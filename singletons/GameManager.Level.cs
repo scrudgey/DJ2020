@@ -511,6 +511,15 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
+    public bool GetAlarmNodeState(AlarmComponent alarmComponent) {
+        if (applicationIsQuitting) return false;
+
+        string idn = alarmComponent.idn;
+        if (gameData.levelState != null && gameData.levelState.delta.alarmGraph != null && gameData.levelState.delta.alarmGraph.nodes.ContainsKey(idn)) {
+            return gameData.levelState.delta.alarmGraph.nodes[idn].alarmTriggered;
+        } else return false;
+    }
+
     public void SetAlarmNodeState(AlarmNode node, bool state) {
         if (applicationIsQuitting) return;
         if (node == null) return;
