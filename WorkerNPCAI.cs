@@ -6,43 +6,42 @@ using KinematicCharacterController;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, IDamageReceiver {
+public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, IDamageReceiver {
     public Listener listener { get; set; }
     public HitState hitState { get; set; }
     public AlertHandler alertHandler;
-
     public SightCone sightCone;
-
-    public NavMeshPath navMeshPath;
     public CharacterController characterController;
     public GunHandler gunHandler;
-    public CivilianNPCBrain stateMachine;
     public KinematicCharacterMotor motor;
     public SpeechTextController speechTextController;
 
+    [Header("specifics")]
+    public Transform guardPoint;
+    public Transform lookAtPoint;
+
+    [HideInInspector]
+    public NavMeshPath navMeshPath;
+    WorkerNPCBrain stateMachine;
     Collider[] nearbyOthers;
     RaycastHit[] raycastHits;
     Vector3 closeness;
     static readonly float avoidFactor = 1f;
     static readonly float avoidRadius = 0.5f;
     static readonly WaitForSeconds wait = new WaitForSeconds(1f);
-
-
-    public SpaceTimePoint lastSeenPlayerPosition;
-    public SpaceTimePoint lastHeardPlayerPosition;
-    public SpaceTimePoint lastHeardDisturbancePosition;
-
+    static readonly float PERCEPTION_INTERVAL = 0.025f;
+    static readonly float MAXIMUM_SIGHT_RANGE = 25f;
+    SpaceTimePoint lastSeenPlayerPosition;
+    SpaceTimePoint lastHeardPlayerPosition;
+    SpaceTimePoint lastHeardDisturbancePosition;
     List<Transform> otherTransforms = new List<Transform>();
-    readonly float PERCEPTION_INTERVAL = 0.025f;
-    readonly float MAXIMUM_SIGHT_RANGE = 25f;
     bool awareOfCorpse;
-    public Suspiciousness lastSuspicionLevel;
-
+    Suspiciousness lastSuspicionLevel;
 
     public void Awake() {
         nearbyOthers = new Collider[32];
         navMeshPath = new NavMeshPath();
-        stateMachine = new CivilianNPCBrain();
+        stateMachine = new WorkerNPCBrain();
         motor = GetComponent<KinematicCharacterMotor>();
         motor.SimulatedCharacterMass = UnityEngine.Random.Range(25f, 2500f);
 
@@ -57,83 +56,6 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
     }
-    IEnumerator findNearby() {
-        yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 2f));
-        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
-        closeness = Vector3.zero;
-        otherTransforms = new List<Transform>();
-        for (int i = 0; i < numColliders; i++) {
-            Collider collider = nearbyOthers[i];
-            if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(transform))
-                continue;
-            WorldNPCAI otherAI = collider.GetComponent<WorldNPCAI>();
-            if (otherAI != null) {
-                otherTransforms.Add(otherAI.transform);
-            }
-        }
-    }
-
-    public void Initialize() {
-        EnterDefaultState();
-    }
-
-    public void ChangeState(CivilianNPCControlState routine) {
-        stateMachine.ChangeState(routine);
-    }
-    void EnterDefaultState() {
-        if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
-            ChangeState(new LoiterState(this, characterController));
-        } else {
-            SocialGroup socialGroup = LookForSocialGroup();
-            ChangeState(new CivilianSocializeState(this, characterController, speechTextController, socialGroup));
-        }
-    }
-    public void StateFinished(CivilianNPCControlState routine) {
-        switch (routine) {
-            case CivilianPanicRunState:
-            case CivilianCowerState:
-            case CivilianReactToAttackState:
-                if (UnityEngine.Random.Range(0f, 1f) < 0.1f) {
-                    EnterDefaultState();
-                }
-                if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
-                    ChangeState(new CivilianCowerState(this, characterController));
-                } else {
-                    ChangeState(new CivilianPanicRunState(this, characterController));
-                }
-                break;
-            default:
-                EnterDefaultState();
-                break;
-        }
-    }
-
-    SocialGroup LookForSocialGroup() {
-        List<SocialGroup> socialGroups = GameObject.FindObjectsOfType<SocialGroup>()
-            // .Where(socialGroup => area.bounds.Contains(socialGroup.transform.position))
-            .Where(socialGroup => socialGroup.members.Count < 4)
-            .ToList();
-        if (socialGroups.Count > 0) {
-            return Toolbox.RandomFromList(socialGroups);
-        } else {
-            Vector3 point = transform.position;
-            NavMeshHit hit = new NavMeshHit();
-            NavMeshQueryFilter filter = new NavMeshQueryFilter {
-                areaMask = LayerUtil.KeySetToNavLayerMask(new HashSet<int>())
-            };
-            bool foundGoodPosition = NavMesh.SamplePosition(point, out hit, 10f, filter);
-            if (!foundGoodPosition) {
-                GameObject socialGroupObject = GameObject.Instantiate(Resources.Load("prefabs/socialGroup"), point, Quaternion.identity) as GameObject;
-                SocialGroup socialGroup = socialGroupObject.GetComponent<SocialGroup>();
-                return socialGroup;
-            } else {
-                GameObject socialGroupObject = GameObject.Instantiate(Resources.Load("prefabs/socialGroup"), hit.position, Quaternion.identity) as GameObject;
-                SocialGroup socialGroup = socialGroupObject.GetComponent<SocialGroup>();
-                return socialGroup;
-            }
-        }
-    }
-
     void Update() {
         PlayerInput input = stateMachine.Update();
         input.preventWallPress = true;
@@ -158,6 +80,52 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         }
     }
 
+    IEnumerator findNearby() {
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 2f));
+        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
+        closeness = Vector3.zero;
+        otherTransforms = new List<Transform>();
+        for (int i = 0; i < numColliders; i++) {
+            Collider collider = nearbyOthers[i];
+            if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(transform))
+                continue;
+            WorldNPCAI otherAI = collider.GetComponent<WorldNPCAI>();
+            if (otherAI != null) {
+                otherTransforms.Add(otherAI.transform);
+            }
+        }
+    }
+
+    public void Initialize() {
+        EnterDefaultState();
+    }
+    public void ChangeState(WorkerNPCControlState routine) {
+        stateMachine.ChangeState(routine);
+    }
+    void EnterDefaultState() {
+        ChangeState(new WorkerGuardState(this, characterController, guardPoint.position, lookAtPoint.position));
+    }
+    public void StateFinished(WorkerNPCControlState routine) {
+        switch (routine) {
+            case WorkerPanicRunState:
+            case WorkerCowerState:
+            case WorkerReactToAttackState:
+                if (UnityEngine.Random.Range(0f, 1f) < 0.1f) {
+                    EnterDefaultState();
+                }
+                if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+                    ChangeState(new WorkerCowerState(this, characterController));
+                } else {
+                    ChangeState(new WorkerPanicRunState(this, characterController));
+                }
+                break;
+            default:
+                EnterDefaultState();
+                break;
+        }
+    }
+
+
     void SetInputs(PlayerInput input) {
         characterController.SetInputs(input);
     }
@@ -180,12 +148,11 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
             directionToNoise.y = 0;
             float dotFactor = Vector3.Dot(rayDirection, directionToNoise);
             switch (stateMachine.currentState) {
-                case LoiterState:
-                case CivilianSocializeState:
-                case CivilianCowerState:
-                case CivilianPanicRunState:
+                case WorkerGuardState:
+                case WorkerCowerState:
+                case WorkerPanicRunState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
-                    ChangeState(new CivilianReactToAttackState(this, speechTextController, noise, characterController));
+                    ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                     break;
             }
         } else { // not player
@@ -199,12 +166,11 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
                     GameManager.I.AddSuspicionRecord(record);
                 }
                 switch (stateMachine.currentState) {
-                    case LoiterState:
-                    case CivilianSocializeState:
-                    case CivilianCowerState:
-                    case CivilianPanicRunState:
+                    case WorkerGuardState:
+                    case WorkerCowerState:
+                    case WorkerPanicRunState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
-                        ChangeState(new CivilianReactToAttackState(this, speechTextController, noise, characterController));
+                        ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                         break;
                 }
             }
@@ -245,12 +211,7 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
                 alertHandler.ShowAlert(useWarnMaterial: true);
                 SuspicionRecord record = SuspicionRecord.shotSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
-                switch (stateMachine.currentState) {
-                    case LoiterState:
-                    case CivilianSocializeState:
-                        ChangeState(new CivilianReactToAttackState(this, speechTextController, bulletImpact.damage, characterController));
-                        break;
-                }
+                // TODO: change states
             }
         }
     }
@@ -260,15 +221,7 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance)) {
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             Reaction reaction = ReactToPlayerSuspicion();
-            // if (reaction == Reaction.attack) {
-            //     alertHandler.ShowAlert();
-            //     // TODO: change state
-            // } else if (reaction == Reaction.investigate) {
-            //     alertHandler.ShowWarn();
-            //     // TODO: change state
-            // } else if (reaction == Reaction.ignore) {
-
-            // }
+            // TODO: change states
         }
     }
 
@@ -283,7 +236,8 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
 
     public DamageResult TakeDamage(Damage damage) {
         alertHandler.ShowAlert(useWarnMaterial: true);
-        ChangeState(new CivilianReactToAttackState(this, speechTextController, damage, characterController));
+        // TODO: change state
+        // ChangeState(new CivilianReactToAttackState(this, speechTextController, damage, characterController));
         return DamageResult.NONE;
     }
 }

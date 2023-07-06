@@ -3069,14 +3069,24 @@ shops:
     sell guns
     market and deals
 
+
+* spawn worker NPC
+* worker AI
+* guard position
+* panic / cower
+        * patrols
+
 habilitate the 7-11 episode
     sphere robot
     NPCs
         an alarm can go off, drawing patrols from outside / the back
-        patrols
         guard response?
-    civilian startle when seeing gun
+    states:
+        run for alarm
 
-worker AI
-    can be: employee, technician, etc.
-    raises the alarm when things are going down
+civilian startle when seeing gun
+generalize "findNearBy"
+wave arms when panicking
+saving/loading breaks deals
+raises the alarm when things are going down
+raycast to interactive when using

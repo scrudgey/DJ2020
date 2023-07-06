@@ -12,6 +12,7 @@ using UnityEngine.Audio;
 // maybe use loudspeaker object
 
 public class Toolbox {
+    static RaycastHit[] raycastHits = new RaycastHit[1];
     public static GameObject explosiveRadiusPrefab;
     public static readonly string ExplosiveRadiusPath = "prefabs/explosiveRadius";
     public static AudioMixer sfxMixer;
@@ -586,6 +587,31 @@ public class Toolbox {
     public static IEnumerator CoroutineFunc(Action action) {
         action();
         yield return null;
+    }
+
+    public static bool ClearLineOfSight(Vector3 position, Collider other, float MAXIMUM_SIGHT_RANGE = 25f) {
+        Vector3[] directions = new Vector3[0];
+        float distance = 0;
+        if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
+            directions = new Vector3[]{
+                other.ClosestPoint(position) - position
+            };
+        } else {
+            directions = new Vector3[]{
+                other.bounds.center - position
+            };
+        }
+        bool clearLineOfSight = false;
+        foreach (Vector3 direction in directions) {
+            // distance = Math.Min(direction.magnitude, MAXIMUM_SIGHT_RANGE);
+            distance = direction.magnitude;
+            if (distance > MAXIMUM_SIGHT_RANGE)
+                return false;
+            Ray ray = new Ray(position, direction);
+            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.99f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+            clearLineOfSight |= numberHits == 0;
+        }
+        return clearLineOfSight;
     }
 }
 

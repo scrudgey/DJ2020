@@ -3,13 +3,13 @@ using AI;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class CivilianCowerState : CivilianNPCControlState {
+public class WorkerCowerState : WorkerNPCControlState {
     readonly float ROUTINE_TIMEOUT = 60f;
     float changeStateCountDown;
     private TaskNode rootTaskNode;
     CharacterController characterController;
 
-    public CivilianCowerState(CivilianNPCAI ai, CharacterController characterController) : base(ai) {
+    public WorkerCowerState(WorkerNPCAI ai, CharacterController characterController) : base(ai) {
         this.characterController = characterController;
         SetupRootNode(); // enough to time out hitstun
     }

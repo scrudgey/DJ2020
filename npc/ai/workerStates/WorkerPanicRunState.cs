@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class CivilianPanicRunState : CivilianNPCControlState {
+public class WorkerPanicRunState : WorkerNPCControlState {
     static readonly string SEARCH_POSITION_KEY = "investigatePosition";
     static readonly HashSet<int> physicalKeys = new HashSet<int>();
     float changeStateCountDown;
     private Vector3 searchDirection;
     private TaskNode rootTaskNode;
     CharacterController characterController;
-    public CivilianPanicRunState(CivilianNPCAI ai, CharacterController characterController) : base(ai) {
+    public WorkerPanicRunState(WorkerNPCAI ai, CharacterController characterController) : base(ai) {
         this.characterController = characterController;
         RandomSearchDirection();
         SetupRootNode();

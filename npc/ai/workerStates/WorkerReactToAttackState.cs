@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class CivilianReactToAttackState : CivilianNPCControlState {
+public class WorkerReactToAttackState : WorkerNPCControlState {
     readonly static float ROUTINE_TIMEOUT = 60f;
     readonly static HashSet<int> myKeys = new HashSet<int>();
     static readonly public string DAMAGE_SOURCE_KEY = "damageSourceKey";
@@ -15,7 +16,7 @@ public class CivilianReactToAttackState : CivilianNPCControlState {
     private SpeechTextController speechTextController;
     CharacterController characterController;
 
-    public CivilianReactToAttackState(CivilianNPCAI ai, SpeechTextController speechTextController, Damage damage, CharacterController characterController) : base(ai) {
+    public WorkerReactToAttackState(WorkerNPCAI ai, SpeechTextController speechTextController, Damage damage, CharacterController characterController) : base(ai) {
         this.speechTextController = speechTextController;
         this.type = AttackType.damage;
         this.characterController = characterController;
@@ -26,7 +27,7 @@ public class CivilianReactToAttackState : CivilianNPCControlState {
         rootTaskNode.SetData(DAMAGE_SOURCE_KEY, damageSourcePosition);
         rootTaskNode.SetData(COVER_POSITION_KEY, coverPosition);
     }
-    public CivilianReactToAttackState(CivilianNPCAI ai, SpeechTextController speechTextController, NoiseComponent noise, CharacterController characterController) : base(ai) {
+    public WorkerReactToAttackState(WorkerNPCAI ai, SpeechTextController speechTextController, NoiseComponent noise, CharacterController characterController) : base(ai) {
         this.speechTextController = speechTextController;
         this.type = AttackType.gunshots;
         this.characterController = characterController;
@@ -47,6 +48,8 @@ public class CivilianReactToAttackState : CivilianNPCControlState {
     }
 
     void SetupRootNode(float initialPause = 1f) {
+        AlarmButton button = GameObject.FindObjectsOfType<AlarmButton>().OrderByDescending(button => Vector3.Distance(button.transform.position, owner.transform.position)).FirstOrDefault();
+
         rootTaskNode = new Sequence(
                 new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                     lookType = TaskLookAt.LookType.position,

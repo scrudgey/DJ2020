@@ -39,10 +39,11 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         foreach (KeyValuePair<U, V> kvp in indicators) {
             // float distance = Mathf.Clamp(Mathf.Abs(kvp.Key.position.y - playerPosition.y) / 2f, 0f, 1f);
             float distance = distances[kvp.Key];
+            // Debug.Log($"{kvp.Value.node.nodeTitle} {distance}");
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
             kvp.Value.Configure(kvp.Key, graph, this);
             kvp.Value.SetScreenPosition(screenPoint);
-            kvp.Value.ApplyDistanceEffect(distance);
+            // kvp.Value.ApplyDistanceEffect(distance);
         }
         foreach (HashSet<string> edge in graph.edgePairs) {
             LineRenderer renderer = GetLineRenderer(edge);

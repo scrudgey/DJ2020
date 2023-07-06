@@ -103,6 +103,9 @@ public partial class GameManager : Singleton<GameManager> {
                     state.delta.npcsSpawned += 1;
                 }
             }
+            foreach (WorkerSpawnPoint spawnPoint in GameObject.FindObjectsOfType<WorkerSpawnPoint>()) {
+                GameObject npc = spawnPoint.SpawnTemplated();
+            }
 
             foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
                 spawnPoint.SpawnNPC(useSpawnEffect: false);
