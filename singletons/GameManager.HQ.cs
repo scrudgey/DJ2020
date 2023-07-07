@@ -30,8 +30,19 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void SetLevelAlarmActive() {
-        if (!gameData.levelState.anyAlarmActive()) {
+        if (gameData.levelState.anyAlarmActive()) {
+
+        } else {
             alarmSoundTimer = alarmSoundInterval;
+        }
+        ClearPoint[] allClearPoints = FindObjectsOfType<ClearPoint>();
+        foreach (ClearPoint point in allClearPoints) {
+            point.cleared = false;
+        }
+        if (allClearPoints.Length > 0) {
+            foreach (SphereRobotAI ai in FindObjectsOfType<SphereRobotAI>()) {
+                ai.OnAlarmActivate(allClearPoints);
+            }
         }
         OnSuspicionChange?.Invoke();
     }

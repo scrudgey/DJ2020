@@ -53,6 +53,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public HashSet<int> physicalKeys;
     Vector3 closeness;
     List<Transform> otherTransforms = new List<Transform>();
+    ClearPoint[] clearPoints;
     static readonly float avoidFactor = 5f;
     static readonly float avoidRadius = 0.2f;
     public void Awake() {
@@ -104,6 +105,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void StateFinished(SphereControlState routine) {
         switch (routine) {
             default:
+                EnterDefaultState();
+                break;
+            case SphereClearPointsState:
                 EnterDefaultState();
                 break;
             case ReportGunshotsState:
@@ -670,6 +674,18 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             reaction = Reaction.attack;
         }
         return reaction;
+    }
+
+    public void OnAlarmActivate(ClearPoint[] allClearPoints) {
+        this.clearPoints = allClearPoints;
+        Debug.Log($"on alarm active: {allClearPoints.Length}");
+        if (allClearPoints.Length > 0) {
+            switch (stateMachine.currentState) {
+                case SpherePatrolState:
+                    ChangeState(new SphereClearPointsState(this, characterController, allClearPoints));
+                    break;
+            }
+        }
     }
 
     public void OnPoolActivate() {

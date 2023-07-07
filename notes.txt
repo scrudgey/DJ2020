@@ -3081,17 +3081,22 @@ shops:
     market and deals
 
 
+* on alarm activate, notify all npcs.
+* guard response?
+    * NPCs
+       *  an alarm can go off, drawing patrols from outside / the back
 
 habilitate the 7-11 episode
     sphere robot
-    NPCs
-        an alarm can go off, drawing patrols from outside / the back
-        guard response?
 
-worker activates alarm when player is suspicious
-draw an alarm button
 wave arms when panicking
-
-
 civilian startle when seeing gun
+    if just suspicious player but nothing else going on, just !
+    if anything else (alarm, etc.?) then flee
+worker activates alarm when player is suspicious
+    1. witnessing something aggro: run for the alarm
+    2. witnessing something suspicious:
+        hands up
+        when player stops looking, run for the alarm
+draw an alarm button
 generalize "findNearBy"
