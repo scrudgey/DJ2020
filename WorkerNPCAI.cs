@@ -7,6 +7,12 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, IDamageReceiver {
+    static readonly float PERCEPTION_INTERVAL = 0.025f;
+    static readonly float avoidFactor = 1f;
+    static readonly float avoidRadius = 0.5f;
+    static readonly WaitForSeconds wait = new WaitForSeconds(1f);
+    static readonly float MAXIMUM_SIGHT_RANGE = 25f;
+
     public Listener listener { get; set; }
     public HitState hitState { get; set; }
     public AlertHandler alertHandler;
@@ -26,18 +32,14 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     Collider[] nearbyOthers;
     RaycastHit[] raycastHits;
     Vector3 closeness;
-    static readonly float avoidFactor = 1f;
-    static readonly float avoidRadius = 0.5f;
-    static readonly WaitForSeconds wait = new WaitForSeconds(1f);
-    static readonly float PERCEPTION_INTERVAL = 0.025f;
-    static readonly float MAXIMUM_SIGHT_RANGE = 25f;
+
     SpaceTimePoint lastSeenPlayerPosition;
     SpaceTimePoint lastHeardPlayerPosition;
     SpaceTimePoint lastHeardDisturbancePosition;
     List<Transform> otherTransforms = new List<Transform>();
     bool awareOfCorpse;
     Suspiciousness lastSuspicionLevel;
-
+    float perceptionCountdown;
     public void Awake() {
         nearbyOthers = new Collider[32];
         navMeshPath = new NavMeshPath();
@@ -73,6 +75,11 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             input.moveDirection += avoidFactor * closeness;
             input.moveDirection = Vector3.ClampMagnitude(input.moveDirection, magnitude);
         }
+        perceptionCountdown -= Time.deltaTime;
+        if (perceptionCountdown <= 0) {
+            perceptionCountdown += PERCEPTION_INTERVAL;
+            PerceiveFieldOfView();
+        }
 
         SetInputs(input);
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
@@ -107,6 +114,11 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
     public void StateFinished(WorkerNPCControlState routine) {
         switch (routine) {
+            case WorkerHeldAtGunpointState:
+                Vector3 direction = GameManager.I.playerPosition - transform.position;
+                Damage fakeDamage = new Damage(0f, direction, transform.position, GameManager.I.playerPosition);
+                ChangeState(new WorkerReactToAttackState(this, speechTextController, fakeDamage, characterController));
+                break;
             case WorkerPanicRunState:
             case WorkerCowerState:
             case WorkerReactToAttackState:
@@ -151,6 +163,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 case WorkerGuardState:
                 case WorkerCowerState:
                 case WorkerPanicRunState:
+                case WorkerHeldAtGunpointState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
                     ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                     break;
@@ -169,6 +182,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                     case WorkerGuardState:
                     case WorkerCowerState:
                     case WorkerPanicRunState:
+                    case WorkerHeldAtGunpointState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
                         ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                         break;
@@ -191,6 +205,14 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         }
     }
 
+    void PerceiveFieldOfView() {
+        foreach (Collider collider in target.fieldOfView) {
+            if (collider == null)
+                continue;
+            if (Toolbox.ClearLineOfSight(target.transform.position, collider))
+                Perceive(collider);
+        }
+    }
     void Perceive(Collider other, bool byPassVisibilityCheck = false) {
         if (hitState == HitState.dead) {
             return;
@@ -220,8 +242,25 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance)) {
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
+            Suspiciousness playerTotalSuspicion = GameManager.I.GetTotalSuspicion();
             Reaction reaction = ReactToPlayerSuspicion();
-            // TODO: change states
+            stateMachine.currentState.OnPlayerPerceived();
+            if (playerTotalSuspicion == Suspiciousness.suspicious) {
+                switch (stateMachine.currentState) {
+                    case WorkerGuardState:
+                        alertHandler.ShowAlert(useWarnMaterial: true);
+                        ChangeState(new WorkerHeldAtGunpointState(this, characterController, other.gameObject));
+                        break;
+                }
+            } else if (playerTotalSuspicion == Suspiciousness.aggressive) {
+                switch (stateMachine.currentState) {
+                    case WorkerHeldAtGunpointState:
+                        Vector3 direction = GameManager.I.playerPosition - transform.position;
+                        Damage fakeDamage = new Damage(0f, direction, transform.position, GameManager.I.playerPosition);
+                        ChangeState(new WorkerReactToAttackState(this, speechTextController, fakeDamage, characterController));
+                        break;
+                }
+            }
         }
     }
 

@@ -343,6 +343,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                             case FollowTheLeaderState:
                             case StopAndListenState:
                             case SphereInvestigateState:
+                            case SphereClearPointsState:
+
                                 corpse.reported = true;
                                 ChangeState(new InvestigateCorpseState(this, corpse, speechTextController, characterController));
                                 break;
@@ -362,6 +364,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereInvestigateState:
                     case SphereHoldAtGunpointState:
                     case StopAndListenState:
+                    case SphereClearPointsState:
+
                         alertHandler.ShowAlert(useWarnMaterial: true);
                         SuspicionRecord record = SuspicionRecord.shotSuspicion();
                         GameManager.I.AddSuspicionRecord(record);
@@ -378,6 +382,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         case FollowTheLeaderState:
                         case PauseState:
                         case StopAndListenState:
+                        case SphereClearPointsState:
+
                             evidence.reported = true;
                             alertHandler.ShowAlert(useWarnMaterial: true);
                             ChangeState(new ReactToTamperState(this, evidence, speechTextController, characterController));
@@ -408,6 +414,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case FollowTheLeaderState:
                     case StopAndListenState:
                     case SphereInvestigateState:
+                    case SphereClearPointsState:
                         alertHandler.ShowAlert();
                         ChangeState(new SphereAttackState(this, gunHandler, characterController));
                         break;
@@ -420,6 +427,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case ReactToAttackState:
                     case FollowTheLeaderState:
                     case StopAndListenState:
+                    case SphereClearPointsState:
+
                         if (timeSinceInterrogatedStranger <= 0) {
                             alertHandler.ShowWarn();
                             GameManager.I.StartSpottedCutscene(gameObject);
@@ -546,6 +555,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case SphereInvestigateState:
                 case SphereHoldAtGunpointState:
                 case StopAndListenState:
+                case SphereClearPointsState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
                     if (GameManager.I.gameData.levelState.anyAlarmActive()) {
                         // alarm is already active; no need to handle reporting to HQ. run to firefight.
@@ -578,6 +588,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SpherePatrolState:
                     case FollowTheLeaderState:
                     case DisableAlarmState:
+                    case SphereClearPointsState:
                         alertHandler.ShowWarn();
                         ChangeState(new SearchDirectionState(this, noise, characterController));
                         break;
@@ -602,6 +613,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         case SpherePatrolState:
                         case FollowTheLeaderState:
                         case DisableAlarmState:
+                        case SphereClearPointsState:
                             alertHandler.ShowWarn();
                             ChangeState(new SearchDirectionState(this, noise, characterController));
                             break;
@@ -614,6 +626,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         case SpherePatrolState:
                         case FollowTheLeaderState:
                         case DisableAlarmState:
+                        case SphereClearPointsState:
                             alertHandler.ShowWarn();
                             ChangeState(new ReportToHQState(this, speechTextController, noise));
                             break;
@@ -633,6 +646,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
+                    case SphereClearPointsState:
+
                         // timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
@@ -645,6 +660,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
+                    case SphereClearPointsState:
+
                         // timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));

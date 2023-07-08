@@ -260,15 +260,17 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance)) {
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             Reaction reaction = ReactToPlayerSuspicion();
-            // if (reaction == Reaction.attack) {
-            //     alertHandler.ShowAlert();
-            //     // TODO: change state
-            // } else if (reaction == Reaction.investigate) {
-            //     alertHandler.ShowWarn();
-            //     // TODO: change state
-            // } else if (reaction == Reaction.ignore) {
-
-            // }
+            Suspiciousness playerTotalSuspicion = GameManager.I.GetTotalSuspicion();
+            if (playerTotalSuspicion >= Suspiciousness.suspicious) {
+                alertHandler.ShowAlert(useWarnMaterial: true);
+                if (GameManager.I.gameData.levelState.anyAlarmActive() || playerTotalSuspicion >= Suspiciousness.aggressive) {
+                    if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+                        ChangeState(new CivilianCowerState(this, characterController));
+                    } else {
+                        ChangeState(new CivilianPanicRunState(this, characterController));
+                    }
+                }
+            }
         }
     }
 

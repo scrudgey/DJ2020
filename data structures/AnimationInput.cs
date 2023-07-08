@@ -41,4 +41,5 @@ public struct AnimationInput {
     public HitState hitState;
     public Vector3 velocity;
     public bool wavingArm;
+    public bool armsRaised;
 }

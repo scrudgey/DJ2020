@@ -78,6 +78,9 @@ public class CivilianReactToAttackState : CivilianNPCControlState {
         } else if (result == TaskState.failure) {
             owner.StateFinished(this);
         }
+        if (input.moveDirection.magnitude > 0.1) {
+            input.armsRaised = true;
+        }
         return input;
     }
 }

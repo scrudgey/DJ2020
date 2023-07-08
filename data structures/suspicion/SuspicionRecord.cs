@@ -163,13 +163,37 @@ public class SuspicionRecord {
         }
     };
 
+    public static SuspicionRecord robRegisterSuspicion() => new SuspicionRecord {
+        content = "robbed a cash register",
+        suspiciousness = Suspiciousness.aggressive,
+        lifetime = 160f,
+        maxLifetime = 160f,
+        dialogue = new SuspicionDialogueParameters {
+            challenge = "Why did you rob the cash register?",
+            tactics = new List<DialogueTactic>{
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.lie,
+                            content = "I thought it was a big pez dispenser!",
+                            successResponse = "Well, don't do it again.",
+                            failResponse = "How stupid do you think I am?"
+                        },
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.deny,
+                            content = "I didn't rob the register.",
+                            successResponse = "I could have sworn I saw something. Huh.",
+                            failResponse = "How stupid do you think I am?"
+                        }
+                    }
+        }
+    };
+
     public static SuspicionRecord bodySuspicion() => new SuspicionRecord {
         content = "A body was discovered",
         maxLifetime = 120,
         lifetime = 120,
         suspiciousness = Suspiciousness.suspicious,
         dialogue = new SuspicionDialogueParameters {
-            challenge = "Do you know anything about the body that was found?",
+            challenge = "Do you know anything about the dead body that was found?",
             tactics = new List<DialogueTactic>{
                         new DialogueTactic{
                             tacticType = DialogueTacticType.lie,

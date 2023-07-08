@@ -112,7 +112,10 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
                     break;
             }
         } else {
-            if (input.isMoving) {
+            if (input.armsRaised) {
+                _frame = 0;
+                SetAnimation(idleAnimation);
+            } else if (input.isMoving) {
                 if (input.isCrouching) {
                     SetAnimation(crawlAnimation);
                 } else {

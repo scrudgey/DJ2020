@@ -11,4 +11,8 @@ public abstract class WorkerNPCControlState : AI.IState {
     public virtual void Enter() { }
     public virtual void Exit() { }
     public TaskNode rootTaskNote { get; set; }
+
+    public virtual void OnPlayerPerceived() {
+
+    }
 }

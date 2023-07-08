@@ -486,7 +486,9 @@ public class Skin {
     }
 
     public Octet<Sprite[]> GetCurrentTorsoOctet(AnimationInput input) {
-        if (input.state == CharacterState.keelOver) {
+        if (input.armsRaised) {
+            return unarmedHandsUp;
+        } else if (input.state == CharacterState.keelOver) {
             return unarmedKeelOver;
         } else if (input.hitState == HitState.dead) {
             return unarmedDead;

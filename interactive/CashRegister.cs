@@ -18,6 +18,8 @@ public class CashRegister : Interactive {
     }
     public override ItemUseResult DoAction(Interactor interactor) {
         Open();
+        SuspicionRecord record = SuspicionRecord.robRegisterSuspicion();
+        GameManager.I.AddSuspicionRecord(record);
         return ItemUseResult.Empty() with { waveArm = true };
     }
     public void Open() {

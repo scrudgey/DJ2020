@@ -183,6 +183,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     float fallTime;
     float fallVelocity;
     public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
+    bool armsRaised;
 
     static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
@@ -377,7 +378,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             interactor.SetCursorData(input.Fire.cursorData);
         }
         _ladderUpDownInput = input.MoveAxisForward;
-
+        armsRaised = input.armsRaised;
         // Clamp input
         // TODO: this is weird
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
@@ -1511,7 +1512,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             velocity = Motor.Velocity,
             wavingArm = waveArmTimer > 0f,
             activeItem = itemHandler?.activeItem,
-            isSpeaking = speechTextController?.IsSpeaking() ?? false
+            isSpeaking = speechTextController?.IsSpeaking() ?? false,
+            armsRaised = armsRaised
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);
