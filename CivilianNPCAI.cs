@@ -66,9 +66,9 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
             Collider collider = nearbyOthers[i];
             if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(transform))
                 continue;
-            WorldNPCAI otherAI = collider.GetComponent<WorldNPCAI>();
-            if (otherAI != null) {
-                otherTransforms.Add(otherAI.transform);
+            // WorldNPCAI otherAI = collider.GetComponent<WorldNPCAI>();
+            if (collider.CompareTag("actor")) {
+                otherTransforms.Add(collider.transform);
             }
         }
     }

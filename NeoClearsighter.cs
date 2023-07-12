@@ -352,14 +352,14 @@ public class NeoClearsighter : MonoBehaviour {
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;
 
-            Vector3 rendererPosition = rendererBounds[renderer].center;
+            Vector3 rendererPosition = rendererBounds[renderer].center - rendererBounds[renderer].extents.y * Vector3.up;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
 
             float xParity = cameraXSide ? 1f : -1f;
             float zParity = cameraZSide ? 1f : -1f;
             bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
             bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
-            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
+            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y >= -0.2f) {
                 if (renderer == null) continue;
                 if (nextAboveRenderBatch?.Contains(renderer) ?? false) continue;
                 MakeTransparent(renderer, directionToInterloper);

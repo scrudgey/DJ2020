@@ -116,6 +116,8 @@ public class ImporterShopController : MonoBehaviour {
         GameManager.I.gameData.dealData.Remove(dealData);
         GameManager.I.gameData.playerState.loots.RemoveAll(loot => lootForPrice.Contains(loot));
         for (int i = 0; i < dealData.offerCount; i++) {
+            LootData newLoot = ScriptableObject.Instantiate(dealData.offerLoot);
+            newLoot.name = Toolbox.CloneRemover(newLoot.name);
             GameManager.I.gameData.playerState.loots.Add(ScriptableObject.Instantiate(dealData.offerLoot));
         }
         HideDealDialogue();

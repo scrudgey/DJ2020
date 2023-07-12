@@ -16,10 +16,13 @@ public class Bush : MonoBehaviour {
     private static Dictionary<Collider, CharacterController> bodies = new Dictionary<Collider, CharacterController>();
     public float leafProbability = 0.5f;
     new private Collider collider;
+
+    Quaternion initialRotation;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         collider = GetComponent<Collider>();
         leafPool = PoolManager.I.RegisterPool(leafPrefab);
+        initialRotation = transform.rotation;
     }
     public CharacterController GetRigidbody(Collider key) {
         CharacterController outBody;
@@ -35,10 +38,11 @@ public class Bush : MonoBehaviour {
     void OnTriggerStay(Collider other) {
         CharacterController body = GetRigidbody(other);
         if (body != null) {
+            body.EnterBush();
             shakeAmount += body.Motor.Velocity.magnitude;
             // Debug.Log(shakeAmount);
             if (shakeAmount > shakeThreshold) {
-                Shake();
+                Shake(other);
                 shakeAmount = 0f;
             }
         }
@@ -46,8 +50,13 @@ public class Bush : MonoBehaviour {
     void OnTriggerEnter(Collider other) {
         // Shake();
     }
-    public void Shake() {
+    public void Shake(Collider other) {
         Toolbox.RandomizeOneShot(audioSource, sounds);
+        Toolbox.Noise(transform.position, new NoiseData() {
+            volume = 5,
+            suspiciousness = Suspiciousness.suspicious,
+            player = other.transform.IsChildOf(GameManager.I.playerObject.transform)
+        }, other.transform.root.gameObject);
         ClearCoroutines();
         Coroutine newRoutine = StartCoroutine(ShakeTree(transform.parent));
         shakeRoutines.Add(newRoutine);
@@ -72,7 +81,7 @@ public class Bush : MonoBehaviour {
             timer += Time.deltaTime;
 
             float angle = (float)PennerDoubleAnimation.ElasticEaseOut(timer, intensity, -intensity, length);
-            target.rotation = Quaternion.AngleAxis(angle, axis);
+            target.rotation = Quaternion.AngleAxis(angle, axis) * initialRotation;
             yield return null;
         }
 

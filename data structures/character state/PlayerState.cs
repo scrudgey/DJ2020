@@ -78,12 +78,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         };
 
         List<LootData> loots = new List<LootData>{
-            Resources.Load("data/loot/rush") as LootData,
-            Resources.Load("data/loot/rush") as LootData,
-            Resources.Load("data/loot/rush") as LootData,
-            Resources.Load("data/loot/vial") as LootData,
-            Resources.Load("data/loot/vial") as LootData,
-            Resources.Load("data/loot/zyme") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/vial") as LootData,
+            Resources.Load("data/loot/drug/vial") as LootData,
+            Resources.Load("data/loot/drug/zyme") as LootData,
         };
 
         return new PlayerState() {

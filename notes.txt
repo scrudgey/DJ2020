@@ -2544,8 +2544,43 @@ note: layer "interactive"
         * patrols
         * run for alarm
 * raises the alarm when things are going down
-
-
+* on alarm activate, notify all npcs.
+* guard response?
+    * NPCs
+       *  an alarm can go off, drawing patrols from outside / the back
+* wave arms when panicking
+* worker activates alarm when player is suspicious
+    * witnessing something aggro: run for the alarm
+    * witnessing something suspicious:
+        * hands up
+        * when player stops looking, run for the alarm
+* player is suspicious when robbing the register
+* include clearState in all the state change logic of NPC AI
+* civilian startle when seeing gun
+    * if just suspicious player but nothing else going on, just !
+    * if anything else (alarm, etc.?) then flee
+* draw an alarm button
+* generalize "findNearBy"
+* habilitate the 7-11 episode
+* Rush(clone) <- comes from the deal dialogue
+        * 7-11 to start
+* saving/loading breaks deals
+* make loot mechanics playable:
+    * more loot
+    * more fences
+* loot
+* hedge
+* rooftop
+* surroundings
+x ladders
+* tune up patrol routes
+* more loot
+* add loot
+* billboard interloper shader should be cutout, or something is up with interloper shader + shells
+* silenced gun is still OP
+    * seeing corpse or bullets -> high alert, easier to see player
+* fix transformer door
+* ladders
 
 
 graphical issues:
@@ -2655,14 +2690,14 @@ UI:
 
 control / combat:
     controller support
-    headshots
+    * headshots
     shoulder switch is a control
     aim sway responds to movement and gun skill
     bullets that can pass through targets
     armor & armor piercing
     modernize some controls:
         weapon / item wheel
-        click to select interactive surfaces without selecting burglar tools.
+        *  click to select interactive surfaces without selecting burglar tools.
 
 sound
     ambience
@@ -2671,10 +2706,9 @@ sound
 
 stealth:
     silencers affect graphic
-    more / better sequences besides alarm / no alarm; search level state.
+    * more / better sequences besides alarm / no alarm; search level state.
     NPC should look in direction of last noise
-
-    stealth kill?
+    stealth kill
     be able to shoot out lights
 
 VR mission designer
@@ -2682,18 +2716,12 @@ VR mission designer
     survive x waves of y NPCS
     inventory management
 
-
 code-controlled shoot animation
     fix shooting animation and automatic interval
     faster shotgun
         click to rack faster?
         raise - shoot - pump
         animator speed can be adjusted
-
-skills
-    gun skills
-    speech skills
-    lockpicking skills
 
 nimrod for texts
 
@@ -2707,17 +2735,18 @@ planning mode
     optional objectives
     HP / def indicators
 
-    on mouseover picker: change stat viewer
-        smooth rolling stat bars when values change
-        compare stats +/-
+    * on mouseover picker: change stat viewer
+        * smooth rolling stat bars when values change
+        * compare stats +/-
     mission plan mapview 
         support multiple scenes per level
         disable selectors when necessary
         markers gated behind tactical data
     tactics pane
+        disable when no tactoics
         purchase keycard
         activate cyberattack
-        clickable active tactics show description
+        * clickable active tactics show description
         buy info
             locate key objectives
             locate key items
@@ -2728,7 +2757,6 @@ planning mode
         when map data is bought, show notification on map tab
 
 minimap
-
     orient relative to main camera
     highlight enemies in red
         show sightcone
@@ -2758,20 +2786,17 @@ NPC tuning:
         accuracy
         shooting behavior
             quickness, bursts
-
     guard HQ potentially notices disabled cameras and sensors
     strike team seems to have a hard time investigating repeated explosions
     guards get stuck in the narrow corridor
     guards should pause in patrol only not around other guards.
 
-silenced gun is still OP
-    seeing corpse or bullets -> high alert, easier to see player
+
 anti-camping visibility boost
     guards are aware of your aggression 
     haven't moved in a while
     have shot more than once or twice?
 damage result addition is weird
-billboard interloper shader should be cutout, or something is up with interloper shader + shells
 
 networks
     marching ants?
@@ -2882,16 +2907,16 @@ graphics
     title screen animations 
     helicopters for skybox
 guns:
-    silenced pistol
     fix silenced smg
 icons:
     redraw others?
 padlock
 disguise tactic icon
 fake id tactic icon
-random loot spots
-loot drops
+* random loot spots
+    * silenced pistol
 
+loot drops
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
 
@@ -2940,19 +2965,14 @@ shop todo:
 graphics:
     swat spritesheet finish
     trees / plants / outside decor
-    tents
+    * tents
     sprite props
         knives / swords / shuriken
         ground wires
         ground decals
     bar curve
     subway entrance
-    neon lights
-        neon ring around the signage name
-        "GUNS" sign
-        how do i do neon?
-            aesthetic 1: white light, red rim
-            aesthetic 2: bright light, wall behind it is super red
+    * neon lights
     graffiti
         bört
         karmadillo
@@ -2998,30 +3018,24 @@ world:
     more randomizable NPC
         random selection of head, torso, legs
         sometimes, torso + legs are set dependently.
-world:
     telephone sales contact
         world map with telephone numbers.
         choose your contact and pop up a trade dialogue
-fix transformer door
+
 
 radial menu for selecting guns and items?
     unify items and guns
-what happened to the sphere robot?
-ladders
-
-
 guards can see through doors
 guard saw me as he walked around the other corner: lock on?
 better sounds for wire, attach
 better sounds for mission computer
 guard hearing other guard gunshot
-
+guard looking at what other guard is shooting at
 silencer shows in gameplay
 ensure all shops and menus are idiot proof: 
     if the player can take no action, tell them explicitly.
     if you can't make the deal, make that explicit
 health persists between missions
-
 map pane:
     show type of location? city view? territory?
     show view of terrain?
@@ -3031,79 +3045,66 @@ item selector clear slot
 display information about items in loadout
 anderson portrait
 hiding affects bodies
-trees, bushes, etc
-
-basic game:
-    progression:
-        1. restrict weapons at gun shop
-        3. adjust the pay / rewards
-    gameplay:
-        more levels
-        more mods
-    make loot mechanics playable:
-        randomized deals
-        randomized bar markets
-        more loot
-        more fences
-
-smooth mouse aim
-
 players face in dialogue controller is stretched
 "insideAttackSurface"
 health does not carry over
 rocket launcher not fully done
-can do a deal multiple times
 some way to distract guards
-saving/loading breaks deals
+sphere robot
+eventual police response
+alarm disable is bugged
+can do a deal multiple times
 raycast to interactive when using
 
+
 major initiatives:
-    loot and loot store mechanics
-    portraits, character art, spritesheets
+    portraits
+    spritesheets
+    more fences
     music
         auto leveling, balance, ducking
     missions
-        7-11 to start
-        some basic combat, sneakiness
-    after mission reports, skill tree
-    pause screen status report
-        loot, data
-        weapons, loadout, 
-        character stats, skills
+        yamachi electronics B&E
+        1 way shootout
+    after mission reports
+        skill tree
     system:
-        controls, audio
+        controls, settings
+        pause screen status report
+            loot, data
+            weapons, loadout, 
+            character stats, skills
 unresolved mechanics:
-    skill tree
     dialogue
     hacking
 shops:
     sell guns
-    market and deals
+    more fence
+    randomize deals
+    randomize markets
+    buy cyberware
+
+7-11 unlocks the other missions
+receptionist at tower
 
 
-* on alarm activate, notify all npcs.
-* guard response?
-    * NPCs
-       *  an alarm can go off, drawing patrols from outside / the back
-* wave arms when panicking
-* worker activates alarm when player is suspicious
-    * witnessing something aggro: run for the alarm
-    * witnessing something suspicious:
-        * hands up
-        * when player stops looking, run for the alarm
-* player is suspicious when robbing the register
-* include clearState in all the state change logic of NPC AI
 
+yamachi:
+    trees and plants
+    keys for locks
+        can be in the back room
+    smooth mouse aim
+    wall with vent hole
+    objectives
+        steal the prototype
+    doors:
+        1. inside vs outside facing locks
+        2. lock difficulty adjusts with level security
+        3. door readability
+        4. lintels over doors
+        5. more door types? more explotable latch?
+        6. locks for doubledoors
 
-habilitate the 7-11 episode
-    sphere robot
-
-
-civilian startle when seeing gun
-    if just suspicious player but nothing else going on, just !
-    if anything else (alarm, etc.?) then flee
-draw an alarm button
-generalize "findNearBy"
-eventual police response
-alarm disable is bugged
-
+    the high ceilings pose a problem, makes it easy to lose track of the guards.
+    also creates an environment that is hard to understand.
+    redo the walls?

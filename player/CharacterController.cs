@@ -185,6 +185,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
     bool armsRaised;
 
+    float inBushesTimer;
+
     static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
     public void TransitionToState(CharacterState newState) {
@@ -1036,7 +1038,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
                 // wall style input is relative to the wall normal
                 targetMovementVelocity = (Vector3.Cross(wallNormal, Motor.GroundingStatus.GroundNormal) * _moveAxis.x - wallNormal * _moveAxis.y) * MaxStableMoveSpeed * 0.5f;
-
+                if (inBushesTimer > 0) {
+                    targetMovementVelocity /= 2f;
+                }
                 // transition from wall press 
                 if (!pressingOnWall) {
                     TransitionToState(CharacterState.normal);
@@ -1106,7 +1110,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     Vector3 inputRight = Vector3.Cross(_moveInputVector, Vector3.up);
                     Vector3 reorientedInput = Vector3.Cross(Motor.GroundingStatus.GroundNormal, inputRight).normalized * _moveInputVector.magnitude;
                     targetMovementVelocity = reorientedInput * MaxStableMoveSpeed;
-
+                    if (inBushesTimer > 0) {
+                        targetMovementVelocity /= 2f;
+                    }
                     if (state == CharacterState.aim) {
                         if (isCrouching) {
                             targetMovementVelocity = Vector3.zero;
@@ -1526,6 +1532,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     void LateUpdate() {
         OnValueChanged?.Invoke(this);
+        if (inBushesTimer > 0) {
+            inBushesTimer -= Time.deltaTime;
+        }
     }
 
     public void OnPoolActivate() {
@@ -1546,5 +1555,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         deadTimer = 0f;
         hitstunTimer = 0f;
         gunHitStunTimer = 0f;
+    }
+
+    public void EnterBush() {
+        inBushesTimer = 0.25f;
     }
 }

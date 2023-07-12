@@ -110,9 +110,9 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void SetDealData() {
         gameData.dealData = new List<DealData>() {
-            DealData.FromLootData(Resources.Load("data/loot/rush") as LootData, 10, LootCategory.drug, 3,
+            DealData.FromLootData(Resources.Load("data/loot/drug/rush") as LootData, 10, LootCategory.drug, 3,
                 "Somehow I ended up with too much of this stuff. Can you take it off my hands?"),
-            DealData.FromLootData(Resources.Load("data/loot/zyme") as LootData, 3, LootCategory.drug, 2,
+            DealData.FromLootData(Resources.Load("data/loot/drug/zyme") as LootData, 3, LootCategory.drug, 2,
                 "A big crate of zyme fell off the truck at the docks. Now I have to move it, pronto."
             ),
         };

@@ -81,6 +81,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     void EnterDefaultState() {
+        // Debug.Log($"initialize NPC AI with patrol route: {patrolRoute}");
         if (patrolRoute != null) {
             ChangeState(new SpherePatrolState(this, patrolRoute, characterController));
         } else {
@@ -217,9 +218,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             Collider collider = nearbyOthers[i];
             if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(transform))
                 continue;
-            SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
-            if (otherAI != null) {
-                otherTransforms.Add(otherAI.transform);
+            // SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
+            if (collider.CompareTag("actor")) {
+                otherTransforms.Add(collider.transform);
             }
         }
     }

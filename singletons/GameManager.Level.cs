@@ -338,6 +338,12 @@ public partial class GameManager : Singleton<GameManager> {
         ClearSceneData();
         // inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
+        if (characterCamera == null) {
+            Debug.Break();
+        }
+        if (InputController.I == null) {
+            Debug.Break();
+        }
         InputController.I.OrbitCamera = characterCamera;
         characterCamera.outlineEffect.Initialize();
         foreach (Outline outline in GameObject.FindObjectsOfType<Outline>()) {
