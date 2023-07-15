@@ -6,6 +6,7 @@ public class NPCSpawnPoint : MonoBehaviour {
     public bool isStrikeTeamSpawn;
     public GameObject spawnEffect;
     public NPCTemplate myTemplate;
+    public PatrolRoute[] patrolRoutes;
     PrefabPool effectPool;
     PrefabPool NPCPool;
     void Start() {
@@ -22,7 +23,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         effectPool.GetObject(transform.position);
         GameObject npc = NPCPool.GetObject(transform.position);
 
-        PatrolRoute route = Toolbox.RandomFromList(GameObject.FindObjectsOfType<PatrolRoute>());
+        PatrolRoute route = Toolbox.RandomFromList(patrolRoutes != null && patrolRoutes.Length > 0 ? patrolRoutes : GameObject.FindObjectsOfType<PatrolRoute>());
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
 
         CharacterController controller = npc.GetComponentInChildren<CharacterController>();

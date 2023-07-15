@@ -83,7 +83,7 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
         if (applyModifiers) {
-            bool alarmActive = gameData.levelState.anyAlarmActive();
+            bool alarmActive = gameData.levelState.anyAlarmTerminalActivated();
             bool disguiseActive = gameData.levelState.delta.disguise;
             if (alarmActive && !disguiseActive) {
                 if (reaction == Reaction.ignore) {

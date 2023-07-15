@@ -56,7 +56,7 @@ public class Footsteps : MonoBehaviour {
                 bool player = false;
                 if (GameManager.I.gameData?.levelState?.delta != null) {
                     player = transform.IsChildOf(GameManager.I.playerObject.transform) &&
-                                !(GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmActive());
+                                !(GameManager.I.gameData.levelState.delta.disguise && !GameManager.I.gameData.levelState.anyAlarmTerminalActivated());
                 }
 
 

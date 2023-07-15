@@ -27,12 +27,12 @@ public class VRMissionController : MonoBehaviour {
 
         CharacterController playerController = GameManager.I.playerObject.GetComponentInChildren<CharacterController>();
         playerController.OnCharacterDead += HandlePlayerDead;
-        int NPCPoolSize = state.template.numberConcurrentNPCs + GameManager.I.gameData.levelState.delta.strikeTeamMaxSize;
+        int NPCPoolSize = state.template.numberConcurrentNPCs + GameManager.I.gameData.levelState.template.strikeTeamMaxSize;
         // Debug.Log($"initializing NPC pool with size {NPCPoolSize}");
         PoolManager.I.RegisterPool("prefabs/NPC", poolSize: NPCPoolSize);
         spawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToArray();
         if (!state.template.alarmHQEnabled) {
-            AlarmHQTerminal levelHQTerminal = GameManager.I.levelHQTerminal();
+            AlarmRadio levelHQTerminal = GameManager.I.levelRadioTerminal();
             if (levelHQTerminal != null) {
                 GameManager.I.RemoveAlarmNode(levelHQTerminal.idn);
             }

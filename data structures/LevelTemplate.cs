@@ -34,9 +34,15 @@ public class LevelTemplate : ScriptableObject {
     public SensitivityLevel sensitivityLevel;
     public AudioClip alarmAudioClip;
     public float strikeTeamResponseTime;
+    public float strikeTeamSpawnInterval = 0.5f;
+    public float npcSpawnInterval = 2f;
     public NPCTemplate strikeTeamTemplate;
+
     public int maxInitialNPC;
+    public int minNPC;
+    public int strikeTeamMaxSize = 3;
     public int maxNPC;
+
 
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/levels/{name}/{name}") as LevelTemplate);

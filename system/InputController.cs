@@ -11,7 +11,10 @@ using UnityEngine.InputSystem.LowLevel;
 public class InputController : Singleton<InputController> {
     public CharacterCamera OrbitCamera;
     public List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
+    [Header("mouse")]
 
+    public Vector2 sensitivity = new Vector2(2f, 2f);
+    public Vector2 smoothing = new Vector2(2f, 2f);
     [Header("Inputs")]
     // public InputActionReference escapeAction;
     public InputActionReference MoveAction;
@@ -60,6 +63,7 @@ public class InputController : Singleton<InputController> {
     private bool useItemThisFrame;
     // private bool escapePressedThisFrame;
     // private bool escapePressConsumed;
+    Vector2 _smoothMouse;
     Vector2 previousMouseDelta;
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
         inputVector = ctx.ReadValue<Vector2>();
@@ -275,8 +279,32 @@ public class InputController : Singleton<InputController> {
 
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector2 viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
+
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
+
+
+
+        // Allow the script to clamp based on a desired target value.
+        // var targetOrientation = Quaternion.Euler(targetDirection);
+        // var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
+
+        // Get raw mouse input for a cleaner reading on more sensitive mice.
+        // var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+
+        // Scale input against the sensitivity setting and multiply that against the smoothing value.
+
+
+        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
+
+        // Interpolate mouse movement over time to apply smoothing delta.
+        _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
+        _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
+
+        // Find the absolute mouse movement value from point zero.
+        // _mouseAbsolute += _smoothMouse;
+
+
 
         CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;
@@ -292,7 +320,7 @@ public class InputController : Singleton<InputController> {
             characterInputs = new PlayerInput() {
                 MoveAxisForward = inputVector.y,
                 MoveAxisRight = inputVector.x,
-                mouseDelta = mouseDelta,
+                mouseDelta = _smoothMouse,
                 CameraRotation = OrbitCamera.isometricRotation,
                 JumpDown = jumpPressedThisFrame,
                 jumpHeld = jumpHeld,

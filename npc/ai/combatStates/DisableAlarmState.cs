@@ -14,7 +14,7 @@ public class DisableAlarmState : SphereControlState {
 
     void SetupRootNode() {
         LevelState levelData = GameManager.I.gameData.levelState;
-        if (GameManager.I.levelHQTerminal() != null) {
+        if (GameManager.I.levelRadioTerminal() != null) {
             HQReport report = new HQReport {
                 reporter = owner.gameObject,
                 desiredAlarmState = HQReport.AlarmChange.cancelAlarm,

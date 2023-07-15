@@ -193,7 +193,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             disguiseChevronRect.sizeDelta = new Vector2(215f, factor * 33f);
             bottomSpacerRect.sizeDelta = new Vector2(215f, factor * 33f);
         }
-        if (GameManager.I.gameData.levelState.anyAlarmActive()) {
+        if (GameManager.I.gameData.levelState.anyAlarmTerminalActivated()) {
             Rect fillBarRect = alarmFillBarRectTransform.rect;
             float factor = 150f * (GameManager.I.alarmCountdown() / 30f);
             alarmFillBarRectTransform.sizeDelta = new Vector2(factor, 1f);
@@ -248,7 +248,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
                 suspicionAggressiveLight.color = lightRedActive;
                 break;
         }
-        bool alarmActive = GameManager.I.gameData.levelState.anyAlarmActive();
+        bool alarmActive = GameManager.I.gameData.levelState.anyAlarmTerminalActivated();
         bool disguiseActive = GameManager.I.gameData.levelState.delta.disguise;
         SensitivityLevel sensitivityLevel = GameManager.I.gameData.levelState.template.sensitivityLevel;
         switch (reaction) {

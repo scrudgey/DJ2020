@@ -34,7 +34,7 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
         }
     }
 
-    public bool anyAlarmActive() => nodes.Values
+    public bool anyAlarmTerminalActivated() => nodes.Values
             .Where(node => GameManager.I.GetAlarmComponent(node.idn) is AlarmTerminal)
             .Any(node => node.alarmTriggered);
 

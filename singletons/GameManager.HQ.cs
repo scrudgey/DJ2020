@@ -5,32 +5,28 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
-    public AudioClip alarmSound;
+
+    public enum GuardPhase { normal, strikeTeam }
     public float alarmSoundTimer;
     public float alarmSoundInterval;
-    // int strikeTeamCount = 0;
-    float strikeTeamSpawnInterval = 0.5f;
-    // float strikeTeamSpawnTimer = 0f;
-    // float strikeTeamResponseTimer = 0f;
     Vector3 locationOfLastDisturbance;
     public GameObject lastStrikeTeamMember;
-    // this should be part of level state.
+    // can't be part of level state: not serializable?
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
     public Action<GameObject> OnNPCSpawn;
 
-    public void ActivateHQRadio() {
-        AlarmHQTerminal terminal = levelHQTerminal();
+    public void ActivateHQRadioNode() {
+        AlarmRadio terminal = levelRadioTerminal();
         if (terminal != null) {
             AlarmNode node = GetAlarmNode(terminal.idn);
             node.alarmTriggered = true;
             node.countdownTimer = 30f;
             RefreshAlarmGraph();
-            SetLevelAlarmActive();
         }
     }
     public void SetLevelAlarmActive() {
-        if (gameData.levelState.anyAlarmActive()) {
+        if (gameData.levelState.anyAlarmTerminalActivated()) {
 
         } else {
             alarmSoundTimer = alarmSoundInterval;
@@ -54,9 +50,9 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return false;
     }
-    public AlarmHQTerminal levelHQTerminal() => alarmComponents.Values
-                    .Where(node => node != null & node is AlarmHQTerminal)
-                    .Select(component => (AlarmHQTerminal)component)
+    public AlarmRadio levelRadioTerminal() => alarmComponents.Values
+                    .Where(node => node != null & node is AlarmRadio)
+                    .Select(component => (AlarmRadio)component)
                     .FirstOrDefault();
 
     public void RemoveAlarmNode(string idn) {
@@ -75,12 +71,12 @@ public partial class GameManager : Singleton<GameManager> {
         // reset strike team 
 
         PrefabPool pool = PoolManager.I?.GetPool("prefabs/NPC");
-        if (pool != null)
-            gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
+        // if (pool != null)
+        //     gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
         gameData.levelState.delta.strikeTeamCount = 0;
     }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
-        if (levelHQTerminal() != null) {
+        if (levelRadioTerminal() != null) {
             if (reports == null) reports = new Dictionary<GameObject, HQReport>();
             if (reports.ContainsKey(reporter)) {
                 ContactReportTicket(reporter);
@@ -91,7 +87,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public bool ContactReportTicket(GameObject reporter) {
-        if (levelHQTerminal() != null) {
+        if (levelRadioTerminal() != null) {
             if (reports.ContainsKey(reporter)) {
                 HQReport report = reports[reporter];
                 report.timeOfLastContact = Time.time;
@@ -133,8 +129,12 @@ public partial class GameManager : Singleton<GameManager> {
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
         SetLocationOfDisturbance(kvp.Value.locationOfLastDisturbance);
         if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.raiseAlarm) {
-            ActivateHQRadio();
-            DisplayHQResponse("HQ: Understood. Dispatching strike team.");
+            ActivateHQRadioNode();
+            if (gameData.levelState.delta.guardPhase == GuardPhase.normal) {
+                DisplayHQResponse("HQ: Understood. Dispatching strike team.");
+            } else {
+                DisplayHQResponse("HQ: Understood. Remain vigilant.");
+            }
         } else if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.cancelAlarm) {
             DeactivateAlarm();
             DisplayHQResponse("HQ: Understood. Disabling alarm.");
@@ -159,7 +159,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void TimeOutReport(KeyValuePair<GameObject, HQReport> kvp) {
         DisplayHQResponse("HQ: What's going on? Respond!");
-        ActivateHQRadio();
+        ActivateHQRadioNode();
     }
     void DisplayHQResponse(String response) {
         OnCaptionChange(response);
@@ -183,27 +183,36 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void UpdateAlarm() {
-        if (gameData.levelState.anyAlarmActive()) {
-            if (strikeTeamSpawnPoint != null && levelHQTerminal() != null) { // TODO: check level data 
+        if (gameData.levelState.anyAlarmTerminalActivated()) {
+            if (strikeTeamSpawnPoint != null && levelRadioTerminal() != null) { // TODO: check level data 
                 UpdateStrikeTeamSpawn();
             }
             alarmSoundTimer += Time.deltaTime;
             if (alarmSoundTimer > alarmSoundInterval) {
                 alarmSoundTimer -= alarmSoundInterval;
-                audioSource.PlayOneShot(alarmSound);
+                audioSource.PlayOneShot(gameData.levelState.template.alarmAudioClip);
+            }
+        }
+        UpdateRegularGuardRespawn();
+    }
+    void UpdateRegularGuardRespawn() {
+        if (gameData.levelState.delta.npcCount < gameData.levelState.template.minNPC) {
+            gameData.levelState.delta.npcSpawnTimer += Time.deltaTime;
+            if (gameData.levelState.delta.npcSpawnTimer > gameData.levelState.template.npcSpawnInterval) {
+                gameData.levelState.delta.npcSpawnTimer -= gameData.levelState.template.npcSpawnInterval;
+                SpawnGuard();
             }
         }
     }
-
     void UpdateStrikeTeamSpawn() {
         // Debug.Log($"{strikeTeamCount} < {gameData.levelState.delta.strikeTeamMaxSize} {strikeTeamResponseTimer} < {gameData.levelState.template.strikeTeamResponseTime}");
-        if (gameData.levelState.delta.strikeTeamCount < gameData.levelState.delta.strikeTeamMaxSize) {
+        if (gameData.levelState.delta.strikeTeamCount < gameData.levelState.template.strikeTeamMaxSize) {
             if (gameData.levelState.delta.strikeTeamResponseTimer < gameData.levelState.template.strikeTeamResponseTime) {
                 gameData.levelState.delta.strikeTeamResponseTimer += Time.deltaTime;
             } else {
                 gameData.levelState.delta.strikeTeamSpawnTimer += Time.deltaTime;
-                if (gameData.levelState.delta.strikeTeamSpawnTimer > strikeTeamSpawnInterval) {
-                    gameData.levelState.delta.strikeTeamSpawnTimer -= strikeTeamSpawnInterval;
+                if (gameData.levelState.delta.strikeTeamSpawnTimer > gameData.levelState.template.strikeTeamSpawnInterval) {
+                    gameData.levelState.delta.strikeTeamSpawnTimer -= gameData.levelState.template.strikeTeamSpawnInterval;
                     SpawnStrikeTeamMember();
                 }
             }
@@ -212,7 +221,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     void SpawnStrikeTeamMember() {
         // Debug.Log($"****** spawn strike member: {gameData.levelState.delta.npcsSpawned} >= {gameData.levelState.template.maxNPC}?");
-        if (gameData.levelState.delta.npcsSpawned >= gameData.levelState.template.maxNPC) return;
+        if (gameData.levelState.delta.npcCount >= gameData.levelState.template.maxNPC) return;
         GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
         CharacterController controller = npc.GetComponent<CharacterController>();
@@ -228,7 +237,20 @@ public partial class GameManager : Singleton<GameManager> {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.left));
         }
         gameData.levelState.delta.strikeTeamCount += 1;
-        gameData.levelState.delta.npcsSpawned += 1;
+        gameData.levelState.delta.npcCount += 1;
+        OnNPCSpawn?.Invoke(npc);
+    }
+
+    void SpawnGuard() {
+        if (gameData.levelState.delta.npcCount >= gameData.levelState.template.maxNPC) return;
+        NPCSpawnPoint spawnPoint = Toolbox.RandomFromList(GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList());
+
+        GameObject npc = strikeTeamSpawnPoint.SpawnNPC(spawnPoint.myTemplate);
+        SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
+        CharacterController controller = npc.GetComponent<CharacterController>();
+        controller.OnCharacterDead += HandleNPCDead;
+
+        gameData.levelState.delta.npcCount += 1;
         OnNPCSpawn?.Invoke(npc);
     }
 

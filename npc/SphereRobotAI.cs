@@ -162,7 +162,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 EnterDefaultState();
                 break;
             case SphereAttackState:
-                if (!GameManager.I.gameData.levelState.anyAlarmActive()) {
+                if (!GameManager.I.gameData.levelState.anyAlarmTerminalActivated()) {
                     if (lastDamage != null) {
                         ChangeState(new ReportToHQState(this, speechTextController, lastDamage));
                     } else if (getLocationOfInterest() != Vector3.zero) {
@@ -232,33 +232,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         PlayerInput input = stateMachine.Update();
         input.preventWallPress = true;
 
-        // avoid bunching with boids algorithm
-        // if (!input.CrouchDown) {
-        //     // float avoidFactor = 0.1f;
-        //     // float avoidRadius = 2f;
-
-        //     // float avoidFactor = 1f;
-        //     // float avoidRadius = 0.5f;
-
-        //     float avoidFactor = 5f;
-        //     float avoidRadius = 0.2f;
-
-        //     int numColliders = Physics.OverlapSphereNonAlloc(transform.position, avoidRadius, nearbyOthers, LayerUtil.GetLayerMask(Layer.obj));
-        //     Vector3 closeness = Vector3.zero;
-        //     for (int i = 0; i < numColliders; i++) {
-        //         Collider collider = nearbyOthers[i];
-        //         if (collider == null || collider.gameObject == null)
-        //             continue;
-        //         if (collider.transform.IsChildOf(transform))
-        //             continue;
-        //         SphereRobotAI otherAI = collider.GetComponent<SphereRobotAI>();
-        //         if (otherAI != null) {
-        //             closeness += transform.position - otherAI.transform.position;
-        //         }
-        //     }
-        //     closeness.y = 0;
-        //     input.moveDirection += avoidFactor * closeness;
-        // }
+        // avoid bunching with boids algorithm 
         if (!input.CrouchDown) {
             Vector3 myPosition = transform.position;
             closeness = Vector3.zero;
@@ -558,13 +532,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 case StopAndListenState:
                 case SphereClearPointsState:
                     alertHandler.ShowAlert(useWarnMaterial: true);
-                    if (GameManager.I.gameData.levelState.anyAlarmActive()) {
+                    if (GameManager.I.gameData.levelState.anyAlarmTerminalActivated()) {
                         // alarm is already active; no need to handle reporting to HQ. run to firefight.
                         ChangeState(new SearchDirectionState(this, noise, characterController, doIntro: false, speedCoefficient: 2f));
                     } else {
                         if (dotFactor < 1f) {
                             // gunshots not directed at me; report to HQ and then run to battle
-                            if (GameManager.I.levelHQTerminal() != null && !GameManager.I.isAlarmRadioInProgress(gameObject)) {
+                            if (GameManager.I.levelRadioTerminal() != null && !GameManager.I.isAlarmRadioInProgress(gameObject)) {
                                 ChangeState(new ReportGunshotsState(this, speechTextController, noise));
                             } else {
                                 ChangeState(new SearchDirectionState(this, noise, characterController, doIntro: false, speedCoefficient: 2f));
@@ -684,8 +658,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         Reaction reaction = GameManager.I.GetSuspicionReaction(lastSuspicionLevel);
 
         Reaction unmodifiedReaction = GameManager.I.GetSuspicionReaction(lastSuspicionLevel, applyModifiers: false);
-        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelState.anyAlarmActive()) {
-            GameManager.I.ActivateHQRadio();
+        if (unmodifiedReaction == Reaction.attack && GameManager.I.gameData.levelState.anyAlarmTerminalActivated()) {
+            GameManager.I.ActivateHQRadioNode();
         }
 
         if (reaction == Reaction.investigate && recentlyInCombat) {

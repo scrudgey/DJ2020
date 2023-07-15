@@ -60,10 +60,10 @@ namespace UI {
             TestSuite.RunToolboxTests();
         }
         public void ToggleAlarm(string[] args) {
-            if (GameManager.I.gameData.levelState.anyAlarmActive())
+            if (GameManager.I.gameData.levelState.anyAlarmTerminalActivated())
                 GameManager.I.DeactivateAlarm();
             else
-                GameManager.I.ActivateHQRadio();
+                GameManager.I.ActivateHQRadioNode();
 
         }
         public void ToggleDisguise(string[] args) {

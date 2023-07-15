@@ -66,6 +66,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         // GunState gunState3 = GunState.Instantiate(gun3);
         // GunState gunState4 = GunState.Instantiate(gun4);
 
+        GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
+        // gunState1.delta.activeMods.Add(silencer);
+
         List<GunState> allGuns = new List<GunState>{
             gunState1,
             // gunState2,

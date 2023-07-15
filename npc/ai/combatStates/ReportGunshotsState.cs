@@ -49,7 +49,7 @@ public class ReportGunshotsState : SphereControlState {
             }, initialPause),
             new Selector(
                 new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
-                new TaskConditional(() => GameManager.I.levelHQTerminal() == null),
+                new TaskConditional(() => GameManager.I.levelRadioTerminal() == null),
                 new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
             )
         );

@@ -46,7 +46,7 @@ public class ReactToAttackState : SphereControlState {
     void SetupRootNode(float initialPause = 1f) {
         // TODO: write better code here
         LevelState levelData = GameManager.I.gameData.levelState;
-        if (GameManager.I.levelHQTerminal() != null && !levelData.anyAlarmActive()) {
+        if (GameManager.I.levelRadioTerminal() != null && !levelData.anyAlarmTerminalActivated()) {
             string speechText = type switch {
                 AttackType.damage => "HQ respond! Taking fire!",
                 AttackType.gunshots => "HQ respond! Shots fired!",
@@ -85,7 +85,7 @@ public class ReactToAttackState : SphereControlState {
                 }, 1.5f),
                 new Selector(
                     new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
-                    new TaskConditional(() => GameManager.I.levelHQTerminal() == null),
+                    new TaskConditional(() => GameManager.I.levelRadioTerminal() == null),
                     new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
                 )
             );

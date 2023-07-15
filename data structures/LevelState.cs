@@ -20,7 +20,6 @@ public class LevelState {
             powerGraph = PowerGraph.LoadAll(template.levelName),
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
-            strikeTeamMaxSize = 3,
             disguise = plan.startWithDisguise(),
             objectivesState = template.objectives
                 .ToDictionary(t => t, t => ObjectiveStatus.inProgress)
@@ -32,11 +31,11 @@ public class LevelState {
         delta = delta
     };
 
-    public bool anyAlarmActive() {
+    public bool anyAlarmTerminalActivated() {
         if (delta == null || delta.alarmGraph == null) {
             return false;
         } else {
-            return delta.alarmGraph.anyAlarmActive();
+            return delta.alarmGraph.anyAlarmTerminalActivated();
         }
     }
 

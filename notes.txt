@@ -3087,24 +3087,83 @@ shops:
 7-11 unlocks the other missions
 receptionist at tower
 
-
+* keys for locks
+* smooth mouse aim
+* objectives
+    * steal the prototype
+    * wall with vent hole
+* spawnpoints can specify patrol routes
 
 yamachi:
     trees and plants
-    keys for locks
-        can be in the back room
-    smooth mouse aim
-    wall with vent hole
-    objectives
-        steal the prototype
+    make vents work
+        double sided attack surface and vent
+        attack surface becomes disabled when used
+        crawlable vent holes
     doors:
         1. inside vs outside facing locks
+            doors can open from the inside
         2. lock difficulty adjusts with level security
         3. door readability
         4. lintels over doors
-        5. more door types? more explotable latch?
+        5. more door types? more explotable latch? more handles and things?
         6. locks for doubledoors
 
-    the high ceilings pose a problem, makes it easy to lose track of the guards.
-    also creates an environment that is hard to understand.
-    redo the walls?
+    the high ceilings pose a problem
+        environment is not readable.
+        easy to lose track of the guards.
+        redo the walls?
+        walls are too thick, too similar in color to the floor, or too dark?
+        minimap?
+
+
+
+concepts:
+    alarm object is triggered
+        * sets off local alarm
+        * opportunity to connect to alarm terminal and set off terminal alarm
+    terminal alarm is triggered 
+        * UI timer countdown indicates time left in alarm state
+        * when the alarm is set off, it changes guard behavior
+            * clear points
+        -> when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
+    radio interaction:
+        * task radio HQ
+        * call HQ to report a body
+        * call HQ to report gunshots
+        * call HQ to request alarm shutoff
+        -> response is handled differently depending on HQ state
+            opportunity to raise radio alarm node
+            oppoerunity to dispatch strike team
+            when a strike team is dispatched, respond differently
+        -> handle when radio mast is destroyed
+    spawning strike team
+        * today: if isAnyAlarmActive and the strike team spawn count is < max, spawn strike team
+        -> change: controlled by HQ logic.
+    completing strike team sequence
+        -> strike behavior when called: 
+            clear
+            * respond to location of last disturbance
+        -> strike team threshold for finish:
+            all points cleared
+            timer
+            * terminal alarm deactivated
+        -> strike team behavior when finished:
+            * cancel alarm
+            leave
+    -> canceling alarm is bugged
+        
+
+I.
+when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
+spawning strike team controlled by this logic.
+
+II.
+radio response is handled differently depending on HQ state
+handle when radio mast is destroyed
+
+III.
+strike behavior when called
+strike team threshold for finish
+strike team behavior when finished
+canceling alarm is bugged

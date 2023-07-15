@@ -263,7 +263,7 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
             Suspiciousness playerTotalSuspicion = GameManager.I.GetTotalSuspicion();
             if (playerTotalSuspicion >= Suspiciousness.suspicious) {
                 alertHandler.ShowAlert(useWarnMaterial: true);
-                if (GameManager.I.gameData.levelState.anyAlarmActive() || playerTotalSuspicion >= Suspiciousness.aggressive) {
+                if (GameManager.I.gameData.levelState.anyAlarmTerminalActivated() || playerTotalSuspicion >= Suspiciousness.aggressive) {
                     if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
                         ChangeState(new CivilianCowerState(this, characterController));
                     } else {

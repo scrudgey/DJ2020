@@ -94,13 +94,13 @@ public partial class GameManager : Singleton<GameManager> {
 
         // spawn NPC
         if (spawnNpcs) {
-            while (state.delta.npcsSpawned < state.template.maxInitialNPC) {
+            while (state.delta.npcCount < state.template.maxInitialNPC) {
                 foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).OrderBy(a => Guid.NewGuid()).ToList()) {
-                    if (state.delta.npcsSpawned >= state.template.maxInitialNPC) continue;
+                    if (state.delta.npcCount >= state.template.maxInitialNPC) continue;
                     GameObject npc = spawnPoint.SpawnTemplated();
                     CharacterController controller = npc.GetComponentInChildren<CharacterController>();
                     controller.OnCharacterDead += HandleNPCDead;
-                    state.delta.npcsSpawned += 1;
+                    state.delta.npcCount += 1;
                 }
             }
             foreach (WorkerSpawnPoint spawnPoint in GameObject.FindObjectsOfType<WorkerSpawnPoint>()) {
@@ -153,7 +153,7 @@ public partial class GameManager : Singleton<GameManager> {
         StartCoroutine(WaitAndShowMissionFinish());
     }
     void HandleNPCDead(CharacterController npc) {
-        gameData.levelState.delta.npcsSpawned -= 1;
+        gameData.levelState.delta.npcCount -= 1;
         npc.OnCharacterDead -= HandleNPCDead;
     }
 
@@ -401,7 +401,7 @@ public partial class GameManager : Singleton<GameManager> {
         RefreshAlarmGraph();
 
         alarmSoundInterval = 2f;
-        alarmSound = gameData.levelState.template.alarmAudioClip;
+        // alarmSound = gameData.levelState.template.alarmAudioClip;
         strikeTeamSpawnPoint = GameObject.FindObjectsOfType<NPCSpawnPoint>().FirstOrDefault(spawn => spawn.isStrikeTeamSpawn);
 
         OnSuspicionChange?.Invoke();
@@ -556,7 +556,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         gameData.levelState.delta.cyberGraph.Refresh();
 
-        TransferCyberState();
+        TransferCyberStateFromGraphToComponents();
 
         // propagate changes to UI
         OnCyberGraphChange?.Invoke(gameData.levelState.delta.cyberGraph);
@@ -566,13 +566,12 @@ public partial class GameManager : Singleton<GameManager> {
         // determine if any active alarm object reaches a terminal
         gameData.levelState.delta.alarmGraph.Refresh();
 
-        TransferAlarmState();
+        TransferAlarmStateFromGraphToComponents();
 
         // propagate changes to UI
         OnAlarmGraphChange?.Invoke(gameData.levelState.delta.alarmGraph);
 
-        bool alarmActive = gameData.levelState.anyAlarmActive();
-        if (alarmActive) {
+        if (gameData.levelState.anyAlarmTerminalActivated()) {
             SetLevelAlarmActive();
         } else {
             DeactivateAlarm();
@@ -585,12 +584,12 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.levelState.delta.powerGraph.Refresh();
 
         // propagate the changes to local state
-        TransferPowerState();
+        TransferPowerStateFromGraphToComponents();
 
         // propagate changes to UI
         OnPowerGraphChange?.Invoke(gameData.levelState.delta.powerGraph);
     }
-    void TransferPowerState() {
+    void TransferPowerStateFromGraphToComponents() {
         if (poweredComponents == null)
             return;
         foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelState.delta.powerGraph.nodes) {
@@ -601,7 +600,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
     }
-    void TransferCyberState() {
+    void TransferCyberStateFromGraphToComponents() {
         if (cyberComponents == null)
             return;
         foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelState.delta.cyberGraph.nodes) {
@@ -612,7 +611,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
     }
-    void TransferAlarmState() {
+    void TransferAlarmStateFromGraphToComponents() {
         if (alarmComponents == null)
             return;
         foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelState.delta.alarmGraph.nodes) {
@@ -645,7 +644,7 @@ public partial class GameManager : Singleton<GameManager> {
         levelState = gameData.levelState,
         suspicionRecords = suspicionRecords,
         playerSuspiciousness = GetTotalSuspicion(),
-        alarmActive = gameData.levelState.delta.alarmGraph.anyAlarmActive(),
+        alarmActive = gameData.levelState.delta.alarmGraph.anyAlarmTerminalActivated(),
         playerInDisguise = gameData.levelState.delta.disguise,
         playerSpeechSkill = gameData.playerState.speechSkillLevel,
         playerHasID = gameData.levelState.PlayerHasID()
