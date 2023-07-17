@@ -20,7 +20,7 @@ public class DisableAlarmState : SphereControlState {
                 desiredAlarmState = HQReport.AlarmChange.cancelAlarm,
                 locationOfLastDisturbance = owner.getLocationOfInterest(),
                 timeOfLastContact = Time.time,
-                lifetime = 6f,
+                lifetime = 5f,
                 speechText = "HQ respond. All clear."
             };
             rootTaskNode = new TaskTimerDectorator(new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report), 6.5f);
@@ -31,10 +31,8 @@ public class DisableAlarmState : SphereControlState {
 
     public override PlayerInput Update(ref PlayerInput input) {
         TaskState result = rootTaskNode.Evaluate(ref input);
-        if (result == TaskState.success) {
-            owner.StateFinished(this);
-        } else if (result == TaskState.failure) {
-            owner.StateFinished(this);
+        if (result == TaskState.success || result == TaskState.failure) {
+            owner.StateFinished(this, result);
         }
         return input;
     }

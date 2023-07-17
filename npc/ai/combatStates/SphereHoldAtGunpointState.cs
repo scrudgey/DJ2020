@@ -31,11 +31,11 @@ public class SphereHoldAtGunpointState : SphereControlState {
         // Debug.Log($"gunpoint: {timeSinceSawPlayer} {integratedPlayerMovement}");
         if (isPlayerVisible()) {
             if (integratedPlayerMovement <= 0) {
-                owner.StateFinished(this);
+                owner.StateFinished(this, TaskState.success);
             } else if (isPlayerSuspicious()) {
                 SuspicionRecord record = SuspicionRecord.fledSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
-                owner.StateFinished(this);
+                owner.StateFinished(this, TaskState.success);
             }
             if (integratedPlayerMovement > 0) {
                 integratedPlayerMovement -= Time.deltaTime * 1.5f;
@@ -45,7 +45,7 @@ public class SphereHoldAtGunpointState : SphereControlState {
             // transfer to attack state
             SuspicionRecord record = SuspicionRecord.fledSuspicion();
             GameManager.I.AddSuspicionRecord(record);
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.failure);
             integratedPlayerMovement += 1.5f * Time.deltaTime;
         }
         input.lookAtPosition = lastSeenPlayerPosition;

@@ -23,7 +23,10 @@ public record LevelDelta {
     public List<PayData> levelAcquiredPaydata;
     public HashSet<string> levelInteractedObjects;
     public List<LootData> levelAcquiredLoot;
-    public GameManager.GuardPhase guardPhase;
+    public GameManager.HQPhase hqPhase;
+    public bool alarmTerminalActive;
+    public float strikeTeamMissionTimer;
+    public LevelTemplate.StrikeTeamResponseBehavior strikeTeamBehavior;
     public static LevelDelta Empty() => new LevelDelta {
         objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
         failedObjectives = new HashSet<Objective>(),

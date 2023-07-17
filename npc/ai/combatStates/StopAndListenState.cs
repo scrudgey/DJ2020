@@ -53,11 +53,11 @@ public class StopAndListenState : SphereControlState {
     public override PlayerInput Update(ref PlayerInput input) {
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.success);
         }
         TaskState result = rootTaskNode.Evaluate(ref input);
         if (result == TaskState.success) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.success);
         }
         return input;
     }
@@ -71,12 +71,12 @@ public class StopAndListenState : SphereControlState {
 
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 suspicionHeard = true;
-                owner.StateFinished(this);
+                owner.StateFinished(this, TaskState.success);
             }
             if (noise.data.isFootsteps) {
                 numberFootstepsHeard += 1;
                 if (numberFootstepsHeard > 2) {
-                    owner.StateFinished(this);
+                    owner.StateFinished(this, TaskState.success);
                 }
             }
 

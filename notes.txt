@@ -3154,16 +3154,39 @@ concepts:
     -> canceling alarm is bugged
         
 
-I.
-when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
-spawning strike team controlled by this logic.
+* when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
+* spawning strike team controlled by this logic.
+* today: spawning will continue until alarm is deactivated. it should stop after the full team has spawned or limit reached.
+* change: a spawnStrikeTeam phase that completes and changes to strike team dispatched
+* change: deactivating alarm does not affect strike team effort.
+* change: transition from strikeTeamMission to normal
+* decrement strike team count when one is killed.
+* handle the case where the entire strike team is wiped but state is not reset
+* strike behavior when called:
+    * if gunshots or body discovered:
+        * respond to location of interest, then clear
+    * else:
+        * clear
+* strike team threshold for finish
+    * timer
+    * all points clear
+* strike team behavior when finished
+    * patrol
+    * leave
+    1. use interaction testbed or a VR level
+        * set up clear points
+        * trigger an alarm: watch strike team clear
+        * shoot a gun: watch NPC investigate
+* radio response is handled differently depending on HQ state
+* canceling alarm is bugged
+* then test multiple waves of strike team
+* in strike team mission, reset timer on certain conditions
 
-II.
-radio response is handled differently depending on HQ state
+
 handle when radio mast is destroyed
 
-III.
-strike behavior when called
-strike team threshold for finish
-strike team behavior when finished
-canceling alarm is bugged
+
+
+current total income:
+248,144 = 179,000 * 1.1 + 55,675
+current salary, bonus, and estimating an extra 10k for katie

@@ -123,13 +123,13 @@ public class SphereInvestigateState : SphereControlState {
         }
 
         if (isPlayerAggressive()) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.success);
         }
 
         if (!isPlayerSuspicious() && lookingAtPlayer()) {
             result = rootTaskNode.Evaluate(ref input);
             if (result == TaskState.failure || result == TaskState.success) {
-                owner.StateFinished(this);
+                owner.StateFinished(this, TaskState.success);
             }
         } else {
             if (saidHeyTimeout <= 0) {
@@ -139,7 +139,7 @@ public class SphereInvestigateState : SphereControlState {
             if (!lookingAtPlayer()) {
                 result = alertTaskNode.Evaluate(ref input);
                 if (result == TaskState.success) {
-                    owner.StateFinished(this);
+                    owner.StateFinished(this, TaskState.success);
                 }
             }
         }
@@ -161,7 +161,7 @@ public class SphereInvestigateState : SphereControlState {
     public void HandleDialogueResult(DialogueController.DialogueResult result) {
         DialogueController.OnDialogueConclude -= HandleDialogueResult;
         dialogueResult = result;
-        owner.StateFinished(this);
+        owner.StateFinished(this, TaskState.success);
     }
 
     public override void OnObjectPerceived(Collider other) {

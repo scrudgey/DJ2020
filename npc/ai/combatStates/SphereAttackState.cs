@@ -55,7 +55,7 @@ public class SphereAttackState : SphereControlState {
         timeSinceSawPlayer += Time.deltaTime;
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.success);
         }
         rootTaskNode.Evaluate(ref input);
         return input;

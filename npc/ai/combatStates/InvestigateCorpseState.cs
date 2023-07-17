@@ -63,7 +63,7 @@ public class InvestigateCorpseState : SphereControlState {
         }
         if (result == TaskState.success || result == TaskState.failure) {
             GameManager.I.AddSuspicionRecord(record);
-            owner.StateFinished(this);
+            owner.StateFinished(this, result);
         }
         return input;
     }

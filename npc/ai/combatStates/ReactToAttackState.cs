@@ -116,13 +116,11 @@ public class ReactToAttackState : SphereControlState {
     public override PlayerInput Update(ref PlayerInput input) {
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.success);
         }
         TaskState result = rootTaskNode.Evaluate(ref input);
-        if (result == TaskState.success) {
-            owner.StateFinished(this);
-        } else if (result == TaskState.failure) {
-            owner.StateFinished(this);
+        if (result == TaskState.success || result == TaskState.failure) {
+            owner.StateFinished(this, result);
         }
         return input;
     }

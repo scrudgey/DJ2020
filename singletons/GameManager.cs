@@ -415,8 +415,10 @@ public partial class GameManager : Singleton<GameManager> {
         } else if (gameData.phase == GamePhase.levelPlay || gameData.phase == GamePhase.vrMission) {
             UpdateSuspicion();
             UpdateAlarm();
+            UpdateNPCSpawning();
             UpdateReportTickets();
             UpdateGraphs();
+
             if (cutsceneIsRunning) {
                 playerCharacterController.ResetMovement();
             } else {

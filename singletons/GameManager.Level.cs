@@ -89,7 +89,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         InitializeLevel(state.plan);
         LoadSkyboxForScene(state.template.sceneName);
-
+        GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
         // spawn NPC
@@ -149,12 +149,25 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
-        // FinishMission();
         StartCoroutine(WaitAndShowMissionFinish());
     }
     void HandleNPCDead(CharacterController npc) {
+        RemoveNPC(npc);
+    }
+
+    public void RemoveNPC(CharacterController npc) {
         gameData.levelState.delta.npcCount -= 1;
         npc.OnCharacterDead -= HandleNPCDead;
+        if (npc.isStrikeTeamMember) {
+            RemoveStrikeTeamMember(npc);
+        }
+    }
+    public void RemoveStrikeTeamMember(CharacterController npc) {
+        gameData.levelState.delta.strikeTeamCount -= 1;
+        strikeTeamMembers.Remove(npc);
+        if (gameData.levelState.delta.strikeTeamCount == 0) {
+            ChangeHQPhase(HQPhase.normal);
+        }
     }
 
     IEnumerator WaitAndShowMissionFinish() {
@@ -331,6 +344,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         // TODO: this stuff should belong to level state
         reports = new Dictionary<GameObject, HQReport>();
+        strikeTeamMembers = new List<CharacterController>();
         suspicionRecords = new Dictionary<string, SuspicionRecord>();
         lastObjectivesStatusHashCode = -1;
     }
@@ -572,7 +586,7 @@ public partial class GameManager : Singleton<GameManager> {
         OnAlarmGraphChange?.Invoke(gameData.levelState.delta.alarmGraph);
 
         if (gameData.levelState.anyAlarmTerminalActivated()) {
-            SetLevelAlarmActive();
+            ActivateLevelAlarm();
         } else {
             DeactivateAlarm();
         }

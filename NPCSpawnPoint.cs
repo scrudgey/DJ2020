@@ -33,6 +33,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         legsAnimation.characterCamera = cam;
         controller.OrbitCamera = cam;
         ai.patrolRoute = route;
+        ai.prefabPool = NPCPool;
 
         // should be part of apply state?
         ai.etiquettes = template.etiquettes;

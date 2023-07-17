@@ -6,41 +6,71 @@ using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
 
-    public enum GuardPhase { normal, strikeTeam }
+    public enum HQPhase { normal, dispatchStrikeTeam, strikeTeamMission }
     public float alarmSoundTimer;
     public float alarmSoundInterval;
-    Vector3 locationOfLastDisturbance;
-    public GameObject lastStrikeTeamMember;
+
     // can't be part of level state: not serializable?
+    public Vector3 locationOfLastDisturbance;
+    public GameObject lastStrikeTeamMember;
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
     public Action<GameObject> OnNPCSpawn;
 
+    List<CharacterController> strikeTeamMembers;
+
     public void ActivateHQRadioNode() {
         AlarmRadio terminal = levelRadioTerminal();
         if (terminal != null) {
-            AlarmNode node = GetAlarmNode(terminal.idn);
-            node.alarmTriggered = true;
-            node.countdownTimer = 30f;
-            RefreshAlarmGraph();
+            SetAlarmNodeState(terminal, true);
         }
     }
-    public void SetLevelAlarmActive() {
-        if (gameData.levelState.anyAlarmTerminalActivated()) {
+    void ChangeHQPhase(HQPhase newPhase) {
+        // Debug.Log($"**** CHANGING HQ PHASE {newPhase}");
+        gameData.levelState.delta.hqPhase = newPhase;
+        if (newPhase == HQPhase.normal || newPhase == HQPhase.dispatchStrikeTeam) {
+            gameData.levelState.delta.strikeTeamMissionTimer = 0f;
+        }
+    }
+    public void ActivateLevelAlarm() {
+        gameData.levelState.delta.strikeTeamMissionTimer = 0f;
+        if (!gameData.levelState.delta.alarmTerminalActive) {
+            if (gameData.levelState.delta.hqPhase == HQPhase.normal)
+                ChangeHQPhase(HQPhase.dispatchStrikeTeam);
 
-        } else {
+            gameData.levelState.delta.alarmTerminalActive = true;
             alarmSoundTimer = alarmSoundInterval;
+
+            ClearPoint[] allClearPoints = FindObjectsOfType<ClearPoint>();
+            foreach (ClearPoint point in allClearPoints) {
+                point.cleared = false;
+            }
+            if (allClearPoints.Length > 0) {
+                foreach (SphereRobotAI ai in FindObjectsOfType<SphereRobotAI>()) {
+                    ai.OnAlarmActivate(allClearPoints);
+                }
+            }
+            OnSuspicionChange?.Invoke();
         }
-        ClearPoint[] allClearPoints = FindObjectsOfType<ClearPoint>();
-        foreach (ClearPoint point in allClearPoints) {
-            point.cleared = false;
-        }
-        if (allClearPoints.Length > 0) {
-            foreach (SphereRobotAI ai in FindObjectsOfType<SphereRobotAI>()) {
-                ai.OnAlarmActivate(allClearPoints);
+    }
+    public void DeactivateAlarm() {
+        if (applicationIsQuitting || isLoadingLevel || !gameData.levelState.delta.alarmTerminalActive)
+            return;
+
+        gameData.levelState.delta.alarmTerminalActive = false;
+        gameData.levelState.delta.strikeTeamResponseTimer = 0f;
+        OnSuspicionChange?.Invoke();
+        PrefabPool pool = PoolManager.I?.GetPool("prefabs/NPC");
+
+        // TODO: correct?
+        gameData.levelState.delta.strikeTeamCount = 0;
+        GameManager.I.gameData.levelState.delta.strikeTeamBehavior = GameManager.I.gameData.levelState.template.strikeTeamBehavior;
+        ChangeHQPhase(HQPhase.normal);
+        foreach (AlarmComponent alarmComponent in FindObjectsOfType<AlarmComponent>()) {
+            if (GetAlarmNodeState(alarmComponent)) {
+                SetAlarmNodeState(alarmComponent, false);
             }
         }
-        OnSuspicionChange?.Invoke();
     }
     public bool isAlarmRadioInProgress(GameObject exclude) {
         foreach (HQReport report in reports.Values) {
@@ -62,19 +92,6 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"removing alarm node {idn}");
     }
 
-    public void DeactivateAlarm() {
-        if (applicationIsQuitting || isLoadingLevel)
-            return;
-        gameData.levelState.delta.strikeTeamResponseTimer = 0f;
-        OnSuspicionChange?.Invoke();
-
-        // reset strike team 
-
-        PrefabPool pool = PoolManager.I?.GetPool("prefabs/NPC");
-        // if (pool != null)
-        //     gameData.levelState.delta.strikeTeamMaxSize = Math.Min(3, pool.objectsInPool.Count);
-        gameData.levelState.delta.strikeTeamCount = 0;
-    }
     public void OpenReportTicket(GameObject reporter, HQReport report) {
         if (levelRadioTerminal() != null) {
             if (reports == null) reports = new Dictionary<GameObject, HQReport>();
@@ -129,8 +146,9 @@ public partial class GameManager : Singleton<GameManager> {
     void CloseReport(KeyValuePair<GameObject, HQReport> kvp) {
         SetLocationOfDisturbance(kvp.Value.locationOfLastDisturbance);
         if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.raiseAlarm) {
+            GameManager.I.gameData.levelState.delta.strikeTeamBehavior = LevelTemplate.StrikeTeamResponseBehavior.investigate;
             ActivateHQRadioNode();
-            if (gameData.levelState.delta.guardPhase == GuardPhase.normal) {
+            if (gameData.levelState.delta.hqPhase == HQPhase.normal) {
                 DisplayHQResponse("HQ: Understood. Dispatching strike team.");
             } else {
                 DisplayHQResponse("HQ: Understood. Remain vigilant.");
@@ -139,7 +157,7 @@ public partial class GameManager : Singleton<GameManager> {
             DeactivateAlarm();
             DisplayHQResponse("HQ: Understood. Disabling alarm.");
         } else if (kvp.Value.desiredAlarmState == HQReport.AlarmChange.noChange) {
-            DeactivateAlarm();
+            // DeactivateAlarm();
             DisplayHQResponse("HQ: Understood. Remain vigilant.");
         }
         if (kvp.Value.suspicionRecord != null) {
@@ -184,16 +202,53 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void UpdateAlarm() {
         if (gameData.levelState.anyAlarmTerminalActivated()) {
-            if (strikeTeamSpawnPoint != null && levelRadioTerminal() != null) { // TODO: check level data 
-                UpdateStrikeTeamSpawn();
-            }
             alarmSoundTimer += Time.deltaTime;
             if (alarmSoundTimer > alarmSoundInterval) {
                 alarmSoundTimer -= alarmSoundInterval;
                 audioSource.PlayOneShot(gameData.levelState.template.alarmAudioClip);
             }
         }
+    }
+
+    void UpdateNPCSpawning() {
+        if (strikeTeamSpawnPoint != null && gameData.levelState.delta.hqPhase == HQPhase.dispatchStrikeTeam) {
+            UpdateStrikeTeamSpawn();
+        }
         UpdateRegularGuardRespawn();
+
+        if (gameData.levelState.delta.hqPhase == HQPhase.strikeTeamMission) {
+            gameData.levelState.delta.strikeTeamMissionTimer += Time.deltaTime;
+            if (gameData.levelState.delta.strikeTeamMissionTimer >= 30f) {
+                StrikeTeamMissionComplete();
+            }
+        }
+    }
+
+    public void StrikeTeamMissionComplete() {
+        gameData.levelState.delta.strikeTeamMissionTimer = 0f;
+        for (int strikeTeamCount = 0; strikeTeamCount < strikeTeamMembers.Count; strikeTeamCount++) {
+            CharacterController controller = strikeTeamMembers[strikeTeamCount];
+            SphereRobotAI ai = controller.GetComponent<SphereRobotAI>();
+            AI.TaskFollowTarget.HeadBehavior headBehavior = AI.TaskFollowTarget.HeadBehavior.right;
+            if (strikeTeamCount == 0) {
+                if (gameData.levelState.template.strikeTeamCompletion == LevelTemplate.StrikeTeamCompletionBehavior.patrol) {
+                    ai.ChangeState(new SpherePatrolState(ai, ai.patrolRoute, controller));
+                } else if (gameData.levelState.template.strikeTeamCompletion == LevelTemplate.StrikeTeamCompletionBehavior.leave) {
+                    ai.ChangeState(new SphereExitLevelState(ai, controller));
+                }
+                lastStrikeTeamMember = controller.gameObject;
+            } else if (strikeTeamCount > 0) {
+                ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: headBehavior));
+                lastStrikeTeamMember = controller.gameObject;
+                headBehavior = headBehavior switch {
+                    AI.TaskFollowTarget.HeadBehavior.right => AI.TaskFollowTarget.HeadBehavior.left,
+                    AI.TaskFollowTarget.HeadBehavior.left => AI.TaskFollowTarget.HeadBehavior.right,
+                    _ => AI.TaskFollowTarget.HeadBehavior.right
+                };
+            }
+        }
+
+        ChangeHQPhase(HQPhase.normal);
     }
     void UpdateRegularGuardRespawn() {
         if (gameData.levelState.delta.npcCount < gameData.levelState.template.minNPC) {
@@ -205,7 +260,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     void UpdateStrikeTeamSpawn() {
-        // Debug.Log($"{strikeTeamCount} < {gameData.levelState.delta.strikeTeamMaxSize} {strikeTeamResponseTimer} < {gameData.levelState.template.strikeTeamResponseTime}");
         if (gameData.levelState.delta.strikeTeamCount < gameData.levelState.template.strikeTeamMaxSize) {
             if (gameData.levelState.delta.strikeTeamResponseTimer < gameData.levelState.template.strikeTeamResponseTime) {
                 gameData.levelState.delta.strikeTeamResponseTimer += Time.deltaTime;
@@ -216,19 +270,33 @@ public partial class GameManager : Singleton<GameManager> {
                     SpawnStrikeTeamMember();
                 }
             }
+        } else if (gameData.levelState.delta.strikeTeamCount >= gameData.levelState.template.strikeTeamMaxSize) {
+            ChangeHQPhase(HQPhase.strikeTeamMission);
         }
     }
 
     void SpawnStrikeTeamMember() {
         // Debug.Log($"****** spawn strike member: {gameData.levelState.delta.npcsSpawned} >= {gameData.levelState.template.maxNPC}?");
-        if (gameData.levelState.delta.npcCount >= gameData.levelState.template.maxNPC) return;
+        if (gameData.levelState.delta.npcCount >= gameData.levelState.template.maxNPC) {
+            if (gameData.levelState.delta.hqPhase == HQPhase.dispatchStrikeTeam) {
+                ChangeHQPhase(HQPhase.strikeTeamMission);
+            }
+            return;
+        }
         GameObject npc = strikeTeamSpawnPoint.SpawnNPC(gameData.levelState.template.strikeTeamTemplate);
         SphereRobotAI ai = npc.GetComponentInChildren<SphereRobotAI>();
         CharacterController controller = npc.GetComponent<CharacterController>();
+        controller.isStrikeTeamMember = true;
+        ai.isStrikeTeamMember = true;
+
         controller.OnCharacterDead += HandleNPCDead;
 
         if (gameData.levelState.delta.strikeTeamCount == 0) {
-            ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, controller, doIntro: false, speedCoefficient: 1.5f));
+            if (gameData.levelState.delta.strikeTeamBehavior == LevelTemplate.StrikeTeamResponseBehavior.clear) {
+                ai.ChangeState(new SphereClearPointsState(ai, controller, FindObjectsOfType<ClearPoint>()));
+            } else {
+                ai.ChangeState(new SearchDirectionState(ai, locationOfLastDisturbance, controller, doIntro: false, speedCoefficient: 1.5f));
+            }
             lastStrikeTeamMember = npc;
         } else if (gameData.levelState.delta.strikeTeamCount == 1) {
             ai.ChangeState(new FollowTheLeaderState(ai, lastStrikeTeamMember, controller, headBehavior: AI.TaskFollowTarget.HeadBehavior.right));
@@ -238,7 +306,10 @@ public partial class GameManager : Singleton<GameManager> {
         }
         gameData.levelState.delta.strikeTeamCount += 1;
         gameData.levelState.delta.npcCount += 1;
+        strikeTeamMembers.Add(controller);
         OnNPCSpawn?.Invoke(npc);
+
+        GameManager.I.gameData.levelState.delta.strikeTeamBehavior = GameManager.I.gameData.levelState.template.strikeTeamBehavior;
     }
 
     void SpawnGuard() {

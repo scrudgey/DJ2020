@@ -27,7 +27,7 @@ public class FollowTheLeaderState : SphereControlState {
     public override PlayerInput Update(ref PlayerInput input) {
         TaskState result = rootTaskNode.Evaluate(ref input);
         if (result == TaskState.success) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, result);
         }
         return input;
     }

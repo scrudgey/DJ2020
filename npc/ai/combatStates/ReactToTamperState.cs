@@ -64,8 +64,7 @@ public class ReactToTamperState : SphereControlState {
             evidence.reported = true;
         }
         if (result == TaskState.success || result == TaskState.failure) {
-            // GameManager.I.AddSuspicionRecord(record);
-            owner.StateFinished(this);
+            owner.StateFinished(this, result);
         }
         return input;
     }

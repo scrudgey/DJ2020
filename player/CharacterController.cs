@@ -186,6 +186,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     bool armsRaised;
 
     float inBushesTimer;
+    public bool isStrikeTeamMember;
 
     static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 

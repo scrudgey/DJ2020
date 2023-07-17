@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AI;
 using Easings;
 using KinematicCharacterController;
 using UnityEditor;
@@ -56,6 +57,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     ClearPoint[] clearPoints;
     static readonly float avoidFactor = 5f;
     static readonly float avoidRadius = 0.2f;
+    public bool isStrikeTeamMember;
+    public PrefabPool prefabPool;
     public void Awake() {
         raycastHits = new RaycastHit[1];
         nearbyOthers = new Collider[32];
@@ -81,8 +84,27 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     void EnterDefaultState() {
-        // Debug.Log($"initialize NPC AI with patrol route: {patrolRoute}");
-        if (patrolRoute != null) {
+        if (isStrikeTeamMember) {
+            switch (GameManager.I.gameData.levelState.delta.strikeTeamBehavior) {
+                case LevelTemplate.StrikeTeamResponseBehavior.clear:
+                    ClearPoint[] allClearPoints = FindObjectsOfType<ClearPoint>();
+                    foreach (ClearPoint point in allClearPoints) {
+                        point.cleared = false;
+                    }
+                    if (allClearPoints.Length > 0) {
+                        ChangeState(new SphereClearPointsState(this, characterController, allClearPoints));
+                    } else {
+                        ChangeState(new SearchDirectionState(this, GameManager.I.locationOfLastDisturbance, characterController, doIntro: false));
+
+                    }
+                    break;
+                default:
+                case LevelTemplate.StrikeTeamResponseBehavior.investigate:
+                    // ChangeState(new SearchDirectionState(this, GameManager.I.locationOfLastDisturbance, characterController, doIntro: false));
+                    ChangeState(new SpherePatrolState(this, patrolRoute, characterController));
+                    break;
+            }
+        } else if (patrolRoute != null) {
             ChangeState(new SpherePatrolState(this, patrolRoute, characterController));
         } else {
             // ChangeState(new SphereMoveState(this, patrolZone));
@@ -103,13 +125,22 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         } else return Vector3.zero;
     }
 
-    public void StateFinished(SphereControlState routine) {
+    public void StateFinished(SphereControlState routine, TaskState result) {
         switch (routine) {
             default:
                 EnterDefaultState();
                 break;
+            case SphereExitLevelState:
+                GameManager.I.RemoveNPC(characterController);
+                prefabPool.RecallObject(transform.root.gameObject);
+                break;
             case SphereClearPointsState:
-                EnterDefaultState();
+                if (isStrikeTeamMember &&
+                    GameManager.I.gameData.levelState.template.strikeCompletionThreshold == LevelTemplate.StrikeTeamCompletionThreshold.clear) {
+                    GameManager.I.StrikeTeamMissionComplete();
+                } else {
+                    EnterDefaultState();
+                }
                 break;
             case ReportGunshotsState:
                 ChangeState(new SearchDirectionState(this, lastGunshotHeard, characterController, doIntro: false, speedCoefficient: 2f));
@@ -159,7 +190,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 break;
             case SearchDirectionState:
                 alertHandler.ShowGiveUp();
-                EnterDefaultState();
+                if (isStrikeTeamMember &&
+                 GameManager.I.gameData.levelState.delta.strikeTeamBehavior == LevelTemplate.StrikeTeamResponseBehavior.investigate &&
+                    GameManager.I.gameData.levelState.template.strikeCompletionThreshold == LevelTemplate.StrikeTeamCompletionThreshold.clear) {
+                    GameManager.I.StrikeTeamMissionComplete();
+                } else {
+                    EnterDefaultState();
+                }
                 break;
             case SphereAttackState:
                 if (!GameManager.I.gameData.levelState.anyAlarmTerminalActivated()) {
@@ -670,7 +707,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     public void OnAlarmActivate(ClearPoint[] allClearPoints) {
         this.clearPoints = allClearPoints;
-        Debug.Log($"on alarm active: {allClearPoints.Length}");
         if (allClearPoints.Length > 0) {
             switch (stateMachine.currentState) {
                 case SpherePatrolState:

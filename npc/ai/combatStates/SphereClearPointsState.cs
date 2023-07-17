@@ -21,7 +21,7 @@ public class SphereClearPointsState : SphereControlState {
     }
     void SetupRootNode() {
         targetPoint = GetClosestUncheckedClearpoint();
-        Debug.Log($"Target point: {targetPoint}");
+        // Debug.Log($"Target point: {targetPoint}");
         rootTaskNode = new TaskUntilFailRepeater(new Sequence(
             new TaskConditional(() => targetPoint != null),
             new TaskMoveToKey(owner.transform, NAV_POINT_KEY, owner.physicalKeys, characterController) {
@@ -29,10 +29,11 @@ public class SphereClearPointsState : SphereControlState {
                 speedCoefficient = 1f
             },
             new TaskLambda(() => {
-                Debug.Log($"target point {targetPoint} cleared");
+                // Debug.Log($"target point {targetPoint} cleared");
                 targetPoint.cleared = true;
                 targetPoint = GetClosestUncheckedClearpoint();
-                rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
+                if (targetPoint != null)
+                    rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
             })
         ));
         rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
@@ -41,7 +42,7 @@ public class SphereClearPointsState : SphereControlState {
     public override PlayerInput Update(ref PlayerInput input) {
         TaskState result = rootTaskNode.Evaluate(ref input);
         if (result == TaskState.success || result == TaskState.failure) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, result);
         }
         return input;
     }

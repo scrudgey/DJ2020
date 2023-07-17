@@ -14,7 +14,7 @@ public class PauseState : SphereControlState {
     public override PlayerInput Update(ref PlayerInput input) {
         changeStateCountDown -= Time.deltaTime;
         if (changeStateCountDown <= 0) {
-            owner.StateFinished(this);
+            owner.StateFinished(this, TaskState.success);
         }
         return input;
     }
