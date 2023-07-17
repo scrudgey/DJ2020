@@ -31,7 +31,6 @@ public class Explosive : MonoBehaviour {
         explosion.power = data.explosionPower;
         if (transform != null && transform.parent != null && transform.parent.gameObject != null) {
             Destroy(transform.parent.gameObject);
-
         } else {
             Destroy(gameObject);
         }

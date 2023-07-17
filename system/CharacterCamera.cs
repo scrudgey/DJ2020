@@ -632,7 +632,26 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             foreach (Interactive interactive in hit.collider.transform.root.GetComponentsInChildren<Interactive>()) {
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
-            hit.collider.transform.root.GetComponentsInChildren<AttackSurface>().ToList().ForEach(attackSurface => {
+            hit.collider.transform.root.GetComponentsInChildren<AttackSurface>()
+            .Where(attackSurface => {
+                if (attackSurface.usePlayerPlane) {
+                    Plane plane = new Plane(attackSurface.playerPlaneNormal, attackSurface.transform.position);
+                    return plane.GetSide(GameManager.I.playerPosition);
+                } else return true;
+            })
+            .Where(attackSurface => {
+                Vector3 origin = hit.collider.ClosestPoint(GameManager.I.playerPosition);
+                Vector3 displacement = (GameManager.I.playerPosition - origin);
+                Vector3 direction = displacement.normalized;
+
+                float distance = (displacement.magnitude * 0.95f) - 0.01f;
+
+                Ray testRay = new Ray(origin + (direction * 0.01f), direction);
+
+                // Debug.DrawRay(testRay.origin, testRay.direction * distance, Color.cyan);
+                return !Physics.Raycast(testRay, distance, LayerUtil.GetLayerMask(Layer.def));
+            })
+            .ToList().ForEach(attackSurface => {
                 float distanceToCursor = Vector3.Distance(hit.point, attackSurface.transform.position);
                 if (distanceToCursor < closestAttackSurfaceDistance) {
                     currentAttackSurface = attackSurface;

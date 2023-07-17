@@ -27,6 +27,7 @@ namespace AI {
         public override TaskState DoEvaluate(ref PlayerInput input) {
             if (GameManager.I.levelRadioTerminal() == null) {
                 GameManager.I.AddSuspicionRecord(report.suspicionRecord);
+                // speechTextController.Say(report.speechText);
                 return TaskState.failure;
             } else if (!started) {
                 alertHandler.ShowRadio();

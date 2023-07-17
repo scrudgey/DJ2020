@@ -2581,6 +2581,71 @@ x ladders
     * seeing corpse or bullets -> high alert, easier to see player
 * fix transformer door
 * ladders
+* keys for locks
+* smooth mouse aim
+* objectives
+    * steal the prototype
+    * wall with vent hole
+* spawnpoints can specify patrol routes
+* concepts:
+    * alarm object is triggered
+        * sets off local alarm
+        * opportunity to connect to alarm terminal and set off terminal alarm
+    * terminal alarm is triggered 
+        * UI timer countdown indicates time left in alarm state
+        * when the alarm is set off, it changes guard behavior
+            * clear points
+        * when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
+    * radio interaction:
+        * task radio HQ
+        * call HQ to report a body
+        * call HQ to report gunshots
+        * call HQ to request alarm shutoff
+        * response is handled differently depending on HQ state
+            * opportunity to raise radio alarm node
+        * handle when radio mast is destroyed
+    * spawning strike team
+        * today: if isAnyAlarmActive and the strike team spawn count is < max, spawn strike team
+        *  change: controlled by HQ logic.
+    * completing strike team sequence
+        * strike behavior when called: 
+            * clear
+            * respond to location of last disturbance
+        * strike team threshold for finish:
+            * all points cleared
+            * timer
+            * terminal alarm deactivated
+        * strike team behavior when finished:
+            * cancel alarm
+            * leave
+    * canceling alarm is bugged
+* when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
+* spawning strike team controlled by this logic.
+* today: spawning will continue until alarm is deactivated. it should stop after the full team has spawned or limit reached.
+* change: a spawnStrikeTeam phase that completes and changes to strike team dispatched
+* change: deactivating alarm does not affect strike team effort.
+* change: transition from strikeTeamMission to normal
+* decrement strike team count when one is killed.
+* handle the case where the entire strike team is wiped but state is not reset
+* strike behavior when called:
+    * if gunshots or body discovered:
+        * respond to location of interest, then clear
+    * else:
+        * clear
+* strike team threshold for finish
+    * timer
+    * all points clear
+* strike team behavior when finished
+    * patrol
+    * leave
+    1. use interaction testbed or a VR level
+        * set up clear points
+        * trigger an alarm: watch strike team clear
+        * shoot a gun: watch NPC investigate
+* radio response is handled differently depending on HQ state
+* canceling alarm is bugged
+* then test multiple waves of strike team
+* in strike team mission, reset timer on certain conditions
 
 
 graphical issues:
@@ -3084,109 +3149,44 @@ shops:
     randomize markets
     buy cyberware
 
+
+* handle when radio mast is destroyed
+* make vents work
+    * double sided attack surface and vent
+        * allow attack surfaces to specify a plane
+        * require player to pass a raycast check
+    * attack surface becomes disabled when used
+    * crawlable vent holes
+
+
 7-11 unlocks the other missions
 receptionist at tower
 
-* keys for locks
-* smooth mouse aim
-* objectives
-    * steal the prototype
-    * wall with vent hole
-* spawnpoints can specify patrol routes
 
 yamachi:
+    graphic for new vent
+    raycast for interactions
     trees and plants
-    make vents work
-        double sided attack surface and vent
-        attack surface becomes disabled when used
-        crawlable vent holes
     doors:
-        1. inside vs outside facing locks
-            doors can open from the inside
-        2. lock difficulty adjusts with level security
-        3. door readability
-        4. lintels over doors
-        5. more door types? more explotable latch? more handles and things?
-        6. locks for doubledoors
+        door appearance in map
+        inside vs outside facing locks
+            doors can open from the inside, locked from the outside.
+                lock does not appear in handle on inside.
+                only deadbolt toggle on inside if appropriate.
+            doors should swing in the direction of egress with exceptions for offices / rooms / closets
+        lock difficulty adjusts with level security
+        door readability
+            dark, knob not visible, doesnt look like a door, etc
 
-    the high ceilings pose a problem
-        environment is not readable.
-        easy to lose track of the guards.
+        lintels over doors
+        more door types? more explotable latch? more handles and things?
+        locks for doubledoors with crash bars
+
+    environment is not readable.
+        easy to lose track of the guards
+        the high ceilings pose a problem?
         redo the walls?
         walls are too thick, too similar in color to the floor, or too dark?
         minimap?
 
 
-
-concepts:
-    alarm object is triggered
-        * sets off local alarm
-        * opportunity to connect to alarm terminal and set off terminal alarm
-    terminal alarm is triggered 
-        * UI timer countdown indicates time left in alarm state
-        * when the alarm is set off, it changes guard behavior
-            * clear points
-        -> when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
-    radio interaction:
-        * task radio HQ
-        * call HQ to report a body
-        * call HQ to report gunshots
-        * call HQ to request alarm shutoff
-        -> response is handled differently depending on HQ state
-            opportunity to raise radio alarm node
-            oppoerunity to dispatch strike team
-            when a strike team is dispatched, respond differently
-        -> handle when radio mast is destroyed
-    spawning strike team
-        * today: if isAnyAlarmActive and the strike team spawn count is < max, spawn strike team
-        -> change: controlled by HQ logic.
-    completing strike team sequence
-        -> strike behavior when called: 
-            clear
-            * respond to location of last disturbance
-        -> strike team threshold for finish:
-            all points cleared
-            timer
-            * terminal alarm deactivated
-        -> strike team behavior when finished:
-            * cancel alarm
-            leave
-    -> canceling alarm is bugged
-        
-
-* when terminal alarm is set off, opportunity to change HQ state to dispatch strike team
-* spawning strike team controlled by this logic.
-* today: spawning will continue until alarm is deactivated. it should stop after the full team has spawned or limit reached.
-* change: a spawnStrikeTeam phase that completes and changes to strike team dispatched
-* change: deactivating alarm does not affect strike team effort.
-* change: transition from strikeTeamMission to normal
-* decrement strike team count when one is killed.
-* handle the case where the entire strike team is wiped but state is not reset
-* strike behavior when called:
-    * if gunshots or body discovered:
-        * respond to location of interest, then clear
-    * else:
-        * clear
-* strike team threshold for finish
-    * timer
-    * all points clear
-* strike team behavior when finished
-    * patrol
-    * leave
-    1. use interaction testbed or a VR level
-        * set up clear points
-        * trigger an alarm: watch strike team clear
-        * shoot a gun: watch NPC investigate
-* radio response is handled differently depending on HQ state
-* canceling alarm is bugged
-* then test multiple waves of strike team
-* in strike team mission, reset timer on certain conditions
-
-
-handle when radio mast is destroyed
-
-
-
-current total income:
-248,144 = 179,000 * 1.1 + 55,675
-current salary, bonus, and estimating an extra 10k for katie

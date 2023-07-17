@@ -21,6 +21,9 @@ public class AttackSurface : MonoBehaviour {
     Dictionary<MeshCollider, MeshRenderer> ropeRenderers;
     public AttackSurfaceVentCover replaceablePanel;
     public ObiSolver obiSolver;
+    // public GameObject playerPlane;
+    public bool usePlayerPlane;
+    public Vector3 playerPlaneNormal;
     public void Start() {
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         attackCam.targetTexture = renderTexture;
@@ -119,4 +122,13 @@ public class AttackSurface : MonoBehaviour {
         }
         return result;
     }
+
+#if UNITY_EDITOR
+    protected void OnDrawGizmos() {
+        if (usePlayerPlane) {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + playerPlaneNormal);
+        }
+    }
+#endif
 }
