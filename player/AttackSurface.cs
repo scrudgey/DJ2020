@@ -127,7 +127,7 @@ public class AttackSurface : MonoBehaviour {
     protected void OnDrawGizmos() {
         if (usePlayerPlane) {
             Gizmos.color = Color.blue;
-            Gizmos.DrawLine(transform.position, transform.position + playerPlaneNormal);
+            Gizmos.DrawLine(attackElementRoot.position, attackElementRoot.position + attackElementRoot.TransformVector(playerPlaneNormal));
         }
     }
 #endif

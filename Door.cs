@@ -397,4 +397,30 @@ public class Door : Interactive, IDoor {
         }
         knobCoroutines.Remove(knob);
     }
+
+#if UNITY_EDITOR
+    void OnDrawGizmos() {
+        Gizmos.color = Color.green;
+        for (int i = 0; i < doorTransforms.Length; i++) {
+            Collider collider = doorTransforms[i].GetComponent<Collider>();
+            Vector3 hingePos = hinges[i].position;
+            Quaternion rotate = Quaternion.AngleAxis(-9f, hinges[i].up);
+
+            float colliderLength = new Vector3(2f * collider.bounds.extents.x, 0f, 2f * collider.bounds.extents.z).magnitude;
+            Vector3 offset = colliderLength * hinges[i].TransformVector(new Vector3(1f, 0f, 0f));
+            Gizmos.DrawLine(hingePos, hingePos + offset);
+            for (int j = 0; j < 10; j++) {
+                Vector3 newOffset = rotate * offset;
+                Gizmos.DrawLine(hingePos + offset, hingePos + newOffset);
+                offset = newOffset;
+            }
+            Gizmos.DrawLine(hingePos + offset, hingePos);
+
+        }
+        string customName = "Relic\\MaskedSpider.png";
+        Collider doorCollider = doorTransforms[0].GetComponent<Collider>();
+        Vector3 keyOffset = doorTransforms[0].TransformVector(new Vector3(0.3f, 0f, 0f));
+        Gizmos.DrawIcon(doorCollider.bounds.center + keyOffset, customName, true);
+    }
+#endif
 }

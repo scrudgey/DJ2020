@@ -3157,6 +3157,8 @@ shops:
         * require player to pass a raycast check
     * attack surface becomes disabled when used
     * crawlable vent holes
+    * door appearance in map
+* raycast for interactions
 
 
 7-11 unlocks the other missions
@@ -3164,16 +3166,10 @@ receptionist at tower
 
 
 yamachi:
-    graphic for new vent
-    raycast for interactions
     trees and plants
     doors:
-        door appearance in map
-        inside vs outside facing locks
-            doors can open from the inside, locked from the outside.
-                lock does not appear in handle on inside.
-                only deadbolt toggle on inside if appropriate.
-            doors should swing in the direction of egress with exceptions for offices / rooms / closets
+        
+
         lock difficulty adjusts with level security
         door readability
             dark, knob not visible, doesnt look like a door, etc
@@ -3190,3 +3186,17 @@ yamachi:
         minimap?
 
 
+handling swing in / out
+            allow selectable in / out?
+            allow selectable handle side?
+            allow selectable side is inside?
+                whatever combination of the above plus rotation allows all 4 door types.
+inside vs outside facing locks
+    doors can open from the inside, locked from the outside.
+        lock does not appear in handle on inside.
+        only deadbolt toggle on inside if appropriate.
+    doors should swing in the direction of egress with exceptions for offices / rooms / closets
+
+graphic for new vent
+attack surface plane should be relative to attack surface root
+attack surface plane normal should be relative to transform

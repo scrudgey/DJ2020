@@ -629,13 +629,26 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         AttackSurface currentAttackSurface = null;
 
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
-            foreach (Interactive interactive in hit.collider.transform.root.GetComponentsInChildren<Interactive>()) {
+            foreach (Interactive interactive in hit.collider.transform.root
+            .GetComponentsInChildren<Interactive>()
+            .Where(interactive => {
+                Vector3 origin = hit.collider.ClosestPoint(GameManager.I.playerPosition);
+                Vector3 displacement = (GameManager.I.playerPosition - origin);
+                Vector3 direction = displacement.normalized;
+
+                float distance = (displacement.magnitude * 0.95f) - 0.01f;
+
+                Ray testRay = new Ray(origin + (direction * 0.01f), direction);
+
+                // Debug.DrawRay(testRay.origin, testRay.direction * distance, Color.cyan);
+                return !Physics.Raycast(testRay, distance, LayerUtil.GetLayerMask(Layer.def));
+            })) {
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
             hit.collider.transform.root.GetComponentsInChildren<AttackSurface>()
             .Where(attackSurface => {
                 if (attackSurface.usePlayerPlane) {
-                    Plane plane = new Plane(attackSurface.playerPlaneNormal, attackSurface.transform.position);
+                    Plane plane = new Plane(attackSurface.attackElementRoot.InverseTransformVector(attackSurface.playerPlaneNormal), attackSurface.attackElementRoot.position);
                     return plane.GetSide(GameManager.I.playerPosition);
                 } else return true;
             })
