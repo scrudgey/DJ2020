@@ -648,7 +648,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             hit.collider.transform.root.GetComponentsInChildren<AttackSurface>()
             .Where(attackSurface => {
                 if (attackSurface.usePlayerPlane) {
-                    Plane plane = new Plane(attackSurface.attackElementRoot.InverseTransformVector(attackSurface.playerPlaneNormal), attackSurface.attackElementRoot.position);
+                    Plane plane = new Plane(attackSurface.attackElementRoot.TransformDirection(attackSurface.playerPlaneNormal), attackSurface.attackElementRoot.position);
                     return plane.GetSide(GameManager.I.playerPosition);
                 } else return true;
             })

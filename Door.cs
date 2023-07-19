@@ -8,6 +8,9 @@ using UnityEngine;
 public class Door : Interactive, IDoor {
     public enum DoorState { closed, opening, closing, open, ajar }
     public enum DoorParity { twoWay, openIn, openOut }
+    public bool reverse;
+    public GameObject normalMapWedge;
+    public GameObject reverseMapWedge;
     public bool autoClose;
     public bool latched;
     public List<DoorLock> doorLocks;
@@ -56,6 +59,7 @@ public class Door : Interactive, IDoor {
         };
         latched = true;
         ChangeState(DoorState.closed);
+
     }
     public List<DoorLock> getDoorLocks() => doorLocks;
 
@@ -202,6 +206,8 @@ public class Door : Interactive, IDoor {
         angle += delta;
         float offAxis = -0.05f * Mathf.Sin(angle * (2 * Mathf.PI / 360));
         float parity = 1f;
+        if (reverse) delta *= -1f;
+        delta *= transform.root.localScale.x;
         for (int i = 0; i < doorTransforms.Length; i++) {
             doorTransforms[i].RotateAround(hinges[i].position, hinges[i].up, parity * delta);
             parents[i].position = parentOriginalPositions[i] + offAxis * hinges[i].right;
@@ -404,10 +410,17 @@ public class Door : Interactive, IDoor {
         for (int i = 0; i < doorTransforms.Length; i++) {
             Collider collider = doorTransforms[i].GetComponent<Collider>();
             Vector3 hingePos = hinges[i].position;
-            Quaternion rotate = Quaternion.AngleAxis(-9f, hinges[i].up);
+            float angleDelta = -9f * transform.root.localScale.x;
+            Quaternion rotate = Quaternion.AngleAxis(angleDelta, hinges[i].up);
 
             float colliderLength = new Vector3(2f * collider.bounds.extents.x, 0f, 2f * collider.bounds.extents.z).magnitude;
-            Vector3 offset = colliderLength * hinges[i].TransformVector(new Vector3(1f, 0f, 0f));
+            Vector3 offset;
+            if (reverse) {
+                offset = colliderLength * hinges[i].TransformVector(new Vector3(0f, 0f, -1f));
+            } else {
+                offset = colliderLength * hinges[i].TransformVector(new Vector3(1f, 0f, 0f));
+            }
+
             Gizmos.DrawLine(hingePos, hingePos + offset);
             for (int j = 0; j < 10; j++) {
                 Vector3 newOffset = rotate * offset;
@@ -417,10 +430,14 @@ public class Door : Interactive, IDoor {
             Gizmos.DrawLine(hingePos + offset, hingePos);
 
         }
-        string customName = "Relic\\MaskedSpider.png";
+        string customName = "key.png";
         Collider doorCollider = doorTransforms[0].GetComponent<Collider>();
-        Vector3 keyOffset = doorTransforms[0].TransformVector(new Vector3(0.3f, 0f, 0f));
+        Vector3 keyOffset = doorTransforms[0].TransformVector(new Vector3(0f, 0f, 0.5f));
         Gizmos.DrawIcon(doorCollider.bounds.center + keyOffset, customName, true);
+
+
+        reverseMapWedge.SetActive(reverse);
+        normalMapWedge.SetActive(!reverse);
     }
 #endif
 }

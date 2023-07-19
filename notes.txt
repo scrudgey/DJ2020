@@ -3159,25 +3159,31 @@ shops:
     * crawlable vent holes
     * door appearance in map
 * raycast for interactions
+* attack surface plane should be relative to attack surface root
+* attack surface plane normal should be relative to transform
+* when door is flipped:
+    * gizmo is no longer correct
+    * rotation is no longer correct
+    * attack surface plane no longer correct
+    * reverse applies to door swing
+    * handle flipped door
+* handling swing in / out
+    * reverse affects map graphic
+    * handle key side graphic? 
 
 
 7-11 unlocks the other missions
 receptionist at tower
 
-
 yamachi:
     trees and plants
     doors:
-        
-
         lock difficulty adjusts with level security
         door readability
             dark, knob not visible, doesnt look like a door, etc
-
         lintels over doors
         more door types? more explotable latch? more handles and things?
         locks for doubledoors with crash bars
-
     environment is not readable.
         easy to lose track of the guards
         the high ceilings pose a problem?
@@ -3186,17 +3192,15 @@ yamachi:
         minimap?
 
 
-handling swing in / out
-            allow selectable in / out?
-            allow selectable handle side?
-            allow selectable side is inside?
-                whatever combination of the above plus rotation allows all 4 door types.
 inside vs outside facing locks
+    locks are specific to handles, not doors.
     doors can open from the inside, locked from the outside.
         lock does not appear in handle on inside.
         only deadbolt toggle on inside if appropriate.
     doors should swing in the direction of egress with exceptions for offices / rooms / closets
+passthrough door
 
 graphic for new vent
-attack surface plane should be relative to attack surface root
-attack surface plane normal should be relative to transform
+
+
+
