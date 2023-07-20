@@ -13,7 +13,6 @@ public class Door : Interactive, IDoor {
     public GameObject reverseMapWedge;
     public bool autoClose;
     public bool latched;
-    public List<DoorLock> doorLocks;
     public DoorParity parity;
     private DoorState _state;
     public DoorState state {
@@ -36,9 +35,14 @@ public class Door : Interactive, IDoor {
     public float autoCloseSpeed = 80f;
     private static readonly float ANGLE_THRESHOLD = 0.1f;
     private Transform lastInteractorTransform;
-    // public Transform[] knobs;
     public Transform[] doorknobs;
     public static Dictionary<Transform, Coroutine> knobCoroutines = new Dictionary<Transform, Coroutine>();
+    [Header("doorknobs")]
+    public Vector3 insidePlaneNormal;
+    public AttackSurfaceDoorknob insideDoorKnob;
+    public AttackSurfaceDoorknob outsideDoorKnob;
+    public List<DoorLock> universalLocks;
+
     float angularSpeed;
     LoHi angleBounds;
     float impulse;
@@ -46,7 +50,6 @@ public class Door : Interactive, IDoor {
     Vector3[] parentOriginalPositions;
     void Awake() {
         knobCoroutines = new Dictionary<Transform, Coroutine>();
-        // parentOriginalPositions = parent.position;
         parentOriginalPositions = parents.Select(p => p.position).ToArray();
         orientationPlane = new Plane(transform.forward, hinges[0].position);
 
@@ -61,7 +64,6 @@ public class Door : Interactive, IDoor {
         ChangeState(DoorState.closed);
 
     }
-    public List<DoorLock> getDoorLocks() => doorLocks;
 
     void Update() {
         switch (state) {
@@ -83,14 +85,6 @@ public class Door : Interactive, IDoor {
                 HandleImpulse();
                 CheckAutoClose();
                 break;
-        }
-        if (lockTimer > 0) {
-            lockTimer -= Time.deltaTime;
-            if (lockTimer <= 0) {
-                foreach (DoorLock doorLock in doorLocks) {
-                    doorLock.Lock();
-                }
-            }
         }
     }
     void HandleImpulse() {
@@ -217,33 +211,29 @@ public class Door : Interactive, IDoor {
         // TODO: check after rotation for collision
     }
 
-    void OnCollisionEnter(Collision col) {
-        // Debug.Log($"on collision enter: {col.gameObject}");
-    }
-
     public override ItemUseResult DoAction(Interactor interactor) {
-        // lastInteractorTransform = interactor.transform;
         // NOTE: assumes that only the player can use the door
-        ActivateDoorknob(interactor.transform.position, interactor.transform, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
+        Plane plane = new Plane(transform.TransformDirection(insidePlaneNormal), transform.position);
+
+        List<DoorLock> doorLocks = new List<DoorLock>();
+        if (insideDoorKnob != null && plane.GetSide(interactor.transform.position)) {
+            doorLocks = insideDoorKnob.doorLocks;
+        } else if (outsideDoorKnob != null) {
+            doorLocks = outsideDoorKnob.doorLocks;
+        }
+        doorLocks.AddRange(universalLocks);
+
+        StartCoroutine(TemporarilyDisableCollisions(interactor.transform.root.gameObject));
+        ActivateDoorknob(interactor.transform.position, interactor.transform, doorLocks, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
         return ItemUseResult.Empty() with { waveArm = true };
     }
-    public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
     public void StartLockTimer() {
         lockTimer = 1f;
     }
-    public void ActivateDoorknob(Vector3 position, Transform activator, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
+    public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
         lastInteractorTransform = activator;
-        if (bypassKeyCheck) {
-            foreach (DoorLock doorLock in doorLocks) {
-                doorLock.ForceUnlock();
-            }
-        } else if (withKeySet != null) {
-            foreach (DoorLock doorLock in doorLocks) {
-                foreach (int keyId in withKeySet) {
-                    doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
-                }
-            }
-        }
+
+        bool isLocked = bypassKeyCheck ? false : doorLocks.Where(doorLock => doorLock != null && doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked);
 
         switch (state) {
             case DoorState.ajar:
@@ -251,7 +241,7 @@ public class Door : Interactive, IDoor {
                 break;
             case DoorState.closing:
             case DoorState.closed:
-                if (IsLocked()) {
+                if (isLocked) {
                     Toolbox.RandomizeOneShot(audioSource, lockedSounds);
                     foreach (Transform doorknob in doorknobs)
                         JiggleKnob(doorknob);
@@ -404,6 +394,31 @@ public class Door : Interactive, IDoor {
         knobCoroutines.Remove(knob);
     }
 
+    IEnumerator TemporarilyDisableCollisions(GameObject other) {
+        Collider[] otherColliders = other.GetComponentsInChildren<Collider>();
+        Collider[] myColliders = transform.root.GetComponentsInChildren<Collider>();
+        CharacterController characterController = other.transform.root.GetComponent<CharacterController>();
+        foreach (Collider otherCollider in otherColliders) {
+            if (otherCollider.isTrigger) continue;
+            foreach (Collider myCollider in myColliders) {
+                if (myCollider.isTrigger) continue;
+                Physics.IgnoreCollision(otherCollider, myCollider, true);
+                characterController.ignoredColliders.Add(myCollider);
+                Debug.Log($"ignoring collision {myCollider} {otherCollider}");
+            }
+        }
+        yield return new WaitForSeconds(1.5f);
+        foreach (Collider otherCollider in otherColliders) {
+            if (otherCollider.isTrigger) continue;
+            foreach (Collider myCollider in myColliders) {
+                if (myCollider.isTrigger) continue;
+                Physics.IgnoreCollision(otherCollider, myCollider, false);
+                characterController.ignoredColliders.Remove(myCollider);
+
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     void OnDrawGizmos() {
         Gizmos.color = Color.green;
@@ -432,12 +447,16 @@ public class Door : Interactive, IDoor {
         }
         string customName = "key.png";
         Collider doorCollider = doorTransforms[0].GetComponent<Collider>();
-        Vector3 keyOffset = doorTransforms[0].TransformVector(new Vector3(0f, 0f, 0.5f));
+        Vector3 keyOffset = doorTransforms[0].TransformVector(new Vector3(0f, 0f, -0.5f));
         Gizmos.DrawIcon(doorCollider.bounds.center + keyOffset, customName, true);
 
+        if (reverseMapWedge != null) {
+            reverseMapWedge?.SetActive(reverse);
+            normalMapWedge?.SetActive(!reverse);
+        }
 
-        reverseMapWedge.SetActive(reverse);
-        normalMapWedge.SetActive(!reverse);
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(transform.position, transform.position + transform.TransformDirection(insidePlaneNormal));
     }
 #endif
 }

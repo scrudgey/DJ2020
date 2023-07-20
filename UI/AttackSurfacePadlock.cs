@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Easings;
 using UnityEngine;
-public class AttackSurfacePadlock : AttackSurfaceDoorknob {
+public class AttackSurfacePadlock : AttackSurfaceLock {
     enum State { normal, disclose, open }
     State state;
     [Header("padlock")]
@@ -19,8 +19,8 @@ public class AttackSurfacePadlock : AttackSurfaceDoorknob {
     public Transform disclosePadlockRect;
     Vector3 initialPosition;
     bool isOpen;
-    public override void Start() {
-        base.Start();
+    public void Start() {
+        // base.Start();
         initialPosition = basePadlockRect.localPosition;
     }
     override public void OnMouseOver() {

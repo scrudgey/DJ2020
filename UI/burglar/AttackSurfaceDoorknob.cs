@@ -7,69 +7,36 @@ using UnityEngine;
 public class AttackSurfaceDoorknob : AttackSurfaceElement {
     public GameObject door;
     IDoor idoor;
-    public DoorLock doorLock;
+    public List<DoorLock> doorLocks;
     public AudioSource audioSource;
-    public AudioClip[] pickSounds;
-    public AudioClip[] manipulateSounds;
-    public AudioClip[] keySounds;
-    public AudioClip[] pinSetSound;
-    public AudioClip[] setbackSound;
-    public AudioClip[] finishSound;
-    public float integratedPickTime;
-    bool clickedThisFrame;
-    public bool isHandle;
-    public float setbackProb = 1;
-    bool setback;
     public virtual void Start() {
         // only required because unity doesn't support interfaces in editor
         idoor = door.GetComponent<IDoor>();
     }
+    public bool IsLocked() => doorLocks.Where(doorLock => doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked); // doorLock.locked;
+
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
-        if (activeTool == BurglarToolType.probe) {
-            Toolbox.RandomizeOneShot(audioSource, manipulateSounds);
-        } else if (activeTool == BurglarToolType.key) {
-            bool success = false;
-            foreach (int keyId in GameManager.I.gameData.playerState.physicalKeys) {
-                success |= doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
-            }
-            Toolbox.RandomizeOneShot(audioSource, keySounds);
-            if (success) {
-                bool locked = doorLock.locked;
-                return BurglarAttackResult.None with {
-                    success = true,
-                    feedbackText = locked ? $"{elementName} locked" : $"{elementName} unlocked"
-                };
-            } else {
-                return BurglarAttackResult.None with {
-                    success = false,
-                    feedbackText = "Your keys don't work"
-                };
-            }
-        } else if (activeTool == BurglarToolType.none && isHandle) {
-            bool success = !idoor.IsLocked();
-            idoor.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform);
+        if (activeTool == BurglarToolType.none) {
+            bool success = !IsLocked();
+            idoor.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform, doorLocks);
             if (success) {
                 return BurglarAttackResult.None with {
                     finish = success,
                 };
             } else {
+                List<Vector3> lockPositions = new List<Vector3>();
+                foreach (DoorLock doorLock in doorLocks) {
+                    if (doorLock.isActiveAndEnabled && doorLock.locked) {
+                        lockPositions.Add(doorLock.transform.position);
+                    }
+                }
+
                 return BurglarAttackResult.None with {
                     finish = success,
                     success = false,
                     feedbackText = "locked",
-                    lockPositions = idoor.getDoorLocks()
-                        .Where(doorLock => doorLock.locked)
-                        .SelectMany(doorLock => doorLock.rotationElements)
-                        .Select(transform => transform.position)
-                        .ToList()
-                };
-            }
-        } else if (activeTool == BurglarToolType.lockpick) {
-            if (!doorLock.locked) {
-                return BurglarAttackResult.None with {
-                    success = true,
-                    feedbackText = "Already unlocked"
+                    lockPositions = lockPositions
                 };
             }
         }
@@ -77,100 +44,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
         return BurglarAttackResult.None;
     }
 
-    public override BurglarAttackResult HandleClickHeld(BurglarToolType activeTool, BurgleTargetData data) {
-        base.HandleClickHeld(activeTool, data);
-        if (activeTool == BurglarToolType.lockpick && !setback && doorLock.locked) {
-            clickedThisFrame = true;
-            integratedPickTime += Time.deltaTime;
-            idoor.PickJiggleKnob(doorLock);
-            if (!audioSource.isPlaying) {
-                Toolbox.RandomizeOneShot(audioSource, pickSounds);
-            }
+    public void ActivateDoorKnob() {
 
-            float roll = Random.Range(0f, 1f);
-            if (integratedPickTime > 0.2f && roll < Time.deltaTime * setbackProb) {
-                setback = true;
-                resetToolJiggle = true;
-                integratedPickTime = 0;
-                SetProgressPercent();
-                audioSource.Stop();
-                OnValueChanged?.Invoke(this);
-                Toolbox.RandomizeOneShot(audioSource, setbackSound);
-            }
-
-            if (integratedPickTime > 2f) {
-                audioSource.Stop();
-                CompleteProgress();
-                OnValueChanged?.Invoke(this);
-                if (progressStageIndex >= progressStages)
-                    return DoPick();
-            }
-        }
-        // else if (!doorLock.locked) {
-        //     return BurglarAttackResult.None with {
-        //         success = true,
-        //         feedbackText = "Already unlocked"
-        //     };
-        // }
-        return BurglarAttackResult.None;
-    }
-    public override void HandleMouseUp() {
-        base.HandleMouseUp();
-        this.resetToolJiggle = false;
-        SetProgressPercent();
-        setback = false;
-        OnValueChanged?.Invoke(this);
-    }
-    public override void HandleFocusLost() {
-        base.HandleFocusLost();
-        setback = false;
-        progressStageIndex = 0;
-        progressPercent = 0;
-        SetProgressPercent();
-        OnValueChanged?.Invoke(this);
-    }
-    void CompleteProgress() {
-        integratedPickTime = 0f;
-        progressPercent = 0f;
-        progressStageIndex += 1;
-        // TODO: play sound
-        Toolbox.RandomizeOneShot(audioSource, pinSetSound);
-    }
-
-    protected virtual BurglarAttackResult DoPick() {
-        bool success = doorLock.lockType == DoorLock.LockType.physical && doorLock.locked;
-        doorLock.PickLock();
-        if (success) {
-            complete = true;
-            audioSource.Stop();
-            Toolbox.AudioSpeaker(transform.position, finishSound);
-            OnValueChanged?.Invoke(this);
-            return BurglarAttackResult.None with {
-                success = true,
-                feedbackText = "Door unlocked"
-            };
-        } else return BurglarAttackResult.None;
-    }
-
-    void Update() {
-        if (integratedPickTime > 0f) {
-            if (!clickedThisFrame) {
-                if (setback) {
-                    // integratedPickTime -= Time.deltaTime / 3f;
-                } else {
-                    integratedPickTime -= Time.deltaTime;
-                }
-            }
-            SetProgressPercent();
-            OnValueChanged?.Invoke(this);
-        }
-        clickedThisFrame = false;
-    }
-
-    void SetProgressPercent() {
-        // float baseline = (1.0f * progressStageIndex) / (1.0f * progressStages);
-        // float progress = (integratedPickTime / 2f) * (1f / (1.0f * progressStages));
-        // progressPercent = baseline + progress;
-        progressPercent = (integratedPickTime / 2f);
     }
 }

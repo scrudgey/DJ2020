@@ -116,6 +116,10 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        foreach (DoorRandomizer doorRandomizer in GameObject.FindObjectsOfType<DoorRandomizer>()) {
+            doorRandomizer.ApplyState(state.template);
+        }
+
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 

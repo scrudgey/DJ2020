@@ -33,15 +33,19 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
                 };
             } else {
                 HandleLockedDoor();
+                List<Vector3> lockPositions = new List<Vector3>();
+                foreach (DoorLock doorLock in doorLocks) {
+                    if (doorLock.locked && doorLock.rotationElements != null) {
+                        foreach (Transform rotation in doorLock.rotationElements) {
+                            lockPositions.Add(rotation.position);
+                        }
+                    }
+                }
                 return BurglarAttackResult.None with {
                     success = false,
                     feedbackText = "door is locked",
                     element = this,
-                    lockPositions = doorLocks
-                        .Where(doorLock => doorLock.locked)
-                        .SelectMany(doorLock => doorLock.rotationElements)
-                        .Select(transform => transform.position)
-                        .ToList()
+                    lockPositions = lockPositions
                 };
             }
         }
@@ -105,7 +109,7 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
 
     public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
 
-    public void ActivateDoorknob(Vector3 position, Transform activator, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
+    public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
 
     }
 

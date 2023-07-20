@@ -2646,6 +2646,52 @@ x ladders
 * canceling alarm is bugged
 * then test multiple waves of strike team
 * in strike team mission, reset timer on certain conditions
+* handle when radio mast is destroyed
+* make vents work
+    * double sided attack surface and vent
+        * allow attack surfaces to specify a plane
+        * require player to pass a raycast check
+    * attack surface becomes disabled when used
+    * crawlable vent holes
+    * door appearance in map
+* raycast for interactions
+* attack surface plane should be relative to attack surface root
+* attack surface plane normal should be relative to transform
+* when door is flipped:
+    * gizmo is no longer correct
+    * rotation is no longer correct
+    * attack surface plane no longer correct
+    * reverse applies to door swing
+    * handle flipped door
+* handling swing in / out
+    * reverse affects map graphic
+    * handle key side graphic? 
+* move separate lock element to all locked handles.
+    * laser controller
+    * alarm central
+    * padlock?
+* change door handle to use lock references
+* when deadbolt is disabled, do not lock door
+* door cylinder lock wiggle
+* door lock icon appeared on opposite side
+* inside vs outside facing locks
+    * locks are specific to handles, not doors.
+    * split off lock from doorknob
+    * doors can open from the inside, locked from the outside.
+        * only deadbolt toggle on inside if appropriate.
+* fix industry loot graphics
+* hide cylinder on other side
+* opening door from interactor 
+    * check player side relative to plane
+* passthrough door
+* change door randomizer to use new system
+* broken cylinder lock on alarm system
+* chainlink door: both inner and outer use the same locks
+* mapmesh for chainlink fence
+* mapmesh for doubledoors
+* graphic for new vent
+* lock icon is wrong
+* lock difficulty adjusts with level security
 
 
 graphical issues:
@@ -3150,57 +3196,28 @@ shops:
     buy cyberware
 
 
-* handle when radio mast is destroyed
-* make vents work
-    * double sided attack surface and vent
-        * allow attack surfaces to specify a plane
-        * require player to pass a raycast check
-    * attack surface becomes disabled when used
-    * crawlable vent holes
-    * door appearance in map
-* raycast for interactions
-* attack surface plane should be relative to attack surface root
-* attack surface plane normal should be relative to transform
-* when door is flipped:
-    * gizmo is no longer correct
-    * rotation is no longer correct
-    * attack surface plane no longer correct
-    * reverse applies to door swing
-    * handle flipped door
-* handling swing in / out
-    * reverse affects map graphic
-    * handle key side graphic? 
-
 
 7-11 unlocks the other missions
 receptionist at tower
+doors should swing in the direction of egress with exceptions for offices / rooms / closets
+
+lock on the transformer
 
 yamachi:
     trees and plants
     doors:
-        lock difficulty adjusts with level security
         door readability
             dark, knob not visible, doesnt look like a door, etc
-        lintels over doors
         more door types? more explotable latch? more handles and things?
         locks for doubledoors with crash bars
+
     environment is not readable.
+        * doors should swing in the direction of egress with exceptions for offices / rooms / closets
+        lintels over doors
         easy to lose track of the guards
         the high ceilings pose a problem?
         redo the walls?
         walls are too thick, too similar in color to the floor, or too dark?
         minimap?
 
-
-inside vs outside facing locks
-    locks are specific to handles, not doors.
-    doors can open from the inside, locked from the outside.
-        lock does not appear in handle on inside.
-        only deadbolt toggle on inside if appropriate.
-    doors should swing in the direction of egress with exceptions for offices / rooms / closets
-passthrough door
-
-graphic for new vent
-
-
-
+clearsighter

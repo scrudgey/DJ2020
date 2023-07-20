@@ -4,15 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElement> {
     public Action<AttackSurfaceElement> OnValueChanged { get; set; }
-    public RectTransform rectTransform;
+    // public RectTransform rectTransform;
     public string elementName;
+    [HideInInspector]
     public float progressPercent;
     public int progressStages = 1;
+    [HideInInspector]
     public int progressStageIndex = 0;
+    [HideInInspector]
     public AttackSurfaceUIElement uiElement;
     public Sprite buttonSprite;
+    [HideInInspector]
     public bool resetToolJiggle;
+    [HideInInspector]
     public bool engaged;
+    [HideInInspector]
     public bool complete;
 
     public virtual void Initialize(AttackSurfaceUIElement uiElement) {

@@ -5,16 +5,17 @@ using UnityEngine;
 public class DoorRandomizer : MonoBehaviour {
     public Door door;
     public AttackSurfaceLatch[] latches;
-    public AttackSurfaceDoorknob[] knobs;
+    // public AttackSurfaceDoorknob[] knobs;
+    public AttackSurfaceLock[] doorLocks;
     public AttackSurfaceLatchGuard[] latchGuards;
     public GameObject innerDeadbolt;
     public GameObject outerDeadbolt;
     public DoorLock deadboltLock;
 
-    void Start() {
-        ApplyState();
-    }
-    void ApplyState() {
+    // void Start() {
+    //     ApplyState();
+    // }
+    public void ApplyState(LevelTemplate levelTemplate) {
         bool latchesEnabled = Random.Range(0f, 1f) < 0.75f;
         bool latchesVulnerable = Random.Range(0f, 1f) < 0.8f;
         bool latchGuardEnabled = Random.Range(0f, 1f) < 0.5f;
@@ -43,19 +44,30 @@ public class DoorRandomizer : MonoBehaviour {
             }
         }
 
-        foreach (AttackSurfaceDoorknob knob in knobs) {
-            knob.setbackProb = Random.Range(0f, 0.6f);
-            knob.progressStages = Random.Range(3, 4);
+        foreach (AttackSurfaceLock knob in doorLocks) {
+            if (levelTemplate.securityLevel == LevelTemplate.SecurityLevel.lax) {
+                knob.setbackProb = Random.Range(0f, 0.2f);
+                knob.progressStages = Random.Range(1, 3);
+            } else if (levelTemplate.securityLevel == LevelTemplate.SecurityLevel.commercial) {
+                knob.setbackProb = Random.Range(0.05f, 0.45f);
+                knob.progressStages = Random.Range(1, 4);
+            } else if (levelTemplate.securityLevel == LevelTemplate.SecurityLevel.hardened) {
+                knob.setbackProb = Random.Range(0.1f, 0.7f);
+                knob.progressStages = Random.Range(3, 5);
+            }
         }
         door.autoClose = autoClose;
 
         if (deadboltEnabled) {
-            innerDeadbolt?.SetActive(true);
-            outerDeadbolt?.SetActive(true);
+            if (innerDeadbolt != null)
+                innerDeadbolt.SetActive(true);
+            if (outerDeadbolt != null)
+                outerDeadbolt?.SetActive(true);
         } else {
-            door.doorLocks?.Remove(deadboltLock);
-            innerDeadbolt?.SetActive(false);
-            outerDeadbolt?.SetActive(false);
+            if (innerDeadbolt != null)
+                innerDeadbolt?.SetActive(false);
+            if (outerDeadbolt != null)
+                outerDeadbolt?.SetActive(false);
         }
     }
 }
