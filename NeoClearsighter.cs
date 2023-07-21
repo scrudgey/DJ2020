@@ -27,20 +27,14 @@ public class NeoClearsighter : MonoBehaviour {
     Dictionary<Renderer, Material> interloperMaterials;
     Dictionary<Collider, Renderer[]> dynamicColliderToRenderer;
     Dictionary<Collider, Transform> dynamicColliderRoot;
+    Dictionary<Renderer, GameObject> cutawayRenderers;
     Collider[] colliderHits;
     CharacterCamera myCamera;
     Transform cameraTransform;
     bool initialized;
     Vector3 previousOrigin;
     MaterialPropertyBlock propBlock;
-
-    private List<Collider> rooftopZones = new List<Collider>();
-    // void Awake() {
-    //     GameManager.OnInputModeChange += HandleInputModeChange;
-    // }
-    // void OnDestroy() {
-    //     GameManager.OnInputModeChange -= HandleInputModeChange;
-    // }
+    List<Collider> rooftopZones = new List<Collider>();
 
     public void Initialize(Transform followTransform, CharacterCamera camera) {
         this.followTransform = followTransform;
@@ -73,6 +67,7 @@ public class NeoClearsighter : MonoBehaviour {
         hiddenTransforms = new HashSet<Transform>();
         initialMaterials = new Dictionary<Renderer, Material>();
         interloperMaterials = new Dictionary<Renderer, Material>();
+        cutawayRenderers = new Dictionary<Renderer, GameObject>();
         propBlock = new MaterialPropertyBlock();
 
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
@@ -97,6 +92,14 @@ public class NeoClearsighter : MonoBehaviour {
             Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
             if (findAnchor != null) {
                 rendererPositions[renderer] = findAnchor.position;
+            }
+        }
+        foreach (Renderer renderer in rendererTree.GetAll()) {
+            GameObject cutawayPrefab = Resources.Load("prefabs/cutaway") as GameObject;
+            if (renderer.CompareTag("cutaway")) {
+                Transform cutaway = renderer.transform.parent.Find("cutaway");
+                cutaway.gameObject.SetActive(false);
+                cutawayRenderers[renderer] = cutaway.gameObject;
             }
         }
     }
@@ -166,7 +169,6 @@ public class NeoClearsighter : MonoBehaviour {
         HashSet<Renderer> nextAboveRenderBatch = new HashSet<Renderer>();
         HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
         HashSet<Renderer> nextDynamicRenderBatch = new HashSet<Renderer>();
-        Vector3 origin = followTransform.position;
 
         // if (previousOrigin == null || previousOrigin == Vector3.zero) {
         //     previousOrigin = origin;
@@ -177,6 +179,7 @@ public class NeoClearsighter : MonoBehaviour {
         //     origin.y = previousOrigin.y;
         // }
 
+        Vector3 origin = followTransform.position;
         origin.y = Mathf.Round(origin.y * 10f) / 10f;
 
         Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
@@ -204,14 +207,13 @@ public class NeoClearsighter : MonoBehaviour {
             }
         }
 
-        List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
-        yield return HandleInterlopers(interlopers, nextInterloperBatch, nextAboveRenderBatch);
+        yield return HandleInterlopers(nextInterloperBatch, nextAboveRenderBatch);
 
         // non-static colliders above me
         int numberHits = Physics.OverlapSphereNonAlloc(liftedOrigin, 40f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell, Layer.bulletOnly, Layer.interactive), QueryTriggerInteraction.Ignore);
         for (int k = 0; k < numberHits; k++) {
             Collider collider = colliderHits[k];
-            if (collider == null || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
+            if (collider == null || collider.name == "cutaway" || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                 continue;
             j += 1;
             if (j > 500) {
@@ -236,6 +238,28 @@ public class NeoClearsighter : MonoBehaviour {
         }
 
         // reset previous batch
+        yield return ResetPreviousBatch();
+
+        previousAboveRendererBatch = nextAboveRenderBatch;
+        previousDynamicRendererBatch = nextDynamicRenderBatch;
+        previousInterloperBatch = nextInterloperBatch;
+        yield return waitForFrame;
+    }
+    IEnumerator InterloperOnly() {
+        HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
+
+        // handle interlopers
+        yield return HandleInterlopers(nextInterloperBatch, null);
+
+        // reset previous batch
+        yield return ResetPreviousBatch();
+
+        previousInterloperBatch = nextInterloperBatch;
+        yield return waitForFrame;
+    }
+
+    IEnumerator ResetPreviousBatch() {
+        int j = 0;
         foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
             j++;
             if (j > 100) {
@@ -243,27 +267,31 @@ public class NeoClearsighter : MonoBehaviour {
                 yield return waitForFrame;
             }
             if (renderer == null) continue;
+            if (renderer.CompareTag("cutaway")) {
+                cutawayRenderers[renderer].SetActive(false);
+            }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
             renderer.material = initialMaterials[renderer];
             hiddenTransforms.Remove(renderer.transform.root);
         }
-
-        previousAboveRendererBatch = nextAboveRenderBatch;
-        previousDynamicRendererBatch = nextDynamicRenderBatch;
-        previousInterloperBatch = nextInterloperBatch;
-        yield return waitForFrame;
     }
 
     void MakeTransparent(Renderer renderer, Vector3 directionToInterloper) {
         if (directionToInterloper.sqrMagnitude < 100f && directionToInterloper.y < 1.5) {
-            renderer.material = interloperMaterials[renderer];
-            // float targetAlpha = Math.Min(0.5f, 1 / (directionToInterloper.sqrMagnitude / 10fs));
-            float targetAlpha = 0.5f;
-            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            renderer.GetPropertyBlock(propBlock);
-            propBlock.SetFloat("_TargetAlpha", targetAlpha);
-            renderer.SetPropertyBlock(propBlock);
-            renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            if (renderer.CompareTag("cutaway")) {
+                renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+                cutawayRenderers[renderer].SetActive(true);
+            } else {
+                renderer.material = interloperMaterials[renderer];
+                // float targetAlpha = Math.Min(0.5f, 1 / (directionToInterloper.sqrMagnitude / 10fs));
+                float targetAlpha = 0.5f;
+                MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+                renderer.GetPropertyBlock(propBlock);
+                propBlock.SetFloat("_TargetAlpha", targetAlpha);
+                renderer.SetPropertyBlock(propBlock);
+                renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            }
+
         } else {
             renderer.material = initialMaterials[renderer];
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
@@ -277,14 +305,10 @@ public class NeoClearsighter : MonoBehaviour {
         float distance = (cameraTransform.position - followTransform.position).magnitude;
         float angle = (float)Math.Atan((myCamera.Camera.orthographicSize) / distance) * (180f / (float)Math.PI) * 5f;
 
-        // Debug.Log(angle);
-
         Vector3 leftNormal = Quaternion.AngleAxis(1f * angle, cameraTransform.up) * cameraTransform.right;
         Vector3 rightNormal = Quaternion.AngleAxis(-1f * angle, cameraTransform.up) * (-1f * cameraTransform.right);
 
-        // Plane left = new Plane(cameraTransform.right, followTransform.position - size * cameraTransform.right);
         Plane left = new Plane(leftNormal, followTransform.position - size * cameraTransform.right);
-        // Plane right = new Plane(-1f * cameraTransform.right, followTransform.position + size * cameraTransform.right);
         Plane right = new Plane(rightNormal, followTransform.position + size * cameraTransform.right);
 
         Plane down = new Plane(cameraTransform.up, followTransform.position - size * cameraTransform.up);
@@ -292,44 +316,15 @@ public class NeoClearsighter : MonoBehaviour {
         Plane near = new Plane(cameraTransform.forward, cameraTransform.position);
         Plane far = new Plane(-1f * cameraTransform.forward, followTransform.position);
 
-
         // Toolbox.DrawPlane(followTransform.position - size * cameraTransform.right, left);
         // Toolbox.DrawPlane(followTransform.position + size * cameraTransform.right, right);
         return new Plane[] { left, right, down, up, near, far };
     }
-    IEnumerator InterloperOnly() {
-        HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
-        Vector3 origin = followTransform.position;
 
-        float interloperSpread = 2f;
-        Ray towardCameraRay = new Ray(origin, cameraTransform.position - origin);
-        Ray towardCameraRay2 = new Ray(origin, (interloperSpread * cameraTransform.up + cameraTransform.position) - origin);
-        Ray towardCameraRay4 = new Ray(origin, (interloperSpread * cameraTransform.right + cameraTransform.position) - origin);
-        Ray towardCameraRay5 = new Ray(origin, (-interloperSpread * cameraTransform.right + cameraTransform.position) - origin);
 
-        int j = 0;
-
+    IEnumerator HandleInterlopers(HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
-        yield return HandleInterlopers(interlopers, nextInterloperBatch, null);
 
-        // reset previous batch
-        foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
-            j++;
-            if (j > 100) {
-                j = 0;
-                yield return waitForFrame;
-            }
-            renderer.shadowCastingMode = initialShadowCastingMode[renderer];
-            renderer.material = initialMaterials[renderer];
-            hiddenTransforms.Remove(renderer.transform.root);
-        }
-        previousAboveRendererBatch = new HashSet<Renderer>();
-        previousInterloperBatch = nextInterloperBatch;
-        previousDynamicRendererBatch = new HashSet<Renderer>();
-        yield return waitForFrame;
-    }
-
-    IEnumerator HandleInterlopers(List<Renderer> interlopers, HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
         Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
 
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
@@ -347,19 +342,20 @@ public class NeoClearsighter : MonoBehaviour {
             }
 
             Renderer renderer = interlopers[i];
+            if (renderer.name == "cutaway") continue;
             if (renderer == null) continue;
 
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;
 
-            Vector3 rendererPosition = rendererBounds[renderer].center - rendererBounds[renderer].extents.y * Vector3.up;
+            Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
 
             float xParity = cameraXSide ? 1f : -1f;
             float zParity = cameraZSide ? 1f : -1f;
             bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
             bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
-            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y >= -0.2f) {
+            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
                 if (renderer == null) continue;
                 if (nextAboveRenderBatch?.Contains(renderer) ?? false) continue;
                 MakeTransparent(renderer, directionToInterloper);

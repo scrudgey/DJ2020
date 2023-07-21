@@ -2692,7 +2692,11 @@ x ladders
 * graphic for new vent
 * lock icon is wrong
 * lock difficulty adjusts with level security
-
+    * environment is not readable.
+        * doors should swing in the direction of egress with exceptions for offices / rooms / closets
+* clearsighter
+* replace all doors in all levels
+* clearsighter in all levels
 
 graphical issues:
     smg torso face left, head face down looks odd
@@ -3166,16 +3170,29 @@ eventual police response
 alarm disable is bugged
 can do a deal multiple times
 raycast to interactive when using
+more door types? more explotable latch? more handles and things?
+locks for doubledoors with crash bars
 
+* lock on the transformer
+* redo map graphics
+* paydata in cyber in yamachi
+* yamachi map markers
+* yamachi start zone
+* yamachi extraction?
+* tab to aim should hide cursor
+* doors should swing in the direction of egress with exceptions for offices / rooms / closets
+* yamachi electronics B&E
+
+receptionist at tower
 
 major initiatives:
     portraits
     spritesheets
     more fences
+    trees and plants
     music
         auto leveling, balance, ducking
     missions
-        yamachi electronics B&E
         1 way shootout
     after mission reports
         skill tree
@@ -3195,29 +3212,13 @@ shops:
     randomize markets
     buy cyberware
 
+interloper buildings
 
+door readability
+    dark, knob not visible, doesnt look like a door, etc
+metallic map on transformer door
 
-7-11 unlocks the other missions
-receptionist at tower
-doors should swing in the direction of egress with exceptions for offices / rooms / closets
-
-lock on the transformer
-
-yamachi:
-    trees and plants
-    doors:
-        door readability
-            dark, knob not visible, doesnt look like a door, etc
-        more door types? more explotable latch? more handles and things?
-        locks for doubledoors with crash bars
-
-    environment is not readable.
-        * doors should swing in the direction of egress with exceptions for offices / rooms / closets
-        lintels over doors
-        easy to lose track of the guards
-        the high ceilings pose a problem?
-        redo the walls?
-        walls are too thick, too similar in color to the floor, or too dark?
-        minimap?
-
-clearsighter
+should not be able to zap after cutting the power
+start with: 7-11 and yamachi, unlock others
+glass shattering makes noise
+too many guards on jack that data bug
