@@ -70,7 +70,7 @@ public class DealDialogueController : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, cancelSounds);
     }
     public void OnAcceptCallback() {
-        Debug.Log("accept deal");
+        acceptButton.interactable = false;
         List<LootData> lootForPrice = lootTradeButtons.SelectMany(button => button.GetLootDataForOffer()).ToList();
         importerShopController.AcceptDeal(dealData, lootForPrice);
         Toolbox.RandomizeOneShot(audioSource, acceptSounds);

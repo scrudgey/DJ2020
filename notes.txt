@@ -2730,6 +2730,16 @@ x ladders
 * glass shattering makes noise
 * save player state on heal
 * interloper tall walls
+* randomize deals
+* randomize markets
+* not all walls are cutaway 
+    * brick
+* can't reach extraction zone in yamachi
+* player spawn point in wrong place in yamachi
+* stealing DAT001 in yamachi doesnt work
+* dont start with stuff
+* stores can't interact
+
 
  
 graphical issues:
@@ -2818,15 +2828,12 @@ UI:
     weapon wheel
     better clarity around alarm logic
         fix edge coloration from active node to alarm terminal
+    show iconography when disguise is lost
+    show iconography when optional objective is complete
 
 control / combat:
     controller support
     shoulder switch is a control
-    aim sway responds to movement and gun skill
-    bullets that can pass through targets
-    armor & armor piercing
-    modernize some controls:
-        weapon / item wheel
 
 sound
     ambience
@@ -2841,20 +2848,21 @@ VR mission designer
     survive x waves of y NPCS
     inventory management
 
-code-controlled shoot animation
-    fix shooting animation and automatic interval
-    faster shotgun
-        click to rack faster?
-        raise - shoot - pump
-        animator speed can be adjusted
-
-nimrod for texts
-
 weapons
+    aim sway responds to movement and gun skill
+    bullets that can pass through targets
+    armor & armor piercing
     colt 2037 sped up sounds great
     attachments
     laser pointer attachment
     flashlight attachment
+    fix silenced smg
+    code-controlled shoot animation
+        fix shooting animation and automatic interval
+        faster shotgun
+            click to rack faster?
+            raise - shoot - pump
+            animator speed can be adjusted
 
 planning mode
     intel can tell in advance where the target data is. 
@@ -2867,7 +2875,6 @@ planning mode
     tactics pane
         disable when no tactoics
         purchase keycard
-        activate cyberattack
         buy info
             locate key objectives
             locate key items
@@ -2877,15 +2884,11 @@ planning mode
             discoverable networks
         when map data is bought, show notification on map tab
 
-minimap
+minimap?
     orient relative to main camera
     highlight enemies in red
         show sightcone
     indicate player
-
-UI
-    show iconography when disguise is lost
-    show iconography when optional objective is complete
 
 HQ state can be moved into delta
 a guy danced on a corpse
@@ -2914,10 +2917,8 @@ NPC tuning:
     guard looking at what other guard is shooting at
     npc text can run off the edge of the screen
     NPC should look in direction of last noise
-    
-
-anti-camping visibility boost
-damage result addition is weird
+    a guard ran up and reported a door was tampered with as i tampered with it
+    anti-camping visibility boost?
 
 networks
     marching ants?
@@ -2926,63 +2927,40 @@ networks
         can we do this programmatically?
     get cyber network working once and for all
     DFS path finding doesn't quite work right for highlighting alarm path
+    better network readability
+        needs slicing by floor
+        highlight connections when mouseover
+        node discoverability?
+        popup box: visibility skill gives you percentage breakdowns of possibilities:
+            50% honeypot
+            50% paydata
+        floppy icon for unopened data nodes
+        a separate screen?
+    data stealing needs to be more clean and engaging
+    some computers trip honeypots
 
 clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
     instead everything should be sliced into y intervals, and all deactivated / activated at once.
 
-data stealing needs to be more clean and engaging
-some computers trip honeypots
-code-controlled gun animation
-
 attack surfaces
     electronic access control
     alarm sensors on doors
     using key in lock should spin the keyway
+    interactive mains connection
 loot
     guards can drop keys or loot
     some data is useful in social engineering
     some data provides keycodes
 dialogue
     get once lie stratagem per mark from player
+    players face in dialogue controller is stretched when a suspicion record has long text
+    "insideAttackSurface"
 vehicles
     strike team may arrive by vehicle
     exfiltration / insertion may be by vehicle
 navigable AC units
     you should be able to crawl through the duct on the ceiling
-
-rocket launcher explosion?
-hand grenade explosion
-    hand grenade sound??
-check blood pool prefab pooling
-destroyed walls leave decal on the ground (difficult?)
-destructible light pylon
-destructible dumpster
-destructible AC unit
-destructible radio dish tower
-plants can catch on fire
-a guard ran up and reported a door was tampered with as i tampered with it
-elevator
-randomly place lasers
-randomly place cameras
-
-better network readability
-    needs slicing by floor
-    highlight connections when mouseover
-    node discoverability?
-    popup box: visibility skill gives you percentage breakdowns of possibilities:
-        50% honeypot
-        50% paydata
-    floppy icon for unopened data nodes
-    a separate screen?
-
-loitering is suspicious but not near a water cooler
-interactive mains connection
-
------------
-turrets
-hatch in the rooftop for jack that data
-
 graphics
     disguise spritesheet (fireman)
     swat team spritesheet
@@ -2993,45 +2971,7 @@ graphics
     civ_female portrait could use some work
     title screen animations 
     helicopters for skybox
-guns:
-    fix silenced smg
-
-some sort of automated check when a level starts if objectives are impossible
-assign lens flares to lights?
-random drug dealers on the corner will buy your drug loot
-world layout:
-    bar:
-        there is an underworld figure in the corner of the bar who will give you missions.
-    tent city:
-        a randomized junk shop
-locations:
-    hardware dealer (the finn)
-    night club 
-    arcade?
-
-shop todo:
-    gunshop
-        show little -100 text goes up from credits, lerp credits color from red to white
-        sell mode
-            can't sell last gun? maybe?
-        indicate selected in the inventory pane
-    item shop
-        after purchase, do something better with item display
-        description (dialogue)
-            "1x per mission"
-            "unlimited use"
-        don't sell items player already has
-    bartender
-        rumors -> faction strength
-    data merchant:
-        buy hacking software
-        buy hacking hardware
-        commission a virus?
-    street doc buy cyberware
-        gated by a different progression mechanic
-
-graphics:
-    swat spritesheet finish
+    assign lens flares to lights?
     trees / plants / outside decor
     sprite props
         knives / swords / shuriken
@@ -3062,6 +3002,11 @@ decals:
     tubes
     vent grate
 world:
+    random drug dealers on the corner will buy your drug loot
+    locations:
+        hardware dealer (the finn)
+        night club 
+        arcade?
     NPCs can hold beer bottles
     fix social group orientation
     sound design
@@ -3086,10 +3031,35 @@ world:
     telephone sales contact
         world map with telephone numbers.
         choose your contact and pop up a trade dialogue
+shop todo:
+    bar:
+        there is an underworld figure in the corner of the bar who will give you missions.
+    tent city:
+        a randomized junk shop?
+    gunshop
+        show little -100 text goes up from credits, lerp credits color from red to white
+        sell mode
+            can't sell last gun? maybe?
+        indicate selected in the inventory pane
+    item shop
+        after purchase, do something better with item display
+        description (dialogue)
+            "1x per mission"
+            "unlimited use"
+        don't sell items player already has
+    bartender
+        rumors -> faction strength
+    data merchant:
+        buy hacking software
+        buy hacking hardware
+        commission a virus?
+    street doc buy cyberware
+        gated by a different progression mechanic
 
+
+* can do a deal multiple times
 
 silencer shows in gameplay
-
 map pane:
     show type of location? city view? territory?
     show view of terrain?
@@ -3097,12 +3067,34 @@ map pane:
 colors for item selector
 item selector clear slot
 display information about items in loadout
-players face in dialogue controller is stretched when a suspicion record has long text
-"insideAttackSurface"
+
 rocket launcher not fully done
 some way to distract guards
 sphere robot
-can do a deal multiple times
+turrets
+hatch in the rooftop for jack that data
+some sort of automated check when a level starts if objectives are impossible
+receptionist at tower
+too many guards on jack that data bug ?
+flickery rooftop in world
+buildings disappear in world
+"shoot interval"
+laptop wire in build
+rocket launcher explosion?
+hand grenade explosion
+    hand grenade sound??
+check blood pool prefab pooling
+destroyed walls leave decal on the ground (difficult?)
+destructible light pylon
+destructible dumpster
+destructible AC unit
+destructible radio dish tower
+plants can catch on fire
+elevator
+randomly place lasers
+randomly place cameras
+
+
 
 doors
     more door types? more explotable latch? more handles and things?
@@ -3113,12 +3105,13 @@ major initiatives:
     portraits
         anderson portrait
     spritesheets
-    more fences
     trees and plants
     music
         auto leveling, balance, ducking
     missions
         1 way shootout
+        elevator / ductwork
+        finalize office
     after mission reports
         skill tree
     system:
@@ -3131,33 +3124,33 @@ unresolved mechanics:
     dialogue
     hacking
 shops:
+    more fences
     sell guns
     more fence
     buy cyberware
 
 
 
-randomize deals
-randomize markets
-radial menu for selecting guns and items?
-    unify items and guns
+
 ensure all shops and menus are idiot proof: 
     if the player can take no action, tell them explicitly.
     if you can't make the deal, make that explicit
+        gun shop
+        item shop
+        importer
+        medical
+        upgrades
 
 
-receptionist at tower
-too many guards on jack that data bug ?
-flickery rooftop in world
-buildings disappear in world
-"shoot interval"
-laptop wire in build
+
+radial menu for selecting guns and items?
+    unify items and guns
+items
+ducts
+elevator
+after action report & skill tree
+dialogue
+hacking
 
 
-* not all walls are cutaway 
-    * brick
-* can't reach extraction zone in yamachi
-* player spawn point in wrong place in yamachi
-* stealing DAT001 in yamachi doesnt work
-* dont start with stuff
-* stores can't interact
+

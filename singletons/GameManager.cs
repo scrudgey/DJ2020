@@ -99,24 +99,7 @@ public partial class GameManager : Singleton<GameManager> {
         SaveGameData();
         ReturnToApartment();
     }
-    public void SetMarketData() {
-        gameData.marketData = new MarketData() {
-            preferences = new List<LootPreferenceData>{
-                new LootPreferenceData(LootCategory.drug, 1),
-                new LootPreferenceData(LootCategory.medical, 2),
-            },
-            description = "big shipment of synthetic biologicals coming in from the mainland tonight."
-        };
-    }
-    public void SetDealData() {
-        gameData.dealData = new List<DealData>() {
-            DealData.FromLootData(Resources.Load("data/loot/drug/rush") as LootData, 10, LootCategory.drug, 3,
-                "Somehow I ended up with too much of this stuff. Can you take it off my hands?"),
-            DealData.FromLootData(Resources.Load("data/loot/drug/zyme") as LootData, 3, LootCategory.drug, 2,
-                "A big crate of zyme fell off the truck at the docks. Now I have to move it, pronto."
-            ),
-        };
-    }
+
     public void LoadGame(GameData loadData) {
         Debug.Log($"load {loadData.filename}");
         timePlayed = 0f;

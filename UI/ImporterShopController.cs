@@ -67,8 +67,6 @@ public class ImporterShopController : MonoBehaviour {
     }
 
     void PopulateDealButtons() {
-        // LootData rushData = Resources.Load("data/loot/rush") as LootData;
-        // DealData deal = DealData.FromLootData(rushData, 10, LootCategory.drug, 3);
         foreach (DealData deal in GameManager.I.gameData.dealData) {
             CreateDealButton(deal);
         }
