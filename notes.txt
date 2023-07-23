@@ -2697,7 +2697,41 @@ x ladders
 * clearsighter
 * replace all doors in all levels
 * clearsighter in all levels
+* grey button when item view player
+* tents
+* neon lights
+* random loot spots
+* silenced pistol
+* guard hearing other guard gunshot
+* raycast to interactive when using
+* eventual police response
+* lock on the transformer
+* redo map graphics
+* paydata in cyber in yamachi
+* yamachi map markers
+* yamachi start zone
+* yamachi extraction?
+* tab to aim should hide cursor
+* doors should swing in the direction of egress with exceptions for offices / rooms / closets
+* yamachi electronics B&E
+* door readability
+* metallic map on transformer door
+* should not be able to zap after cutting the power
+* interloper buildings
+* start with: 7-11 and yamachi, unlock others
+* stealth kill
+* clickable active tactics show description
+* more / better sequences besides alarm / no alarm; search level state.
+*  click to select interactive surfaces without selecting burglar tools.
+* headshots
+    * solution for total level wipe of NPCs
+    * search level systematically
+* player health stays: this is because state is unchanged.
+* glass shattering makes noise
+* save player state on heal
+* interloper tall walls
 
+ 
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
@@ -2728,8 +2762,6 @@ uncertain:
 
 nice to have / future goals:
     after action report should be fragmentary, show reward, over a transit cutscene
-    ambient sounds
-        room tone
     first level should set the tone
     aim: swing into position, then subtly zoom in to focus on reticle
         accompanied by rotating reticle element
@@ -2740,11 +2772,8 @@ nice to have / future goals:
     glass break fx
     leaves and junk in the street that blows around
     off-screen indicator for active threats?
-
     animation shows recoil
     head look around if player has been idle
-    make elevator
-    if an NPC sees another NPC shooting at something, look / search in that direction
     NPC better take cover
         move into another room
     HQ will be level specific state:
@@ -2760,32 +2789,19 @@ nice to have / future goals:
     allow renaming gun?
 
 
-
 deep save system:
     serialize the complete level state
 
 strike team
     when one is alerted, all are alerted?
-    solution for total level wipe of NPCs
-        reset strike team count when one dies?
-        if you've killed everyone, more arrive? <-- this
-    search level systematically
-        ideally, move and clear room to room.
-            possibility 1: generate room and door mappings automatically
-            possibility 2: mark up rooms in unity editor
-        possibility 3: a patrol route that leads through the level?
-        all possibilities require some extra level work
 
 graphical embellishments
-    small font text near locked-on character
-    arcs swing about lock size indicator
     callout:
         extended mode callout on level start vs quick callout on display changes 
         text? 
             PLAYER: STATS
     pulse some element in color in alarm timer, maybe show some bkg
         blink at 00.00 and then ease out
-
     easing in overlay 
     more blink-style transformations
     show thermal goggles on player head?
@@ -2805,14 +2821,12 @@ UI:
 
 control / combat:
     controller support
-    * headshots
     shoulder switch is a control
     aim sway responds to movement and gun skill
     bullets that can pass through targets
     armor & armor piercing
     modernize some controls:
         weapon / item wheel
-        *  click to select interactive surfaces without selecting burglar tools.
 
 sound
     ambience
@@ -2820,10 +2834,6 @@ sound
         distant traffic sounds
 
 stealth:
-    silencers affect graphic
-    * more / better sequences besides alarm / no alarm; search level state.
-    NPC should look in direction of last noise
-    stealth kill
     be able to shoot out lights
 
 VR mission designer
@@ -2847,12 +2857,9 @@ weapons
     flashlight attachment
 
 planning mode
+    intel can tell in advance where the target data is. 
     optional objectives
     HP / def indicators
-
-    * on mouseover picker: change stat viewer
-        * smooth rolling stat bars when values change
-        * compare stats +/-
     mission plan mapview 
         support multiple scenes per level
         disable selectors when necessary
@@ -2861,7 +2868,6 @@ planning mode
         disable when no tactoics
         purchase keycard
         activate cyberattack
-        * clickable active tactics show description
         buy info
             locate key objectives
             locate key items
@@ -2881,12 +2887,8 @@ UI
     show iconography when disguise is lost
     show iconography when optional objective is complete
 
-hack target ! indicator only sometimes visible
-NPC portraits not being set properly
-
 HQ state can be moved into delta
-
-a guy danced on a corpse (I think he was investigating a noise?)
+a guy danced on a corpse
 
 ---------------
 
@@ -2905,12 +2907,16 @@ NPC tuning:
     strike team seems to have a hard time investigating repeated explosions
     guards get stuck in the narrow corridor
     guards should pause in patrol only not around other guards.
-
+    guards can see through doors
+    guard saw me as he walked around the other corner: lock on?
+    better sounds for wire, attach
+    better sounds for mission computer
+    guard looking at what other guard is shooting at
+    npc text can run off the edge of the screen
+    NPC should look in direction of last noise
+    
 
 anti-camping visibility boost
-    guards are aware of your aggression 
-    haven't moved in a while
-    have shot more than once or twice?
 damage result addition is weird
 
 networks
@@ -2925,32 +2931,18 @@ clearsighter:
     it's a little less than ideal that things pop in in different order on levels: windows, then walls, etc.
     instead everything should be sliced into y intervals, and all deactivated / activated at once.
 
-distraction needed
-    throw a coin
-using key in lock should spin the keyway
-npc text can run off the edge of the screen
-
--------------
-how to make it more difficult?
-    1. try insert from steet, no disguise
-    2. add receptionist
-    3. add civilians
 data stealing needs to be more clean and engaging
 some computers trip honeypots
-intel can tell in advance where the target data is. 
-
 code-controlled gun animation
+
 attack surfaces
-    more door styles
-        different handles
-        electronic access control
+    electronic access control
     alarm sensors on doors
-    padlock
+    using key in lock should spin the keyway
 loot
     guards can drop keys or loot
     some data is useful in social engineering
     some data provides keycodes
-
 dialogue
     get once lie stratagem per mark from player
 vehicles
@@ -2969,23 +2961,10 @@ destructible dumpster
 destructible AC unit
 destructible radio dish tower
 plants can catch on fire
-
-an NPC ran down the stairs towards me, got stuck, didn't see me.
-an NPC saw me easily in the corner when he'd walked past me.
 a guard ran up and reported a door was tampered with as i tampered with it
-
-
-level 3:
-    holes for AC ducts 
-    elevator
-
+elevator
 randomly place lasers
 randomly place cameras
-
-doors
-    can open from the inside
-    different knobs?
-    sometimes unlocked
 
 better network readability
     needs slicing by floor
@@ -3001,15 +2980,8 @@ loitering is suspicious but not near a water cooler
 interactive mains connection
 
 -----------
-build a test level, 3 storey building infiltration
-    vent into the side of the building
-    vent into access into basement
-    populate various other datas, honeypots
-build a test level equivalent to Jack That Data
-    make level more challenging
-        turrets
-        camera view bigger
-    hatch in the rooftop
+turrets
+hatch in the rooftop for jack that data
 
 graphics
     disguise spritesheet (fireman)
@@ -3023,29 +2995,10 @@ graphics
     helicopters for skybox
 guns:
     fix silenced smg
-icons:
-    redraw others?
-padlock
-disguise tactic icon
-fake id tactic icon
-* random loot spots
-    * silenced pistol
 
-loot drops
 some sort of automated check when a level starts if objectives are impossible
 assign lens flares to lights?
-
-world NPCs:
-    potentially talkable: leave that for later.
-    moving with purpose around the scene. 
-        up & down streets.
-        in & out of stores.
-    stopping and talking with each other.
-    some are loitering
-        loitering on the street corner
-        leaning up against the wall
-        hanging around the Fire
-    random drug dealers on the corner will buy your drug loot
+random drug dealers on the corner will buy your drug loot
 world layout:
     bar:
         there is an underworld figure in the corner of the bar who will give you missions.
@@ -3067,7 +3020,6 @@ shop todo:
         description (dialogue)
             "1x per mission"
             "unlimited use"
-        * grey button when item view player
         don't sell items player already has
     bartender
         rumors -> faction strength
@@ -3076,18 +3028,17 @@ shop todo:
         buy hacking hardware
         commission a virus?
     street doc buy cyberware
+        gated by a different progression mechanic
 
 graphics:
     swat spritesheet finish
     trees / plants / outside decor
-    * tents
     sprite props
         knives / swords / shuriken
         ground wires
         ground decals
     bar curve
     subway entrance
-    * neon lights
     graffiti
         bört
         karmadillo
@@ -3098,7 +3049,6 @@ graphics:
     https://twitter.com/scrudgey/status/1627911883952099329?s=20
 models:
     another car
-    more neon
     buildings
     barrel not on fire
     fire hydrant
@@ -3138,19 +3088,8 @@ world:
         choose your contact and pop up a trade dialogue
 
 
-radial menu for selecting guns and items?
-    unify items and guns
-guards can see through doors
-guard saw me as he walked around the other corner: lock on?
-better sounds for wire, attach
-better sounds for mission computer
-guard hearing other guard gunshot
-guard looking at what other guard is shooting at
 silencer shows in gameplay
-ensure all shops and menus are idiot proof: 
-    if the player can take no action, tell them explicitly.
-    if you can't make the deal, make that explicit
-health persists between missions
+
 map pane:
     show type of location? city view? territory?
     show view of terrain?
@@ -3158,35 +3097,21 @@ map pane:
 colors for item selector
 item selector clear slot
 display information about items in loadout
-anderson portrait
-hiding affects bodies
-players face in dialogue controller is stretched
+players face in dialogue controller is stretched when a suspicion record has long text
 "insideAttackSurface"
-health does not carry over
 rocket launcher not fully done
 some way to distract guards
 sphere robot
-eventual police response
-alarm disable is bugged
 can do a deal multiple times
-raycast to interactive when using
-more door types? more explotable latch? more handles and things?
-locks for doubledoors with crash bars
 
-* lock on the transformer
-* redo map graphics
-* paydata in cyber in yamachi
-* yamachi map markers
-* yamachi start zone
-* yamachi extraction?
-* tab to aim should hide cursor
-* doors should swing in the direction of egress with exceptions for offices / rooms / closets
-* yamachi electronics B&E
-
-receptionist at tower
+doors
+    more door types? more explotable latch? more handles and things?
+    sometimes unlocked
+    locks for doubledoors with crash bars
 
 major initiatives:
     portraits
+        anderson portrait
     spritesheets
     more fences
     trees and plants
@@ -3208,17 +3133,31 @@ unresolved mechanics:
 shops:
     sell guns
     more fence
-    randomize deals
-    randomize markets
     buy cyberware
 
-interloper buildings
 
-door readability
-    dark, knob not visible, doesnt look like a door, etc
-metallic map on transformer door
 
-should not be able to zap after cutting the power
-start with: 7-11 and yamachi, unlock others
-glass shattering makes noise
-too many guards on jack that data bug
+randomize deals
+randomize markets
+radial menu for selecting guns and items?
+    unify items and guns
+ensure all shops and menus are idiot proof: 
+    if the player can take no action, tell them explicitly.
+    if you can't make the deal, make that explicit
+
+
+receptionist at tower
+too many guards on jack that data bug ?
+flickery rooftop in world
+buildings disappear in world
+"shoot interval"
+laptop wire in build
+
+
+* not all walls are cutaway 
+    * brick
+* can't reach extraction zone in yamachi
+* player spawn point in wrong place in yamachi
+* stealing DAT001 in yamachi doesnt work
+* dont start with stuff
+* stores can't interact

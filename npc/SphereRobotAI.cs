@@ -88,14 +88,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             switch (GameManager.I.gameData.levelState.delta.strikeTeamBehavior) {
                 case LevelTemplate.StrikeTeamResponseBehavior.clear:
                     ClearPoint[] allClearPoints = FindObjectsOfType<ClearPoint>();
-                    foreach (ClearPoint point in allClearPoints) {
-                        point.cleared = false;
-                    }
+                    // foreach (ClearPoint point in allClearPoints) {
+                    //     point.cleared = false;
+                    // }
                     if (allClearPoints.Length > 0) {
                         ChangeState(new SphereClearPointsState(this, characterController, allClearPoints));
                     } else {
                         ChangeState(new SearchDirectionState(this, GameManager.I.locationOfLastDisturbance, characterController, doIntro: false));
-
                     }
                     break;
                 default:

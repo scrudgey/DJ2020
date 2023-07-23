@@ -36,7 +36,8 @@ public class SphereClearPointsState : SphereControlState {
                     rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
             })
         ));
-        rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
+        if (targetPoint != null)
+            rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
     }
 
     public override PlayerInput Update(ref PlayerInput input) {

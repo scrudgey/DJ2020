@@ -53,7 +53,7 @@ public class Bush : MonoBehaviour {
     public void Shake(Collider other) {
         Toolbox.RandomizeOneShot(audioSource, sounds);
         Toolbox.Noise(transform.position, new NoiseData() {
-            volume = 5,
+            volume = 4,
             suspiciousness = Suspiciousness.suspicious,
             player = other.transform.IsChildOf(GameManager.I.playerObject.transform)
         }, other.transform.root.gameObject);

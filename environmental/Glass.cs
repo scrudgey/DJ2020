@@ -38,11 +38,6 @@ public class Glass : Destructible {
     override protected void DoDestruct(Damage damage) {
         base.DoDestruct(damage);
 
-        // AudioSource source = Toolbox.AudioSpeaker(transform.position, destroySounds, volume: 2f);
-        // source.minDistance = 5f;
-        // source.maxDistance = 10f;
-
-        // Destroy(gameObject);
         PoolManager.I.RecallObjects(decals.ToArray());
         // TODO: amortize this expensive operation
         Collider myCollider = GetComponent<Collider>();
@@ -69,6 +64,11 @@ public class Glass : Destructible {
             Collider gibsCollider = shard.GetComponentInChildren<Collider>();
             Physics.IgnoreCollision(gibsCollider, myCollider, true);
         }
-        
+
+        Toolbox.Noise(transform.position, new NoiseData() {
+            volume = 10,
+            suspiciousness = Suspiciousness.suspicious,
+            player = false
+        }, gameObject);
     }
 }

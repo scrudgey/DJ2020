@@ -15,7 +15,14 @@ public class RenderCubemapWizard : ScriptableWizard {
     void OnWizardCreate() {
         // create temporary camera for rendering
         GameObject go = new GameObject("CubemapCamera");
-        go.AddComponent<Camera>();
+        Camera camera = go.AddComponent<Camera>();
+        camera.clearFlags = CameraClearFlags.Skybox;
+        Material skyMat = Resources.Load("materials/skyline/cityskybox") as Material;
+        RenderSettings.skybox = skyMat;
+
+        Skybox skyBox = go.AddComponent<Skybox>();
+        skyBox.material = skyMat;
+        // camera
         // place it on the object
         go.transform.position = renderFromPosition.position;
         go.transform.rotation = Quaternion.identity;

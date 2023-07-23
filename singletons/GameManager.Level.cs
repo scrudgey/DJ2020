@@ -199,6 +199,14 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.credits += gameData.levelState.template.creditReward;
         gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
         gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot);
+
+        // TODO: broken
+        CharacterHurtable playerHurtable = playerObject.GetComponentInChildren<CharacterHurtable>();
+        gameData.playerState.health = playerHurtable.health;
+        foreach (LevelTemplate unlock in gameData.levelState.template.unlockLevels) {
+            if (gameData.unlockedLevels.Contains(unlock.levelName)) continue;
+            gameData.unlockedLevels.Add(unlock.levelName);
+        }
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {

@@ -32,6 +32,7 @@ public class LevelTemplate : ScriptableObject {
     public List<Objective> objectives;
     public List<Objective> bonusObjectives;
     public List<Tactic> availableTactics;
+    public List<LevelTemplate> unlockLevels;
 
     [Header("gameplay parameters")]
     public SensitivityLevel sensitivityLevel;

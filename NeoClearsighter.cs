@@ -80,6 +80,7 @@ public class NeoClearsighter : MonoBehaviour {
         rendererTree = new PointOctree<Renderer>(100, Vector3.zero, 1);
         rendererBoundsTree = new BoundsOctree<Renderer>(100, Vector3.zero, 0.5f, 1);
         foreach (Renderer renderer in staticRenderers) {
+            if (renderer.name.Contains("cutaway")) continue;
             Vector3 position = renderer.bounds.center;
             rendererTree.Add(renderer, position);
             rendererBoundsTree.Add(renderer, renderer.bounds);
@@ -95,7 +96,6 @@ public class NeoClearsighter : MonoBehaviour {
             }
         }
         foreach (Renderer renderer in rendererTree.GetAll()) {
-            GameObject cutawayPrefab = Resources.Load("prefabs/cutaway") as GameObject;
             if (renderer.CompareTag("cutaway")) {
                 Transform cutaway = renderer.transform.parent.Find("cutaway");
                 cutaway.gameObject.SetActive(false);
@@ -184,10 +184,10 @@ public class NeoClearsighter : MonoBehaviour {
 
         Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
+        int j = 0;
 
         // static geometry above me
         Renderer[] above = rendererTree.GetNearby(upRay, 50f);
-        int j = 0;
         for (int i = 0; i < above.Length; i++) {
             j++;
             if (j > 100) {
@@ -277,11 +277,11 @@ public class NeoClearsighter : MonoBehaviour {
     }
 
     void MakeTransparent(Renderer renderer, Vector3 directionToInterloper) {
-        if (directionToInterloper.sqrMagnitude < 100f && directionToInterloper.y < 1.5) {
-            if (renderer.CompareTag("cutaway")) {
-                renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-                cutawayRenderers[renderer].SetActive(true);
-            } else {
+        if (renderer.CompareTag("cutaway")) {
+            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+            cutawayRenderers[renderer].SetActive(true);
+        } else {
+            if (directionToInterloper.sqrMagnitude < 100f && directionToInterloper.y < 1.5) {
                 renderer.material = interloperMaterials[renderer];
                 // float targetAlpha = Math.Min(0.5f, 1 / (directionToInterloper.sqrMagnitude / 10fs));
                 float targetAlpha = 0.5f;
@@ -290,11 +290,10 @@ public class NeoClearsighter : MonoBehaviour {
                 propBlock.SetFloat("_TargetAlpha", targetAlpha);
                 renderer.SetPropertyBlock(propBlock);
                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+            } else {
+                renderer.material = initialMaterials[renderer];
+                renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             }
-
-        } else {
-            renderer.material = initialMaterials[renderer];
-            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         }
     }
 
@@ -347,7 +346,6 @@ public class NeoClearsighter : MonoBehaviour {
 
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;
-
             Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
 

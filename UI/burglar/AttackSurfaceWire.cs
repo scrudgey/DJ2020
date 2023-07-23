@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AttackSurfaceWire : MonoBehaviour {
@@ -9,14 +10,24 @@ public class AttackSurfaceWire : MonoBehaviour {
     public SecurityCamera securityCamera;
     public string resultText;
     public bool electricalDamage;
+    public PoweredComponent electricalDamageSourceComponent;
     public BurglarAttackResult DoCut() {
         BurglarAttackResult result = BurglarAttackResult.None;
 
         if (electricalDamage) {
-            result = BurglarAttackResult.None with {
-                success = false,
-                electricDamage = new ElectricalDamage(10f, Vector3.up, transform.position, transform.position)
-            };
+            bool doZap = electricalDamageSourceComponent == null || electricalDamageSourceComponent.nodeEnabled;
+            if (doZap) {
+                result = result with {
+                    success = false,
+                    electricDamage = new ElectricalDamage(10f, Vector3.up, transform.position, transform.position)
+                };
+            } else {
+                result = result with {
+                    success = true,
+                    makeTamperEvidenceSuspicious = true,
+                    tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
+                };
+            }
             return result;
         }
 
@@ -41,6 +52,7 @@ public class AttackSurfaceWire : MonoBehaviour {
         }
         foreach (PoweredComponent component in poweredComponentsToDisable) {
             GameManager.I.SetNodeEnabled<PoweredComponent, PowerNode>(component, false);
+            GameManager.I.SetPowerNodeState(component, false);
             result = result with {
                 success = true,
                 feedbackText = resultText,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 public abstract class Interactive : Highlightable {
+    public bool dontRequireRaycast;
     public string actionPrompt;
     public Interactor interactor;
     public string interactiveId;

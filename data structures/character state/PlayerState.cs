@@ -57,7 +57,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
-        GunTemplate gun2 = GunTemplate.Load("s1");
+        // GunTemplate gun2 = GunTemplate.Load("s1");
         // GunTemplate gun3 = GunTemplate.Load("r1");
         // GunTemplate gun4 = GunTemplate.Load("p2");
 
@@ -67,7 +67,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         // GunState gunState4 = GunState.Instantiate(gun4);
 
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
-        gunState1.delta.activeMods.Add(silencer);
+        // gunState1.delta.activeMods.Add(silencer);
 
         List<GunState> allGuns = new List<GunState>{
             gunState1,
@@ -77,16 +77,16 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         };
 
         List<BaseItem> allItems = new List<BaseItem> {
-            ItemInstance.LoadItem("C4")
+            // ItemInstance.LoadItem("C4")
         };
 
-        List<LootData> loots = new List<LootData>{
-            Resources.Load("data/loot/drug/rush") as LootData,
-            Resources.Load("data/loot/drug/rush") as LootData,
-            Resources.Load("data/loot/drug/rush") as LootData,
-            Resources.Load("data/loot/drug/vial") as LootData,
-            Resources.Load("data/loot/drug/vial") as LootData,
-            Resources.Load("data/loot/drug/zyme") as LootData,
+        List<LootData> loots = new List<LootData> {
+            // Resources.Load("data/loot/drug/rush") as LootData,
+            // Resources.Load("data/loot/drug/rush") as LootData,
+            // Resources.Load("data/loot/drug/rush") as LootData,
+            // Resources.Load("data/loot/drug/vial") as LootData,
+            // Resources.Load("data/loot/drug/vial") as LootData,
+            // Resources.Load("data/loot/drug/zyme") as LootData,
         };
 
         return new PlayerState() {

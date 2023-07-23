@@ -632,16 +632,20 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             foreach (Interactive interactive in hit.collider.transform.root
             .GetComponentsInChildren<Interactive>()
             .Where(interactive => {
-                Vector3 origin = hit.collider.ClosestPoint(GameManager.I.playerPosition);
-                Vector3 displacement = (GameManager.I.playerPosition - origin);
-                Vector3 direction = displacement.normalized;
+                if (interactive.dontRequireRaycast) {
+                    return true;
+                } else {
+                    Vector3 origin = hit.collider.ClosestPoint(GameManager.I.playerPosition);
+                    Vector3 displacement = (GameManager.I.playerPosition - origin);
+                    Vector3 direction = displacement.normalized;
 
-                float distance = (displacement.magnitude * 0.95f) - 0.01f;
+                    float distance = (displacement.magnitude * 0.95f) - 0.01f;
 
-                Ray testRay = new Ray(origin + (direction * 0.01f), direction);
+                    Ray testRay = new Ray(origin + (direction * 0.01f), direction);
 
-                // Debug.DrawRay(testRay.origin, testRay.direction * distance, Color.cyan);
-                return !Physics.Raycast(testRay, distance, LayerUtil.GetLayerMask(Layer.def));
+                    // Debug.DrawRay(testRay.origin, testRay.direction * distance, Color.cyan);
+                    return !Physics.Raycast(testRay, distance, LayerUtil.GetLayerMask(Layer.def));
+                }
             })) {
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }

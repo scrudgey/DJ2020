@@ -33,6 +33,8 @@ public class TagSystemData {
 
     // if set, aiming at this object will point here. otherwise, collider bounds center
     public Transform targetPoint;
+
+    public bool debugClearSighter;
 }
 public class TagSystem : MonoBehaviour {
     public TagSystemData data;

@@ -27,7 +27,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
                 float amount = Random.Range(90, 180f);
                 totalRotation += amount;
                 turnCoroutine = StartCoroutine(TurnScrew(amount));
-                if (totalRotation > 540) {
+                if (totalRotation > 360) {
                     unscrewed = true;
                     uiElement.gameObject.SetActive(false);
                     return BurglarAttackResult.None with {
