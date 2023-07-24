@@ -81,6 +81,7 @@ public class UIController : MonoBehaviour {
         if (burglarCanvas != null && burglarCanvas.enabled)
             burglarCanvasController?.UpdateWithInput(input);
         weaponWheelController.UpdateWithPlayerInput(ref input);
+        lockRadiusIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;

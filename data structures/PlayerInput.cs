@@ -1,5 +1,5 @@
+using Items;
 using UnityEngine;
-
 public struct PlayerInput {
     public struct FireInputs {
         public bool FirePressed;
@@ -27,6 +27,7 @@ public struct PlayerInput {
     public int selectgun;
     public bool actionButtonPressed;
     public int incrementItem;
+    public BaseItem selectItem;
     public bool useItem;
     public int incrementOverlay;
     public bool rotateCameraRightPressedThisFrame;

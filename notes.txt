@@ -2825,7 +2825,7 @@ UI:
         scan time 
         retain stats after breaking lock up to N 
         small health bar 
-    weapon wheel
+    * weapon wheel
     better clarity around alarm logic
         fix edge coloration from active node to alarm terminal
     show iconography when disguise is lost
@@ -3058,6 +3058,10 @@ shop todo:
 
 
 * can do a deal multiple times
+* support items
+* holster
+* sound effect
+* weapon wheel ease in
 
 silencer shows in gameplay
 map pane:
@@ -3095,7 +3099,6 @@ randomly place lasers
 randomly place cameras
 
 
-
 doors
     more door types? more explotable latch? more handles and things?
     sometimes unlocked
@@ -3129,9 +3132,6 @@ shops:
     more fence
     buy cyberware
 
-
-
-
 ensure all shops and menus are idiot proof: 
     if the player can take no action, tell them explicitly.
     if you can't make the deal, make that explicit
@@ -3140,16 +3140,6 @@ ensure all shops and menus are idiot proof:
         importer
         medical
         upgrades
-
-
-
-support items
-sound effect
-ease in
-show items
-
-
-
 items
 ducts
 elevator

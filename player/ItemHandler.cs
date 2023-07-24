@@ -15,9 +15,7 @@ public record ItemUseResult {
     };
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
-
     public Action<ItemHandler> OnValueChanged { get; set; }
-
     public List<BaseItem> items = new List<BaseItem>();
     public int index;
     public BaseItem activeItem;
@@ -52,6 +50,10 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                     break;
             }
             SwitchToItem(items[index]);
+        }
+        if (input.selectItem != null) {
+            SwitchToItem(input.selectItem);
+            index = items.IndexOf(input.selectItem);
         }
         if (activeItem is RocketLauncherItem) {
             if (input.Fire.FirePressed) {

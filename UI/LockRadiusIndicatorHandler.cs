@@ -64,7 +64,7 @@ public class LockRadiusIndicatorHandler : IBinder<GunHandler> {
             hasGun = false;
         }
     }
-    void DisableCursorImage() {
+    public void DisableCursorImage() {
         cursorImage.enabled = false;
         embellishDotText.Disable();
     }

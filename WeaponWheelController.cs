@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Easings;
+using Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class WeaponWheelController : MonoBehaviour {
+    public RectTransform mainRect;
+    public AudioSource audioSource;
+    public AudioClip[] revealSound;
+    public AudioClip[] mouseOverSound;
     public bool revealed;
     public GameObject wheelObject;
     Vector2 cursorPosition;
@@ -12,8 +19,9 @@ public class WeaponWheelController : MonoBehaviour {
     public Transform optionContainer;
     public GameObject weaponWheelOptionPrefab;
     public List<WeaponWheelOption> wheelOptions;
-
+    Coroutine dialogueCoroutine;
     WeaponWheelOption selectedOption;
+    WeaponWheelOption previousSelectedOption;
     float thetaDelta;
     public void Initialize() {
         wheelOptions = new List<WeaponWheelOption>();
@@ -27,26 +35,45 @@ public class WeaponWheelController : MonoBehaviour {
         if (GameManager.I.gameData.playerState.secondaryGun != null) {
             guns.Add(GameManager.I.gameData.playerState.secondaryGun);
         }
-        if (GameManager.I.gameData.playerState.tertiaryGun != null) {
+        if (GameManager.I.gameData.playerState.tertiaryGun != null && GameManager.I.gameData.playerState.thirdWeaponSlot) {
             guns.Add(GameManager.I.gameData.playerState.tertiaryGun);
         }
-        thetaDelta = 2f * Mathf.PI / guns.Count;
+        thetaDelta = 2f * Mathf.PI / (guns.Count + GameManager.I.gameData.levelState.plan.items.Where(item => item != null).Count() + 1);
         float theta = 0f;
         foreach (GunState gun in guns) {
             WeaponWheelOption option = CreateSelectorOption(theta, gun);
-            wheelOptions.Add(option);
             theta += thetaDelta;
         }
+        foreach (BaseItem item in GameManager.I.gameData.levelState.plan.items) {
+            if (item == null) continue;
+            WeaponWheelOption option = CreateSelectorOption(theta, item);
+            theta += thetaDelta;
+        }
+        CreateHolsterOption(theta);
     }
     WeaponWheelOption CreateSelectorOption(float theta, GunState gun) {
+        WeaponWheelOption weaponWheelOption = SpawnOption(theta);
+        weaponWheelOption.Initialize(gun);
+        return weaponWheelOption;
+    }
+    WeaponWheelOption CreateSelectorOption(float theta, BaseItem item) {
+        WeaponWheelOption weaponWheelOption = SpawnOption(theta);
+        weaponWheelOption.Initialize(item);
+        return weaponWheelOption;
+    }
+    WeaponWheelOption CreateHolsterOption(float theta) {
+        WeaponWheelOption weaponWheelOption = SpawnOption(theta);
+        weaponWheelOption.InitializeHolster();
+        return weaponWheelOption;
+    }
+    WeaponWheelOption SpawnOption(float theta) {
         GameObject selector = GameObject.Instantiate(weaponWheelOptionPrefab);
         selector.transform.SetParent(optionContainer, false);
         RectTransform selectorRect = selector.GetComponent<RectTransform>();
         Vector2 position = 155f * new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
         selectorRect.anchoredPosition = position;
-
         WeaponWheelOption weaponWheelOption = selector.GetComponent<WeaponWheelOption>();
-        weaponWheelOption.Initialize(gun);
+        wheelOptions.Add(weaponWheelOption);
         return weaponWheelOption;
     }
     public void UpdateWithPlayerInput(ref PlayerInput input) {
@@ -57,14 +84,27 @@ public class WeaponWheelController : MonoBehaviour {
                 CloseMenu(ref input);
                 Cursor.lockState = CursorLockMode.None;
             } else {
-                ResetCursor();
-                Cursor.lockState = CursorLockMode.Locked;
+                Reveal();
             }
         }
         if (revealed) {
             selectorText.text = "";
             UpdateCursor(input);
         }
+    }
+
+    void Reveal() {
+        Toolbox.RandomizeOneShot(audioSource, revealSound);
+        dialogueCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
+            Toolbox.Ease(null, 0.25f, 0f, 1, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+                mainRect.localScale = height * Vector2.one;
+            }, unscaledTime: true),
+            Toolbox.CoroutineFunc(() => {
+                dialogueCoroutine = null;
+            })
+        ));
+        ResetCursor();
+        Cursor.lockState = CursorLockMode.Locked;
     }
     public void HideWheel() {
         revealed = false;
@@ -74,21 +114,23 @@ public class WeaponWheelController : MonoBehaviour {
         cursorPosition = Vector2.zero;
     }
     void CloseMenu(ref PlayerInput input) {
+        if (dialogueCoroutine != null) StopCoroutine(dialogueCoroutine);
         Debug.Log($"closing menu with theta {selectedOption}");
         if (selectedOption.gun == GameManager.I.gameData.playerState.primaryGun) {
             input.selectgun = 1;
-            Debug.Log("**** 1");
         } else if (selectedOption.gun == GameManager.I.gameData.playerState.secondaryGun) {
             input.selectgun = 2;
-            Debug.Log("**** 2");
         } else if (selectedOption.gun == GameManager.I.gameData.playerState.tertiaryGun) {
             input.selectgun = 3;
-            Debug.Log("**** 3");
+        } else if (selectedOption.item != null) {
+            input.selectItem = selectedOption.item;
+        } else if (selectedOption.holster) {
+            input.selectgun = -1;
         }
     }
     void UpdateCursor(PlayerInput input) {
         cursorPosition += input.mouseDelta * 5f;
-        cursorPosition = Vector2.ClampMagnitude(cursorPosition, 200f);
+        cursorPosition = Vector2.ClampMagnitude(cursorPosition, 220f);
         mouseCursor.anchoredPosition = cursorPosition;
 
         float magnitude = cursorPosition.magnitude;
@@ -110,6 +152,11 @@ public class WeaponWheelController : MonoBehaviour {
         foreach (WeaponWheelOption option in wheelOptions) {
             option.HandleMouseOver(option == selectedOption);
         }
+        if (previousSelectedOption != selectedOption && selectedOption != null) {
+            Toolbox.RandomizeOneShot(audioSource, mouseOverSound);
+        }
+
+        previousSelectedOption = selectedOption;
     }
 
     int ThetaToIndex(float theta) {
@@ -120,4 +167,5 @@ public class WeaponWheelController : MonoBehaviour {
         }
         return 0;
     }
+
 }
