@@ -3143,8 +3143,13 @@ ensure all shops and menus are idiot proof:
 
 
 
-radial menu for selecting guns and items?
-    unify items and guns
+support items
+sound effect
+ease in
+show items
+
+
+
 items
 ducts
 elevator

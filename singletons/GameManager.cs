@@ -24,6 +24,8 @@ public partial class GameManager : Singleton<GameManager> {
     public PlayerOutlineHandler playerOutlineHandler;
     public LightLevelProbe playerLightLevelProbe;
     public NeoClearsighter clearSighter2;
+    List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
+
 
     [Header("input actions")]
     // UI input
@@ -458,13 +460,31 @@ public partial class GameManager : Singleton<GameManager> {
         if (Time.timeScale > 0) {
             playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
             if (gameData.levelState != null)
-                uiController?.UpdateWithPlayerInput(playerInput);
+                uiController?.UpdateWithPlayerInput(ref playerInput);
+        }
+        Debug.Log(playerInput.selectgun);
+        foreach (IInputReceiver i in inputReceivers) {
+            Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
+            playerInput.lookAtDirection = directionToCursor;
+            i.SetInputs(playerInput);
+            // i.SetInputs(playerInput with { lookAtDirection = directionToCursor });
         }
         UpdateCursor(uiclick, playerInput);
 
         // still not 100% clean here
         CameraInput input = playerCharacterController.BuildCameraInput();
         characterCamera.UpdateWithInput(input);
+
+        if (playerInput.incrementOverlay != 0) {
+            IncrementOverlay(playerInput.incrementOverlay);
+        }
+    }
+    public void SetInputReceivers(GameObject playerObject) {
+        inputReceivers = new List<IInputReceiver>();
+        foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<CharacterController>()) {
+            inputReceivers.Add(inputReceiver);
+        }
+        inputReceivers.Add(GameManager.I.characterCamera);
     }
 
     void UpdateCursor(bool uiclick, PlayerInput playerInput) {

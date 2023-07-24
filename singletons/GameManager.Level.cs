@@ -381,8 +381,7 @@ public partial class GameManager : Singleton<GameManager> {
         SetFocus(playerObj);
 
         // connect player object to input controller
-        InputController.I.SetInputReceivers(playerObj);
-
+        SetInputReceivers(playerObj);
     }
     public void LoadSkyBox(SceneData sceneData) {
         SkyBoxType skyBoxType = sceneData?.skyBoxType ?? SkyBoxType.none;

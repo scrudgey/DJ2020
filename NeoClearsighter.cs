@@ -341,8 +341,8 @@ public class NeoClearsighter : MonoBehaviour {
             }
 
             Renderer renderer = interlopers[i];
-            if (renderer.name == "cutaway") continue;
             if (renderer == null) continue;
+            if (renderer.name == "cutaway") continue;
 
             TagSystemData tagSystemData = rendererTagData[renderer];
             if (tagSystemData.dontHideInterloper) continue;

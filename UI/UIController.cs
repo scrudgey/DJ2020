@@ -35,6 +35,7 @@ public class UIController : MonoBehaviour {
     public ObjectivesCompleteController objectivesCompleteController;
     public MissionComputerController missionComputerController;
     public SaveIndicatorController saveIndicatorController;
+    public WeaponWheelController weaponWheelController;
     bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -64,6 +65,8 @@ public class UIController : MonoBehaviour {
         objectiveCanvasController.Initialize();
         objectivesCompleteController.Initialize();
         weaponUIHandler.Initialize();
+        weaponWheelController.HideWheel();
+        weaponWheelController.Initialize();
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
@@ -74,9 +77,10 @@ public class UIController : MonoBehaviour {
     public void DisplayObjectiveCompleteMessage(params string[] messages) {
         objectivesCompleteController.DisplayMessage(messages);
     }
-    public void UpdateWithPlayerInput(PlayerInput input) {
+    public void UpdateWithPlayerInput(ref PlayerInput input) {
         if (burglarCanvas != null && burglarCanvas.enabled)
             burglarCanvasController?.UpdateWithInput(input);
+        weaponWheelController.UpdateWithPlayerInput(ref input);
     }
     void OnDestroy() {
         GameManager.OnFocusChanged -= BindToNewTarget;

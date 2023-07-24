@@ -10,7 +10,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 public class InputController : Singleton<InputController> {
     public CharacterCamera OrbitCamera;
-    public List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
     [Header("mouse")]
 
     public Vector2 sensitivity = new Vector2(2f, 2f);
@@ -37,6 +36,7 @@ public class InputController : Singleton<InputController> {
     public InputActionReference useItem;
     public InputActionReference nextOverlay;
     public InputActionReference previousOverlay;
+    public InputActionReference revealWeaponWheel;
     [Header("Debug")]
     public InputActionReference DebugBreakAction;
 
@@ -61,6 +61,7 @@ public class InputController : Singleton<InputController> {
     private int incrementItemThisFrame;
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
+    private bool revealWeaponWheelHeld;
     // private bool escapePressedThisFrame;
     // private bool escapePressConsumed;
     Vector2 _smoothMouse;
@@ -87,6 +88,9 @@ public class InputController : Singleton<InputController> {
     public void HandleJumpAction(InputAction.CallbackContext ctx) {
         jumpPressedThisFrame = ctx.ReadValueAsButton();
         jumpHeld = ctx.ReadValueAsButton();
+    }
+    public void HandleRevealWeaponWheel(InputAction.CallbackContext ctx) {
+        revealWeaponWheelHeld = ctx.ReadValueAsButton();
     }
     public void HandleRotateCameraLeftAction(InputAction.CallbackContext ctx) {
         rotateCameraLeftPressedThisFrame = ctx.ReadValueAsButton();
@@ -170,6 +174,9 @@ public class InputController : Singleton<InputController> {
         jumpHeld = false;
         jumpReleasedThisFrame = true;
     }
+    public void HandleWeaponWheelCanceled(InputAction.CallbackContext ctx) {
+        revealWeaponWheelHeld = false;
+    }
     public void Start() {
         RegisterCallbacks();
     }
@@ -220,6 +227,10 @@ public class InputController : Singleton<InputController> {
         RunAction.action.canceled += HandleRunActionCanceled;
         MoveAction.action.canceled += HandleMoveActionCanceled;
         JumpAction.action.canceled += HandleJumpActionCanceled;
+
+        // Weapon wheel
+        revealWeaponWheel.action.performed += HandleRevealWeaponWheel;
+        revealWeaponWheel.action.canceled += HandleWeaponWheelCanceled;
     }
     void DeregisterCallbacks() {
         // Escape
@@ -263,6 +274,10 @@ public class InputController : Singleton<InputController> {
         RunAction.action.canceled -= HandleRunActionCanceled;
         MoveAction.action.canceled -= HandleMoveActionCanceled;
         JumpAction.action.canceled -= HandleJumpActionCanceled;
+
+        // Weapon wheel
+        revealWeaponWheel.action.performed -= HandleRevealWeaponWheel;
+        revealWeaponWheel.action.canceled -= HandleWeaponWheelCanceled;
     }
 
     public PlayerInput HandleCharacterInput(bool pointerOverUIElement, bool escapePressedThisFrame) {
@@ -283,28 +298,11 @@ public class InputController : Singleton<InputController> {
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
 
-
-
-        // Allow the script to clamp based on a desired target value.
-        // var targetOrientation = Quaternion.Euler(targetDirection);
-        // var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
-
-        // Get raw mouse input for a cleaner reading on more sensitive mice.
-        // var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
-
-        // Scale input against the sensitivity setting and multiply that against the smoothing value.
-
-
         mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
 
         // Interpolate mouse movement over time to apply smoothing delta.
         _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
         _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
-
-        // Find the absolute mouse movement value from point zero.
-        // _mouseAbsolute += _smoothMouse;
-
-
 
         CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;
@@ -315,46 +313,41 @@ public class InputController : Singleton<InputController> {
             useItemThisFrame = false;
             incrementOverlayThisFrame = 0;
         }
-        foreach (IInputReceiver i in inputReceivers) {
-            Vector3 directionToCursor = (targetData.worldPosition - i.transform.position).normalized;
-            characterInputs = new PlayerInput() {
-                MoveAxisForward = inputVector.y,
-                MoveAxisRight = inputVector.x,
-                mouseDelta = _smoothMouse,
-                CameraRotation = OrbitCamera.isometricRotation,
-                JumpDown = jumpPressedThisFrame,
-                jumpHeld = jumpHeld,
-                jumpReleased = jumpReleasedThisFrame,
-                CrouchDown = crouchHeld,
-                runDown = runHeld,
-                Fire = new PlayerInput.FireInputs() {
-                    FirePressed = firePressedThisFrame,
-                    FireHeld = firePressedHeld,
-                    cursorData = targetData,
-                    AimPressed = aimPressedThisFrame
-                },
-                reload = reloadPressedThisFrame,
-                selectgun = selectGunThisFrame,
-                actionButtonPressed = actionButtonPressedThisFrame,
-                incrementItem = incrementItemThisFrame,
-                useItem = useItemThisFrame,
-                incrementOverlay = incrementOverlayThisFrame,
-                rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
-                rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
-                lookAtDirection = directionToCursor,
-                zoomInput = zoomInput,
-                mouseDown = mouseDown,
-                mouseClicked = mouseClick,
-                escapePressed = escapePressedThisFrame, //&& !escapePressConsumed
-                mousePosition = mousePosition,
-                viewPortPoint = viewPortPoint
-            };
-            i.SetInputs(characterInputs);
-        }
 
-        if (incrementOverlayThisFrame != 0) {
-            GameManager.I.IncrementOverlay(incrementOverlayThisFrame);
-        }
+        characterInputs = new PlayerInput() {
+            MoveAxisForward = inputVector.y,
+            MoveAxisRight = inputVector.x,
+            mouseDelta = _smoothMouse,
+            CameraRotation = OrbitCamera.isometricRotation,
+            JumpDown = jumpPressedThisFrame,
+            jumpHeld = jumpHeld,
+            jumpReleased = jumpReleasedThisFrame,
+            CrouchDown = crouchHeld,
+            runDown = runHeld,
+            Fire = new PlayerInput.FireInputs() {
+                FirePressed = firePressedThisFrame,
+                FireHeld = firePressedHeld,
+                cursorData = targetData,
+                AimPressed = aimPressedThisFrame
+            },
+            reload = reloadPressedThisFrame,
+            selectgun = selectGunThisFrame,
+            actionButtonPressed = actionButtonPressedThisFrame,
+            incrementItem = incrementItemThisFrame,
+            useItem = useItemThisFrame,
+            incrementOverlay = incrementOverlayThisFrame,
+            rotateCameraRightPressedThisFrame = rotateCameraRightPressedThisFrame,
+            rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
+            zoomInput = zoomInput,
+            mouseDown = mouseDown,
+            mouseClicked = mouseClick,
+            escapePressed = escapePressedThisFrame, //&& !escapePressConsumed
+            mousePosition = mousePosition,
+            viewPortPoint = viewPortPoint,
+            revealWeaponWheel = revealWeaponWheelHeld
+        };
+
+
         if (!mouseDown) {
             mouseClickedThisFrame = false;
         }
@@ -376,14 +369,5 @@ public class InputController : Singleton<InputController> {
         // escapePressConsumed = false;
         previousMouseDelta = mouseDelta;
         return characterInputs;
-    }
-
-    // TODO: this can belong to gamemanager.
-    public void SetInputReceivers(GameObject playerObject) {
-        inputReceivers = new List<IInputReceiver>();
-        foreach (IInputReceiver inputReceiver in playerObject.GetComponentsInChildren<CharacterController>()) {
-            inputReceivers.Add(inputReceiver);
-        }
-        inputReceivers.Add(GameManager.I.characterCamera);
     }
 }

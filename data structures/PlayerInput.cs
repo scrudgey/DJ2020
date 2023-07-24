@@ -46,6 +46,7 @@ public struct PlayerInput {
     public Vector2 mousePosition;
     public Vector2 viewPortPoint;
     public bool armsRaised;
+    public bool revealWeaponWheel;
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };

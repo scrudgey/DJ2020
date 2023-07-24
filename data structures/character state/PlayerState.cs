@@ -57,13 +57,13 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
-        // GunTemplate gun2 = GunTemplate.Load("s1");
-        // GunTemplate gun3 = GunTemplate.Load("r1");
+        GunTemplate gun2 = GunTemplate.Load("s1");
+        GunTemplate gun3 = GunTemplate.Load("r1");
         // GunTemplate gun4 = GunTemplate.Load("p2");
 
         GunState gunState1 = GunState.Instantiate(gun1);
-        // GunState gunState2 = GunState.Instantiate(gun2);
-        // GunState gunState3 = GunState.Instantiate(gun3);
+        GunState gunState2 = GunState.Instantiate(gun2);
+        GunState gunState3 = GunState.Instantiate(gun3);
         // GunState gunState4 = GunState.Instantiate(gun4);
 
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
@@ -104,8 +104,10 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             allGuns = allGuns,
             allItems = allItems,
             primaryGun = gunState1,
-            secondaryGun = null,
-            tertiaryGun = null,
+            // secondaryGun = null,
+            secondaryGun = gunState2,
+            // tertiaryGun = null,
+            tertiaryGun = gunState3,
             activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
