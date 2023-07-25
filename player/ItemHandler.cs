@@ -10,27 +10,34 @@ public record ItemUseResult {
     public bool doBurgle;
     public Ladder useLadder;
     public AttackSurface attackSurface;
+    public bool emptyUse;
     public static ItemUseResult Empty() => new ItemUseResult {
 
     };
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
+    public GunHandler gunHandler;
     public Action<ItemHandler> OnValueChanged { get; set; }
     public List<ItemInstance> items = new List<ItemInstance>();
     public int index;
     public ItemInstance activeItem;
     public AudioSource audioSource;
+    public AudioClip[] emptyUse;
     public RocketLauncher rocketLauncher;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
+
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
     void Start() {
         OnItemEnter(activeItem);
     }
-    public void LoadItemState(List<ItemInstance> loadItems) {
+    public void LoadItemState(List<ItemTemplate> loadItems) {
         items = new List<ItemInstance>();
-        items.AddRange(loadItems);
+        foreach (ItemTemplate template in loadItems) {
+            ItemInstance instance = ItemInstance.FactoryLoad(template);
+            items.Add(instance);
+        }
         ClearItem();
     }
 
@@ -53,8 +60,13 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             SwitchToItem(items[index]);
         }
         if (input.selectItem != null) {
-            SwitchToItem(input.selectItem);
-            index = items.IndexOf(input.selectItem);
+            ItemInstance instance = items.Where(item => item.template == input.selectItem).FirstOrDefault();
+            if (activeItem == instance && instance.toggleable) {
+                ClearItem();
+            } else {
+                SwitchToItem(instance);
+            }
+            index = items.IndexOf(instance);
         }
         if (activeItem is RocketLauncherItem) {
             if (input.Fire.FirePressed) {
@@ -75,17 +87,27 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         SwitchToItem(null);
         index = items.IndexOf(null);
     }
-
-
     ItemUseResult UseItem(PlayerInput input) {
         if (activeItem == null)
             return ItemUseResult.Empty();
-        return activeItem.Use(this, input);
+        ItemUseResult result = activeItem.Use(this, input);
+        if (result.emptyUse) {
+            Toolbox.RandomizeOneShot(audioSource, emptyUse);
+        }
+        OnValueChanged?.Invoke(this);
+        return result;
     }
-
+    public void EvictSubweapon() {
+        if (activeItem != null && activeItem.subweapon) {
+            ClearItem();
+        }
+    }
     void OnItemEnter(ItemInstance item) {
         if (item == null)
             return;
+        if (item.subweapon) {
+            gunHandler?.SwitchToGun(-1);
+        }
         switch (item) {
             case RocketLauncherItem rocketItem:
                 Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);

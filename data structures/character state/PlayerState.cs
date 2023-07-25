@@ -19,7 +19,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     // gun
     public List<GunState> allGuns;
-    public List<ItemInstance> allItems;
+    public List<ItemTemplate> allItems;
     public GunState primaryGun { get; set; }
     public GunState secondaryGun { get; set; }
     public GunState tertiaryGun { get; set; }
@@ -76,7 +76,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // gunState4
         };
 
-        List<ItemInstance> allItems = new List<ItemInstance> {
+        List<ItemTemplate> allItems = new List<ItemTemplate> {
             // BaseItem.LoadItem("C4"),
             // BaseItem.LoadItem("rocket"),
             // BaseItem.LoadItem("goggles"),

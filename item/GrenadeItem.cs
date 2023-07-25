@@ -8,9 +8,12 @@ namespace Items {
         public GrenadeData grenadeData;
         public GrenadeItem(GrenadeData grenadeData) : base(grenadeData) {
             this.grenadeData = grenadeData;
+            count = 3;
+            maxCount = 3;
+            consumable = true;
         }
-        public override ItemUseResult Use(ItemHandler handler, PlayerInput input) {
-            base.Use(handler, input);
+        protected override ItemUseResult DoUse(ItemHandler handler, PlayerInput input) {
+            base.DoUse(handler, input);
             handler.ThrowGrenade(grenadeData, input);
             Toolbox.RandomizeOneShot(handler.audioSource, grenadeData.throwSound);
             return new ItemUseResult {

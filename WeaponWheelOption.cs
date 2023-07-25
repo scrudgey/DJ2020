@@ -14,7 +14,7 @@ public class WeaponWheelOption : MonoBehaviour {
     // public Sprite holsterSprite;
     public GameObject holsterIcon;
     public GunState gun;
-    public ItemInstance item;
+    public ItemTemplate item;
     public bool holster;
 
     public void Initialize(GunState gun) {
@@ -24,11 +24,11 @@ public class WeaponWheelOption : MonoBehaviour {
         optionName = gun.getName();
         holsterIcon.SetActive(false);
     }
-    public void Initialize(ItemInstance item) {
+    public void Initialize(ItemTemplate item) {
         this.item = item;
-        icon.sprite = item.template.image;
+        icon.sprite = item.image;
         background.color = normalColor;
-        optionName = item.template.name;
+        optionName = item.name;
         holsterIcon.SetActive(false);
     }
     public void InitializeHolster() {

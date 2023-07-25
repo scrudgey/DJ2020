@@ -12,6 +12,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         racking,
         reloading,
     }
+    public ItemHandler itemHandler;
     public CharacterCamera characterCamera;
     public GunStateEnum state;
     // public InputMode inputMode;
@@ -405,12 +406,15 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 Holster();
                 break;
             case 1:
+                itemHandler?.EvictSubweapon();
                 SwitchGun(primary);
                 break;
             case 2:
+                itemHandler?.EvictSubweapon();
                 SwitchGun(secondary);
                 break;
             case 3:
+                itemHandler?.EvictSubweapon();
                 SwitchGun(third);
                 break;
         }

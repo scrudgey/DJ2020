@@ -8,15 +8,32 @@ namespace Items {
     public class ItemInstance {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<ItemTemplate>))]
         public ItemTemplate template;
+        protected bool consumable;
+        public bool toggleable;
+        public bool subweapon;
+        public int count = 1;
+        public int maxCount = 1;
+
+
         public ItemInstance(ItemTemplate template) {
             this.template = template;
         }
-        public virtual ItemUseResult Use(ItemHandler handler, PlayerInput input) => ItemUseResult.Empty();
+        public ItemUseResult Use(ItemHandler handler, PlayerInput input) {
+            if (count > 0) {
+                if (consumable) {
+                    count -= 1;
+                }
+                return DoUse(handler, input);
+            } else {
+                return ItemUseResult.Empty() with { emptyUse = true };
+            }
+        }
+
+        protected virtual ItemUseResult DoUse(ItemHandler handler, PlayerInput input) => ItemUseResult.Empty();
         public virtual bool EnablesManualHack() => false;
         public virtual bool EnablesBurglary() => false;
-        static ItemInstance FactoryLoad(string baseName) {
-            if (baseName == "") return null;
-            ItemTemplate baseItem = ItemTemplate.LoadItem(baseName);
+        public static ItemInstance FactoryLoad(ItemTemplate baseItem) {
+            if (baseItem == null) return null;
             return baseItem switch {
                 GrenadeData grenadeData => new GrenadeItem(grenadeData),
                 RocketLauncherData rocketData => new RocketLauncherItem(rocketData),
@@ -31,16 +48,20 @@ namespace Items {
             };
         }
 
-        public static ItemInstance LoadItem(string itemName) {
-            if (itemName == "") return null;
-            ItemInstance newItem = ItemInstance.FactoryLoad(itemName);
-            if (newItem != null) {
-                return newItem;
-            } else {
-                Debug.LogError($"unable to load plan item {itemName}");
-                return null;
-            }
-        }
+        // public static ItemInstance LoadItem(string itemName) {
+        //     if (itemName == "") return null;
+        //     ItemTemplate template = ItemTemplate.LoadItem(itemName);
+        //     if (template == null) {
+        //         Debug.LogError($"failed to load item template: {itemName}");
+        //     }
+        //     ItemInstance newItem = ItemInstance.FactoryLoad(template);
+        //     if (newItem != null) {
+        //         return newItem;
+        //     } else {
+        //         Debug.LogError($"unable to load plan item {itemName}");
+        //         return null;
+        //     }
+        // }
     }
 }
 

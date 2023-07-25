@@ -3140,18 +3140,22 @@ dialogue
 hacking
 
 
+* rocket launcher
+    * used up after one use
+* grenade
+    * used up after 3 uses
+* C4 
+    * used up after two uses
+* UI handler: indicate when empty
+play a sound when use empty 
+    if we standardize at the iteminstance level, it could work ?
 
-
-rocket launcher
-    can't have a gun at the same time
-    used up after one use
-C4 
-    used up after two uses
-goggles 
-    toggle on/off
-grenade
-    used up after 3 uses
 
 idea: rocket launcher and grenade might take weapon slot.
-
-
+    obviously, we can't use a gun and rocket launcher at the same time.
+goggles 
+    toggle on/off?
+    if the main way to interact with items is by weapon wheel, then this will be necessary
+indicate empty in weapon wheel?
+indicate selected in weapon wheel?
+kick off item when empty?

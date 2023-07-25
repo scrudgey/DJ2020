@@ -8,9 +8,12 @@ namespace Items {
         public C4Data c4Data;
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;
+            count = 2;
+            maxCount = 2;
+            consumable = true;
         }
-        public override ItemUseResult Use(ItemHandler handler, PlayerInput input) {
-            base.Use(handler, input);
+        protected override ItemUseResult DoUse(ItemHandler handler, PlayerInput input) {
+            base.DoUse(handler, input);
             Toolbox.RandomizeOneShot(handler.audioSource, c4Data.deploySound);
             GameObject c4 = GameObject.Instantiate(c4Data.prefab, handler.transform.position, Quaternion.identity);
             Explosive explosive = c4.GetComponentInChildren<Explosive>();

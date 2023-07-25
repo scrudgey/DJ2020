@@ -6,12 +6,11 @@ using UnityEngine;
 public record LevelPlan {
     public string insertionPointIdn;
     public string extractionPointIdn;
-    // TODO: converter for list
     [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> activeTactics;
-    public List<ItemInstance> items;
-    public static LevelPlan Default(List<ItemInstance> allItems) {
-        List<ItemInstance> itemList = new List<ItemInstance>() { null, null, null, null };
+    public List<ItemTemplate> items;
+    public static LevelPlan Default(List<ItemTemplate> allItems) {
+        List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null };
         if (allItems.Count >= 1) {
             itemList[0] = allItems[0];
         }
@@ -31,14 +30,14 @@ public record LevelPlan {
     }
 
     public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);
-    public bool startWithFakeID() => activeTactics.Any(tactic => tactic is TacticFakeID);
+    // public bool startWithFakeID() => activeTactics.Any(tactic => tactic is TacticFakeID);
 
     public void ApplyState(GameObject playerObject) {
         foreach (ItemHandler itemHandler in playerObject.GetComponentsInChildren<ItemHandler>()) {
             itemHandler.LoadItemState(items);
-            if (startWithFakeID()) {
-                itemHandler.items.Add(ItemInstance.LoadItem("ID"));
-            }
+            // if (startWithFakeID()) {
+            //     itemHandler.items.Add(ItemInstance.LoadItem("ID"));
+            // }
         }
     }
 

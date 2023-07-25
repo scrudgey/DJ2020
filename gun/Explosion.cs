@@ -21,7 +21,7 @@ public class Explosion : MonoBehaviour {
         }
         Destroy(gameObject);
         NoiseData data = new NoiseData {
-            volume = radius * 10f,
+            volume = radius * 50f,
             suspiciousness = Suspiciousness.aggressive
         };
         Toolbox.Noise(transform.position, data, transform.root.gameObject);

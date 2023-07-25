@@ -17,6 +17,7 @@ namespace UI {
         // public InputAction useItem;
         public InputActionReference actionReference;
         public int bindingIndex;
+        public GameObject emptyIndicator;
         override public void HandleValueChanged(ItemHandler itemHandler) {
             InputAction action = actionReference.action;
             var displayString = string.Empty;
@@ -34,11 +35,11 @@ namespace UI {
                 parent.SetActive(false);
             } else {
                 parent.SetActive(true);
-                // TODO: fix this up
                 itemImage.enabled = true;
                 itemImage.sprite = itemHandler.activeItem.template.image;
                 itemTitle.text = itemHandler.activeItem.template.name;
-                itemCaption.text = "1/1";
+                itemCaption.text = $"{itemHandler.activeItem.count}/{itemHandler.activeItem.maxCount}";
+                emptyIndicator.SetActive(itemHandler.activeItem.count == 0);
             }
         }
     }

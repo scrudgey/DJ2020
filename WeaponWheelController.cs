@@ -44,7 +44,7 @@ public class WeaponWheelController : MonoBehaviour {
             WeaponWheelOption option = CreateSelectorOption(theta, gun);
             theta += thetaDelta;
         }
-        foreach (ItemInstance item in GameManager.I.gameData.levelState.plan.items) {
+        foreach (ItemTemplate item in GameManager.I.gameData.levelState.plan.items) {
             if (item == null) continue;
             WeaponWheelOption option = CreateSelectorOption(theta, item);
             theta += thetaDelta;
@@ -56,7 +56,7 @@ public class WeaponWheelController : MonoBehaviour {
         weaponWheelOption.Initialize(gun);
         return weaponWheelOption;
     }
-    WeaponWheelOption CreateSelectorOption(float theta, ItemInstance item) {
+    WeaponWheelOption CreateSelectorOption(float theta, ItemTemplate item) {
         WeaponWheelOption weaponWheelOption = SpawnOption(theta);
         weaponWheelOption.Initialize(item);
         return weaponWheelOption;

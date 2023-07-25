@@ -4,9 +4,6 @@ using UnityEngine;
 namespace Items {
     public class BurglarTools : ItemInstance {
         public BurglarTools(ItemTemplate baseData) : base(baseData) { }
-        public override ItemUseResult Use(ItemHandler handler, PlayerInput input) {
-            return base.Use(handler, input);
-        }
         public override bool EnablesBurglary() => true;
     }
 }

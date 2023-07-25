@@ -50,9 +50,9 @@ public class MissionPlanController : MonoBehaviour {
             GameManager.I.gameData.playerState.allGuns.Add(gunState3);
             GameManager.I.gameData.playerState.allGuns.Add(gunState4);
 
-            ItemInstance item1 = ItemInstance.LoadItem("C4");
-            ItemInstance item2 = ItemInstance.LoadItem("rocket");
-            ItemInstance item3 = ItemInstance.LoadItem("grenade");
+            ItemTemplate item1 = ItemTemplate.LoadItem("C4");
+            ItemTemplate item2 = ItemTemplate.LoadItem("rocket");
+            ItemTemplate item3 = ItemTemplate.LoadItem("grenade");
 
             GameManager.I.gameData.playerState.allItems.Add(item1);
             GameManager.I.gameData.playerState.allItems.Add(item2);

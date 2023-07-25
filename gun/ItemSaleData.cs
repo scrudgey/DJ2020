@@ -1,8 +1,8 @@
 using Items;
 public class ItemSaleData {
-    public ItemInstance item;
+    public ItemTemplate item;
     public int cost;
-    public ItemSaleData(ItemInstance baseItem, int cost) {
+    public ItemSaleData(ItemTemplate baseItem, int cost) {
         this.item = baseItem;
         this.cost = cost;
     }

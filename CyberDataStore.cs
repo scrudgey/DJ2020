@@ -18,11 +18,14 @@ public class CyberDataStore : MonoBehaviour {
     public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         cyberComponent.OnStateChange += HandleCyberStateChange;
-        if (payDatas.Count == 0) {
-            dataFileIndicator.Initialize(null);
-        } else {
-            dataFileIndicator.Initialize(payDatas[0]);
+        if (dataFileIndicator != null) {
+            if (payDatas.Count == 0) {
+                dataFileIndicator.Initialize(null);
+            } else {
+                dataFileIndicator.Initialize(payDatas[0]);
+            }
         }
+
     }
     public void HandleCyberStateChange(CyberComponent component) {
         // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");

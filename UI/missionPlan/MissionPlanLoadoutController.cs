@@ -149,7 +149,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             }
         }
     }
-    void SetItemSlot(int index, ItemInstance item) {
+    void SetItemSlot(int index, ItemTemplate item) {
         if (item == null) {
             itemSlots[index].Clear();
             return;
@@ -322,7 +322,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
         }
-        foreach (ItemInstance item in data.playerState.allItems) {
+        foreach (ItemTemplate item in data.playerState.allItems) {
             // BaseItem item = BaseItem.LoadItem(itemName);
             if (item == null) continue;
             // if (plan.items.Any(planItem => item.data.shortName == planItem)) continue;

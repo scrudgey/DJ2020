@@ -8,21 +8,21 @@ public class LoadoutGearSlotButton : MonoBehaviour {
     public int slotIndex;
     public MissionPlanLoadoutController loadoutController;
     public Image weaponImage;
-    public ItemInstance item;
+    public ItemTemplate item;
     int index;
 
     public void Initialize(MissionPlanLoadoutController controller, int index) {
         this.loadoutController = controller;
         this.index = index;
     }
-    public void SetItem(ItemInstance item) {
+    public void SetItem(ItemTemplate item) {
         if (item == null) {
             Clear();
             return;
         }
         this.item = item;
         weaponImage.enabled = true;
-        weaponImage.sprite = item.template.image;
+        weaponImage.sprite = item.image;
     }
     public void Clear() {
         weaponImage.enabled = false;

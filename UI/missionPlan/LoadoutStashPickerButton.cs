@@ -9,17 +9,17 @@ public class LoadoutStashPickerButton : MonoBehaviour {
     public MissionPlanLoadoutController loadoutController;
     public TextMeshProUGUI text;
     public GunState gunstate;
-    public ItemInstance item;
+    public ItemTemplate item;
     public void Initialize(MissionPlanLoadoutController controller, GunState state) {
         this.gunstate = state;
         this.loadoutController = controller;
         text.text = state.getShortName();
         type = PickerType.gun;
     }
-    public void Initialize(MissionPlanLoadoutController controller, ItemInstance item) {
+    public void Initialize(MissionPlanLoadoutController controller, ItemTemplate item) {
         this.item = item;
         this.loadoutController = controller;
-        text.text = item.template.name;
+        text.text = item.name;
         type = PickerType.item;
     }
 
