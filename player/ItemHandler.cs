@@ -22,17 +22,18 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     public AudioSource audioSource;
     public RocketLauncher rocketLauncher;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
-    float burglarHighlightTimer;
-    float burglarHighlightRefreshInterval = 1f;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
     void Start() {
         OnItemEnter(activeItem);
     }
-    void nextNonNullItem() {
-
+    public void LoadItemState(List<BaseItem> loadItems) {
+        items = new List<BaseItem>();
+        items.AddRange(loadItems);
+        ClearItem();
     }
+
     public ItemUseResult SetInputs(PlayerInput input) {
         if (input.incrementItem != 0) {
             int cycles = 0;
@@ -60,7 +61,6 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 return UseItem(input);
             }
         }
-
         if (input.useItem) {
             return UseItem(input);
         } else return ItemUseResult.Empty();
@@ -68,12 +68,6 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     void SwitchToItem(BaseItem item) {
         OnItemExit(this.activeItem);
         this.activeItem = item;
-        // Debug.Log($"switch to item: {activeItem} {index}");
-        // int i = 0;
-        // foreach (BaseItem x in items) {
-        //     i++;
-        //     Debug.Log($"{i}: {x}");
-        // }
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
@@ -81,12 +75,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         SwitchToItem(null);
         index = items.IndexOf(null);
     }
-    public void LoadItemState(List<BaseItem> loadItems) {
-        items = new List<BaseItem>();
-        items.AddRange(loadItems);
-        // items.Add(null);
-        ClearItem();
-    }
+
 
     ItemUseResult UseItem(PlayerInput input) {
         if (activeItem == null)
@@ -109,31 +98,11 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                 Toolbox.RandomizeOneShot(audioSource, goggles.goggleData.wearSounds);
                 break;
-            case BurglarTools:
-                // foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
-                //     surface.EnableOutline();
-                // }
-                break;
             default:
                 break;
         }
     }
-    void Update() {
-        if (activeItem is BurglarTools) {
-            burglarHighlightTimer += Time.deltaTime;
-            if (burglarHighlightTimer > burglarHighlightRefreshInterval) {
-                burglarHighlightTimer -= burglarHighlightRefreshInterval;
-                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
-                    if (Math.Abs(surface.transform.position.y - transform.position.y) < 1f) {
-                        surface.EnableOutline();
-                    } else {
-                        surface.DisableOutline();
-                    }
-                }
-            }
 
-        }
-    }
     void OnItemExit(BaseItem item) {
         if (item == null)
             return;
@@ -144,12 +113,6 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             case IRGoggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;
                 GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
-                break;
-            case BurglarTools:
-                burglarHighlightTimer = 0f;
-                foreach (AttackSurface surface in GameObject.FindObjectsOfType<AttackSurface>()) {
-                    surface.DisableOutline();
-                }
                 break;
             default:
                 break;

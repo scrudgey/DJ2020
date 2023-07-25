@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Items {
     [CreateAssetMenu(menuName = "ScriptableObjects/Items/RocketLauncher")]
-    public class RocketLauncherData : ItemData {
+    public class RocketLauncherData : ItemTemplate {
         public GameObject rocketPrefab;
         public AudioClip[] deploySound;
         public AudioClip[] shootSound;

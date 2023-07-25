@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
     [CreateAssetMenu(menuName = "ScriptableObjects/Items/C4")]
-    public class C4Data : ItemData {
+    public class C4Data : ItemTemplate {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<GameObject>))]
         public GameObject prefab;
         [JsonConverter(typeof(ScriptableObjectJsonConverter<AudioClip>))]

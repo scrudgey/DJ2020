@@ -142,7 +142,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         for (int i = 0; i < 4; i++) {
             itemSlots[i].Initialize(this, i);
             if (i < plan.items.Count) {
-                // BaseItem item = ItemInstance.LoadItem(plan.items[i]);
+                // BaseItem item = BaseItem.LoadItem(plan.items[i]);
                 SetItemSlot(i, plan.items[i]);
             } else {
                 SetItemSlot(i, null);
@@ -323,7 +323,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         foreach (BaseItem item in data.playerState.allItems) {
-            // BaseItem item = ItemInstance.LoadItem(itemName);
+            // BaseItem item = BaseItem.LoadItem(itemName);
             if (item == null) continue;
             // if (plan.items.Any(planItem => item.data.shortName == planItem)) continue;
             if (plan.items.Contains(item)) continue;

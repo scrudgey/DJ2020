@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Items {
     [CreateAssetMenu(menuName = "ScriptableObjects/Items/IRGoggles")]
-    public class IRGoggleData : ItemData {
+    public class IRGoggleData : ItemTemplate {
         public AudioClip[] wearSounds;
     }
 }

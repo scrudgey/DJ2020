@@ -37,7 +37,7 @@ public record LevelPlan {
         foreach (ItemHandler itemHandler in playerObject.GetComponentsInChildren<ItemHandler>()) {
             itemHandler.LoadItemState(items);
             if (startWithFakeID()) {
-                itemHandler.items.Add(ItemInstance.LoadItem("ID"));
+                itemHandler.items.Add(BaseItem.LoadItem("ID"));
             }
         }
     }

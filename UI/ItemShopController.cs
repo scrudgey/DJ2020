@@ -49,10 +49,10 @@ public class ItemShopController : MonoBehaviour {
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
     List<ItemSaleData> LoadItemSaleData() => new List<ItemSaleData>(){
-            new ItemSaleData(ItemInstance.LoadItem("C4"), 600),
-            new ItemSaleData(ItemInstance.LoadItem("grenade"), 500),
-            new ItemSaleData(ItemInstance.LoadItem("rocket"), 800),
-            new ItemSaleData(ItemInstance.LoadItem("goggles"), 750),
+            new ItemSaleData(BaseItem.LoadItem("C4"), 600),
+            new ItemSaleData(BaseItem.LoadItem("grenade"), 500),
+            new ItemSaleData(BaseItem.LoadItem("rocket"), 800),
+            new ItemSaleData(BaseItem.LoadItem("goggles"), 750),
         };
 
     void ClearInitialize() {

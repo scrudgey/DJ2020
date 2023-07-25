@@ -77,9 +77,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         };
 
         List<BaseItem> allItems = new List<BaseItem> {
-            // ItemInstance.LoadItem("C4"),
-            // ItemInstance.LoadItem("rocket"),
-            // ItemInstance.LoadItem("goggles"),
+            // BaseItem.LoadItem("C4"),
+            // BaseItem.LoadItem("rocket"),
+            // BaseItem.LoadItem("goggles"),
         };
 
         List<LootData> loots = new List<LootData> {
