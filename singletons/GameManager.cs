@@ -462,7 +462,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (gameData.levelState != null)
                 uiController?.UpdateWithPlayerInput(ref playerInput);
         }
-        Debug.Log(playerInput.selectgun);
+        // Debug.Log(playerInput.selectgun);
         foreach (IInputReceiver i in inputReceivers) {
             Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
             playerInput.lookAtDirection = directionToCursor;

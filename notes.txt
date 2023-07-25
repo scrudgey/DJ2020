@@ -2739,6 +2739,12 @@ x ladders
 * stealing DAT001 in yamachi doesnt work
 * dont start with stuff
 * stores can't interact
+* can do a deal multiple times
+* support items
+* holster
+* sound effect
+* weapon wheel ease in
+
 
 
  
@@ -3057,12 +3063,6 @@ shop todo:
         gated by a different progression mechanic
 
 
-* can do a deal multiple times
-* support items
-* holster
-* sound effect
-* weapon wheel ease in
-
 silencer shows in gameplay
 map pane:
     show type of location? city view? territory?
@@ -3132,14 +3132,6 @@ shops:
     more fence
     buy cyberware
 
-ensure all shops and menus are idiot proof: 
-    if the player can take no action, tell them explicitly.
-    if you can't make the deal, make that explicit
-        gun shop
-        item shop
-        importer
-        medical
-        upgrades
 items
 ducts
 elevator
@@ -3149,3 +3141,13 @@ hacking
 
 
 
+
+rocket launcher
+    can't have a gun at the same time
+    used up after one use
+C4 
+    used up after two uses
+goggles 
+    toggle on/off
+grenade
+    used up after 3 uses

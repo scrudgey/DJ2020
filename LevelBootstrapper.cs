@@ -47,6 +47,7 @@ public class LevelBootstrapper : MonoBehaviour {
             // ItemInstance.LoadItem("deck"),
             ItemInstance.LoadItem("C4"),
             ItemInstance.LoadItem("goggles"),
+            ItemInstance.LoadItem("rocket"),
         };
 
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems));

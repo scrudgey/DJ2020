@@ -20,7 +20,7 @@ public class PayDataShopController : MonoBehaviour {
     [Header("data list")]
     public GameObject paydataButtonPrefab;
     public Transform payDataButtonsContainer;
-
+    public GameObject emptyInventoryIndicator;
 
     [Header("sounds")]
     public AudioClip[] sellSound;
@@ -45,6 +45,7 @@ public class PayDataShopController : MonoBehaviour {
 
     void ClearDataButtons() {
         foreach (Transform child in payDataButtonsContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
     }
@@ -55,6 +56,7 @@ public class PayDataShopController : MonoBehaviour {
         foreach (PayData data in GameManager.I.gameData.playerState.payDatas) {
             CreateDataButton(data);
         }
+        emptyInventoryIndicator.SetActive(GameManager.I.gameData.playerState.payDatas.Count == 0);
     }
     void CreateDataButton(PayData data) {
         GameObject obj = GameObject.Instantiate(paydataButtonPrefab);

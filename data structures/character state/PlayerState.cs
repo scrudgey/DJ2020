@@ -69,15 +69,17 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
         // gunState1.delta.activeMods.Add(silencer);
 
-        List<GunState> allGuns = new List<GunState>{
+        List<GunState> allGuns = new List<GunState> {
             gunState1,
-            // gunState2,
+            gunState2,
             // gunState3,
             // gunState4
         };
 
         List<BaseItem> allItems = new List<BaseItem> {
-            // ItemInstance.LoadItem("C4")
+            // ItemInstance.LoadItem("C4"),
+            // ItemInstance.LoadItem("rocket"),
+            // ItemInstance.LoadItem("goggles"),
         };
 
         List<LootData> loots = new List<LootData> {
@@ -131,6 +133,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             payDatas = new List<PayData>(),
 
             credits = 10000,
+            // credits = 600,
             loots = loots
         };
     }

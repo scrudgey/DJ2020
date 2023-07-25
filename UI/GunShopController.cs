@@ -13,13 +13,18 @@ public class GunShopController : MonoBehaviour {
     public GameObject gunListDividerPrefab;
     public StoreDialogueController dialogueController;
     public RectTransform bottomRect;
+    [Header("empty")]
+    public GameObject emptyInventoryIndicator;
+    public GameObject emptyForSaleIndicator;
     [Header("lists")]
     public Transform leftGunScrollContainer;
     public Transform rightGunScrollContainer;
+    public Transform leftGunListFinalSpacer;
     [Header("stats")]
     public GunStatHandler gunStatHandler;
     public TextMeshProUGUI creditsPlayerTotal;
     public TextMeshProUGUI creditsCost;
+    public Button buyButton;
     [Header("compare")]
     public Image compareBoxImage;
     public TextMeshProUGUI compareGunTitle;
@@ -54,20 +59,20 @@ public class GunShopController : MonoBehaviour {
     }
 
 
-    List<GunSaleData> LoadGunSaleData() => new List<GunSaleData>(){
-            new GunSaleData(GunTemplate.Load("p1"), 600),
-            new GunSaleData(GunTemplate.Load("p2"), 500),
-            new GunSaleData(GunTemplate.Load("p3"), 800),
-            new GunSaleData(GunTemplate.Load("p4"), 750),
-            new GunSaleData(GunTemplate.Load("s1"), 1750),
-            new GunSaleData(GunTemplate.Load("s2"), 2450),
-            new GunSaleData(GunTemplate.Load("s3"), 2700),
-            new GunSaleData(GunTemplate.Load("r1"), 5620),
-            new GunSaleData(GunTemplate.Load("r2"), 8900),
-            new GunSaleData(GunTemplate.Load("sh1"), 2000),
-            new GunSaleData(GunTemplate.Load("sh2"), 2300),
-            new GunSaleData(GunTemplate.Load("sh2"), 1900),
-        };
+    List<GunSaleData> LoadGunSaleData() => new List<GunSaleData>() {
+        new GunSaleData(GunTemplate.Load("p1"), 600),
+        new GunSaleData(GunTemplate.Load("p2"), 500),
+        new GunSaleData(GunTemplate.Load("p3"), 800),
+        new GunSaleData(GunTemplate.Load("p4"), 750),
+        new GunSaleData(GunTemplate.Load("s1"), 1750),
+        new GunSaleData(GunTemplate.Load("s2"), 2450),
+        new GunSaleData(GunTemplate.Load("s3"), 2700),
+        new GunSaleData(GunTemplate.Load("r1"), 5620),
+        new GunSaleData(GunTemplate.Load("r2"), 8900),
+        new GunSaleData(GunTemplate.Load("sh1"), 2000),
+        new GunSaleData(GunTemplate.Load("sh2"), 2300),
+        // new GunSaleData(GunTemplate.Load("sh2"), 1900),
+    };
 
     void ClearInitialize() {
         PopulateStoreInventory();
@@ -86,6 +91,7 @@ public class GunShopController : MonoBehaviour {
     void SetBuyMode() {
         buyModeButton.SetActive(false);
         sellModeButton.SetActive(true);
+        ClearGunForSale();
     }
     void SetSellMode() {
         buyModeButton.SetActive(true);
@@ -93,12 +99,14 @@ public class GunShopController : MonoBehaviour {
     }
     void PopulateStoreInventory() {
         foreach (Transform child in leftGunScrollContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
         CreateShopGunButtons(gunSaleData);
     }
 
     void CreateShopGunButtons(List<GunSaleData> saleData) {
+        int numberGuns = 0;
         saleData.GroupBy(saleData => saleData.template.type).ToList().ForEach(saleDataGroup => {
             string sectionHeader = saleDataGroup.Key switch {
                 GunType.pistol => "Pistols",
@@ -112,8 +120,11 @@ public class GunShopController : MonoBehaviour {
             foreach (GunSaleData data in saleDataGroup) {
                 GameObject button = CreateStoreGunButton(data);
                 button.transform.SetParent(leftGunScrollContainer, false);
+                numberGuns += 1;
             }
         });
+        emptyForSaleIndicator.SetActive(numberGuns == 0);
+        leftGunListFinalSpacer.SetAsLastSibling();
     }
     void SetPlayerCredits() {
         creditsPlayerTotal.text = GameManager.I.gameData.playerState.credits.ToString();
@@ -123,8 +134,10 @@ public class GunShopController : MonoBehaviour {
     }
     void PopulatePlayerInventory() {
         foreach (Transform child in rightGunScrollContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
+        emptyInventoryIndicator.SetActive(GameManager.I.gameData.playerState.allGuns.Count == 0);
         foreach (GunState gun in GameManager.I.gameData.playerState.allGuns) {
             if (gun == null) continue;
             GameObject button = CreatePlayerGunButton(gun);
@@ -166,13 +179,13 @@ public class GunShopController : MonoBehaviour {
         dialogueController.SetShopownerDialogue(data.template.shopDescription);
         currentGunForSale = data;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound, randomPitchWidth: 0.02f);
-        // TODO: grey out Buy button if player has insufficient credits
+        buyButton.interactable = GameManager.I.gameData.playerState.credits >= data.cost;
     }
     void ClearGunForSale() {
         gunStatHandler.ClearGunTemplate();
         currentGunForSale = null;
         creditsCost.text = "";
-        // TODO: grey out Buy button if player has insufficient credits
+        buyButton.interactable = false;
     }
 
     public void DoneButtonCallback() {

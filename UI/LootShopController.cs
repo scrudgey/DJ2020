@@ -67,6 +67,7 @@ public class LootShopController : MonoBehaviour {
         }
         nothingToSellText.enabled = GameManager.I.gameData.playerState.loots.Count == 0;
 
+        int numberOfitems = 0;
         foreach (IGrouping<string, LootData> grouping in GameManager.I.gameData.playerState.loots.GroupBy(lootData => lootData.lootName)) {
             int count = grouping.Count();
             LootData data = grouping.First();
@@ -75,6 +76,7 @@ public class LootShopController : MonoBehaviour {
             script.Initialize(this, grouping.ToList(), count);
             Debug.Log($"group: {data.name} {count}");
             button.transform.SetParent(inventoryContainer, false);
+            numberOfitems += 1;
         }
     }
     public void DoneButtonCallback() {

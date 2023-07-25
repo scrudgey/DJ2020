@@ -18,6 +18,7 @@ public class DealDialogueController : MonoBehaviour {
     public GameObject lootTradeButtonPrefab;
     public Transform lootTradeButtonsContainer;
     private List<LootTradeButton> lootTradeButtons;
+    public GameObject emptyLootTradeIndicator;
     [Header("buttons")]
     public Button acceptButton;
     private DealData dealData;
@@ -34,7 +35,7 @@ public class DealDialogueController : MonoBehaviour {
         PopulateAllLootTradeButtons();
     }
     void SetInitialText(DealData data) {
-        receiveCaptionText.text = $"{data.offerCount}x {data.offerName}";
+        receiveCaptionText.text = $"{data.offerName}: {data.offerCount}";
         receiveValueText.text = $"{data.offerCount * data.offerValue}";
         receiveCountText.text = $"{data.offerCount}x";
         receiveIcon.sprite = data.offerIcon;
@@ -43,6 +44,7 @@ public class DealDialogueController : MonoBehaviour {
 
     void ClearLootTradeButtons() {
         foreach (Transform child in lootTradeButtonsContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
     }
@@ -55,13 +57,21 @@ public class DealDialogueController : MonoBehaviour {
 
     void PopulateAllLootTradeButtons() {
         lootTradeButtons = new List<LootTradeButton>();
+        int totalLootToTrade = 0;
         foreach (IGrouping<string, LootData> group in GameManager.I.gameData.playerState.loots
             .Where(loot => loot.category == dealData.priceType)
             .GroupBy(loot => loot.lootName).ToList()) {
             List<LootData> lootData = group.ToList();
             LootTradeButton button = CreateLootTradeButton();
             button.Initialize(this, lootData, dealData, audioSource);
+            totalLootToTrade += lootData.Count;
             lootTradeButtons.Add(button);
+        }
+        if (totalLootToTrade < dealData.priceCount) {
+            ClearLootTradeButtons();
+            emptyLootTradeIndicator.SetActive(true);
+        } else {
+            emptyLootTradeIndicator.SetActive(false);
         }
     }
 

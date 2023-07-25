@@ -13,16 +13,19 @@ public class ItemShopController : MonoBehaviour {
     public RectTransform bottomRect;
 
     public GameObject costBar;
-    public GameObject buyButton;
+    // public GameObject buyButton;
 
     [Header("lists")]
     public Transform leftGunScrollContainer;
     public Transform rightGunScrollContainer;
+    public GameObject emptySaleIndicator;
+    public GameObject emptyInventoryIndicator;
     [Header("stats")]
     public TextMeshProUGUI creditsPlayerTotal;
     public TextMeshProUGUI creditsCost;
     public TextMeshProUGUI itemNameTitle;
     public Image itemImage;
+    public Button buyButtonButton;
     [Header("sounds")]
     public AudioSource audioSource;
     public AudioClip[] buySound;
@@ -68,6 +71,7 @@ public class ItemShopController : MonoBehaviour {
 
     void PopulateStoreInventory() {
         foreach (Transform child in leftGunScrollContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
         CreateShopItemButtons(itemSaleData);
@@ -80,6 +84,7 @@ public class ItemShopController : MonoBehaviour {
     }
     void PopulatePlayerInventory() {
         foreach (Transform child in rightGunScrollContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
         foreach (BaseItem item in GameManager.I.gameData.playerState.allItems) {
@@ -88,12 +93,17 @@ public class ItemShopController : MonoBehaviour {
             if (button == null) continue;
             button.transform.SetParent(rightGunScrollContainer, false);
         }
+        emptyInventoryIndicator.SetActive(GameManager.I.gameData.playerState.allItems.Count == 0);
     }
     void CreateShopItemButtons(List<ItemSaleData> saleData) {
-        saleData.ForEach(saleData => {
+        int itemsForSale = 0;
+        saleData.Where(saleData => !GameManager.I.gameData.playerState.allItems.Contains(saleData.item)).ToList()
+        .ForEach(saleData => {
             GameObject button = CreateStoreItemButton(saleData);
             button.transform.SetParent(leftGunScrollContainer, false);
+            itemsForSale += 1;
         });
+        emptySaleIndicator.SetActive(itemsForSale == 0);
     }
     GameObject CreateStoreItemButton(ItemSaleData data) {
         GameObject obj = GameObject.Instantiate(itemButtonPrefab);
@@ -116,7 +126,9 @@ public class ItemShopController : MonoBehaviour {
         itemNameTitle.text = data.item.data.name;
 
         costBar.SetActive(true);
-        buyButton.SetActive(true);
+        buyButtonButton.gameObject.SetActive(true);
+
+        buyButtonButton.interactable = GameManager.I.gameData.playerState.credits >= data.cost;
     }
     void ClearItemForSale() {
         currentItemForSale = null;
@@ -147,7 +159,7 @@ public class ItemShopController : MonoBehaviour {
         // hide cost
         // hide sell button
         costBar.SetActive(false);
-        buyButton.SetActive(false);
+        buyButtonButton.gameObject.SetActive(false);
     }
 
     public void BuyCallback() {
@@ -181,6 +193,7 @@ public class ItemShopController : MonoBehaviour {
         SetPlayerCredits();
         // set portraits
         dialogueController.SetShopownerDialogue("Thank you.");
+        buyButtonButton.interactable = false;
     }
 
 

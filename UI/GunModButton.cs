@@ -10,12 +10,14 @@ public class GunModButton : MonoBehaviour {
     public GunMod gunMod;
     private GunModShopController gunModShopController;
     public Color activeModColor;
+    public GameObject plusObject;
 
 
     public void Initialize(GunModShopController gunModShopController, GunMod gunMod, Sprite sprite) {
         this.gunModShopController = gunModShopController;
         this.gunMod = gunMod;
         icon.sprite = sprite;
+        plusObject.SetActive(false);
     }
     public void OnClick() {
         gunModShopController.OnModButtonClicked(this);
@@ -24,5 +26,6 @@ public class GunModButton : MonoBehaviour {
     public void SetEnabledColors() {
         icon.color = activeModColor;
         outlineImage.color = activeModColor;
+        plusObject.SetActive(true);
     }
 }

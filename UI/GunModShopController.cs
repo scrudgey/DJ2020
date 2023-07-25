@@ -9,6 +9,13 @@ public class GunModShopController : MonoBehaviour {
     public RectTransform bottomRect;
     public AudioSource audioSource;
 
+    [Header("empty")]
+    public GameObject emptyGunsIndicator;
+    public GameObject mainEmptyIndicator;
+    public GameObject modlist;
+    public GameObject statsList;
+    public GameObject emptyModlist;
+
     [Header("mod buttons")]
     public Transform gunModButtonContainer;
     public GameObject gunModButtonPrefab;
@@ -58,6 +65,20 @@ public class GunModShopController : MonoBehaviour {
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         activeModsObject.SetActive(false);
         storeDialogueController.SetShopownerDialogue("Please come in to my black market gun mod shop.");
+        SetNoGunsIndicator(GameManager.I.gameData.playerState.allGuns.Count == 0);
+    }
+
+    void SetNoGunsIndicator(bool value) {
+        emptyGunsIndicator.SetActive(value);
+        mainEmptyIndicator.SetActive(value);
+        modlist.SetActive(!value);
+        statsList.SetActive(!value);
+    }
+    void ShowEmptyModsIndicator() {
+        activeModsObject.SetActive(false);
+        detailsObject.SetActive(false);
+        emptyModlist.SetActive(true);
+        gunModButtonContainer.gameObject.SetActive(false);
     }
     void SetPlayerCredits() {
         playerCreditsText.text = $"{GameManager.I.gameData.playerState.credits}";
@@ -111,6 +132,7 @@ public class GunModShopController : MonoBehaviour {
 
     void ClearPlayerInventory() {
         foreach (Transform child in rightGunScrollContainer) {
+            if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
     }
@@ -179,14 +201,18 @@ public class GunModShopController : MonoBehaviour {
         ClearModInformation();
     }
     void PopulateModButtons(GunState state) {
-        ShowModDetails();
-        foreach (GunMod mod in state.template.availableMods) {
-            Button button = CreateModButton(mod);
-            if (state.delta.activeMods.Contains(mod)) {
-                button.interactable = false;
-                GunModButton gunModButton = button.GetComponent<GunModButton>();
-                gunModButton.SetEnabledColors();
-                // button.SetEnabledColors();
+        if (state.template.availableMods.Count == 0) {
+            ShowEmptyModsIndicator();
+        } else {
+            ShowModDetails();
+            foreach (GunMod mod in state.template.availableMods) {
+                Button button = CreateModButton(mod);
+                if (state.delta.activeMods.Contains(mod)) {
+                    button.interactable = false;
+                    GunModButton gunModButton = button.GetComponent<GunModButton>();
+                    gunModButton.SetEnabledColors();
+                    // button.SetEnabledColors();
+                }
             }
         }
     }
@@ -197,6 +223,8 @@ public class GunModShopController : MonoBehaviour {
         activeModsObject.SetActive(true);
     }
     void ShowModDetails() {
+        emptyModlist.SetActive(false);
+        gunModButtonContainer.gameObject.SetActive(true);
         detailsObject.SetActive(true);
         activeModsObject.SetActive(false);
     }
