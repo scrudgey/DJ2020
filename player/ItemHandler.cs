@@ -16,9 +16,9 @@ public record ItemUseResult {
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     public Action<ItemHandler> OnValueChanged { get; set; }
-    public List<BaseItem> items = new List<BaseItem>();
+    public List<ItemInstance> items = new List<ItemInstance>();
     public int index;
-    public BaseItem activeItem;
+    public ItemInstance activeItem;
     public AudioSource audioSource;
     public RocketLauncher rocketLauncher;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
@@ -28,8 +28,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     void Start() {
         OnItemEnter(activeItem);
     }
-    public void LoadItemState(List<BaseItem> loadItems) {
-        items = new List<BaseItem>();
+    public void LoadItemState(List<ItemInstance> loadItems) {
+        items = new List<ItemInstance>();
         items.AddRange(loadItems);
         ClearItem();
     }
@@ -65,7 +65,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             return UseItem(input);
         } else return ItemUseResult.Empty();
     }
-    void SwitchToItem(BaseItem item) {
+    void SwitchToItem(ItemInstance item) {
         OnItemExit(this.activeItem);
         this.activeItem = item;
         OnItemEnter(this.activeItem);
@@ -83,7 +83,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         return activeItem.Use(this, input);
     }
 
-    void OnItemEnter(BaseItem item) {
+    void OnItemEnter(ItemInstance item) {
         if (item == null)
             return;
         switch (item) {
@@ -103,7 +103,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         }
     }
 
-    void OnItemExit(BaseItem item) {
+    void OnItemExit(ItemInstance item) {
         if (item == null)
             return;
         switch (item) {

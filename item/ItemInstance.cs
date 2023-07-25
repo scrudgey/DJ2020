@@ -5,16 +5,16 @@ using UnityEngine;
 
 
 namespace Items {
-    public class BaseItem {
+    public class ItemInstance {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<ItemTemplate>))]
-        public ItemTemplate data;
-        public BaseItem(ItemTemplate baseData) {
-            this.data = baseData;
+        public ItemTemplate template;
+        public ItemInstance(ItemTemplate template) {
+            this.template = template;
         }
         public virtual ItemUseResult Use(ItemHandler handler, PlayerInput input) => ItemUseResult.Empty();
         public virtual bool EnablesManualHack() => false;
         public virtual bool EnablesBurglary() => false;
-        static BaseItem FactoryLoad(string baseName) {
+        static ItemInstance FactoryLoad(string baseName) {
             if (baseName == "") return null;
             ItemTemplate baseItem = ItemTemplate.LoadItem(baseName);
             return baseItem switch {
@@ -25,15 +25,15 @@ namespace Items {
                 ItemTemplate itemData => itemData.shortName switch {
                     "deck" => new CyberDeck(itemData),
                     "tools" => new BurglarTools(itemData),
-                    _ => new BaseItem(baseItem)
+                    _ => new ItemInstance(baseItem)
                 },
-                _ => new BaseItem(baseItem)
+                _ => new ItemInstance(baseItem)
             };
         }
 
-        public static BaseItem LoadItem(string itemName) {
+        public static ItemInstance LoadItem(string itemName) {
             if (itemName == "") return null;
-            BaseItem newItem = BaseItem.FactoryLoad(itemName);
+            ItemInstance newItem = ItemInstance.FactoryLoad(itemName);
             if (newItem != null) {
                 return newItem;
             } else {

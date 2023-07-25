@@ -9,9 +9,9 @@ public record LevelPlan {
     // TODO: converter for list
     [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> activeTactics;
-    public List<BaseItem> items;
-    public static LevelPlan Default(List<BaseItem> allItems) {
-        List<BaseItem> itemList = new List<BaseItem>() { null, null, null, null };
+    public List<ItemInstance> items;
+    public static LevelPlan Default(List<ItemInstance> allItems) {
+        List<ItemInstance> itemList = new List<ItemInstance>() { null, null, null, null };
         if (allItems.Count >= 1) {
             itemList[0] = allItems[0];
         }
@@ -37,7 +37,7 @@ public record LevelPlan {
         foreach (ItemHandler itemHandler in playerObject.GetComponentsInChildren<ItemHandler>()) {
             itemHandler.LoadItemState(items);
             if (startWithFakeID()) {
-                itemHandler.items.Add(BaseItem.LoadItem("ID"));
+                itemHandler.items.Add(ItemInstance.LoadItem("ID"));
             }
         }
     }

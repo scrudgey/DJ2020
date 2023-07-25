@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 public class ManualHackInput {
     public PlayerInput playerInput;
-    public Items.BaseItem activeItem;
+    public Items.ItemInstance activeItem;
 }
 public class ManualHackTargetData {
     public CyberComponent target;

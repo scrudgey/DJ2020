@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
 
-    public class IRGoggles : BaseItem {
+    public class IRGoggles : ItemInstance {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<IRGoggleData>))]
         public IRGoggleData goggleData;
         public IRGoggles(IRGoggleData baseItem) : base(baseItem) {

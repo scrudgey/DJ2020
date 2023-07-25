@@ -49,10 +49,10 @@ public class ItemShopController : MonoBehaviour {
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
     List<ItemSaleData> LoadItemSaleData() => new List<ItemSaleData>(){
-            new ItemSaleData(BaseItem.LoadItem("C4"), 600),
-            new ItemSaleData(BaseItem.LoadItem("grenade"), 500),
-            new ItemSaleData(BaseItem.LoadItem("rocket"), 800),
-            new ItemSaleData(BaseItem.LoadItem("goggles"), 750),
+            new ItemSaleData(ItemInstance.LoadItem("C4"), 600),
+            new ItemSaleData(ItemInstance.LoadItem("grenade"), 500),
+            new ItemSaleData(ItemInstance.LoadItem("rocket"), 800),
+            new ItemSaleData(ItemInstance.LoadItem("goggles"), 750),
         };
 
     void ClearInitialize() {
@@ -87,7 +87,7 @@ public class ItemShopController : MonoBehaviour {
             if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
-        foreach (BaseItem item in GameManager.I.gameData.playerState.allItems) {
+        foreach (ItemInstance item in GameManager.I.gameData.playerState.allItems) {
             if (item == null) continue;
             GameObject button = CreatePlayerItemButton(item);
             if (button == null) continue;
@@ -117,13 +117,13 @@ public class ItemShopController : MonoBehaviour {
     }
     void SetItemForSale(ItemSaleData data) {
         SetSalePrice(data.cost);
-        dialogueController.SetShopownerDialogue(data.item.data.shopDescription);
+        dialogueController.SetShopownerDialogue(data.item.template.shopDescription);
         currentItemForSale = data;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound);
 
         itemImage.enabled = true;
-        itemImage.sprite = data.item.data.image;
-        itemNameTitle.text = data.item.data.name;
+        itemImage.sprite = data.item.template.image;
+        itemNameTitle.text = data.item.template.name;
 
         costBar.SetActive(true);
         buyButtonButton.gameObject.SetActive(true);
@@ -137,7 +137,7 @@ public class ItemShopController : MonoBehaviour {
         itemImage.enabled = false;
         itemNameTitle.text = "";
     }
-    GameObject CreatePlayerItemButton(BaseItem item) {
+    GameObject CreatePlayerItemButton(ItemInstance item) {
         if (item == null) return null;
         GameObject obj = GameObject.Instantiate(itemButtonPrefab);
         ItemShopButton button = obj.GetComponent<ItemShopButton>();
@@ -148,13 +148,13 @@ public class ItemShopController : MonoBehaviour {
         bodyContainer.SetActive(true);
         // SetCompareGun(button.gunState.template);
         ClearItemForSale();
-        dialogueController.SetShopownerDialogue(button.item.data.shopDescription);
+        dialogueController.SetShopownerDialogue(button.item.template.shopDescription);
         currentItemForSale = null;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound);
 
         itemImage.enabled = true;
-        itemImage.sprite = button.item.data.image;
-        itemNameTitle.text = button.item.data.name;
+        itemImage.sprite = button.item.template.image;
+        itemNameTitle.text = button.item.template.name;
 
         // hide cost
         // hide sell button

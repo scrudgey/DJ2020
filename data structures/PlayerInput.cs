@@ -27,7 +27,7 @@ public struct PlayerInput {
     public int selectgun;
     public bool actionButtonPressed;
     public int incrementItem;
-    public BaseItem selectItem;
+    public ItemInstance selectItem;
     public bool useItem;
     public int incrementOverlay;
     public bool rotateCameraRightPressedThisFrame;

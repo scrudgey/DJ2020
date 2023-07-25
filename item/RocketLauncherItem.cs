@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
-    public class RocketLauncherItem : BaseItem {
+    public class RocketLauncherItem : ItemInstance {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<RocketLauncherData>))]
         public RocketLauncherData rocketData;
         public RocketLauncherItem(RocketLauncherData rocketData) : base(rocketData) {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 namespace Items {
-    public class GrenadeItem : BaseItem {
+    public class GrenadeItem : ItemInstance {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<GrenadeData>))]
         public GrenadeData grenadeData;
         public GrenadeItem(GrenadeData grenadeData) : base(grenadeData) {

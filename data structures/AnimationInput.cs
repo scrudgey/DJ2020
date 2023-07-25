@@ -23,7 +23,7 @@ public struct AnimationInput {
     public GunAnimationInput gunInput;
     public Direction orientation;
     public PlayerInput playerInputs;
-    public BaseItem activeItem;
+    public ItemInstance activeItem;
     public bool isMoving;
     public bool isCrouching;
     public bool isProne;

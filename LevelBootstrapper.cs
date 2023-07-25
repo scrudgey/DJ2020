@@ -43,11 +43,11 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapMission() {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
-        List<BaseItem> allItems = new List<BaseItem> {
+        List<ItemInstance> allItems = new List<ItemInstance> {
             // BaseItem.LoadItem("deck"),
-            BaseItem.LoadItem("C4"),
-            BaseItem.LoadItem("goggles"),
-            BaseItem.LoadItem("rocket"),
+            ItemInstance.LoadItem("C4"),
+            ItemInstance.LoadItem("goggles"),
+            ItemInstance.LoadItem("rocket"),
         };
 
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems));
