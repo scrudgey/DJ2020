@@ -42,9 +42,9 @@ public class DoorLock : MonoBehaviour {
     }
 
 
-#if UNITY_EDITOR
-    void OnDrawGizmos() {
-        Handles.Label(transform.position, $"Locked: {locked}\nKeyId: {lockId}");
-    }
-#endif
+    // #if UNITY_EDITOR
+    //     void OnDrawGizmos() {
+    //         Handles.Label(transform.position, $"Locked: {locked}\nKeyId: {lockId}");
+    //     }
+    // #endif
 }

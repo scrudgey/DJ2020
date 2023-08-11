@@ -2744,6 +2744,17 @@ x ladders
 * holster
 * sound effect
 * weapon wheel ease in
+* rocket launcher
+    * used up after one use
+* grenade
+    * used up after 3 uses
+* C4 
+    * used up after two uses
+* UI handler: indicate when empty
+* play a sound when use empty 
+    * if we standardize at the iteminstance level, it could work ?
+
+
 
 
 
@@ -3105,6 +3116,9 @@ doors
     locks for doubledoors with crash bars
 
 major initiatives:
+    more items
+        shuriken
+        throwing knife
     portraits
         anderson portrait
     spritesheets
@@ -3114,7 +3128,7 @@ major initiatives:
     missions
         1 way shootout
         elevator / ductwork
-        finalize office
+        productionize office
     after mission reports
         skill tree
     system:
@@ -3132,30 +3146,88 @@ shops:
     more fence
     buy cyberware
 
-items
 ducts
 elevator
 after action report & skill tree
 dialogue
 hacking
 
+5'9" average height = 69 inches
+64 pixels height
 
-* rocket launcher
-    * used up after one use
-* grenade
-    * used up after 3 uses
-* C4 
-    * used up after two uses
-* UI handler: indicate when empty
-play a sound when use empty 
-    if we standardize at the iteminstance level, it could work ?
+inches per pixel = 69 / 64 = 1.078125
+current wall height:
+    2 = 64x64 = 5'9"
+    2.25 = 72x64 = 77.625" = 6.46875'
+desired ceiling:
+    8' = 96" = 89 pixels
+    
+    good fits:
+        88 pixels is ~8'
+        96 pixels is ~8.58333'
+ceiling void 
+2.5' = 30" = 27.8260869565 pixels ~ 28 pixels
+I can do 24 or 32 pixels for a ceiling void
+    good fits:
+        24 pixels is 25.875" = ~2.1'
+        32 piels is 34.5" = ~2.875'
+
+8 pixels (floor) is 8.625" = 0.71875'
 
 
-idea: rocket launcher and grenade might take weapon slot.
-    obviously, we can't use a gun and rocket launcher at the same time.
-goggles 
-    toggle on/off?
-    if the main way to interact with items is by weapon wheel, then this will be necessary
-indicate empty in weapon wheel?
-indicate selected in weapon wheel?
-kick off item when empty?
+
+
+├
+│   32 pixels ceiling void (~1.8')
+├
+│
+│
+│   88 pixels wall (~8.5')
+│
+├
+├   8 pixels floor (~0.7')
+
+
+
+Typical doors are 80" or 84" tall
+36" wide is probably the most common width for single room doors
+30" for small doors, most common residential or private office door size (edited) 
+42" for big doors
+48" in hospitals, about the widest a single leaf would be
+Double doors, like for paths of egress in corridors and large spaces is calculated by occupancy count, which depends on occupancy type
+You might see an 8' tall door now and then
+36" min for wheel chair (edited) 
+
+36" wide = 33 pixels
+80" tall = 74 pixels
+84" tall = 78 pixels
+
+
+
+
+wind sounds on the rooftop
+
+working texture:
+    in all cyber crocotile projects
+    in wetworks project
+    in pixaki
+
+make half walls
+doors
+* fix up floors
+more hvac
+elevator
+sliding glass lab door
+more door types?
+door lintel
+lab benches / lab equipment
+signage and door stuff
+
+
+how will hvac ducts work?
+    1. machine room to enter -> ceiling ducts
+        from ceiling ducts:
+            move through ducts and branch points
+            look out through vents
+            exit through vents
+    simplest solution is just make player collider small and change movement parameters to be v simple.

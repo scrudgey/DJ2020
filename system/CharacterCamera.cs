@@ -159,8 +159,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     void HandleEyeVisibilityChange(PlayerState playerData) {
         thermalGogglesActive = playerData.cyberEyesThermalBuff;
         if (playerData.cyberEyesThermal || playerData.cyberEyesThermalBuff) {
+            QualitySettings.shadowDistance = 0;
             ShowLasers();
         } else {
+            QualitySettings.shadowDistance = 1000;
             HideLasers();
         }
     }
@@ -484,7 +486,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         PlanarDirection = closestCardinal * Vector3.forward;
 
         return new CameraTargetParameters() {
-            fieldOfView = 50f,
+            fieldOfView = 65f,
             orthographic = false,
             rotation = cameraRotation,
             snapToRotation = cameraRotation,
