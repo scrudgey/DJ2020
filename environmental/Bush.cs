@@ -58,35 +58,14 @@ public class Bush : MonoBehaviour {
             player = other.transform.IsChildOf(GameManager.I.playerObject.transform)
         }, other.transform.root.gameObject);
         ClearCoroutines();
-        Coroutine newRoutine = StartCoroutine(ShakeTree(transform.parent));
+        Coroutine newRoutine = StartCoroutine(Toolbox.ShakeTree(transform.parent, initialRotation));
         shakeRoutines.Add(newRoutine);
 
         if (Random.Range(0f, 1f) < leafProbability) {
             leafPool.GetObject(Toolbox.RandomInsideBounds(collider, padding: 1.5f));
         }
     }
-    public IEnumerator ShakeTree(Transform target) {
-        // Debug.Log(target);
-        // Transform target = tree;
-        Quaternion initial = target.rotation;
 
-        float timer = 0f;
-        float length = Random.Range(0.5f, 1.2f);
-        float intensity = Random.Range(5f, 15f);
-
-        Vector2 randomCircle = Random.insideUnitCircle.normalized;
-        Vector3 axis = new Vector3(randomCircle.x, 0f, randomCircle.y);
-
-        while (timer < length) {
-            timer += Time.deltaTime;
-
-            float angle = (float)PennerDoubleAnimation.ElasticEaseOut(timer, intensity, -intensity, length);
-            target.rotation = Quaternion.AngleAxis(angle, axis) * initialRotation;
-            yield return null;
-        }
-
-        target.rotation = initial;
-    }
     public void ClearCoroutines() {
         foreach (Coroutine routine in shakeRoutines) {
             StopCoroutine(routine);

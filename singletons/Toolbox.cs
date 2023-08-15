@@ -630,5 +630,26 @@ public class Toolbox {
 
         return new Bounds { center = center, extents = extents };
     }
+
+    public static IEnumerator ShakeTree(Transform target, Quaternion initialRotation) {
+        Quaternion initial = target.rotation;
+
+        float timer = 0f;
+        float length = UnityEngine.Random.Range(0.5f, 1.2f);
+        float intensity = UnityEngine.Random.Range(5f, 15f);
+
+        Vector2 randomCircle = UnityEngine.Random.insideUnitCircle.normalized;
+        Vector3 axis = new Vector3(randomCircle.x, 0f, randomCircle.y);
+
+        while (timer < length) {
+            timer += Time.deltaTime;
+
+            float angle = (float)PennerDoubleAnimation.ElasticEaseOut(timer, intensity, -intensity, length);
+            target.rotation = Quaternion.AngleAxis(angle, axis) * initialRotation;
+            yield return null;
+        }
+
+        target.rotation = initial;
+    }
 }
 

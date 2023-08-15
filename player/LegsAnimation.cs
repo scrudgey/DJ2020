@@ -94,9 +94,15 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
                 frame = hitstunEffect ? 0 : 1;
             }
         } else {
-            spriteRenderer.enabled = true;
-            torsoAnimation.spriteRenderer.enabled = true;
-            headAnimation.spriteRenderer.enabled = true;
+
+            bool disableSpritesBecauseHVAC = lastInput.state == CharacterState.hvac || lastInput.state == CharacterState.hvacAim;
+            spriteRenderer.enabled = !disableSpritesBecauseHVAC;
+            torsoAnimation.spriteRenderer.enabled = !disableSpritesBecauseHVAC;
+            headAnimation.spriteRenderer.enabled = !disableSpritesBecauseHVAC;
+
+            // spriteRenderer.enabled = true;
+            // torsoAnimation.spriteRenderer.enabled = true;
+            // headAnimation.spriteRenderer.enabled = true;
             offset = Vector3.zero;
             scaleOffset = Vector3.zero;
         }
@@ -116,9 +122,11 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             return;
         if (input.movementSticking)
             return;
+
         lastInput = input;
         crouchTransitionTimer += Time.deltaTime;
         hitState = input.hitState;
+
 
         // set direction
         direction = input.orientation;
@@ -177,7 +185,10 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         }
 
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
-        if (input.hitState == HitState.dead || input.hitState == HitState.zapped) {
+        shadowCaster.gameObject.SetActive(true);
+        if (input.state == CharacterState.hvac) {
+            shadowCaster.gameObject.SetActive(false);
+        } else if (input.hitState == HitState.dead || input.hitState == HitState.zapped) {
             animator.Stop();
         } else if (input.state == CharacterState.superJump) {
             state = State.jump;

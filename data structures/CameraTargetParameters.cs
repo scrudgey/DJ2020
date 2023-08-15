@@ -13,4 +13,5 @@ public record CameraTargetParameters {
     public float distanceMovementSharpness;
     public CharacterState state; // TODO: remove this
     public Vector3 playerDirection;
+    public float minDistance;
 }

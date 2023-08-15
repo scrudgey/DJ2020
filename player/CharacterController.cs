@@ -19,7 +19,9 @@ public enum CharacterState {
     popout,
     burgle,
     useItem,
-    zapped
+    zapped,
+    hvac,
+    hvacAim
 }
 public enum ClimbingState {
     Anchoring,
@@ -161,6 +163,28 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private Quaternion _anchoringStartRotation = Quaternion.identity;
     private Quaternion _rotationBeforeClimbing = Quaternion.identity;
 
+    // hvac
+    private HVACNetwork _activeHVACNetwork;
+    private HVACElement _currentHVACNode;
+    private HVACElement _targetHVACNode;
+    private ClimbingState _internalHvacClimbingState;
+    private float _hvacAnchoringTimer = 0f;
+
+    private Vector3 _hvacAnchoringStartPosition = Vector3.zero;
+    private Quaternion _hvacAnchoringStartRotation = Quaternion.identity;
+    private ClimbingState _hvacClimbingState {
+        get {
+            return _internalHvacClimbingState;
+        }
+        set {
+            _internalHvacClimbingState = value;
+            _hvacAnchoringTimer = 0f;
+            _hvacAnchoringStartPosition = Motor.TransientPosition;
+            _hvacAnchoringStartRotation = Motor.TransientRotation;
+        }
+    }
+
+
     private float landStunTimer;
     private PlayerInput _lastInput = PlayerInput.none;
     private CursorData lastTargetDataInput;
@@ -218,6 +242,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 _inputTorque = Vector3.zero;
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
+            case CharacterState.hvacAim:
+                aimCameraRotation = Quaternion.FromToRotation(Vector3.forward, Motor.CharacterForward);
+                lookAtDirection = Motor.CharacterForward;
+                _inputTorque = Vector3.zero;
+                break;
             case CharacterState.jumpPrep:
                 Toolbox.RandomizeOneShot(audioSource, jumpPrepSounds);
                 break;
@@ -260,6 +289,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 _ladderTargetRotation = _activeLadder.transform.rotation;
                 Toolbox.RandomizeOneShot(audioSource, _activeLadder.sounds);
                 break;
+            case CharacterState.hvac:
+                _rotationBeforeClimbing = Motor.TransientRotation;
+                Motor.SetMovementCollisionsSolvingActivation(false);
+                Motor.SetGroundSolvingActivation(false);
+                _hvacClimbingState = ClimbingState.Anchoring;
+                Toolbox.RandomizeOneShot(audioSource, _activeHVACNetwork.crawlSounds);
+                break;
             case CharacterState.dead:
                 break;
 
@@ -287,6 +323,18 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 Toolbox.RandomizeOneShot(audioSource, _activeLadder.sounds);
                 Motor.SetMovementCollisionsSolvingActivation(true);
                 Motor.SetGroundSolvingActivation(true);
+                break;
+            case CharacterState.hvac:
+                if (toState != CharacterState.hvacAim) {
+                    Motor.SetMovementCollisionsSolvingActivation(true);
+                    Motor.SetGroundSolvingActivation(true);
+                }
+                break;
+            case CharacterState.hvacAim:
+                if (toState != CharacterState.hvac) {
+                    Motor.SetMovementCollisionsSolvingActivation(true);
+                    Motor.SetGroundSolvingActivation(true);
+                }
                 break;
         }
     }
@@ -415,7 +463,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         } else {
             isRunning = false;
             // Crouching input
-            if (input.CrouchDown || input.jumpHeld || state == CharacterState.landStun || state == CharacterState.jumpPrep || state == CharacterState.useItem) {
+            if (input.CrouchDown || input.jumpHeld || state == CharacterState.landStun || state == CharacterState.jumpPrep || state == CharacterState.useItem || state == CharacterState.hvac) {
                 SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 if (!isCrouching) {
                     isCrouching = true;
@@ -657,6 +705,28 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.landStun:
                 SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 break;
+            case CharacterState.hvac:
+                if (interactor != null) {
+                    ItemUseResult interactorResult = interactor.SetInputs(input, true);
+                    HandleItemUseResult(interactorResult);
+                }
+                if (input.Fire.AimPressed && _hvacClimbingState == ClimbingState.Climbing) {
+                    TransitionToState(CharacterState.hvacAim);
+                }
+                break;
+            case CharacterState.hvacAim:
+                _moveInputVector = _moveAxis.y * Motor.CharacterForward;
+
+                _moveInputVector.y = 0;
+                _moveInputVector = _moveInputVector.normalized;
+
+                _inputTorque = 3f * input.mouseDelta;
+                _inputTorque.x += 5f * _moveAxis.x;
+
+                if (input.Fire.AimPressed) {
+                    TransitionToState(CharacterState.hvac);
+                }
+                break;
         }
 
         if (Vector2.Distance(InputThreshold(input.MoveAxis()), InputThreshold(_lastInput.MoveAxis())) > 0.1f) {
@@ -684,7 +754,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
         // _ladderUpDownInput = input.MoveAxisForward;
         if (result.useLadder != null) {
-
             if (state == CharacterState.normal) {
                 _activeLadder = result.useLadder;
                 TransitionToState(CharacterState.climbing);
@@ -693,30 +762,16 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 _ladderTargetPosition = Motor.TransientPosition;
                 _ladderTargetRotation = _rotationBeforeClimbing;
             }
+        }
 
-            // _probedColliders = new Collider[8];
-            // if (Motor.CharacterOverlap(Motor.TransientPosition, Motor.TransientRotation, _probedColliders, InteractionLayer, QueryTriggerInteraction.Collide) > 0) {
-            //     foreach (Collider collider in _probedColliders) {
-            //         // Handle ladders
-            //         if (collider == null || collider.gameObject == null)
-            //             continue;
-            //         // Ladder ladder = collider.gameObject.GetComponent<Ladder>();
-            //         if (ladder) {
-            //             // Transition to ladder climbing state
-            //             if (state == CharacterState.normal) {
-            //                 _activeLadder = ladder;
-            //                 TransitionToState(CharacterState.climbing);
-            //             }
-            //             // Transition back to default movement state
-            //             else if (state == CharacterState.climbing) {
-            //                 _climbingState = ClimbingState.DeAnchoring;
-            //                 _ladderTargetPosition = Motor.TransientPosition;
-            //                 _ladderTargetRotation = _rotationBeforeClimbing;
-            //             }
-            //             break;
-            //         }
-            //     }
-            // }
+        if (result.hvacUseResult.activateHVAC) {
+            _activeHVACNetwork = result.hvacUseResult.hVACNetwork;
+            _currentHVACNode = result.hvacUseResult.startElement;
+            TransitionToState(CharacterState.hvac);
+        } else if (result.hvacUseResult.dismountElement != null) {
+            if (_currentHVACNode == result.hvacUseResult.dismountElement) {
+                DismountHVAC(_currentHVACNode);
+            }
         }
     }
 
@@ -757,6 +812,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 slewLookVector = -1f * Motor.Velocity;
                 lookAtDirection = -1f * Motor.Velocity;
                 break;
+            case CharacterState.hvacAim:
             case CharacterState.aim:
                 if (snapToDirection != Vector3.zero) {
                     Vector3 target = snapToDirection;
@@ -827,6 +883,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 Vector3 smoothedLookDirection = Vector3.Slerp(Motor.CharacterForward, indicatorDirection, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
                 currentRotation = Quaternion.LookRotation(smoothedLookDirection, Vector3.up);
                 break;
+            case CharacterState.hvac:
+                if (_targetHVACNode != null) {
+                    Vector3 lookDirection = (_targetHVACNode.crawlpoint.position - Motor.TransientPosition).normalized;
+                    currentRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                }
+                break;
             case CharacterState.climbing:
                 switch (_climbingState) {
                     case ClimbingState.Climbing:
@@ -854,7 +916,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         return numberHit > 0;
     }
     bool DetectWallPress() {
-        if (state == CharacterState.aim)
+        if (state == CharacterState.aim || state == CharacterState.hvac || state == CharacterState.hvacAim)
             return false;
         if (wallNormal == Vector3.zero)
             return false;
@@ -1250,7 +1312,59 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     TransitionToState(CharacterState.normal);
                 }
                 break;
+
+            case CharacterState.hvacAim:
+            case CharacterState.hvac:
+                currentVelocity = Vector3.zero;
+                switch (_hvacClimbingState) {
+                    case ClimbingState.Climbing:
+                        float distanceFromCurrentNode = Vector3.Distance(Motor.TransientPosition, _currentHVACNode.crawlpoint.position);
+
+                        if (distanceFromCurrentNode < 0.1f && _moveInputVector != Vector3.zero) {
+                            _targetHVACNode = _activeHVACNetwork.neighbors[_currentHVACNode]
+                            .OrderBy(neighbor => {
+                                Vector3 displacementToNeighbor = neighbor.crawlpoint.position - Motor.TransientPosition;
+                                float dot = Vector3.Dot(displacementToNeighbor, _moveInputVector);
+                                return dot;
+                            }).Last();
+                        }
+
+                        if (_targetHVACNode != null) {
+                            Vector3 displacementToTarget = _targetHVACNode.crawlpoint.position - Motor.TransientPosition;
+                            _moveInputVector.y = 0;
+                            _moveInputVector = _moveInputVector.normalized;
+                            Vector3 projectedMoveVector = Vector3.Project(_moveInputVector, displacementToTarget);
+                            projectedMoveVector.y = 0;
+                            currentVelocity = projectedMoveVector * ClimbingSpeed;
+                            float distanceToTarget = Vector3.Distance(Motor.TransientPosition, _targetHVACNode.crawlpoint.position);
+                            Debug.Log($"{_targetHVACNode.crawlpoint.position} {projectedMoveVector} distance to target: {distanceToTarget} {distanceToTarget < 0.05f}");
+                            if (distanceToTarget < 0.05f) {
+                                _currentHVACNode = _targetHVACNode;
+                                if (_currentHVACNode.DismountOnEnter()) {
+                                    DismountHVAC(_currentHVACNode);
+                                    currentVelocity = Vector3.zero;
+                                }
+                                Toolbox.RandomizeOneShot(audioSource, _activeHVACNetwork.crawlSounds);
+                            }
+                            Vector3 displacementFromCurrentNoce = Motor.TransientPosition - _currentHVACNode.crawlpoint.position;
+                            Vector3 directionToTarget = _targetHVACNode.crawlpoint.position - _currentHVACNode.crawlpoint.position;
+                            if (Vector3.Dot(displacementFromCurrentNoce, directionToTarget) < 0 && Vector3.Dot(projectedMoveVector, directionToTarget) < 0) {
+                                currentVelocity = Vector3.zero;
+                            }
+                        }
+                        break;
+                    case ClimbingState.Anchoring:
+                    case ClimbingState.DeAnchoring:
+                        Vector3 tmpPosition = Vector3.Lerp(_hvacAnchoringStartPosition, _currentHVACNode.crawlpoint.position, (_hvacAnchoringTimer / AnchoringDuration));
+                        currentVelocity = Motor.GetVelocityForMovePosition(Motor.TransientPosition, tmpPosition, deltaTime);
+                        break;
+                }
+                break;
         }
+    }
+
+    void DismountHVAC(HVACElement element) {
+        element.EjectGrating(this);
     }
 
     void CheckUncrouch() {
@@ -1388,12 +1502,30 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                         break;
                 }
                 break;
+            case CharacterState.hvac:
+                switch (_hvacClimbingState) {
+                    case ClimbingState.Anchoring:
+                    case ClimbingState.DeAnchoring:
+                        if (_hvacAnchoringTimer >= AnchoringDuration) {
+                            if (_hvacClimbingState == ClimbingState.Anchoring) {
+                                _hvacClimbingState = ClimbingState.Climbing;
+                            } else if (_hvacClimbingState == ClimbingState.DeAnchoring) {
+                                TransitionToState(CharacterState.normal);
+                            }
+                        }
+                        _hvacAnchoringTimer += deltaTime;
+                        break;
+                }
+                direction = Motor.CharacterForward;
+                break;
+            case CharacterState.hvacAim:
+                direction = Motor.CharacterForward;
+                break;
             case CharacterState.useItem:
                 if (timeInState > 0.5f) {
                     TransitionToState(CharacterState.normal);
                 }
                 break;
-
         }
         // tookDamageThisFrame = false;
         if (hitstunTimer > 0f) {
@@ -1476,7 +1608,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             state = state,
             targetData = lastTargetDataInput,
             playerDirection = direction,
-            playerLookDirection = lookAtDirection,
+            // playerLookDirection = lookAtDirection,
             popoutParity = popoutParity,
             aimCameraRotation = aimCameraRotation,
             targetTransform = cameraFollowTransform,
@@ -1525,7 +1657,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);
     public bool isMoving() {
-        if (isCrouching) {
+        if (state == CharacterState.hvac) {
+            return Motor.Velocity.magnitude > 0.1;
+        } else if (isCrouching) {
             return crouchMovementInputTimer > 0.5f && Motor.Velocity.magnitude > 0.1;
         } else {
             return Motor.Velocity.magnitude > 0.1 && (Motor.GroundingStatus.IsStableOnGround || state == CharacterState.climbing);

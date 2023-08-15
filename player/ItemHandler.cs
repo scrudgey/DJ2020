@@ -4,6 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Items;
 using UnityEngine;
+public record HvacUseResult {
+    public bool activateHVAC;
+    public HVACElement startElement;
+    public HVACNetwork hVACNetwork;
+    public HVACElement dismountElement;
+    public static HvacUseResult Empty() => new HvacUseResult {
+        activateHVAC = false,
+        startElement = null,
+        hVACNetwork = null,
+        dismountElement = null
+    };
+}
 public record ItemUseResult {
     public bool crouchDown;
     public bool waveArm;
@@ -11,8 +23,9 @@ public record ItemUseResult {
     public Ladder useLadder;
     public AttackSurface attackSurface;
     public bool emptyUse;
+    public HvacUseResult hvacUseResult;
     public static ItemUseResult Empty() => new ItemUseResult {
-
+        hvacUseResult = HvacUseResult.Empty()
     };
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {

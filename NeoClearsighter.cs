@@ -298,7 +298,8 @@ public class NeoClearsighter : MonoBehaviour {
     }
 
     Plane[] interloperFrustrum() {
-        float size = 2f;
+        // float size = 2f;
+        float size = 5f;
 
         // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
         float distance = (cameraTransform.position - followTransform.position).magnitude;
@@ -325,6 +326,9 @@ public class NeoClearsighter : MonoBehaviour {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
 
         Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
+
+        // Plane XPlane = new Plane(Vector3.right, followTransform.position - 2f * Vector3.right);
+        // Plane ZPlane = new Plane(Vector3.forward, followTransform.position - 2f * Vector3.forward);
 
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
         Plane ZPlane = new Plane(Vector3.forward, followTransform.position);

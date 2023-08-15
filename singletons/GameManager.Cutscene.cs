@@ -32,6 +32,9 @@ public partial class GameManager : Singleton<GameManager> {
     public void ShowExtractionZoneCutscene(ExtractionZone zone) {
         StartCutsceneCoroutine(ExtractionZoneCutscene(zone));
     }
+    public void ShowGrateKickCutscene(HVACElement element, CharacterController controller) {
+        StartCutsceneCoroutine(KickOutHVACGrateCutscene(element, controller));
+    }
     public IEnumerator SpottedCutscene(GameObject NPC) {
         uiController?.HideUI();
         float timer = 0f;
@@ -69,7 +72,7 @@ public partial class GameManager : Singleton<GameManager> {
                 state = CharacterState.normal,
                 targetData = CursorData.none,
                 playerDirection = playerCharacterController.direction,
-                playerLookDirection = playerCharacterController.direction,
+                // playerLookDirection = playerCharacterController.direction,
                 popoutParity = PopoutParity.left,
                 aimCameraRotation = Quaternion.identity,
                 targetPosition = positionBetweenPeople
@@ -110,7 +113,7 @@ public partial class GameManager : Singleton<GameManager> {
                 state = CharacterState.normal,
                 targetData = CursorData.none,
                 playerDirection = playerCharacterController.direction,
-                playerLookDirection = playerCharacterController.direction,
+                // playerLookDirection = playerCharacterController.direction,
                 popoutParity = PopoutParity.left,
                 aimCameraRotation = Quaternion.identity,
                 targetPosition = targetPosition
@@ -143,7 +146,7 @@ public partial class GameManager : Singleton<GameManager> {
                 state = CharacterState.normal,
                 targetData = CursorData.none,
                 playerDirection = playerCharacterController.direction,
-                playerLookDirection = playerCharacterController.direction,
+                // playerLookDirection = playerCharacterController.direction,
                 popoutParity = PopoutParity.left,
                 aimCameraRotation = Quaternion.identity,
                 targetPosition = zone.myCollider.bounds.center
@@ -156,5 +159,64 @@ public partial class GameManager : Singleton<GameManager> {
         yield return null;
     }
 
+    public IEnumerator KickOutHVACGrateCutscene(HVACElement element, CharacterController controller) {
+        Rigidbody grate = element.grate;
+
+        // Vector3 positiion = element.transform.position - 2f * Vector3.up;
+        Vector3 positiion = element.transform.position;
+        Vector3 direction = element.transform.position - characterCamera.transform.position;
+        Vector3 up = Vector3.Cross(characterCamera.transform.right, direction);
+        Quaternion rotation = Quaternion.LookRotation(direction, up);
+
+        CameraInput input = new CameraInput {
+            deltaTime = Time.deltaTime,
+            wallNormal = Vector2.zero,
+            lastWallInput = Vector2.zero,
+            crouchHeld = false,
+            playerPosition = positiion,
+            state = CharacterState.normal,
+            targetData = CursorData.none,
+            playerDirection = playerCharacterController.direction,
+            // playerLookDirection = playerCharacterController.direction,
+            popoutParity = PopoutParity.left,
+            aimCameraRotation = rotation,
+            targetPosition = positiion
+        };
+
+        float timer = 0f;
+        while (timer < 0.2f) {
+            timer += Time.deltaTime;
+            characterCamera.UpdateWithInput(input, ignoreAttractor: true);
+            yield return null;
+        }
+        // kick
+        element.PlayImactSound();
+        StartCoroutine(Toolbox.ShakeTree(element.transform, Quaternion.identity));
+
+        timer = 0f;
+        while (timer < 1.2f) {
+            timer += Time.deltaTime;
+            characterCamera.UpdateWithInput(input, ignoreAttractor: true);
+            yield return null;
+        }
+        // kick
+        element.PlayImactSound();
+        StartCoroutine(Toolbox.ShakeTree(element.transform, Quaternion.identity));
+        timer = 0f;
+        while (timer < 1.2f) {
+            timer += Time.deltaTime;
+            characterCamera.UpdateWithInput(input, ignoreAttractor: true);
+            yield return null;
+        }
+        // eject
+        element.PlayEjectSound();
+
+        grate.isKinematic = false;
+        Vector3 force = UnityEngine.Random.Range(-4750f, -6525f) * Vector3.up + UnityEngine.Random.Range(2500f, 4700f) * Vector3.right + UnityEngine.Random.Range(2500f, 4700f) * Vector3.forward;
+        Vector3 torque = UnityEngine.Random.Range(3550f, 4250f) * Vector3.right + UnityEngine.Random.Range(3550f, 4250f) * Vector3.forward;
+        grate.AddForce(force);
+        grate.AddTorque(torque);
+        controller.TransitionToState(CharacterState.normal);
+    }
 
 }

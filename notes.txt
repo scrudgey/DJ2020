@@ -3231,3 +3231,66 @@ how will hvac ducts work?
             look out through vents
             exit through vents
     simplest solution is just make player collider small and change movement parameters to be v simple.
+
+* model the hvac source
+* usable hvac portals
+* start with simple hvac duct
+* two entrances
+* one vent
+* a bend
+* a t-intersection
+* crawl anim
+* dismount
+    * a special node type
+* clickable dismounts:
+    * interactives can specify 
+    * do not dismount on enter
+    * dismount on click
+    * dislodge vent on dismount
+* dismount node descends thru ceiling tile
+    * make a new model with removable grate
+* eject grate cutscene
+* sound effects
+* clickable vents
+* animated dismount
+* sounds when crawling around
+* first person view
+    * tab to enter
+    * camera 1st person
+    * controls
+        * forward / backward
+* correct torque direction
+* torque with A/D
+* fix movement
+* fix player graphic
+    * hide in first person mode
+* hide graphic and/or shadow caster
+
+
+removable panel on hvac central
+slower crawl in vent
+indicator when player inside hvac
+a separate gun sprite in aim?
+door needs lintel
+
+when in vent:
+    1. ceiling visible
+    2. ceiling tile visible
+
+
+
+how to make interior look more like office interior?
+1. colors
+    beige walls and wood doors
+2. door details
+    door jamb
+    hinges
+    kick plate 
+3. walls
+    floor runner
+    carpet
+    wainscotting
+4. signage
+    exit sign
+    room number plates
+

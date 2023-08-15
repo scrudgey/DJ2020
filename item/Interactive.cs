@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class Interactive : Highlightable {
     public bool dontRequireRaycast;
     public string actionPrompt;
+    [HideInInspector]
     public Interactor interactor;
     public string interactiveId;
 
@@ -17,6 +18,9 @@ public abstract class Interactive : Highlightable {
         return DoAction(interactor);
     }
     public abstract ItemUseResult DoAction(Interactor interactor);
+    public virtual bool AllowInteraction() {
+        return true;
+    }
     public static T TopTarget<T>(IEnumerable<T> interactives) where T : InteractorTargetData {
         T topInteractive = null;
         foreach (T data in interactives) {

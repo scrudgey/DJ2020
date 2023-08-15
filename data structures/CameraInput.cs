@@ -17,7 +17,7 @@ public struct CameraInput {
     public CharacterState state;
     public CursorData targetData;
     public Vector3 playerDirection;
-    public Vector3 playerLookDirection;
+    // public Vector3 playerLookDirection;
     public PopoutParity popoutParity;
     public Quaternion aimCameraRotation;
     public Vector3 targetPosition;

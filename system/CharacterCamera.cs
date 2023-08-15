@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.PostProcessing;
 
 // TODO: eliminate this enum
-public enum CameraState { normal, wallPress, attractor, aim, burgle }
+public enum CameraState { normal, wallPress, attractor, aim, burgle, free, firstPerson }
 
 public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
     public static bool ORTHOGRAPHIC_MODE = true;
@@ -183,6 +183,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // Debug.Log($"entering state {state} from {fromState}");
         Camera.clearFlags = CameraClearFlags.SolidColor;
         switch (state) {
+            case CameraState.firstPerson:
+                Camera.clearFlags = CameraClearFlags.Skybox;
+                currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
+                currentFollowingSharpness = followingSharpnessDefault * 3f;
+                currentDistanceMovementSpeed = distanceMovementSpeedDefault * 3f;
+                break;
             case CameraState.normal:
                 Camera.clearFlags = CameraClearFlags.Skybox;
                 if (fromState == CameraState.aim || fromState == CameraState.wallPress) {
@@ -247,7 +253,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
-        if (input.state == CharacterState.aim) {
+        if (input.state == CharacterState.hvacAim) {
+            camState = CameraState.firstPerson;
+        } else if (input.state == CharacterState.aim) {
             camState = CameraState.aim;
         } else if (input.state == CharacterState.wallPress || input.state == CharacterState.popout) {
             camState = CameraState.wallPress;
@@ -304,6 +312,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             case CameraState.aim:
                 RenderSettings.skybox = wallPressSkybox;
                 ApplyTargetParameters(AimParameters(input));
+                volume.profile = aimProfile;
+                SetSkyBoxCamerasEnabled(true);
+                break;
+            case CameraState.firstPerson:
+                RenderSettings.skybox = wallPressSkybox;
+                ApplyTargetParameters(FirstPersonParameters(input));
                 volume.profile = aimProfile;
                 SetSkyBoxCamerasEnabled(true);
                 break;
@@ -380,7 +394,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             followingSharpness = currentFollowingSharpness,
             distanceMovementSpeed = currentDistanceMovementSpeed,
             state = input.state,
-            playerDirection = input.playerDirection
+            playerDirection = input.playerDirection,
+            minDistance = MinDistance
+
         };
     }
     public CameraTargetParameters AttractorParameters(CameraInput input) {
@@ -434,7 +450,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,
             state = input.state,
-            playerDirection = input.playerDirection
+            playerDirection = input.playerDirection,
+            minDistance = MinDistance
+
         };
 
         if (input.state == CharacterState.wallPress || input.state == CharacterState.burgle) {
@@ -498,7 +516,39 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,
             state = input.state,
-            playerDirection = input.playerDirection
+            playerDirection = input.playerDirection,
+            minDistance = MinDistance
+
+        };
+    }
+    public CameraTargetParameters FirstPersonParameters(CameraInput input) {
+        float verticalPixels = (Camera.scaledPixelHeight / Camera.aspect);
+        float horizontalPixels = (Camera.scaledPixelHeight * Camera.aspect);
+        Vector2 cursorPosition = Mouse.current.position.ReadValue();
+        Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
+
+        Quaternion cameraRotation = Quaternion.identity;
+        cameraRotation = input.aimCameraRotation;
+
+        // update PlanarDirection to snap to nearest of 4 quadrants
+        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
+        PlanarDirection = closestCardinal * Vector3.forward;
+
+        return new CameraTargetParameters() {
+            fieldOfView = 65f,
+            orthographic = false,
+            rotation = cameraRotation,
+            snapToRotation = cameraRotation,
+            deltaTime = input.deltaTime,
+            targetDistance = 0f,
+            targetPosition = input.playerPosition,
+            orthographicSize = 4f,
+            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            distanceMovementSpeed = currentDistanceMovementSpeed,
+            state = input.state,
+            playerDirection = input.playerDirection,
+            minDistance = 0
         };
     }
     public CameraTargetParameters BurgleParameters(CameraInput input) {
@@ -527,7 +577,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             distanceMovementSpeed = currentDistanceMovementSpeed,
             state = input.state,
-            playerDirection = input.playerDirection
+            playerDirection = input.playerDirection,
+            minDistance = MinDistance
         };
     }
 
@@ -537,7 +588,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public void ApplyTargetParameters(CameraTargetParameters input) {
         // Process distance input
         TargetDistance = input.targetDistance;
-        TargetDistance = Mathf.Clamp(TargetDistance, MinDistance, MaxDistance);
+        TargetDistance = Mathf.Clamp(TargetDistance, input.minDistance, MaxDistance);
 
 
         // apply orthographic
@@ -648,7 +699,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                     // Debug.DrawRay(testRay.origin, testRay.direction * distance, Color.cyan);
                     return !Physics.Raycast(testRay, distance, LayerUtil.GetLayerMask(Layer.def));
                 }
-            })) {
+            })
+            .Where(interactive => interactive.AllowInteraction())
+            ) {
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
             hit.collider.transform.root.GetComponentsInChildren<AttackSurface>()
