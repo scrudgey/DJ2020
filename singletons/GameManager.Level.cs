@@ -335,7 +335,7 @@ public partial class GameManager : Singleton<GameManager> {
             Destroy(clearSighter);
         }
         if (clearSighter2 != null) {
-            clearSighter2.Initialize(focus.transform, characterCamera);
+            clearSighter2.Initialize(focus.transform, characterCamera, playerCharacterController);
             // Destroy(clearSighter2);
         }
 
@@ -579,6 +579,8 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void RefreshCyberGraph() {
         if (applicationIsQuitting) return;
+        if (gameData.levelState.delta.cyberGraph == null) return;
+
 
         gameData.levelState.delta.cyberGraph.Refresh();
 
@@ -589,6 +591,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void RefreshAlarmGraph() {
         if (applicationIsQuitting) return;
+        if (gameData.levelState.delta.alarmGraph == null) return;
+
         // determine if any active alarm object reaches a terminal
         gameData.levelState.delta.alarmGraph.Refresh();
 
@@ -605,6 +609,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void RefreshPowerGraph() {
         if (applicationIsQuitting) return;
+        if (gameData.levelState.delta.powerGraph == null) return;
 
         // power distribution algorithm
         gameData.levelState.delta.powerGraph.Refresh();

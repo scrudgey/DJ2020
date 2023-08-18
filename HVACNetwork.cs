@@ -41,6 +41,7 @@ public class HVACNetwork : MonoBehaviour {
         foreach (HVACPath path in paths) {
             if (path.path.Count <= 1) continue;
             for (int i = 1; i < path.path.Count; i++) {
+                if (path.path[i] == null || path.path[i - 1] == null) continue;
                 Vector3 point1 = path.path[i].crawlpoint.position;
                 Vector3 point2 = path.path[i - 1].crawlpoint.position;
                 Gizmos.DrawLine(point1 + Vector3.up / 2f, point2 + Vector3.up / 2f);

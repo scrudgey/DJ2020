@@ -2753,6 +2753,50 @@ x ladders
 * UI handler: indicate when empty
 * play a sound when use empty 
     * if we standardize at the iteminstance level, it could work ?
+* door lintel
+* make half walls
+* doors
+* fix up floors
+* more hvac
+* model the hvac source
+* usable hvac portals
+* start with simple hvac duct
+* two entrances
+* one vent
+* a bend
+* a t-intersection
+* crawl anim
+* dismount
+    * a special node type
+* clickable dismounts:
+    * interactives can specify 
+    * do not dismount on enter
+    * dismount on click
+    * dislodge vent on dismount
+* dismount node descends thru ceiling tile
+    * make a new model with removable grate
+* eject grate cutscene
+* sound effects
+* clickable vents
+* animated dismount
+* sounds when crawling around
+* first person view
+    * tab to enter
+    * camera 1st person
+    * controls
+        * forward / backward
+* correct torque direction
+* torque with A/D
+* fix movement
+* fix player graphic
+    * hide in first person mode
+* hide graphic and/or shadow caster
+* door needs lintel
+* door lintel visibility in isometric view
+* why interloper frustrum changes with zoom level
+* when in vent:
+    * ceiling visible
+* indicator when player inside hvac
 
 
 
@@ -3108,12 +3152,20 @@ plants can catch on fire
 elevator
 randomly place lasers
 randomly place cameras
+a separate gun sprite in aim?
+ambient sound system
 
 
 doors
     more door types? more explotable latch? more handles and things?
     sometimes unlocked
     locks for doubledoors with crash bars
+    what sorts of things do we want configurable?
+        1. presence / absence of door lock
+        2. presence / absence of deadbolt
+        3. remove attack surface altogether for a push door
+        4. strength of locks
+        5. id of key
 
 major initiatives:
     more items
@@ -3146,137 +3198,33 @@ shops:
     more fence
     buy cyberware
 
-ducts
+* ducts
 elevator
 after action report & skill tree
 dialogue
 hacking
-
-5'9" average height = 69 inches
-64 pixels height
-
-inches per pixel = 69 / 64 = 1.078125
-current wall height:
-    2 = 64x64 = 5'9"
-    2.25 = 72x64 = 77.625" = 6.46875'
-desired ceiling:
-    8' = 96" = 89 pixels
-    
-    good fits:
-        88 pixels is ~8'
-        96 pixels is ~8.58333'
-ceiling void 
-2.5' = 30" = 27.8260869565 pixels ~ 28 pixels
-I can do 24 or 32 pixels for a ceiling void
-    good fits:
-        24 pixels is 25.875" = ~2.1'
-        32 piels is 34.5" = ~2.875'
-
-8 pixels (floor) is 8.625" = 0.71875'
-
-
-
-
-├
-│   32 pixels ceiling void (~1.8')
-├
-│
-│
-│   88 pixels wall (~8.5')
-│
-├
-├   8 pixels floor (~0.7')
-
-
-
-Typical doors are 80" or 84" tall
-36" wide is probably the most common width for single room doors
-30" for small doors, most common residential or private office door size (edited) 
-42" for big doors
-48" in hospitals, about the widest a single leaf would be
-Double doors, like for paths of egress in corridors and large spaces is calculated by occupancy count, which depends on occupancy type
-You might see an 8' tall door now and then
-36" min for wheel chair (edited) 
-
-36" wide = 33 pixels
-80" tall = 74 pixels
-84" tall = 78 pixels
-
-
-
-
-wind sounds on the rooftop
 
 working texture:
     in all cyber crocotile projects
     in wetworks project
     in pixaki
 
-make half walls
-doors
-* fix up floors
-more hvac
+* signage and door stuff
+* removable panel on hvac central
+* wind sounds on the rooftop
+* finish floors
+* screws
+* unlocked doors
+
+
+
+glitchy cutaways when going to/from tab view
+exterior
+
 elevator
 sliding glass lab door
-more door types?
-door lintel
 lab benches / lab equipment
-signage and door stuff
-
-
-how will hvac ducts work?
-    1. machine room to enter -> ceiling ducts
-        from ceiling ducts:
-            move through ducts and branch points
-            look out through vents
-            exit through vents
-    simplest solution is just make player collider small and change movement parameters to be v simple.
-
-* model the hvac source
-* usable hvac portals
-* start with simple hvac duct
-* two entrances
-* one vent
-* a bend
-* a t-intersection
-* crawl anim
-* dismount
-    * a special node type
-* clickable dismounts:
-    * interactives can specify 
-    * do not dismount on enter
-    * dismount on click
-    * dislodge vent on dismount
-* dismount node descends thru ceiling tile
-    * make a new model with removable grate
-* eject grate cutscene
-* sound effects
-* clickable vents
-* animated dismount
-* sounds when crawling around
-* first person view
-    * tab to enter
-    * camera 1st person
-    * controls
-        * forward / backward
-* correct torque direction
-* torque with A/D
-* fix movement
-* fix player graphic
-    * hide in first person mode
-* hide graphic and/or shadow caster
-
-
-removable panel on hvac central
-slower crawl in vent
-indicator when player inside hvac
-a separate gun sprite in aim?
-door needs lintel
-
-when in vent:
-    1. ceiling visible
-    2. ceiling tile visible
-
+drop-in hvac grates
 
 
 how to make interior look more like office interior?
@@ -3294,3 +3242,6 @@ how to make interior look more like office interior?
     exit sign
     room number plates
 
+pushing on reverse door closes it backwards
+
+neo clearsighter frustrum could be rotated 

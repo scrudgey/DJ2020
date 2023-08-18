@@ -34,7 +34,8 @@ public record GameData {
                 // "Jack That Data",
                 // "Tower",
                 "711",
-                "yamachi"
+                "yamachi",
+                "elevator"
             },
             levelPlans = new SerializableDictionary<string, LevelPlan>()
         };

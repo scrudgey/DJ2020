@@ -89,7 +89,8 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         if (graphCount == 0) {
             Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");
         }
-        graph.levelName = levelName;
+        if (graph != null)
+            graph.levelName = levelName;
         return graph;
     }
 

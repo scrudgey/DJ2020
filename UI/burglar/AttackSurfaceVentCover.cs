@@ -13,7 +13,9 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
     public bool finishing;
     public GameObject[] obscuredElements;
     public MeshRenderer[] obscuredRenderers;
+    public bool ventCoverIsShut;
     void Start() {
+        ventCoverIsShut = true;
         foreach (GameObject element in obscuredElements) {
             element.SetActive(false);
         }
@@ -41,6 +43,7 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
     }
 
     public void RemovePanel() {
+        ventCoverIsShut = false;
         Toolbox.AudioSpeaker(transform.position, openSounds);
         ventSprite.enabled = false;
         foreach (GameObject parentVentObject in parentVentObjects) {
@@ -54,6 +57,7 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
         }
     }
     public void ReplacePanel() {
+        ventCoverIsShut = true;
         Toolbox.AudioSpeaker(transform.position, openSounds);
         ventSprite.enabled = true;
         foreach (GameObject parentVentObject in parentVentObjects) {

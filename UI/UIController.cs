@@ -27,6 +27,7 @@ public class UIController : MonoBehaviour {
     public SuspicionIndicatorHandler suspicionIndicatorHandler;
     public HealthIndicatorController healthIndicatorController;
     public PlayerCalloutHandler playerCalloutHandler;
+    public PlayerArrowCalloutHandler playerArrowCalloutHandler;
     public TextMeshProUGUI caption;
     public HitIndicatorController hitIndicatorController;
     public VRStatHandler vRStatHandler;
@@ -50,6 +51,7 @@ public class UIController : MonoBehaviour {
         lockRadiusIndicatorHandler.UICamera = Camera.main;
         lockIndicatorHandler.UICamera = Camera.main;
         playerCalloutHandler.UICamera = Camera.main;
+        playerArrowCalloutHandler.UICamera = Camera.main;
         hackDisplay.cam = Camera.main;
         caption.text = "";
 
@@ -108,6 +110,8 @@ public class UIController : MonoBehaviour {
 
         healthIndicatorController.Bind(target);
         hitIndicatorController.Bind(target);
+
+        playerArrowCalloutHandler.Bind(target);
     }
     public void LogMessage(string message) {
         if (actionLogHandler != null) {

@@ -185,6 +185,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public float alarmCountdown() {
         float timer = 0f;
+        if (gameData.levelState.delta.alarmGraph == null) return 0f;
         foreach (AlarmNode node in gameData.levelState.delta.alarmGraph.nodes.Values) {
             timer = Math.Max(timer, node.countdownTimer);
         }

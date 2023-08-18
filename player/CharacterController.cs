@@ -1337,7 +1337,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                             projectedMoveVector.y = 0;
                             currentVelocity = projectedMoveVector * ClimbingSpeed;
                             float distanceToTarget = Vector3.Distance(Motor.TransientPosition, _targetHVACNode.crawlpoint.position);
-                            Debug.Log($"{_targetHVACNode.crawlpoint.position} {projectedMoveVector} distance to target: {distanceToTarget} {distanceToTarget < 0.05f}");
                             if (distanceToTarget < 0.05f) {
                                 _currentHVACNode = _targetHVACNode;
                                 if (_currentHVACNode.DismountOnEnter()) {

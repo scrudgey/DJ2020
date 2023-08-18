@@ -117,3 +117,60 @@ now the only challenge is setting up the navmesh properly.
 * instruct the NPC to move into a room, path takes through door.
 
 how does it work with keyed-alike?
+
+
+
+# dimension
+
+
+5'9" average height = 69 inches
+64 pixels height
+
+inches per pixel = 69 / 64 = 1.078125
+current wall height:
+    2 = 64x64 = 5'9"
+    2.25 = 72x64 = 77.625" = 6.46875'
+desired ceiling:
+    8' = 96" = 89 pixels
+    
+    good fits:
+        88 pixels is ~8'
+        96 pixels is ~8.58333'
+ceiling void 
+2.5' = 30" = 27.8260869565 pixels ~ 28 pixels
+I can do 24 or 32 pixels for a ceiling void
+    good fits:
+        24 pixels is 25.875" = ~2.1'
+        32 piels is 34.5" = ~2.875'
+
+8 pixels (floor) is 8.625" = 0.71875'
+
+
+
+
+├
+│   32 pixels ceiling void (~1.8')
+├
+│
+│
+│   88 pixels wall (~8.5')
+│
+├
+├   8 pixels floor (~0.7')
+
+
+
+Typical doors are 80" or 84" tall
+36" wide is probably the most common width for single room doors
+30" for small doors, most common residential or private office door size (edited) 
+42" for big doors
+48" in hospitals, about the widest a single leaf would be
+Double doors, like for paths of egress in corridors and large spaces is calculated by occupancy count, which depends on occupancy type
+You might see an 8' tall door now and then
+36" min for wheel chair (edited) 
+
+36" wide = 33 pixels
+80" tall = 74 pixels
+84" tall = 78 pixels
+
+

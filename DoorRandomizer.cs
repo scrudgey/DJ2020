@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DoorRandomizer : MonoBehaviour {
     public Door door;
+    public bool locked = true;
     public AttackSurfaceLatch[] latches;
     // public AttackSurfaceDoorknob[] knobs;
     public AttackSurfaceLock[] doorLocks;
@@ -55,6 +56,7 @@ public class DoorRandomizer : MonoBehaviour {
                 knob.setbackProb = Random.Range(0.1f, 0.7f);
                 knob.progressStages = Random.Range(3, 5);
             }
+            knob.doorLock.locked = locked;
         }
         door.autoClose = autoClose;
 

@@ -143,13 +143,13 @@ public class Toolbox {
         var corner1 = position + v3;
         var corner3 = position - v3;
 
-        Debug.DrawLine(corner0, corner2, Color.cyan, 10f);
-        Debug.DrawLine(corner1, corner3, Color.cyan, 10f);
-        Debug.DrawLine(corner0, corner1, Color.cyan, 10f);
-        Debug.DrawLine(corner1, corner2, Color.cyan, 10f);
-        Debug.DrawLine(corner2, corner3, Color.cyan, 10f);
-        Debug.DrawLine(corner3, corner0, Color.cyan, 10f);
-        Debug.DrawRay(position, normal, Color.red);
+        Debug.DrawLine(corner0, corner2, Color.cyan, 0.75f);
+        Debug.DrawLine(corner1, corner3, Color.cyan, 0.75f);
+        Debug.DrawLine(corner0, corner1, Color.cyan, 0.75f);
+        Debug.DrawLine(corner1, corner2, Color.cyan, 0.75f);
+        Debug.DrawLine(corner2, corner3, Color.cyan, 0.75f);
+        Debug.DrawLine(corner3, corner0, Color.cyan, 0.75f);
+        Debug.DrawRay(position, normal, Color.red, 0.75f);
     }
     static public TagSystemData GetTagData(GameObject target) {
         TagSystem system = target.transform.root.GetComponentInChildren<TagSystem>();

@@ -30,15 +30,17 @@ public class NeoClearsighter : MonoBehaviour {
     Dictionary<Renderer, GameObject> cutawayRenderers;
     Collider[] colliderHits;
     CharacterCamera myCamera;
+    CharacterController characterController;
     Transform cameraTransform;
     bool initialized;
     Vector3 previousOrigin;
     MaterialPropertyBlock propBlock;
     List<Collider> rooftopZones = new List<Collider>();
 
-    public void Initialize(Transform followTransform, CharacterCamera camera) {
+    public void Initialize(Transform followTransform, CharacterCamera camera, CharacterController characterController) {
         this.followTransform = followTransform;
         this.myCamera = camera;
+        this.characterController = characterController;
 
         cameraTransform = myCamera.transform;
         myTransform = transform;
@@ -182,7 +184,8 @@ public class NeoClearsighter : MonoBehaviour {
         Vector3 origin = followTransform.position;
         origin.y = Mathf.Round(origin.y * 10f) / 10f;
 
-        Vector3 liftedOrigin = origin + new Vector3(0f, 1.5f, 0f);
+        float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
+        Vector3 liftedOrigin = origin + new Vector3(0f, lift, 0f);
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
         int j = 0;
 
@@ -196,7 +199,11 @@ public class NeoClearsighter : MonoBehaviour {
             }
             Renderer renderer = above[i];
             if (renderer == null) continue;
+            // floor of the collider
             Vector3 position = rendererPositions[renderer] - new Vector3(0f, rendererBounds[renderer].extents.y, 0f);
+
+            // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
+            // which is player position + 1.5
             if (position.y > liftedOrigin.y) {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                 nextAboveRenderBatch.Add(renderer);
@@ -299,11 +306,11 @@ public class NeoClearsighter : MonoBehaviour {
 
     Plane[] interloperFrustrum() {
         // float size = 2f;
-        float size = 5f;
+        float size = 4f;
 
         // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
         float distance = (cameraTransform.position - followTransform.position).magnitude;
-        float angle = (float)Math.Atan((myCamera.Camera.orthographicSize) / distance) * (180f / (float)Math.PI) * 5f;
+        float angle = (float)Math.Atan((myCamera.Camera.orthographicSize) / distance) * (180f / (float)Math.PI);
 
         Vector3 leftNormal = Quaternion.AngleAxis(1f * angle, cameraTransform.up) * cameraTransform.right;
         Vector3 rightNormal = Quaternion.AngleAxis(-1f * angle, cameraTransform.up) * (-1f * cameraTransform.right);
@@ -325,6 +332,9 @@ public class NeoClearsighter : MonoBehaviour {
     IEnumerator HandleInterlopers(HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
 
+        // float margin = 0.5f;
+        float margin = 0f;
+
         Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
 
         // Plane XPlane = new Plane(Vector3.right, followTransform.position - 2f * Vector3.right);
@@ -335,6 +345,18 @@ public class NeoClearsighter : MonoBehaviour {
 
         bool cameraXSide = XPlane.GetSide(cameraTransform.position);
         bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
+
+        if (cameraXSide) {
+            XPlane = new Plane(Vector3.right, followTransform.position - margin * Vector3.right);
+        } else {
+            XPlane = new Plane(Vector3.right, followTransform.position + margin * Vector3.right);
+        }
+
+        if (cameraZSide) {
+            ZPlane = new Plane(Vector3.forward, followTransform.position - margin * Vector3.forward);
+        } else {
+            ZPlane = new Plane(Vector3.forward, followTransform.position + margin * Vector3.forward);
+        }
 
         int j = 0;
         for (int i = 0; i < interlopers.Count; i++) {

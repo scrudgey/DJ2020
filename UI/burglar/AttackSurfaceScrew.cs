@@ -10,6 +10,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
     float totalRotation;
     public SpriteRenderer screwImage;
     public bool unscrewed;
+    readonly static float ROTATION_LIMIT = 360f;
     public override void Initialize(AttackSurfaceUIElement uIElement) {
         base.Initialize(uIElement);
         if (unscrewed) {
@@ -27,7 +28,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
                 float amount = Random.Range(90, 180f);
                 totalRotation += amount;
                 turnCoroutine = StartCoroutine(TurnScrew(amount));
-                if (totalRotation > 360) {
+                if (totalRotation > ROTATION_LIMIT) {
                     unscrewed = true;
                     uiElement.gameObject.SetActive(false);
                     return BurglarAttackResult.None with {
@@ -64,7 +65,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
             yield return null;
         }
         turnCoroutine = null;
-        if (totalRotation > 540) {
+        if (totalRotation > ROTATION_LIMIT) {
             screwImage.enabled = false;
             unscrewed = true;
         }
