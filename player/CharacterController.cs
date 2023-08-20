@@ -1533,8 +1533,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         if (gunHitStunTimer > 0f) {
             gunHitStunTimer -= Time.deltaTime;
         }
-        if (GameManager.I.showDebugRays)
-            Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.red);
+        // if (GameManager.I.showDebugRays)
+        //     Debug.DrawRay(transform.position + new Vector3(0f, 1f, 0f), direction, Color.red);
         recoil = Vector3.zero;
     }
 

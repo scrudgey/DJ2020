@@ -287,7 +287,8 @@ public class Door : Interactive, IDoor {
         Vector3 d = hitPoint - hinges[0].position;
         d.y = 0;
         Vector3 torque = Vector3.Cross(d, -1f * hitNormal);
-        impulse += 10f * torque.y;
+        float parity = reverse ? -1f : 1f;
+        impulse += 10f * torque.y * parity;
     }
 
     public void Unlatch() {

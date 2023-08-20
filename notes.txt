@@ -2798,6 +2798,19 @@ x ladders
     * ceiling visible
 * indicator when player inside hvac
 
+* ducts
+* signage and door stuff
+* removable panel on hvac central
+* wind sounds on the rooftop
+* finish floors
+* screws
+* unlocked doors
+* glitchy cutaways when going to/from tab view
+* neo clearsighter frustrum could be rotated 
+* exterior
+* fix floor 2
+* fix yamachi map
+
 
 
 
@@ -3149,11 +3162,11 @@ destructible dumpster
 destructible AC unit
 destructible radio dish tower
 plants can catch on fire
-elevator
 randomly place lasers
 randomly place cameras
 a separate gun sprite in aim?
 ambient sound system
+pushing on reverse door closes it backwards?
 
 
 doors
@@ -3172,7 +3185,6 @@ major initiatives:
         shuriken
         throwing knife
     portraits
-        anderson portrait
     spritesheets
     trees and plants
     music
@@ -3198,33 +3210,22 @@ shops:
     more fence
     buy cyberware
 
-* ducts
-elevator
 after action report & skill tree
 dialogue
 hacking
-
-working texture:
-    in all cyber crocotile projects
-    in wetworks project
-    in pixaki
-
-* signage and door stuff
-* removable panel on hvac central
-* wind sounds on the rooftop
-* finish floors
-* screws
-* unlocked doors
-
-
-
-glitchy cutaways when going to/from tab view
-exterior
 
 elevator
 sliding glass lab door
 lab benches / lab equipment
 drop-in hvac grates
+clearsight textmesh
+guards
+
+
+
+
+
+
 
 
 how to make interior look more like office interior?
@@ -3242,6 +3243,13 @@ how to make interior look more like office interior?
     exit sign
     room number plates
 
-pushing on reverse door closes it backwards
+how to roads?
+    lettering
+    crosswalk
+    speed bump
+    small streets
 
-neo clearsighter frustrum could be rotated 
+working texture:
+    in all cyber crocotile projects
+    in wetworks project
+    in pixaki

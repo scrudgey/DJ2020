@@ -151,15 +151,16 @@ public class NeoClearsighter : MonoBehaviour {
     IEnumerator ShowAllGeometry() {
         int j = 0;
         // reset previous batch
-        foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
-            j++;
-            if (j > 100) {
-                j = 0;
-                yield return waitForFrame;
-            }
-            renderer.shadowCastingMode = initialShadowCastingMode[renderer];
-            renderer.material = initialMaterials[renderer];
-        }
+        yield return ResetPreviousBatch();
+        // foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
+        //     j++;
+        //     if (j > 100) {
+        //         j = 0;
+        //         yield return waitForFrame;
+        //     }
+        //     renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+        //     renderer.material = initialMaterials[renderer];
+        // }
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
@@ -333,12 +334,9 @@ public class NeoClearsighter : MonoBehaviour {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
 
         // float margin = 0.5f;
-        float margin = 0f;
+        // float margin = 0f;
 
-        Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
-
-        // Plane XPlane = new Plane(Vector3.right, followTransform.position - 2f * Vector3.right);
-        // Plane ZPlane = new Plane(Vector3.forward, followTransform.position - 2f * Vector3.forward);
+        // Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
 
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
         Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
@@ -346,17 +344,34 @@ public class NeoClearsighter : MonoBehaviour {
         bool cameraXSide = XPlane.GetSide(cameraTransform.position);
         bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
 
-        if (cameraXSide) {
-            XPlane = new Plane(Vector3.right, followTransform.position - margin * Vector3.right);
-        } else {
-            XPlane = new Plane(Vector3.right, followTransform.position + margin * Vector3.right);
-        }
+        Vector3 planarDisplacement = cameraTransform.position - followTransform.position;
+        planarDisplacement.y = 0;
+        planarDisplacement = planarDisplacement.normalized;
 
-        if (cameraZSide) {
-            ZPlane = new Plane(Vector3.forward, followTransform.position - margin * Vector3.forward);
+        Plane detectionPlane;
+        if (Math.Abs(planarDisplacement.x) > Math.Abs(planarDisplacement.z)) {
+            detectionPlane = XPlane;
         } else {
-            ZPlane = new Plane(Vector3.forward, followTransform.position + margin * Vector3.forward);
+            detectionPlane = ZPlane;
         }
+        bool detectionSide = detectionPlane.GetSide(cameraTransform.position);
+
+
+        // Debug.Log(planarDisplacement);
+        // Debug.DrawRay(followTransform.position, CharacterCamera.rotationOffset * planarDisplacement, Color.white, 0.75f);
+
+
+        // if (cameraXSide) {
+        //     XPlane = new Plane(Vector3.right, followTransform.position - margin * Vector3.right);
+        // } else {
+        //     XPlane = new Plane(Vector3.right, followTransform.position + margin * Vector3.right);
+        // }
+
+        // if (cameraZSide) {
+        //     ZPlane = new Plane(Vector3.forward, followTransform.position - margin * Vector3.forward);
+        // } else {
+        //     ZPlane = new Plane(Vector3.forward, followTransform.position + margin * Vector3.forward);
+        // }
 
         int j = 0;
         for (int i = 0; i < interlopers.Count; i++) {
@@ -379,7 +394,12 @@ public class NeoClearsighter : MonoBehaviour {
             float zParity = cameraZSide ? 1f : -1f;
             bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
             bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
-            if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
+            // bool rendererZSide = true;
+
+            // bool detectionSide = detectionPlane.GetSide(rendererBounds[renderer].center);
+
+            // if (rendererXSide == cameraXSide && rendererZSide == cameraZSide && directionToInterloper.y > 0.2f) {
+            if (detectionPlane.GetSide(rendererBounds[renderer].center) == detectionSide && directionToInterloper.y > 0.2f) {
                 if (renderer == null) continue;
                 if (nextAboveRenderBatch?.Contains(renderer) ?? false) continue;
                 MakeTransparent(renderer, directionToInterloper);
