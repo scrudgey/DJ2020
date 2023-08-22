@@ -2,17 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ElevatorIndicator : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+public class ElevatorIndicator : MonoBehaviour {
+    public AudioSource audioSource;
+    public AudioClip[] arrivalSound;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void ElevatorArrival() {
+        Toolbox.RandomizeOneShot(audioSource, arrivalSound);
     }
 }
