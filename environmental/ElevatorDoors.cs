@@ -16,11 +16,13 @@ public class ElevatorDoors : MonoBehaviour {
     State _state;
     public ElevatorDoorData[] doorDatas;
     Dictionary<ElevatorDoorData, Coroutine> coroutines;
-    public Transform indicator;
+    public Transform indicatorTransform;
     public bool doorsAreClosed;
+    public ElevatorIndicator elevatorIndicator;
+    public ElevatorCallButton callButton;
 
     void Awake() {
-        indicator.SetParent(null, true);
+        indicatorTransform.SetParent(null, true);
     }
 
     void Start() {
@@ -35,6 +37,7 @@ public class ElevatorDoors : MonoBehaviour {
     }
     public void CloseDoors() {
         ChangeState(State.closed);
+        elevatorIndicator.ShowLight(false);
     }
 
     void ChangeState(State newState) {
@@ -55,7 +58,6 @@ public class ElevatorDoors : MonoBehaviour {
 
     }
     void OnStateEnter(State oldState, State newState) {
-        Debug.Log($"elevator doors changing state {oldState} -> {newState}");
         if (newState == oldState) return;
         switch (newState) {
             case State.open:
@@ -80,8 +82,13 @@ public class ElevatorDoors : MonoBehaviour {
     }
 
     IEnumerator CloseDoorRoutine(ElevatorDoorData data) {
-        yield return Toolbox.ChainCoroutines(Toolbox.Ease(null, 1f, data.openLocalPosition.z, data.closedLocalPosition.z, PennerDoubleAnimation.Linear, (amount) => {
+        yield return Toolbox.ChainCoroutines(Toolbox.Ease(null, 1f, data.openLocalPosition.z, data.closedLocalPosition.z, PennerDoubleAnimation.QuadEaseOut, (amount) => {
             Vector3 newPos = new Vector3(data.closedLocalPosition.x, data.closedLocalPosition.y, amount);
+            data.door.localPosition = newPos;
+        }),
+        new WaitForSecondsRealtime(0.1f),
+        Toolbox.Ease(null, 0.6f, data.closedLocalPosition.y + 0.04f, data.closedLocalPosition.y, PennerDoubleAnimation.BounceEaseOut, (amount) => {
+            Vector3 newPos = new Vector3(data.closedLocalPosition.x, amount, data.closedLocalPosition.z);
             data.door.localPosition = newPos;
         }),
         Toolbox.CoroutineFunc(() => {

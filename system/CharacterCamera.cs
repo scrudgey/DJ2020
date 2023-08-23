@@ -567,7 +567,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             // rotation = planarRot * verticalRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
-            targetDistance = 1.5f,
+            targetDistance = 0f,
             // targetDistance = MaxDistance,
             targetPosition = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.position,
             // targetPosition = lastTargetPosition,
@@ -578,7 +578,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             distanceMovementSpeed = currentDistanceMovementSpeed,
             state = input.state,
             playerDirection = input.playerDirection,
-            minDistance = MinDistance
+            minDistance = 0
         };
     }
 

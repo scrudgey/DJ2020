@@ -14,15 +14,24 @@
     * elevator doors close
     * elevator car moves to requested floor'
 * play sound on floor arrival
-
-
+* elevator machine noise
 * close elevator doors before moving
-    add a delay
-    juice up the lerps
+    * add a delay
+    * juice up the lerps
+* fix elevator door wall
+* elevator car texture
+* TMPro
+* realistic buttons and interiors
 
 elevator car doors
+    * doors rattle up/down on close
 door sounds on open/close
-elevator machine noise
+
+elevator accoutrements
+    top stuff
+    bottom stuff
+    counterweight
+    rope
+
 call button highlight?
-realistic buttons and interiors
-elevator car texture
+elevator occlusion

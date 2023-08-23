@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-
 public class NeoClearsighter : MonoBehaviour {
     enum State { normal, showAll, interloperOnly }
     State state;
@@ -78,7 +78,12 @@ public class NeoClearsighter : MonoBehaviour {
                 GameObject.FindObjectsOfType<SpriteRenderer>()
                     .Where(obj => obj.CompareTag("decor"))
                     .Select(obj => obj.GetComponent<Renderer>())
-            ).ToList();
+            )
+            .Concat(
+                GameObject.FindObjectsOfType<TextMeshPro>()
+                    .Select(obj => obj.GetComponent<Renderer>())
+            )
+            .ToList();
         rendererTree = new PointOctree<Renderer>(100, Vector3.zero, 1);
         rendererBoundsTree = new BoundsOctree<Renderer>(100, Vector3.zero, 0.5f, 1);
         foreach (Renderer renderer in staticRenderers) {
@@ -94,6 +99,7 @@ public class NeoClearsighter : MonoBehaviour {
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
             if (findAnchor != null) {
+                Debug.Log($"found clear sighter anchor: {renderer.gameObject} {findAnchor}");
                 rendererPositions[renderer] = findAnchor.position;
             }
         }
@@ -149,18 +155,8 @@ public class NeoClearsighter : MonoBehaviour {
     }
 
     IEnumerator ShowAllGeometry() {
-        int j = 0;
         // reset previous batch
         yield return ResetPreviousBatch();
-        // foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
-        //     j++;
-        //     if (j > 100) {
-        //         j = 0;
-        //         yield return waitForFrame;
-        //     }
-        //     renderer.shadowCastingMode = initialShadowCastingMode[renderer];
-        //     renderer.material = initialMaterials[renderer];
-        // }
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();

@@ -13,13 +13,10 @@ public class DoorRandomizer : MonoBehaviour {
     public GameObject outerDeadbolt;
     public DoorLock deadboltLock;
 
-    // void Start() {
-    //     ApplyState();
-    // }
     public void ApplyState(LevelTemplate levelTemplate) {
         bool latchesEnabled = Random.Range(0f, 1f) < 0.75f;
         bool latchesVulnerable = Random.Range(0f, 1f) < 0.8f;
-        bool latchGuardEnabled = Random.Range(0f, 1f) < 0.5f;
+        bool latchGuardEnabled = Random.Range(0f, 1f) < 0.1f;
         bool latchGuardScrews = Random.Range(0f, 1f) < 0.75f;
         bool deadboltEnabled = Random.Range(0f, 1f) < 0.5f;
         bool autoClose = Random.Range(0f, 1f) < 0.5f;

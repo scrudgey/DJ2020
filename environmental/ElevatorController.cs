@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
+using TMPro;
 using UnityEngine;
 
 [System.Serializable]
 public class ElevatorFloorData {
     public int floorNumber;
-    public ElevatorIndicator indicator;
+    // public ElevatorIndicator indicator;
     public ElevatorDoors doors;
     public Vector3 carPosition;
 }
@@ -14,7 +16,8 @@ public class ElevatorFloorData {
 public class ElevatorController : MonoBehaviour {
     enum State { none, move, load, close }
     State _state;
-    public Transform elevatorCar;
+    // public Transform elevatorCar;
+    public ElevatorCar elevatorCar;
     public ElevatorFloorData[] floors;
     Dictionary<int, ElevatorFloorData> floorDictionary;
 
@@ -26,6 +29,8 @@ public class ElevatorController : MonoBehaviour {
     public AudioClip elevatorGoSound;
     public AudioClip elevatorStopSound;
 
+    private ElevatorFloorData[] floorsAscending;
+
     void Start() {
         floorDictionary = new Dictionary<int, ElevatorFloorData>();
         foreach (ElevatorFloorData data in floors) {
@@ -33,7 +38,9 @@ public class ElevatorController : MonoBehaviour {
             Debug.Log($"closing doors {data.doors}");
             data.doors.CloseDoors();
         }
-
+        floorsAscending = floors.OrderBy(floor => floor.floorNumber).ToArray();
+        currentFloor = floors.OrderBy(floor => Mathf.Abs(floor.carPosition.y - elevatorCar.transform.position.y)).First();
+        SelectFloorMove(currentFloor.floorNumber);
     }
     public void CallElevator(ElevatorCallButton button) {
         ElevatorFloorData data = floorDictionary[button.floorNumber];
@@ -77,39 +84,46 @@ public class ElevatorController : MonoBehaviour {
                 elevatorCarAudioSource.clip = elevatorStartSound;
                 elevatorCarAudioSource.Play();
 
-                float distance = Mathf.Abs(elevatorCar.position.y - targetMoveFloor.carPosition.y);
+                float distance = Mathf.Abs(elevatorCar.transform.position.y - targetMoveFloor.carPosition.y);
                 float duration = distance;
 
                 StartCoroutine(Toolbox.ChainCoroutines(
-                    Toolbox.Ease(null, duration, elevatorCar.position.y, targetMoveFloor.carPosition.y, PennerDoubleAnimation.Linear, (amount) => {
-                        Vector3 newPos = new Vector3(elevatorCar.position.x, amount, elevatorCar.position.z);
-                        elevatorCar.position = newPos;
+                    Toolbox.Ease(null, duration, elevatorCar.transform.position.y, targetMoveFloor.carPosition.y, PennerDoubleAnimation.QuadEaseInOut, (amount) => {
+                        Vector3 newPos = new Vector3(elevatorCar.transform.position.x, amount, elevatorCar.transform.position.z);
+                        elevatorCar.transform.position = newPos;
                     }),
+                    new WaitForSecondsRealtime(0.1f),
+                    Toolbox.Ease(null, 0.4f, targetMoveFloor.carPosition.y + 0.05f, targetMoveFloor.carPosition.y, PennerDoubleAnimation.BounceEaseOut, (amount) => {
+                        Vector3 newPos = new Vector3(elevatorCar.transform.position.x, amount, elevatorCar.transform.position.z);
+                        elevatorCar.transform.position = newPos;
+                    }),
+                    new WaitForSecondsRealtime(1f),
                 Toolbox.CoroutineFunc(() => {
                     elevatorCarAudioSource.Stop();
                     elevatorCarAudioSource.loop = false;
                     elevatorCarAudioSource.clip = elevatorStopSound;
                     elevatorCarAudioSource.Play();
 
-                    currentFloor = targetMoveFloor;
+                    // SetCurrentFloor(targetMoveFloor);
                     ChangeState(State.load);
                 })
                 ));
 
                 break;
             case State.load:
-                currentFloor.indicator.ElevatorArrival();
+                currentFloor.doors.elevatorIndicator.ShowLight(true);
                 currentFloor.doors.OpenDoors();
                 break;
             case State.close:
                 if (currentFloor != null && currentFloor != targetMoveFloor) {
                     currentFloor.doors.CloseDoors();
                     StartCoroutine(Toolbox.ChainCoroutines(
-                    currentFloor.doors.WaitForDoorsToShut(),
-                    Toolbox.CoroutineFunc(() => {
-                        ChangeState(State.move);
-                    })
-                ));
+                        currentFloor.doors.WaitForDoorsToShut(),
+                        new WaitForSecondsRealtime(1f),
+                        Toolbox.CoroutineFunc(() => {
+                            ChangeState(State.move);
+                        })
+                    ));
                 } else {
                     ChangeState(State.load);
                 }
@@ -128,5 +142,58 @@ public class ElevatorController : MonoBehaviour {
                 elevatorCarAudioSource.Play();
             }
         }
+        if (currentFloor != null && targetMoveFloor != null && floorsAscending != null) {
+            if (currentFloor.floorNumber > targetMoveFloor.floorNumber) {
+                foreach (ElevatorFloorData data in floorsAscending.Reverse()) {
+                    if (data.carPosition.y >= currentFloor.carPosition.y) {
+                        continue;
+                    }
+                    if (data.carPosition.y > elevatorCar.transform.position.y) {
+                        SetCurrentFloor(data);
+                        break;
+                    }
+                }
+            } else if (currentFloor.floorNumber < targetMoveFloor.floorNumber) {
+                foreach (ElevatorFloorData data in floorsAscending) {
+                    if (data.carPosition.y <= currentFloor.carPosition.y) {
+                        continue;
+                    }
+                    if (data.carPosition.y < elevatorCar.transform.position.y) {
+                        SetCurrentFloor(data);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /**
+            |
+          4 |-- <- target floor
+            |
+            | 
+            |
+          3 |--
+            |
+            |    <- car position
+            |
+          2 |--  <- current floor
+            |
+            |
+            |
+          1 |-- 
+            |
+         */
+
+
+    }
+
+    void SetCurrentFloor(ElevatorFloorData data) {
+        currentFloor = data;
+        currentFloor.doors.elevatorIndicator.ElevatorArrival();
+        data.doors.callButton.AnswerCallButton();
+        foreach (ElevatorFloorData floor in floors) {
+            floor.doors.elevatorIndicator.UpdateCurrentFloor(data.floorNumber);
+        }
+        elevatorCar.SetCurrentFloor(data.floorNumber);
     }
 }
