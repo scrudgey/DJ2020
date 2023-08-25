@@ -22,16 +22,29 @@
 * elevator car texture
 * TMPro
 * realistic buttons and interiors
-
-elevator car doors
+* elevator car doors
     * doors rattle up/down on close
-door sounds on open/close
+* elevator car door texture
+* door sounds on open/close
+* call button highlight
+* counterweight
 
-elevator accoutrements
-    top stuff
-    bottom stuff
-    counterweight
-    rope
+usable hatch
+    crowbar?
+        other uses for crowbar:
+            quick entry to vent grates
+        is crowbar a burglar tool? or separate item?
+        weapon too?
+usable manual controls
+    manual mode on/off
+    up / down
+cabling only visible in showall mode
 
-call button highlight?
-elevator occlusion
+breakable glass
+
+## unique clearsighter logic
+    car should go transparent
+    when in elevator, show counterweight?
+    cables only visible in showall mode
+
+    elevator doors should be hidden

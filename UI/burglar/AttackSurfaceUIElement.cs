@@ -138,7 +138,8 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
 
     public void HandleElementDestroyed() {
-        Destroy(gameObject);
+        if (gameObject != null)
+            Destroy(gameObject);
     }
 
     public void BlinkCompletePips() {

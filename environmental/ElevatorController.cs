@@ -18,6 +18,7 @@ public class ElevatorController : MonoBehaviour {
     State _state;
     // public Transform elevatorCar;
     public ElevatorCar elevatorCar;
+    public Transform counterWeightTransform;
     public ElevatorFloorData[] floors;
     Dictionary<int, ElevatorFloorData> floorDictionary;
 
@@ -31,21 +32,30 @@ public class ElevatorController : MonoBehaviour {
 
     private ElevatorFloorData[] floorsAscending;
 
+    float totalHeight;
     void Start() {
         floorDictionary = new Dictionary<int, ElevatorFloorData>();
         foreach (ElevatorFloorData data in floors) {
             floorDictionary[data.floorNumber] = data;
-            Debug.Log($"closing doors {data.doors}");
-            data.doors.CloseDoors();
+            // Debug.Log($"closing doors {data.doors}");
+            data.doors.CloseDoors(silent: true);
         }
+        elevatorCar.CloseDoors();
         floorsAscending = floors.OrderBy(floor => floor.floorNumber).ToArray();
         currentFloor = floors.OrderBy(floor => Mathf.Abs(floor.carPosition.y - elevatorCar.transform.position.y)).First();
         SelectFloorMove(currentFloor.floorNumber);
+
+
+        // height of counterweight = 9 - height of elevator + offset = 9 - height of elevator
+        float[] heights = floors.Select(floor => floor.carPosition.y).ToArray();
+        float maxHeight = heights.Max();
+        float minHeight = heights.Min();
+        totalHeight = maxHeight - minHeight;
     }
     public void CallElevator(ElevatorCallButton button) {
         ElevatorFloorData data = floorDictionary[button.floorNumber];
 
-        Debug.Log($"call elevator {data.floorNumber}");
+        // Debug.Log($"call elevator {data.floorNumber}");
         targetMoveFloor = data;
         ChangeState(State.move);
     }
@@ -79,6 +89,7 @@ public class ElevatorController : MonoBehaviour {
                 if (currentFloor != null && currentFloor != targetMoveFloor) {
                     currentFloor.doors.CloseDoors();
                 }
+                elevatorCar.CloseDoors();
 
                 elevatorCarAudioSource.loop = false;
                 elevatorCarAudioSource.clip = elevatorStartSound;
@@ -113,10 +124,12 @@ public class ElevatorController : MonoBehaviour {
             case State.load:
                 currentFloor.doors.elevatorIndicator.ShowLight(true);
                 currentFloor.doors.OpenDoors();
+                elevatorCar.OpenDoors();
                 break;
             case State.close:
                 if (currentFloor != null && currentFloor != targetMoveFloor) {
                     currentFloor.doors.CloseDoors();
+                    elevatorCar.CloseDoors();
                     StartCoroutine(Toolbox.ChainCoroutines(
                         currentFloor.doors.WaitForDoorsToShut(),
                         new WaitForSecondsRealtime(1f),
@@ -141,6 +154,12 @@ public class ElevatorController : MonoBehaviour {
                 elevatorCarAudioSource.clip = elevatorGoSound;
                 elevatorCarAudioSource.Play();
             }
+
+            // move counterweight
+
+
+            counterWeightTransform.position = new Vector3(counterWeightTransform.position.x, totalHeight - elevatorCar.transform.position.y, counterWeightTransform.position.z);
+
         }
         if (currentFloor != null && targetMoveFloor != null && floorsAscending != null) {
             if (currentFloor.floorNumber > targetMoveFloor.floorNumber) {
@@ -168,20 +187,25 @@ public class ElevatorController : MonoBehaviour {
 
         /**
             |
-          4 |-- <- target floor
+          4 |-- <- target floor                 (10)
             |
             | 
             |
-          3 |--
+          3 |--                                 (7)
             |
             |    <- car position
             |
-          2 |--  <- current floor
+          2 |--  <- current floor               (4)
             |
             |
             |
-          1 |-- 
+          1 |--                                 (1)
             |
+
+            total height: 10 - 1 = 9  = max(y) - min(y)
+            offset: min(y)
+            height of counterweight + height of elevator = 9
+            height of counterweight = 9 - height of elevator + offset = 9 - height of elevator
          */
 
 

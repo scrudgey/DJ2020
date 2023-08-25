@@ -26,12 +26,13 @@ public class DoorRandomizer : MonoBehaviour {
                 latch.gameObject.SetActive(true);
                 latch.vulnerable = latchesVulnerable;
             }
-            if (latchGuardEnabled) {
-                foreach (AttackSurfaceLatchGuard guard in latchGuards) {
-                    guard.gameObject.SetActive(true);
+            // if (latchGuardEnabled) {
+            foreach (AttackSurfaceLatchGuard guard in latchGuards) {
+                guard.gameObject.SetActive(latchGuardEnabled);
+                if (latchGuardEnabled)
                     guard.Configure(latchGuardScrews);
-                }
             }
+            // }
         } else {
             foreach (AttackSurfaceLatch latch in latches) {
                 if (latch == null) continue;

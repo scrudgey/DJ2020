@@ -36,6 +36,7 @@ public class Toolbox {
         if (randomPitchWidth > 0) {
             audioSource.pitch = UnityEngine.Random.Range(1 - (randomPitchWidth / 2f), 1 + (randomPitchWidth / 2f));
         }
+        
         audioSource.PlayOneShot(audioClip, volume);
     }
     static public string NameWithoutClone(GameObject gameObject) {
