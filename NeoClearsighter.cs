@@ -84,6 +84,10 @@ public class NeoClearsighter : MonoBehaviour {
                     .Select(obj => obj.GetComponent<Renderer>())
             )
             .ToList();
+
+        // specialRenderers = GameObject.FindGameObjectsWithTag("occlusionSpecial").Select(obj => obj.GetComponent<Renderer>()).Where(renderer => renderer != null).ToList();
+        // elevatorShowZones = GameObject.FindObjectsOfType<ElevatorShowZone>().ToArray();
+
         rendererTree = new PointOctree<Renderer>(100, Vector3.zero, 1);
         rendererBoundsTree = new BoundsOctree<Renderer>(100, Vector3.zero, 0.5f, 1);
         foreach (Renderer renderer in staticRenderers) {
@@ -112,7 +116,7 @@ public class NeoClearsighter : MonoBehaviour {
         }
     }
 
-    Material NewInterloperMaterial(Renderer renderer) {
+    public static Material NewInterloperMaterial(Renderer renderer) {
         Material interloperMaterial = new Material(renderer.sharedMaterial);
         Texture albedo = renderer.sharedMaterial.mainTexture;
         interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
@@ -156,7 +160,7 @@ public class NeoClearsighter : MonoBehaviour {
 
     IEnumerator ShowAllGeometry() {
         // reset previous batch
-        yield return ResetPreviousBatch();
+        yield return ResetPreviousBatch(0);
         previousAboveRendererBatch = new HashSet<Renderer>();
         previousInterloperBatch = new HashSet<Renderer>();
         previousDynamicRendererBatch = new HashSet<Renderer>();
@@ -183,10 +187,30 @@ public class NeoClearsighter : MonoBehaviour {
 
         float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
         Vector3 liftedOrigin = origin + new Vector3(0f, lift, 0f);
-        Ray upRay = new Ray(liftedOrigin, Vector3.up);
         int j = 0;
 
         // static geometry above me
+        yield return HandleStaticAbove(j, liftedOrigin, nextAboveRenderBatch);
+
+        // static geometry interlopers
+        yield return HandleInterlopers(j, nextInterloperBatch, nextAboveRenderBatch);
+
+        // yield return HandleSpecialRenderers(liftedOrigin);
+
+        // dynamic renderers above me
+        yield return HandleDynamicAbove(j, liftedOrigin, nextAboveRenderBatch.Union(nextInterloperBatch).ToHashSet(), nextDynamicRenderBatch);
+
+        // reset previous batch
+        yield return ResetPreviousBatch(j);
+
+        previousAboveRendererBatch = nextAboveRenderBatch;
+        previousDynamicRendererBatch = nextDynamicRenderBatch;
+        previousInterloperBatch = nextInterloperBatch;
+        yield return waitForFrame;
+    }
+
+    IEnumerator HandleStaticAbove(int j, Vector3 liftedOrigin, HashSet<Renderer> nextAboveRenderBatch) {
+        Ray upRay = new Ray(liftedOrigin, Vector3.up);
         Renderer[] above = rendererTree.GetNearby(upRay, 50f);
         for (int i = 0; i < above.Length; i++) {
             j++;
@@ -202,7 +226,8 @@ public class NeoClearsighter : MonoBehaviour {
             // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
             // which is player position + 1.5
             if (position.y > liftedOrigin.y) {
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                MakeTransparent(renderer, Vector3.zero, true);
+
                 nextAboveRenderBatch.Add(renderer);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousAboveRendererBatch.Contains(renderer)) {
@@ -210,10 +235,9 @@ public class NeoClearsighter : MonoBehaviour {
                 }
             }
         }
+    }
 
-        yield return HandleInterlopers(nextInterloperBatch, nextAboveRenderBatch);
-
-        // non-static colliders above me
+    IEnumerator HandleDynamicAbove(int j, Vector3 liftedOrigin, HashSet<Renderer> alreadyHandledRenderer, HashSet<Renderer> nextDynamicRenderBatch) {
         int numberHits = Physics.OverlapSphereNonAlloc(liftedOrigin, 40f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell, Layer.bulletOnly, Layer.interactive), QueryTriggerInteraction.Ignore);
         for (int k = 0; k < numberHits; k++) {
             Collider collider = colliderHits[k];
@@ -230,8 +254,11 @@ public class NeoClearsighter : MonoBehaviour {
             if (root.position.y > liftedOrigin.y) {
                 foreach (Renderer renderer in renderers) {
                     if (renderer == null) continue;
-                    if (nextAboveRenderBatch.Contains(renderer) || nextInterloperBatch.Contains(renderer)) continue;
-                    renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                    if (alreadyHandledRenderer.Contains(renderer)) continue;
+                    if (renderer.CompareTag("occlusionSpecial")) continue;
+
+                    MakeTransparent(renderer, Vector3.zero, true);
+
                     nextDynamicRenderBatch.Add(renderer);
                     hiddenTransforms.Add(root);
                     if (previousDynamicRendererBatch.Contains(renderer)) {
@@ -240,30 +267,23 @@ public class NeoClearsighter : MonoBehaviour {
                 }
             }
         }
-
-        // reset previous batch
-        yield return ResetPreviousBatch();
-
-        previousAboveRendererBatch = nextAboveRenderBatch;
-        previousDynamicRendererBatch = nextDynamicRenderBatch;
-        previousInterloperBatch = nextInterloperBatch;
-        yield return waitForFrame;
     }
+
     IEnumerator InterloperOnly() {
         HashSet<Renderer> nextInterloperBatch = new HashSet<Renderer>();
 
+        int j = 0;
         // handle interlopers
-        yield return HandleInterlopers(nextInterloperBatch, null);
+        yield return HandleInterlopers(j, nextInterloperBatch, null);
 
         // reset previous batch
-        yield return ResetPreviousBatch();
+        yield return ResetPreviousBatch(j);
 
         previousInterloperBatch = nextInterloperBatch;
         yield return waitForFrame;
     }
 
-    IEnumerator ResetPreviousBatch() {
-        int j = 0;
+    IEnumerator ResetPreviousBatch(int j) {
         foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
             j++;
             if (j > 100) {
@@ -274,14 +294,23 @@ public class NeoClearsighter : MonoBehaviour {
             if (renderer.CompareTag("cutaway")) {
                 cutawayRenderers[renderer].SetActive(false);
             }
+            if (renderer.CompareTag("occlusionSpecial")) continue;
+            if (renderer.name == "elevator_car") {
+                Debug.Log("weird");
+                Debug.Break();
+            }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
             renderer.material = initialMaterials[renderer];
             hiddenTransforms.Remove(renderer.transform.root);
         }
     }
 
-    void MakeTransparent(Renderer renderer, Vector3 directionToInterloper) {
-        if (renderer.CompareTag("cutaway")) {
+    void MakeTransparent(Renderer renderer, Vector3 directionToInterloper, bool above) {
+        // handle non-static
+        // handle elevator car
+        if (above) {
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        } else if (renderer.CompareTag("cutaway")) {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             cutawayRenderers[renderer].SetActive(true);
         } else {
@@ -295,6 +324,11 @@ public class NeoClearsighter : MonoBehaviour {
                 renderer.SetPropertyBlock(propBlock);
                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];
             } else {
+                if (renderer.name == "elevator_car") {
+                    Debug.Log("weird");
+                    Debug.Break();
+                }
+
                 renderer.material = initialMaterials[renderer];
                 renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             }
@@ -325,8 +359,31 @@ public class NeoClearsighter : MonoBehaviour {
         return new Plane[] { left, right, down, up, near, far };
     }
 
-
-    IEnumerator HandleInterlopers(HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
+    // IEnumerator HandleSpecialRenderers(Vector3 liftedOrigin) {
+    //     bool showRenderers = elevatorShowZones.Any(zone => zone.collider.bounds.Contains(liftedOrigin));
+    //     bool transparent = elevatorShowZones.Where(zone => zone.transparent).Any(zone => zone.collider.bounds.Contains(liftedOrigin));
+    //     foreach (Renderer renderer in specialRenderers) {
+    //         if (showRenderers) {
+    //             if (transparent) {
+    //                 renderer.material = interloperMaterials[renderer];
+    //                 float targetAlpha = 0.7f;
+    //                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+    //                 renderer.GetPropertyBlock(propBlock);
+    //                 propBlock.SetFloat("_TargetAlpha", targetAlpha);
+    //                 renderer.SetPropertyBlock(propBlock);
+    //                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+    //             } else {
+    //                 renderer.material = initialMaterials[renderer];
+    //                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];
+    //             }
+    //         } else {
+    //             renderer.material = initialMaterials[renderer];
+    //             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+    //         }
+    //     }
+    //     yield return null;
+    // }
+    IEnumerator HandleInterlopers(int j, HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
 
         // float margin = 0.5f;
@@ -356,7 +413,6 @@ public class NeoClearsighter : MonoBehaviour {
         // Debug.Log(planarDisplacement);
         // Debug.DrawRay(followTransform.position, CharacterCamera.rotationOffset * planarDisplacement, Color.white, 0.75f);
 
-
         // if (cameraXSide) {
         //     XPlane = new Plane(Vector3.right, followTransform.position - margin * Vector3.right);
         // } else {
@@ -369,7 +425,6 @@ public class NeoClearsighter : MonoBehaviour {
         //     ZPlane = new Plane(Vector3.forward, followTransform.position + margin * Vector3.forward);
         // }
 
-        int j = 0;
         for (int i = 0; i < interlopers.Count; i++) {
             j++;
             if (j > 100) {
@@ -398,7 +453,7 @@ public class NeoClearsighter : MonoBehaviour {
             if (detectionPlane.GetSide(rendererBounds[renderer].center) == detectionSide && directionToInterloper.y > 0.2f) {
                 if (renderer == null) continue;
                 if (nextAboveRenderBatch?.Contains(renderer) ?? false) continue;
-                MakeTransparent(renderer, directionToInterloper);
+                MakeTransparent(renderer, directionToInterloper, false);
                 nextInterloperBatch.Add(renderer);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousInterloperBatch.Contains(renderer)) {

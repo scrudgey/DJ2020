@@ -28,6 +28,7 @@
 * door sounds on open/close
 * call button highlight
 * counterweight
+* initialize counterweight position
 
 usable hatch
     crowbar?
@@ -46,5 +47,11 @@ breakable glass
     car should go transparent
     when in elevator, show counterweight?
     cables only visible in showall mode
-
     elevator doors should be hidden
+
+multiple other renderers depend on elevator car renderer
+elevator should be visible when doors are open?
+elevator should be visible when on the floor.
+elevator should not be opaque when obscuring player- can be invisible?
+
+does this logic need to belong to clearsighter at all?

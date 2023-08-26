@@ -30,6 +30,9 @@ public class ElevatorDoors : MonoBehaviour {
     void Awake() {
         indicatorTransform.SetParent(null, true);
         callbuttonTransform.SetParent(null, true);
+        foreach (ElevatorDoorData data in doorDatas) {
+            data.door.SetParent(null, true);
+        }
     }
 
     void Start() {
@@ -86,7 +89,7 @@ public class ElevatorDoors : MonoBehaviour {
             Toolbox.RandomizeOneShot(audioSource, doorOpen);
         yield return Toolbox.Ease(null, 1f, data.closedLocalPosition.z, data.openLocalPosition.z, PennerDoubleAnimation.Linear, (amount) => {
             Vector3 newPos = new Vector3(data.openLocalPosition.x, data.openLocalPosition.y, amount);
-            data.door.localPosition = newPos;
+            data.door.position = transform.TransformPoint(newPos);
         });
     }
 
@@ -96,7 +99,8 @@ public class ElevatorDoors : MonoBehaviour {
 
         yield return Toolbox.ChainCoroutines(Toolbox.Ease(null, 1f, data.openLocalPosition.z, data.closedLocalPosition.z, PennerDoubleAnimation.QuadEaseOut, (amount) => {
             Vector3 newPos = new Vector3(data.closedLocalPosition.x, data.closedLocalPosition.y, amount);
-            data.door.localPosition = newPos;
+            data.door.position = transform.TransformPoint(newPos);
+
         }),
         new WaitForSecondsRealtime(0.1f),
         Toolbox.CoroutineFunc(() => {
@@ -105,7 +109,7 @@ public class ElevatorDoors : MonoBehaviour {
         }),
         Toolbox.Ease(null, 0.6f, data.closedLocalPosition.y + 0.04f, data.closedLocalPosition.y, PennerDoubleAnimation.BounceEaseOut, (amount) => {
             Vector3 newPos = new Vector3(data.closedLocalPosition.x, amount, data.closedLocalPosition.z);
-            data.door.localPosition = newPos;
+            data.door.position = transform.TransformPoint(newPos);
         }),
         Toolbox.CoroutineFunc(() => {
             doorsAreClosed = true;

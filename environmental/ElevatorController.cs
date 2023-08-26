@@ -14,7 +14,7 @@ public class ElevatorFloorData {
 }
 
 public class ElevatorController : MonoBehaviour {
-    enum State { none, move, load, close }
+    enum State { none, move, load, close, idle }
     State _state;
     // public Transform elevatorCar;
     public ElevatorCar elevatorCar;
@@ -32,6 +32,8 @@ public class ElevatorController : MonoBehaviour {
 
     private ElevatorFloorData[] floorsAscending;
 
+    Coroutine coroutine;
+
     float totalHeight;
     void Start() {
         floorDictionary = new Dictionary<int, ElevatorFloorData>();
@@ -42,7 +44,8 @@ public class ElevatorController : MonoBehaviour {
         }
         elevatorCar.CloseDoors();
         floorsAscending = floors.OrderBy(floor => floor.floorNumber).ToArray();
-        currentFloor = floors.OrderBy(floor => Mathf.Abs(floor.carPosition.y - elevatorCar.transform.position.y)).First();
+        // currentFloor = floors.OrderBy(floor => Mathf.Abs(floor.carPosition.y - elevatorCar.transform.position.y)).First();
+        currentFloor = ClosestFloor(elevatorCar.transform.position);
         SelectFloorMove(currentFloor.floorNumber);
 
 
@@ -51,6 +54,13 @@ public class ElevatorController : MonoBehaviour {
         float maxHeight = heights.Max();
         float minHeight = heights.Min();
         totalHeight = maxHeight - minHeight;
+        SetCounterweightPosition();
+    }
+    public ElevatorFloorData ClosestFloor(Vector3 position) {
+        return floors.OrderBy(floor => Mathf.Abs(floor.carPosition.y - position.y)).First();
+    }
+    void SetCounterweightPosition() {
+        counterWeightTransform.position = new Vector3(counterWeightTransform.position.x, totalHeight - elevatorCar.transform.position.y, counterWeightTransform.position.z);
     }
     public void CallElevator(ElevatorCallButton button) {
         ElevatorFloorData data = floorDictionary[button.floorNumber];
@@ -83,6 +93,10 @@ public class ElevatorController : MonoBehaviour {
     void OnStateEnter(State oldState, State newState) {
         // Debug.Log($"elevator doors changing state {oldState} -> {newState}");
         if (newState == oldState) return;
+        if (coroutine != null) {
+            StopCoroutine(coroutine);
+            coroutine = null;
+        }
         switch (newState) {
             case State.move:
 
@@ -125,6 +139,16 @@ public class ElevatorController : MonoBehaviour {
                 currentFloor.doors.elevatorIndicator.ShowLight(true);
                 currentFloor.doors.OpenDoors();
                 elevatorCar.OpenDoors();
+                coroutine = StartCoroutine(Toolbox.ChainCoroutines(
+                    new WaitForSecondsRealtime(5f),
+                    Toolbox.CoroutineFunc(() => {
+                        ChangeState(State.idle);
+                    })
+                ));
+                break;
+            case State.idle:
+                currentFloor.doors.CloseDoors();
+                elevatorCar.CloseDoors();
                 break;
             case State.close:
                 if (currentFloor != null && currentFloor != targetMoveFloor) {
@@ -140,7 +164,6 @@ public class ElevatorController : MonoBehaviour {
                 } else {
                     ChangeState(State.load);
                 }
-
                 break;
         }
     }
@@ -156,10 +179,7 @@ public class ElevatorController : MonoBehaviour {
             }
 
             // move counterweight
-
-
-            counterWeightTransform.position = new Vector3(counterWeightTransform.position.x, totalHeight - elevatorCar.transform.position.y, counterWeightTransform.position.z);
-
+            SetCounterweightPosition();
         }
         if (currentFloor != null && targetMoveFloor != null && floorsAscending != null) {
             if (currentFloor.floorNumber > targetMoveFloor.floorNumber) {
