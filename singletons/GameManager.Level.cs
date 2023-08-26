@@ -320,6 +320,8 @@ public partial class GameManager : Singleton<GameManager> {
         this.playerCollider = focus.GetComponentInChildren<Collider>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
 
+        ElevatorOccluder elevatorOccluder = GameObject.FindObjectOfType<ElevatorOccluder>();
+
         if (playerOutlineHandler != null) {
             playerOutlineHandler.UnBind();
         }
@@ -337,6 +339,9 @@ public partial class GameManager : Singleton<GameManager> {
         if (clearSighter2 != null) {
             clearSighter2.Initialize(focus.transform, characterCamera, playerCharacterController);
             // Destroy(clearSighter2);
+        }
+        if (elevatorOccluder != null) {
+            elevatorOccluder.Initialize(characterCamera);
         }
 
         GunHandler handler = focus.GetComponentInChildren<GunHandler>();

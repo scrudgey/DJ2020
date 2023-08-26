@@ -19,6 +19,10 @@ public class ElevatorOccluder : MonoBehaviour {
     // if elevator is on player's floor and elevator doors shut, invisible
     // if elevator doors open, visible
     // if occluding player, transparent
+
+    public void Initialize(CharacterCamera characterCamera) {
+        myCamera = characterCamera;
+    }
     void Start() {
         initialMaterials = new Dictionary<Renderer, Material>();
         initialShadowCastingMode = new Dictionary<Renderer, ShadowCastingMode>();
@@ -36,8 +40,9 @@ public class ElevatorOccluder : MonoBehaviour {
         ElevatorDoors currentDoors = currentFloor.doors;
 
         // TODO: handle other view modes
-
-        if (elevatorCarZone.collider.bounds.Contains(GameManager.I.playerPosition)) {
+        if ((myCamera.state != CameraState.normal && myCamera.state != CameraState.attractor)) {
+            MakeOpaque();
+        } else if (elevatorCarZone.collider.bounds.Contains(GameManager.I.playerPosition)) {
             MakeTranslucent();
         } else if (showZones.Any(zone => zone.collider.bounds.Contains(GameManager.I.playerPosition))) {
             MakeOpaque();

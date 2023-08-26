@@ -55,7 +55,7 @@ public class ElevatorDoors : MonoBehaviour {
         State tempInitialState = _state;
         OnStateExit(tempInitialState, newState);
         _state = newState;
-        OnStateEnter(tempInitialState, newState, silent: silent);
+        OnElevatorStateEnter(tempInitialState, newState, silent: silent);
     }
 
     void OnStateExit(State oldState, State newState) {
@@ -67,7 +67,7 @@ public class ElevatorDoors : MonoBehaviour {
         if (newState == oldState) return;
 
     }
-    void OnStateEnter(State oldState, State newState, bool silent = false) {
+    void OnElevatorStateEnter(State oldState, State newState, bool silent = false) {
         if (newState == oldState) return;
         switch (newState) {
             case State.open:

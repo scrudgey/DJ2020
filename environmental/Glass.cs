@@ -36,7 +36,8 @@ public class Glass : Destructible {
     }
 
     override protected void DoDestruct(Damage damage) {
-        base.DoDestruct(damage);
+        // base.DoDestruct(damage);
+        Destroy(gameObject);
 
         PoolManager.I.RecallObjects(decals.ToArray());
         // TODO: amortize this expensive operation

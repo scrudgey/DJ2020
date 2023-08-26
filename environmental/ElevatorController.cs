@@ -46,6 +46,7 @@ public class ElevatorController : MonoBehaviour {
         floorsAscending = floors.OrderBy(floor => floor.floorNumber).ToArray();
         // currentFloor = floors.OrderBy(floor => Mathf.Abs(floor.carPosition.y - elevatorCar.transform.position.y)).First();
         currentFloor = ClosestFloor(elevatorCar.transform.position);
+        elevatorCar.transform.position = currentFloor.carPosition;
         SelectFloorMove(currentFloor.floorNumber);
 
 
@@ -73,7 +74,6 @@ public class ElevatorController : MonoBehaviour {
     public void SelectFloorMove(int floorNumber) {
         ElevatorFloorData data = floorDictionary[floorNumber];
 
-        Debug.Log($"call elevator {data.floorNumber}");
         targetMoveFloor = data;
         ChangeState(State.close);
     }

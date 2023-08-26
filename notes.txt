@@ -3214,14 +3214,14 @@ after action report & skill tree
 dialogue
 hacking
 
-elevator
 sliding glass lab door
 lab benches / lab equipment
 drop-in hvac grates
-clearsight textmesh
 guards
 civilians
 
+* breakable glass
+* fixbreakable glass
 
 
 
