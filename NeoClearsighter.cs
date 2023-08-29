@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class NeoClearsighter : MonoBehaviour {
+    static readonly int BATCHSIZE = 500;
     enum State { normal, showAll, interloperOnly }
     State state;
     PointOctree<Renderer> rendererTree;
@@ -214,7 +215,7 @@ public class NeoClearsighter : MonoBehaviour {
         Renderer[] above = rendererTree.GetNearby(upRay, 50f);
         for (int i = 0; i < above.Length; i++) {
             j++;
-            if (j > 100) {
+            if (j > BATCHSIZE) {
                 j = 0;
                 yield return waitForFrame;
             }
@@ -244,7 +245,7 @@ public class NeoClearsighter : MonoBehaviour {
             if (collider == null || collider.name == "cutaway" || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                 continue;
             j += 1;
-            if (j > 500) {
+            if (j > BATCHSIZE) {
                 j = 0;
                 yield return waitForFrame;
             }
@@ -286,7 +287,7 @@ public class NeoClearsighter : MonoBehaviour {
     IEnumerator ResetPreviousBatch(int j) {
         foreach (Renderer renderer in previousAboveRendererBatch.Concat(previousDynamicRendererBatch).Concat(previousInterloperBatch)) {
             j++;
-            if (j > 100) {
+            if (j > BATCHSIZE) {
                 j = 0;
                 yield return waitForFrame;
             }
@@ -427,7 +428,7 @@ public class NeoClearsighter : MonoBehaviour {
 
         for (int i = 0; i < interlopers.Count; i++) {
             j++;
-            if (j > 100) {
+            if (j > BATCHSIZE) {
                 j = 0;
                 yield return waitForFrame;
             }

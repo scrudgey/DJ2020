@@ -2810,6 +2810,12 @@ x ladders
 * exterior
 * fix floor 2
 * fix yamachi map
+* sliding glass lab door
+* lab benches
+* lab equipment
+* drop-in hvac grates
+* breakable glass
+* fixbreakable glass
 
 
 
@@ -3166,10 +3172,11 @@ randomly place lasers
 randomly place cameras
 a separate gun sprite in aim?
 ambient sound system
-pushing on reverse door closes it backwards?
+* pushing on reverse door closes it backwards?
 
 
 doors
+    door config should be scriptable object
     more door types? more explotable latch? more handles and things?
     sometimes unlocked
     locks for doubledoors with crash bars
@@ -3204,27 +3211,54 @@ major initiatives:
 unresolved mechanics:
     dialogue
     hacking
+    circuits
 shops:
     more fences
     sell guns
-    more fence
     buy cyberware
 
 after action report & skill tree
 dialogue
 hacking
 
-sliding glass lab door
-lab benches / lab equipment
-drop-in hvac grates
 guards
 civilians
+warning message (???)
+furniture
+* stairs
 
-* breakable glass
-* fixbreakable glass
 
+doors and cyberware are all randomized/configured according to scriptableobject templates
+respond to level difficulty
+doors break down by type:
+    external door
+    office door
+    closet
+    unlocked door
 
-
+hacking:
+    network is discoverable
+    nodes are discoverable:
+        type:
+            actuator
+            datastore
+                filename
+                value
+    nodes are locked / unlocked
+        requires password breaking
+    nodes are usable
+        actuator: use object
+        controller: disable object
+        datastore: download data
+ways to interact with nodes:
+    discover node
+    discover node type
+    discover node connections
+    discover filename
+    activate actuator
+    disable controller
+    download file
+    break password
 
 
 
