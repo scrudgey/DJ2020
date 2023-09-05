@@ -10,15 +10,8 @@ public class WorkerSpawnPoint : MonoBehaviour {
     public Transform lookAtPoint;
     PrefabPool NPCPool;
     public List<WorkerLandmark> landmarks;
-    // Stack<WorkerLandmark> stations;
-    // List<WorkerLandmark> pointsOfInterest;
     void Start() {
         InitializePools();
-        // stations = new Stack<WorkerLandmark>(landmarks.Where(landmark => {
-        //     return landmark.landmarkType == WorkerLandmark.LandmarkType.station && !landmark.stationIsClaimed;
-        // }
-        //     ));
-        // pointsOfInterest = new List<WorkerLandmark>(landmarks.Where(landmark => landmark.landmarkType == WorkerLandmark.LandmarkType.pointOfInterest));
     }
     void InitializePools() {
         NPCPool = PoolManager.I?.RegisterPool("prefabs/WorkerNPC", poolSize: 10);

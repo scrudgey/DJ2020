@@ -7,14 +7,12 @@ using UnityEngine;
 namespace AI {
 
     public class TaskSocialize : TaskNode {
-        // WorldNPCAI ai;
         SpeechTextController speechTextController;
         SocialGroup socialGroup;
         float headSwivelOffset;
         Vector3 baseLookDirection;
         Grammar grammar;
         public TaskSocialize(SpeechTextController speechTextController, SocialGroup socialGroup) : base() {
-            // this.ai = ai;
             this.socialGroup = socialGroup;
             this.speechTextController = speechTextController;
             baseLookDirection = speechTextController.transform.forward;

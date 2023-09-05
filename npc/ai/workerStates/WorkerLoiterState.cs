@@ -23,18 +23,21 @@ public class WorkerLoiterState : WorkerNPCControlState {
         SetupRootNode();
         socialTime = 5f;
         ai.SetCurrentLandmark(null);
+        ai.UnexcludeCurrentLandmark();
     }
     public override void Exit() {
         ai.SetCurrentLandmark(null);
         socialTime = 5f;
+        ai.UnexcludeCurrentLandmark();
     }
 
     void SetupRootNode() {
         destination = GetDestination();
+        ai.ExcludeLandmark(destination);
         float speedCoefficient = Random.Range(0.3f, 0.75f);
         rootTaskNode =
         new Sequence(
-         new TaskMoveToKey(owner.transform, NAV_POINT_KEY, new System.Collections.Generic.HashSet<int>(), characterController, arrivalDistance: 2.5f) {
+         new TaskMoveToKey(owner.transform, NAV_POINT_KEY, new System.Collections.Generic.HashSet<int>(), characterController, arrivalDistance: 1.0f) {
              speedCoefficient = speedCoefficient
          },
          new TaskLambda(() => {
@@ -51,10 +54,10 @@ public class WorkerLoiterState : WorkerNPCControlState {
                 new TaskSocialize(speechTextController, null)
             ),
             new TaskTimerDectorator(Random.Range(5f, 30f))
-        )
+        ),
+        new TaskLambda(() => ai.UnexcludeCurrentLandmark())
         );
         rootTaskNode.SetData(NAV_POINT_KEY, destination.transform.position);
-        // rootTaskNode = new TaskPatrol(owner.transform, patrolRoute, patrolType, owner.physicalKeys, characterController);
     }
 
     bool AnyOtherWorkerInMyPlace() {
@@ -65,7 +68,7 @@ public class WorkerLoiterState : WorkerNPCControlState {
 
     WorkerLandmark GetDestination() {
         if (destination == ai.landmarkStation || ai.landmarkStation == null) {
-            return Toolbox.RandomFromList(ai.landmarkPointsOfInterest);
+            return Toolbox.RandomFromList(ai.landmarkPointsOfInterest.Where(landmark => !landmark.isExcluded()).ToList());
         } else {
             return ai.landmarkStation;
         }

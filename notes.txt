@@ -3067,6 +3067,32 @@ graphics
         franco
         no me baño
     https://twitter.com/scrudgey/status/1627911883952099329?s=20
+    how to make interior look more like office interior?
+        fire extinguisher boxes
+        1. colors
+            beige walls and wood doors
+        2. door details
+            door jamb
+            hinges
+            kick plate 
+        3. walls
+            floor runner
+            carpet
+            wainscotting
+        4. signage
+            exit sign
+            room number plates
+
+        how to roads?
+            lettering
+            crosswalk
+            speed bump
+            small streets
+
+        working texture:
+            in all cyber crocotile projects
+            in wetworks project
+            in pixaki
 models:
     another car
     buildings
@@ -3243,11 +3269,22 @@ hacking
 warning message (???)
 
 * "what was that" with footsteps constantly
-
+    * spawn worker NPCS
+    * initialize them to do activities
+        * stay at desk
+        * move to bathroom
+        * move to place of interest
+        * socialize near watercooler
+        * randomize loiter time
+        * socialize while loitering
+        * workers flee gunshots
+        * excludable bathroom
+* suspicion for grabbing loot
+* sentry worker at front desk
+* worker spawnpoints
+* worker activities
 
 elevator level
-    worker spawnpoints
-    worker activities
     scientist spritesheet
 
 lock elevator from third floor
@@ -3265,54 +3302,12 @@ doors and cyberware are all randomized/configured according to scriptableobject 
 
 
 worker NPC:
-    spawn worker NPCS
-    initialize them to do activities
-        stay at desk
-        move to bathroom
-        move to place of interest
-        socialize near watercooler
-
-        excludable bathroom
-        randomize loiter time
-        socialize while loitering
-workers flee gunshots
-
-suspicion for grabbing loot
-
     how to be an obstacle:
         activate alarm if they see something suspicious
-        maybe interrogate player?
+            a reaction between suspicious and aggro
+                suspicious: tampering, looting
+                    react: interrogate, find guard
+                aggro: gun
+                    react: find alarm, flee, find guard
         workers contain keys
-        
-    workers are assigned a desk, they move between desk and destination
-    can't assign same desk to multiple workers.
-a new component: worker landmark
-worker spawn points get a list of worker landmarks.
-sentry worker at front desk
 
-how to make interior look more like office interior?
-fire extinguisher boxes
-1. colors
-    beige walls and wood doors
-2. door details
-    door jamb
-    hinges
-    kick plate 
-3. walls
-    floor runner
-    carpet
-    wainscotting
-4. signage
-    exit sign
-    room number plates
-
-how to roads?
-    lettering
-    crosswalk
-    speed bump
-    small streets
-
-working texture:
-    in all cyber crocotile projects
-    in wetworks project
-    in pixaki

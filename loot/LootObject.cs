@@ -19,6 +19,7 @@ public class LootObject : Interactive {
         bool waveArm = transform.position.y - interactor.transform.position.y > -0.25f;
         bool crouchDown = !waveArm;
         PoolManager.I.GetPool(creditIndicator).GetObject(transform.position);
+        GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(data));
         return ItemUseResult.Empty() with {
             crouchDown = crouchDown,
             waveArm = waveArm

@@ -452,6 +452,30 @@ public class SuspicionRecord {
         }
     };
 
+    public static SuspicionRecord lootSuspicion(LootData data) => new SuspicionRecord {
+        content = "tampering with equipment",
+        suspiciousness = Suspiciousness.suspicious,
+        lifetime = 2f,
+        maxLifetime = 2f,
+        dialogue = new SuspicionDialogueParameters {
+            challenge = $"What are you doing with that {data.lootName}?",
+            tactics = new List<DialogueTactic>{
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.lie,
+                            content = $"I'm the {data.lootName} inspector.",
+                            successResponse = "Carry on.",
+                            failResponse = "Oh yeah? You don't look like one."
+                        },
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.challenge,
+                            content = $"What, is this your {data.lootName}?",
+                            successResponse = "I don't mean to interfere.",
+                            failResponse = "I know it isn't yours."
+                        }
+                    }
+        }
+    };
+
     public static SuspicionRecord tamperingSuspicion(HackData data) => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,

@@ -59,7 +59,19 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             WorkerLandmark.visitors = new Dictionary<WorkerNPCAI, WorkerLandmark>();
         }
         WorkerLandmark.visitors[this] = landmark;
+
         currentLandmark = landmark;
+
+    }
+    public void ExcludeLandmark(WorkerLandmark landmark) {
+        if (landmark.excludable) {
+            landmark.excluded = true;
+        }
+    }
+    public void UnexcludeCurrentLandmark() {
+        if (currentLandmark != null && currentLandmark.excludable) {
+            currentLandmark.excluded = false;
+        }
     }
     void Start() {
         gunHandler.Holster();
@@ -183,6 +195,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             directionToNoise.y = 0;
             float dotFactor = Vector3.Dot(rayDirection, directionToNoise);
             switch (stateMachine.currentState) {
+                case WorkerLoiterState:
                 case WorkerGuardState:
                 case WorkerCowerState:
                 case WorkerPanicRunState:
@@ -206,6 +219,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                     case WorkerCowerState:
                     case WorkerPanicRunState:
                     case WorkerHeldAtGunpointState:
+                    case WorkerLoiterState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
                         ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                         break;
@@ -271,6 +285,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             if (playerTotalSuspicion == Suspiciousness.suspicious) {
                 switch (stateMachine.currentState) {
                     case WorkerGuardState:
+                    case WorkerLoiterState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
                         ChangeState(new WorkerHeldAtGunpointState(this, characterController, other.gameObject));
                         break;
