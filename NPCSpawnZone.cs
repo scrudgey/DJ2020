@@ -12,7 +12,6 @@ public class NPCSpawnZone : MonoBehaviour {
     public bool world;
     PrefabPool NPCPool;
     WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.01f);
-
     void Start() {
         InitializePools();
     }

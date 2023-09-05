@@ -30,6 +30,8 @@ namespace AI {
 
             if (speechTextController.IsSpeaking()) {
 
+            } else if (socialGroup == null) {
+                speechTextController.Say("hi");
             } else {
                 if (socialGroup.currentSpeaker == speechTextController) {
                     socialGroup.DeregisterSpeaker();

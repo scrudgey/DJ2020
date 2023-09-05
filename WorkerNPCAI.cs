@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, IDamageReceiver {
+    public enum WorkerType { sentry, visitActivities }
+    WorkerType myType;
     static readonly float PERCEPTION_INTERVAL = 0.025f;
     static readonly float avoidFactor = 1f;
     static readonly float avoidRadius = 0.5f;
@@ -25,6 +27,9 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     [Header("specifics")]
     public Transform guardPoint;
     public Transform lookAtPoint;
+    public List<WorkerLandmark> landmarkPointsOfInterest;
+    public WorkerLandmark landmarkStation;
+    public WorkerLandmark currentLandmark;
 
     [HideInInspector]
     public NavMeshPath navMeshPath;
@@ -49,7 +54,13 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
 
         Bind(sightCone.gameObject);
     }
-
+    public void SetCurrentLandmark(WorkerLandmark landmark) {
+        if (WorkerLandmark.visitors == null) {
+            WorkerLandmark.visitors = new Dictionary<WorkerNPCAI, WorkerLandmark>();
+        }
+        WorkerLandmark.visitors[this] = landmark;
+        currentLandmark = landmark;
+    }
     void Start() {
         gunHandler.Holster();
         StartCoroutine(Toolbox.RunJobRepeatedly(findNearby));
@@ -103,17 +114,29 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         }
     }
 
-    public void Initialize() {
+    public void Initialize(WorkerType workerType) {
+        myType = workerType;
         EnterDefaultState();
     }
     public void ChangeState(WorkerNPCControlState routine) {
         stateMachine.ChangeState(routine);
     }
     void EnterDefaultState() {
-        ChangeState(new WorkerGuardState(this, characterController, guardPoint.position, lookAtPoint.position));
+        switch (myType) {
+            default:
+            case WorkerType.sentry:
+                ChangeState(new WorkerGuardState(this, characterController, guardPoint.position, lookAtPoint.position));
+                break;
+            case WorkerType.visitActivities:
+                ChangeState(new WorkerLoiterState(this, characterController, speechTextController));
+                break;
+        }
     }
     public void StateFinished(WorkerNPCControlState routine) {
         switch (routine) {
+            case WorkerLoiterState:
+                EnterDefaultState();
+                break;
             case WorkerHeldAtGunpointState:
                 Vector3 direction = GameManager.I.playerPosition - transform.position;
                 Damage fakeDamage = new Damage(0f, direction, transform.position, GameManager.I.playerPosition);

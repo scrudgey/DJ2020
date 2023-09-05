@@ -281,8 +281,6 @@ public class Door : Interactive, IDoor {
 
 
     public void Push(Vector3 hitNormal, Vector3 hitPoint) {
-        // TODO: fix!?
-
         // hitpoint is world coordinates.
         Vector3 d = hitPoint - hinges[0].position;
         d.y = 0;

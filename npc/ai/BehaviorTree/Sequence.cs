@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace AI {
     public class Sequence : TaskNode {
+        // move through whole list.
+        // stop on first failure or running.
+        // if all succeed, return success
         public Sequence() : base() { }
         public Sequence(List<TaskNode> children) : base(children) { }
         public Sequence(params TaskNode[] tasks) : base(new List<TaskNode>(tasks)) { }

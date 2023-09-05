@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace AI {
     public class Selector : TaskNode {
+        // move through whole list until we find a running or non-failure.
+        // stop on success or running.
+        // if all fail, then fail
         public Selector() : base() { }
         public Selector(List<TaskNode> children) : base(children) { }
         public Selector(params TaskNode[] tasks) : base(new List<TaskNode>(tasks)) { }

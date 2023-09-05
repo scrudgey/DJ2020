@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-
 public class DoorRandomizer : MonoBehaviour {
+    public DoorRandomizerTemplate template;
+    [Header("door objects")]
     public Door door;
     public bool locked = true;
     public AttackSurfaceLatch[] latches;
-    // public AttackSurfaceDoorknob[] knobs;
     public AttackSurfaceLock[] doorLocks;
     public AttackSurfaceLatchGuard[] latchGuards;
     public GameObject innerDeadbolt;
@@ -14,60 +15,45 @@ public class DoorRandomizer : MonoBehaviour {
     public DoorLock deadboltLock;
 
     public void ApplyState(LevelTemplate levelTemplate) {
-        bool latchesEnabled = Random.Range(0f, 1f) < 0.75f;
-        bool latchesVulnerable = Random.Range(0f, 1f) < 0.8f;
-        bool latchGuardEnabled = Random.Range(0f, 1f) < 0.1f;
-        bool latchGuardScrews = Random.Range(0f, 1f) < 0.75f;
-        bool deadboltEnabled = Random.Range(0f, 1f) < 0.5f;
-        bool autoClose = Random.Range(0f, 1f) < 0.5f;
+        bool latchesEnabled = template.getLatchesEnabled(levelTemplate.securityLevel);
+        bool latchesVulnerable = template.getLatchesVulnerable(levelTemplate.securityLevel);
+        bool latchGuardEnabled = template.getLatchGuardEnabled(levelTemplate.securityLevel);
+        bool latchGuardScrews = template.getLatchGuardScrews(levelTemplate.securityLevel);
+        bool deadboltEnabled = template.getDeadboltEnabled(levelTemplate.securityLevel);
+        bool autoClose = template.getAutoClose(levelTemplate.securityLevel);
 
-        if (latchesEnabled) {
-            foreach (AttackSurfaceLatch latch in latches) {
-                latch.gameObject.SetActive(true);
-                latch.vulnerable = latchesVulnerable;
-            }
-            // if (latchGuardEnabled) {
-            foreach (AttackSurfaceLatchGuard guard in latchGuards) {
-                guard.gameObject.SetActive(latchGuardEnabled);
-                if (latchGuardEnabled)
-                    guard.Configure(latchGuardScrews);
-            }
-            // }
-        } else {
-            foreach (AttackSurfaceLatch latch in latches) {
-                if (latch == null) continue;
-                latch.gameObject.SetActive(false);
-            }
-            foreach (AttackSurfaceLatchGuard guard in latchGuards) {
-                guard.gameObject.SetActive(false);
-            }
+
+        foreach (AttackSurfaceLatch latch in latches) {
+            if (latch == null) continue;
+            latch.gameObject.SetActive(latchesEnabled);
+            latch.vulnerable = latchesVulnerable;
+        }
+        foreach (AttackSurfaceLatchGuard guard in latchGuards) {
+            guard.gameObject.SetActive(latchGuardEnabled && latchesEnabled);
+            if (latchGuardEnabled)
+                guard.Configure(latchGuardScrews);
         }
 
         foreach (AttackSurfaceLock knob in doorLocks) {
-            if (levelTemplate.securityLevel == LevelTemplate.SecurityLevel.lax) {
-                knob.setbackProb = Random.Range(0f, 0.2f);
-                knob.progressStages = Random.Range(1, 3);
-            } else if (levelTemplate.securityLevel == LevelTemplate.SecurityLevel.commercial) {
-                knob.setbackProb = Random.Range(0.05f, 0.45f);
-                knob.progressStages = Random.Range(1, 4);
-            } else if (levelTemplate.securityLevel == LevelTemplate.SecurityLevel.hardened) {
-                knob.setbackProb = Random.Range(0.1f, 0.7f);
-                knob.progressStages = Random.Range(3, 5);
-            }
+            knob.setbackProb = template.knobLock.getSetbackProb(levelTemplate.securityLevel);
+            knob.progressStages = template.knobLock.getProgressStages(levelTemplate.securityLevel);
             knob.doorLock.locked = locked;
         }
         door.autoClose = autoClose;
 
-        if (deadboltEnabled) {
-            if (innerDeadbolt != null)
-                innerDeadbolt.SetActive(true);
-            if (outerDeadbolt != null)
-                outerDeadbolt?.SetActive(true);
-        } else {
-            if (innerDeadbolt != null)
-                innerDeadbolt?.SetActive(false);
-            if (outerDeadbolt != null)
-                outerDeadbolt?.SetActive(false);
-        }
+        if (innerDeadbolt != null)
+            innerDeadbolt.SetActive(deadboltEnabled);
+        if (outerDeadbolt != null)
+            outerDeadbolt.SetActive(deadboltEnabled);
     }
+
+#if UNITY_EDITOR
+
+    private void OnDrawGizmos() {
+        GUIStyle myStyle = new GUIStyle();
+        myStyle.normal.textColor = template.color;
+        Handles.Label(transform.position, $"{template.doorName}", myStyle);
+    }
+#endif
+
 }

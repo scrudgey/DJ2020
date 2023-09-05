@@ -3173,7 +3173,27 @@ randomly place cameras
 a separate gun sprite in aim?
 ambient sound system
 * pushing on reverse door closes it backwards?
+holster to put away rocket launcher
+* guards
+* stairs    
+* do guards get stuck in stairwell?
+    * furniture
+    * wire up network
+    * cyberware
+* cutaway for windows
+* wire up power
+* wire up alarm
+    * clear points
+    * objective
+    * ensure all attack surface cams good
+    * ceiling decor
+    * destructible walls
+    * lock sliding door
+    * way to unlock - key card
 
+
+
+reselect rocket launcher to put away
 
 doors
     door config should be scriptable object
@@ -3220,49 +3240,58 @@ shops:
 after action report & skill tree
 dialogue
 hacking
-
-guards
-civilians
 warning message (???)
-furniture
-* stairs
 
+* "what was that" with footsteps constantly
+
+
+elevator level
+    worker spawnpoints
+    worker activities
+    scientist spritesheet
+
+lock elevator from third floor
+    -> attack surface card reader
+    attack surface card reader attack
+    keycard
 
 doors and cyberware are all randomized/configured according to scriptableobject templates
-respond to level difficulty
-doors break down by type:
-    external door
-    office door
-    closet
-    unlocked door
-
-hacking:
-    network is discoverable
-    nodes are discoverable:
-        type:
-            actuator
-            datastore
-                filename
-                value
-    nodes are locked / unlocked
-        requires password breaking
-    nodes are usable
-        actuator: use object
-        controller: disable object
-        datastore: download data
-ways to interact with nodes:
-    discover node
-    discover node type
-    discover node connections
-    discover filename
-    activate actuator
-    disable controller
-    download file
-    break password
+    respond to level difficulty
+    doors break down by type:
+        external door - deadbolt + lock
+        office door - door lock, variable difficulty
+        closet - deadbolt,no door handle lock
+        unlocked door
 
 
+worker NPC:
+    spawn worker NPCS
+    initialize them to do activities
+        stay at desk
+        move to bathroom
+        move to place of interest
+        socialize near watercooler
+
+        excludable bathroom
+        randomize loiter time
+        socialize while loitering
+workers flee gunshots
+
+suspicion for grabbing loot
+
+    how to be an obstacle:
+        activate alarm if they see something suspicious
+        maybe interrogate player?
+        workers contain keys
+        
+    workers are assigned a desk, they move between desk and destination
+    can't assign same desk to multiple workers.
+a new component: worker landmark
+worker spawn points get a list of worker landmarks.
+sentry worker at front desk
 
 how to make interior look more like office interior?
+fire extinguisher boxes
 1. colors
     beige walls and wood doors
 2. door details

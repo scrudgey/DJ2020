@@ -1573,7 +1573,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         if (hitCollider.CompareTag("door")) {
             // Debug.Log($"pushing door: {hitCollider} {hitNormal} {hitPoint} {hitStabilityReport}");
             Door door = hitCollider.GetComponent<Door>();
-            door.Push(hitNormal, hitPoint);
+            if (door != null)
+                door.Push(hitNormal, hitPoint);
         }
     }
 

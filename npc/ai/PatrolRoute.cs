@@ -19,7 +19,8 @@ public class PatrolRoute : MonoBehaviour {
                     return;
                 }
             }
-            Gizmos.color = Color.green;
+            Gizmos.color = Color.cyan;
+            if (points[i] == null || points[j] == null) continue;
             Gizmos.DrawLine(points[i].position, points[j].position);
         }
     }

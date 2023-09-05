@@ -139,7 +139,14 @@ namespace AI {
                 // Debug.DrawLine(position, hit.collider.bounds.center, color, 0.5f);
                 if (doorFound) {
                     Door door = hit.collider.gameObject.GetComponent<Door>();
-                    OpenDoor(position, door);
+                    if (door) {
+                        OpenDoor(position, door);
+                    } else {
+                        SlidingDoor slidingDoor = hit.collider.gameObject.GetComponent<SlidingDoor>();
+                        if (slidingDoor) {
+                            slidingDoor.OpenDoors();
+                        }
+                    }
                     PassThroughDoor(hit.collider.gameObject);
                 }
             }

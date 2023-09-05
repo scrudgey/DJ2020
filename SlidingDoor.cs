@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using UnityEngine;
 public class SlidingDoor : Interactive {
@@ -11,11 +12,15 @@ public class SlidingDoor : Interactive {
     public AudioClip[] doorCloseStart;
     public ElevatorDoorData doorData;
     Coroutine coroutine;
+    public List<DoorLock> doorLocks;
     public override ItemUseResult DoAction(Interactor interactor) {
+        bool isLocked = doorLocks.Where(doorLock => doorLock != null && doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked);
+
         switch (_state) {
             case State.none:
             case State.closed:
-                OpenDoors();
+                if (!isLocked)
+                    OpenDoors();
                 break;
             case State.open:
                 CloseDoors();

@@ -63,3 +63,39 @@ virus:
     compromises nodes
     scans nodes?
 
+
+
+
+
+
+# hack v2
+
+hacking:
+    network is discoverable
+    nodes are discoverable:
+        type:
+            actuator
+            datastore
+                filename
+                value
+    nodes are locked / unlocked
+        requires password breaking
+    nodes are usable
+        actuator: use object
+        controller: disable object
+        datastore: download data
+ways to interact with nodes:
+    discover node
+    discover node type
+    discover node connections
+    discover filename
+    activate actuator
+    disable controller
+    download file
+    break password
+what is the purpose of network then?
+    there must be a way to attack a neighboring node from a given node
+    maybe not unlimited movement as we have today- but one hop away
+are attacks consumable?
+pegged to specific cyber type?
+how do attacks upgrade?
