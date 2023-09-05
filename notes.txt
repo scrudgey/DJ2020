@@ -3307,7 +3307,8 @@ worker NPC:
             a reaction between suspicious and aggro
                 suspicious: tampering, looting
                     react: interrogate, find guard
-                aggro: gun
-                    react: find alarm, flee, find guard
+                * aggro: gun
+                    * react: find alarm, flee, find guard
         workers contain keys
 
+worker suspicion state: a new state.

@@ -34,9 +34,7 @@ public partial class GameManager : Singleton<GameManager> {
 
 
     // UI callbacks
-    // public static Action OnMenuClosed;
     public static Action<GameObject> OnFocusChanged;
-    // public static Action<MenuType> OnMenuChange;
     public static Action<PowerGraph> OnPowerGraphChange;
     public static Action<CyberGraph> OnCyberGraphChange;
     public static Action<AlarmGraph> OnAlarmGraphChange;
@@ -70,12 +68,11 @@ public partial class GameManager : Singleton<GameManager> {
     public InputMode inputMode {
         get { return _inputMode; }
     }
-    // int numberFrames;
     public bool showDebugRays;
-    // public InputController inputController;
     public UIController uiController;
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
+    public GunHandler playerGunHandler;
     public void Start() {
         cursorType = CursorType.pointer;
         showDebugRays = true;

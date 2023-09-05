@@ -52,6 +52,10 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
+    public bool PlayerHasGunOut() {
+        return playerGunHandler.gunInstance != null;
+    }
+
     public SensitivityLevel GetCurrentSensitivity() =>
         gameData.levelState.template.sensitivityLevel;
 

@@ -280,9 +280,10 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance)) {
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             Suspiciousness playerTotalSuspicion = GameManager.I.GetTotalSuspicion();
-            Reaction reaction = ReactToPlayerSuspicion();
+            bool playerHasGunOut = GameManager.I.PlayerHasGunOut();
+            // Reaction reaction = ReactToPlayerSuspicion();
             stateMachine.currentState.OnPlayerPerceived();
-            if (playerTotalSuspicion == Suspiciousness.suspicious) {
+            if (playerHasGunOut) {
                 switch (stateMachine.currentState) {
                     case WorkerGuardState:
                     case WorkerLoiterState:
@@ -292,6 +293,11 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 }
             } else if (playerTotalSuspicion == Suspiciousness.aggressive) {
                 switch (stateMachine.currentState) {
+                    case WorkerGuardState:
+                    case WorkerLoiterState:
+                        alertHandler.ShowAlert(useWarnMaterial: true);
+                        ChangeState(new WorkerHeldAtGunpointState(this, characterController, other.gameObject));
+                        break;
                     case WorkerHeldAtGunpointState:
                         Vector3 direction = GameManager.I.playerPosition - transform.position;
                         Damage fakeDamage = new Damage(0f, direction, transform.position, GameManager.I.playerPosition);

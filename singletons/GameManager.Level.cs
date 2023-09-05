@@ -317,6 +317,7 @@ public partial class GameManager : Singleton<GameManager> {
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
+        this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
 

@@ -50,6 +50,6 @@ public class WorkerHeldAtGunpointState : WorkerNPCControlState {
     public override void OnPlayerPerceived() {
         base.OnPlayerPerceived();
         timeSinceISawPlayer = 0;
-        playerHasGunOut = GameManager.I.GetTotalSuspicion() >= Suspiciousness.suspicious;
+        playerHasGunOut = GameManager.I.PlayerHasGunOut();
     }
 }

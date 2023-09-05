@@ -453,7 +453,7 @@ public class SuspicionRecord {
     };
 
     public static SuspicionRecord lootSuspicion(LootData data) => new SuspicionRecord {
-        content = "tampering with equipment",
+        content = "stealing things",
         suspiciousness = Suspiciousness.suspicious,
         lifetime = 2f,
         maxLifetime = 2f,
