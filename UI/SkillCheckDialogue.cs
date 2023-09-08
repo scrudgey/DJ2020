@@ -50,7 +50,7 @@ public class SkillCheckDialogue : MonoBehaviour {
         float threshold = input.threshold;
         float roll = UnityEngine.Random.Range(0f, 100f);
         // float roll = 20f;
-        Debug.Log(roll);
+        // Debug.Log(roll);
 
         yield return StartUpIndicators(threshold, input);
 

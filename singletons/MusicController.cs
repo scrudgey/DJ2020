@@ -66,16 +66,16 @@ public class MusicController : Singleton<MusicController> {
                 audioSources[3].volume = 0;
                 break;
             case Suspiciousness.suspicious:
-                audioSources[0].volume = 1;
-                audioSources[1].volume = 1;
+                audioSources[0].volume = 0.5f;
+                audioSources[1].volume = 0.5f;
                 audioSources[2].volume = 0;
                 audioSources[3].volume = 0;
                 break;
             case Suspiciousness.aggressive:
-                audioSources[0].volume = 1;
-                audioSources[1].volume = 1;
-                audioSources[2].volume = 1;
-                audioSources[3].volume = 1;
+                audioSources[0].volume = 0.2f;
+                audioSources[1].volume = 0.2f;
+                audioSources[2].volume = 0.2f;
+                audioSources[3].volume = 0.2f;
                 break;
         }
 

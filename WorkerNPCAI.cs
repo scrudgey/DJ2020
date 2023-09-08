@@ -24,12 +24,19 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public KinematicCharacterMotor motor;
     public SpeechTextController speechTextController;
 
+    [Header("character")]
+    public Alertness alertness = Alertness.normal;
+    public SpeechEtiquette[] etiquettes;
+    public Sprite portrait;
+
     [Header("specifics")]
     public Transform guardPoint;
     public Transform lookAtPoint;
     public List<WorkerLandmark> landmarkPointsOfInterest;
     public WorkerLandmark landmarkStation;
     public WorkerLandmark currentLandmark;
+    public bool notifyGuard;
+    public bool guardNotified;
 
     [HideInInspector]
     public NavMeshPath navMeshPath;
@@ -37,14 +44,15 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     Collider[] nearbyOthers;
     RaycastHit[] raycastHits;
     Vector3 closeness;
-
-    SpaceTimePoint lastSeenPlayerPosition;
-    SpaceTimePoint lastHeardPlayerPosition;
-    SpaceTimePoint lastHeardDisturbancePosition;
+    float timeSinceInterrogatedStranger;
+    public SpaceTimePoint lastSeenPlayerPosition;
+    public SpaceTimePoint lastHeardPlayerPosition;
+    public SpaceTimePoint lastHeardDisturbancePosition;
     List<Transform> otherTransforms = new List<Transform>();
     bool awareOfCorpse;
     Suspiciousness lastSuspicionLevel;
     float perceptionCountdown;
+    bool panic;
     public void Awake() {
         nearbyOthers = new Collider[32];
         navMeshPath = new NavMeshPath();
@@ -103,7 +111,9 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             perceptionCountdown += PERCEPTION_INTERVAL;
             PerceiveFieldOfView();
         }
-
+        if (timeSinceInterrogatedStranger > 0f) {
+            timeSinceInterrogatedStranger -= Time.deltaTime;
+        }
         SetInputs(input);
         for (int i = 0; i < navMeshPath.corners.Length - 1; i++) {
             Debug.DrawLine(navMeshPath.corners[i], navMeshPath.corners[i + 1], Color.white);
@@ -132,8 +142,26 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
     public void ChangeState(WorkerNPCControlState routine) {
         stateMachine.ChangeState(routine);
+        switch (routine) {
+            case WorkerPanicRunState:
+            case WorkerReactToAttackState:
+            case WorkerCowerState:
+                panic = true;
+                break;
+            case WorkerInvestigateState:
+                timeSinceInterrogatedStranger = 120f;
+                break;
+        }
     }
     void EnterDefaultState() {
+        // TODO: enter panic
+        if (panic) {
+            if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+                ChangeState(new WorkerCowerState(this, characterController));
+            } else {
+                ChangeState(new WorkerPanicRunState(this, characterController));
+            }
+        }
         switch (myType) {
             default:
             case WorkerType.sentry:
@@ -146,6 +174,10 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
     public void StateFinished(WorkerNPCControlState routine) {
         switch (routine) {
+            case WorkerNotifyGuardState:
+                guardNotified = true;
+                EnterDefaultState();
+                break;
             case WorkerLoiterState:
                 EnterDefaultState();
                 break;
@@ -153,11 +185,13 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 Vector3 direction = GameManager.I.playerPosition - transform.position;
                 Damage fakeDamage = new Damage(0f, direction, transform.position, GameManager.I.playerPosition);
                 ChangeState(new WorkerReactToAttackState(this, speechTextController, fakeDamage, characterController));
+                notifyGuard = true;
                 break;
             case WorkerPanicRunState:
             case WorkerCowerState:
             case WorkerReactToAttackState:
                 if (UnityEngine.Random.Range(0f, 1f) < 0.1f) {
+                    panic = false;
                     EnterDefaultState();
                 }
                 if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
@@ -165,6 +199,23 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 } else {
                     ChangeState(new WorkerPanicRunState(this, characterController));
                 }
+                notifyGuard = true;
+                break;
+            case WorkerInvestigateState:
+                timeSinceInterrogatedStranger = 120f;
+                WorkerInvestigateState investigateState = (WorkerInvestigateState)routine;
+                if (investigateState.dialogueResult == DialogueController.DialogueResult.fail) {
+                    ChangeState(new WorkerPanicRunState(this, characterController));
+                    notifyGuard = true;
+                } else if (investigateState.dialogueResult == DialogueController.DialogueResult.stun) {
+                    alertHandler.ShowWarn();
+                    ChangeState(new WorkerPanicRunState(this, characterController));
+                    notifyGuard = true;
+                } else if (investigateState.isPlayerAggressive() || investigateState.isPlayerSuspicious()) {
+                    alertHandler.ShowWarn();
+                    ChangeState(new WorkerPanicRunState(this, characterController));
+                    notifyGuard = true;
+                } else goto default;
                 break;
             default:
                 EnterDefaultState();
@@ -180,6 +231,10 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public void HearNoise(NoiseComponent noise) {
         if (noise == null || (noise.data.source != null && noise.data.source == transform.root.gameObject))
             return;
+
+        if (stateMachine != null && stateMachine.currentState != null)
+            stateMachine.currentState.OnNoiseHeard(noise);
+
         if (noise.data.isGunshot && noise.data.suspiciousness > Suspiciousness.suspicious) {
             lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
             if (noise.data.player) {
@@ -272,7 +327,24 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 GameManager.I.AddSuspicionRecord(record);
                 // TODO: change states
             }
+            SphereRobotAI guardAI = other.GetComponent<SphereRobotAI>();
+            if (guardAI != null) {
+                Debug.Log($"saw a guard {notifyGuard} {guardNotified}");
+                if (notifyGuard && !guardNotified) {
+                    switch (stateMachine.currentState) {
+                        case WorkerGuardState:
+                        case WorkerLoiterState:
+                        case WorkerPanicRunState:
+                        case WorkerCowerState:
+                            Debug.Log("changing state to notify guard");
+                            ChangeState(new WorkerNotifyGuardState(this, characterController, speechTextController, guardAI));
+                            break;
+                    }
+                }
+            }
         }
+        if (stateMachine.currentState != null)
+            stateMachine.currentState.OnObjectPerceived(other);
     }
 
     void PerceivePlayerObject(Collider other, bool byPassVisibilityCheck = false) {
@@ -304,9 +376,25 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                         ChangeState(new WorkerReactToAttackState(this, speechTextController, fakeDamage, characterController));
                         break;
                 }
+            } else if (playerTotalSuspicion == Suspiciousness.suspicious) {
+                switch (stateMachine.currentState) {
+                    case WorkerGuardState:
+                    case WorkerLoiterState:
+                        alertHandler.ShowAlert(useWarnMaterial: true);
+                        if (timeSinceInterrogatedStranger <= 0) {
+                            ChangeState(new WorkerInvestigateState(this, characterController));
+                        }
+                        break;
+                }
             }
         }
     }
+
+    public DialogueCharacterInput MyCharacterInput() => new DialogueCharacterInput() {
+        portrait = portrait,
+        etiquettes = etiquettes,
+        alertness = alertness
+    };
 
     public Reaction ReactToPlayerSuspicion() {
         Suspiciousness totalSuspicion = GameManager.I.GetTotalSuspicion();

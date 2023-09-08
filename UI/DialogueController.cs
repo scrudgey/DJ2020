@@ -122,7 +122,7 @@ public class DialogueController : MonoBehaviour {
         SetDialogueResponses(input, nextRecord);
     }
     public void SetPortraits(DialogueInput input) {
-        leftPortrait.sprite = input.NPCAI.portrait;
+        leftPortrait.sprite = input.npcCharacter.portrait;
         rightPortrait.sprite = input.playerState.portrait;
     }
     public void SetStatusContainers(DialogueInput input) {
@@ -146,7 +146,7 @@ public class DialogueController : MonoBehaviour {
             CreateStatusElement($"in disguise", -1, false);
         }
 
-        switch (input.NPCAI.alertness) {
+        switch (input.npcCharacter.alertness) {
             case Alertness.normal:
                 CreateStatusElement("normal posture", 0, true);
                 break;
@@ -170,7 +170,7 @@ public class DialogueController : MonoBehaviour {
                 CreateStatusElement("in restricted area", 2, true);
                 break;
         }
-        foreach (SpeechEtiquette etiquette in input.NPCAI.etiquettes) {
+        foreach (SpeechEtiquette etiquette in input.npcCharacter.etiquettes) {
             CreateStatusElement($"etiquette: {etiquette}", 0, true);
         }
         SetAppearance(input);

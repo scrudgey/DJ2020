@@ -3198,8 +3198,10 @@ randomly place lasers
 randomly place cameras
 a separate gun sprite in aim?
 ambient sound system
-* pushing on reverse door closes it backwards?
 holster to put away rocket launcher
+hide elements in inspector that are set by template
+
+* pushing on reverse door closes it backwards?
 * guards
 * stairs    
 * do guards get stuck in stairwell?
@@ -3283,9 +3285,17 @@ warning message (???)
 * sentry worker at front desk
 * worker spawnpoints
 * worker activities
+* periodically yell for a guard if i am panic
+* emit noise that attracts guards
+* worker report to guard state -> run at random until a guard is found?
+
 
 elevator level
     scientist spritesheet
+
+worker NPC:
+    workers contain keys
+workers on all floors
 
 lock elevator from third floor
     -> attack surface card reader
@@ -3299,16 +3309,3 @@ doors and cyberware are all randomized/configured according to scriptableobject 
         office door - door lock, variable difficulty
         closet - deadbolt,no door handle lock
         unlocked door
-
-
-worker NPC:
-    how to be an obstacle:
-        activate alarm if they see something suspicious
-            a reaction between suspicious and aggro
-                suspicious: tampering, looting
-                    react: interrogate, find guard
-                * aggro: gun
-                    * react: find alarm, flee, find guard
-        workers contain keys
-
-worker suspicion state: a new state.

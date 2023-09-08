@@ -5,7 +5,7 @@ using UnityEngine;
 public struct DialogueInput {
     public GameObject playerObject;
     public GameObject npcObject;
-    public SphereRobotAI NPCAI;
+    public DialogueCharacterInput npcCharacter;
     public PlayerState playerState;
     public LevelState levelState;
     public Dictionary<String, SuspicionRecord> suspicionRecords;
@@ -14,4 +14,10 @@ public struct DialogueInput {
     public bool playerHasID;
     public bool alarmActive;
     public int playerSpeechSkill;
+}
+
+public struct DialogueCharacterInput {
+    public Sprite portrait;
+    public Alertness alertness;
+    public SpeechEtiquette[] etiquettes;
 }

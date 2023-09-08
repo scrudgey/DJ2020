@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-public class SphereInvestigateState : SphereControlState {
+public class WorkerInvestigateState : WorkerNPCControlState {
     static readonly public string SEARCH_POSITION_KEY = "investigatePosition";
     static readonly public string LAST_SEEN_PLAYER_POSITION_KEY = "lastSeenPlayerPosition";
     static readonly float AGGRESSION_THRESHOLD = 4.0f;
@@ -15,23 +17,14 @@ public class SphereInvestigateState : SphereControlState {
     Vector3 lastSeenPlayerPosition;
     TaskOpenDialogue dialogueTask;
     HQReport report;
-    SpottedHighlight highlight;
     float integratedPlayerMovement;
     float totalPlayerMovement;
     float saidHeyTimeout;
     CharacterController characterController;
-    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight, CharacterController characterController) : base(ai) {
-        this.highlight = highlight;
+    public WorkerInvestigateState(WorkerNPCAI ai, CharacterController characterController) : base(ai) {
         this.characterController = characterController;
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
-        report = new HQReport {
-            reporter = owner.gameObject,
-            desiredAlarmState = HQReport.AlarmChange.raiseAlarm,
-            locationOfLastDisturbance = owner.getLocationOfInterest(),
-            timeOfLastContact = Time.time,
-            lifetime = 6f,
-            speechText = "HQ respond. Intruder spotted. Raise the alarm.",
-        };
+
         DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
     public override void Enter() {
@@ -40,12 +33,9 @@ public class SphereInvestigateState : SphereControlState {
         lastSeenPlayerPosition = Vector3.zero;
         rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, GameManager.I.playerObject.transform.position);
         alertTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, GameManager.I.playerObject.transform.position);
-        highlight.target = GameManager.I.playerObject.transform;
         integratedPlayerMovement = 0f;
     }
-    public override void Exit() {
-        highlight.target = null;
-    }
+
     public bool lookingAtPlayer() {
         return timeSinceSawPlayer < 0.1f;
     }
@@ -61,19 +51,13 @@ public class SphereInvestigateState : SphereControlState {
         return integratedPlayerMovement > AGGRESSION_THRESHOLD;
     }
     void SetupRootNode() {
-        dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.myCharacterInput());
+        dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.MyCharacterInput());
 
         alertTaskNode = new Sequence(
-            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
+            new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
-                speedCoefficient = 1.2f,
-                highlight = highlight
-            },
-            new Selector(
-                    new TaskConditional(() => GameManager.I.isAlarmRadioInProgress(owner.gameObject)),
-                    new TaskConditional(() => GameManager.I.levelRadioTerminal() == null),
-                    new TaskRadioHQ(owner, speechTextController, owner.alertHandler, report)
-                )
+                speedCoefficient = 1.2f
+            }
         );
 
         rootTaskNode = new Sequence(
@@ -84,9 +68,8 @@ public class SphereInvestigateState : SphereControlState {
             }, 0.5f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
-                        speedCoefficient = 0.5f,
-                        highlight = highlight
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {
+                        speedCoefficient = 0.5f
                     },
                     new TaskConditional(() => isPlayerNear()),
                     dialogueTask
@@ -94,9 +77,8 @@ public class SphereInvestigateState : SphereControlState {
                 new Sequence(
                     new TaskConditional(() => seenPlayerRecently()),
                     new Sequence(
-                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
-                            headBehavior = TaskMoveToKey.HeadBehavior.search,
-                            highlight = highlight,
+                        new TaskMoveToKey(owner.transform, SEARCH_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {
+                            headBehavior = TaskMoveToKey.HeadBehavior.search
                         },
                         new TaskTimerDectorator(new TaskLookAt(owner.transform) {
                             lookType = TaskLookAt.LookType.position,
@@ -123,29 +105,25 @@ public class SphereInvestigateState : SphereControlState {
         }
 
         if (isPlayerAggressive()) {
-            owner.StateFinished(this, TaskState.success);
+            owner.StateFinished(this);
         }
 
         if (!isPlayerSuspicious() && lookingAtPlayer()) {
             result = rootTaskNode.Evaluate(ref input);
             if (result == TaskState.failure || result == TaskState.success) {
-                owner.StateFinished(this, TaskState.success);
+                owner.StateFinished(this);
             }
         } else {
             if (saidHeyTimeout <= 0) {
-                speechTextController.Say("<color=#ff4757>Hey! Hold it!</color>");
+                speechTextController.Say("<color=#ff4757>Hey! You there!</color>");
                 saidHeyTimeout = 60f;
             }
             if (!lookingAtPlayer()) {
                 result = alertTaskNode.Evaluate(ref input);
                 if (result == TaskState.success) {
-                    owner.StateFinished(this, TaskState.success);
+                    owner.StateFinished(this);
                 }
             }
-        }
-
-        if (!seenPlayerRecently()) {
-            highlight.target = null;
         }
 
         input.lookAtPosition = lastSeenPlayerPosition;
@@ -161,7 +139,7 @@ public class SphereInvestigateState : SphereControlState {
     public void HandleDialogueResult(DialogueController.DialogueResult result) {
         DialogueController.OnDialogueConclude -= HandleDialogueResult;
         dialogueResult = result;
-        owner.StateFinished(this, TaskState.success);
+        owner.StateFinished(this);
     }
 
     public override void OnObjectPerceived(Collider other) {

@@ -15,4 +15,7 @@ public abstract class WorkerNPCControlState : AI.IState {
     public virtual void OnPlayerPerceived() {
 
     }
+
+    public virtual void OnObjectPerceived(Collider other) { }
+    public virtual void OnNoiseHeard(NoiseComponent noise) { }
 }

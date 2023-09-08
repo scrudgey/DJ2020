@@ -35,6 +35,9 @@ public class WorkerSpawnPoint : MonoBehaviour {
 
         ai.lookAtPoint = lookAtPoint;
         ai.guardPoint = guardPoint;
+
+        // TODO: handle portrait, etiquette, alertness
+
         ApplyLandmarksToNPC(ai);
 
         motor.SetPosition(transform.position, bypassInterpolation: true);
@@ -57,6 +60,7 @@ public class WorkerSpawnPoint : MonoBehaviour {
         NPCState state = NPCState.Instantiate(template);
         state.activeGun = 0;
         state.ApplyState(npcObject);
+
     }
 
     public GameObject SpawnTemplated() {

@@ -151,7 +151,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 } else ChangeState(new SphereInvestigateState(this, highlight, characterController));
                 break;
             case SphereInvestigateState:
-                Debug.Log("leaving investigate state");
                 timeSinceInterrogatedStranger = 120f;
                 highlight.target = null;
                 SphereInvestigateState investigateState = (SphereInvestigateState)routine;
@@ -737,8 +736,41 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;
         // TODO: reset gun state...?!?
     }
+    public DialogueCharacterInput myCharacterInput() => new DialogueCharacterInput {
+        portrait = portrait,
+        etiquettes = etiquettes,
+        alertness = alertness
+    };
+    public DialogueInput GetDialogueInput() => GameManager.I.GetDialogueInput(gameObject, myCharacterInput());
 
-    public DialogueInput GetDialogueInput() => GameManager.I.GetDialogueInput(this);
+    public void TellAboutSuspiciousPlayer(WorkerNPCAI reporter) {
+        if (this.lastSeenPlayerPosition != null && reporter.lastSeenPlayerPosition != null && this.lastSeenPlayerPosition.time < reporter.lastSeenPlayerPosition.time)
+            this.lastSeenPlayerPosition = reporter.lastSeenPlayerPosition;
+
+        if (this.lastHeardDisturbancePosition != null && reporter.lastHeardDisturbancePosition != null && this.lastHeardDisturbancePosition.time < reporter.lastHeardDisturbancePosition.time)
+            this.lastHeardDisturbancePosition = reporter.lastHeardDisturbancePosition;
+
+        if (this.lastHeardPlayerPosition != null && reporter.lastHeardPlayerPosition != null && this.lastHeardPlayerPosition.time < reporter.lastHeardPlayerPosition.time)
+            this.lastHeardPlayerPosition = reporter.lastHeardPlayerPosition;
+
+        switch (stateMachine.currentState) {
+            case SearchDirectionState:
+            case SphereMoveState:
+            case SpherePatrolState:
+            case FollowTheLeaderState:
+            case StopAndListenState:
+            case SphereInvestigateState:
+            case SphereClearPointsState:
+            case DisableAlarmState:
+            case ReportToHQState:
+            case ReactToTamperState:
+            case StunState:
+            case PauseState:
+                ChangeState(new SearchDirectionState(this, lastSeenPlayerPosition.position, characterController, doIntro: false, speedCoefficient: 2f));
+                break;
+        }
+    }
+
 
 #if UNITY_EDITOR
     void OnDrawGizmos() {

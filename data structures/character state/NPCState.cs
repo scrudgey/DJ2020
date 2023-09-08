@@ -32,10 +32,27 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
         ((ISkinState)template).ApplySkinState(npcObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
 
+        // TODO: abstract this out with an interface
         SphereRobotAI ai = npcObject.GetComponent<SphereRobotAI>();
         if (ai != null) {
             ai.physicalKeys = new HashSet<int>(template.physicalKeys);
             ai.alertness = template.alertness;
+            ai.etiquettes = template.etiquettes;
+            ai.portrait = template.portrait;
+        }
+
+        WorkerNPCAI workerNPCAI = npcObject.GetComponent<WorkerNPCAI>();
+        if (workerNPCAI != null) {
+            // workerNPCAI.physicalKeys = new HashSet<int>(template.physicalKeys);
+            workerNPCAI.alertness = template.alertness;
+            workerNPCAI.etiquettes = template.etiquettes;
+            workerNPCAI.portrait = template.portrait;
+        }
+
+        LevelRandomSound randomSound = npcObject.GetComponent<LevelRandomSound>();
+        if (randomSound != null) {
+            randomSound.enabled = template.radioChatter;
+
         }
     }
 

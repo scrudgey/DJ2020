@@ -672,9 +672,10 @@ public partial class GameManager : Singleton<GameManager> {
         return spawnPoint.SpawnPlayer(state, plan);
     }
 
-    public DialogueInput GetDialogueInput(SphereRobotAI ai) => new DialogueInput() {
-        NPCAI = ai,
-        npcObject = ai.gameObject,
+    public DialogueInput GetDialogueInput(GameObject gameObject, DialogueCharacterInput npcCharacter) => new DialogueInput() {
+        // NPCAI = ai,
+        npcObject = gameObject,
+        npcCharacter = npcCharacter,
 
         playerObject = playerObject,
         playerState = gameData.playerState,
