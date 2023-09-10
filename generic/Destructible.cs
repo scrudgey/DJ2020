@@ -8,6 +8,7 @@ public class Destructible : Damageable, IPoolable {
     public GameObject[] destructionFx;
     public AudioClip[] destructSounds;
     public Action<Destructible> OnHitStateChanged { get; set; }
+    public Action OnDestruct;
     private HitState _hitState;
     public HitState hitState {
         get { return _hitState; }
@@ -36,6 +37,7 @@ public class Destructible : Damageable, IPoolable {
         data.targetPriority = -1;
         EmitGibs(damage);
         DoDestruct(damage);
+        OnDestruct?.Invoke();
     }
     virtual protected void DoDestruct(Damage damage) {
         if (transform.root != null) {

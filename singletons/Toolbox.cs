@@ -30,13 +30,24 @@ public class Toolbox {
         if (list.Count == 0) return default(T);
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
+    public static T RandomFromListByWeight<T>(IEnumerable<T> sequence, Func<T, float> weightSelector) {
+        float totalWeight = sequence.Sum(weightSelector);
+        float itemWeightIndex = (float)new System.Random().NextDouble() * totalWeight;
+        float currentWeightIndex = 0;
+        foreach (var item in from weightedItem in sequence select new { Value = weightedItem, Weight = weightSelector(weightedItem) }) {
+            currentWeightIndex += item.Weight;
+            if (currentWeightIndex >= itemWeightIndex)
+                return item.Value;
+        }
+        return default(T);
+    }
     static public void RandomizeOneShot(AudioSource audioSource, AudioClip audioClip, float randomPitchWidth = 0.1f, float volume = 1f) {
         if (!audioSource.isActiveAndEnabled)
             return;
         if (randomPitchWidth > 0) {
             audioSource.pitch = UnityEngine.Random.Range(1 - (randomPitchWidth / 2f), 1 + (randomPitchWidth / 2f));
         }
-        
+
         audioSource.PlayOneShot(audioClip, volume);
     }
     static public string NameWithoutClone(GameObject gameObject) {

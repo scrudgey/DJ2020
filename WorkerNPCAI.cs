@@ -35,6 +35,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public List<WorkerLandmark> landmarkPointsOfInterest;
     public WorkerLandmark landmarkStation;
     public WorkerLandmark currentLandmark;
+    public WorkerLandmark destinationLandmark;
     public bool notifyGuard;
     public bool guardNotified;
 
@@ -329,7 +330,6 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             }
             SphereRobotAI guardAI = other.GetComponent<SphereRobotAI>();
             if (guardAI != null) {
-                Debug.Log($"saw a guard {notifyGuard} {guardNotified}");
                 if (notifyGuard && !guardNotified) {
                     switch (stateMachine.currentState) {
                         case WorkerGuardState:

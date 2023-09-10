@@ -119,6 +119,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             CharacterController controller = transform.root.GetComponentInChildren<CharacterController>();
             controller.OnCharacterDead?.Invoke(controller);
         }
+
     }
 
     public void CheckWallDecal(BulletDamage damage) {

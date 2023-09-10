@@ -2816,6 +2816,42 @@ x ladders
 * drop-in hvac grates
 * breakable glass
 * fixbreakable glass
+* pushing on reverse door closes it backwards?
+* guards
+* stairs    
+* do guards get stuck in stairwell?
+    * furniture
+    * wire up network
+    * cyberware
+* cutaway for windows
+* wire up power
+* wire up alarm
+    * clear points
+    * objective
+    * ensure all attack surface cams good
+    * ceiling decor
+    * destructible walls
+    * lock sliding door
+    * way to unlock - key card
+* "what was that" with footsteps constantly
+    * spawn worker NPCS
+    * initialize them to do activities
+        * stay at desk
+        * move to bathroom
+        * move to place of interest
+        * socialize near watercooler
+        * randomize loiter time
+        * socialize while loitering
+        * workers flee gunshots
+        * excludable bathroom
+* suspicion for grabbing loot
+* sentry worker at front desk
+* worker spawnpoints
+* worker activities
+* periodically yell for a guard if i am panic
+* emit noise that attracts guards
+* worker report to guard state -> run at random until a guard is found?
+* workers on all floors
 
 
 
@@ -3201,23 +3237,6 @@ ambient sound system
 holster to put away rocket launcher
 hide elements in inspector that are set by template
 
-* pushing on reverse door closes it backwards?
-* guards
-* stairs    
-* do guards get stuck in stairwell?
-    * furniture
-    * wire up network
-    * cyberware
-* cutaway for windows
-* wire up power
-* wire up alarm
-    * clear points
-    * objective
-    * ensure all attack surface cams good
-    * ceiling decor
-    * destructible walls
-    * lock sliding door
-    * way to unlock - key card
 
 
 
@@ -3268,44 +3287,54 @@ shops:
 after action report & skill tree
 dialogue
 hacking
-warning message (???)
 
-* "what was that" with footsteps constantly
-    * spawn worker NPCS
-    * initialize them to do activities
-        * stay at desk
-        * move to bathroom
-        * move to place of interest
-        * socialize near watercooler
-        * randomize loiter time
-        * socialize while loitering
-        * workers flee gunshots
-        * excludable bathroom
-* suspicion for grabbing loot
-* sentry worker at front desk
-* worker spawnpoints
-* worker activities
-* periodically yell for a guard if i am panic
-* emit noise that attracts guards
-* worker report to guard state -> run at random until a guard is found?
+* scientist spritesheet
+* change "hi"
+* worker NPC:
+    * workers contain keys
+
 
 
 elevator level
-    scientist spritesheet
+    lock elevator from third floor
+        -> attack surface card reader & attack
+        keycard system
+    doors and cyberware are all randomized/configured according to scriptableobject templates
+        respond to level difficulty
+        doors break down by type:
+            external door - deadbolt + lock
+            office door - door lock, variable difficulty
+            closet - deadbolt,no door handle lock
+            unlocked door
+    elevator is broken when pressing button during door close
+    laser grid visible above player
+    upside-down inside vent
+    visible inside vent
+    vent cover should disappear after some time
+    click ladder through wall
+    top-shelf loot not visible
+    small shelves for janitor closet
+    mezzanine door lock on wrong side
+    back balcony door lock on wrong side
+    level acquired credits
+    "someone was shot" happens instantly
+    glass breaking sound should be loud, suspicious
+    make more furniture opaque
+    clicking door to unlock does not work
 
-worker NPC:
-    workers contain keys
-workers on all floors
 
-lock elevator from third floor
-    -> attack surface card reader
-    attack surface card reader attack
-    keycard
+worker notify:
+    test gunpoint 
 
-doors and cyberware are all randomized/configured according to scriptableobject templates
-    respond to level difficulty
-    doors break down by type:
-        external door - deadbolt + lock
-        office door - door lock, variable difficulty
-        closet - deadbolt,no door handle lock
-        unlocked door
+sphere clear points state:
+    get closest by nav mesh?
+    transitions from this state?
+
+
+
+generic spritesheet template is not complete:
+    head talking sprites
+    head sprite on torso in many frames
+    separate arm and torso?
+
+door randomizer should specify key id

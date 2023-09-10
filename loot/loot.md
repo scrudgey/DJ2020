@@ -146,3 +146,38 @@ different shops will buy different loot at different rates
     drugs +
     hardware -
     industrial ++
+
+
+
+
+# random loot drops
+
+1. should allow multiple "drop elements" per loot dropper.
+2. drop element has a probability of dropping or not
+3. when drop element drops, it chooses an element from its list.
+    elements can have weight
+4. drop element can specify n drops.
+
+4. people can drop keys
+5. it is possible to set the level up so that one NPC will carry a key.
+    do not hard code key drops to a specific spawn point.
+6. drop elements should be scriptable objects.
+7. probability of dropping drop element should belong to loot dropper, not drop element.
+
+the only really tricky part is #5.
+to do #5:
+    this must exist outside of spawnpoint logic.
+    a component (level initializer) has a list of spawn points and a list of required loot elements.
+        it places the loot element on randomly selected spawn point
+        when spawn point spawns, it places the loot element on the NPC lootdropper with probability 1.
+
+problem: what happens when some spawn points don't spwan (i.e. randomization?)
+    it seems like we need a two stage process:
+    1. determine which spawn points are going to spawn
+    2. determine which spawn points get the random item
+    3. apply the random item
+this logic can belong to level initializer pretty readily.
+level initializer logic can be moved to level template.? perhaps not: level-specific references.
+
+
+connect up lootdropper status with worker spawn points / npc spawn points

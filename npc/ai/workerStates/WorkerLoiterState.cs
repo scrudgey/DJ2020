@@ -9,7 +9,7 @@ public class WorkerLoiterState : WorkerNPCControlState {
     private TaskNode rootTaskNode;
     WorkerNPCAI ai;
     CharacterController characterController;
-    public WorkerLandmark destination;
+    // public WorkerLandmark destination;
     public SpeechTextController speechTextController;
     float socialTime;
     public WorkerLoiterState(WorkerNPCAI ai, CharacterController characterController, SpeechTextController speechTextController) : base(ai) {
@@ -32,8 +32,8 @@ public class WorkerLoiterState : WorkerNPCControlState {
     }
 
     void SetupRootNode() {
-        destination = GetDestination();
-        ai.ExcludeLandmark(destination);
+        ai.destinationLandmark = GetDestination();
+        ai.ExcludeLandmark(ai.destinationLandmark);
         float speedCoefficient = Random.Range(0.3f, 0.75f);
         rootTaskNode =
         new Sequence(
@@ -41,7 +41,7 @@ public class WorkerLoiterState : WorkerNPCControlState {
              speedCoefficient = speedCoefficient
          },
          new TaskLambda(() => {
-             ai.SetCurrentLandmark(destination);
+             ai.SetCurrentLandmark(ai.destinationLandmark);
          }),
          new Selector(
             new Sequence(
@@ -57,7 +57,7 @@ public class WorkerLoiterState : WorkerNPCControlState {
         ),
         new TaskLambda(() => ai.UnexcludeCurrentLandmark())
         );
-        rootTaskNode.SetData(NAV_POINT_KEY, destination.transform.position);
+        rootTaskNode.SetData(NAV_POINT_KEY, ai.destinationLandmark.transform.position);
     }
 
     bool AnyOtherWorkerInMyPlace() {
@@ -67,10 +67,12 @@ public class WorkerLoiterState : WorkerNPCControlState {
     }
 
     WorkerLandmark GetDestination() {
-        if (destination == ai.landmarkStation || ai.landmarkStation == null) {
-            return Toolbox.RandomFromList(ai.landmarkPointsOfInterest.Where(landmark => !landmark.isExcluded()).ToList());
+        if (ai.destinationLandmark == ai.landmarkStation || ai.landmarkStation == null) {
+            var x = Toolbox.RandomFromList(ai.landmarkPointsOfInterest.Where(landmark => !landmark.isExcluded()).ToList());
+            return x;
         } else {
-            return ai.landmarkStation;
+            var x = ai.landmarkStation;
+            return x;
         }
     }
 

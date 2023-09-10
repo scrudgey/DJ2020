@@ -10,6 +10,7 @@ public class WorkerSpawnPoint : MonoBehaviour {
     public Transform lookAtPoint;
     PrefabPool NPCPool;
     public List<WorkerLandmark> landmarks;
+    public List<LootDropElementWithProbability> lootDrops;
     void Start() {
         InitializePools();
     }
@@ -33,6 +34,11 @@ public class WorkerSpawnPoint : MonoBehaviour {
         legsAnimation.characterCamera = cam;
         controller.OrbitCamera = cam;
 
+        LootDropper lootDropper = npc.GetComponentInChildren<LootDropper>();
+        if (lootDropper != null) {
+            lootDropper.loot.AddRange(lootDrops);
+        }
+
         ai.lookAtPoint = lookAtPoint;
         ai.guardPoint = guardPoint;
 
@@ -42,7 +48,6 @@ public class WorkerSpawnPoint : MonoBehaviour {
 
         motor.SetPosition(transform.position, bypassInterpolation: true);
         ApplyNPCState(template, npc);
-
         ai.Initialize(workerType);
         return npc;
     }
