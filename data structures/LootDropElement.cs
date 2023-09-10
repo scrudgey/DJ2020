@@ -15,7 +15,14 @@ public class LootDropElement : ScriptableObject {
     public GameObject instantiateLoot(Vector3 position) {
         WeightedLoot loot = Toolbox.RandomFromListByWeight(loots, (WeightedLoot loot) => loot.weight);
 
-        GameObject obj = GameObject.Instantiate(loot.prefab, position, Quaternion.identity);
+        GameObject prefab = loot.prefab;
+
+        SpawnRandom randomSpawner = loot.prefab.GetComponent<SpawnRandom>();
+        if (randomSpawner != null) {
+            prefab = randomSpawner.getPrefab();
+        }
+
+        GameObject obj = GameObject.Instantiate(prefab, position, Quaternion.identity);
 
         // apply keyId if prefab is a key
         Key key = obj.GetComponentInChildren<Key>();

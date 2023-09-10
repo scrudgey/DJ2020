@@ -28,9 +28,23 @@ public partial class GameManager : Singleton<GameManager> {
         OnLootChange?.Invoke(data, gameData);
         CheckObjectives();
     }
-
+    public void AddKey(int keyId, DoorLock.LockType type) {
+        switch (type) {
+            case DoorLock.LockType.physical:
+                AddPhysicalKey(keyId);
+                break;
+            case DoorLock.LockType.keycard:
+                AddKeyCard(keyId);
+                break;
+        }
+    }
     public void AddPhysicalKey(int keyId) {
         gameData.playerState.physicalKeys.Add(keyId);
+        CheckObjectives();
+        OnItemPickup?.Invoke(0, $"{keyId}");
+    }
+    public void AddKeyCard(int keyId) {
+        gameData.playerState.keycards.Add(keyId);
         CheckObjectives();
         OnItemPickup?.Invoke(0, $"{keyId}");
     }

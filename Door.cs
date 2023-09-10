@@ -233,6 +233,13 @@ public class Door : Interactive, IDoor {
     public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
         lastInteractorTransform = activator;
 
+        // TODO: apply keys
+        foreach (int keyId in GameManager.I.gameData.playerState.physicalKeys) {
+            foreach (DoorLock doorLock in doorLocks) {
+                doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
+            }
+        }
+
         bool isLocked = bypassKeyCheck ? false : doorLocks.Where(doorLock => doorLock != null && doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked);
 
         switch (state) {

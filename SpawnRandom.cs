@@ -8,8 +8,12 @@ public class SpawnRandom : MonoBehaviour {
 
     public void Start() {
         if (Random.Range(0f, 1f) < probability) {
-            GameObject.Instantiate(Toolbox.RandomFromList(prefabs), transform.position, Quaternion.identity);
+            GameObject.Instantiate(getPrefab(), transform.position, Quaternion.identity);
         }
         Destroy(gameObject);
+    }
+
+    public GameObject getPrefab() {
+        return Toolbox.RandomFromList(prefabs);
     }
 }

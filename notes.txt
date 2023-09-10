@@ -3299,6 +3299,9 @@ elevator level
     lock elevator from third floor
         -> attack surface card reader & attack
         keycard system
+            make a keycard lock
+    worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
+    worker portrait not right
     doors and cyberware are all randomized/configured according to scriptableobject templates
         respond to level difficulty
         doors break down by type:
@@ -3321,7 +3324,10 @@ elevator level
     glass breaking sound should be loud, suspicious
     make more furniture opaque
     clicking door to unlock does not work
-
+    do not move camera in aim mode with weapon wheel
+    cutting wire on security camera did not work
+    hacking seccurity camera did not work
+    security camera should be easier to shoot
 
 worker notify:
     test gunpoint 

@@ -12,9 +12,21 @@ public class KeycardReader : Interactive {
     public Color failColor;
     Coroutine coroutine;
     public override ItemUseResult DoAction(Interactor interactor) {
-        doorLock.locked = false;
-        Toolbox.RandomizeOneShot(audioSource, successSound);
-        BlinkLight(successColor);
+        bool success = false;
+        foreach (int keyId in GameManager.I.gameData.playerState.keycards) {
+            success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+        }
+        AudioClip[] sound;
+        Color color;
+        if (success) {
+            sound = successSound;
+            color = successColor;
+        } else {
+            sound = failSound;
+            color = failColor;
+        }
+        Toolbox.RandomizeOneShot(audioSource, sound);
+        BlinkLight(color);
         return ItemUseResult.Empty() with {
             waveArm = true
         };

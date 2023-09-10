@@ -54,6 +54,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public Sprite portrait;
 
     public HashSet<int> physicalKeys;
+    public HashSet<int> keycards;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
@@ -129,6 +130,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
 
             physicalKeys = new HashSet<int>(),
+            keycards = new HashSet<int>(),
 
             payDatas = new List<PayData>(),
 

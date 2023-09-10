@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 [System.Serializable]
 public class DoorLock : MonoBehaviour {
-    public enum LockType { physical, electronic }
+    public enum LockType { physical, keycard }
     // public Door door;
     public AudioSource audioSource;
     public LockType lockType;
