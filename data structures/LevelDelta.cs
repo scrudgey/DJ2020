@@ -23,6 +23,7 @@ public record LevelDelta {
     public List<PayData> levelAcquiredPaydata;
     public HashSet<string> levelInteractedObjects;
     public List<LootData> levelAcquiredLoot;
+    public int levelAcquiredCredits;
     public GameManager.HQPhase hqPhase;
     public bool alarmTerminalActive;
     public float strikeTeamMissionTimer;

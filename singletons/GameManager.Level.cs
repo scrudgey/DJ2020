@@ -198,6 +198,7 @@ public partial class GameManager : Singleton<GameManager> {
         MusicController.I.Stop();
         gameData.completedLevels.Add(gameData.levelState.template.levelName);
         gameData.playerState.credits += gameData.levelState.template.creditReward;
+        gameData.playerState.credits += gameData.levelState.delta.levelAcquiredCredits;
         gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
         gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot);
 

@@ -19,7 +19,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void AddCredits(int amount) {
-        gameData.playerState.credits += amount;
+        // gameData.playerState.credits += amount;
+        gameData.levelState.delta.levelAcquiredCredits += amount;
         CheckObjectives();
         OnItemPickup?.Invoke(1, $"{amount}");
     }

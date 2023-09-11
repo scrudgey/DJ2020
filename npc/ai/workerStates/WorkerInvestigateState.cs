@@ -17,10 +17,11 @@ public class WorkerInvestigateState : WorkerNPCControlState {
     Vector3 lastSeenPlayerPosition;
     TaskOpenDialogue dialogueTask;
     HQReport report;
-    float integratedPlayerMovement;
-    float totalPlayerMovement;
+    // float integratedPlayerMovement;
+    // float totalPlayerMovement;
     float saidHeyTimeout;
     CharacterController characterController;
+    public bool gaveUp;
     public WorkerInvestigateState(WorkerNPCAI ai, CharacterController characterController) : base(ai) {
         this.characterController = characterController;
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
@@ -30,10 +31,12 @@ public class WorkerInvestigateState : WorkerNPCControlState {
     public override void Enter() {
         base.Enter();
         SetupRootNode();
+        speechTextController.Say("<color=#ff4757>Hey! You there!</color>");
+        saidHeyTimeout = 60f;
         lastSeenPlayerPosition = Vector3.zero;
         rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, GameManager.I.playerObject.transform.position);
         alertTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, GameManager.I.playerObject.transform.position);
-        integratedPlayerMovement = 0f;
+        // integratedPlayerMovement = 0f;
     }
 
     public bool lookingAtPlayer() {
@@ -44,19 +47,19 @@ public class WorkerInvestigateState : WorkerNPCControlState {
     public bool isPlayerNear() {
         return Vector3.Distance(GameManager.I.playerObject.transform.position, owner.transform.position) < 2.5f;
     }
-    public bool isPlayerSuspicious() {
-        return integratedPlayerMovement > WARN_THRESHOLD;
-    }
-    public bool isPlayerAggressive() {
-        return integratedPlayerMovement > AGGRESSION_THRESHOLD;
-    }
+    // public bool isPlayerSuspicious() {
+    //     return integratedPlayerMovement > WARN_THRESHOLD;
+    // }
+    // public bool isPlayerAggressive() {
+    //     return integratedPlayerMovement > AGGRESSION_THRESHOLD;
+    // }
     void SetupRootNode() {
         dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.MyCharacterInput());
 
         alertTaskNode = new Sequence(
             new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
-                speedCoefficient = 1.2f
+                speedCoefficient = 1.5f
             }
         );
 
@@ -68,8 +71,8 @@ public class WorkerInvestigateState : WorkerNPCControlState {
             }, 0.2f),
             new Selector(
                 new Sequence(
-                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {
-                        speedCoefficient = 0.5f
+                    new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 1.5f) {
+                        speedCoefficient = 1f
                     },
                     new TaskConditional(() => isPlayerNear()),
                     dialogueTask
@@ -94,45 +97,45 @@ public class WorkerInvestigateState : WorkerNPCControlState {
 
     public override PlayerInput Update(ref PlayerInput input) {
         TaskState result = TaskState.running;
-        if (lookingAtPlayer()) {
-            if (integratedPlayerMovement > 0) {
-                integratedPlayerMovement -= Time.deltaTime * 0.5f;
-            }
-        }
+        // if (lookingAtPlayer()) {
+        //     // if (integratedPlayerMovement > 0) {
+        //     //     integratedPlayerMovement -= Time.deltaTime * 0.5f;
+        //     // }
+        // }
         timeSinceSawPlayer += Time.deltaTime;
         if (saidHeyTimeout > 0) {
             saidHeyTimeout -= Time.deltaTime;
         }
 
-        if (isPlayerAggressive()) {
-            owner.StateFinished(this);
+        // if (isPlayerAggressive()) {
+        //     owner.StateFinished(this);
+        // }
+        if (saidHeyTimeout <= 0) {
+            speechTextController.Say("<color=#ff4757>Hey! You there!</color>");
+            saidHeyTimeout = 60f;
         }
 
-        if (!isPlayerSuspicious() && lookingAtPlayer()) {
+        if (lookingAtPlayer()) {
             result = rootTaskNode.Evaluate(ref input);
             if (result == TaskState.failure || result == TaskState.success) {
                 owner.StateFinished(this);
             }
+            input.lookAtPosition = lastSeenPlayerPosition;
+            input.snapToLook = true;
+            // object keyObj = rootTaskNode.GetData(LAST_SEEN_PLAYER_POSITION_KEY);
+            // if (keyObj != null) {
+            //     Vector3 target = (Vector3)keyObj;
+            //     input.lookAtPosition = target;
+            // }
         } else {
-            if (saidHeyTimeout <= 0) {
-                speechTextController.Say("<color=#ff4757>Hey! You there!</color>");
-                saidHeyTimeout = 60f;
-            }
-            if (!lookingAtPlayer()) {
-                result = alertTaskNode.Evaluate(ref input);
-                if (result == TaskState.success) {
-                    owner.StateFinished(this);
-                }
+            result = alertTaskNode.Evaluate(ref input);
+            if (result == TaskState.success) {
+                gaveUp = true;
+                owner.StateFinished(this);
             }
         }
 
-        input.lookAtPosition = lastSeenPlayerPosition;
-        input.snapToLook = true;
-        object keyObj = rootTaskNode.GetData(LAST_SEEN_PLAYER_POSITION_KEY);
-        if (keyObj != null) {
-            Vector3 target = (Vector3)keyObj;
-            input.lookAtPosition = target;
-        }
+
         return input;
     }
 
@@ -144,11 +147,11 @@ public class WorkerInvestigateState : WorkerNPCControlState {
 
     public override void OnObjectPerceived(Collider other) {
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            if (lastSeenPlayerPosition != Vector3.zero) {
-                float amountOfMotion = (other.transform.root.position - lastSeenPlayerPosition).magnitude;
-                integratedPlayerMovement += amountOfMotion;
-                totalPlayerMovement += amountOfMotion;
-            }
+            // if (lastSeenPlayerPosition != Vector3.zero) {
+            //     float amountOfMotion = (other.transform.root.position - lastSeenPlayerPosition).magnitude;
+            //     // integratedPlayerMovement += amountOfMotion;
+            //     // totalPlayerMovement += amountOfMotion;
+            // }
             timeSinceSawPlayer = 0;
             lastSeenPlayerPosition = other.transform.root.position;
             rootTaskNode.SetData(LAST_SEEN_PLAYER_POSITION_KEY, lastSeenPlayerPosition);

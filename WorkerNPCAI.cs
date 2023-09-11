@@ -211,7 +211,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                     alertHandler.ShowWarn();
                     ChangeState(new WorkerPanicRunState(this, characterController));
                     notifyGuard = true;
-                } else if (investigateState.isPlayerAggressive() || investigateState.isPlayerSuspicious()) {
+                } else if (investigateState.gaveUp) {
                     alertHandler.ShowWarn();
                     ChangeState(new WorkerPanicRunState(this, characterController));
                     notifyGuard = true;
@@ -270,17 +270,18 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                     SuspicionRecord record = SuspicionRecord.explosionSuspicion();
                     GameManager.I.AddSuspicionRecord(record);
                     notifyGuard = true;
+                    switch (stateMachine.currentState) {
+                        case WorkerGuardState:
+                        case WorkerCowerState:
+                        case WorkerPanicRunState:
+                        case WorkerHeldAtGunpointState:
+                        case WorkerLoiterState:
+                            alertHandler.ShowAlert(useWarnMaterial: true);
+                            ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
+                            break;
+                    }
                 }
-                switch (stateMachine.currentState) {
-                    case WorkerGuardState:
-                    case WorkerCowerState:
-                    case WorkerPanicRunState:
-                    case WorkerHeldAtGunpointState:
-                    case WorkerLoiterState:
-                        alertHandler.ShowAlert(useWarnMaterial: true);
-                        ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
-                        break;
-                }
+
             }
         }
     }

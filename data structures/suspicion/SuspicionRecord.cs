@@ -402,8 +402,8 @@ public class SuspicionRecord {
     public static SuspicionRecord tamperingSuspicion(BurgleTargetData data) => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,
-        lifetime = 8f,
-        maxLifetime = 8f,
+        lifetime = 3f,
+        maxLifetime = 3f,
         dialogue = new SuspicionDialogueParameters {
             challenge = $"What are you doing with that {data.target.niceName}?",
             tactics = new List<DialogueTactic>{

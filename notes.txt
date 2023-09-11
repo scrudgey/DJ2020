@@ -3301,15 +3301,18 @@ hacking
     * worker portrait not right
     * mezzanine door lock on wrong side
     * back balcony door lock on wrong side
+    * level acquired credits
+    * tampering with equipment lasts too long
+    * make more furniture opaque
+    * glass breaking sound should be loud, suspicious
+    * security camera should be easier to shoot
+    * worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
 
 elevator level
     lock elevator from third floor
         -> attack surface card reader & attack
     cyberware randomized/configured according to scriptableobject templates
         respond to level difficulty
-
-    worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
-
     elevator is broken when pressing button during door close
     laser grid visible above player
     upside-down inside vent
@@ -3318,14 +3321,13 @@ elevator level
     click ladder through wall
     small shelves for janitor closet
     
-    level acquired credits
-    glass breaking sound should be loud, suspicious
-    make more furniture opaque
     do not move camera in aim mode with weapon wheel
     cutting wire on security camera did not work
     hacking seccurity camera did not work
-    security camera should be easier to shoot
     don't perceive things if i am dead
+
+    attack cams should see people
+
 
 worker notify:
     test gunpoint 
