@@ -243,7 +243,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 GameManager.I.TransitionToInputMode(InputMode.aim);
                 break;
             case CharacterState.hvacAim:
-                aimCameraRotation = Quaternion.FromToRotation(Vector3.forward, Motor.CharacterForward);
+                aimCameraRotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
                 lookAtDirection = Motor.CharacterForward;
                 _inputTorque = Vector3.zero;
                 break;
