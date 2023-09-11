@@ -3293,41 +3293,39 @@ hacking
 * worker NPC:
     * workers contain keys
 
-
+        * keycard system
+            * make a keycard lock
+    * top-shelf loot not visible
+    * "someone was shot" happens instantly
+    * clicking door to unlock does not work
+    * worker portrait not right
+    * mezzanine door lock on wrong side
+    * back balcony door lock on wrong side
 
 elevator level
     lock elevator from third floor
         -> attack surface card reader & attack
-        keycard system
-            make a keycard lock
-    worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
-    worker portrait not right
-    doors and cyberware are all randomized/configured according to scriptableobject templates
+    cyberware randomized/configured according to scriptableobject templates
         respond to level difficulty
-        doors break down by type:
-            external door - deadbolt + lock
-            office door - door lock, variable difficulty
-            closet - deadbolt,no door handle lock
-            unlocked door
+
+    worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
+
     elevator is broken when pressing button during door close
     laser grid visible above player
     upside-down inside vent
     visible inside vent
     vent cover should disappear after some time
     click ladder through wall
-    top-shelf loot not visible
     small shelves for janitor closet
-    mezzanine door lock on wrong side
-    back balcony door lock on wrong side
+    
     level acquired credits
-    "someone was shot" happens instantly
     glass breaking sound should be loud, suspicious
     make more furniture opaque
-    clicking door to unlock does not work
     do not move camera in aim mode with weapon wheel
     cutting wire on security camera did not work
     hacking seccurity camera did not work
     security camera should be easier to shoot
+    don't perceive things if i am dead
 
 worker notify:
     test gunpoint 

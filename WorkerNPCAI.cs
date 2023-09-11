@@ -200,7 +200,6 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 } else {
                     ChangeState(new WorkerPanicRunState(this, characterController));
                 }
-                notifyGuard = true;
                 break;
             case WorkerInvestigateState:
                 timeSinceInterrogatedStranger = 120f;
@@ -239,6 +238,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         if (noise.data.isGunshot && noise.data.suspiciousness > Suspiciousness.suspicious) {
             lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
             if (noise.data.player) {
+                notifyGuard = true;
                 lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
                 SightCheckPlayer();
             }
@@ -269,6 +269,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 } else if (noise.data.suspiciousness == Suspiciousness.aggressive) {
                     SuspicionRecord record = SuspicionRecord.explosionSuspicion();
                     GameManager.I.AddSuspicionRecord(record);
+                    notifyGuard = true;
                 }
                 switch (stateMachine.currentState) {
                     case WorkerGuardState:
@@ -323,10 +324,21 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                alertHandler.ShowAlert(useWarnMaterial: true);
-                SuspicionRecord record = SuspicionRecord.shotSuspicion();
-                GameManager.I.AddSuspicionRecord(record);
-                // TODO: change states
+                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
+
+                } else {
+                    alertHandler.ShowAlert(useWarnMaterial: true);
+                    SuspicionRecord record = SuspicionRecord.shotSuspicion();
+                    GameManager.I.AddSuspicionRecord(record);
+                    switch (stateMachine.currentState) {
+                        case WorkerLoiterState:
+                        case WorkerGuardState:
+                        case WorkerInvestigateState:
+                            ChangeState(new WorkerReactToAttackState(this, speechTextController, bulletImpact.damage, characterController));
+                            break;
+                    }
+                }
+
             }
             SphereRobotAI guardAI = other.GetComponent<SphereRobotAI>();
             if (guardAI != null) {

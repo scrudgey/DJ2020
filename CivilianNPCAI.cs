@@ -242,14 +242,18 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                alertHandler.ShowAlert(useWarnMaterial: true);
-                SuspicionRecord record = SuspicionRecord.shotSuspicion();
-                GameManager.I.AddSuspicionRecord(record);
-                switch (stateMachine.currentState) {
-                    case LoiterState:
-                    case CivilianSocializeState:
-                        ChangeState(new CivilianReactToAttackState(this, speechTextController, bulletImpact.damage, characterController));
-                        break;
+                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
+
+                } else {
+                    alertHandler.ShowAlert(useWarnMaterial: true);
+                    SuspicionRecord record = SuspicionRecord.shotSuspicion();
+                    GameManager.I.AddSuspicionRecord(record);
+                    switch (stateMachine.currentState) {
+                        case LoiterState:
+                        case CivilianSocializeState:
+                            ChangeState(new CivilianReactToAttackState(this, speechTextController, bulletImpact.damage, characterController));
+                            break;
+                    }
                 }
             }
         }

@@ -65,7 +65,7 @@ public class WorkerInvestigateState : WorkerNPCControlState {
                 lookType = TaskLookAt.LookType.position,
                 key = LAST_SEEN_PLAYER_POSITION_KEY,
                 useKey = true
-            }, 0.5f),
+            }, 0.2f),
             new Selector(
                 new Sequence(
                     new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {

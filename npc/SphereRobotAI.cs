@@ -364,24 +364,28 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                switch (stateMachine.currentState) {
-                    case SphereMoveState:
-                    case SpherePatrolState:
-                    case FollowTheLeaderState:
-                    case PauseState:
-                    case DisableAlarmState:
-                    case InvestigateCorpseState:
-                    case SphereInvestigateState:
-                    case SphereHoldAtGunpointState:
-                    case StopAndListenState:
-                    case SphereClearPointsState:
+                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
 
-                        alertHandler.ShowAlert(useWarnMaterial: true);
-                        SuspicionRecord record = SuspicionRecord.shotSuspicion();
-                        GameManager.I.AddSuspicionRecord(record);
-                        ChangeState(new ReactToAttackState(this, speechTextController, bulletImpact.damage, characterController, initialPause: 0f));
-                        break;
+                } else {
+                    switch (stateMachine.currentState) {
+                        case SphereMoveState:
+                        case SpherePatrolState:
+                        case FollowTheLeaderState:
+                        case PauseState:
+                        case DisableAlarmState:
+                        case InvestigateCorpseState:
+                        case SphereInvestigateState:
+                        case SphereHoldAtGunpointState:
+                        case StopAndListenState:
+                        case SphereClearPointsState:
+                            alertHandler.ShowAlert(useWarnMaterial: true);
+                            SuspicionRecord record = SuspicionRecord.shotSuspicion();
+                            GameManager.I.AddSuspicionRecord(record);
+                            ChangeState(new ReactToAttackState(this, speechTextController, bulletImpact.damage, characterController, initialPause: 0f));
+                            break;
+                    }
                 }
+
             }
             if (other.CompareTag("tamperEvidence")) {
                 TamperEvidence evidence = other.GetComponent<TamperEvidence>();
