@@ -3318,6 +3318,8 @@ hacking
     * visible inside vent
     * small shelves for janitor closet
     * keycard graphic
+    * elevator is broken when pressing button during door close
+
 
 elevator level
     lock elevator from third floor
@@ -3326,7 +3328,6 @@ elevator level
     cyberware randomized/configured according to scriptableobject templates
         respond to level difficulty
 
-    elevator is broken when pressing button during door close
     upside-down inside vent
     some sort of time delay on reporting someone shot?
 
@@ -3341,3 +3342,7 @@ generic spritesheet template is not complete:
     separate arm and torso?
 
 door randomizer should specify key id
+
+
+
+   

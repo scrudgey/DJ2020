@@ -33,13 +33,12 @@ public class ElevatorCar : MonoBehaviour {
     }
 
     void OnStateExit(State oldState, State newState) {
+        if (newState == oldState) return;
         foreach (ElevatorDoorData data in doorDatas) {
             if (coroutines != null && coroutines.ContainsKey(data) && coroutines[data] != null) {
                 StopCoroutine(coroutines[data]);
             }
         }
-        if (newState == oldState) return;
-
     }
     void OnStateEnter(State oldState, State newState) {
         if (newState == oldState) return;

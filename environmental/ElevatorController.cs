@@ -112,7 +112,8 @@ public class ElevatorController : MonoBehaviour {
                 float distance = Mathf.Abs(elevatorCar.transform.position.y - targetMoveFloor.carPosition.y);
                 float duration = distance;
 
-                StartCoroutine(Toolbox.ChainCoroutines(
+                StartCoroutine(
+                    Toolbox.ChainCoroutines(
                     Toolbox.Ease(null, duration, elevatorCar.transform.position.y, targetMoveFloor.carPosition.y, PennerDoubleAnimation.QuadEaseInOut, (amount) => {
                         Vector3 newPos = new Vector3(elevatorCar.transform.position.x, amount, elevatorCar.transform.position.z);
                         elevatorCar.transform.position = newPos;
@@ -123,17 +124,14 @@ public class ElevatorController : MonoBehaviour {
                         elevatorCar.transform.position = newPos;
                     }),
                     new WaitForSecondsRealtime(1f),
-                Toolbox.CoroutineFunc(() => {
-                    elevatorCarAudioSource.Stop();
-                    elevatorCarAudioSource.loop = false;
-                    elevatorCarAudioSource.clip = elevatorStopSound;
-                    elevatorCarAudioSource.Play();
-
-                    // SetCurrentFloor(targetMoveFloor);
-                    ChangeState(State.load);
-                })
-                ));
-
+                    Toolbox.CoroutineFunc(() => {
+                        elevatorCarAudioSource.Stop();
+                        elevatorCarAudioSource.loop = false;
+                        elevatorCarAudioSource.clip = elevatorStopSound;
+                        elevatorCarAudioSource.Play();
+                        ChangeState(State.load);
+                    }))
+                );
                 break;
             case State.load:
                 currentFloor.doors.elevatorIndicator.ShowLight(true);

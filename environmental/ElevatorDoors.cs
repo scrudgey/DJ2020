@@ -59,6 +59,7 @@ public class ElevatorDoors : MonoBehaviour {
     }
 
     void OnStateExit(State oldState, State newState) {
+        if (oldState == newState) return;
         foreach (ElevatorDoorData data in doorDatas) {
             if (coroutines != null && coroutines.ContainsKey(data) && coroutines[data] != null) {
                 StopCoroutine(coroutines[data]);
