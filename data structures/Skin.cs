@@ -486,9 +486,7 @@ public class Skin {
     }
 
     public Octet<Sprite[]> GetCurrentTorsoOctet(AnimationInput input) {
-        if (input.armsRaised) {
-            return unarmedHandsUp;
-        } else if (input.state == CharacterState.keelOver) {
+        if (input.state == CharacterState.keelOver) {
             return unarmedKeelOver;
         } else if (input.hitState == HitState.dead) {
             return unarmedDead;
@@ -502,6 +500,8 @@ public class Skin {
             return gunCrouchSprites(input.gunInput.gunType);
         } else if (input.isProne && !(input.wallPressTimer > 0 || input.state == CharacterState.wallPress)) {
             return unarmedCrawl;
+        } else if (input.armsRaised) {
+            return unarmedHandsUp;
         } else if (input.wavingArm) {
             return unarmedUse;
         } else if (input.activeItem != null && input.activeItem is RocketLauncherItem) {

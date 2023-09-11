@@ -217,6 +217,8 @@ public partial class GameManager : Singleton<GameManager> {
         grate.AddForce(force);
         grate.AddTorque(torque);
         controller.TransitionToState(CharacterState.normal);
+
+        Destroy(grate.gameObject, 5f);
     }
 
 }

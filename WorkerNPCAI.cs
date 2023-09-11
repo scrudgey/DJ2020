@@ -229,6 +229,9 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
 
     public void HearNoise(NoiseComponent noise) {
+        if (hitState == HitState.dead || hitState == HitState.hitstun || hitState == HitState.zapped) {
+            return;
+        }
         if (noise == null || (noise.data.source != null && noise.data.source == transform.root.gameObject))
             return;
 
@@ -309,7 +312,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         }
     }
     void Perceive(Collider other, bool byPassVisibilityCheck = false) {
-        if (hitState == HitState.dead) {
+        if (hitState == HitState.dead || hitState == HitState.hitstun || hitState == HitState.zapped) {
             return;
         }
         if (other.transform.IsChildOf(GameManager.I.playerObject.transform)) {
@@ -361,8 +364,10 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
 
     void PerceivePlayerObject(Collider other, bool byPassVisibilityCheck = false) {
+        if (GameManager.I.playerCharacterController.state == CharacterState.hvac || GameManager.I.playerCharacterController.state == CharacterState.hvacAim)
+            return;
         float distance = Vector3.Distance(transform.position, other.bounds.center);
-        if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance)) {
+        if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance) || stateMachine.currentState is WorkerInvestigateState) {
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             Suspiciousness playerTotalSuspicion = GameManager.I.GetTotalSuspicion();
             bool playerHasGunOut = GameManager.I.PlayerHasGunOut();

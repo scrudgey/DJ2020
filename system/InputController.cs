@@ -291,11 +291,12 @@ public class InputController : Singleton<InputController> {
             firePressedThisFrame = false;
             firePressedHeld = false;
         }
-
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector2 viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
-
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+
+        // if (!revealWeaponWheelHeld) {
+
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
 
         mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
@@ -303,6 +304,10 @@ public class InputController : Singleton<InputController> {
         // Interpolate mouse movement over time to apply smoothing delta.
         _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
         _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
+        // } else {
+        //     _smoothMouse = Vector2.zero;
+        //     mouseDelta = Vector2.zero;
+        // }
 
         CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;

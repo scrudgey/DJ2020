@@ -2852,6 +2852,28 @@ x ladders
 * emit noise that attracts guards
 * worker report to guard state -> run at random until a guard is found?
 * workers on all floors
+* scientist spritesheet
+* change "hi"
+* worker NPC:
+    * workers contain keys
+
+        * keycard system
+            * make a keycard lock
+    * top-shelf loot not visible
+    * "someone was shot" happens instantly
+    * clicking door to unlock does not work
+    * worker portrait not right
+    * mezzanine door lock on wrong side
+    * back balcony door lock on wrong side
+    * level acquired credits
+    * tampering with equipment lasts too long
+    * make more furniture opaque
+    * glass breaking sound should be loud, suspicious
+    * security camera should be easier to shoot
+    * worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
+    * laser grid visible above player
+    * attack cams should see people
+    * click ladder through wall
 
 
 
@@ -3236,7 +3258,8 @@ a separate gun sprite in aim?
 ambient sound system
 holster to put away rocket launcher
 hide elements in inspector that are set by template
-
+cutting wire on security camera did not work
+hacking seccurity camera did not work
 
 
 
@@ -3288,55 +3311,29 @@ after action report & skill tree
 dialogue
 hacking
 
-* scientist spritesheet
-* change "hi"
-* worker NPC:
-    * workers contain keys
-
-        * keycard system
-            * make a keycard lock
-    * top-shelf loot not visible
-    * "someone was shot" happens instantly
-    * clicking door to unlock does not work
-    * worker portrait not right
-    * mezzanine door lock on wrong side
-    * back balcony door lock on wrong side
-    * level acquired credits
-    * tampering with equipment lasts too long
-    * make more furniture opaque
-    * glass breaking sound should be loud, suspicious
-    * security camera should be easier to shoot
-    * worker investigate state not quite right: they might stand back for a long time, should approach. dialogue not triggered
+    * do not move camera in aim mode with weapon wheel
+    * hands up should not preempt death animation
+    * vent cover should disappear after some time
+    * don't perceive things if i am dead
+    * visible inside vent
+    * small shelves for janitor closet
+    * keycard graphic
 
 elevator level
     lock elevator from third floor
         -> attack surface card reader & attack
+        elevator controller on 1st and 4th floors
     cyberware randomized/configured according to scriptableobject templates
         respond to level difficulty
+
     elevator is broken when pressing button during door close
-    laser grid visible above player
     upside-down inside vent
-    visible inside vent
-    vent cover should disappear after some time
-    click ladder through wall
-    small shelves for janitor closet
-    
-    do not move camera in aim mode with weapon wheel
-    cutting wire on security camera did not work
-    hacking seccurity camera did not work
-    don't perceive things if i am dead
+    some sort of time delay on reporting someone shot?
 
-    attack cams should see people
-
-
-worker notify:
-    test gunpoint 
 
 sphere clear points state:
     get closest by nav mesh?
     transitions from this state?
-
-
 
 generic spritesheet template is not complete:
     head talking sprites

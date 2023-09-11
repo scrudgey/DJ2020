@@ -536,14 +536,16 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 gunHandler.ProcessGunSwitch(input);
                 gunHandler.SetInputs(input);
 
-                _inputTorque = input.mouseDelta;
-
-                aimSwayTimer += Time.deltaTime;
-
-                float aimSwayX = Mathf.Cos(aimSwayTimer * aimSwayFrequencyConstant);
-                float aimSwayY = Mathf.Cos(aimSwayTimer * aimSwayFrequencyConstant * 2f);
-                Vector3 aimSway = new Vector3(aimSwayX, aimSwayY, 0f) * aimSwayMagnitude;
-                _inputTorque += aimSway;
+                if (!input.revealWeaponWheel) {
+                    _inputTorque = input.mouseDelta;
+                    aimSwayTimer += Time.deltaTime;
+                    float aimSwayX = Mathf.Cos(aimSwayTimer * aimSwayFrequencyConstant);
+                    float aimSwayY = Mathf.Cos(aimSwayTimer * aimSwayFrequencyConstant * 2f);
+                    Vector3 aimSway = new Vector3(aimSwayX, aimSwayY, 0f) * aimSwayMagnitude;
+                    _inputTorque += aimSway;
+                } else {
+                    _inputTorque = Vector3.zero;
+                }
 
                 ItemUseResult itemresult = itemHandler.SetInputs(input);
                 HandleItemUseResult(itemresult);

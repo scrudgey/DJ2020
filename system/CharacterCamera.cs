@@ -700,10 +700,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                     return !Physics.Raycast(testRay, distance, LayerUtil.GetLayerMask(Layer.def));
                 }
             })
-            .Where(interactive => interactive.AllowInteraction())
-            ) {
+            .Where(interactive => interactive.AllowInteraction())) {
                 targetDatas.Add(new InteractorTargetData(interactive, hit.collider, GameManager.I.playerPosition));
             }
+
             hit.collider.transform.root.GetComponentsInChildren<AttackSurface>()
             .Where(attackSurface => {
                 if (attackSurface.usePlayerPlane) {
