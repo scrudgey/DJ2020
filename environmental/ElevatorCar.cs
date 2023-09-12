@@ -7,9 +7,13 @@ public class ElevatorCar : MonoBehaviour {
     enum State { none, open, closed }
     State _state;
     public TextMeshPro elevatorFloorIndicator;
+    public TextMeshPro accessTextIndicator;
     public ElevatorDoorData[] doorDatas;
     Dictionary<ElevatorDoorData, Coroutine> coroutines;
 
+    void Start() {
+        accessTextIndicator.text = "";
+    }
     public void SetCurrentFloor(int floorNumber) {
         elevatorFloorIndicator.text = $"{floorNumber}";
     }
