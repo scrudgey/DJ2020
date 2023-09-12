@@ -20,12 +20,12 @@ namespace AI {
             base.Initialize();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
-            // if (isConcluded) {
-            //     return TaskState.success;
-            // } else {
-            //     return TaskState.running;
-            // }
             guardAI.TellAboutSuspiciousPlayer(myAI);
+            if (myAI.someoneWasShot) {
+                myAI.someoneWasShot = false;
+                SuspicionRecord record = SuspicionRecord.shotSuspicion();
+                GameManager.I.AddSuspicionRecord(record);
+            }
             return TaskState.success;
         }
 

@@ -38,6 +38,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public WorkerLandmark destinationLandmark;
     public bool notifyGuard;
     public bool guardNotified;
+    public bool someoneWasShot;
 
     [HideInInspector]
     public NavMeshPath navMeshPath;
@@ -332,8 +333,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
 
                 } else {
                     alertHandler.ShowAlert(useWarnMaterial: true);
-                    SuspicionRecord record = SuspicionRecord.shotSuspicion();
-                    GameManager.I.AddSuspicionRecord(record);
+                    someoneWasShot = true;
+                    notifyGuard = true;
                     switch (stateMachine.currentState) {
                         case WorkerLoiterState:
                         case WorkerGuardState:

@@ -3345,3 +3345,9 @@ door randomizer should specify key id
 
 
    
+elevator button lock:
+    keycard tool
+    keycard slot
+    feedback:
+        "ACCESS DENIED" blinks on a screen, flashing red light by keycard slot
+        
