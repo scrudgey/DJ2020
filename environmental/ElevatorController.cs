@@ -7,6 +7,8 @@ using UnityEngine;
 
 [System.Serializable]
 public class ElevatorFloorData {
+    public enum FloorLockoutType { normal, locked, unlocked }
+    public FloorLockoutType lockout;
     public int floorNumber;
     // public ElevatorIndicator indicator;
     public ElevatorDoors doors;
@@ -31,7 +33,8 @@ public class ElevatorController : MonoBehaviour {
     public AudioClip elevatorStopSound;
 
     private ElevatorFloorData[] floorsAscending;
-
+    bool temporaryAuthorization;
+    Coroutine temporaryAuthorizationCoroutine;
     Coroutine coroutine;
 
     float totalHeight;
@@ -73,9 +76,23 @@ public class ElevatorController : MonoBehaviour {
 
     public void SelectFloorMove(int floorNumber) {
         ElevatorFloorData data = floorDictionary[floorNumber];
-
-        targetMoveFloor = data;
-        ChangeState(State.close);
+        switch (data.lockout) {
+            case ElevatorFloorData.FloorLockoutType.locked:
+                if (temporaryAuthorization) {
+                    elevatorCar.AlertAccessGranted();
+                    goto default;
+                }
+                elevatorCar.AlertAccessDenied();
+                break;
+            case ElevatorFloorData.FloorLockoutType.unlocked:
+                elevatorCar.AlertAccessGranted();
+                goto default;
+            default:
+            case ElevatorFloorData.FloorLockoutType.normal:
+                targetMoveFloor = data;
+                ChangeState(State.close);
+                break;
+        }
     }
 
 
@@ -237,5 +254,18 @@ public class ElevatorController : MonoBehaviour {
             floor.doors.elevatorIndicator.UpdateCurrentFloor(data.floorNumber);
         }
         elevatorCar.SetCurrentFloor(data.floorNumber);
+    }
+
+    public void EnableTemporaryAuthorization() {
+        if (temporaryAuthorizationCoroutine != null) {
+            StopCoroutine(temporaryAuthorizationCoroutine);
+        }
+        temporaryAuthorizationCoroutine = StartCoroutine(DoTemporaryAuthorization());
+    }
+
+    IEnumerator DoTemporaryAuthorization() {
+        temporaryAuthorization = true;
+        yield return new WaitForSeconds(120f);
+        temporaryAuthorization = false;
     }
 }

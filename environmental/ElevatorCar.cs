@@ -7,12 +7,19 @@ public class ElevatorCar : MonoBehaviour {
     enum State { none, open, closed }
     State _state;
     public TextMeshPro elevatorFloorIndicator;
-    public TextMeshPro accessTextIndicator;
     public ElevatorDoorData[] doorDatas;
-    Dictionary<ElevatorDoorData, Coroutine> coroutines;
 
+    [Header("access control")]
+    public TextMeshPro accessTextIndicator;
+    public AudioSource audioSource;
+    public AudioClip[] accessGrantedSound;
+    public AudioClip[] accessDeniedSound;
+
+    Dictionary<ElevatorDoorData, Coroutine> coroutines;
+    bool alertIsRunning;
     void Start() {
         accessTextIndicator.text = "";
+        accessTextIndicator.enabled = false;
     }
     public void SetCurrentFloor(int floorNumber) {
         elevatorFloorIndicator.text = $"{floorNumber}";
@@ -79,4 +86,38 @@ public class ElevatorCar : MonoBehaviour {
         })
         );
     }
+
+
+    public void AlertAccessGranted() {
+        Toolbox.RandomizeOneShot(audioSource, accessGrantedSound);
+        if (!alertIsRunning) StartCoroutine(BlinkAccess("Access Granted"));
+    }
+
+    public void AlertAccessDenied() {
+        Toolbox.RandomizeOneShot(audioSource, accessDeniedSound);
+        if (!alertIsRunning) StartCoroutine(BlinkAccess("Access Denied"));
+    }
+
+    IEnumerator BlinkAccess(string text) {
+        alertIsRunning = true;
+        accessTextIndicator.text = text;
+        accessTextIndicator.enabled = true;
+        float timer = 0f;
+        int index = 0;
+        float blinkDuration = 0.1f;
+        while (index < 4) {
+            timer += Time.deltaTime;
+            if (timer > blinkDuration) {
+                timer -= blinkDuration;
+                index += 1;
+                accessTextIndicator.enabled = !accessTextIndicator.enabled;
+            }
+            yield return null;
+        }
+        accessTextIndicator.enabled = true;
+        yield return new WaitForSeconds(3f);
+        accessTextIndicator.enabled = false;
+        alertIsRunning = false;
+    }
+
 }

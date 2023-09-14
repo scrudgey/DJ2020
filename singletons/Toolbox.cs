@@ -409,62 +409,92 @@ public class Toolbox {
         float total_max_x = float.MinValue;
         float total_min_y = float.MaxValue;
         float total_max_y = float.MinValue;
-        foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>()) {
-            if (renderer is LineRenderer) continue;
-            if (renderer.name.ToLower().Contains("jumppoint")) continue;
-            if (renderer.name.ToLower().Contains("alerticon")) continue;
-            if (renderer.name.ToLower().Contains("shadowcaster")) continue;
-            if (renderer.name.ToLower().Contains("blood_spray")) continue;
-            if (renderer.name.ToLower().Contains("cube")) continue;
-            if (renderer.name.ToLower().Contains("lightsprite")) continue;
-            if (renderer.name.ToLower().Contains("damagedecal")) continue;
-            if (renderer.name.ToLower().Contains("bullethole")) continue;
-            if (renderer.name.ToLower().Contains("callout")) continue;
-            if (renderer.name.ToLower().Contains("particle")) continue;
-            if (renderer.name.ToLower().Contains("sharp_explosion")) continue;
-            if (renderer.name.ToLower().Contains("target")) continue;
-            if (renderer.name.ToLower().Contains("shadow")) continue;
-            // Debug.Log(renderer.name);
 
-            Bounds bounds = renderer.bounds;
-            if (renderer is SpriteRenderer) {
-                SpriteRenderer spriteRenderer = (SpriteRenderer)renderer;
-                if (spriteRenderer.sprite != null) {
-                    bounds = spriteRenderer.sprite.bounds;
-                    // bounds = spriteRenderer.bounds;
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
 
-                    // weird hack. maybe because billboarding? i.e. should be camera angle dependent?
-                    Vector3 extents = bounds.extents;
-                    if (adjustYScale)
-                        extents.y *= 1.3f;
-                    bounds.extents = extents;
-                }
+        if (renderers.Length == 0) {
+            RectTransform childRectTransform = root.GetComponent<RectTransform>();
+            if (childRectTransform != null) {
+                Vector3[] v = new Vector3[4];
+                childRectTransform.GetWorldCorners(v);
+
+                Vector3[] screenSpaceCorners = v.Select(point => UICamera.WorldToScreenPoint(point)).ToArray();
+
+                float min_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x < curMin.x ? x : curMin)).x;
+                float max_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x > curMin.x ? x : curMin)).x;
+                float min_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y < curMin.y ? x : curMin)).y;
+                float max_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y > curMin.y ? x : curMin)).y;
+
+                total_max_x = Mathf.Max(total_max_x, max_x);
+                total_min_x = Mathf.Min(total_min_x, min_x);
+                total_max_y = Mathf.Max(total_max_y, max_y);
+                total_min_y = Mathf.Min(total_min_y, min_y);
+
+                return new Rect(total_min_x, total_min_y, (total_max_x - total_min_x) * root.lossyScale.x * 100, (total_max_y - total_min_y) * root.lossyScale.y * 100);
             }
+        } else {
+            foreach (Renderer renderer in renderers) {
+                if (root.name.Contains("elevatorControllerFloorButton")) {
+                    Debug.Log("elevator button");
+                }
+                if (renderer is LineRenderer) continue;
+                if (renderer.name.ToLower().Contains("jumppoint")) continue;
+                if (renderer.name.ToLower().Contains("alerticon")) continue;
+                if (renderer.name.ToLower().Contains("shadowcaster")) continue;
+                if (renderer.name.ToLower().Contains("blood_spray")) continue;
+                if (renderer.name.ToLower().Contains("cube")) continue;
+                if (renderer.name.ToLower().Contains("lightsprite")) continue;
+                if (renderer.name.ToLower().Contains("damagedecal")) continue;
+                if (renderer.name.ToLower().Contains("bullethole")) continue;
+                if (renderer.name.ToLower().Contains("callout")) continue;
+                if (renderer.name.ToLower().Contains("particle")) continue;
+                if (renderer.name.ToLower().Contains("sharp_explosion")) continue;
+                if (renderer.name.ToLower().Contains("target")) continue;
+                if (renderer.name.ToLower().Contains("shadow")) continue;
+                // Debug.Log(renderer.name);
 
-            // add offset
-            bounds.center = renderer.transform.position + (bounds.extents / 2f);
+                Bounds bounds = renderer.bounds;
+                if (renderer is SpriteRenderer) {
+                    SpriteRenderer spriteRenderer = (SpriteRenderer)renderer;
+                    if (spriteRenderer.sprite != null) {
+                        bounds = spriteRenderer.sprite.bounds;
+                        // bounds = spriteRenderer.bounds;
 
-            Vector3[] screenSpaceCorners = new Vector3[8];
-            screenSpaceCorners[0] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z + bounds.extents.z));
-            screenSpaceCorners[1] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z - bounds.extents.z));
-            screenSpaceCorners[2] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z + bounds.extents.z));
-            screenSpaceCorners[3] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z - bounds.extents.z));
+                        // weird hack. maybe because billboarding? i.e. should be camera angle dependent?
+                        Vector3 extents = bounds.extents;
+                        if (adjustYScale)
+                            extents.y *= 1.3f;
+                        bounds.extents = extents;
+                    }
+                }
 
-            screenSpaceCorners[4] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z + bounds.extents.z));
-            screenSpaceCorners[5] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z - bounds.extents.z));
-            screenSpaceCorners[6] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z + bounds.extents.z));
-            screenSpaceCorners[7] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z - bounds.extents.z));
+                // add offset
+                bounds.center = renderer.transform.position + (bounds.extents / 2f);
 
-            float min_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x < curMin.x ? x : curMin)).x;
-            float max_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x > curMin.x ? x : curMin)).x;
-            float min_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y < curMin.y ? x : curMin)).y;
-            float max_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y > curMin.y ? x : curMin)).y;
+                Vector3[] screenSpaceCorners = new Vector3[8];
+                screenSpaceCorners[0] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z + bounds.extents.z));
+                screenSpaceCorners[1] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z - bounds.extents.z));
+                screenSpaceCorners[2] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z + bounds.extents.z));
+                screenSpaceCorners[3] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x + bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z - bounds.extents.z));
 
-            total_max_x = Mathf.Max(total_max_x, max_x);
-            total_min_x = Mathf.Min(total_min_x, min_x);
-            total_max_y = Mathf.Max(total_max_y, max_y);
-            total_min_y = Mathf.Min(total_min_y, min_y);
+                screenSpaceCorners[4] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z + bounds.extents.z));
+                screenSpaceCorners[5] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y + bounds.extents.y, bounds.center.z - bounds.extents.z));
+                screenSpaceCorners[6] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z + bounds.extents.z));
+                screenSpaceCorners[7] = UICamera.WorldToScreenPoint(new Vector3(bounds.center.x - bounds.extents.x, bounds.center.y - bounds.extents.y, bounds.center.z - bounds.extents.z));
+
+                float min_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x < curMin.x ? x : curMin)).x;
+                float max_x = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.x > curMin.x ? x : curMin)).x;
+                float min_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y < curMin.y ? x : curMin)).y;
+                float max_y = screenSpaceCorners.Aggregate((curMin, x) => (curMin == null || x.y > curMin.y ? x : curMin)).y;
+
+                total_max_x = Mathf.Max(total_max_x, max_x);
+                total_min_x = Mathf.Min(total_min_x, min_x);
+                total_max_y = Mathf.Max(total_max_y, max_y);
+                total_min_y = Mathf.Min(total_min_y, min_y);
+            }
         }
+
+
         Rect totalRect = new Rect(total_min_x, total_min_y, (total_max_x - total_min_x) * root.lossyScale.x, (total_max_y - total_min_y) * root.lossyScale.y);
         return totalRect;
     }

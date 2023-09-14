@@ -73,7 +73,7 @@ public class SecurityCamera : IBinder<SightCone> {
         };
         foreach (Vector3 direction in directions) {
             Ray ray = new Ray(position, direction);
-            RaycastHit[] hits = Physics.RaycastAll(ray, MAXIMUM_SIGHT_RANGE, LayerUtil.GetLayerMask(Layer.def, Layer.obj));
+            RaycastHit[] hits = Physics.RaycastAll(ray, MAXIMUM_SIGHT_RANGE, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive));
             foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
                 if (hit.transform.IsChildOf(transform.root))
                     continue;

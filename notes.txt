@@ -2874,6 +2874,24 @@ x ladders
     * laser grid visible above player
     * attack cams should see people
     * click ladder through wall
+    * do not move camera in aim mode with weapon wheel
+    * hands up should not preempt death animation
+    * vent cover should disappear after some time
+    * don't perceive things if i am dead
+    * visible inside vent
+    * small shelves for janitor closet
+    * keycard graphic
+    * elevator is broken when pressing button during door close
+    * upside-down inside vent
+    * lock elevator from third floor
+    * attack surface card reader
+    * some sort of time delay on reporting someone shot?
+    * "alarm reset"
+    * keycard graphics
+    * elevator controller on 1st and 4th floors
+    * door config should be scriptable object
+    * sometimes unlocked
+* rocket launcher not fully done
 
 
 
@@ -3229,8 +3247,6 @@ map pane:
 colors for item selector
 item selector clear slot
 display information about items in loadout
-
-rocket launcher not fully done
 some way to distract guards
 sphere robot
 turrets
@@ -3260,15 +3276,23 @@ holster to put away rocket launcher
 hide elements in inspector that are set by template
 cutting wire on security camera did not work
 hacking seccurity camera did not work
-
-
-
+npc heads can turn to face other npcs in the area
+npc can ask "can i help you?" to player who intrudes on their space?
 reselect rocket launcher to put away
+attack surface card reader attack
+sphere clear points state:
+    get closest by nav mesh?
+    transitions from this state?
+generic spritesheet template is not complete:
+    head talking sprites
+    head sprite on torso in many frames
+    separate arm and torso?
+   
+
+
 
 doors
-    door config should be scriptable object
     more door types? more explotable latch? more handles and things?
-    sometimes unlocked
     locks for doubledoors with crash bars
     what sorts of things do we want configurable?
         1. presence / absence of door lock
@@ -3308,46 +3332,13 @@ shops:
     buy cyberware
 
 after action report & skill tree
-dialogue
-hacking
-
-    * do not move camera in aim mode with weapon wheel
-    * hands up should not preempt death animation
-    * vent cover should disappear after some time
-    * don't perceive things if i am dead
-    * visible inside vent
-    * small shelves for janitor closet
-    * keycard graphic
-    * elevator is broken when pressing button during door close
-    * upside-down inside vent
 
 
 elevator level
-    lock elevator from third floor
-        -> attack surface card reader & attack
-        elevator controller on 1st and 4th floors
     cyberware randomized/configured according to scriptableobject templates
         respond to level difficulty
-    some sort of time delay on reporting someone shot?
+    door randomizer should specify key id ?
 
-
-sphere clear points state:
-    get closest by nav mesh?
-    transitions from this state?
-
-generic spritesheet template is not complete:
-    head talking sprites
-    head sprite on torso in many frames
-    separate arm and torso?
-
-door randomizer should specify key id
-
-
-
-   
-elevator button lock:
-    keycard tool
-    keycard slot
-    feedback:
-        "ACCESS DENIED" blinks on a screen, flashing red light by keycard slot
-        
+jazz up elevator controller
+    sound effects
+    click effect

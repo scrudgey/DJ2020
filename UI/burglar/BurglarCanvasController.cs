@@ -29,6 +29,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image lockpickImage;
     public Image keyImage;
     public Image screwdriverImage;
+    public Image keyCardImage;
     // public 
     public WireCutterToolIndicator wireCutterImage;
     public GameObject panelButton;
@@ -40,6 +41,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public GameObject keyToolButton;
     public GameObject usbToolButton;
     public GameObject wireCutterButton;
+    public GameObject keycardButton;
 
     [Header("cyber")]
     public CyberdeckCanvasController cyberdeckController;
@@ -456,6 +458,7 @@ public class BurglarCanvasController : MonoBehaviour {
             "screwdriver" => BurglarToolType.screwdriver,
             "usb" => BurglarToolType.usb,
             "wirecutter" => BurglarToolType.wirecutter,
+            "keycard" => BurglarToolType.keycard,
             _ => BurglarToolType.none
         };
         SetTool(toolType);
@@ -492,6 +495,7 @@ public class BurglarCanvasController : MonoBehaviour {
         screwdriverToolButton.SetActive(true);
         usbToolButton.SetActive(!usbCableAttached);
         wireCutterButton.SetActive(true);
+        keycardButton.SetActive(true);
         usbCableCanvasGroup.enabled = (!usbCableAttached);
 
         switch (toolType) {
@@ -501,6 +505,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
                 wireCutterImage.gameObject.SetActive(false);
+                keyCardImage.enabled = false;
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.lockpick:
@@ -508,6 +513,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = true;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                keyCardImage.enabled = false;
+
                 lockpickToolButton.SetActive(false);
                 wireCutterImage.gameObject.SetActive(false);
 
@@ -518,6 +525,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                keyCardImage.enabled = false;
+
                 probeToolButton.SetActive(false);
                 wireCutterImage.gameObject.SetActive(false);
 
@@ -528,6 +537,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = true;
                 screwdriverImage.enabled = false;
+                keyCardImage.enabled = false;
+
                 keyToolButton.SetActive(false);
                 wireCutterImage.gameObject.SetActive(false);
 
@@ -538,9 +549,9 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = true;
+                keyCardImage.enabled = false;
                 screwdriverToolButton.SetActive(false);
                 wireCutterImage.gameObject.SetActive(false);
-
                 usbCable.SetActive(usbCableAttached);
                 break;
             case BurglarToolType.usb:
@@ -548,6 +559,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
                 screwdriverImage.enabled = false;
+                keyCardImage.enabled = false;
+
                 wireCutterImage.gameObject.SetActive(false);
 
                 ResetUSBTool();
@@ -560,11 +573,23 @@ public class BurglarCanvasController : MonoBehaviour {
                 probeImage.enabled = false;
                 lockpickImage.enabled = false;
                 keyImage.enabled = false;
+                keyCardImage.enabled = false;
                 screwdriverImage.enabled = false;
 
                 usbCable.SetActive(usbCableAttached);
                 wireCutterButton.SetActive(false);
                 wireCutterImage.gameObject.SetActive(true);
+                break;
+            case BurglarToolType.keycard:
+                probeImage.enabled = false;
+                lockpickImage.enabled = false;
+                keyImage.enabled = false;
+                screwdriverImage.enabled = false;
+                keyCardImage.enabled = true;
+                screwdriverToolButton.SetActive(false);
+                wireCutterImage.gameObject.SetActive(false);
+                usbCable.SetActive(usbCableAttached);
+                keycardButton.SetActive(false);
                 break;
         }
     }

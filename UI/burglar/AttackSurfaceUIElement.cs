@@ -138,7 +138,7 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     }
 
     public void HandleElementDestroyed() {
-        if (gameObject != null)
+        if (this != null)
             Destroy(gameObject);
     }
 

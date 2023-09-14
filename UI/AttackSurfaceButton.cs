@@ -41,17 +41,20 @@ public class AttackSurfaceButton : AttackSurfaceElement {
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.none) {
+            pressTimer = 0.5f;
+            Toolbox.RandomizeOneShot(audioSource, buttonPressedSound);
+            string feedbackText = "";
             if (alarmComponent != null) {
                 GameManager.I.SetAlarmNodeState(alarmComponent, false);
+                feedbackText = "alarm reset";
             }
             if (elevatorController != null) {
                 elevatorController.SelectFloorMove(selectFloor);
             }
-            pressTimer = 0.5f;
-            Toolbox.RandomizeOneShot(audioSource, buttonPressedSound);
+
             return BurglarAttackResult.None with {
                 success = true,
-                feedbackText = "alarm reset",
+                feedbackText = feedbackText,
                 element = this,
             };
         }
