@@ -3292,10 +3292,13 @@ clickable loot in burglar?
 no character in burglar
 loot has portrait view in burglar?
     door randomizer should specify key id ?
+attack surface for keycard reader
 
 * cyberware randomized/configured according to scriptableobject templates
 * elevator level
-
+* stealing keycard no suspicion
+* keycard reader inside lab
+* different lab configuration?
 
 
 doors

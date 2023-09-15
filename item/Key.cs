@@ -6,19 +6,22 @@ public class Key : Interactive {
     public DoorLock.LockType type;
     public int keyId;
     public AudioClip[] pickupSounds;
+
+    public bool suspicious;
     public override ItemUseResult DoAction(Interactor interactor) {
         Destroy(gameObject);
-        // switch (type) {
-        //     case DoorLock.LockType.physical:
-        //         GameManager.I.AddPhysicalKey(keyId);
-        //         break;
-        //     case DoorLock.LockType.keycard:
-        //         GameManager.I.AddKeyCard(keyId);
-        //         break;
-        // }
         GameManager.I.AddKey(keyId, type);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
+        if (suspicious) {
+            string lootName = type switch {
+                DoorLock.LockType.keycard => "keycard",
+                DoorLock.LockType.physical => "key",
+                _ => "key"
+            };
+            GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(lootName));
+
+        }
         return ItemUseResult.Empty() with { crouchDown = true };
     }
     public override string ResponseString() {

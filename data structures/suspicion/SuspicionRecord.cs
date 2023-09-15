@@ -452,23 +452,23 @@ public class SuspicionRecord {
         }
     };
 
-    public static SuspicionRecord lootSuspicion(LootData data) => new SuspicionRecord {
+    public static SuspicionRecord lootSuspicion(string lootName) => new SuspicionRecord {
         content = "stealing things",
         suspiciousness = Suspiciousness.suspicious,
         lifetime = 2f,
         maxLifetime = 2f,
         dialogue = new SuspicionDialogueParameters {
-            challenge = $"What are you doing with that {data.lootName}?",
+            challenge = $"What are you doing with that {lootName}?",
             tactics = new List<DialogueTactic>{
                         new DialogueTactic{
                             tacticType = DialogueTacticType.lie,
-                            content = $"I'm the {data.lootName} inspector.",
+                            content = $"I'm the {lootName} inspector.",
                             successResponse = "Carry on.",
                             failResponse = "Oh yeah? You don't look like one."
                         },
                         new DialogueTactic{
                             tacticType = DialogueTacticType.challenge,
-                            content = $"What, is this your {data.lootName}?",
+                            content = $"What, is this your {lootName}?",
                             successResponse = "I don't mean to interfere.",
                             failResponse = "I know it isn't yours."
                         }
