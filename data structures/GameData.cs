@@ -19,7 +19,7 @@ public record GameData {
     public MarketData marketData;
     public List<DealData> dealData;
     public static GameData TestInitialData() {
-        LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/levels/test/test") as LevelTemplate;
+        LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/missions/test/test") as LevelTemplate;
         // DateTime.Now;
         PlayerState playerState = PlayerState.DefaultState();
         return new GameData() {
