@@ -7,15 +7,14 @@ using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
     public static Action<GameData, Dictionary<Objective, ObjectiveStatus>> OnObjectivesChange;
     public static Action<LootData, GameData> OnLootChange;
-    public static Action<List<PayData>, GameData> OnPayDataChange;
+    public static Action<PayData, GameData> OnPayDataChange;
     public static Action<int, String> OnItemPickup;
     int lastObjectivesStatusHashCode;
 
-    public void AddPayDatas(List<PayData> datas) {
-        // gameData.playerState.payDatas.AddRange(datas);
-        gameData.levelState.delta.levelAcquiredPaydata.AddRange(datas);
+    public void AddPayDatas(PayData data) {
+        gameData.levelState.delta.levelAcquiredPaydata.Add(data);
         CheckObjectives();
-        OnPayDataChange?.Invoke(datas, gameData);
+        OnPayDataChange?.Invoke(data, gameData);
     }
 
     public void AddCredits(int amount) {

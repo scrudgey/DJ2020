@@ -8,7 +8,7 @@ public class DataFileIndicator : MonoBehaviour {
     public TextMeshProUGUI filenameText;
     public Image dataIcon;
 
-    public void Initialize(PayData payData) {
+    public void Refresh(PayData payData) {
         if (payData == null) {
             filenameText.text = "";
             SetIconVisibility(false);

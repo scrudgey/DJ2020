@@ -3287,7 +3287,14 @@ generic spritesheet template is not complete:
     head talking sprites
     head sprite on torso in many frames
     separate arm and torso?
-   
+fix mission loots interaction with randomizer
+clickable loot in burglar?
+no character in burglar
+loot has portrait view in burglar?
+    door randomizer should specify key id ?
+
+* cyberware randomized/configured according to scriptableobject templates
+* elevator level
 
 
 
@@ -3332,12 +3339,6 @@ shops:
     buy cyberware
 
 after action report & skill tree
-
-
-elevator level
-    cyberware randomized/configured according to scriptableobject templates
-        respond to level difficulty
-    door randomizer should specify key id ?
 
 jazz up elevator controller
     sound effects

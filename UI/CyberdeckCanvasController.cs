@@ -69,7 +69,7 @@ public class CyberdeckCanvasController : MonoBehaviour {
         progressText2.enabled = true;
         progressText1.text = "Downloaded file:";
         if (attachedDataStore != null)
-            progressText2.text = attachedDataStore.payDatas[0].filename;
+            progressText2.text = attachedDataStore.payData.filename;
     }
     void ShowUploadComplete() {
         progressBarParent.gameObject.SetActive(false);

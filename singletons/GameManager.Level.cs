@@ -117,10 +117,19 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        // randomize doors
         foreach (DoorRandomizer doorRandomizer in GameObject.FindObjectsOfType<DoorRandomizer>()) {
             doorRandomizer.ApplyState(state.template);
         }
 
+        // randomize cyber components
+        foreach (CyberRandomizer cyberRandomizer in GameObject.FindObjectsOfType<CyberRandomizer>()) {
+            cyberRandomizer.ApplyState(state.template);
+        }
+
+        // apply level initializer
+        LevelInitializer initializer = GameObject.FindObjectOfType<LevelInitializer>();
+        initializer?.ApplyState();
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
@@ -407,9 +416,6 @@ public partial class GameManager : Singleton<GameManager> {
     private void InitializeLevel(LevelPlan plan) {
         InitializePlayerAndController(plan);
 
-        // apply level initializer
-        LevelInitializer initializer = GameObject.FindObjectOfType<LevelInitializer>();
-        initializer?.ApplyState();
 
         // connect up power grids
         Debug.Log("connecting power grid...");

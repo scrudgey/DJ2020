@@ -18,6 +18,6 @@ public class RandomPayDataInitializer {
     public void Apply() {
         CyberDataStore dataStore = Toolbox.RandomFromList(dataStores);
         Debug.Log($"apply random paydata state: {payData.name} -> {dataStore.gameObject}");
-        dataStore.payDatas.Add(payData);
+        dataStore.payData = payData;
     }
 }

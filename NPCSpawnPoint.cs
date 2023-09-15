@@ -7,6 +7,8 @@ public class NPCSpawnPoint : MonoBehaviour {
     public GameObject spawnEffect;
     public NPCTemplate myTemplate;
     public PatrolRoute[] patrolRoutes;
+    public List<LootDropElementWithProbability> lootDrops;
+
     PrefabPool effectPool;
     PrefabPool NPCPool;
     void Start() {
@@ -34,6 +36,11 @@ public class NPCSpawnPoint : MonoBehaviour {
         controller.OrbitCamera = cam;
         ai.patrolRoute = route;
         ai.prefabPool = NPCPool;
+
+        LootDropper lootDropper = npc.GetComponentInChildren<LootDropper>();
+        if (lootDropper != null) {
+            lootDropper.loot.AddRange(lootDrops);
+        }
 
         motor.SetPosition(transform.position, bypassInterpolation: true);
         ApplyNPCState(template, npc);

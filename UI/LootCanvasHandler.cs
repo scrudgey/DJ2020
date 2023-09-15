@@ -57,10 +57,10 @@ public class LootCanvasHandler : MonoBehaviour {
         ConfigureLootDetails(loot);
         ShowCanvasCoroutine();
     }
-    public void HandleDataChange(List<PayData> newData, GameData data) {
-        if (newData == null || newData.Count == 0) return;
+    public void HandleDataChange(PayData newData, GameData data) {
+        if (newData == null) return;
         ConfigureLootCounts(data);
-        ConfigurePayDataDetail(newData.FirstOrDefault());
+        ConfigurePayDataDetail(newData);
         ShowCanvasCoroutine();
     }
     public void HandleItemPickup(int index, string caption) {

@@ -9,23 +9,19 @@ public class CyberDataStore : MonoBehaviour {
     public CyberComponent cyberComponent;
     public ParticleSystem particles;
 
-    public List<PayData> payDatas;
-
-    // public GameObject datafileIndicator;
+    public PayData payData;
     public DataFileIndicator dataFileIndicator;
     bool opened;
 
     public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         cyberComponent.OnStateChange += HandleCyberStateChange;
+        RefreshState();
+    }
+    public void RefreshState() {
         if (dataFileIndicator != null) {
-            if (payDatas.Count == 0) {
-                dataFileIndicator.Initialize(null);
-            } else {
-                dataFileIndicator.Initialize(payDatas[0]);
-            }
+            dataFileIndicator.Refresh(payData);
         }
-
     }
     public void HandleCyberStateChange(CyberComponent component) {
         // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");
@@ -39,10 +35,8 @@ public class CyberDataStore : MonoBehaviour {
         if (opened) return;
         PlayParticles();
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        foreach (PayData payData in payDatas) {
-            Debug.Log($"stealing paydata: {payData.filename}");
-        }
-        GameManager.I.AddPayDatas(payDatas);
+        Debug.Log($"stealing paydata: {payData.filename}");
+        GameManager.I.AddPayDatas(payData);
         opened = true;
     }
     public void PlayParticles() {
@@ -57,7 +51,7 @@ public class CyberDataStore : MonoBehaviour {
             if (objective is ObjectiveData) {
                 ObjectiveData objectiveData = (ObjectiveData)objective;
                 foreach (PayData targetData in objectiveData.targetPaydata) {
-                    if (payDatas.Contains(targetData)) {
+                    if (payData == targetData) {
                         GameManager.I.FailObjective(objective);
                     }
                 }
