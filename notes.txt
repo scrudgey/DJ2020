@@ -3287,7 +3287,6 @@ generic spritesheet template is not complete:
     head talking sprites
     head sprite on torso in many frames
     separate arm and torso?
-fix mission loots interaction with randomizer
 clickable loot in burglar?
 no character in burglar
 loot has portrait view in burglar?
@@ -3341,8 +3340,10 @@ shops:
     sell guns
     buy cyberware
 
-after action report & skill tree
-
+skill tree
+fix mission loots interaction with randomizer
+fix mission data interaction with randomizer
 jazz up elevator controller
     sound effects
     click effect
+

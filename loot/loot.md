@@ -115,6 +115,10 @@ high value industrial:
     vacuum pump
     Uranium Acetate
     vacuum dessicator
+
+asteroid minerals
+pure space-grown crystal
+
 low value industrial:
     solar cell
     2-Propanol-99%

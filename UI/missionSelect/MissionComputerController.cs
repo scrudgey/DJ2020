@@ -210,7 +210,7 @@ public class MissionComputerController : MonoBehaviour {
 
         emailText.text = template.proposalEmail.text;
 
-        missionNameText.text = template.levelName;
+        missionNameText.text = template.readableMissionName;
         taglineText.text = template.tagline;
 
         InitializeObjectives(template);

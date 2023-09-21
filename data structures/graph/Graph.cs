@@ -70,7 +70,7 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     }
 
     public static W LoadAll(string levelName) {
-        string levelPath = Path.Combine("data", "levels", levelName);
+        string levelPath = Path.Combine("data", "missions", levelName);
         Debug.Log($"loading all graphs at {levelPath}...");
         string prefix = PowerGraphPrefix();
 

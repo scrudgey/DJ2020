@@ -12,6 +12,7 @@ public class LevelTemplate : ScriptableObject {
 
     [Header("level and scene")]
     public string levelName;
+    public string readableMissionName;
     public string sceneName;
     public string sceneDescriptor;
     public int mapviewInitialFloor = 1;

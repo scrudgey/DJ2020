@@ -21,8 +21,9 @@ public class LevelState {
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
             disguise = plan.startWithDisguise(),
-            objectivesState = template.objectives
+            objectivesState = template.objectives.Concat(template.bonusObjectives)
                 .ToDictionary(t => t, t => ObjectiveStatus.inProgress)
+
         }
     };
 
@@ -40,8 +41,8 @@ public class LevelState {
     }
 
     public static string LevelDataPath(string levelName, bool includeDataPath = true) {
-        string path = includeDataPath ? Path.Combine(Application.dataPath, "Resources", "data", "levels", levelName) :
-                                        Path.Combine("data", "levels", levelName);
+        string path = includeDataPath ? Path.Combine(Application.dataPath, "Resources", "data", "missions", levelName) :
+                                        Path.Combine("data", "missions", levelName);
         // if (!Directory.Exists(path)) {
         //     Directory.CreateDirectory(path);
         // }

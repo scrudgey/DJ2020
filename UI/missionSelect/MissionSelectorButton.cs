@@ -13,7 +13,7 @@ public class MissionSelectorButton : MonoBehaviour {
     public void Initialize(MissionComputerController controller, LevelTemplate template) {
         this.controller = controller;
         this.template = template;
-        missionName.text = template.levelName;
+        missionName.text = template.readableMissionName;
         faction.text = template.faction.name;
         reward.text = template.creditReward.ToString("#,#");
     }

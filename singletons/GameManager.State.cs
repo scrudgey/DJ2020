@@ -65,7 +65,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         List<ObjectiveStatus> statuses = gameData.levelState.template.objectives
-            .Where(objective => !objective.isOptional)
             .Select(objective => objective.Status(gameData)).ToList();
 
         ObjectiveStatus newTotalStatus;

@@ -136,7 +136,6 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToPhase(GamePhase.levelPlay);
 
         lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.template.objectives
-            .Where(objective => !objective.isOptional)
             .Select(objective => objective.Status(gameData)).ToList());
 
         if (doCutscene)
@@ -232,7 +231,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void ReturnToTitleScreen() {
         MusicController.I.Stop();
         LoadScene("title", () => {
-            Debug.Log("start title screen");
+            // Debug.Log("start title screen");
             activeMenuType = MenuType.none;
         });
     }
@@ -241,9 +240,11 @@ public partial class GameManager : Singleton<GameManager> {
         MusicController.I.Stop();
         TransitionToPhase(GamePhase.afteraction);
         LoadScene("AfterAction", () => {
-            Debug.Log("start afteraction");
+            // Debug.Log("start afteraction");
             // activeMenuType = MenuType.none;
-            AfterActionReportHandler handler = GameObject.FindObjectOfType<AfterActionReportHandler>();
+            // AfterActionReportHandler handler = GameObject.FindObjectOfType<AfterActionReportHandler>();
+            // handler.Initialize(gameData);
+            NeoAfterActionReport handler = GameObject.FindObjectOfType<NeoAfterActionReport>();
             handler.Initialize(gameData);
         });
     }
@@ -261,7 +262,7 @@ public partial class GameManager : Singleton<GameManager> {
                 scenesToUnload.Add(activeSceneName);
             }
 
-            Debug.Log("show loading screen");
+            // Debug.Log("show loading screen");
             SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Additive);
         }
 
@@ -273,7 +274,7 @@ public partial class GameManager : Singleton<GameManager> {
                 callback();
 
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
-                Debug.Log("remove loading screen");
+                // Debug.Log("remove loading screen");
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
             isLoadingLevel = false;
