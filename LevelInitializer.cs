@@ -9,15 +9,34 @@ public class LevelInitializer : MonoBehaviour {
             payDataInitializer.Apply();
         }
     }
+
+#if UNITY_EDITOR
+    protected virtual void OnDrawGizmos() {
+        // foreach (T other in edges) {
+        //     if (other == null)
+        //         continue;
+        //     Gizmos.DrawLine(NodePosition(), other.NodePosition());
+        // }
+        Gizmos.color = Color.red;
+        foreach (RandomPayDataInitializer initializer in payDataInitializers) {
+            foreach (CyberDataStore dataStore in initializer.dataStores) {
+                if (dataStore == null) continue;
+                Gizmos.DrawLine(transform.position, dataStore.transform.position);
+            }
+        }
+    }
+#endif
 }
 
 [System.Serializable]
 public class RandomPayDataInitializer {
-    public PayData payData;
+    // public PayData payData;
+    public ObjectiveData objectiveData;
     public List<CyberDataStore> dataStores;
     public void Apply() {
         CyberDataStore dataStore = Toolbox.RandomFromList(dataStores);
-        Debug.Log($"apply random paydata state: {payData.name} -> {dataStore.gameObject}");
-        dataStore.payData = payData;
+        Debug.Log($"apply random paydata state: {objectiveData.targetPaydata.name} -> {dataStore.gameObject}");
+        dataStore.payData = objectiveData.targetPaydata;
+        dataStore.RefreshState();
     }
 }

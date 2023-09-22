@@ -3341,9 +3341,11 @@ shops:
     buy cyberware
 
 skill tree
-fix mission loots interaction with randomizer
-fix mission data interaction with randomizer
 jazz up elevator controller
     sound effects
     click effect
 
+
+places randomizer could break down:
+    we have the wrong objective on it
+    we have overlapping datastore sets

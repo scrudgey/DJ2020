@@ -50,10 +50,8 @@ public class CyberDataStore : MonoBehaviour {
         foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {
             if (objective is ObjectiveData) {
                 ObjectiveData objectiveData = (ObjectiveData)objective;
-                foreach (PayData targetData in objectiveData.targetPaydata) {
-                    if (payData == targetData) {
-                        GameManager.I.FailObjective(objective);
-                    }
+                if (payData == objectiveData.targetPaydata) {
+                    GameManager.I.FailObjective(objective);
                 }
             }
         }

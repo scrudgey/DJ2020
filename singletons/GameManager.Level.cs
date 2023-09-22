@@ -127,9 +127,10 @@ public partial class GameManager : Singleton<GameManager> {
             cyberRandomizer.ApplyState(state.template);
         }
 
-        // apply level initializer
-        LevelInitializer initializer = GameObject.FindObjectOfType<LevelInitializer>();
-        initializer?.ApplyState();
+        // apply level initializer(s)
+        foreach (LevelInitializer initializer in GameObject.FindObjectsOfType<LevelInitializer>()) {
+            initializer.ApplyState();
+        }
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
