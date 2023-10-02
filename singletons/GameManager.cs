@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop, perkMenu }
 public enum OverlayType { none, power, cyber, alarm }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -287,6 +287,11 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("MedicalShop", callback, unloadAll: false);
                 }
                 break;
+            case MenuType.perkMenu:
+                if (!SceneManager.GetSceneByName("PerkMenu").isLoaded) {
+                    LoadScene("PerkMenu", callback, unloadAll: false);
+                }
+                break;
             case MenuType.console:
                 uiController.ShowTerminal();
                 callback?.Invoke();
@@ -343,6 +348,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.medicalShop:
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("MedicalShop"));
+                break;
+            case MenuType.perkMenu:
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("PerkMenu"));
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
@@ -539,6 +547,16 @@ public partial class GameManager : Singleton<GameManager> {
         ShowMenu(MenuType.missionSelect);
     }
     public void HideMissionSelectMenu() {
+        CloseMenu();
+    }
+
+    public void ShowPerkMenu() {
+        ShowMenu(MenuType.perkMenu, callback: () => {
+            PerkMenuController controller = GameObject.FindObjectOfType<PerkMenuController>();
+            controller.Initialize(gameData.playerState);
+        });
+    }
+    public void HidePerkMenu() {
         CloseMenu();
     }
 

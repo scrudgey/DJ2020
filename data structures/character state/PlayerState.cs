@@ -43,6 +43,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         {GunType.sword, 1},
     };
 
+
+    // TODO: remove these
     public int speechSkillLevel;
     public int maxConcurrentNetworkHacks;
     public float hackSpeedCoefficient;
@@ -55,6 +57,13 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     public HashSet<int> physicalKeys;
     public HashSet<int> keycards;
+
+    public HashSet<string> activePerks;
+    public int skillpoints;
+    public int bodySkillPoints;
+    public int gunSkillPoints;
+    public int hackSkillPoints;
+    public int speechSkillPoints;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
@@ -136,7 +145,10 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
             credits = 10000,
             // credits = 600,
-            loots = loots
+            loots = loots,
+
+            activePerks = new HashSet<string>(),
+            skillpoints = 10
         };
     }
 
@@ -182,4 +194,42 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             tertiaryGun.ClipIn();
         }
     }
+    public int PlayerLevel() {
+        return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;
+    }
+    public bool PerkIsFullyActivated(Perk perk) {
+        if (perk.IsMultiStagePerk()) {
+            return PerkLevelIsActivated(perk, perk.stages);
+        } else {
+            return activePerks.Contains(perk.perkId);
+        }
+    }
+    public bool PerkLevelIsActivated(Perk perk, int level) {
+        string perkString = perk.PerkIdForLevel(level);
+        return activePerks.Contains(perkString);
+    }
+    public void ActivatePerk(Perk perk) {
+        skillpoints -= 1;
+        switch (perk.category) {
+            case PerkCategory.gun:
+                gunSkillPoints += 1;
+                break;
+            case PerkCategory.hack:
+                hackSkillPoints += 1;
+                break;
+            case PerkCategory.body:
+                bodySkillPoints += 1;
+                break;
+            case PerkCategory.speech:
+                speechSkillPoints += 1;
+                break;
+        }
+        if (perk.IsMultiStagePerk()) {
+            int level = perk.GetPerkLevel(this);
+            activePerks.Add(perk.PerkIdForLevel(level));
+        } else {
+            activePerks.Add(perk.perkId);
+        }
+    }
+
 }

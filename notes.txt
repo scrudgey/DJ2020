@@ -2892,6 +2892,16 @@ x ladders
     * door config should be scriptable object
     * sometimes unlocked
 * rocket launcher not fully done
+* cyberware randomized/configured according to scriptableobject templates
+* elevator level
+* stealing keycard no suspicion
+* keycard reader inside lab
+* different lab configuration?
+
+
+places randomizer could break down:
+    we have the wrong objective on it
+    we have overlapping datastore sets
 
 
 
@@ -3014,6 +3024,7 @@ weapons
     flashlight attachment
     fix silenced smg
     code-controlled shoot animation
+        AnimationUtility?
         fix shooting animation and automatic interval
         faster shotgun
             click to rack faster?
@@ -3251,7 +3262,6 @@ some way to distract guards
 sphere robot
 turrets
 hatch in the rooftop for jack that data
-some sort of automated check when a level starts if objectives are impossible
 receptionist at tower
 too many guards on jack that data bug ?
 flickery rooftop in world
@@ -3293,11 +3303,6 @@ loot has portrait view in burglar?
     door randomizer should specify key id ?
 attack surface for keycard reader
 
-* cyberware randomized/configured according to scriptableobject templates
-* elevator level
-* stealing keycard no suspicion
-* keycard reader inside lab
-* different lab configuration?
 
 
 doors
@@ -3335,6 +3340,8 @@ unresolved mechanics:
     dialogue
     hacking
     circuits
+    do we buy / unlock more burglar tools?
+        
 shops:
     more fences
     sell guns
@@ -3346,6 +3353,37 @@ jazz up elevator controller
     click effect
 
 
-places randomizer could break down:
-    we have the wrong objective on it
-    we have overlapping datastore sets
+
+more equipment to bring on mission?
+    shuriken
+    throwing knife
+    key duplicator
+        what is the purpose? only if someone will notice a missing key.
+        or a key is too hard to steal, but 
+    rfid sniffer
+    duffel bag
+        can be placed somewhere inside the mission ahead of time
+    crowbar uses:
+        open door
+        open elevator door
+        open hatch
+        open cars
+        break windows
+        melee weapon
+    fence cutters (self explanatory)
+    high voltage bolt cutters
+    power drill
+        can destroy a lock, but is noisy
+    safe cracking equipment
+        destructive / noisy vs. silent
+    emp grenade
+    flashbang?
+    gas grenade?
+    remote mine
+    rope
+    grapple
+
+
+fix pip 0
+indicate when perk button is active
+indicate when perk button is selected
