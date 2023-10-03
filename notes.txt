@@ -3384,6 +3384,73 @@ more equipment to bring on mission?
     grapple
 
 
-fix pip 0
-indicate when perk button is active
-indicate when perk button is selected
+* fix pip 0
+* indicate when perk button is active
+* indicate when perk button is selected
+
+* player name
+* player level
+* bigger level display
+* load two shotgun shells at a time
+* disable engine
+
+bonus damage
+
+body perks
+    * health bonus
+    * cyberware slot
+    * third gun slot
+    * extra item slot
+    * regeneration
+    resuscitation
+    armor ?
+    speed?
+speech perks
+    * bargain + 10% loot 
+    * speech skill
+    * one more deal per day
+    * one more market condition per day
+    * generally better market conditions
+    spend favors for other thing
+hack perks
+    * better lockpicking
+    visually identify weaknesses / identify types
+    hotwire
+    * door breach
+    * cyber sword
+
+
+
+add hook to after action report
+add hook to bedroom
+
+
+make perks take effect
+    bargain ->  bargain
+    cyberware_1 ... _4
+    dealmaker
+    door_breach
+    engine_shot
+    explosive_pro
+    fast_reload
+    gun_nut
+    health_1 ... _3
+    item_slot
+    lockpick
+    market
+    market_chaos
+    pistol_accuracy
+    pistol_control
+    pistol_lock_head
+    regeneration
+    rifle_accuracy
+    rifle_control
+    shell_pro
+    shotgun_accuracy
+    shotgun_control
+    smg_accuracy
+    smg_contorl
+    speech
+    sword_hack
+    third_gun
+    twoshells

@@ -553,7 +553,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void ShowPerkMenu() {
         ShowMenu(MenuType.perkMenu, callback: () => {
             PerkMenuController controller = GameObject.FindObjectOfType<PerkMenuController>();
-            controller.Initialize(gameData.playerState);
+            controller.Initialize(gameData, gameData.playerState);
         });
     }
     public void HidePerkMenu() {

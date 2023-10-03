@@ -28,6 +28,7 @@ public class PerkMenuController : MonoBehaviour {
     public TextMeshProUGUI categoryTitle;
     public TextMeshProUGUI skillPointIndicator;
     public TextMeshProUGUI playerName;
+    public TextMeshProUGUI playerLevel;
     public TextMeshProUGUI playerHealth;
 
 
@@ -42,19 +43,22 @@ public class PerkMenuController : MonoBehaviour {
     public TextMeshProUGUI perkViewRequirements;
     public Button perkViewActivateButton;
     public TextMeshProUGUI perkViewActiveText;
+    public TextMeshProUGUI requirementTitleText;
     PlayerState state;
     PerkButton selectedPerkButton;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
-    public void Initialize(PlayerState state) {
+    public void Initialize(GameData data, PlayerState state) {
         this.state = state;
+        playerName.text = data.filename;
         ChangePane(PerkCategory.gun);
         RefreshDisplay(state);
     }
 
     void RefreshDisplay(PlayerState state) {
         playerHealth.text = $"HP: {(int)state.health} / {state.fullHealthAmount}";
+        playerLevel.text = $"{state.PlayerLevel()}";
         skillPointIndicator.text = $"{state.skillpoints}";
 
         bodyPoints.text = $"{state.bodySkillPoints}";
@@ -64,6 +68,11 @@ public class PerkMenuController : MonoBehaviour {
 
         foreach (PerkButton button in GameObject.FindObjectsOfType(typeof(PerkButton), true)) {
             button.Initialize(this, state);
+            button.SetSelected(false);
+        }
+
+        if (selectedPerkButton != null) {
+            selectedPerkButton.SetSelected(true);
         }
     }
     public void CloseButtonCallback() {
@@ -118,8 +127,11 @@ public class PerkMenuController : MonoBehaviour {
     }
 
     public void PerkButtonCallback(PerkButton button) {
+        if (selectedPerkButton != null) {
+            selectedPerkButton.SetSelected(false);
+        }
         selectedPerkButton = button;
-        Debug.Log(button.perk.readableName);
+        selectedPerkButton.SetSelected(true);
         PopulatePerkView(button.perk);
     }
     public void ActivateButtonCallback() {
@@ -133,12 +145,14 @@ public class PerkMenuController : MonoBehaviour {
         perkViewIcon.sprite = perk.icon;
         perkViewDescription.text = perk.description;
         string requirementText = "";
+        bool requirementSet = false;
         if (perk.playerLevelRequirement > 0) {
             if (perk.PlayerLevelRequirementMet(state)) {
                 requirementText += $"player level {perk.playerLevelRequirement}\n";
             } else {
                 requirementText += $"<color=#ff4757>player level {perk.playerLevelRequirement}</color>\n";
             }
+            requirementSet = true;
         }
         if (perk.skillLevelRequirement > 0) {
             if (perk.SkillLevelRequirementMet(state)) {
@@ -146,6 +160,7 @@ public class PerkMenuController : MonoBehaviour {
             } else {
                 requirementText += $"<color=#ff4757>{perk.category} level {perk.skillLevelRequirement}</color>\n";
             }
+            requirementSet = true;
         }
         foreach (Perk requiredPerk in perk.requiredPerks) {
             if (perk.PerkRequirementMet(state, requiredPerk)) {
@@ -153,7 +168,9 @@ public class PerkMenuController : MonoBehaviour {
             } else {
                 requirementText += $"<color=#ff4757>{requiredPerk.readableName}</color>\n";
             }
+            requirementSet = true;
         }
+        requirementTitleText.enabled = requirementSet;
         perkViewRequirements.text = requirementText;
 
         if (state.PerkIsFullyActivated(perk)) {

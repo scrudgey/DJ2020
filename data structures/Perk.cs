@@ -52,7 +52,7 @@ public class Perk : ScriptableObject {
     }
 
     public string PerkIdForLevel(int level) {
-        return $"{perkId}{level}";
+        return $"{perkId}_{level}";
     }
     public int GetPerkLevel(PlayerState state) {
         bool containsLevel = true;

@@ -220,7 +220,7 @@ perks are defined in a scriptable object template
     * skill level requirement
     * player level requirement
     * icon
-    some sort of pip spec
+    * some sort of pip spec
     * name
     * description
 
@@ -232,3 +232,10 @@ player state can provide a clean api to answer questions: getCurrentPistolAccura
 allow multi-stage perks
 add more perks
 indicate levels in perk descriptor
+smarter "requirements" text
+sfx
+
+
+faster reload
+gun nut
+bring two explosives

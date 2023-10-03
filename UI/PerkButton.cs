@@ -13,7 +13,9 @@ public class PerkButton : MonoBehaviour {
     public Perk perk;
     public Sprite pipActive;
     public Sprite pipDisabled;
-
+    public Image selectedIndicator;
+    public Image backgroundImage;
+    public Color activeColor;
     PlayerState state;
     PerkMenuController controller;
 
@@ -46,7 +48,8 @@ public class PerkButton : MonoBehaviour {
             }
         }
         if (state.PerkIsFullyActivated(perk)) {
-
+            backgroundImage.color = activeColor;
+            icon.color = Color.black;
         }
 
         if (perk.CanBePurchased(state)) {
@@ -58,6 +61,10 @@ public class PerkButton : MonoBehaviour {
 
     public void ClickCallback() {
         controller.PerkButtonCallback(this);
+    }
+
+    public void SetSelected(bool selected) {
+        selectedIndicator.enabled = selected;
     }
 
 
