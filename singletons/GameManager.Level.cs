@@ -210,6 +210,7 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.credits += gameData.levelState.delta.levelAcquiredCredits;
         gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
         gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot);
+        gameData.playerState.skillpoints += 1;
 
         // TODO: broken
         CharacterHurtable playerHurtable = playerObject.GetComponentInChildren<CharacterHurtable>();
@@ -693,7 +694,7 @@ public partial class GameManager : Singleton<GameManager> {
         playerSuspiciousness = GetTotalSuspicion(),
         alarmActive = gameData.levelState.delta.alarmGraph.anyAlarmTerminalActivated(),
         playerInDisguise = gameData.levelState.delta.disguise,
-        playerSpeechSkill = gameData.playerState.speechSkillLevel,
+        playerSpeechSkill = gameData.playerState.PerkSpeechlevel(),
         playerHasID = gameData.levelState.PlayerHasID()
     };
 }

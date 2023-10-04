@@ -21,7 +21,7 @@ public record DealData {
             offerIcon = offer.portrait,
             offerName = offer.lootName,
             offerCount = offerCount,
-            offerValue = offer.value * offerCount,
+            offerValue = offer.GetValue() * offerCount,
 
             priceType = price,
             priceIsCredits = false,

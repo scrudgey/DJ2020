@@ -1595,7 +1595,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
     public void LoadState(PlayerState data) {
         superJumpEnabled = data.cyberlegsLevel > 0;
-        thirdGunSlotEnabled = data.thirdWeaponSlot;
+        thirdGunSlotEnabled = data.PerkThirdWeaponSlot();
     }
 
     public CameraInput BuildCameraInput() {

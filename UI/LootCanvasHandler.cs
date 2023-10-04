@@ -101,7 +101,7 @@ public class LootCanvasHandler : MonoBehaviour {
     void ConfigureLootDetails(LootData data) {
         lootTitle.text = data.lootName;
         lootDescription.text = data.lootDescription;
-        valueText.text = $"{data.value}";
+        valueText.text = $"{data.GetValue()}";
         lootImage.sprite = data.portrait;
         valueText.enabled = true;
         lootCategoryIcon.enabled = true;

@@ -26,7 +26,11 @@ public class PerkButton : MonoBehaviour {
         icon.sprite = perk.icon;
         caption.text = perk.readableName;
         if (perk.IsMultiStagePerk()) {
-
+            int i = 0;
+            foreach (Image pip in pips) {
+                pip.gameObject.SetActive(i < perk.stages);
+                i += 1;
+            }
         } else {
             foreach (Image pip in pips) {
                 pip.gameObject.SetActive(false);

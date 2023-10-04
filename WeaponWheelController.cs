@@ -35,7 +35,7 @@ public class WeaponWheelController : MonoBehaviour {
         if (GameManager.I.gameData.playerState.secondaryGun != null) {
             guns.Add(GameManager.I.gameData.playerState.secondaryGun);
         }
-        if (GameManager.I.gameData.playerState.tertiaryGun != null && GameManager.I.gameData.playerState.thirdWeaponSlot) {
+        if (GameManager.I.gameData.playerState.tertiaryGun != null && GameManager.I.gameData.playerState.PerkThirdWeaponSlot()) {
             guns.Add(GameManager.I.gameData.playerState.tertiaryGun);
         }
         thetaDelta = 2f * Mathf.PI / (guns.Count + GameManager.I.gameData.levelState.plan.items.Where(item => item != null).Count() + 1);

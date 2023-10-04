@@ -16,7 +16,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public CharacterCamera characterCamera;
     public GunStateEnum state;
     // public InputMode inputMode;
-    public CharacterState characterState;
+    // public CharacterState characterState;
     public Action<GunHandler> OnValueChanged { get; set; }
     public float height = 0.5f;
     public AudioSource audioSource;
@@ -39,6 +39,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool isAimingWeapon;
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
+    int numberOfShellsPerReload;
     void Awake() {
         lockOnColliders = new Collider[32];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -72,7 +73,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     // used by animator
     public void ShellIn() {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipIn);
-        gunInstance.ShellIn();
+
+
+
+        gunInstance.ShellIn(numberOfShellsPerReload);
         OnValueChanged?.Invoke(this);
     }
     // used by animator
@@ -547,6 +551,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         primary = state.primaryGun;
         secondary = state.secondaryGun;
         third = state.tertiaryGun;
+        numberOfShellsPerReload = state.numberOfShellsPerReload;
         SwitchToGun(state.activeGun);
     }
 

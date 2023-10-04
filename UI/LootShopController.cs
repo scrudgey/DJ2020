@@ -87,7 +87,7 @@ public class LootShopController : MonoBehaviour {
     }
     void SetSaleData(List<LootData> datas) {
         LootData data = datas[0];
-        valueText.text = data.value.ToString();
+        valueText.text = data.GetValue().ToString();
 
         itemImage.enabled = true;
         itemImage.sprite = data.portrait;
@@ -99,7 +99,7 @@ public class LootShopController : MonoBehaviour {
         }
         float bonus = lootBuyerData.CalculateBonusFactor(data);
         int count = datas.Count();
-        forSaleTotalPrice = (int)(data.value * count * bonus);
+        forSaleTotalPrice = (int)(data.GetValue() * count * bonus);
         totalText.text = $"{forSaleTotalPrice}";
         factorText.text = $"{bonus}x";
         countText.text = $"{count}x";

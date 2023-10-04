@@ -26,7 +26,7 @@ public class LootTradeButton : MonoBehaviour {
         LootData lootData = lootDatas[0];
         icon.sprite = lootData.portrait;
         lootName.text = lootData.lootName;
-        lootValueText.text = $"{lootData.value}";
+        lootValueText.text = $"{lootData.GetValue()}";
         tradeCount = 0;
         totalCount = lootDatas.Count;
         SetCountText();
@@ -34,7 +34,7 @@ public class LootTradeButton : MonoBehaviour {
     public int LootValue() {
         if (lootDatas == null || lootDatas.Count == 0) return 0;
         LootData lootData = lootDatas[0];
-        return lootData.value;
+        return lootData.GetValue();
     }
     void SetCountText() {
         playerCount.text = $"{totalCount - tradeCount}";

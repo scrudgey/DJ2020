@@ -47,21 +47,6 @@ namespace Items {
                 _ => new ItemInstance(baseItem)
             };
         }
-
-        // public static ItemInstance LoadItem(string itemName) {
-        //     if (itemName == "") return null;
-        //     ItemTemplate template = ItemTemplate.LoadItem(itemName);
-        //     if (template == null) {
-        //         Debug.LogError($"failed to load item template: {itemName}");
-        //     }
-        //     ItemInstance newItem = ItemInstance.FactoryLoad(template);
-        //     if (newItem != null) {
-        //         return newItem;
-        //     } else {
-        //         Debug.LogError($"unable to load plan item {itemName}");
-        //         return null;
-        //     }
-        // }
     }
 }
 

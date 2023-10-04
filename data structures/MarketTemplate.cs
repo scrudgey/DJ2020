@@ -53,6 +53,14 @@ public class LootPreferenceDataTemplate {
     public LootPreferenceData Compile() {
         LootCategory type = Toolbox.RandomFromList(types);
         int bonus = Mathf.RoundToInt(bonusLoHi.GetRandomInsideBound());
+        int bonuses = GameManager.I.gameData.playerState.PerkBetterMarketConditionsChances();
+        if (bonuses > 0) {
+            for (int i = 0; i < bonuses; i++) {
+                if (Random.Range(0f, 1f) > 0.5f) {
+                    bonus += 1;
+                }
+            }
+        }
         return new LootPreferenceData(type, bonus);
     }
 }

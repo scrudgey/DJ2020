@@ -9,6 +9,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
     public GunState secondaryGun { get; set; }
     public GunState tertiaryGun { get; set; }
     public int activeGun { get; set; }
+    public int numberOfShellsPerReload { get { return 1; } }
 
     // health
     public float health { get; set; }

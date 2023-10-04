@@ -75,8 +75,6 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
         InitializeItemSlots(plan);
 
-        thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
-
         selectedWeaponSlot = 0;
 
         pickerObject.SetActive(false);
@@ -89,7 +87,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         secondaryHighlight.SetActive(false);
         tertiaryHighlight.SetActive(false);
 
-        thirdWeaponSlot.SetActive(data.playerState.thirdWeaponSlot);
+        thirdWeaponSlot.SetActive(data.playerState.PerkThirdWeaponSlot());
 
         initialized = true;
     }

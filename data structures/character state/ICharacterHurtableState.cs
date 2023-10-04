@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface ICharacterHurtableState {
     public float health { get; set; }
-    public float fullHealthAmount { get; set; }
+    public float fullHealthAmount { get; }
     public HitState hitState { get; set; }
 
     public void ApplyHurtableState(GameObject playerObject) {

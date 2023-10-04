@@ -3,7 +3,7 @@ using Items;
 using Newtonsoft.Json;
 using UnityEngine;
 [System.Serializable]
-public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState {
+public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState, PerkIdConstants {
     public int credits;
 
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
@@ -24,16 +24,25 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public GunState secondaryGun { get; set; }
     public GunState tertiaryGun { get; set; }
     public int activeGun { get; set; }
+    public int numberOfShellsPerReload {
+        get {
+            return PerkNumberOfShellsPerReload();
+        }
+    }
 
     // health
     public float health { get; set; }
-    public float fullHealthAmount { get; set; }
+    public float fullHealthAmount {
+        get {
+            return PerkFullHealthAmount();
+        }
+    }
     public HitState hitState { get; set; }
 
     // stats
     public int cyberlegsLevel;
     public bool cyberEyesThermal;
-    public bool thirdWeaponSlot;
+    // public bool thirdWeaponSlot;
     public bool cyberEyesThermalBuff;
     public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
         {GunType.pistol, 1},
@@ -45,7 +54,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
 
     // TODO: remove these
-    public int speechSkillLevel;
+    // public int speechSkillLevel;
     public int maxConcurrentNetworkHacks;
     public float hackSpeedCoefficient;
     public float hackRadius;
@@ -129,12 +138,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,
             hackRadius = 1.5f,
-            thirdWeaponSlot = false,
+            // thirdWeaponSlot = false,
 
             health = 150f,
-            fullHealthAmount = 150f,
+            // fullHealthAmount = 150f,
 
-            speechSkillLevel = 3,
+            // speechSkillLevel = 3,
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
             portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
 
@@ -148,7 +157,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             loots = loots,
 
             activePerks = new HashSet<string>(),
-            skillpoints = 10
+            skillpoints = 20
         };
     }
 
@@ -172,7 +181,6 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         health = template.fullHealthAmount,
         cyberEyesThermal = template.cyberEyesThermal,
         cyberlegsLevel = template.cyberlegsLevel,
-        thirdWeaponSlot = template.thirdWeaponSlot,
         legSkin = template.legSkin,
         bodySkin = template.bodySkin,
         headSkin = template.headSkin,
@@ -201,12 +209,32 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         if (perk.IsMultiStagePerk()) {
             return PerkLevelIsActivated(perk, perk.stages);
         } else {
-            return activePerks.Contains(perk.perkId);
+            return PerkIsActivated(perk.perkId);
         }
+    }
+    public bool PerkIsActivated(string perkId) {
+        return activePerks.Contains(perkId);
     }
     public bool PerkLevelIsActivated(Perk perk, int level) {
         string perkString = perk.PerkIdForLevel(level);
-        return activePerks.Contains(perkString);
+        return PerkIsActivated(perkString);
+    }
+    public bool PerkLevelIsActivated(string perkid, int level) {
+        string perkString = Perk.PerkIdForLevel(perkid, level);
+        return PerkIsActivated(perkString);
+    }
+    public int GetPerkLevel(Perk perk) {
+        return GetPerkLevel(perk.perkId);
+    }
+    public int GetPerkLevel(string perkId) {
+        int level = 0;
+
+        bool containsNextLevel = PerkLevelIsActivated(perkId, level + 1);
+        while (containsNextLevel) {
+            level += 1;
+            containsNextLevel = PerkLevelIsActivated(perkId, level + 1);
+        }
+        return level;
     }
     public void ActivatePerk(Perk perk) {
         skillpoints -= 1;
@@ -225,11 +253,53 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
                 break;
         }
         if (perk.IsMultiStagePerk()) {
-            int level = perk.GetPerkLevel(this);
-            activePerks.Add(perk.PerkIdForLevel(level));
+            int level = GetPerkLevel(perk);
+            activePerks.Add(perk.PerkIdForLevel(level + 1));
         } else {
             activePerks.Add(perk.perkId);
         }
+        if (perk.perkId == PerkIdConstants.PERKID_HEALTH_1 || perk.perkId == PerkIdConstants.PERKID_HEALTH_2 || perk.perkId == PerkIdConstants.PERKID_HEALTH_3) {
+            health = PerkFullHealthAmount();
+        }
     }
 
+    public int PerkScaledLootValue(LootData loot) {
+        if (PerkIsActivated(Perk.PerkIdForLevel(PerkIdConstants.PERKID_BARGAIN, 3))) {
+            return (int)(loot.value * 1.15f);
+        } else if (PerkIsActivated(Perk.PerkIdForLevel(PerkIdConstants.PERKID_BARGAIN, 2))) {
+            return (int)(loot.value * 1.1f);
+        } else if (PerkIsActivated(Perk.PerkIdForLevel(PerkIdConstants.PERKID_BARGAIN, 1))) {
+            return (int)(loot.value * 1.05f);
+        } else return loot.value;
+    }
+
+    public int PerkNumberOfDailyDeals() {
+        int dealLevels = GetPerkLevel(PerkIdConstants.PERKID_DEALMAKER);
+        return 3 + dealLevels;
+    }
+    public bool PerkBonusMarketForces() {
+        return PerkIsActivated(PerkIdConstants.PERKID_MARKET_CHAOS);
+    }
+    public int PerkNumberOfExplosives() {
+        return PerkIsActivated(PerkIdConstants.PERKID_TWO_EXPLOSIVE) ? 2 : 1;
+    }
+    public int PerkNumberOfShellsPerReload() {
+        return PerkIsActivated(PerkIdConstants.PERKID_TWO_SHELL) ? 2 : 1;
+    }
+    public int PerkBetterMarketConditionsChances() {
+        return GetPerkLevel(PerkIdConstants.PERKID_MARKET);
+    }
+    public float PerkFullHealthAmount() {
+        int totalLevel = 0;
+        totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_1);
+        totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_2);
+        totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_3);
+        return 150f + (totalLevel * 50f);
+    }
+    public int PerkSpeechlevel() {
+        return GetPerkLevel(PerkIdConstants.PERKID_SPEECH);
+    }
+    public bool PerkThirdWeaponSlot() {
+        return PerkIsActivated(PerkIdConstants.PERKID_THIRD_GUN);
+    }
 }

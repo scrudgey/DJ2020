@@ -46,10 +46,11 @@ public class GunState : IGunStatProvider {
     public void ClipIn() {
         delta.clip = getClipSize();
     }
-    public void ShellIn() {
-        if (delta.clip < getClipSize()) {
-            delta.clip++;
-        }
+    public void ShellIn(int number) {
+        // if (delta.clip < getClipSize()) {
+        delta.clip += number;
+        delta.clip = Mathf.Min(delta.clip, getClipSize());
+        // }
     }
     public NoiseData GetShootNoise() => shootNoise();
 

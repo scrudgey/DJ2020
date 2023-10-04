@@ -8,6 +8,8 @@ public interface IGunHandlerState {
     public GunState tertiaryGun { get; set; }
     public int activeGun { get; set; }
 
+    public int numberOfShellsPerReload { get; }
+
     public void ApplyGunState(GameObject playerObject) {
         foreach (IGunHandlerStateLoader gunLoader in playerObject.GetComponentsInChildren<IGunHandlerStateLoader>()) {
             gunLoader.LoadGunHandlerState(this);

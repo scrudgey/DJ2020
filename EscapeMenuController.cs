@@ -32,4 +32,8 @@ public class EscapeMenuController : MonoBehaviour {
     public void HandleEscapeAction(InputAction.CallbackContext ctx) {
         ContinueButtonCallback();
     }
+
+    public void SkillMenuCallback() {
+        GameManager.I.ShowPerkMenu();
+    }
 }

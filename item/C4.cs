@@ -8,8 +8,8 @@ namespace Items {
         public C4Data c4Data;
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;
-            count = 2;
-            maxCount = 2;
+            maxCount = GameManager.I.gameData.playerState.PerkNumberOfExplosives();
+            count = GameManager.I.gameData.playerState.PerkNumberOfExplosives();
             consumable = true;
         }
         protected override ItemUseResult DoUse(ItemHandler handler, PlayerInput input) {

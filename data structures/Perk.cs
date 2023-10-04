@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public enum PerkCategory { gun, hack, body, speech }
 [CreateAssetMenu(menuName = "ScriptableObjects/Perk")]
 public class Perk : ScriptableObject {
@@ -52,15 +51,11 @@ public class Perk : ScriptableObject {
     }
 
     public string PerkIdForLevel(int level) {
+        return PerkIdForLevel(perkId, level);
+    }
+
+    public static string PerkIdForLevel(string perkId, int level) {
         return $"{perkId}_{level}";
     }
-    public int GetPerkLevel(PlayerState state) {
-        bool containsLevel = true;
-        int level = 0;
-        while (containsLevel) {
-            level += 1;
-            containsLevel = state.PerkLevelIsActivated(this, level);
-        }
-        return level;
-    }
+
 }
