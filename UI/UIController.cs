@@ -37,6 +37,7 @@ public class UIController : MonoBehaviour {
     public MissionComputerController missionComputerController;
     public SaveIndicatorController saveIndicatorController;
     public WeaponWheelController weaponWheelController;
+    public TargetPracticeUIHandler targetPracticeUIHandler;
     bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -69,6 +70,7 @@ public class UIController : MonoBehaviour {
         weaponUIHandler.Initialize();
         weaponWheelController.HideWheel();
         weaponWheelController.Initialize();
+        // targetPracticeUIHandler.canvas.enabled = false;
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);

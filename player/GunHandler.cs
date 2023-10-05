@@ -283,6 +283,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             }
         }
 
+        TargetPracticeUIHandler.OnShotFired?.Invoke();
+
         // callback
         OnShoot?.Invoke(this);
     }

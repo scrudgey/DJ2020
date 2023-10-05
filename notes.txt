@@ -2917,7 +2917,19 @@ x ladders
 * generally better market conditions
 * better lockpicking
 * door breach
-* cyber sword
+* cyber sword    
+* lanes with counters
+    * target objects
+    * targets at different ranges
+    * reset button
+    * can lock onto human target
+    * bullet impacts register location: how to do this?
+        * we can detect when a bullet hits the target, then check if impact is contained in which target zones
+    * track every shot:
+        * number of shots
+    * indicator for:
+        * accuracy
+        * target zones
 
 
 places randomizer could break down:
@@ -3400,6 +3412,8 @@ more equipment to bring on mission?
     remote mine
     rope
     grapple
+    smoke bomb
+    ninja vanish
 
 
 bonus damage
@@ -3420,6 +3434,17 @@ add hook to after action report
     show skill points
 add hook to escape menu (temporary)
 add hook to bedroom
+closing perk menu does not reset UI?
+
+
+build a shooting range
+
+    buttons for bringing target in to inspect?
+    perk computer
+    weapon selector
+    damage dealt
+
+    configuration: breakable targets? target reset?
 
 
 make perks take effect
@@ -3433,16 +3458,34 @@ make perks take effect
         shotgun_control
         smg_accuracy
         smg_contorl
-    build a shooting range
 
     gun_nut
     item_slot
     lockpick
     regeneration
 
-
     cyberware_1 ... _4
     door_breach
     engine_shot
     fast_reload
     sword_hack
+
+
+how to handle weapon progression?
+
+we have a fairly balanced(?) calibration right now.
+one solution is to have this be the halfway mark.
+    to do this, it means that we've been "playing at level 2" or is it level 1? or 1.5
+    regardless, this means that now that we are at level 0, our guns should actually have lower accuracy and lower control
+    and then skill level bonus 1.5 recovers the current level of control and accuracy.
+
+1. is the current tuning level 1 or level 2?
+    definitely not level 3 or level 0.
+what should level 0 look like?
+    still playable, functional, but it takes time to acquire target and we're not guaranteed to always hit 
+    what we are aiming at.
+    so, it should be harder to play at level 0.
+        but still possible to beat the early missions
+    current state is level 1
+        
+
