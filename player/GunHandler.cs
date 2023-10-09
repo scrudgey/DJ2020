@@ -37,6 +37,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool isSwitchingWeapon;
     public Action<GunHandler> OnShoot;
     public bool isAimingWeapon;
+    public bool isPlayerCharacter;
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
     int numberOfShellsPerReload;
@@ -105,20 +106,101 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             state = GunStateEnum.racking;
         }
 
-        // TODO: inaccuracy decrease based on weapon weight and skill
-        float weightCoefficient = 10f / gunInstance.getWeight();
-
         if (movementInaccuracy > 0) {
-            // lighter weapons recover accuracy faster
-            // weight = 1: handgun
-            // weight = 10: rifle
-            movementInaccuracy -= Time.deltaTime * weightCoefficient;
-            movementInaccuracy = Math.Max(0, movementInaccuracy);
+            movementInaccuracy = CalculateInaccuracyRecovery(gunInstance, movementInaccuracy);
         }
+
         if (shootingInaccuracy > 0) {
-            shootingInaccuracy -= Time.deltaTime * weightCoefficient;
-            shootingInaccuracy = Math.Max(0, shootingInaccuracy);
+            shootingInaccuracy = CalculateInaccuracyRecovery(gunInstance, shootingInaccuracy);
         }
+    }
+    float CalculateInaccuracyRecovery(GunState gunState, float value) {
+        if (gunState == null)
+            return 0f;
+        // movement inaccuracy recovery
+        //     skill normalized
+        //     weight involved
+
+        float weight = gunState.getWeight();
+        // lighter weapons recover accuracy faster
+
+        float adjustmentFactor = 1f;
+        if (isPlayerCharacter) {
+            int skillLevel = GameManager.I.gameData.playerState.PerkGunControlLevel(gunState.template.type);
+
+            adjustmentFactor = skillLevel switch {
+                0 => 2f,
+                1 => 3f,
+                2 => 3.5f,
+                3 => 4f,
+                _ => 4f,
+
+            };
+        }
+
+        float inaccuracy = value - adjustmentFactor * (Time.deltaTime / weight);
+        inaccuracy = Math.Max(0, inaccuracy);
+        return inaccuracy;
+    }
+
+    float CalculateRecoilInaccuracy(GunState gunState, float value) {
+        if (gunState == null)
+            return 0f;
+        // recoil inaccuracy
+        //     driven by recoil stat
+        //     skill normalized
+
+        float recoil = gunState.getRecoil().GetRandomInsideBound() / 10f;
+
+        float adjustmentFactor = 1f;
+
+        if (isPlayerCharacter) {
+            int skillLevel = GameManager.I.gameData.playerState.PerkGunControlLevel(gunState.template.type);
+            // 0, 1, 2, 3
+
+            adjustmentFactor = skillLevel switch {
+                0 => 2f,
+                1 => 1.5f,
+                2 => 1.2f,
+                3 => 1f,
+                _ => 1f,
+            };
+        }
+
+        // Debug.Log($"{recoil} * {adjustmentFactor} = {recoil * adjustmentFactor}");
+        float inaccuracy = recoil * adjustmentFactor;
+
+        float maximum = gunState.template.cycle switch {
+            CycleType.automatic => gunState.getRecoil().Average() * 1.5f,
+            CycleType.manual => gunState.getRecoil().Average(),
+            CycleType.semiautomatic => gunState.getRecoil().Average() * 1.5f,
+            _ => gunState.getRecoil().high
+        } * adjustmentFactor / 10f;
+
+        inaccuracy += value;
+        inaccuracy = Math.Min(inaccuracy, maximum);
+        // inaccuracy = Math.Max(shootingInaccuracy, inaccuracy);
+
+        return inaccuracy;
+    }
+    float CalculateMovementInaccuracy(GunState gunState, float value) {
+        if (gunState == null)
+            return 0f;
+        // movement inaccuracy
+        //     driven by weight
+        // TODO: skill normalized
+        float weight = gunState.getWeight();
+
+        float inaccuracy = value + motor.Velocity.magnitude * (Time.deltaTime * (weight / 5f));
+
+        float minimum = gunState.template.type switch {
+            GunType.pistol => 0.75f,
+            GunType.smg => 0.8f,
+            _ => 1f
+        };
+
+        inaccuracy = Math.Min(minimum, inaccuracy);
+        return inaccuracy;
     }
 
     public Vector3 gunPosition() {
@@ -128,78 +210,98 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (data == null) return Vector3.zero;
         return data.worldPosition - this.gunPosition();
     }
-    public float inaccuracy(CursorData input) {
-        float inaccuracy = 0;
-
-        // returns the inaccuracy in world units at the world point of the target data
+    public float CalculateInaccuracy(CursorData input) {
         if (gunInstance == null || gunInstance.template == null || input == null)
             return 0f;
-
-        // range
-        // TODO: change this. use a fixed angular 
-        // to do that, inaccuracy must be fixed; when we want to show accuracy at a given distance, apply scale there.
-        // inaccuracy should be a quantity that then is applied to a distance.
-        // when shooting, it is applied at a fixed distance
-        // when displaying, it is shown at that distance
-        float distance = Vector3.Distance(input.worldPosition, this.gunPosition());
-        // inaccuracy += gunInstance.template.spread * (distance / 10f);
-        inaccuracy += gunInstance.getSpread();
+        float spread = gunInstance.getSpread();
 
         // movement
-        inaccuracy += movementInaccuracy;
+        // inaccuracy += movementInaccuracy;
 
-        // crouching
-        inaccuracy += crouchingInaccuracy;
+        // // crouching
+        // inaccuracy += crouchingInaccuracy;
 
-        // shooting
-        inaccuracy += shootingInaccuracy;
+        // // shooting
+        // inaccuracy += shootingInaccuracy;
 
-        // skills
-        // TODO: this doesn't work for enemies
-        int skillLevel = GameManager.I.gameData.playerState.gunSkillLevel[gunInstance.template.type];
-        float skillBonus = (1 - skillLevel) * (0.1f);
-        inaccuracy += skillBonus;
+        float inaccuracy = (float)Math.Sqrt(Math.Pow(spread, 2) + Math.Pow(movementInaccuracy, 2) + Math.Pow(shootingInaccuracy, 2)) + crouchingInaccuracy;
+        // skill
+        if (isPlayerCharacter) {
+            int skillLevel = GameManager.I.gameData.playerState.PerkGunAccuracyLevel(gunInstance.template.type);
+            // 0, 1, 2, 3
 
-        // TODO: weapon mods
+            // 0: accuracy -> 80%;      spread -> 1.5
+            // 1: accuracy -> 100%; `   spread -> 1.0
+            // 2: accuracy -> 120%;     spread -> 0.8
+            // 2: accuracy -> 140%;     spread -> 0.5
+            float adjustmentFactor = skillLevel switch {
+                0 => 2f,
+                1 => 1.5f,
+                2 => 1f,
+                3 => 0.5f,
+                _ => 1f,
+            };
+
+            // Debug.Log($"{skillLevel} -> {adjustmentFactor} -> {inaccuracy} -> {inaccuracy * adjustmentFactor}");
+            inaccuracy *= adjustmentFactor;
+        }
 
         inaccuracy = Math.Max(0.05f, inaccuracy);
-
         return inaccuracy;
     }
-    public Bullet EmitBullet(CursorData input) {
+    public float CalculateInaccuracyAtDistance(CursorData input, float distance) {
+        return CalculateInaccuracy(input) * distance / 10f;
+    }
+    public Bullet EmitBullet(CursorData input, int numberOfBullets) {
         Vector3 gunPosition = this.gunPosition();
 
         Vector3 trueDirection = gunDirection(input);
         Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
-        Vector3 aimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
+        Vector3 baseAimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
 
-        // Vector3 jitter = UnityEngine.Random.insideUnitSphere * gunInstance.template.spread;
-        Vector3 jitter = UnityEngine.Random.insideUnitSphere * inaccuracy(input);
-        Vector3 jitterPoint = aimpoint + jitter;
+        float inaccuracy = CalculateInaccuracy(input);
+        Vector3 jitter = UnityEngine.Random.insideUnitSphere * inaccuracy;
+        Vector3 aimPoint = baseAimpoint + jitter;
 
-        Vector3 direction = jitterPoint - gunPosition;
-        Vector3 endPosition = gunPosition + (gunInstance.getRange() * direction);
+        int bulletIndex = 0;
+        float shotgunSpread = 0f;
+        Bullet bullet = null;
+        while (bulletIndex < numberOfBullets) {
+            bulletIndex += 1;
 
-        Bullet bullet = new Bullet(new Ray(gunPosition, direction)) {
-            damage = gunInstance.getBaseDamage(),
-            range = gunInstance.getRange(),
-            gunPosition = gunPosition,
-            source = transform.position
-        };
+            Vector3 shotJitter = UnityEngine.Random.insideUnitSphere * shotgunSpread;
+            Vector3 jitterPoint = aimPoint + shotJitter;
 
-        bullet.DoImpacts(transform.root);
+            Vector3 direction = jitterPoint - gunPosition;
+            Vector3 endPosition = gunPosition + (gunInstance.getRange() * direction);
+            bullet = new Bullet(new Ray(gunPosition, direction)) {
+                damage = gunInstance.getBaseDamage(),
+                range = gunInstance.getRange(),
+                gunPosition = gunPosition,
+                source = transform.position
+            };
+            bullet.DoImpacts(transform.root);
+            Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
 
-        Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
+            shotgunSpread = gunInstance.template.shotgunSpread;
+        }
+
+
+        // shootingInaccuracy = Math.Max(shootingInaccuracy, CalculateRecoilInaccuracy());
+        shootingInaccuracy = CalculateRecoilInaccuracy(gunInstance, shootingInaccuracy);
         return bullet;
     }
+
+
     public bool IsClearShot(CursorData input) {
         Vector3 targetPosition = input.worldPosition;
         Transform root = transform.root;
         Vector3 gunPosition = this.gunPosition();
         Vector3 trueDirection = gunDirection(input);
         Ray ray = new Ray(gunPosition, trueDirection);
+
         // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(ray, 3f, LayerUtil.GetLayerMask(Layer.obj));
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
@@ -231,15 +333,15 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         // shoot bullet
         int numberBullets = gunInstance.template.type == GunType.shotgun ? 5 : 1;
         Bullet bullet = null;
-        for (int i = 0; i < numberBullets; i++) {
-            bullet = EmitBullet(input);
-        }
+        // for (int i = 0; i < numberBullets; i++) {
+        bullet = EmitBullet(input, numberBullets);
+        // }
 
         // play sound
         NoiseData noiseData = gunInstance.GetShootNoise() with {
             ray = bullet.ray
         };
-        noiseData.player = transform.IsChildOf(GameManager.I.playerObject.transform);
+        noiseData.player = isPlayerCharacter;
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.GetShootSounds()));
         Toolbox.Noise(gunPosition(), noiseData, transform.root.gameObject);
@@ -269,13 +371,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             EmitShell();
         }
 
-        // accuracy effect
-        shootingInaccuracy += gunInstance.getShootInaccuracy() / 2f;
-
         // state change callbacks
         OnValueChanged?.Invoke(this);
 
-        if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
+        if (isPlayerCharacter) {
             CharacterCamera.Shake(gunInstance.getNoise() / 50f, 0.1f);
             if (!gunInstance.getSilencer()) {
                 SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
@@ -391,7 +490,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             Toolbox.RandomizeOneShot(audioSource, gunInstance.template.unholster);
             PoolManager.I?.RegisterPool(gunInstance.template.shellCasing);
             PoolManager.I?.RegisterPool(gunInstance.template.muzzleFlash);
-            if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            if (isPlayerCharacter) {
                 GameManager.I.AddSuspicionRecord(SuspicionRecord.brandishingSuspicion());
             }
         }
@@ -400,7 +499,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         isSwitchingWeapon = true;
         gunInstance = null;
         OnValueChanged?.Invoke(this);
-        if (GameManager.I.playerObject != null && transform.IsChildOf(GameManager.I.playerObject.transform)) {
+        if (isPlayerCharacter) {
             GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
         }
     }
@@ -511,12 +610,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
 
         if (input.MoveAxisForward != 0 || input.MoveAxisRight != 0) {
-            // TODO: move inaccuracy based on weapon weight and skill
-            // float movement = 1;
-            // movementInaccuracy = Math.Max(movement, movementInaccuracy);
-            movementInaccuracy += motor.Velocity.magnitude * Time.deltaTime;
-            movementInaccuracy = Math.Min(1f, movementInaccuracy);
-            // inaccuracy increases faster for heavy weapons, decreases faster for lighter weapons
+            movementInaccuracy = CalculateMovementInaccuracy(gunInstance, movementInaccuracy);
         }
         if (input.CrouchDown) {
             crouchingInaccuracy = -0.15f;
@@ -528,6 +622,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (input.Fire.skipAnimation && (input.Fire.FireHeld || input.Fire.FirePressed) && gunInstance.delta.cooldownTimer <= 0)
             ShootImmediately(input.Fire.cursorData);
     }
+
+
 
     public AnimationInput.GunAnimationInput BuildAnimationInput() {
         GunType gunType = GunType.unarmed;
@@ -547,7 +643,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         };
     }
 
-    // TODO: save method
     public void LoadGunHandlerState(IGunHandlerState state) {
         // TODO: here, we would instantiate from template with mutable state applied
         primary = state.primaryGun;

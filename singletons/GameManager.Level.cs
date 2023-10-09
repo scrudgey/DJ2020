@@ -327,12 +327,16 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void SetFocus(GameObject focus) {
         Debug.Log($"setting focus: {focus}");
+        if (playerGunHandler != null) {
+            playerGunHandler.isPlayerCharacter = false;
+        }
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
         this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
+        playerGunHandler.isPlayerCharacter = true;
 
         ElevatorOccluder elevatorOccluder = GameObject.FindObjectOfType<ElevatorOccluder>();
 

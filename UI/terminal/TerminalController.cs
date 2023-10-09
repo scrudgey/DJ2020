@@ -22,6 +22,9 @@ namespace UI {
             commands["disguise"] = ToggleDisguise;
             commands["timescale"] = TimeScale;
             commands["extract"] = Objectives;
+            commands["givegun"] = GiveGun;
+            commands["resetPerks"] = ResetPerks;
+            commands["gunskill"] = GunSkill;
         }
         public void OnEnable() {
             TakeFocus();
@@ -94,30 +97,72 @@ namespace UI {
                 case "debug-rays":
                     GameManager.I.showDebugRays = value == 1;
                     break;
-                case "pistol-skill":
-                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.pistol] = value;
-                    break;
-                case "smg-skill":
-                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.smg] = value;
-                    break;
-                case "rifle-skill":
-                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.rifle] = value;
-                    break;
-                case "shotgun-skill":
-                    GameManager.I.gameData.playerState.gunSkillLevel[GunType.shotgun] = value;
-                    break;
                 case "eyes-laser":
                     GameManager.I.gameData.playerState.cyberEyesThermal = value == 1;
                     GameManager.OnEyeVisibilityChange?.Invoke(GameManager.I.gameData.playerState);
                     break;
-                // case "test":
-                //     TestSuite.RunToolboxTests();
-                //     break;
                 default:
                     Println($"unrecognized set parameter: {fieldName}");
                     break;
             }
         }
 
+        public void GiveGun(string[] args) {
+            string templateName = args[1];
+            GunTemplate gun1 = GunTemplate.Load(templateName);
+            GunState gunState = GunState.Instantiate(gun1);
+            switch (args[0]) {
+                case "1":
+                    GameManager.I.gameData.playerState.primaryGun = gunState;
+                    break;
+                case "2":
+                    GameManager.I.gameData.playerState.secondaryGun = gunState;
+                    break;
+                case "3":
+                    GameManager.I.gameData.playerState.tertiaryGun = gunState;
+                    break;
+                default:
+                    Debug.LogError("bad gun slot");
+                    break;
+            }
+            GameManager.I.playerGunHandler.LoadGunHandlerState(GameManager.I.gameData.playerState);
+        }
+        public void ResetPerks(string[] args) {
+            GameManager.I.gameData.playerState.activePerks = new List<string>();
+        }
+        public void GunSkill(string[] args) {
+            string gunTypeString = args[0];
+            int accuracy = int.Parse(args[1]);
+            int control = int.Parse(args[2]);
+            string[] accuracyStrings = Enumerable.Range(1, accuracy).Select(i => i.ToString()).ToArray();
+            string[] controlStrings = Enumerable.Range(1, control).Select(i => i.ToString()).ToArray();
+
+            switch (gunTypeString) {
+                case "pistol":
+                    foreach (string accuracyString in accuracyStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"p1_{accuracyString}");
+                    foreach (string controlString in controlStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"p2_{controlString}");
+                    break;
+                case "smg":
+                    foreach (string accuracyString in accuracyStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"smg1_{accuracyString}");
+                    foreach (string controlString in controlStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"smg2_{controlString}");
+                    break;
+                case "shotgun":
+                    foreach (string accuracyString in accuracyStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"sh1_{accuracyString}");
+                    foreach (string controlString in controlStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"sh2_{controlString}");
+                    break;
+                case "rifle":
+                    foreach (string accuracyString in accuracyStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"rifle1_{accuracyString}");
+                    foreach (string controlString in controlStrings)
+                        GameManager.I.gameData.playerState.activePerks.Add($"rifle2_{controlString}");
+                    break;
+            }
+        }
     }
 }

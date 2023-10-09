@@ -23,7 +23,7 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public int clipSize;
     public float range;
     public float spread;
-    public float shootInaccuracy;
+    public float shotgunSpread;
     public float lockOnSize = 1f;
     public LoHi baseDamage;
     public List<Sprite> images;
@@ -50,20 +50,12 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public static GunTemplate Load(string name) {
         return Resources.Load($"data/guns/{name}") as GunTemplate;
     }
-    // public float getBaseDamage() {
-    //     return Random.Range(baseDamage.low, baseDamage.high);
-    // }
-
-    // public AudioClip[] GetShootSounds() {
-    //     return silencer ? silencedSounds : shootSounds;
-    // }
 
     public GunStats GetGunStats() => new GunStats {
         shootInterval = shootInterval,
         noise = noise,
         clipSize = clipSize,
         spread = spread,
-        shootInaccuracy = shootInaccuracy,
         lockOnSize = lockOnSize,
         baseDamage = baseDamage,
         recoil = recoil

@@ -359,6 +359,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         gunHandler.OnShoot -= HandleOnShoot;
     }
     void HandleOnShoot(GunHandler target) {
+        // TODO: handle skill levels
         float recoilMagnitudeY = target.gunInstance.getRecoil().GetRandomInsideBound();
         float recoilMagnitudeX = target.gunInstance.getRecoil().GetRandomInsideBound() * UnityEngine.Random.Range(-0.5f, 0.5f);
         recoil = new Vector3(recoilMagnitudeX, recoilMagnitudeY, 0f);

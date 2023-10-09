@@ -17,17 +17,14 @@ public class GunMod : ScriptableObject, IGunStatProvider {
     public float noise;
     public int clipSize;
     public float spread;
-    public float shootInaccuracy;
     public float lockOnSize;
     public LoHi baseDamage;
-
 
     public GunStats GetGunStats() => new GunStats {
         shootInterval = shootInterval,
         noise = noise,
         clipSize = clipSize,
         spread = spread,
-        shootInaccuracy = shootInaccuracy,
         lockOnSize = lockOnSize,
         baseDamage = baseDamage,
         recoil = new LoHi(0, 0)

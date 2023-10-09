@@ -3,7 +3,6 @@ public class GunStats {
     public float noise;
     public int clipSize;
     public float spread;
-    public float shootInaccuracy;
     public float lockOnSize;
     public LoHi baseDamage;
     public LoHi recoil;
@@ -13,7 +12,6 @@ public class GunStats {
         noise = a.noise + b.noise,
         clipSize = a.clipSize + b.clipSize,
         spread = a.spread + b.spread,
-        shootInaccuracy = a.shootInaccuracy + b.shootInaccuracy,
         lockOnSize = a.lockOnSize + b.lockOnSize,
         baseDamage = a.baseDamage + b.baseDamage,
         recoil = a.recoil + b.recoil

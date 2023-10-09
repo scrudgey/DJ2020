@@ -2,12 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
-// shootInterval
-// clipSize
-// silencer
-// noise
-// pitch
-// baseDamage
 
 public class GunState : IGunStatProvider {
     public GunDelta delta;
@@ -47,10 +41,8 @@ public class GunState : IGunStatProvider {
         delta.clip = getClipSize();
     }
     public void ShellIn(int number) {
-        // if (delta.clip < getClipSize()) {
         delta.clip += number;
         delta.clip = Mathf.Min(delta.clip, getClipSize());
-        // }
     }
     public NoiseData GetShootNoise() => shootNoise();
 
@@ -66,17 +58,6 @@ public class GunState : IGunStatProvider {
     public void ApplyDelta(GunDelta newDelta) {
         this.delta = newDelta;
     }
-    // public void Save() {
-    //  save template path
-    //  GunDelta.Save()
-    // }
-    // public static GunState Load() {
-    //     // load template
-    //     // load delta
-    //     // return instantiate
-    // }
-
-
     public GunStats GetGunStats() {
         GunStats templateStats = template.GetGunStats();
         foreach (GunMod mod in delta.activeMods) {
@@ -89,10 +70,6 @@ public class GunState : IGunStatProvider {
         template = template,
         delta = delta with { activeMods = new System.Collections.Generic.List<GunMod>(delta.activeMods) }
     };
-
-
-
-
 
     public NoiseData shootNoise() {
         if (getSilencer()) {
@@ -142,7 +119,6 @@ public class GunState : IGunStatProvider {
     public float getRange() {
         return template.range;
     }
-    public float getShootInaccuracy() => template.shootInaccuracy + delta.activeMods.Select(mod => mod.shootInaccuracy).Sum();
 
     public float getLockOnSize() {
         return template.lockOnSize;
@@ -161,11 +137,9 @@ public class GunState : IGunStatProvider {
             .ToList();
 
         // Debug.Log($"all required suffixes: {string.Join(",", allRequiredSuffixes)}");
-
         Dictionary<string, Sprite> sprites = template.images.ToDictionary(sprite => sprite.name, sprite => sprite);
 
         // Debug.Log($"all sprites: {string.Join(",", sprites.Keys)}");
-
         string shortestKey = sprites.Keys
             .Where(name => allRequiredSuffixes.All(suffix => name.Contains(suffix)))
             .OrderBy(c => c.Length)

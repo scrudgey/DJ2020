@@ -44,13 +44,13 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public bool cyberEyesThermal;
     // public bool thirdWeaponSlot;
     public bool cyberEyesThermalBuff;
-    public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
-        {GunType.pistol, 1},
-        {GunType.smg, 1},
-        {GunType.rifle, 1},
-        {GunType.shotgun, 1},
-        {GunType.sword, 1},
-    };
+    // public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
+    //     {GunType.pistol, 1},
+    //     {GunType.smg, 1},
+    //     {GunType.rifle, 1},
+    //     {GunType.shotgun, 1},
+    //     {GunType.sword, 1},
+    // };
 
 
     // TODO: remove these
@@ -67,7 +67,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public HashSet<int> physicalKeys;
     public HashSet<int> keycards;
 
-    public HashSet<string> activePerks;
+    public List<string> activePerks;
     public int skillpoints;
     public int bodySkillPoints;
     public int gunSkillPoints;
@@ -78,12 +78,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         GunTemplate gun1 = GunTemplate.Load("p1");
         GunTemplate gun2 = GunTemplate.Load("s1");
         GunTemplate gun3 = GunTemplate.Load("r1");
-        // GunTemplate gun4 = GunTemplate.Load("p2");
+        GunTemplate gun4 = GunTemplate.Load("sh1");
 
         GunState gunState1 = GunState.Instantiate(gun1);
         GunState gunState2 = GunState.Instantiate(gun2);
         GunState gunState3 = GunState.Instantiate(gun3);
-        // GunState gunState4 = GunState.Instantiate(gun4);
+        GunState gunState4 = GunState.Instantiate(gun4);
 
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
         gunState1.delta.activeMods.Add(silencer);
@@ -109,6 +109,30 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // Resources.Load("data/loot/drug/vial") as LootData,
             // Resources.Load("data/loot/drug/zyme") as LootData,
         };
+
+        List<string> perks = new List<string>{
+            "p1_1",
+            "p1_2",
+            "p1_3",
+            "sh1_1",
+            "sh1_2",
+            "sh1_3",
+            "p2_1",
+            "p2_2",
+            "p2_3",
+            "sh2_1",
+            "sh2_2",
+            "sh2_3",
+            "rifle1_1",
+            "rifle1_2",
+            "rifle1_3",
+            "smg1_1",
+            "smg1_2",
+            "smg1_3",
+            "rifle2_1",
+            "smg2"
+        };
+        perks = new List<string>();
 
         return new PlayerState() {
             legSkin = "Jack",
@@ -156,7 +180,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // credits = 600,
             loots = loots,
 
-            activePerks = new HashSet<string>(),
+            // activePerks = new List<string>(),
+            activePerks = perks,
             skillpoints = 20
         };
     }
@@ -295,6 +320,22 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_2);
         totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_3);
         return 150f + (totalLevel * 50f);
+    }
+    public int PerkGunAccuracyLevel(GunType gunType) {
+        return gunType switch {
+            GunType.pistol => GetPerkLevel(PerkIdConstants.PERKID_PISTOL_ACC),
+            GunType.smg => GetPerkLevel(PerkIdConstants.PERKID_SMG_ACC),
+            GunType.shotgun => GetPerkLevel(PerkIdConstants.PERKID_SHOTGUN_ACC),
+            GunType.rifle => GetPerkLevel(PerkIdConstants.PERKID_RIFLE_ACC)
+        };
+    }
+    public int PerkGunControlLevel(GunType gunType) {
+        return gunType switch {
+            GunType.pistol => GetPerkLevel(PerkIdConstants.PERKID_PISTOL_CONTROL),
+            GunType.smg => GetPerkLevel(PerkIdConstants.PERKID_SMG_CONTROL),
+            GunType.shotgun => GetPerkLevel(PerkIdConstants.PERKID_SHOTGUN_CONTROL),
+            GunType.rifle => GetPerkLevel(PerkIdConstants.PERKID_RIFLE_CONTROL)
+        };
     }
     public int PerkSpeechlevel() {
         return GetPerkLevel(PerkIdConstants.PERKID_SPEECH);

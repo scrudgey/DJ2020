@@ -39,8 +39,8 @@ public class GunStatHandler : MonoBehaviour {
     public TextMeshProUGUI recoilText;
     public RectTransform recoilBar;
     public RectTransform recoilOffsetBar;
-    public TextMeshProUGUI recoilLowText;
-    public TextMeshProUGUI recoilHighText;
+    // public TextMeshProUGUI recoilLowText;
+    // public TextMeshProUGUI recoilHighText;
 
     [Header("locksize")]
     public TextMeshProUGUI lockSizeText;
@@ -137,13 +137,15 @@ public class GunStatHandler : MonoBehaviour {
         noiseText.text = template.noise.ToString();
         clipSizeText.text = template.clipSize.ToString();
         spreadText.text = (template.spread * 10).ToString();
-        recoilText.text = template.shootInaccuracy.ToString();
+
+        recoilText.text = template.recoil.Average().ToString();
+        // recoilLowText.text = (template.recoil.low * 10).ToString();
+        // recoilHighText.text = (template.recoil.high * 10).ToString();
+
         lockSizeText.text = template.lockOnSize.ToString() + "m";
         damageLowText.text = template.baseDamage.low.ToString();
         damageHighText.text = template.baseDamage.high.ToString();
         // weightText.text = template.weight.ToString();
-        recoilLowText.text = (template.recoil.low * 10).ToString();
-        recoilHighText.text = (template.recoil.high * 10).ToString();
         gunImage.enabled = true;
     }
     public void ClearStats() {
@@ -159,8 +161,8 @@ public class GunStatHandler : MonoBehaviour {
         damageLowText.text = "";
         damageHighText.text = "";
         // weightText.text = "";
-        recoilLowText.text = "";
-        recoilHighText.text = "";
+        // recoilLowText.text = "";
+        // recoilHighText.text = "";
         gunImage.enabled = false;
 
         foreach (GunStat stat in Enum.GetValues(typeof(GunStat))) {

@@ -70,7 +70,7 @@ public class UIController : MonoBehaviour {
         weaponUIHandler.Initialize();
         weaponWheelController.HideWheel();
         weaponWheelController.Initialize();
-        // targetPracticeUIHandler.canvas.enabled = false;
+        targetPracticeUIHandler.canvas.enabled = false;
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);

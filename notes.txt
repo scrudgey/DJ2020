@@ -2930,15 +2930,38 @@ x ladders
     * indicator for:
         * accuracy
         * target zones
+    * guns:
+        * pistol_accuracy
+        * pistol_control
+        * rifle_accuracy
+        * rifle_control
+        * shotgun_accuracy
+        * shotgun_control
+        * smg_accuracy
+        * smg_contorl
+* smg:
+    * smg control only has one level? i kind of like that idea
+    * smg control currently broken
+* shotgun:
+    * shotgun spread vs. accuracy
+* make all skill adjustments relative to player ONLY
+* shotguns should be more accurate, like rifles
+* movement inaccuracy should be capped
+* hide target practice UI
+* handle when guninstance null
 
 
 places randomizer could break down:
     we have the wrong objective on it
     we have overlapping datastore sets
 
+more shooting range?
+    buttons for bringing target in to inspect?
+    perk computer
+    weapon selector
+    damage dealt
+    configuration: breakable targets? target reset?
 
-
- 
 graphical issues:
     smg torso face left, head face down looks odd
     female walk left / right torso offset is incorrect?
@@ -3437,27 +3460,8 @@ add hook to bedroom
 closing perk menu does not reset UI?
 
 
-build a shooting range
-
-    buttons for bringing target in to inspect?
-    perk computer
-    weapon selector
-    damage dealt
-
-    configuration: breakable targets? target reset?
-
-
 make perks take effect
-    guns:
-        pistol_accuracy
-        pistol_control
-        pistol_lock_head
-        rifle_accuracy
-        rifle_control
-        shotgun_accuracy
-        shotgun_control
-        smg_accuracy
-        smg_contorl
+    pistol_lock_head
 
     gun_nut
     item_slot
@@ -3470,22 +3474,5 @@ make perks take effect
     fast_reload
     sword_hack
 
-
-how to handle weapon progression?
-
-we have a fairly balanced(?) calibration right now.
-one solution is to have this be the halfway mark.
-    to do this, it means that we've been "playing at level 2" or is it level 1? or 1.5
-    regardless, this means that now that we are at level 0, our guns should actually have lower accuracy and lower control
-    and then skill level bonus 1.5 recovers the current level of control and accuracy.
-
-1. is the current tuning level 1 or level 2?
-    definitely not level 3 or level 0.
-what should level 0 look like?
-    still playable, functional, but it takes time to acquire target and we're not guaranteed to always hit 
-    what we are aiming at.
-    so, it should be harder to play at level 0.
-        but still possible to beat the early missions
-    current state is level 1
-        
+inaccuracy increases more slowly with distance? 
 
