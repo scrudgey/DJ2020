@@ -10,7 +10,7 @@ public record LevelPlan {
     public List<Tactic> activeTactics;
     public List<ItemTemplate> items;
     public static LevelPlan Default(List<ItemTemplate> allItems) {
-        List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null };
+        List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
         if (allItems.Count >= 1) {
             itemList[0] = allItems[0];
         }
@@ -19,6 +19,9 @@ public record LevelPlan {
         }
         if (allItems.Count >= 3) {
             itemList[2] = allItems[2];
+        }
+        if (allItems.Count >= 4) {
+            itemList[3] = allItems[3];
         }
         return new LevelPlan {
             insertionPointIdn = "",

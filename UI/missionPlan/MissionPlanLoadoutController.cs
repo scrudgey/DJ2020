@@ -33,6 +33,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
     [Header("item slots")]
     public LoadoutGearSlotButton[] itemSlots;
+    public GameObject itemSlot5;
     [Header("picker")]
     public GameObject pickerObject;
     public RectTransform statsRect;
@@ -89,6 +90,8 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
         thirdWeaponSlot.SetActive(data.playerState.PerkThirdWeaponSlot());
 
+        itemSlot5.SetActive(GameManager.I.gameData.playerState.PerkNumberOfItemSlots() == 5);
+
         initialized = true;
     }
 
@@ -137,7 +140,8 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
     void InitializeItemSlots(LevelPlan plan) {
-        for (int i = 0; i < 4; i++) {
+        int numberOfItemSlots = GameManager.I.gameData.playerState.PerkNumberOfItemSlots();
+        for (int i = 0; i < numberOfItemSlots; i++) {
             itemSlots[i].Initialize(this, i);
             if (i < plan.items.Count) {
                 // BaseItem item = BaseItem.LoadItem(plan.items[i]);

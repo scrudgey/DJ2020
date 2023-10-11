@@ -162,10 +162,14 @@ public class UIController : MonoBehaviour {
     }
     public void HideUI() {
         HideVRStats();
-        canvas.enabled = false;
-        gunDisplayCanvas.enabled = false;
-        interactiveHighlightCanvas.enabled = false;
-        burglarCanvas.enabled = false;
+        if (canvas != null)
+            canvas.enabled = false;
+        if (gunDisplayCanvas != null)
+            gunDisplayCanvas.enabled = false;
+        if (interactiveHighlightCanvas != null)
+            interactiveHighlightCanvas.enabled = false;
+        if (burglarCanvas != null)
+            burglarCanvas.enabled = false;
     }
     public void ShowUI() {
         canvas.enabled = true;

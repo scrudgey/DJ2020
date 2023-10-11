@@ -96,9 +96,11 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         };
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
-            // BaseItem.LoadItem("C4"),
-            // BaseItem.LoadItem("rocket"),
-            // BaseItem.LoadItem("goggles"),
+            ItemTemplate.LoadItem("C4"),
+            ItemTemplate.LoadItem("rocket"),
+            ItemTemplate.LoadItem("goggles"),
+            ItemTemplate.LoadItem("grenade"),
+            ItemTemplate.LoadItem("deck"),
         };
 
         List<LootData> loots = new List<LootData> {
@@ -342,5 +344,18 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     }
     public bool PerkThirdWeaponSlot() {
         return PerkIsActivated(PerkIdConstants.PERKID_THIRD_GUN);
+    }
+    public bool PerkTargetLockOnHead() {
+        return PerkIsActivated(PerkIdConstants.PERKID_PISTOL_LOCK_HEAD);
+    }
+    public int PerkNumberOfItemSlots() {
+        if (PerkIsActivated(PerkIdConstants.PERKID_ITEM_SLOT)) {
+            return 5;
+        } else {
+            return 4;
+        }
+    }
+    public int PerkLockpickLevel() {
+        return GetPerkLevel(PerkIdConstants.PERKID_LOCKPICK);
     }
 }

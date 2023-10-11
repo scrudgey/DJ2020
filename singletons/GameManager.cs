@@ -350,6 +350,7 @@ public partial class GameManager : Singleton<GameManager> {
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("MedicalShop"));
                 break;
             case MenuType.perkMenu:
+                // uiController.ShowUI();
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("PerkMenu"));
                 break;
             case MenuType.missionSelect:

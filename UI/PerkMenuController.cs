@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PerkMenuController : MonoBehaviour {
+    public AudioSource audioSource;
     public PerkCategory currentPane;
     public GameObject UIEditorCamera;
     [Header("color")]
@@ -44,6 +46,14 @@ public class PerkMenuController : MonoBehaviour {
     public Button perkViewActivateButton;
     public TextMeshProUGUI perkViewActiveText;
     public TextMeshProUGUI requirementTitleText;
+    public GameObject perkviewContainer;
+    public RectTransform perkviewRect;
+    [Header("sfx")]
+    public AudioClip[] selectPerkSound;
+    public AudioClip[] activatePerkSound;
+    public AudioClip[] disclosePerkSound;
+    public AudioClip[] changePaneSound;
+    bool perkViewActive;
     PlayerState state;
     PerkButton selectedPerkButton;
     void Awake() {
@@ -54,6 +64,12 @@ public class PerkMenuController : MonoBehaviour {
         playerName.text = data.filename;
         ChangePane(PerkCategory.gun);
         RefreshDisplay(state);
+        HidePerkView();
+    }
+    void HidePerkView() {
+        perkViewActive = false;
+        perkviewContainer.SetActive(false);
+        perkviewRect.sizeDelta = new Vector2(450, 50f);
     }
 
     void RefreshDisplay(PlayerState state) {
@@ -96,6 +112,8 @@ public class PerkMenuController : MonoBehaviour {
     }
 
     void ChangePane(PerkCategory newPane) {
+        Toolbox.RandomizeOneShot(audioSource, changePaneSound);
+
         currentPane = newPane;
 
         categoryTitle.text = $"{newPane}";
@@ -133,11 +151,25 @@ public class PerkMenuController : MonoBehaviour {
         selectedPerkButton = button;
         selectedPerkButton.SetSelected(true);
         PopulatePerkView(button.perk);
+        if (!perkViewActive) {
+            Toolbox.RandomizeOneShot(audioSource, disclosePerkSound);
+            ShowPerkView();
+        } else {
+            Toolbox.RandomizeOneShot(audioSource, selectPerkSound);
+        }
+    }
+    void ShowPerkView() {
+        perkViewActive = true;
+        perkviewContainer.SetActive(true);
+        StartCoroutine(Toolbox.Ease(null, 0.5f, 50f, 740f, PennerDoubleAnimation.Linear, (float amount) => {
+            perkviewRect.sizeDelta = new Vector2(450f, amount);
+        }, unscaledTime: true));
     }
     public void ActivateButtonCallback() {
         state.ActivatePerk(selectedPerkButton.perk);
         RefreshDisplay(state);
         PerkButtonCallback(selectedPerkButton);
+        Toolbox.RandomizeOneShot(audioSource, activatePerkSound);
     }
 
     void PopulatePerkView(Perk perk) {

@@ -735,7 +735,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             if (data != null && data.targetPriority > -1) {
                 if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
                     priorityData = data;
-                    if (data.targetPoint != null) {
+                    if (data.headTargetPoint != null &&
+                         GameManager.I.gameData.playerState.PerkTargetLockOnHead() &&
+                         GameManager.I.playerGunHandler.gunInstance != null &&
+                         GameManager.I.playerGunHandler.gunInstance.template.type == GunType.pistol) {
+                        targetPoint = data.headTargetPoint.position;
+                    } else if (data.targetPoint != null) {
                         targetPoint = data.targetPoint.position;
                     } else {
                         targetPoint = hit.collider.bounds.center;

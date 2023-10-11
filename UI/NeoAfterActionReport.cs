@@ -14,6 +14,8 @@ public class NeoAfterActionReport : MonoBehaviour {
     public RectTransform reportMask;
     public RectTransform reportRect;
     public GameObject continueButton;
+    public GameObject perkMenuButton;
+    public Button perkMenuButtonComponent;
 
     [Header("mission name")]
     public ContentSizeFitter missionContentFitter;
@@ -39,6 +41,7 @@ public class NeoAfterActionReport : MonoBehaviour {
     public GameObject bonusObject;
     public GameObject balanceObject;
     public GameObject counterObject;
+    public GameObject skillPointsObject;
     public GameObject counterCreditSymbolObject;
     public Image rewardLine;
     public TextMeshProUGUI rewardCaptionText;
@@ -49,6 +52,9 @@ public class NeoAfterActionReport : MonoBehaviour {
     public TextMeshProUGUI counterAmountText;
     public TextMeshProUGUI balanceAmountText;
     public ParticleSystem creditParticles;
+    public TextMeshProUGUI skillPointsText;
+    public TextMeshProUGUI skillPointCounterText;
+    public RectTransform skillPointCounterRect;
     RectTransform adjustMaskToRect;
     int mutableBalance;
     int counterBalance;
@@ -57,6 +63,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         fade.color = new Color(0, 0, 0, 1);
         targetHeight = 0f;
         continueButton.SetActive(false);
+        perkMenuButton.SetActive(false);
 
         mutableBalance = data.playerState.credits - data.levelState.template.creditReward;
         counterBalance = data.levelState.template.creditReward;
@@ -71,6 +78,10 @@ public class NeoAfterActionReport : MonoBehaviour {
             targetHeight = Mathf.Lerp(targetHeight, preferredHeight, 1f);
             reportMask.sizeDelta = new Vector2(adjustMaskToRect.rect.width, targetHeight);
         }
+        if (perkMenuButton.activeInHierarchy) {
+            skillPointCounterText.text = $"{GameManager.I.gameData.playerState.skillpoints}";
+            // perkMenuButtonComponent.interactable = GameManager.I.gameData.playerState.skillpoints > 0;
+        }
     }
     public void ContinueButtonCallback() {
         switch (state) {
@@ -84,6 +95,9 @@ public class NeoAfterActionReport : MonoBehaviour {
                 StartCoroutine(FadeOut());
                 break;
         }
+    }
+    public void PerkButtonCallback() {
+        GameManager.I.ShowPerkMenu();
     }
     IEnumerator FadeIn() {
         yield return Toolbox.Ease(null, 2f, 1f, 0f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true);
@@ -156,7 +170,9 @@ public class NeoAfterActionReport : MonoBehaviour {
         rewardObject.SetActive(false);
         bonusObject.SetActive(false);
         counterObject.SetActive(false);
+        skillPointsObject.SetActive(false);
         balanceObject.SetActive(false);
+
         rewardLine.color = Color.clear;
 
         missionContentFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
@@ -215,14 +231,23 @@ public class NeoAfterActionReport : MonoBehaviour {
             creditParticles.Stop();
         }
         yield return new WaitForSeconds(1f);
-
+        skillPointsObject.SetActive(true);
+        skillPointCounterText.text = $"{data.playerState.skillpoints - 1}";
+        StartCoroutine(TypeText(skillPointsText));
+        StartCoroutine(TypeText(skillPointCounterText));
+        yield return new WaitForSeconds(1f);
+        skillPointCounterText.text = $"{data.playerState.skillpoints}";
+        StartCoroutine(Toolbox.Ease(null, 1f, 2f, 1f, PennerDoubleAnimation.BounceEaseOut, (float amount) => {
+            skillPointCounterRect.localScale = amount * Vector3.one;
+        }, unscaledTime: true));
+        yield return new WaitForSeconds(0.5f);
         continueButton.SetActive(true);
+        perkMenuButton.SetActive(true);
         // emailText.text = data.levelState.template.successEmail.text;
         // rewardAmountText.text = data.levelState.template.creditReward.ToString("#,#");
         // bonusAmountText.text = "0";
         // balanceAmountText.text = data.playerState.credits.ToString("#,#");
     }
-
     void ClearMissionInfo() {
         foreach (Transform child in objectivesContainer) {
             Destroy(child.gameObject);

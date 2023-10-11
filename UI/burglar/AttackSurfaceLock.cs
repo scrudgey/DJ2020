@@ -19,6 +19,17 @@ public class AttackSurfaceLock : AttackSurfaceElement {
     public static Dictionary<Transform, Coroutine> knobCoroutines = new Dictionary<Transform, Coroutine>();
     public Transform[] rotationElements;
 
+    // int playerLockpickLevel;
+    float lockPickSkillCoefficient;
+    void Start() {
+        int playerLockpickLevel = GameManager.I.gameData.playerState.PerkLockpickLevel();
+        lockPickSkillCoefficient = playerLockpickLevel switch {
+            0 => 1f,
+            1 => 1.7f,
+            2 => 2f,
+            3 => 3f,
+        };
+    }
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
@@ -58,7 +69,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
         base.HandleClickHeld(activeTool, data);
         if (activeTool == BurglarToolType.lockpick && !setback && doorLock.locked) {
             clickedThisFrame = true;
-            integratedPickTime += Time.deltaTime;
+            integratedPickTime += Time.deltaTime * lockPickSkillCoefficient;
             PickJiggleKnob(doorLock);
             if (!audioSource.isPlaying) {
                 Toolbox.RandomizeOneShot(audioSource, pickSounds);
