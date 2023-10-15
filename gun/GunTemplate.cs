@@ -58,6 +58,7 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
         spread = spread,
         lockOnSize = lockOnSize,
         baseDamage = baseDamage,
-        recoil = recoil
+        recoil = recoil,
+        weight = weight
     };
 }

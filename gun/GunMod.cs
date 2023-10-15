@@ -19,6 +19,7 @@ public class GunMod : ScriptableObject, IGunStatProvider {
     public float spread;
     public float lockOnSize;
     public LoHi baseDamage;
+    public float weight;
 
     public GunStats GetGunStats() => new GunStats {
         shootInterval = shootInterval,
@@ -27,6 +28,7 @@ public class GunMod : ScriptableObject, IGunStatProvider {
         spread = spread,
         lockOnSize = lockOnSize,
         baseDamage = baseDamage,
-        recoil = new LoHi(0, 0)
+        recoil = new LoHi(0, 0),
+        weight = weight
     };
 }

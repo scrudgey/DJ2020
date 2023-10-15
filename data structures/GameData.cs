@@ -31,8 +31,8 @@ public record GameData {
             levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState.allItems)),
             completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
-                // "Jack That Data",
-                // "Tower",
+                "Jack That Data",
+                "Tower",
                 "711",
                 "yamachi",
                 "elevator"

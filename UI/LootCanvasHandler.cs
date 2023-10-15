@@ -23,6 +23,8 @@ public class LootCanvasHandler : MonoBehaviour {
     public TextMeshProUGUI valueText;
     public Image lootCategoryIcon;
     public Image lootImage;
+    public Image creditsImage;
+    public GameObject creditsContainer;
     [Header("counters")]
     public List<LootCanvasCounter> counters;
     public TextMeshProUGUI dataCounter;
@@ -54,7 +56,7 @@ public class LootCanvasHandler : MonoBehaviour {
     }
     public void HandleLootChange(LootData loot, GameData data) {
         ConfigureLootCounts(data);
-        ConfigureLootDetails(loot);
+        ConfigureLootDetails(loot, loot.isLoot);
         ShowCanvasCoroutine();
     }
     public void HandleDataChange(PayData newData, GameData data) {
@@ -68,7 +70,7 @@ public class LootCanvasHandler : MonoBehaviour {
             0 => keyData,
             1 => creditData,
         };
-        ConfigureLootDetails(data);
+        ConfigureLootDetails(data, false);
         lootCategoryIcon.enabled = false;
         if (index == 0) {
             valueText.enabled = false;
@@ -98,17 +100,27 @@ public class LootCanvasHandler : MonoBehaviour {
         int payDataCount = data.playerState.payDatas.Count;
         dataCounter.text = $"{payDataCount}";
     }
-    void ConfigureLootDetails(LootData data) {
+    void ConfigureLootDetails(LootData data, bool isLoot) {
+        if (isLoot) {
+            creditsContainer.SetActive(true);
+            valueText.text = $"{data.GetValue()}";
+            valueText.enabled = true;
+            lootCategoryIcon.enabled = true;
+            creditsImage.enabled = true;
+            // lootCategoryIcon.sprite = data.category switch {
+            //     LootCategory.drug => drugSprite,
+            //     _ => dataSprite
+            // };
+            lootCategoryIcon.sprite = LootTypeIcon.LootCategoryToSprite(data.category);
+        } else {
+            creditsContainer.SetActive(false);
+            valueText.enabled = false;
+            lootCategoryIcon.enabled = false;
+            creditsImage.enabled = false;
+        }
         lootTitle.text = data.lootName;
         lootDescription.text = data.lootDescription;
-        valueText.text = $"{data.GetValue()}";
         lootImage.sprite = data.portrait;
-        valueText.enabled = true;
-        lootCategoryIcon.enabled = true;
-        lootCategoryIcon.sprite = data.category switch {
-            LootCategory.drug => drugSprite,
-            _ => dataSprite
-        };
     }
     void ConfigurePayDataDetail(PayData data) {
         if (data == null) return;

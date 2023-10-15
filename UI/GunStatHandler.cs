@@ -6,7 +6,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-enum GunStat { shootInterval, noise, clipSize, spread, recoil, lockSize, damage }//, weight }
+enum GunStat { shootInterval, noise, clipSize, spread, recoil, lockSize, damage, weight }
 public class GunStatHandler : MonoBehaviour {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI typeText;
@@ -65,6 +65,7 @@ public class GunStatHandler : MonoBehaviour {
     Coroutine lerpBarsCoroutine;
     Dictionary<GunStat, RectTransform> statBarRects;
     Dictionary<GunStat, RectTransform> statBarOffsetRects;
+    Dictionary<GunStat, float> statMaxes;
     public void SetCompareGun(IGunStatProvider compareGun) {
         if (compareGun == null) {
             this.compareGun = null;
@@ -84,7 +85,7 @@ public class GunStatHandler : MonoBehaviour {
             {GunStat.recoil, recoilBar},
             {GunStat.lockSize, locksizeBar},
             {GunStat.damage, damageBar},
-            // {GunStat.weight, weightBar}
+            {GunStat.weight, weightBar}
         };
         statBarOffsetRects = new Dictionary<GunStat, RectTransform>{
             {GunStat.shootInterval, shootIntervalOffsetBar},
@@ -94,7 +95,19 @@ public class GunStatHandler : MonoBehaviour {
             {GunStat.recoil, recoilOffsetBar},
             {GunStat.lockSize, locksizeOffsetBar},
             {GunStat.damage, damageOffsetBar},
-            // {GunStat.weight, weightBar}
+            {GunStat.weight, weightOffsetBar}
+        };
+
+        GunTemplate[] allTemplates = Resources.LoadAll<GunTemplate>("data/guns");
+        statMaxes = new Dictionary<GunStat, float>{
+            {GunStat.shootInterval, allTemplates.Select(template => template.GetGunStats().getFireRate()).Max()},
+            {GunStat.noise, allTemplates.Select(template => template.GetGunStats().noise).Max()},
+            {GunStat.clipSize, allTemplates.Select(template => template.GetGunStats().clipSize).Max()},
+            {GunStat.spread, allTemplates.Select(template => template.GetGunStats().getAccuracy()).Max()},
+            {GunStat.recoil, allTemplates.Select(template => template.GetGunStats().recoil.Average()).Max()},
+            {GunStat.lockSize, allTemplates.Select(template => template.GetGunStats().lockOnSize).Max()},
+            {GunStat.damage, allTemplates.Select(template => template.GetGunStats().baseDamage.Average()).Max()},
+            {GunStat.weight, allTemplates.Select(template => template.GetGunStats().weight).Max()},
         };
     }
     public void DisplayGunTemplate(GunTemplate template) {
@@ -133,10 +146,10 @@ public class GunStatHandler : MonoBehaviour {
         // gunImage.sprite = template.image;
     }
     public void PopulateStats(GunStats template) {
-        shootIntervalText.text = (template.shootInterval * 50).ToString();
+        shootIntervalText.text = (template.getFireRate()).ToString("f1");
         noiseText.text = template.noise.ToString();
         clipSizeText.text = template.clipSize.ToString();
-        spreadText.text = (template.spread * 10).ToString();
+        spreadText.text = (template.getAccuracy()).ToString("f1");
 
         recoilText.text = template.recoil.Average().ToString();
         // recoilLowText.text = (template.recoil.low * 10).ToString();
@@ -145,7 +158,7 @@ public class GunStatHandler : MonoBehaviour {
         lockSizeText.text = template.lockOnSize.ToString() + "m";
         damageLowText.text = template.baseDamage.low.ToString();
         damageHighText.text = template.baseDamage.high.ToString();
-        // weightText.text = template.weight.ToString();
+        weightText.text = template.weight.ToString() + "kg";
         gunImage.enabled = true;
     }
     public void ClearStats() {
@@ -160,7 +173,7 @@ public class GunStatHandler : MonoBehaviour {
         lockSizeText.text = "-";
         damageLowText.text = "";
         damageHighText.text = "";
-        // weightText.text = "";
+        weightText.text = "";
         // recoilLowText.text = "";
         // recoilHighText.text = "";
         gunImage.enabled = false;
@@ -191,14 +204,14 @@ public class GunStatHandler : MonoBehaviour {
             .ToDictionary(stat => stat, stat => statBarRects[stat].rect.width);
 
         Dictionary<GunStat, float> targetWidths = new Dictionary<GunStat, float>{
-            {GunStat.clipSize, TargetBarWidth(template.clipSize, 30f)},
-            {GunStat.damage, TargetBarWidth(template.baseDamage.Average(), 100f)},
-            {GunStat.lockSize, TargetBarWidth(template.lockOnSize, 3f)},
-            {GunStat.noise, TargetBarWidth(template.noise, 50f)},
-            {GunStat.recoil, TargetBarWidth(template.recoil.Average(), 10f)},
-            {GunStat.shootInterval, TargetBarWidth(template.shootInterval * 50 , 8f)},
-            {GunStat.spread, TargetBarWidth(template.spread, 2f)},
-            // {GunStat.weight, TargetBarWidth(template.spread, 20f)},
+            {GunStat.clipSize, TargetBarWidth(template.clipSize, 30f, GunStat.clipSize)},
+            {GunStat.damage, TargetBarWidth(template.baseDamage.Average(), 100f, GunStat.damage)},
+            {GunStat.lockSize, TargetBarWidth(template.lockOnSize, 3f, GunStat.lockSize)},
+            {GunStat.noise, TargetBarWidth(template.noise, 50f, GunStat.noise)},
+            {GunStat.recoil, TargetBarWidth(template.recoil.Average(), 10f, GunStat.recoil)},
+            {GunStat.shootInterval, TargetBarWidth(template.getFireRate() , 8f, GunStat.shootInterval)},
+            {GunStat.spread, TargetBarWidth(template.getAccuracy(), 2f, GunStat.spread)},
+            {GunStat.weight, TargetBarWidth(template.weight, 20f, GunStat.weight)},
         };
 
         // compare width should be : compare stat - gun stat -> width
@@ -209,14 +222,14 @@ public class GunStatHandler : MonoBehaviour {
         Dictionary<GunStat, float> targetCompareWidths;
         if (compareGun != null) {
             targetCompareWidths = new Dictionary<GunStat, float>{
-                {GunStat.clipSize, TargetBarWidth(compareGun.clipSize - template.clipSize, 30f)},
-                {GunStat.damage, TargetBarWidth(compareGun.baseDamage.Average() - template.baseDamage.Average(), 100f)},
-                {GunStat.lockSize, TargetBarWidth(compareGun.lockOnSize - template.lockOnSize, 3f)},
-                {GunStat.noise, TargetBarWidth(compareGun.noise - template.noise, 50f)},
-                {GunStat.recoil, TargetBarWidth(compareGun.recoil.Average() - template.recoil.Average(), 10f)},
-                {GunStat.shootInterval, TargetBarWidth((compareGun.shootInterval - template.shootInterval)*50f, 8f)},
-                {GunStat.spread, TargetBarWidth(compareGun.spread - template.spread, 2f)},
-                // {GunStat.weight, TargetBarWidth(template.spread, 20f)},
+                {GunStat.clipSize, TargetBarWidth(compareGun.clipSize - template.clipSize, 30f, GunStat.clipSize)},
+                {GunStat.damage, TargetBarWidth(compareGun.baseDamage.Average() - template.baseDamage.Average(), 100f, GunStat.damage)},
+                {GunStat.lockSize, TargetBarWidth(compareGun.lockOnSize - template.lockOnSize, 3f, GunStat.lockSize)},
+                {GunStat.noise, TargetBarWidth(compareGun.noise - template.noise, 50f, GunStat.noise)},
+                {GunStat.recoil, TargetBarWidth(compareGun.recoil.Average() - template.recoil.Average(), 10f, GunStat.recoil)},
+                {GunStat.shootInterval, TargetBarWidth((compareGun.getFireRate() - template.getFireRate()), 8f, GunStat.shootInterval)},
+                {GunStat.spread, TargetBarWidth(compareGun.getAccuracy() - template.getAccuracy(), 2f, GunStat.spread)},
+                {GunStat.weight, TargetBarWidth(compareGun.weight - template.weight, 20f, GunStat.weight)},
             };
             foreach (GunStat stat in Enum.GetValues(typeof(GunStat))) {
                 Image image = statBarOffsetRects[stat].GetComponent<Image>();
@@ -238,7 +251,7 @@ public class GunStatHandler : MonoBehaviour {
                 {GunStat.recoil, 0f},
                 {GunStat.shootInterval, 0f},
                 {GunStat.spread, 0f},
-                // {GunStat.weight, TargetBarWidth(template.spread, 20f)},
+                {GunStat.weight, 0f},
             };
         }
 
@@ -269,8 +282,12 @@ public class GunStatHandler : MonoBehaviour {
         lerpBarsCoroutine = null;
     }
 
-    float TargetBarWidth(float statValue, float maxValue) {
+    float TargetBarWidth(float statValue, float maxValue, GunStat statType) {
+        // statMaxes
+        // float max = statMaxes[]
+        float max = statMaxes[statType];
         float totalWidth = mainContainer.rect.width;
-        return (statValue / maxValue) * totalWidth;
+        Debug.Log($"{statValue} {maxValue} {statType} -> {totalWidth} {(statValue / max) * totalWidth}");
+        return (statValue / max) * totalWidth;
     }
 }

@@ -34,8 +34,8 @@ namespace AI {
         public override TaskState DoEvaluate(ref PlayerInput input) {
             TaskState result = rootNode.DoEvaluate(ref input);
             if (result == TaskState.success && navPoints.Count == 0) {
-                if (patrolRoute.type == PatrolRoute.PatrolRouteType.pingPong)
-                    reverse = !reverse;
+                // if (patrolRoute.type == PatrolRoute.PatrolRouteType.pingPong)
+                //     reverse = !reverse;
                 setupRootNode();
             }
             return result;
@@ -43,8 +43,8 @@ namespace AI {
 
         void setupRootNode() {
             navPoints = new Stack<Vector3>();
-            if (reverse) {
-                patrolRoute.points.Select((transform) => transform.position).Reverse().ToList().ForEach(point => navPoints.Push(point));
+            if (patrolRoute.type == PatrolRoute.PatrolRouteType.pingPong) {
+                patrolRoute.points.Select((transform) => transform.position).ToList().ForEach(point => navPoints.Push(point));
                 patrolRoute.points.Select((transform) => transform.position).Reverse().ToList().ForEach(point => navPoints.Push(point));
             } else {
                 patrolRoute.points.Select((transform) => transform.position).ToList().ForEach(point => navPoints.Push(point));

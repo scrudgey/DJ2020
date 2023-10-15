@@ -15,7 +15,8 @@ public class MarketInfoIndicator : MonoBehaviour {
         lootTypeIcon.SetLootCategory(data.type);
         int amount = data.bonus * 10;
         typeNameText.text = data.type.ToString();
-        amountText.text = $"+{amount}%";
+        string prefix = data.bonus > 0 ? "+" : "";
+        amountText.text = $"{prefix}{amount}%";
     }
     public void SetBackgroundColor(int index) {
         backgroundImage.color = index switch {

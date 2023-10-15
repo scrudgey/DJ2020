@@ -209,7 +209,7 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.credits += gameData.levelState.template.creditReward;
         gameData.playerState.credits += gameData.levelState.delta.levelAcquiredCredits;
         gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
-        gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot);
+        gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot.Where(loot => loot.isCollectible));
         gameData.playerState.skillpoints += 1;
 
         // TODO: broken

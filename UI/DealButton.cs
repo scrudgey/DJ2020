@@ -22,6 +22,7 @@ public class DealButton : MonoBehaviour {
     [Header("inventory")]
     public Image inventoryIcon;
     public TextMeshProUGUI inventoryAmountText;
+    public Color notPossibleColor;
 
     public void Initialize(ImporterShopController importerShopController, DealData data) {
         this.importerShopController = importerShopController;
@@ -38,17 +39,27 @@ public class DealButton : MonoBehaviour {
             priceTitle.text = "credits";
 
             inventoryAmountText.text = $"{GameManager.I.gameData.playerState.credits}";
+
+            if (GameManager.I.gameData.playerState.credits < data.priceValue) {
+                inventoryIcon.color = notPossibleColor;
+                inventoryAmountText.color = notPossibleColor;
+            }
         } else {
             priceIcon.sprite = LootTypeIcon.LootCategoryToSprite(data.priceType);
             priceCreditObject.SetActive(false);
             priceTitle.text = $"{data.priceCount}x {data.priceType}";
 
-            int playerCount = GameManager.I.gameData.playerState.loots.Select(loot => loot.category == data.priceType).Count();
+            int playerCount = GameManager.I.gameData.playerState.loots.Where(loot => loot.category == data.priceType).Count();
             inventoryAmountText.text = $"{playerCount}";
+            if (playerCount < data.priceCount) {
+                inventoryIcon.color = notPossibleColor;
+                inventoryAmountText.color = notPossibleColor;
+            }
         }
 
         // TODO: set player
         inventoryIcon.sprite = priceIcon.sprite;
+
 
     }
     public void OnClick() {
