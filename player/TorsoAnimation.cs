@@ -13,7 +13,8 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     public HeadAnimation headAnimation;
     public SpriteRenderer spriteRenderer;
     public RocketLauncher rocketLauncher;
-    public Animation animator;
+    // public Animation animator;
+    public CustomAnimator animator;
     public AnimationClip idleAnimation;
     public AnimationClip unarmedWalkAnimation;
     public AnimationClip unarmedWalkSlowAnimation;
@@ -95,6 +96,10 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             switch (state) {
                 case GunHandler.GunStateEnum.shooting:
                     SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
+                    animator.playbackSpeed = input.gunInput.baseGun.cycle switch {
+                        CycleType.automatic => 0.1f / input.gunInput.baseGun.GetGunStats().shootInterval,
+                        _ => 1f
+                    };
                     break;
                 case GunHandler.GunStateEnum.reloading:
                     SetAnimation(input.gunInput.baseGun.reloadAnimation);
@@ -172,6 +177,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     }
 
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
+        animator.playbackSpeed = 1f;
         if (forcePlay) {
             animator.Stop();
         }

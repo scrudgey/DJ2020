@@ -84,6 +84,7 @@ public class UIController : MonoBehaviour {
     public void UpdateWithPlayerInput(ref PlayerInput input) {
         if (burglarCanvas != null && burglarCanvas.enabled)
             burglarCanvasController?.UpdateWithInput(input);
+        aimIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);
         weaponWheelController.UpdateWithPlayerInput(ref input);
         lockRadiusIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);
     }

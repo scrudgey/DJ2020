@@ -20,7 +20,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
     public Transform[] rotationElements;
 
     // int playerLockpickLevel;
-    float lockPickSkillCoefficient;
+    float lockPickSkillCoefficient = 1f;
     void Start() {
         int playerLockpickLevel = GameManager.I.gameData.playerState.PerkLockpickLevel();
         lockPickSkillCoefficient = playerLockpickLevel switch {
@@ -28,7 +28,9 @@ public class AttackSurfaceLock : AttackSurfaceElement {
             1 => 1.7f,
             2 => 2f,
             3 => 3f,
+            _ => 1f
         };
+        Debug.Log($"lockpick skill coefficient {lockPickSkillCoefficient}");
     }
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
@@ -85,6 +87,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
                 OnValueChanged?.Invoke(this);
                 Toolbox.RandomizeOneShot(audioSource, setbackSound);
             }
+            Debug.Log($"{progressStageIndex} >= {progressStages}");
 
             if (integratedPickTime > 2f) {
                 audioSource.Stop();

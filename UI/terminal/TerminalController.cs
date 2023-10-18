@@ -15,24 +15,23 @@ namespace UI {
         private Dictionary<string, Action<string[]>> commands = new Dictionary<string, Action<string[]>>();
         public void Start() {
             consoleInput.onEndEdit.AddListener(OnConsoleEditEnd);
-
             commands["set"] = SetValue;
             commands["test"] = RunTests;
             commands["alarm"] = ToggleAlarm;
             commands["disguise"] = ToggleDisguise;
             commands["timescale"] = TimeScale;
-            commands["extract"] = Objectives;
             commands["givegun"] = GiveGun;
             commands["resetPerks"] = ResetPerks;
             commands["gunskill"] = GunSkill;
+            commands["completeMission"] = CompleteMission;
         }
         public void OnEnable() {
             TakeFocus();
         }
         public void OnConsoleEditEnd(string fieldValue) {
-            ReceiveInput(fieldValue.Trim());
-            consoleInput.text = "";
             TakeFocus();
+            consoleInput.text = "";
+            ReceiveInput(fieldValue.Trim());
         }
         public void TakeFocus() {
             consoleInput.Select();
@@ -129,6 +128,10 @@ namespace UI {
         }
         public void ResetPerks(string[] args) {
             GameManager.I.gameData.playerState.activePerks = new List<string>();
+        }
+        public void CompleteMission(string[] args) {
+            GameManager.I.CloseMenu();
+            GameManager.I.HandleAllObjectivesComplete();
         }
         public void GunSkill(string[] args) {
             string gunTypeString = args[0];

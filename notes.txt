@@ -2969,7 +2969,9 @@ x ladders
 * truncate values
     * accuracy
     * rate of fire
-
+* weapon wheel appearance
+* gun animation system
+* civilian NPC dialogue
 
 
 places randomizer could break down:
@@ -3009,6 +3011,7 @@ uncertain:
     redo networks:
         remove transferState. instead, every cyber component should bind to the state of the cyber node.
         enable progress 
+    adjust rate of fire for pistols?
 
 
 nice to have / future goals:
@@ -3339,13 +3342,6 @@ perks to implement:
 doors
     more door types? more explotable latch? more handles and things?
     locks for doubledoors with crash bars
-    what sorts of things do we want configurable?
-        1. presence / absence of door lock
-        2. presence / absence of deadbolt
-        3. remove attack surface altogether for a push door
-        4. strength of locks
-        5. id of key
-
 
 
 silencer shows in gameplay
@@ -3401,24 +3397,22 @@ jazz up elevator controller
     sound effects
     click effect
 after action report is missing highlights
-
+fix catenary?
 
 
 major initiatives:
-    gun animation system
     cyberware
     destructible walls
-
     vehicles
+    finalize street level
+    clearsighter polish
     music
         auto leveling, balance, ducking
     missions
         1 way shootout
-        elevator / ductwork
         productionize office
-    after mission reports
-        skill tree
     system:
+        title
         controls, settings
         pause screen status report
             loot, data
@@ -3432,7 +3426,6 @@ unresolved mechanics:
 shops:
     more fences
     sell guns
-    buy cyberware
 
 
 more equipment to bring on mission?
@@ -3466,11 +3459,8 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-polish folder
-weapon wheel appearance
-gun animation system
-    animate gun holster /unholster
-adjust rate of fire for pistols?
 
-civilian NPC dialogye
+animate gun holster / unholster
 padlock door doesnt work
+npc dialogue is jumpy
+some things are not stealing

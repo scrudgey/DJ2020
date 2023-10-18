@@ -375,7 +375,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         OnValueChanged?.Invoke(this);
 
         if (isPlayerCharacter) {
-            CharacterCamera.Shake(gunInstance.getNoise() / 50f, 0.1f);
+            CharacterCamera.Shake(gunInstance.getNoise() / 10f, 0.1f);
             if (!gunInstance.getSilencer()) {
                 SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
                 GameManager.I.AddSuspicionRecord(record);
@@ -602,7 +602,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 }
             } else {
                 if (gunInstance.template.cycle == CycleType.automatic) {
-                    if (state == GunStateEnum.shooting) {
+                    if (state == GunStateEnum.shooting && gunInstance.delta.clip == 0 && gunInstance.delta.chamber == 0) {
                         state = GunStateEnum.idle;
                     }
                 }

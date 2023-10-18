@@ -37,7 +37,8 @@ namespace AI {
                     bool shouldISpeak = socialGroup.ShouldISpeak(speechTextController);
                     if (shouldISpeak) {
                         socialGroup.RegisterSpeaker(speechTextController);
-                        speechTextController.Say(GetPhrase());
+                        // speechTextController.Say(GetPhrase());
+                        speechTextController.Say("");
                     }
                 }
             }

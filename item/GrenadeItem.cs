@@ -16,7 +16,7 @@ namespace Items {
             base.DoUse(handler, input);
             handler.ThrowGrenade(grenadeData, input);
             Toolbox.RandomizeOneShot(handler.audioSource, grenadeData.throwSound);
-            return new ItemUseResult {
+            return ItemUseResult.Empty() with {
                 waveArm = true
             };
         }
