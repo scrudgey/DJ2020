@@ -4,7 +4,7 @@ Shader "Custom/InterloperShadow"
 {
 	Properties
 	{
-		_Texture("Texture", 2D) = "white" {}
+		_MainTex("Texture", 2D) = "white" {}
 		_Color0("Color 0", Color) = (0.9339623,0.9339623,0.9339623,0)
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
@@ -29,7 +29,7 @@ Shader "Custom/InterloperShadow"
 		};
 
 		uniform float4 _Color0;
-		uniform sampler2D _Texture;
+		uniform sampler2D _MainTex;
 		uniform float4 _Texture_ST;
         float _TargetAlpha;
 
@@ -37,7 +37,7 @@ Shader "Custom/InterloperShadow"
 		void surf( Input i , inout SurfaceOutputStandard o )
 		{
 			float2 uv_Texture = i.uv_texcoord * _Texture_ST.xy + _Texture_ST.zw;
-			float4 tex2DNode7 = tex2D( _Texture, uv_Texture );
+			float4 tex2DNode7 = tex2D( _MainTex, uv_Texture );
 			o.Albedo = ( _Color0 * tex2DNode7 ).rgb;
 			// o.Alpha = tex2DNode7.a;
 			// o.Alpha = _TargetAlpha;

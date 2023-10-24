@@ -193,7 +193,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float crouchMovementInputTimer;
     private float crouchMovementSoundTimer;
     private bool inputCrouchDown;
-    private Vector3 deadMoveVelocity;
+    private Vector3 deadMoveVelocity = Vector3.zero;
     private float deadTimer;
     private float hitstunTimer;
     private float gunHitStunTimer;
@@ -366,15 +366,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     private void HandleHurtableChanged(Destructible hurtable) {
         ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);
-        if (hurtable.lastDamage != null)
+        if (hurtable.lastDamage != null && deadMoveVelocity == Vector3.zero)
             deadMoveVelocity = hurtable.lastDamage.direction;
     }
     private void HandleTakeDamage(Damageable damageable, Damage damage) {
         hitstunTimer = 0.15f;
         gunHitStunTimer = 0.5f;
     }
-    public void OnHitStateEnter(HitState state, HitState fromState) {
-        switch (state) {
+    public void OnHitStateEnter(HitState toHitState, HitState fromState) {
+        switch (toHitState) {
             default:
                 break;
             case HitState.hitstun:
@@ -385,10 +385,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 TransitionToState(CharacterState.zapped);
                 break;
             case HitState.dead:
-                TransitionToState(CharacterState.dead);
+                if (state != CharacterState.dead && state != CharacterState.keelOver)
+                    TransitionToState(CharacterState.dead);
                 break;
             case HitState.normal:
-                TransitionToState(CharacterState.normal);
+                // if (state == CharacterState.normal)
+                if (state != CharacterState.aim)
+                    TransitionToState(CharacterState.normal);
                 break;
         }
         OnValueChanged?.Invoke(this);

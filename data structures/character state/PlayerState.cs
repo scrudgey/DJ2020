@@ -79,11 +79,19 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         GunTemplate gun2 = GunTemplate.Load("s1");
         GunTemplate gun3 = GunTemplate.Load("r1");
         GunTemplate gun4 = GunTemplate.Load("sh1");
+        GunTemplate gun5 = GunTemplate.Load("s3");
+        GunTemplate gun6 = GunTemplate.Load("p3");
+        GunTemplate gun7 = GunTemplate.Load("p4");
+        GunTemplate gun8 = GunTemplate.Load("r2");
 
         GunState gunState1 = GunState.Instantiate(gun1);
         GunState gunState2 = GunState.Instantiate(gun2);
         GunState gunState3 = GunState.Instantiate(gun3);
         GunState gunState4 = GunState.Instantiate(gun4);
+        GunState gunState5 = GunState.Instantiate(gun5);
+        GunState gunState6 = GunState.Instantiate(gun6);
+        GunState gunState7 = GunState.Instantiate(gun7);
+        GunState gunState8 = GunState.Instantiate(gun8);
 
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
         gunState1.delta.activeMods.Add(silencer);
@@ -91,8 +99,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         List<GunState> allGuns = new List<GunState> {
             gunState1,
             gunState2,
-            // gunState3,
-            // gunState4
+            gunState3,
+            gunState4,
+            gunState5,
+            gunState6,
+            gunState7,
+            gunState8
         };
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
@@ -115,26 +127,26 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         List<string> perks = new List<string>{
             "p1_1",
             "p1_2",
-            "p1_3",
+            // "p1_3",
             "sh1_1",
             "sh1_2",
-            "sh1_3",
+            // "sh1_3",
             "p2_1",
             "p2_2",
-            "p2_3",
+            // "p2_3",
             "sh2_1",
             "sh2_2",
-            "sh2_3",
+            // "sh2_3",
             "rifle1_1",
             "rifle1_2",
-            "rifle1_3",
+            // "rifle1_3",
             "smg1_1",
             "smg1_2",
-            "smg1_3",
-            "rifle2_1",
-            "smg2"
+            // "smg1_3",
+            "rifle2_1"
+            // "smg2"
         };
-        perks = new List<string>();
+        // perks = new List<string>();
 
         return new PlayerState() {
             legSkin = "Jack",
@@ -178,7 +190,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
             payDatas = new List<PayData>(),
 
-            credits = 10000,
+            credits = 9650,
             // credits = 600,
             loots = loots,
 

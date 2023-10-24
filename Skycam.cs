@@ -10,6 +10,7 @@ public class Skycam : MonoBehaviour {
     public Camera masterCamera;
     public Camera myCamera;
     public void Initialize(Camera masterCamera, Vector3 offset) {
+        // Debug.Log($"intialize skybox with: {offset}");
         this.masterCamera = masterCamera;
         masterCameraTransform = masterCamera.transform;
         masterCameraInitialPosition = masterCameraTransform.position;

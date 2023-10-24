@@ -30,7 +30,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
             3 => 3f,
             _ => 1f
         };
-        Debug.Log($"lockpick skill coefficient {lockPickSkillCoefficient}");
+        // Debug.Log($"lockpick skill coefficient {lockPickSkillCoefficient}");
     }
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {

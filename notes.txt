@@ -3464,3 +3464,8 @@ animate gun holster / unholster
 padlock door doesnt work
 npc dialogue is jumpy
 some things are not stealing
+* billboarded sprites don't work:
+
+
+c4
+VR

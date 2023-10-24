@@ -9,6 +9,7 @@ public class LoadoutGearSlotButton : MonoBehaviour {
     public MissionPlanLoadoutController loadoutController;
     public Image weaponImage;
     public ItemTemplate item;
+    public TextMeshProUGUI itemName;
     int index;
 
     public void Initialize(MissionPlanLoadoutController controller, int index) {
@@ -23,9 +24,11 @@ public class LoadoutGearSlotButton : MonoBehaviour {
         this.item = item;
         weaponImage.enabled = true;
         weaponImage.sprite = item.image;
+        itemName.text = item.shortName;
     }
     public void Clear() {
         weaponImage.enabled = false;
+        itemName.text = "";
     }
     public void OnClick() {
         loadoutController.ItemSlotClicked(index, this);

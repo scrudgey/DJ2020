@@ -144,6 +144,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         switch (input.state) {
             case CharacterState.zapped:
             case CharacterState.dead:
+            case CharacterState.keelOver:
                 break;
             case CharacterState.superJump:
                 trailTimer += Time.deltaTime;
@@ -188,7 +189,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         shadowCaster.gameObject.SetActive(true);
         if (input.state == CharacterState.hvac) {
             shadowCaster.gameObject.SetActive(false);
-        } else if (input.hitState == HitState.dead || input.hitState == HitState.zapped) {
+        } else if (input.hitState == HitState.dead || input.hitState == HitState.zapped || input.state == CharacterState.dead || input.state == CharacterState.keelOver) {
             animator.Stop();
         } else if (input.state == CharacterState.superJump) {
             state = State.jump;

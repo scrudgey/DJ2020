@@ -20,3 +20,5 @@ points to hit:
 
 ## cutscene
 * riding the subway
+
+✓

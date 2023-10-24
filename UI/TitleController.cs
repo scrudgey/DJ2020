@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 public class TitleController : MonoBehaviour {
     public AudioSource audioSource;
+    public Camera UICam;
     [Header("Components")]
     public GameObject mainMenu;
     public Canvas VRCanvas;
@@ -33,6 +34,8 @@ public class TitleController : MonoBehaviour {
     Coroutine introCoroutine;
     bool menusStarted;
     void Start() {
+
+
         introCoroutine = StartCoroutine(DoIntro());
         mainMenu.SetActive(false);
         VRCanvas.enabled = false;
@@ -41,6 +44,7 @@ public class TitleController : MonoBehaviour {
         saveDialogCanvas.enabled = false;
         alertCanvas.enabled = false;
         GameManager.I.TransitionToPhase(GamePhase.mainMenu);
+        Time.timeScale = 1f;
     }
 
     void Update() {
@@ -98,7 +102,21 @@ public class TitleController : MonoBehaviour {
     }
 
     public IEnumerator DoIntro() {
-        yield return new WaitForSecondsRealtime(0.5f);
+        Quaternion skyCamRotation = Quaternion.Euler(-17.4f, 360.14f, 0f);
+
+        GameManager.I.LoadScene("cityskybox", () => {
+            // List<Camera> skycams = new List<Camera>();
+            foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
+                Debug.Log(skycam);
+                // skycams.Add(skycam.myCamera);
+                skycam.Initialize(UICam, new Vector3(0f, 8f, 0f));
+                skycam.transform.rotation = skyCamRotation * skycam.transform.rotation;
+                skycam.transform.position = new Vector3(0f, -2.4f, 0f);
+            }
+            // characterCamera.skyBoxCameras = skycams.ToArray();
+        }, unloadAll: false);
+
+        yield return new WaitForSecondsRealtime(5f);
         audioSource.PlayOneShot(startSound);
         Vector2 topStartPosition = logoTopRect.anchoredPosition;
         Vector2 bottomStartPosition = logoBottomRect.anchoredPosition;
@@ -143,5 +161,32 @@ public class TitleController : MonoBehaviour {
         logoBottomImage.enabled = false;
         logoImage.enabled = true;
         logoImage.color = Color.white;
+    }
+
+    public void InteractionTestbedCallback() {
+        GameManager.I.LoadScene("interactionTestBed", () => {
+            Debug.Log("callback");
+            LevelTemplate levelTemplate = LevelTemplate.LoadResource("test");
+            Debug.Log($"level template: {levelTemplate}");
+
+            List<ItemTemplate> allItems = new List<ItemTemplate> {
+                // BaseItem.LoadItem("deck"),
+                // ItemTemplate.LoadItem("C4"),
+                ItemTemplate.LoadItem("goggles"),
+                ItemTemplate.LoadItem("rocket"),
+                ItemTemplate.LoadItem("grenade"),
+            };
+
+            LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems));
+
+            // initialize game state
+            GameManager.I.gameData = GameData.TestInitialData() with {
+                levelState = level
+            };
+            Debug.Log("start mission");
+
+            // start the game state
+            GameManager.I.StartMission(level, spawnNpcs: false, doCutscene: false);
+        });
     }
 }

@@ -42,7 +42,7 @@ public class CustomAnimator : MonoBehaviour {
                 }
                 j++;
             }
-            // i think part of the problem is this being outside the other while loop
+            // i think part of the problem is this being outside the other while loop?
             while (timer > _clip.length) {
                 timer -= _clip.length;
                 eventIndex = 0;

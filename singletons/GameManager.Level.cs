@@ -163,6 +163,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
+        GameObject.Instantiate(Resources.Load("prefabs/listener"), npc.transform.position, Quaternion.identity);
         StartCoroutine(WaitAndShowMissionFinish());
     }
     void HandleNPCDead(CharacterController npc) {
