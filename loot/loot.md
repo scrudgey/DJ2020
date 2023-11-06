@@ -49,6 +49,8 @@ high value drug:
     drencrom
     tiger tea
     smart drugs
+    betaphenethylamine
+    consult shulgun
 low value drug:
     caffeine powder
     alcohol - liquor

@@ -35,7 +35,9 @@ public class PayDataShopController : MonoBehaviour {
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
     public void Initialize() {
-        storeDialogueController.SetShopownerDialogue("Please come in to my black market data shop.");
+        storeDialogueController.Initialize(GameManager.I.gameData.filename, "Stacks");
+
+        storeDialogueController.SetShopownerDialogue("I can move your wares on the Tri/Net data exchange, for a price.");
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         ClearDataButtons();
         ClearSaleData();

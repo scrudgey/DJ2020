@@ -108,9 +108,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         };
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
-            ItemTemplate.LoadItem("C4"),
-            ItemTemplate.LoadItem("rocket"),
-            ItemTemplate.LoadItem("goggles"),
+            // ItemTemplate.LoadItem("C4"),
+            // ItemTemplate.LoadItem("rocket"),
+            // ItemTemplate.LoadItem("goggles"),
             ItemTemplate.LoadItem("grenade"),
             ItemTemplate.LoadItem("deck"),
         };
@@ -122,6 +122,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             Resources.Load("data/loot/drug/vial") as LootData,
             Resources.Load("data/loot/drug/vial") as LootData,
             Resources.Load("data/loot/drug/zyme") as LootData,
+            Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
+            Resources.Load("data/loot/industrial/tungstenRod") as LootData,
+            Resources.Load("data/loot/industrial/flask") as LootData,
         };
 
         List<string> perks = new List<string>{
@@ -369,5 +372,16 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     }
     public int PerkLockpickLevel() {
         return GetPerkLevel(PerkIdConstants.PERKID_LOCKPICK);
+    }
+
+    public DialogueCard NewDialogueCard() {
+        List<DialogueTacticType> tacticTypes = new List<DialogueTacticType>() { DialogueTacticType.lie, DialogueTacticType.deny };
+        DialogueTacticType tacticType = Toolbox.RandomFromList(tacticTypes);
+        int baseValue = (int)Toolbox.RandomGaussian(minValue: 10, maxValue: 90);
+        DialogueCard newCard = new DialogueCard() {
+            type = tacticType,
+            baseValue = baseValue
+        };
+        return newCard;
     }
 }

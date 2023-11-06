@@ -43,7 +43,6 @@ public class ItemShopController : MonoBehaviour {
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
     public void Start() {
-        dialogueController.Initialize(GameManager.I.gameData.filename, "seller");
         itemSaleData = LoadItemSaleData();
         ClearInitialize();
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
@@ -60,7 +59,9 @@ public class ItemShopController : MonoBehaviour {
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits
-        dialogueController.SetShopownerDialogue("Please come in to my underground black market items shop.");
+        dialogueController.Initialize(GameManager.I.gameData.filename, "Zone");
+
+        dialogueController.SetShopownerDialogue("Have you tried the new Zikon night vision goggles?");
         creditsCost.text = "";
         ClearItemForSale();
         bodyContainer.SetActive(false);

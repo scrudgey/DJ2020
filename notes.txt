@@ -3209,7 +3209,7 @@ graphics
     title screen animations 
     helicopters for skybox
     assign lens flares to lights?
-    trees / plants / outside decor
+    * trees / plants / outside decor
     sprite props
         knives / swords / shuriken
         ground wires
@@ -3301,6 +3301,7 @@ world:
 shop todo:
     bar:
         there is an underworld figure in the corner of the bar who will give you missions.
+        rumors
     tent city:
         a randomized junk shop?
     gunshop
@@ -3392,12 +3393,15 @@ generic spritesheet template is not complete:
     separate arm and torso?
 clickable loot in burglar?
 loot has portrait view in burglar?
-    door randomizer should specify key id ?
+door randomizer should specify key id ?
 jazz up elevator controller
     sound effects
     click effect
-after action report is missing highlights
-fix catenary?
+
+* after action report is missing highlights
+* fix catenary?
+* billboarded sprites don't work:
+* reenable jtd attractor
 
 
 major initiatives:
@@ -3459,13 +3463,31 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-
 animate gun holster / unholster
 padlock door doesnt work
 npc dialogue is jumpy
 some things are not stealing
-* billboarded sprites don't work:
+
+gameplay questions:
+    progression in burglar tools?
+    progression in shops? 
+        items, guns
+    progression in world?
+        other towns connected by subway?
+    dialogue
+    hacking
+    backpack and duffel bag
+
+polish:
+    reduce frequency of "enemy sighted"
+    change sensitivity elevator, or eliminate "guess it was nothing"
+    better investigative ability when player does something weird like superjump / land
+    better AI navigation / building search
+    better clearsighter
+
+clearsighter visibility should be based on line of sight
+let NPCS walk through each other
+highlight NPCs that are shooting me, and apply clearsight
+remove attack surface cam positioning
 
 
-c4
-VR

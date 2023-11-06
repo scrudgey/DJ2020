@@ -12,7 +12,7 @@ public class LevelState {
     public LevelPlan plan;
     public LevelDelta delta;
 
-    public static LevelState Instantiate(LevelTemplate template, LevelPlan plan) => new LevelState {
+    public static LevelState Instantiate(LevelTemplate template, LevelPlan plan, PlayerState playerState) => new LevelState {
         template = template,
         plan = plan,
         delta = LevelDelta.Empty() with {
@@ -21,11 +21,28 @@ public class LevelState {
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
             disguise = plan.startWithDisguise(),
+            dialogueCards = Enumerable.Range(0, 3).Select((i) => playerState.NewDialogueCard()).ToList(),
             objectivesState = template.objectives.Concat(template.bonusObjectives)
                 .ToDictionary(t => t, t => ObjectiveStatus.inProgress)
-
         }
     };
+
+    static List<DialogueCard> initializeDialogueCards() {
+        return new List<DialogueCard>(){
+            new DialogueCard(){
+                type = DialogueTacticType.lie,
+                baseValue = 10
+            },
+            new DialogueCard(){
+                type = DialogueTacticType.lie,
+                baseValue = 8
+            },
+            new DialogueCard(){
+                type = DialogueTacticType.deny,
+                baseValue = 6
+            }
+        };
+    }
 
     public static LevelState Instantiate(LevelTemplate template, LevelDelta delta) => new LevelState {
         template = template,
@@ -51,4 +68,11 @@ public class LevelState {
 
     public bool PlayerHasID() => plan.activeTactics.Any(tactic => tactic is TacticFakeID);
 
+    public int NumberPreviousTacticType(DialogueTacticType type) {
+        if (delta.lastTactics.Count == 0) {
+            return 0;
+        } else if (delta.lastTactics.Peek() == type) {
+            return delta.lastTactics.Count;
+        } else return 0;
+    }
 }

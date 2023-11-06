@@ -31,7 +31,9 @@ public class MedicalShopController : MonoBehaviour {
     }
     public void Initialize() {
 
-        storeDialogueController.SetShopownerDialogue("Please come in to my black market clinic.");
+        storeDialogueController.Initialize(GameManager.I.gameData.filename, "Dr. Head");
+
+        storeDialogueController.SetShopownerDialogue("My work is clean. No questions asked.");
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         SetPlayerStats();
     }

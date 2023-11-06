@@ -593,9 +593,8 @@ public class Toolbox {
         } else return value;
     }
 
-    public static IEnumerator BlitText(TextMeshProUGUI textMesh, string content) {
+    public static IEnumerator BlitText(TextMeshProUGUI textMesh, string content, float interval = 0.05f) {
         float timer = 0f;
-        float interval = 0.05f;
         int index = 0;
         while (index < content.Length) {
             timer += Time.unscaledDeltaTime;
@@ -692,6 +691,40 @@ public class Toolbox {
         }
 
         target.rotation = initial;
+    }
+
+    public static float RandomGaussian(float minValue = 0.0f, float maxValue = 1.0f) {
+        float u, v, S;
+        do {
+            u = 2.0f * UnityEngine.Random.value - 1.0f;
+            v = 2.0f * UnityEngine.Random.value - 1.0f;
+            S = u * u + v * v;
+        }
+        while (S >= 1.0f);
+
+        // Standard Normal Distribution
+        float std = u * Mathf.Sqrt(-2.0f * Mathf.Log(S) / S);
+
+        // Normal Distribution centered between the min and max value
+        // and clamped following the "three-sigma rule"
+        float mean = (minValue + maxValue) / 2.0f;
+        float sigma = (maxValue - mean) / 3.0f;
+        return Mathf.Clamp(std * sigma + mean, minValue, maxValue);
+    }
+
+    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7) {
+        float timer = 0f;
+        int cycles = 0;
+        while (cycles < pulses) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > 0.1f) {
+                timer -= 0.05f;
+                cycles += 1;
+                component.enabled = !component.enabled;
+            }
+            yield return null;
+        }
+        component.enabled = true;
     }
 }
 

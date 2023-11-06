@@ -212,7 +212,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     float inBushesTimer;
     public bool isStrikeTeamMember;
 
-    static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
+    // static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
     public void TransitionToState(CharacterState newState) {
         CharacterState tmpInitialState = state;
@@ -1393,9 +1393,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     void SetCrawlSuspicion(bool value) {
         if (transform.IsChildOf(GameManager.I.playerObject.transform)) {
             if (value) {
-                GameManager.I.AddSuspicionRecord(crawlSuspicion);
+                GameManager.I.AddSuspicionRecord(SuspicionRecord.crawlingSuspicion());
             } else {
-                GameManager.I.RemoveSuspicionRecord(crawlSuspicion);
+                GameManager.I.RemoveSuspicionRecord(SuspicionRecord.crawlingSuspicion());
             }
         }
     }

@@ -57,7 +57,7 @@ public class LootShopController : MonoBehaviour {
         ShowSellerData(lootBuyerData);
         dialogueController.Initialize(GameManager.I.gameData.filename, lootBuyerData.buyerName);
         // set portraits
-        dialogueController.SetShopownerDialogue("Please come in to my underground loot shop.");
+        dialogueController.SetShopownerDialogue("We have a cash flow problem. Can you front?");
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
     }
     void PopulatePlayerInventory() {

@@ -220,12 +220,14 @@ public partial class GameManager : Singleton<GameManager> {
                 }
                 break;
             case MenuType.dialogue:
-                if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
-                    LoadScene("DialogueMenu", callback, unloadAll: false);
+                // if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
+                //     LoadScene("DialogueMenu", callback, unloadAll: false);
+                // }
+                if (!SceneManager.GetSceneByName("NeoDialogueMenu").isLoaded) {
+                    LoadScene("NeoDialogueMenu", callback, unloadAll: false);
                 }
                 CloseBurglar();
                 uiController.HideUI();
-
                 break;
             case MenuType.VRMissionFinish:
                 if (!SceneManager.GetSceneByName("VRMissionFinish").isLoaded) {
@@ -312,7 +314,8 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.dialogue:
                 uiController.ShowUI();
-                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("DialogueMenu"));
+                // SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("DialogueMenu"));
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("NeoDialogueMenu"));
                 break;
             case MenuType.escapeMenu:
                 uiController.ShowUI();

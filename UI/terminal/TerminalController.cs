@@ -24,6 +24,7 @@ namespace UI {
             commands["resetPerks"] = ResetPerks;
             commands["gunskill"] = GunSkill;
             commands["completeMission"] = CompleteMission;
+            commands["suspicion"] = Suspicion;
         }
         public void OnEnable() {
             TakeFocus();
@@ -132,6 +133,10 @@ namespace UI {
         public void CompleteMission(string[] args) {
             GameManager.I.CloseMenu();
             GameManager.I.HandleAllObjectivesComplete();
+        }
+        public void Suspicion(string[] args) {
+            GameManager.I.CloseMenu();
+            GameManager.I.AddSuspicionRecord(SuspicionRecord.bodySuspicion());
         }
         public void GunSkill(string[] args) {
             string gunTypeString = args[0];

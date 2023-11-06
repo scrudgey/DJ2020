@@ -9,7 +9,7 @@ public record LevelPlan {
     [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> activeTactics;
     public List<ItemTemplate> items;
-    public static LevelPlan Default(List<ItemTemplate> allItems) {
+    public static LevelPlan Default(List<ItemTemplate> allItems) { // TODO: replace argument with playerstate?
         List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
         if (allItems.Count >= 1) {
             itemList[0] = allItems[0];

@@ -23,6 +23,8 @@ public class BarShopController : MonoBehaviour {
         foreach (Transform child in marketReportContainer) {
             Destroy(child.gameObject);
         }
+        dialogueController.Initialize(GameManager.I.gameData.filename, "Boston");
+
         dialogueController.SetShopownerDialogue("come in to my underground black market bar.");
         marketData = GameManager.I.gameData.marketData;
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));

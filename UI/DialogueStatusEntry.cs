@@ -30,4 +30,17 @@ public class DialogueStatusEntry : MonoBehaviour {
             dotText.color = red;
         }
     }
+
+    public void InitializeNumeric(int alarmCount, string content, bool plain = false) {
+        contentText.text = content;
+        if (plain) {
+            dotText.text = $"{alarmCount}";
+        } else if (alarmCount <= 0) {
+            dotText.text = $"{alarmCount}";
+            dotText.color = red;
+        } else {
+            dotText.text = $"+{alarmCount}";
+            dotText.color = green;
+        }
+    }
 }

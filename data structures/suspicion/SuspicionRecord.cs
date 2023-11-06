@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-
+using System.Linq;
+using UnityEngine;
 [System.Serializable]
 public class SuspicionDialogueParameters {
     public string challenge;
@@ -23,11 +24,24 @@ public class SuspicionRecord {
     public float maxLifetime;
     public Suspiciousness suspiciousness;
     public SuspicionDialogueParameters dialogue;
+    public int challengeValue = (int)Toolbox.RandomGaussian(20, 80);
+
     public void Update(float deltaTime) {
         lifetime -= deltaTime;
     }
     public bool IsTimed() {
         return maxLifetime > 0;
+    }
+    public DialogueTactic getResponse(DialogueTacticType tacticType) {
+        DialogueTactic tactic;
+        List<DialogueTactic> viableTactics = dialogue.tactics.Where(tactic => tactic.tacticType == tacticType).ToList();
+        if (viableTactics.Count > 0) {
+            tactic = Toolbox.RandomFromList(viableTactics);
+        } else {
+            tactic = Toolbox.RandomFromList(dialogue.tactics);
+            Debug.LogError($"missing tactic type {tacticType} for {content}");
+        }
+        return tactic;
     }
 
     public static SuspicionRecord identitySuspicion(DialogueInput input) {
@@ -39,7 +53,7 @@ public class SuspicionRecord {
             dialogue = new SuspicionDialogueParameters {
                 challenge = "You there, stop! You're not authorized to be in this area! Show me your identification!",
                 tactics = new List<DialogueTactic>{
-                        new DialogueTactic{
+                        new DialogueTactic {
                             tacticType = DialogueTacticType.lie,
                             content = "I am P.J. Pennypacker, security inspector.",
                             successResponse = "Yes, that sounds right. Ok then.",
@@ -89,12 +103,7 @@ public class SuspicionRecord {
                             successResponse = "I don't mean to get in your way, sir. Carry on.",
                             failResponse = "Tile inspector? Yeah right."
                         },
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.deny,
-                            content = "I'm not lying on the ground.",
-                            successResponse = "I'm sorry, I guess I was confused.",
-                            failResponse = "How stupid do you think I am?"
-                        },
+
                         new DialogueTactic{
                             tacticType = DialogueTacticType.redirect,
                             content = "I'm not lying on the ground, you're lying on the ground.",

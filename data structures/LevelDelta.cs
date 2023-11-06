@@ -28,11 +28,19 @@ public record LevelDelta {
     public bool alarmTerminalActive;
     public float strikeTeamMissionTimer;
     public LevelTemplate.StrikeTeamResponseBehavior strikeTeamBehavior;
+
+    // dialogue
+
+    public List<DialogueCard> dialogueCards;
+    public int bullshitLevel;
+    public Stack<DialogueTacticType> lastTactics;
     public static LevelDelta Empty() => new LevelDelta {
         objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
         failedObjectives = new HashSet<Objective>(),
         levelAcquiredPaydata = new List<PayData>(),
         levelInteractedObjects = new HashSet<string>(),
-        levelAcquiredLoot = new List<LootData>()
+        levelAcquiredLoot = new List<LootData>(),
+        dialogueCards = new List<DialogueCard>(),
+        lastTactics = new Stack<DialogueTacticType>()
     };
 }

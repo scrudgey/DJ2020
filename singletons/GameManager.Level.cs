@@ -39,10 +39,11 @@ public partial class GameManager : Singleton<GameManager> {
         levelTemplate.sensitivityLevel = template.sensitivityLevel;
         levelTemplate.maxNPC = 3;
 
-        LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<ItemTemplate>()));
+        PlayerState playerState = PlayerState.Instantiate(template.playerState);
+        LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<ItemTemplate>()), playerState);
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
-            playerState = PlayerState.Instantiate(template.playerState),
+            playerState = playerState,
             levelState = levelState
         };
 
@@ -53,7 +54,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
-        gameData.levelState = LevelState.Instantiate(template, plan);
+        gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
         gameData.playerState.ResetTemporaryState();
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }

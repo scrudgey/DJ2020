@@ -51,12 +51,10 @@ public class LevelBootstrapper : MonoBehaviour {
             ItemTemplate.LoadItem("grenade"),
         };
 
-        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems));
-
         // initialize game state
-        GameManager.I.gameData = GameData.TestInitialData() with {
-            levelState = level
-        };
+        GameManager.I.gameData = GameData.TestInitialData();
+        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems), GameManager.I.gameData.playerState);
+        GameManager.I.gameData.levelState = level;
 
         // start the game state
         GameManager.I.StartMission(level, spawnNpcs: spawnNPCs, doCutscene: false);

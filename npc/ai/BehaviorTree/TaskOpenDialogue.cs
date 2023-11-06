@@ -19,9 +19,12 @@ namespace AI {
                 // DialogueInput input = ai.GetDialogueInput();
                 DialogueInput input = GameManager.I.GetDialogueInput(gameObject, characterInput);
                 GameManager.I.ShowMenu(MenuType.dialogue, () => {
-                    DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
-                    menuController.Initialize(input);
-                    DialogueController.OnDialogueConclude += HandleDialogueResult;
+                    // DialogueController menuController = GameObject.FindObjectOfType<DialogueController>();
+                    NeoDialogueMenu menuController = GameObject.FindObjectOfType<NeoDialogueMenu>();
+                    // menuController.Initialize(input);
+                    menuController.Initialize(input, HandleDialogueResult);
+                    // DialogueController.OnDialogueConclude += HandleDialogueResult;
+                    // NeoDialogueMenu.OnDialogueConclude += HandleDialogueResult;
                 });
             }
         }
@@ -33,8 +36,9 @@ namespace AI {
             }
         }
 
-        public void HandleDialogueResult(DialogueController.DialogueResult result) {
-            DialogueController.OnDialogueConclude -= HandleDialogueResult;
+        public void HandleDialogueResult(NeoDialogueMenu.DialogueResult result) {
+            // DialogueController.OnDialogueConclude -= HandleDialogueResult;
+            // NeoDialogueMenu.OnDialogueConclude -= HandleDialogueResult;
             isConcluded = true;
         }
 

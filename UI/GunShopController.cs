@@ -79,7 +79,9 @@ public class GunShopController : MonoBehaviour {
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits
-        dialogueController.SetShopownerDialogue("Please come in to my underground black market weapons shop.");
+        dialogueController.Initialize(GameManager.I.gameData.filename, "Zed");
+
+        dialogueController.SetShopownerDialogue("Check back with me tomorrow- I have a shipment coming in from Tangier.");
         creditsCost.text = "";
 
         // clear compare gun

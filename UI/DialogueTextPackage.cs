@@ -7,12 +7,20 @@ using UnityEngine;
 public class DialogueTextPackage : MonoBehaviour {
     public RectTransform container;
     public TextMeshProUGUI text;
+    public TextMeshProUGUI subtext;
     public GameObject leftPadding;
     public GameObject rightPadding;
-    public void Initialize(string content, bool left) {
-        text.text = content;
+    public IEnumerator Initialize(string content, string subContent, bool left) {
+        // text.text = content;
+        subtext.text = subContent;
         leftPadding.SetActive(!left);
         rightPadding.SetActive(left);
+        if (left) {
+            text.alignment = TextAlignmentOptions.Left;
+        } else {
+            text.alignment = TextAlignmentOptions.Right;
+        }
+        return Toolbox.BlitText(text, content, interval: 0.02f);
     }
     public void Remove() {
         StartCoroutine(easeOut());

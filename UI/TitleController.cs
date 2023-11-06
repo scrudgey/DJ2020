@@ -176,17 +176,19 @@ public class TitleController : MonoBehaviour {
                 ItemTemplate.LoadItem("rocket"),
                 ItemTemplate.LoadItem("grenade"),
             };
+            GameManager.I.gameData = GameData.TestInitialData();
 
-            LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems));
+            LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems), GameManager.I.gameData.playerState);
 
-            // initialize game state
-            GameManager.I.gameData = GameData.TestInitialData() with {
-                levelState = level
-            };
+            GameManager.I.gameData.levelState = level;
             Debug.Log("start mission");
 
             // start the game state
             GameManager.I.StartMission(level, spawnNpcs: false, doCutscene: false);
         });
+    }
+
+    public void SubwaySecretCallback() {
+        GameManager.I.LoadScene("SubwaySecret", () => { });
     }
 }

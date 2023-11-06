@@ -64,7 +64,8 @@ public class GunModShopController : MonoBehaviour {
         SetPlayerCredits();
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         activeModsObject.SetActive(false);
-        storeDialogueController.SetShopownerDialogue("Please come in to my black market gun mod shop.");
+        storeDialogueController.Initialize(GameManager.I.gameData.filename, "Shin");
+        storeDialogueController.SetShopownerDialogue("You need something with a little more punch, huh? I got you covered.");
         SetNoGunsIndicator(GameManager.I.gameData.playerState.allGuns.Count == 0);
     }
 

@@ -280,7 +280,7 @@ public class DialogueController : MonoBehaviour {
         GameObject newDialogue = GameObject.Instantiate(dialoguePrefab);
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
-        dialogue.Initialize(content, true);
+        dialogue.Initialize(content, "", true);
         if (dialogueContainer.childCount > 3) {
             Transform earliest = dialogueContainer.GetChild(1);
             DialogueTextPackage targetDialogue = earliest.GetComponent<DialogueTextPackage>();
@@ -292,7 +292,7 @@ public class DialogueController : MonoBehaviour {
         GameObject newDialogue = GameObject.Instantiate(dialoguePrefab);
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
-        dialogue.Initialize(content, false);
+        dialogue.Initialize(content, "", false);
         if (dialogueContainer.childCount > 3) {
             Transform earliest = dialogueContainer.GetChild(1);
             DialogueTextPackage targetDialogue = earliest.GetComponent<DialogueTextPackage>();

@@ -28,7 +28,7 @@ public record GameData {
             filename = "test",
             phase = GamePhase.none,
             playerState = playerState,
-            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState.allItems)),
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState.allItems), playerState),
             completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
                 "Jack That Data",
@@ -101,8 +101,6 @@ public record GameData {
             Debug.LogError(ex.Message);
         }
     }
-
-
 
     static public string SaveGameRootDirectory() => System.IO.Path.Join(Application.persistentDataPath, "saveGames");
     static public string SaveGamePath(string filename) => System.IO.Path.Join(SaveGameRootDirectory(), filename.ToLower());
