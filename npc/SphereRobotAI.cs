@@ -11,6 +11,7 @@ using UnityEngine.AI;
 public enum Reaction { ignore, attack, investigate }
 
 public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHitstateSubscriber, IPoolable {
+    public string dialogueName;
     public Destructible characterHurtable;
     public Listener listener { get; set; }
     public HitState hitState { get; set; }
@@ -745,7 +746,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public DialogueCharacterInput myCharacterInput() => new DialogueCharacterInput {
         portrait = portrait,
         etiquettes = etiquettes,
-        alertness = alertness
+        alertness = alertness,
+        name = dialogueName
     };
     public DialogueInput GetDialogueInput() => GameManager.I.GetDialogueInput(gameObject, myCharacterInput());
 

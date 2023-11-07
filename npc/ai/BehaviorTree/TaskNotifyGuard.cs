@@ -6,13 +6,11 @@ using UnityEngine.SceneManagement;
 
 namespace AI {
     public class TaskNotifyGuard : TaskNode {
-        DialogueCharacterInput characterInput;
         GameObject gameObject;
         SphereRobotAI guardAI;
         WorkerNPCAI myAI;
-        public TaskNotifyGuard(GameObject gameObject, DialogueCharacterInput characterInput, SphereRobotAI guardAI, WorkerNPCAI myAI) : base() {
+        public TaskNotifyGuard(GameObject gameObject, SphereRobotAI guardAI, WorkerNPCAI myAI) : base() {
             this.gameObject = gameObject;
-            this.characterInput = characterInput;
             this.guardAI = guardAI;
             this.myAI = myAI;
         }

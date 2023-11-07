@@ -11,6 +11,17 @@ public class DialogueCard {
         return baseValue + effects.Values.Sum();
     }
 
+    string pluralTactic(DialogueTacticType type) => type switch {
+        DialogueTacticType.bluff => "bluffs",
+        DialogueTacticType.challenge => "challenges",
+        DialogueTacticType.deny => "denials",
+        DialogueTacticType.escape => "escapes",
+        DialogueTacticType.item => "items",
+        DialogueTacticType.lie => "lies",
+        DialogueTacticType.none => "nothings",
+        DialogueTacticType.redirect => "redirections",
+    };
+
     public Dictionary<string, int> getStatusEffects(DialogueInput input) {
         Dictionary<string, int> effects = new Dictionary<string, int>();
 
@@ -34,10 +45,8 @@ public class DialogueCard {
         int previousTacticPenalty = GameManager.I.gameData.levelState.NumberPreviousTacticType(type);
         if (previousTacticPenalty > 0) {
             int magnitude = (int)((float)baseValue * ((float)previousTacticPenalty / (float)(previousTacticPenalty + 1)));
-            // 1/2 => 1 - 1/2 = 1/2
-            // 1/3 => 1 - 1/3 = 2/3
-            // 1/4 => 1 - 1/4 = 3/4
-            effects.Add($"told {previousTacticPenalty} {type}s", -1 * magnitude);
+            string plural = pluralTactic(type);
+            effects.Add($"used {previousTacticPenalty} {plural}", -1 * magnitude);
         }
 
         return effects;

@@ -15,11 +15,11 @@ public class DialogueTextPackage : MonoBehaviour {
         subtext.text = subContent;
         leftPadding.SetActive(!left);
         rightPadding.SetActive(left);
-        if (left) {
-            text.alignment = TextAlignmentOptions.Left;
-        } else {
-            text.alignment = TextAlignmentOptions.Right;
-        }
+        // if (left) {
+        //     text.alignment = TextAlignmentOptions.Left;
+        // } else {
+        //     text.alignment = TextAlignmentOptions.Right;
+        // }
         return Toolbox.BlitText(text, content, interval: 0.02f);
     }
     public void Remove() {

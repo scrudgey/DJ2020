@@ -40,7 +40,7 @@ public class NeoDialogueController : MonoBehaviour {
     }
     void ClearDialogueContainer() {
         foreach (Transform child in dialogueContainer) {
-            if (child.name.ToLower().Contains("toppadding")) {
+            if (child == dialogueTopPadding.transform) {
                 continue;
             }
             Destroy(child.gameObject);
@@ -79,7 +79,8 @@ public class NeoDialogueController : MonoBehaviour {
         leftPortrait.sprite = input.npcCharacter.portrait;
         rightPortrait.sprite = input.playerState.portrait;
 
-        // leftPortraitCaption.text = input.npcCharacter.
+        leftPortraitCaption.text = input.npcCharacter.name;
+        rightPortraitCaption.text = input.playerName;
     }
 
     public void SetAppearance(DialogueInput input) {
@@ -91,7 +92,29 @@ public class NeoDialogueController : MonoBehaviour {
         };
     }
 
-
+    IEnumerator easeOutDialogue(RectTransform container) {
+        // LayoutElement containerElement = container.GetComponent<LayoutElement>();
+        LayoutElement paddingElement = dialogueTopPadding.GetComponent<LayoutElement>();
+        float baseHeight = container.rect.height;
+        IEnumerator shrinker = Toolbox.Ease(null, 1f, baseHeight, 0f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+            // container.minHeight = amount;
+            // dialogueTopPadding.sizeDelta = new Vector2(1000f, amount);
+            paddingElement.minHeight = amount;
+        }, unscaledTime: true);
+        IEnumerator destroyer = Toolbox.CoroutineFunc(() => {
+            Destroy(container.gameObject);
+            // dialogueTopPadding.sizeDelta = new Vector2(1000f, baseHeight);
+            paddingElement.minHeight = baseHeight;
+        });
+        return Toolbox.ChainCoroutines(shrinker, destroyer);
+    }
+    void CheckAndEaseOutEarliestDialogue() {
+        if (dialogueContainer.childCount > 4) {
+            Transform earliest = dialogueContainer.GetChild(1);
+            RectTransform container = earliest.GetComponent<RectTransform>();
+            StartCoroutine(easeOutDialogue(container));
+        }
+    }
     public IEnumerator SetLeftDialogueText(string content, string challengeContent) {
         yield return null;
         Toolbox.RandomizeOneShot(audioSource, nextDialogueSound, randomPitchWidth: 0.05f);
@@ -99,11 +122,7 @@ public class NeoDialogueController : MonoBehaviour {
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
         IEnumerator blitter = dialogue.Initialize(content, challengeContent, true);
-        if (dialogueContainer.childCount > 3) {
-            Transform earliest = dialogueContainer.GetChild(1);
-            DialogueTextPackage targetDialogue = earliest.GetComponent<DialogueTextPackage>();
-            targetDialogue.Remove();
-        }
+        CheckAndEaseOutEarliestDialogue();
         yield return blitter;
     }
     public IEnumerator SetRightDialogueText(string content) {
@@ -113,11 +132,7 @@ public class NeoDialogueController : MonoBehaviour {
         newDialogue.transform.SetParent(dialogueContainer, false);
         DialogueTextPackage dialogue = newDialogue.GetComponent<DialogueTextPackage>();
         IEnumerator blitter = dialogue.Initialize(content, "", false);
-        if (dialogueContainer.childCount > 3) {
-            Transform earliest = dialogueContainer.GetChild(1);
-            DialogueTextPackage targetDialogue = earliest.GetComponent<DialogueTextPackage>();
-            targetDialogue.Remove();
-        }
+        CheckAndEaseOutEarliestDialogue();
         yield return blitter;
     }
 

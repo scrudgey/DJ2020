@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public struct DialogueInput {
+    public string playerName;
     public GameObject playerObject;
     public GameObject npcObject;
     public DialogueCharacterInput npcCharacter;
@@ -20,4 +21,5 @@ public struct DialogueCharacterInput {
     public Sprite portrait;
     public Alertness alertness;
     public SpeechEtiquette[] etiquettes;
+    public string name;
 }

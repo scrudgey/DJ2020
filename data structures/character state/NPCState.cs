@@ -40,6 +40,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
             ai.alertness = template.alertness;
             ai.etiquettes = template.etiquettes;
             ai.portrait = template.portrait;
+            ai.dialogueName = template.dialogueName;
         }
 
         WorkerNPCAI workerNPCAI = npcObject.GetComponent<WorkerNPCAI>();
@@ -48,6 +49,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
             workerNPCAI.alertness = template.alertness;
             workerNPCAI.etiquettes = template.etiquettes;
             workerNPCAI.portrait = template.portrait;
+            workerNPCAI.dialogueName = template.dialogueName;
         }
 
         LevelRandomSound randomSound = npcObject.GetComponent<LevelRandomSound>();

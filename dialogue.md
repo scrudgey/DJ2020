@@ -275,43 +275,45 @@ lie, deny, bluff, redirect, challenge
 * conclusion
 * conclusion:
 * when end is pressed:
+* denser dialogue segments
+* correct ease out of dialogue 
+* fix textblit to blit all of <>at once
+* "told 5 denys"
+* set names
+* prevent clicking of multiple cards
 
-
-escape
-support items
-
-denser dialogue segments
-fix textblit to blit all of <>at once
-when to handle success vs fail response?s
-"told 5 denys"
-continue button in dialogue container?
-set names
-prevent clicking of multiple cards
-correct ease out of dialogue 
-support nimrod
 blink "warning" when over bullshit threshold
 
+escape
+items
+    ID card
+    personnel data
+
+when to handle success vs fail response?s
+continue button in dialogue container?
+support nimrod
 
 
 
-balance:
 
-threshold correct
-    take status effects
-bonus consumable
-    double value
-    bonus decrease
-    
-flaw:
-    if the threshold is high- you just need to hold a card for 100-threshold until the last challenge.
-challenge 60
-lie 30      -> 30, lie 24   (-6)
-lie 47      -> 13, lie 15   (-2)
+mechanical questions:
 
-the main only reason to not play the high card is to save it for later potential
-    -> but your strategy can be to just save one high card until you hit bullshit threshold?
-in effect, you want to match the played challenge.
-suppose you have two lies and the choice of playing a high card against a low challenge, or a low challenge
-    play the high card and you waste it, play the low card and you sabotage the high card
+    threshold correct
+        take status effects
+    bonus consumable
+        double value
+        bonus decrease
+        
+    flaw:
+        if the threshold is high- you just need to hold a card for 100-threshold until the last challenge.
+    challenge 60
+    lie 30      -> 30, lie 24   (-6)
+    lie 47      -> 13, lie 15   (-2)
 
-what about success/fail rolls?
+    the main only reason to not play the high card is to save it for later potential
+        -> but your strategy can be to just save one high card until you hit bullshit threshold?
+    in effect, you want to match the played challenge.
+    suppose you have two lies and the choice of playing a high card against a low challenge, or a low challenge
+        play the high card and you waste it, play the low card and you sabotage the high card
+
+    what about success/fail rolls?

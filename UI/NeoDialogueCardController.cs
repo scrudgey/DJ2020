@@ -59,7 +59,7 @@ public class NeoDialogueCardController : MonoBehaviour {
     }
 
     public IEnumerator PlayCard() {
-        IEnumerator mover = Toolbox.Ease(null, 0.4f, 0f, 600f, PennerDoubleAnimation.BackEaseOut, (amount) => {
+        IEnumerator mover = Toolbox.Ease(null, 0.4f, 0f, 500f, PennerDoubleAnimation.BackEaseOut, (amount) => {
             Vector2 newPos = new Vector2(cardRect.anchoredPosition.x, amount);
             cardRect.anchoredPosition = newPos;
         }, unscaledTime: true);

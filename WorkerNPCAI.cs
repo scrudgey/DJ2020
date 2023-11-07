@@ -9,6 +9,7 @@ using UnityEngine.AI;
 public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, IDamageReceiver {
     public enum WorkerType { sentry, visitActivities }
     WorkerType myType;
+    public string dialogueName;
     static readonly float PERCEPTION_INTERVAL = 0.025f;
     static readonly float avoidFactor = 1f;
     static readonly float avoidRadius = 0.5f;
@@ -412,7 +413,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public DialogueCharacterInput MyCharacterInput() => new DialogueCharacterInput() {
         portrait = portrait,
         etiquettes = etiquettes,
-        alertness = alertness
+        alertness = alertness,
+        name = dialogueName
     };
 
     public Reaction ReactToPlayerSuspicion() {

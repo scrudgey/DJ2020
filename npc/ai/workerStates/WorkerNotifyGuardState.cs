@@ -41,7 +41,7 @@ public class WorkerNotifyGuardState : WorkerNPCControlState {
         return Vector3.Distance(guardAI.transform.position, owner.transform.position) < 2.5f;
     }
     void SetupRootNode() {
-        notifyTask = new TaskNotifyGuard(owner.gameObject, owner.MyCharacterInput(), guardAI, owner);
+        notifyTask = new TaskNotifyGuard(owner.gameObject, guardAI, owner);
 
         alertTaskNode = new Sequence(
             new TaskMoveToKey(owner.transform, LAST_SEEN_GUARD_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {

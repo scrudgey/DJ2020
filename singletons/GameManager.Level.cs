@@ -690,6 +690,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public DialogueInput GetDialogueInput(GameObject gameObject, DialogueCharacterInput npcCharacter) => new DialogueInput() {
         // NPCAI = ai,
+        playerName = gameData.filename,
         npcObject = gameObject,
         npcCharacter = npcCharacter,
 

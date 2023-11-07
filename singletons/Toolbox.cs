@@ -596,13 +596,26 @@ public class Toolbox {
     public static IEnumerator BlitText(TextMeshProUGUI textMesh, string content, float interval = 0.05f) {
         float timer = 0f;
         int index = 0;
+        bool foundTag = false;
         while (index < content.Length) {
             timer += Time.unscaledDeltaTime;
             if (timer > interval) {
                 timer -= interval;
                 index += 1;
             }
-            textMesh.text = content.Substring(0, index);
+            if (index < content.Length && content[index] == '<') {
+                foundTag = !foundTag;
+                while (index < content.Length && content[index] != '>') {
+                    index++;
+                }
+                index++;
+            }
+
+            string substring = content.Substring(0, index);
+            if (foundTag) {
+                substring += "</color>";
+            }
+            textMesh.text = substring;
             yield return null;
         }
     }

@@ -9,7 +9,7 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/NPCTemplate")]
 public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, ICharacterHurtableState {
-
+    public string dialogueName;
     // skin
     [field: SerializeField]
     public string legSkin { get; set; }

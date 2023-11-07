@@ -116,6 +116,9 @@ public class NeoDialogueMenu : MonoBehaviour {
             end = -850f;
             // cardContainer.gameObject.SetActive(false);
         }
+        foreach (Button button in cardContainer.GetComponentsInChildren<Button>()) {
+            button.interactable = value;
+        }
         return Toolbox.Ease(null, 0.5f, start, end, PennerDoubleAnimation.Linear, (amount) => {
             cardContainerRect.anchoredPosition = new Vector2(cardContainerRect.anchoredPosition.x, amount);
         }, unscaledTime: true);
