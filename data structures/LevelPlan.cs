@@ -27,8 +27,9 @@ public record LevelPlan {
             insertionPointIdn = "",
             extractionPointIdn = "",
             items = itemList,
-            activeTactics = new List<Tactic>()
+            // activeTactics = new List<Tactic>()
             // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
+            activeTactics = new List<Tactic>() { new TacticFakeID() }
         };
     }
 

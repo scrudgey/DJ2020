@@ -19,7 +19,11 @@ public class NeoDialogueMenu : MonoBehaviour {
     public GameObject continueButton;
     public GameObject endButton;
     public Action continueButtonAction;
-    // public Action en
+    public NeoDialogueCardController specialCard;
+    public NeoDialogueCardController escapeCard;
+    public TextMeshProUGUI doubterText;
+    public Color red;
+    // public Action en 
     Stack<SuspicionRecord> unresolvedSuspicionRecords;
     DialogueInput input;
     DialogueResult dialogueResult;
@@ -45,7 +49,7 @@ public class NeoDialogueMenu : MonoBehaviour {
             bullshitRect.anchoredPosition = new Vector2(amount, -224f);
         }, unscaledTime: true);
         // set current bullshit- controlled by level delta
-        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel);
+        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
 
         // set bullshit threshold 
         IEnumerator threshold = bullshitMeter.SetBullshitThreshold(65);
@@ -72,8 +76,17 @@ public class NeoDialogueMenu : MonoBehaviour {
     NeoDialogueCardController InstantiateCard(DialogueCard card) {
         GameObject cardObj = Instantiate(cardPrefab);
         cardObj.transform.SetParent(cardContainer, false);
+        if (cardContainer.childCount > 1) {
+            cardObj.transform.SetSiblingIndex(cardContainer.childCount - 2);
+        }
         NeoDialogueCardController cardController = cardObj.GetComponent<NeoDialogueCardController>();
-        cardController.Initialize(this, input, card);
+        cardController.Initialize(this, input, card, CardClick);
+        return cardController;
+    }
+    NeoDialogueCardController InstantiateBlankCard() {
+        GameObject cardObj = Instantiate(cardPrefab);
+        cardObj.transform.SetParent(cardContainer, false);
+        NeoDialogueCardController cardController = cardObj.GetComponent<NeoDialogueCardController>();
         return cardController;
     }
     void Conclude() {
@@ -81,15 +94,40 @@ public class NeoDialogueMenu : MonoBehaviour {
         GameManager.I.CloseMenu();
     }
     IEnumerator StartNextChallenge(SuspicionRecord manualSuspicionRecord = null) {
+        yield return null;
         currentChallenge = manualSuspicionRecord == null ? unresolvedSuspicionRecords.Pop() : manualSuspicionRecord;
         GameManager.I.gameData.levelState.delta.bullshitLevel += currentChallenge.challengeValue;
 
+        // rectify item cards
+        RectifySpecialCards(currentChallenge);
+
         IEnumerator blitter = neoDialogueController.SetLeftDialogueText(currentChallenge.dialogue.challenge, $"Challenge: {currentChallenge.challengeValue}");
-        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel);
+        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
         IEnumerator activateCards = ActivateCards(true);
-        return Toolbox.ChainCoroutines(blitter, bullshitter, activateCards);
+        yield return Toolbox.ChainCoroutines(blitter, bullshitter, activateCards);
     }
 
+    void RectifySpecialCards(SuspicionRecord challenge) {
+        if (specialCard != null) {
+            Destroy(specialCard.gameObject);
+        }
+        if (escapeCard != null) {
+            Destroy(escapeCard.gameObject);
+        }
+        if (challenge.allowIDCardResponse) {
+            NeoDialogueCardController cardController = InstantiateBlankCard();
+            cardController.InitializeIDCard(this, IDCardClick);
+            specialCard = cardController;
+        }
+        if (challenge.allowDataResponse) {
+            // TODO: check for personnel data in inventory
+            NeoDialogueCardController cardController = InstantiateBlankCard();
+            cardController.InitializeDataCard(this, DataCardClick);
+            specialCard = cardController;
+        }
+        escapeCard = InstantiateBlankCard();
+        escapeCard.InitializeEscapeCard(this, EscapeCardClick);
+    }
 
     IEnumerator StartConclusion() {
         if (GameManager.I.gameData.levelState.delta.bullshitLevel > bullshitMeter.bullshitThreshold) {
@@ -133,14 +171,10 @@ public class NeoDialogueMenu : MonoBehaviour {
             GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         }
         GameManager.I.gameData.levelState.delta.lastTactics.Push(cardController.cardData.type);
-        foreach (NeoDialogueCardController card in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
-            card.InitializeStatusContainer(input);
-        }
-        // Debug.Log("cardclick " + response.content);
 
         IEnumerator cardPlay = cardController.PlayCard();
 
-        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{response.tacticType}]</color> {response.content}");
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{response.tacticType.ToString().ToUpper()}]</color> {response.content}");
 
         IEnumerator removeCard = cardController.RemoveCard();
 
@@ -151,7 +185,7 @@ public class NeoDialogueMenu : MonoBehaviour {
         IEnumerator continuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(true); });
         IEnumerator antiContinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
 
-        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel);
+        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
 
         IEnumerator responseBlit;
         if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
@@ -177,11 +211,9 @@ public class NeoDialogueMenu : MonoBehaviour {
             cardPlay,
             removeCard,
             newCard,
-            new WaitForSecondsRealtime(1f),
             deactivatecards,
             recalculateCards,
             blitter,
-            new WaitForSecondsRealtime(0.5f),
             bullshitter,
             continuer
         ));
@@ -197,12 +229,150 @@ public class NeoDialogueMenu : MonoBehaviour {
 
     }
 
+    public void EscapeCardClick(NeoDialogueCardController cardController) {
+        dialogueResult = DialogueResult.stun;
+
+        IEnumerator cardPlay = cardController.PlayCard();
+
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText("<color=#ff4757>[ESCAPE]</color> Excuse me, I think I left my identification in my car.");
+
+        IEnumerator deactivatecards = ActivateCards(false);
+
+        IEnumerator removeCard = cardController.RemoveCard();
+
+        IEnumerator continuer = Toolbox.CoroutineFunc(() => {
+            SuspicionRecord record = SuspicionRecord.fledSuspicion();
+            GameManager.I.AddSuspicionRecord(record);
+            endButton.SetActive(true);
+        });
+
+        StartCoroutine(Toolbox.ChainCoroutines(
+            cardPlay,
+            removeCard,
+            deactivatecards,
+            blitter,
+            continuer
+        ));
+    }
+    public void IDCardClick(NeoDialogueCardController cardController) {
+        GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
+        GameManager.I.gameData.levelState.delta.lastTactics.Push(DialogueTacticType.item);
+        GameManager.I.gameData.levelState.delta.bullshitLevel -= currentChallenge.challengeValue;
+
+        IEnumerator cardPlay = cardController.PlayCard();
+
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[ITEM]</color> Sure, check my ID card.");
+
+        IEnumerator removeCard = cardController.RemoveCard();
+
+        IEnumerator deactivatecards = ActivateCards(false);
+        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
+
+
+        IEnumerator continuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(true); });
+        IEnumerator antiContinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
+
+        IEnumerator responseBlit = neoDialogueController.SetLeftDialogueText("I see.", "");
+
+        IEnumerator nextBit;
+        // next challenge
+        if (unresolvedSuspicionRecords.Count > 0) {
+            nextBit = StartNextChallenge();
+        } else {
+            nextBit = StartConclusion();
+        }
+
+        IEnumerator recalculateCards = Toolbox.CoroutineFunc(() => {
+            foreach (NeoDialogueCardController card in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+                card.InitializeStatusContainer(input);
+            }
+        });
+
+        StartCoroutine(Toolbox.ChainCoroutines(
+            cardPlay,
+            removeCard,
+            deactivatecards,
+            recalculateCards,
+            blitter,
+            bullshitter,
+            continuer
+        ));
+
+        continueButtonAction = () => {
+            StartCoroutine(Toolbox.ChainCoroutines(
+                antiContinuer,
+                responseBlit,
+                new WaitForSecondsRealtime(1f),
+                nextBit
+            ));
+        };
+    }
+
+    public void DataCardClick(NeoDialogueCardController cardController) {
+        // TODO: decrement personnel data
+        GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
+        GameManager.I.gameData.levelState.delta.lastTactics.Push(DialogueTacticType.item);
+        GameManager.I.gameData.levelState.delta.bullshitLevel -= currentChallenge.challengeValue;
+
+        DialogueTactic response = currentChallenge.getResponse(DialogueTacticType.item);
+
+        IEnumerator cardPlay = cardController.PlayCard();
+
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[DATA]</color> {response.content}");
+
+        IEnumerator removeCard = cardController.RemoveCard();
+        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
+
+        IEnumerator deactivatecards = ActivateCards(false);
+
+        IEnumerator continuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(true); });
+        IEnumerator antiContinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
+
+        IEnumerator responseBlit = neoDialogueController.SetLeftDialogueText("I see.", "");
+
+        IEnumerator nextBit;
+        // next challenge
+        if (unresolvedSuspicionRecords.Count > 0) {
+            nextBit = StartNextChallenge();
+        } else {
+            nextBit = StartConclusion();
+        }
+
+        IEnumerator recalculateCards = Toolbox.CoroutineFunc(() => {
+            foreach (NeoDialogueCardController card in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+                card.InitializeStatusContainer(input);
+            }
+        });
+
+        StartCoroutine(Toolbox.ChainCoroutines(
+            cardPlay,
+            removeCard,
+            deactivatecards,
+            recalculateCards,
+            blitter,
+            bullshitter,
+            continuer
+        ));
+
+        continueButtonAction = () => {
+            StartCoroutine(Toolbox.ChainCoroutines(
+                antiContinuer,
+                responseBlit,
+                new WaitForSecondsRealtime(1f),
+                nextBit
+            ));
+        };
+    }
+
 
     IEnumerator DrawNewCard() {
         yield return null;
         DialogueCard cardData = GameManager.I.gameData.playerState.NewDialogueCard();
         GameManager.I.gameData.levelState.delta.dialogueCards.Add(cardData);
         NeoDialogueCardController newCard = InstantiateCard(cardData);
+        foreach (Button button in newCard.GetComponentsInChildren<Button>()) {
+            button.interactable = false;
+        }
         yield return newCard.DrawCard();
     }
     public void ContinueButtonCallback() {
@@ -224,6 +394,25 @@ public class NeoDialogueMenu : MonoBehaviour {
 
     public void EndButtonCallback() {
         Conclude();
+    }
+
+    public IEnumerator PulseDoubterColor() {
+        doubterText.enabled = true;
+        float timer = 0f;
+        Color color = red;
+        int pulses = 0;
+        while (pulses < 3) {
+            timer += Time.unscaledDeltaTime;
+            float factor = (float)PennerDoubleAnimation.CircEaseIn(timer, 1f, -1f, 1f);
+            doubterText.color = new Color(red.r, red.g, red.b, factor);
+            if (timer > 1f) {
+                pulses += 1;
+                timer -= 1f;
+            }
+            yield return null;
+        }
+        doubterText.color = red;
+        doubterText.enabled = false;
     }
 }
 

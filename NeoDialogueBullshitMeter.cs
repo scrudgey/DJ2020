@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
@@ -12,6 +13,7 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
     public AudioClip[] thresholdSound;
     public List<Image> bars;
     public TextMeshProUGUI bullshitCounterText;
+    public TextMeshProUGUI dangerText;
     public TextMeshProUGUI bullshitThresholdText;
     public RectTransform thresholdBar;
     public RectTransform thresholdBarContainer;
@@ -21,13 +23,15 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
     public Color green;
     public Color orange;
     public Color red;
-
+    Coroutine dangerRoutine;
     int targetBullshit;
     float currentBullshit;
     public int bullshitThreshold;
     float currentThreshold;
     int randomOffset;
-
+    void Awake() {
+        dangerText.enabled = false;
+    }
     public void Initialize(DialogueInput input) {
         UpdateBars(0);
         UpdateThresholdPosition(0);
@@ -71,10 +75,23 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
         status.InitializeNumeric(alarmCount, content);
     }
 
-    public IEnumerator SetTargetBullshit(int amount) {
+    public IEnumerator SetTargetBullshit(int amount, Func<IEnumerator> doubterPulseFunc) {
         yield return null;
+        Coroutine doubterRoutine = null;
+        if (amount > bullshitThreshold) {
+            Debug.Log($"starting danger routine: {amount} {bullshitThreshold}");
+            if (dangerRoutine == null)
+                dangerRoutine = StartCoroutine(PulseDoubterColor());
+        } else {
+            if (dangerRoutine != null) {
+                StopCoroutine(dangerRoutine);
+                dangerRoutine = null;
+            }
+        }
+
         if (amount > targetBullshit) {
             Toolbox.RandomizeOneShot(audioSource, increaseSound);
+            doubterRoutine = StartCoroutine(doubterPulseFunc.Invoke());
         } else if (amount < targetBullshit) {
             Toolbox.RandomizeOneShot(audioSource, decreaseSound);
         }
@@ -86,6 +103,10 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
             currentBullshit = amount;
         }, unscaledTime: true);
         IEnumerator blinker = Toolbox.BlinkEmphasis(bullshitCounterText);
+        // IEnumerator stopper = Toolbox.CoroutineFunc(() => {
+        //     if (doubterRoutine != null)
+
+        // })
         yield return Toolbox.ChainCoroutines(meterMove, blinker);
     }
 
@@ -99,7 +120,7 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
     }
 
     void UpdateRandomOffset() {
-        float rand = Random.Range(0f, 1f);
+        float rand = UnityEngine.Random.Range(0f, 1f);
         if (rand < 0.02f) {
             if (randomOffset < 1)
                 randomOffset += 1;
@@ -152,5 +173,31 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
         float targetHeight = fraction * (thresholdBarContainer.rect.height - bottomOffset) + bottomOffset;
         thresholdBar.anchoredPosition = new Vector2(0f, targetHeight);
         bullshitThresholdText.text = $"{(int)(threshold)}";
+    }
+
+    IEnumerator PulseDoubterColor() {
+        dangerText.enabled = true;
+        float timer = 0f;
+        Color color = red;
+        int pulses = 0;
+        while (targetBullshit > bullshitThreshold) {
+            timer += Time.unscaledDeltaTime;
+            float factor = (float)PennerDoubleAnimation.CircEaseIn(timer, 1f, -1f, 1f);
+            dangerText.color = new Color(red.r, red.g, red.b, factor);
+            if (timer > 1f) {
+                pulses += 1;
+                timer -= 1f;
+            }
+            yield return null;
+        }
+        Debug.Log($"stopping danger routine: {targetBullshit} {bullshitThreshold}");
+        dangerText.color = red;
+        dangerText.enabled = false;
+        dangerRoutine = null;
+    }
+
+    void OnDestroy() {
+        if (dangerRoutine != null)
+            StopCoroutine(dangerRoutine);
     }
 }

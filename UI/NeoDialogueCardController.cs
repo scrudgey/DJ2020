@@ -1,41 +1,110 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class NeoDialogueCardController : MonoBehaviour {
     public RectTransform cardRect;
     public RectTransform myRect;
     public TextMeshProUGUI title;
     public TextMeshProUGUI count;
+    [Header("icon")]
     public Image icon;
+    public Sprite dataIcon;
+    public Sprite idIcon;
     public TextMeshProUGUI description;
     public GameObject statusRecordPrefab;
     public Transform statusContainer;
 
-    NeoDialogueMenu controller;
+    // NeoDialogueMenu controller;
     public DialogueCard cardData;
+    // bool isEscape;
+    // bool isId;
+    // bool isDataPlay;
+    bool noStatusEffects;
 
-    public void Initialize(NeoDialogueMenu controller, DialogueInput input, DialogueCard cardData) {
-        this.controller = controller;
+    Action<NeoDialogueCardController> callback;
+
+    public static readonly float BASE_WIDTH = 270f;
+
+    public void Initialize(NeoDialogueMenu controller, DialogueInput input, DialogueCard cardData, Action<NeoDialogueCardController> callback) {
+        // this.controller = controller;
+        this.callback = callback;
         this.cardData = cardData;
 
-        myRect.sizeDelta = new Vector2(300f, 750f);
+        myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         int derivedValue = cardData.derivedValue(input);
 
-        title.text = cardData.type.ToString();
+        title.text = $"<color=#ffa502>{cardData.type.ToString()}</color>";
         count.text = derivedValue.ToString();
 
-        icon.enabled = cardData.type == DialogueTacticType.item;
-        count.enabled = cardData.type != DialogueTacticType.item;
+        icon.enabled = false;
+        count.enabled = true;
         description.text = $"Decrease bullshit meter by {derivedValue} points";
 
         InitializeStatusContainer(input);
     }
+    public void InitializeEscapeCard(NeoDialogueMenu controller, Action<NeoDialogueCardController> callback) {
+        // this.controller = controller;
+        this.callback = callback;
+        noStatusEffects = true;
+
+        // isEscape = true;
+        title.text = "<color=#ff4757>Escape</color>";
+        count.text = "";
+
+        myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
+        icon.enabled = false;
+        count.enabled = false;
+        description.text = $"Escape the conversation. Opponent is momentarily stunned.";
+
+        foreach (Transform child in statusContainer) {
+            Destroy(child.gameObject);
+        }
+    }
+    public void InitializeIDCard(NeoDialogueMenu controller, Action<NeoDialogueCardController> callback) {
+        // this.controller = controller;
+        this.callback = callback;
+        noStatusEffects = true;
+
+        // isId = true;
+        title.text = "<color=#2ed573>ID Card</color>";
+        count.text = "";
+
+        myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
+        icon.enabled = true;
+        icon.sprite = idIcon;
+        count.enabled = false;
+        description.text = $"Use your ID card. Bypass this challenge.";
+
+        foreach (Transform child in statusContainer) {
+            Destroy(child.gameObject);
+        }
+    }
+    public void InitializeDataCard(NeoDialogueMenu controller, Action<NeoDialogueCardController> callback) {
+        // this.controller = controller;
+        this.callback = callback;
+        noStatusEffects = true;
+
+        // isDataPlay = true;
+        title.text = "<color=#2ed573>Data</color>";
+        count.text = "";
+
+        myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
+        icon.enabled = true;
+        icon.sprite = dataIcon;
+        count.enabled = false;
+        description.text = $"Use knowledge gained from stolen data to bypass this challenge. Consumes 1 personnel data.";
+
+        foreach (Transform child in statusContainer) {
+            Destroy(child.gameObject);
+        }
+    }
 
     public void InitializeStatusContainer(DialogueInput input) {
+        if (noStatusEffects) return;
         foreach (Transform child in statusContainer) {
             Destroy(child.gameObject);
         }
@@ -55,7 +124,17 @@ public class NeoDialogueCardController : MonoBehaviour {
 
     }
     public void ClickCallback() {
-        controller.CardClick(this);
+        // TODO: handle this with callbacks.
+        // if (isEscape) {
+        //     controller.EscapeCardClick(this);
+        // } else if (isId) {
+        //     controller.IDCardClick(this);
+        // } else if (isDataPlay) {
+        //     controller.DataCardClick(this);
+        // } else {
+        //     controller.CardClick(this);
+        // }
+        callback?.Invoke(this);
     }
 
     public IEnumerator PlayCard() {
@@ -68,7 +147,7 @@ public class NeoDialogueCardController : MonoBehaviour {
     }
 
     public IEnumerator RemoveCard() {
-        IEnumerator shrinker = Toolbox.Ease(null, 0.4f, 300f, 0f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+        IEnumerator shrinker = Toolbox.Ease(null, 0.4f, BASE_WIDTH, 0f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             myRect.sizeDelta = new Vector2(amount, 450f);
         }, unscaledTime: true);
 
@@ -78,7 +157,7 @@ public class NeoDialogueCardController : MonoBehaviour {
 
     public IEnumerator DrawCard() {
         cardRect.anchoredPosition = new Vector2(cardRect.anchoredPosition.x, -600f);
-        IEnumerator grower = Toolbox.Ease(null, 0.4f, 0f, 300f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+        IEnumerator grower = Toolbox.Ease(null, 0.4f, 0f, BASE_WIDTH, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             myRect.sizeDelta = new Vector2(amount, 450f);
         }, unscaledTime: true);
         IEnumerator mover = Toolbox.Ease(null, 0.4f, -600f, 0f, PennerDoubleAnimation.BackEaseOut, (amount) => {

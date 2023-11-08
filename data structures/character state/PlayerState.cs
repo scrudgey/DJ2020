@@ -377,7 +377,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public DialogueCard NewDialogueCard() {
         List<DialogueTacticType> tacticTypes = new List<DialogueTacticType>() { DialogueTacticType.lie, DialogueTacticType.deny };
         DialogueTacticType tacticType = Toolbox.RandomFromList(tacticTypes);
-        int baseValue = (int)Toolbox.RandomGaussian(minValue: 10, maxValue: 90);
+        int baseValue = (int)Toolbox.RandomGaussian(minValue: 5, maxValue: 50);
         DialogueCard newCard = new DialogueCard() {
             type = tacticType,
             baseValue = baseValue

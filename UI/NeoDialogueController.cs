@@ -11,7 +11,6 @@ public class NeoDialogueController : MonoBehaviour {
     public GameObject UIEditorCamera;
     public Image leftPortrait;
     public Image rightPortrait;
-    // TODO: use portrait caption!
     public TextMeshProUGUI leftPortraitCaption;
     public TextMeshProUGUI rightPortraitCaption;
     public TextMeshProUGUI doubterText;
@@ -109,10 +108,11 @@ public class NeoDialogueController : MonoBehaviour {
         return Toolbox.ChainCoroutines(shrinker, destroyer);
     }
     void CheckAndEaseOutEarliestDialogue() {
-        if (dialogueContainer.childCount > 4) {
-            Transform earliest = dialogueContainer.GetChild(1);
-            RectTransform container = earliest.GetComponent<RectTransform>();
-            StartCoroutine(easeOutDialogue(container));
+        if (dialogueContainer.childCount > 6) {
+            // Transform earliest = dialogueContainer.GetChild(1);
+            // RectTransform container = earliest.GetComponent<RectTransform>();
+            // StartCoroutine(easeOutDialogue(container));
+            Destroy(dialogueContainer.transform.GetFirstChild(true));
         }
     }
     public IEnumerator SetLeftDialogueText(string content, string challengeContent) {

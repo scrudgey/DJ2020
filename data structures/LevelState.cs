@@ -21,7 +21,7 @@ public class LevelState {
             cyberGraph = CyberGraph.LoadAll(template.levelName),
             alarmGraph = AlarmGraph.LoadAll(template.levelName),
             disguise = plan.startWithDisguise(),
-            dialogueCards = Enumerable.Range(0, 3).Select((i) => playerState.NewDialogueCard()).ToList(),
+            dialogueCards = Enumerable.Range(0, 2).Select((i) => playerState.NewDialogueCard()).ToList(),
             objectivesState = template.objectives.Concat(template.bonusObjectives)
                 .ToDictionary(t => t, t => ObjectiveStatus.inProgress)
         }

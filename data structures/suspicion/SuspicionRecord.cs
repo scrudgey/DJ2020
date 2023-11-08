@@ -24,7 +24,9 @@ public class SuspicionRecord {
     public float maxLifetime;
     public Suspiciousness suspiciousness;
     public SuspicionDialogueParameters dialogue;
-    public int challengeValue = (int)Toolbox.RandomGaussian(20, 80);
+    public bool allowIDCardResponse;
+    public bool allowDataResponse;
+    public int challengeValue = (int)Toolbox.RandomGaussian(30, 80);
 
     public void Update(float deltaTime) {
         lifetime -= deltaTime;
@@ -38,7 +40,8 @@ public class SuspicionRecord {
         if (viableTactics.Count > 0) {
             tactic = Toolbox.RandomFromList(viableTactics);
         } else {
-            tactic = Toolbox.RandomFromList(dialogue.tactics);
+            List<DialogueTactic> viableRandomTactics = dialogue.tactics.Where(tactic => tactic.tacticType != DialogueTacticType.item).ToList();
+            tactic = Toolbox.RandomFromList(viableRandomTactics);
             Debug.LogError($"missing tactic type {tacticType} for {content}");
         }
         return tactic;
@@ -50,6 +53,7 @@ public class SuspicionRecord {
             maxLifetime = 120,
             lifetime = 120,
             suspiciousness = Suspiciousness.suspicious,
+            allowIDCardResponse = true,
             dialogue = new SuspicionDialogueParameters {
                 challenge = "You there, stop! You're not authorized to be in this area! Show me your identification!",
                 tactics = new List<DialogueTactic>{
@@ -65,21 +69,15 @@ public class SuspicionRecord {
                             successResponse = "I'm sorry, I didn't mean to intrude. Carry on.",
                             failResponse = "Rockwell, eh? Let's see what he has to say about it."
                         },
-
-                    }
+                        new DialogueTactic {
+                            tacticType = DialogueTacticType.item,
+                            content = "Sure, check my ID card.",
+                            successResponse = "I see.",
+                            failResponse = "Where did you get this?"
+                        }
+                }
             }
         };
-
-        if (input.playerHasID) {
-            record.dialogue.tactics.Add(
-                new DialogueTactic {
-                    tacticType = DialogueTacticType.item,
-                    content = "Sure, check my ID card.",
-                    successResponse = "I see.",
-                    failResponse = "Where did you get this?"
-                });
-        }
-        // TODO: more checks
 
         return record;
     }
@@ -201,6 +199,7 @@ public class SuspicionRecord {
         maxLifetime = 120,
         lifetime = 120,
         suspiciousness = Suspiciousness.suspicious,
+        allowDataResponse = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = "Do you know anything about the dead body that was found?",
             tactics = new List<DialogueTactic>{
@@ -215,6 +214,12 @@ public class SuspicionRecord {
                             content = "Body? How do I know you didn't kill this person?",
                             successResponse = "Obviously I had nothing to do with it.",
                             failResponse = "I don't know but you seem awfully suspicious to me."
+                        },
+                        new DialogueTactic{
+                            tacticType = DialogueTacticType.item,
+                            content = "Jan from accounting sent me to rectify the org chart. The body will be cleaned up by the end of the day.",
+                            successResponse = "Tell Jan I said hi.",
+                            failResponse = "You don't look like an accountant to me."
                         }
                     }
         }

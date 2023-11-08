@@ -281,22 +281,31 @@ lie, deny, bluff, redirect, challenge
 * "told 5 denys"
 * set names
 * prevent clicking of multiple cards
+* escape
+* play escape card
+    * blit text
+* handle dialogue result properly
+* items
+    * ID card
+    * personnel data
+* are colors right?
+* ensure escape comes last
+* test not id card and card goes away
+* missing tactic resolved as item
+* id card icon
+* blink "warning" when over bullshit threshold
+* pulse [doubt] during bullshit phase
+* check: can you click the new card?
+* continue button in dialogue container?
 
-blink "warning" when over bullshit threshold
-
-escape
-items
-    ID card
-    personnel data
-
-when to handle success vs fail response?s
-continue button in dialogue container?
 support nimrod
-
+implement personnel data
+implement all suspicion records
 
 
 
 mechanical questions:
+    when to handle success vs fail response?s
 
     threshold correct
         take status effects

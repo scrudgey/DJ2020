@@ -10,7 +10,7 @@ public class SphereInvestigateState : SphereControlState {
     private TaskNode rootTaskNode;
     private TaskNode alertTaskNode;
     public SpeechTextController speechTextController;
-    public DialogueController.DialogueResult dialogueResult;
+    public NeoDialogueMenu.DialogueResult dialogueResult;
     float timeSinceSawPlayer;
     Vector3 lastSeenPlayerPosition;
     TaskOpenDialogue dialogueTask;
@@ -32,7 +32,7 @@ public class SphereInvestigateState : SphereControlState {
             lifetime = 6f,
             speechText = "HQ respond. Intruder spotted. Raise the alarm.",
         };
-        DialogueController.OnDialogueConclude += HandleDialogueResult;
+        // DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
     public override void Enter() {
         base.Enter();
@@ -61,7 +61,7 @@ public class SphereInvestigateState : SphereControlState {
         return integratedPlayerMovement > AGGRESSION_THRESHOLD;
     }
     void SetupRootNode() {
-        dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.myCharacterInput());
+        dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.myCharacterInput(), HandleDialogueResult);
 
         alertTaskNode = new Sequence(
             new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, owner.physicalKeys, characterController, arrivalDistance: 2f) {
@@ -158,8 +158,8 @@ public class SphereInvestigateState : SphereControlState {
         return input;
     }
 
-    public void HandleDialogueResult(DialogueController.DialogueResult result) {
-        DialogueController.OnDialogueConclude -= HandleDialogueResult;
+    public void HandleDialogueResult(NeoDialogueMenu.DialogueResult result) {
+        // DialogueController.OnDialogueConclude -= HandleDialogueResult;
         dialogueResult = result;
         owner.StateFinished(this, TaskState.success);
     }

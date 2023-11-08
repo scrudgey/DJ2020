@@ -12,7 +12,7 @@ public class WorkerInvestigateState : WorkerNPCControlState {
     private TaskNode rootTaskNode;
     private TaskNode alertTaskNode;
     public SpeechTextController speechTextController;
-    public DialogueController.DialogueResult dialogueResult;
+    public NeoDialogueMenu.DialogueResult dialogueResult;
     float timeSinceSawPlayer;
     Vector3 lastSeenPlayerPosition;
     TaskOpenDialogue dialogueTask;
@@ -26,7 +26,6 @@ public class WorkerInvestigateState : WorkerNPCControlState {
         this.characterController = characterController;
         speechTextController = owner.GetComponentInChildren<SpeechTextController>();
 
-        DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
     public override void Enter() {
         base.Enter();
@@ -54,7 +53,7 @@ public class WorkerInvestigateState : WorkerNPCControlState {
     //     return integratedPlayerMovement > AGGRESSION_THRESHOLD;
     // }
     void SetupRootNode() {
-        dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.MyCharacterInput());
+        dialogueTask = new TaskOpenDialogue(owner.gameObject, owner.MyCharacterInput(), HandleDialogueResult);
 
         alertTaskNode = new Sequence(
             new TaskMoveToKey(owner.transform, LAST_SEEN_PLAYER_POSITION_KEY, new HashSet<int>(), characterController, arrivalDistance: 2f) {
@@ -139,8 +138,7 @@ public class WorkerInvestigateState : WorkerNPCControlState {
         return input;
     }
 
-    public void HandleDialogueResult(DialogueController.DialogueResult result) {
-        DialogueController.OnDialogueConclude -= HandleDialogueResult;
+    public void HandleDialogueResult(NeoDialogueMenu.DialogueResult result) {
         dialogueResult = result;
         owner.StateFinished(this);
     }

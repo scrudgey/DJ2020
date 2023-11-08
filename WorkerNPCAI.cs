@@ -206,10 +206,10 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             case WorkerInvestigateState:
                 timeSinceInterrogatedStranger = 120f;
                 WorkerInvestigateState investigateState = (WorkerInvestigateState)routine;
-                if (investigateState.dialogueResult == DialogueController.DialogueResult.fail) {
+                if (investigateState.dialogueResult == NeoDialogueMenu.DialogueResult.fail) {
                     ChangeState(new WorkerPanicRunState(this, characterController));
                     notifyGuard = true;
-                } else if (investigateState.dialogueResult == DialogueController.DialogueResult.stun) {
+                } else if (investigateState.dialogueResult == NeoDialogueMenu.DialogueResult.stun) {
                     alertHandler.ShowWarn();
                     ChangeState(new WorkerPanicRunState(this, characterController));
                     notifyGuard = true;
