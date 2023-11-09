@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
@@ -35,44 +36,26 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
     public void Initialize(DialogueInput input) {
         UpdateBars(0);
         UpdateThresholdPosition(0);
-        InitializeStatusContainer(input);
     }
-    void InitializeStatusContainer(DialogueInput input) {
+    void InitializeStatusContainer(Dictionary<string, int> statusEffects) {
         foreach (Transform child in statusContainer) {
             Destroy(child.gameObject);
         }
-        if (input.alarmActive) {
-            CreateStatusElement("alarm is active", 1);
-        }
-        switch (input.npcCharacter.alertness) {
-            case Alertness.normal:
-                CreateStatusElement("normal posture", 0);
-                break;
-            case Alertness.alert:
-                CreateStatusElement("on alert", 2);
-                break;
-            case Alertness.distracted:
-                CreateStatusElement("distracted", -1);
-                break;
-        }
-        switch (input.levelState.template.sensitivityLevel) {
-            case SensitivityLevel.publicProperty:
-                CreateStatusElement("on public property", -1);
-                break;
-            case SensitivityLevel.semiprivateProperty:
-            case SensitivityLevel.privateProperty:
-                CreateStatusElement("on private property", 1);
-                break;
-            case SensitivityLevel.restrictedProperty:
-                CreateStatusElement("in restricted area", 2);
-                break;
+        CreateStatusElement($"base value", 50, plain: true);
+        foreach (KeyValuePair<string, int> entry in statusEffects) {
+            CreateStatusElement(entry.Key, entry.Value);
         }
     }
-    public void CreateStatusElement(string content, int alarmCount) {
+    public IEnumerator SetBullshitThreshold(Dictionary<string, int> statusEffects) {
+        InitializeStatusContainer(statusEffects);
+        bullshitThreshold = 50 + statusEffects.Values.Sum();
+        return moveThresholdBar(bullshitThreshold);
+    }
+    public void CreateStatusElement(string content, int alarmCount, bool plain = false) {
         GameObject statusObj = GameObject.Instantiate(statusPrefab);
         statusObj.transform.SetParent(statusContainer, false);
         DialogueStatusEntry status = statusObj.GetComponent<DialogueStatusEntry>();
-        status.InitializeNumeric(alarmCount, content);
+        status.InitializeNumeric(alarmCount, content, plain: plain);
     }
 
     public IEnumerator SetTargetBullshit(int amount, Func<IEnumerator> doubterPulseFunc) {
@@ -151,15 +134,10 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
 
 
 
-    public IEnumerator SetBullshitThreshold(int threshold) {
-        // bullshitThresholdText.text = $"{threshold}";
-        bullshitThreshold = threshold;
-        return moveThresholdBar(bullshitThreshold);
-    }
     public IEnumerator moveThresholdBar(int targetThreshold) {
         yield return null;
         Toolbox.RandomizeOneShot(audioSource, thresholdSound);
-        IEnumerator mover = Toolbox.Ease(null, 1f, currentThreshold, targetThreshold, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+        IEnumerator mover = Toolbox.Ease(null, 0.5f, currentThreshold, targetThreshold, PennerDoubleAnimation.SineEaseOut, (amount) => {
             currentThreshold = amount;
             UpdateThresholdPosition((int)amount);
         }, unscaledTime: true);

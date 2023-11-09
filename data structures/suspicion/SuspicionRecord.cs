@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Nimrod;
 using UnityEngine;
 [System.Serializable]
 public class SuspicionDialogueParameters {
@@ -14,6 +15,16 @@ public class DialogueTactic {
     public string content;
     public string successResponse;
     public string failResponse;
+    public Grammar grammar;
+    public string getContent() {
+        return grammar.Parse(content);
+    }
+    public string getSuccessResponse() {
+        return grammar.Parse(successResponse);
+    }
+    public string getFailResponse() {
+        return grammar.Parse(failResponse);
+    }
 }
 
 public enum DialogueTacticType { none, lie, deny, bluff, redirect, challenge, item, escape }
@@ -26,6 +37,7 @@ public class SuspicionRecord {
     public SuspicionDialogueParameters dialogue;
     public bool allowIDCardResponse;
     public bool allowDataResponse;
+    public List<string> grammarFiles = new List<string>();
     public int challengeValue = (int)Toolbox.RandomGaussian(30, 80);
 
     public void Update(float deltaTime) {
@@ -37,6 +49,12 @@ public class SuspicionRecord {
     public DialogueTactic getResponse(DialogueTacticType tacticType) {
         DialogueTactic tactic;
         List<DialogueTactic> viableTactics = dialogue.tactics.Where(tactic => tactic.tacticType == tacticType).ToList();
+        // TODO: cache the grammar somewhere
+        Grammar grammar = new Grammar();
+        grammar.Load("suspicion");
+        foreach (string grammarFile in grammarFiles) {
+            grammar.Load(grammarFile);
+        }
         if (viableTactics.Count > 0) {
             tactic = Toolbox.RandomFromList(viableTactics);
         } else {
@@ -44,6 +62,7 @@ public class SuspicionRecord {
             tactic = Toolbox.RandomFromList(viableRandomTactics);
             Debug.LogError($"missing tactic type {tacticType} for {content}");
         }
+        tactic.grammar = grammar;
         return tactic;
     }
 
@@ -59,7 +78,7 @@ public class SuspicionRecord {
                 tactics = new List<DialogueTactic>{
                         new DialogueTactic {
                             tacticType = DialogueTacticType.lie,
-                            content = "I am P.J. Pennypacker, security inspector.",
+                            content = "I am {fakename}, security inspector.",
                             successResponse = "Yes, that sounds right. Ok then.",
                             failResponse = "I don't think so."
                         },

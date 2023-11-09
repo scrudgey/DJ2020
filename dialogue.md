@@ -90,9 +90,6 @@ multiplier from speech skill
 etiquettes?
     corporate, street, science?
 
-
-
-
 ## data interaction
 
 data can come from datastore, wastebasket, printouts, desk drawer, filing cabinet, datacube
@@ -118,7 +115,7 @@ icons for data type:
     paydata
     lie data
     password data
-    objective
+    objective / location
     visibility
 
 hacking verbs:
@@ -131,6 +128,7 @@ hacking verbs:
 
 map now plays a role in discoverability
 highlight objectives!
+possibly use dialogue with civilian/worker to locate objectives
 
 
 ## status effects
@@ -144,185 +142,19 @@ highlight objectives!
     tactic use          - affects card
     appearance          - affects card * 
 
-player statuses affect cards
-npc and level statuses affect threshold
-
-maybe the statuses don't appear on the portraits
-    visually awkward
-    what do they modify?
-        suspicion threshold
-        player card rating
-
-start:
-    initialize dialogue
-    show initial challenge
-    ease in suspicion bar
-    set suspicion threshold
-    show challenge level and indicate it on the suspicion bar
-    ease in dialogue responses & challenge level
-        lie
-        bluff
-        id card, etc
-    dialogue responses start disabled
-    activate response buttons
-
-    when player mouses over response button:
-        ease the card up
-        indicate effect on suspicion bar
-    
-    when player clicks response button:
-        activate card:
-            move it out of stack
-            apply card and challenge to suspicion bar
-            ease in new card
-        show dialogue
-        show continue button
-    
-    when player clicks continue button:
-        resolve effect on suspicion bar
-        show dialogue response
-        show continue button
-
-    when player clicks continue button:
-
-
-✔ separate dialogue management into its own class
-update the UI
-create the new UI:
-    suspicionbar
-    responses and challenge
-
-why not just play best card always?
-    the guard challenge is random- you don't want to waste a good card on a weak 
-    challenge when you'll need it later.
-    your best card might be a high scoring lie, but it'll dilute your other lie, when you could use the moderate scoring bluff instead
-    mostly when you're trying to buffer for later challenges
-
-    if you are holding a high 10 lie, and two 5 lies
-    playing the 5 will dilute your 10.
-    playing the 10 will dilute your 5s, 
-
-    the penalty is for playing x lies in a row:
-        now, you just played a 5 lie to preserve your 10
-        and you get another 5- now worth 2.5
-        do you play it and hope to get a bluff? preserving the 10?
-    this only really works if there are multiple challenges-
-        sometimes we see one, sometimes two
-    but if the bullshit meter & cards carry over, then it adds to the strategy.
-
-    since conditions change, you might start out the conversation
-    in a deficit, you have to work it down a lot to get out ok
-
-end conditions
-    does not end when you're above threshold
-    this gives you opportunity to cut & run
-
-extra ways to pay down bullshit meter
-    consumable skill
-
 lie, deny, bluff, redirect, challenge
 
 
-
-
-* card state belongs to level delta
-* bullshhit level belongs to level delta
-* show initial dialogue
-* support threshold 
-* set challenge text
-* clicking a card triggers the correct text response
-* overall flow control 
-    * when challenge starts: 
-        * npc dialogue happens
-        * then apply bullshit meter (rising sound)
-        * then enable cards
-    * player chooses a card:
-        * disable cards
-        * card goes up and disappears
-        * player dialogue happens
-        * apply bullshit meter    (decreasing sound)
-        * new card?
-        ? continue button appears
-    * player presses continue:
-        * npc response happens
-        * apply bullshit meter?
-* audio comes in first?
-* no sound for second bullshit move?
-* fractional bs amout
-* bullshit starts 55- should start 0, ease up to 55
-* threshold starts 85- should start 0, ease up to 85
-* setting bullshit to 0
-* then updating to current bullshit (0)
-* takes too long
-* more delays between things
-* draw new card
-* card numbers generated correctly
-* some delay between card action and responses
-* blink final threshold text for emphasis
-* no sound for threshold meter
-* standardize card drawing
-* disable and enable cards correctly
-* ease in bullshit meter from the side
-* challenges generated correctly
-* show [LIE]
-* allow status effects
-    * correctly show base value
-    * apply status effect
-    * number of lies told
-* 2 cards
-* faster card play
-* challenges correct
-* conclusion
-* conclusion:
-* when end is pressed:
-* denser dialogue segments
-* correct ease out of dialogue 
-* fix textblit to blit all of <>at once
-* "told 5 denys"
-* set names
-* prevent clicking of multiple cards
-* escape
-* play escape card
-    * blit text
-* handle dialogue result properly
-* items
-    * ID card
-    * personnel data
-* are colors right?
-* ensure escape comes last
-* test not id card and card goes away
-* missing tactic resolved as item
-* id card icon
-* blink "warning" when over bullshit threshold
-* pulse [doubt] during bullshit phase
-* check: can you click the new card?
-* continue button in dialogue container?
-
-support nimrod
-implement personnel data
-implement all suspicion records
-
-
-
-mechanical questions:
+## mechanical questions:
     when to handle success vs fail response?s
+        <color=#ff4757>[FAIL]</color>
 
-    threshold correct
-        take status effects
     bonus consumable
         double value
         bonus decrease
         
-    flaw:
-        if the threshold is high- you just need to hold a card for 100-threshold until the last challenge.
-    challenge 60
-    lie 30      -> 30, lie 24   (-6)
-    lie 47      -> 13, lie 15   (-2)
 
-    the main only reason to not play the high card is to save it for later potential
-        -> but your strategy can be to just save one high card until you hit bullshit threshold?
-    in effect, you want to match the played challenge.
-    suppose you have two lies and the choice of playing a high card against a low challenge, or a low challenge
-        play the high card and you waste it, play the low card and you sabotage the high card
+## todo
 
-    what about success/fail rolls?
+implement personnel data
+implement all suspicion records

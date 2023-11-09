@@ -11,6 +11,8 @@ public class NeoDialogueCardController : MonoBehaviour {
     public TextMeshProUGUI title;
     public TextMeshProUGUI count;
     [Header("icon")]
+    public GameObject topSpacer;
+    public GameObject iconHolder;
     public Image icon;
     public Sprite dataIcon;
     public Sprite idIcon;
@@ -36,10 +38,12 @@ public class NeoDialogueCardController : MonoBehaviour {
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         int derivedValue = cardData.derivedValue(input);
-
-        title.text = $"<color=#ffa502>{cardData.type.ToString()}</color>";
         count.text = derivedValue.ToString();
 
+        title.text = $"<color=#ffa502>{cardData.type.ToString()}</color>";
+
+        iconHolder.SetActive(false);
+        topSpacer.SetActive(false);
         icon.enabled = false;
         count.enabled = true;
         description.text = $"Decrease bullshit meter by {derivedValue} points";
@@ -56,6 +60,9 @@ public class NeoDialogueCardController : MonoBehaviour {
         count.text = "";
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
+        iconHolder.SetActive(false);
+        topSpacer.SetActive(true);
+
         icon.enabled = false;
         count.enabled = false;
         description.text = $"Escape the conversation. Opponent is momentarily stunned.";
@@ -74,6 +81,8 @@ public class NeoDialogueCardController : MonoBehaviour {
         count.text = "";
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
+        iconHolder.SetActive(true);
+        topSpacer.SetActive(false);
         icon.enabled = true;
         icon.sprite = idIcon;
         count.enabled = false;
@@ -93,6 +102,8 @@ public class NeoDialogueCardController : MonoBehaviour {
         count.text = "";
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
+        iconHolder.SetActive(true);
+        topSpacer.SetActive(false);
         icon.enabled = true;
         icon.sprite = dataIcon;
         count.enabled = false;
@@ -108,6 +119,8 @@ public class NeoDialogueCardController : MonoBehaviour {
         foreach (Transform child in statusContainer) {
             Destroy(child.gameObject);
         }
+        int derivedValue = cardData.derivedValue(input);
+        count.text = derivedValue.ToString();
         CreateStatusElement($"base value", cardData.baseValue, plain: true);
         foreach (KeyValuePair<string, int> kvp in cardData.getStatusEffects(input)) {
             CreateStatusElement(kvp.Key, kvp.Value);

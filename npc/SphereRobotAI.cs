@@ -156,6 +156,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 highlight.target = null;
                 SphereInvestigateState investigateState = (SphereInvestigateState)routine;
                 if (investigateState.dialogueResult == NeoDialogueMenu.DialogueResult.fail) {
+                    // TODO: why fails?
                     ChangeState(new SphereHoldAtGunpointState(this));
                 } else if (investigateState.dialogueResult == NeoDialogueMenu.DialogueResult.stun) {
                     alertHandler.ShowWarn();

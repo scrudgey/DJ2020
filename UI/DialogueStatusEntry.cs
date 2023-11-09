@@ -11,6 +11,7 @@ public class DialogueStatusEntry : MonoBehaviour {
     public Color green;
     public Color yellow;
     public Color red;
+    public Color white;
     public void Initialize(int alarmCount, string content) {
         contentText.text = content;
         dotText.text = alarmCount switch {
@@ -35,12 +36,16 @@ public class DialogueStatusEntry : MonoBehaviour {
         contentText.text = content;
         if (plain) {
             dotText.text = $"{alarmCount}";
-        } else if (alarmCount <= 0) {
+            dotText.color = white;
+        } else if (alarmCount < 0) {
             dotText.text = $"{alarmCount}";
             dotText.color = red;
-        } else {
+        } else if (alarmCount > 0) {
             dotText.text = $"+{alarmCount}";
             dotText.color = green;
+        } else {
+            dotText.text = $"+0";
+            dotText.color = white;
         }
     }
 }

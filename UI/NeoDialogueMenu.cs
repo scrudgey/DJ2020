@@ -25,6 +25,8 @@ public class NeoDialogueMenu : MonoBehaviour {
     public Color red;
     // public Action en 
     Stack<SuspicionRecord> unresolvedSuspicionRecords;
+
+    SuspicionRecord failedSuspicionRecord;
     DialogueInput input;
     DialogueResult dialogueResult;
     SuspicionRecord currentChallenge;
@@ -45,14 +47,15 @@ public class NeoDialogueMenu : MonoBehaviour {
         SuspicionRecord identityChallenge = SuspicionRecord.identitySuspicion(input);
 
 
-        IEnumerator easeInBullshit = Toolbox.Ease(null, 1f, -1425.18f, -885.66f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+        IEnumerator easeInBullshit = Toolbox.Ease(null, 0.5f, -1425.18f, -885.66f, PennerDoubleAnimation.SineEaseOut, (amount) => {
             bullshitRect.anchoredPosition = new Vector2(amount, -224f);
         }, unscaledTime: true);
         // set current bullshit- controlled by level delta
         IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
 
         // set bullshit threshold 
-        IEnumerator threshold = bullshitMeter.SetBullshitThreshold(65);
+        Dictionary<string, int> effects = getThresholdStatusEffects(input);
+        IEnumerator threshold = bullshitMeter.SetBullshitThreshold(effects);
 
         IEnumerator challenge = StartNextChallenge(manualSuspicionRecord: identityChallenge);
 
@@ -61,7 +64,6 @@ public class NeoDialogueMenu : MonoBehaviour {
             easeInBullshit,
             threshold,
             bullshitter,
-            new WaitForSecondsRealtime(1f),
             challenge
             ));
     }
@@ -174,7 +176,7 @@ public class NeoDialogueMenu : MonoBehaviour {
 
         IEnumerator cardPlay = cardController.PlayCard();
 
-        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{response.tacticType.ToString().ToUpper()}]</color> {response.content}");
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{response.tacticType.ToString().ToUpper()}]</color> {response.getContent()}");
 
         IEnumerator removeCard = cardController.RemoveCard();
 
@@ -189,9 +191,9 @@ public class NeoDialogueMenu : MonoBehaviour {
 
         IEnumerator responseBlit;
         if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
-            responseBlit = neoDialogueController.SetLeftDialogueText(response.successResponse, "");
+            responseBlit = neoDialogueController.SetLeftDialogueText(response.getSuccessResponse(), "");
         } else {
-            responseBlit = neoDialogueController.SetLeftDialogueText(response.failResponse, "");
+            responseBlit = neoDialogueController.SetLeftDialogueText(response.getFailResponse(), "");
         }
         IEnumerator nextBit;
         // next challenge
@@ -227,6 +229,24 @@ public class NeoDialogueMenu : MonoBehaviour {
             ));
         };
 
+    }
+    SuspicionRecord GetFailSuspicion() {
+        string resultString = GameManager.I.gameData.levelState.delta.lastTactics.First() switch {
+            DialogueTacticType.bluff => "bluff called",
+            DialogueTacticType.challenge => "tried to intimidate a guard",
+            DialogueTacticType.deny => "obvious denial of facts",
+            // DialogueTacticType.escape => "[ESCAPE]",
+            DialogueTacticType.item => "used counterfeit credentials",
+            DialogueTacticType.lie => "caught in a lie",
+            DialogueTacticType.redirect => "shadiness",
+            _ => "general awkwardness"
+        };
+        return new SuspicionRecord {
+            content = resultString,
+            suspiciousness = Suspiciousness.aggressive,
+            lifetime = 120f,
+            maxLifetime = 120f
+        };
     }
 
     public void EscapeCardClick(NeoDialogueCardController cardController) {
@@ -318,7 +338,7 @@ public class NeoDialogueMenu : MonoBehaviour {
 
         IEnumerator cardPlay = cardController.PlayCard();
 
-        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[DATA]</color> {response.content}");
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[DATA]</color> {response.getContent()}");
 
         IEnumerator removeCard = cardController.RemoveCard();
         IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
@@ -328,7 +348,7 @@ public class NeoDialogueMenu : MonoBehaviour {
         IEnumerator continuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(true); });
         IEnumerator antiContinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
 
-        IEnumerator responseBlit = neoDialogueController.SetLeftDialogueText("I see.", "");
+        IEnumerator responseBlit = neoDialogueController.SetLeftDialogueText(response.getSuccessResponse(), "");
 
         IEnumerator nextBit;
         // next challenge
@@ -383,6 +403,7 @@ public class NeoDialogueMenu : MonoBehaviour {
         if (dialogueResult == DialogueResult.success) {
             content = "Let me know if you see anything suspicious.";
         } else if (dialogueResult == DialogueResult.fail) {
+            GameManager.I.AddSuspicionRecord(GetFailSuspicion());
             content = "You're coming with me, creep!";
         }
         // continueButtonAction = () => { Conclude(); };
@@ -413,6 +434,40 @@ public class NeoDialogueMenu : MonoBehaviour {
         }
         doubterText.color = red;
         doubterText.enabled = false;
+    }
+
+
+    public Dictionary<string, int> getThresholdStatusEffects(DialogueInput input) {
+        Dictionary<string, int> effects = new Dictionary<string, int>();
+
+        if (input.alarmActive) {
+            effects.Add("alarm is active", -20);
+        }
+        switch (input.npcCharacter.alertness) {
+            case Alertness.normal:
+                effects.Add("normal posture", 0);
+                break;
+            case Alertness.alert:
+                effects.Add("on alert", -10);
+                break;
+            case Alertness.distracted:
+                effects.Add("distracted", 10);
+                break;
+        }
+        switch (input.levelState.template.sensitivityLevel) {
+            case SensitivityLevel.publicProperty:
+                effects.Add("on public property", +10);
+                break;
+            case SensitivityLevel.semiprivateProperty:
+            case SensitivityLevel.privateProperty:
+                effects.Add("on private property", 0);
+                break;
+            case SensitivityLevel.restrictedProperty:
+                effects.Add("in restricted area", -20);
+                break;
+        }
+
+        return effects;
     }
 }
 

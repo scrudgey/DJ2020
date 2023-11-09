@@ -24,7 +24,7 @@ namespace UI {
             commands["resetPerks"] = ResetPerks;
             commands["gunskill"] = GunSkill;
             commands["completeMission"] = CompleteMission;
-            commands["suspicion"] = Suspicion;
+            commands["sus"] = Suspicion;
         }
         public void OnEnable() {
             TakeFocus();
