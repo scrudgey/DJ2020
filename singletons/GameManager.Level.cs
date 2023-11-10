@@ -210,7 +210,7 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.completedLevels.Add(gameData.levelState.template.levelName);
         gameData.playerState.credits += gameData.levelState.template.creditReward;
         gameData.playerState.credits += gameData.levelState.delta.levelAcquiredCredits;
-        gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata);
+        gameData.playerState.payDatas.AddRange(gameData.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.pay));
         gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot.Where(loot => loot.isCollectible));
         gameData.playerState.skillpoints += 1;
 

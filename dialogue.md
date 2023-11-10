@@ -146,15 +146,21 @@ lie, deny, bluff, redirect, challenge
 
 
 ## mechanical questions:
-    when to handle success vs fail response?s
-        <color=#ff4757>[FAIL]</color>
+when to handle success vs fail response?s
+    <color=#ff4757>[FAIL]</color>
 
-    bonus consumable
-        double value
-        bonus decrease
-        
+bonus consumable
+    double value
+    bonus decrease
+    
+limit the number of tactics per level?
 
-## todo
 
-implement personnel data
-implement all suspicion records
+# todo
+
+create perks
+    unlock redirect, unlock challenge
+    lie x 2, deny x2, redirect x2, challenge x2
+    speech skill
+populate perk menu
+

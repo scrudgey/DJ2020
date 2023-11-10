@@ -28,17 +28,17 @@ public class DialogueCard {
         effects.Add($"speech skill {input.playerSpeechSkill}", 5 * input.playerSpeechSkill);
 
         if (input.playerInDisguise) {
-            effects.Add($"in disguise", +10);
+            effects.Add($"in disguise", -10);
         }
 
         switch (input.playerSuspiciousness) {
             case Suspiciousness.normal:
                 break;
             case Suspiciousness.suspicious:
-                effects.Add($"suspicious appearance", -5);
+                effects.Add($"suspicious appearance", +7);
                 break;
             case Suspiciousness.aggressive:
-                effects.Add($"aggressive appearance", -10);
+                effects.Add($"aggressive appearance", +15);
                 break;
         }
 
@@ -46,7 +46,7 @@ public class DialogueCard {
         if (previousTacticPenalty > 0) {
             int magnitude = (int)((float)baseValue * ((float)previousTacticPenalty / (float)(previousTacticPenalty + 1)));
             string plural = pluralTactic(type);
-            effects.Add($"used {previousTacticPenalty} {plural}", -1 * magnitude);
+            effects.Add($"used {previousTacticPenalty} {plural}", magnitude);
         }
 
         return effects;

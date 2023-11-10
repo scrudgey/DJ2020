@@ -41,14 +41,14 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
         foreach (Transform child in statusContainer) {
             Destroy(child.gameObject);
         }
-        CreateStatusElement($"base value", 50, plain: true);
+        CreateStatusElement($"base value", 70, plain: true);
         foreach (KeyValuePair<string, int> entry in statusEffects) {
             CreateStatusElement(entry.Key, entry.Value);
         }
     }
     public IEnumerator SetBullshitThreshold(Dictionary<string, int> statusEffects) {
         InitializeStatusContainer(statusEffects);
-        bullshitThreshold = 50 + statusEffects.Values.Sum();
+        bullshitThreshold = 70 + statusEffects.Values.Sum();
         return moveThresholdBar(bullshitThreshold);
     }
     public void CreateStatusElement(string content, int alarmCount, bool plain = false) {

@@ -3485,9 +3485,8 @@ polish:
     better AI navigation / building search
     better clearsighter
 
-clearsighter visibility should be based on line of sight
-let NPCS walk through each other
-highlight NPCs that are shooting me, and apply clearsight
-remove attack surface cam positioning
-
-
+    clearsighter visibility should be based on line of sight
+    let NPCS walk through each other
+    highlight NPCs that are shooting me, and apply clearsight
+    remove attack surface cam positioning
+    shooting should visually be suspicious

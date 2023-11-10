@@ -46,7 +46,7 @@ public class NeoDialogueCardController : MonoBehaviour {
         topSpacer.SetActive(false);
         icon.enabled = false;
         count.enabled = true;
-        description.text = $"Decrease bullshit meter by {derivedValue} points";
+        description.text = $"Increase bullshit meter by {derivedValue} points";
 
         InitializeStatusContainer(input);
     }
@@ -137,16 +137,6 @@ public class NeoDialogueCardController : MonoBehaviour {
 
     }
     public void ClickCallback() {
-        // TODO: handle this with callbacks.
-        // if (isEscape) {
-        //     controller.EscapeCardClick(this);
-        // } else if (isId) {
-        //     controller.IDCardClick(this);
-        // } else if (isDataPlay) {
-        //     controller.DataCardClick(this);
-        // } else {
-        //     controller.CardClick(this);
-        // }
         callback?.Invoke(this);
     }
 

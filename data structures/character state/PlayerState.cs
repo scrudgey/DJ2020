@@ -42,23 +42,10 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     // stats
     public int cyberlegsLevel;
     public bool cyberEyesThermal;
-    // public bool thirdWeaponSlot;
     public bool cyberEyesThermalBuff;
-    // public Dictionary<GunType, int> gunSkillLevel = new Dictionary<GunType, int>{
-    //     {GunType.pistol, 1},
-    //     {GunType.smg, 1},
-    //     {GunType.rifle, 1},
-    //     {GunType.shotgun, 1},
-    //     {GunType.sword, 1},
-    // };
-
-
-    // TODO: remove these
-    // public int speechSkillLevel;
     public int maxConcurrentNetworkHacks;
     public float hackSpeedCoefficient;
     public float hackRadius;
-
 
     public SpeechEtiquette[] etiquettes;
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
