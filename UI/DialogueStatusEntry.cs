@@ -32,17 +32,25 @@ public class DialogueStatusEntry : MonoBehaviour {
         }
     }
 
-    public void InitializeNumeric(int alarmCount, string content, bool plain = false) {
+    public void InitializeNumeric(int alarmCount, string content, bool positiveIsBad = false, bool plain = false) {
         contentText.text = content;
         if (plain) {
             dotText.text = $"{alarmCount}";
             dotText.color = white;
         } else if (alarmCount < 0) {
             dotText.text = $"{alarmCount}";
-            dotText.color = red;
+            if (positiveIsBad) {
+                dotText.color = green;
+            } else {
+                dotText.color = red;
+            }
         } else if (alarmCount > 0) {
             dotText.text = $"+{alarmCount}";
-            dotText.color = green;
+            if (positiveIsBad) {
+                dotText.color = red;
+            } else {
+                dotText.color = green;
+            }
         } else {
             dotText.text = $"+0";
             dotText.color = white;

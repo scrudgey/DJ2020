@@ -38,7 +38,7 @@ public class NeoDialogueCardController : MonoBehaviour {
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         int derivedValue = cardData.derivedValue(input);
-        count.text = derivedValue.ToString();
+        count.text = $"-{derivedValue.ToString()} bullshit";
 
         title.text = $"<color=#ffa502>{cardData.type.ToString()}</color>";
 
@@ -61,7 +61,8 @@ public class NeoDialogueCardController : MonoBehaviour {
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         iconHolder.SetActive(false);
-        topSpacer.SetActive(true);
+        // topSpacer.SetActive(true);
+        topSpacer.SetActive(false);
 
         icon.enabled = false;
         count.enabled = false;
@@ -78,7 +79,7 @@ public class NeoDialogueCardController : MonoBehaviour {
 
         // isId = true;
         title.text = "<color=#2ed573>ID Card</color>";
-        count.text = "";
+        count.text = $"";
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         iconHolder.SetActive(true);
@@ -99,14 +100,14 @@ public class NeoDialogueCardController : MonoBehaviour {
 
         // isDataPlay = true;
         title.text = "<color=#2ed573>Data</color>";
-        count.text = "";
+        count.text = "-1 personnel data";
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         iconHolder.SetActive(true);
         topSpacer.SetActive(false);
         icon.enabled = true;
         icon.sprite = dataIcon;
-        count.enabled = false;
+        count.enabled = true;
         description.text = $"Use knowledge gained from stolen data to bypass this challenge. Consumes 1 personnel data.";
 
         foreach (Transform child in statusContainer) {
@@ -120,7 +121,7 @@ public class NeoDialogueCardController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         int derivedValue = cardData.derivedValue(input);
-        count.text = derivedValue.ToString();
+        count.text = $"<color=#ff4757>+{derivedValue.ToString()} bullshit</color>";
         CreateStatusElement($"base value", cardData.baseValue, plain: true);
         foreach (KeyValuePair<string, int> kvp in cardData.getStatusEffects(input)) {
             CreateStatusElement(kvp.Key, kvp.Value);
@@ -130,7 +131,7 @@ public class NeoDialogueCardController : MonoBehaviour {
         GameObject statusObj = GameObject.Instantiate(statusRecordPrefab);
         statusObj.transform.SetParent(statusContainer, false);
         DialogueStatusEntry status = statusObj.GetComponent<DialogueStatusEntry>();
-        status.InitializeNumeric(alarmCount, content, plain: plain);
+        status.InitializeNumeric(alarmCount, content, positiveIsBad: true, plain: plain);
     }
 
     public void OnMouseOver() {
