@@ -151,57 +151,44 @@ when to handle success vs fail response?s
 
 # todo
 
-bonus consumable
-    double value
-    bonus decrease
-create perks
-    unlock redirect, unlock challenge
-    speech skill
-populate perk menu
-stall/discard
-2x across the board
+* create perks
+    * unlock redirect
+    * unlock challenge
+    * 3 cards in hand
+    * speech skill
+    * higher threshold
+    * stall?
+* populate perk menu
+* 2x across the board
+* trustworthy in two places?
+
+wire up perks:
+    * challenge
+    * redirect
+    * 3card
+    * speech
+    * threshold
+    stall
+
+test perks
+
 numbers drawn from shuffled number deck
 move card on mouseover
+show amount of personnel data
+show stack of played tactics
+bonus consumable ? 
+
+lock icon in skill menu
+highlight unlocked zones in skill menu?
 
 
-L10, L5
 
-PLAY L10
-    L5, X, +10
-        X IS L > 5
-            L5', L7', +10 (PLAY L5') -> +10+5'      20          more likely than L > 10
-        X IS L < 5
-            L5', L3', +10 (PLAY L3') -> +10+3'      16 
-        X IS B > 5'
-            L5', B7, +10  (PLAY ?) -> +10+5'        20
-        X IS B < 5'
-            L5', B3, +10    PLAY B3 -> +10+3        13
-PLAY L5
-    L10', X, +5
-        X IS L > 10                                         
-            L10', L13', +5  (PLAY L10') -> +5+10'   25          less likely
-        X IS L < 10
-            L10', L7', +5   (PLAY L7') -> +5+7'     19
-        X IS B > 10'
-            L10', B13, +5   (PLAY L10) -> +5+10'    25
-        X IS B < 10'
-            L10', B7, +5    PLAY B7 -> +5+7         12
-
-
-10+5' VS 10'+5
-
-in order for play L10 to make sense, 10+5' < 5+10'
-
-if ' is doubling, 20 < 25 
-
-the original doubling idea works... but it's down to probability of drawing different cards.
-right now every draw is random but within a range.
-so if i have L5 and L10 and draw x, x is more likely to be > 5, less likely to be > 10
-
-we need to put some numbers on this before we can draw any conclusions.
-
-assume:
-    1. card values are drawn from normal distribution
-    2. primed values are double
-    3. L vs. B is 50/50
+how does stall work?
+    when stall is unlocked, show button
+    clicking button goes into "stall mode"
+        now clicking cards does not play them.
+            instead marks them for discard
+        cards wiggle to indicate stall mode
+        show buttons "discard" and "cancel"
+            discard is disabled until one card is selected for discard
 

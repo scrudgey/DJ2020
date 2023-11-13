@@ -6,7 +6,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class NeoDialogueMenu : MonoBehaviour {
+public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public enum DialogueResult { success, fail, stun }
     // static public Action<DialogueResult> OnDialogueConclude;
     public NeoDialogueController neoDialogueController;
@@ -448,6 +448,11 @@ public class NeoDialogueMenu : MonoBehaviour {
 
     public Dictionary<string, int> getThresholdStatusEffects(DialogueInput input) {
         Dictionary<string, int> effects = new Dictionary<string, int>();
+
+        int trustworthiness = input.playerState.GetPerkLevel(PerkIdConstants.PERKID_SPEECH_TRUST);
+        if (trustworthiness > 0) {
+            effects.Add("trustworthy", +5 * trustworthiness);
+        }
 
         if (input.alarmActive) {
             effects.Add("alarm is active", -20);

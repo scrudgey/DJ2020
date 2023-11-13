@@ -36,4 +36,10 @@ public interface PerkIdConstants {
     public static readonly string PERKID_SPEECH = "speech";
     public static readonly string PERKID_SWORD_HACK = "cybersword";
     public static readonly string PERKID_THIRD_GUN = "gunslot";
+
+    public static readonly string PERKID_SPEECH_REDIRECT = "redirect";
+    public static readonly string PERKID_SPEECH_CHALLENGE = "challenge";
+    public static readonly string PERKID_SPEECH_3CARD = "3cards";
+    public static readonly string PERKID_SPEECH_TRUST = "trustworthy";
+    public static readonly string PERKID_SPEECH_STALL = "stall";
 }

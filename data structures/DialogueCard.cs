@@ -44,7 +44,8 @@ public class DialogueCard {
 
         int previousTacticPenalty = GameManager.I.gameData.levelState.NumberPreviousTacticType(type);
         if (previousTacticPenalty > 0) {
-            int magnitude = (int)((float)baseValue * ((float)previousTacticPenalty / (float)(previousTacticPenalty + 1)));
+            // int magnitude = (int)((float)baseValue * ((float)previousTacticPenalty / (float)(previousTacticPenalty + 1)));
+            int magnitude = baseValue;
             string plural = pluralTactic(type);
             effects.Add($"used {previousTacticPenalty} {plural}", magnitude);
         }

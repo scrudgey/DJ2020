@@ -363,8 +363,18 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     public DialogueCard NewDialogueCard() {
         List<DialogueTacticType> tacticTypes = new List<DialogueTacticType>() { DialogueTacticType.lie, DialogueTacticType.deny };
+
+        // check for unlocked perks
+        if (PerkIsActivated(PerkIdConstants.PERKID_SPEECH_CHALLENGE)) {
+            tacticTypes.Add(DialogueTacticType.challenge);
+        }
+        if (PerkIsActivated(PerkIdConstants.PERKID_SPEECH_REDIRECT)) {
+            tacticTypes.Add(DialogueTacticType.redirect);
+        }
+
         DialogueTacticType tacticType = Toolbox.RandomFromList(tacticTypes);
-        int baseValue = (int)Toolbox.RandomGaussian(minValue: 5, maxValue: 50);
+        // int baseValue = (int)Toolbox.RandomGaussian(minValue: 5, maxValue: 50);
+        int baseValue = Random.Range(5, 50);
         DialogueCard newCard = new DialogueCard() {
             type = tacticType,
             baseValue = baseValue
