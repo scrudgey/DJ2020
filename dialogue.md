@@ -161,34 +161,29 @@ when to handle success vs fail response?s
 * populate perk menu
 * 2x across the board
 * trustworthy in two places?
-
-wire up perks:
+* hide stall button until cards visible
+* don;t discard special cards
+* indicate discard mode
+* hide stall on start
+* on cancel, hide discard mark
+* fsdter eiggler
+* say something
+* can't click new card?
+* wire up perks:
     * challenge
     * redirect
     * 3card
     * speech
     * threshold
-    stall
-
-test perks
+    * stall
+* test perks
 
 numbers drawn from shuffled number deck
 move card on mouseover
 show amount of personnel data
 show stack of played tactics
 bonus consumable ? 
+    
 
 lock icon in skill menu
 highlight unlocked zones in skill menu?
-
-
-
-how does stall work?
-    when stall is unlocked, show button
-    clicking button goes into "stall mode"
-        now clicking cards does not play them.
-            instead marks them for discard
-        cards wiggle to indicate stall mode
-        show buttons "discard" and "cancel"
-            discard is disabled until one card is selected for discard
-

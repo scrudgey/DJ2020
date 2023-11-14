@@ -16,13 +16,20 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public RectTransform cardContainerRect;
     public GameObject cardPrefab;
     public Action<DialogueResult> concludeCallback;
-    public GameObject continueButton;
-    public GameObject endButton;
+
     public Action continueButtonAction;
     public NeoDialogueCardController specialCard;
     public NeoDialogueCardController escapeCard;
     public TextMeshProUGUI doubterText;
     public Color red;
+    [Header("buttons")]
+    public GameObject continueButton;
+    public GameObject endButton;
+    public GameObject stallButton;
+    public GameObject discardButtonObject;
+    public Button discardButton;
+    public GameObject cancelDiscardButton;
+
     // public Action en 
     Stack<SuspicionRecord> unresolvedSuspicionRecords;
 
@@ -34,6 +41,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public void Initialize(DialogueInput input, Action<DialogueResult> onConcludeCallback) {
         this.input = input;
         this.concludeCallback = onConcludeCallback;
+        stallButton.SetActive(false);
 
         unresolvedSuspicionRecords = new Stack<SuspicionRecord>(input.suspicionRecords.Values);
         continueButton.SetActive(false);
@@ -99,6 +107,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         yield return null;
         currentChallenge = manualSuspicionRecord == null ? unresolvedSuspicionRecords.Pop() : manualSuspicionRecord;
         // GameManager.I.gameData.levelState.delta.bullshitLevel += currentChallenge.challengeValue;
+        stallButton.SetActive(false);
 
         // rectify item cards
         RectifySpecialCards(currentChallenge);
@@ -142,8 +151,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         } else {
             dialogueResult = DialogueResult.success;
         }
+        stallButton.SetActive(false);
 
-        // IEnumerator deactivatecards = ActivateCards(false);
         continueButtonAction = SayFinalRemark;
         IEnumerator blitter = neoDialogueController.SetLeftDialogueText($"Hmm...", "");
         IEnumerator ender = Toolbox.CoroutineFunc(() => { continueButton.gameObject.SetActive(true); });
@@ -164,16 +173,20 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         foreach (Button button in cardContainer.GetComponentsInChildren<Button>()) {
             button.interactable = value;
         }
-        return Toolbox.Ease(null, 0.5f, start, end, PennerDoubleAnimation.Linear, (amount) => {
+        IEnumerator mover = Toolbox.Ease(null, 0.5f, start, end, PennerDoubleAnimation.Linear, (amount) => {
             cardContainerRect.anchoredPosition = new Vector2(cardContainerRect.anchoredPosition.x, amount);
         }, unscaledTime: true);
+        IEnumerator showStallButton = Toolbox.CoroutineFunc(() => {
+            stallButton.SetActive(GameManager.I.gameData.playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_STALL));
+        });
+        return Toolbox.ChainCoroutines(mover, showStallButton);
     }
 
     public void CardClick(NeoDialogueCardController cardController) {
         DialogueTactic response = currentChallenge.getResponse(cardController.cardData.type);
         GameManager.I.gameData.levelState.delta.dialogueCards.Remove(cardController.cardData);
         GameManager.I.gameData.levelState.delta.bullshitLevel += cardController.cardData.derivedValue(input);
-
+        stallButton.SetActive(false);
         if (GameManager.I.gameData.levelState.delta.lastTactics.Count > 0 && GameManager.I.gameData.levelState.delta.lastTactics.Peek() != cardController.cardData.type) {
             GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         }
@@ -256,6 +269,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
 
     public void EscapeCardClick(NeoDialogueCardController cardController) {
         dialogueResult = DialogueResult.stun;
+        stallButton.SetActive(false);
 
         IEnumerator cardPlay = cardController.PlayCard();
 
@@ -283,6 +297,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         GameManager.I.gameData.levelState.delta.lastTactics.Push(DialogueTacticType.item);
         // GameManager.I.gameData.levelState.delta.bullshitLevel -= currentChallenge.challengeValue;
+        stallButton.SetActive(false);
 
         IEnumerator cardPlay = cardController.PlayCard();
 
@@ -337,6 +352,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         // TODO: decrement personnel data
         GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         GameManager.I.gameData.levelState.delta.lastTactics.Push(DialogueTacticType.item);
+        stallButton.SetActive(false);
+
         // GameManager.I.gameData.levelState.delta.bullshitLevel -= currentChallenge.challengeValue;
         List<PayData> personnelData = GameManager.I.gameData.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.personnel).ToList();
         if (personnelData.Count > 0) {
@@ -482,6 +499,53 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         }
 
         return effects;
+    }
+
+    public void StallCallback() {
+        StartCoroutine(neoDialogueController.SetRightDialogueText("Um..."));
+        stallButton.SetActive(false);
+        discardButtonObject.SetActive(true);
+        cancelDiscardButton.SetActive(true);
+        discardButton.interactable = false;
+        foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+            cardController.SetMode(NeoDialogueCardController.Mode.discard);
+        }
+    }
+    public void DiscardCallback() {
+        StartCoroutine(neoDialogueController.SetRightDialogueText("<color=#2ed573>[STALL]</color> Hold on, my cell phone is ringing."));
+        int numberDiscarded = 0;
+        foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+            // do discard
+            if (cardController.markedForDiscard) {
+                numberDiscarded++;
+                Destroy(cardController.gameObject);
+            }
+            cardController.SetMode(NeoDialogueCardController.Mode.normal);
+        }
+        // draw new
+        for (int i = 0; i < numberDiscarded; i++) {
+            StartCoroutine(DrawNewCard());
+        }
+        stallButton.SetActive(false);
+        discardButtonObject.SetActive(false);
+        cancelDiscardButton.SetActive(false);
+    }
+    public void CancelDiscardCallback() {
+        StartCoroutine(neoDialogueController.SetRightDialogueText("Never mind."));
+        stallButton.SetActive(true);
+        discardButtonObject.SetActive(false);
+        cancelDiscardButton.SetActive(false);
+        foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+            cardController.SetMode(NeoDialogueCardController.Mode.normal);
+        }
+    }
+
+    public void CardModeChanged() {
+        int numberSelected = 0;
+        foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+            if (cardController.markedForDiscard) numberSelected++;
+        }
+        discardButton.interactable = numberSelected > 0;
     }
 }
 

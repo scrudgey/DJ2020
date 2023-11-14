@@ -6,6 +6,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class NeoDialogueCardController : MonoBehaviour {
+    public enum Mode { normal, discard }
+    public Mode mode;
+    public Button button;
+    public Image discardMark;
+    public bool markedForDiscard;
     public RectTransform cardRect;
     public RectTransform myRect;
     public TextMeshProUGUI title;
@@ -19,8 +24,8 @@ public class NeoDialogueCardController : MonoBehaviour {
     public TextMeshProUGUI description;
     public GameObject statusRecordPrefab;
     public Transform statusContainer;
-
-    // NeoDialogueMenu controller;
+    float timer = 0;
+    NeoDialogueMenu controller;
     public DialogueCard cardData;
     // bool isEscape;
     // bool isId;
@@ -32,7 +37,7 @@ public class NeoDialogueCardController : MonoBehaviour {
     public static readonly float BASE_WIDTH = 270f;
 
     public void Initialize(NeoDialogueMenu controller, DialogueInput input, DialogueCard cardData, Action<NeoDialogueCardController> callback) {
-        // this.controller = controller;
+        this.controller = controller;
         this.callback = callback;
         this.cardData = cardData;
 
@@ -137,8 +142,35 @@ public class NeoDialogueCardController : MonoBehaviour {
     public void OnMouseOver() {
 
     }
+    void Update() {
+        if (mode == Mode.discard && !noStatusEffects) {
+            timer += Time.unscaledDeltaTime;
+            cardRect.rotation = Quaternion.Euler(0f, 0f, 2f * Mathf.Sin(timer * 25f));
+        }
+    }
     public void ClickCallback() {
-        callback?.Invoke(this);
+        if (mode == Mode.normal) {
+            callback?.Invoke(this);
+        } else {
+            if (noStatusEffects) return;
+            // mark for discard
+            markedForDiscard = !markedForDiscard;
+            discardMark.enabled = markedForDiscard;
+            controller.CardModeChanged();
+        }
+    }
+    public void SetMode(Mode mode) {
+        this.mode = mode;
+        cardRect.rotation = Quaternion.identity;
+        timer = 0f;
+        if (mode == Mode.discard) {
+            markedForDiscard = false;
+            if (noStatusEffects)
+                button.interactable = false;
+        } else {
+            button.interactable = true;
+            discardMark.enabled = false;
+        }
     }
 
     public IEnumerator PlayCard() {
@@ -168,6 +200,7 @@ public class NeoDialogueCardController : MonoBehaviour {
             Vector2 newPos = new Vector2(cardRect.anchoredPosition.x, amount);
             cardRect.anchoredPosition = newPos;
         }, unscaledTime: true);
-        return Toolbox.ChainCoroutines(grower, mover);
+        IEnumerator activator = Toolbox.CoroutineFunc(() => button.interactable = true);
+        return Toolbox.ChainCoroutines(grower, mover, activator);
     }
 }

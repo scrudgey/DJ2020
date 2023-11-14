@@ -133,7 +133,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             "smg1_1",
             "smg1_2",
             // "smg1_3",
-            "rifle2_1"
+            "rifle2_1",
+            "stall"
             // "smg2"
         };
         // perks = new List<string>();
