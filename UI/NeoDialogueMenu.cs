@@ -297,7 +297,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     }
 
     void MaybeEnableEaseButton() {
-        if (GameManager.I.gameData.levelState.delta.bullshitLevel > 0)
+        if (GameManager.I.gameData.levelState.delta.bullshitLevel > 0 && GameManager.I.gameData.playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_EASE))
             easeButtonObject.SetActive(GameManager.I.gameData.levelState.delta.easesAvailable > 0);
     }
 

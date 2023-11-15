@@ -42,4 +42,5 @@ public interface PerkIdConstants {
     public static readonly string PERKID_SPEECH_3CARD = "3cards";
     public static readonly string PERKID_SPEECH_TRUST = "trustworthy";
     public static readonly string PERKID_SPEECH_STALL = "stall";
+    public static readonly string PERKID_SPEECH_EASE = "ease";
 }

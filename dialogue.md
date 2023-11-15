@@ -183,13 +183,12 @@ when to handle success vs fail response?s
 * stall reappeared after putting cards away?
 * limit number of stall uses
 * convo 1: stall discard -> convo 2: three cards in hand
-
-bonus consumable ? 
+* bonus consumable ? 
     * only enable when bullshit > 0
     * only enable ease when stall button enabled
     * randomize decrease
     * nimrod output
-    connect up skill
+    * connect up skill
 
 move card on mouseover
 show stack of played tactics?
