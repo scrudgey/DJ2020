@@ -27,10 +27,7 @@ public class NeoDialogueCardController : MonoBehaviour {
     float timer = 0;
     NeoDialogueMenu controller;
     public DialogueCard cardData;
-    // bool isEscape;
-    // bool isId;
-    // bool isDataPlay;
-    bool noStatusEffects;
+    public bool noStatusEffects;
 
     Action<NeoDialogueCardController> callback;
 
@@ -56,17 +53,14 @@ public class NeoDialogueCardController : MonoBehaviour {
         InitializeStatusContainer(input);
     }
     public void InitializeEscapeCard(NeoDialogueMenu controller, Action<NeoDialogueCardController> callback) {
-        // this.controller = controller;
         this.callback = callback;
         noStatusEffects = true;
 
-        // isEscape = true;
         title.text = "<color=#ff4757>Escape</color>";
         count.text = "";
 
         myRect.sizeDelta = new Vector2(BASE_WIDTH, 750f);
         iconHolder.SetActive(false);
-        // topSpacer.SetActive(true);
         topSpacer.SetActive(false);
 
         icon.enabled = false;
@@ -78,11 +72,9 @@ public class NeoDialogueCardController : MonoBehaviour {
         }
     }
     public void InitializeIDCard(NeoDialogueMenu controller, Action<NeoDialogueCardController> callback) {
-        // this.controller = controller;
         this.callback = callback;
         noStatusEffects = true;
 
-        // isId = true;
         title.text = "<color=#2ed573>ID Card</color>";
         count.text = $"";
 
@@ -99,11 +91,9 @@ public class NeoDialogueCardController : MonoBehaviour {
         }
     }
     public void InitializeDataCard(NeoDialogueMenu controller, Action<NeoDialogueCardController> callback) {
-        // this.controller = controller;
         this.callback = callback;
         noStatusEffects = true;
 
-        // isDataPlay = true;
         title.text = "<color=#2ed573>Data</color>";
         count.text = "-1 personnel data";
 

@@ -3402,6 +3402,7 @@ jazz up elevator controller
 * fix catenary?
 * billboarded sprites don't work:
 * reenable jtd attractor
+* dialogue
 
 
 major initiatives:
@@ -3423,7 +3424,6 @@ major initiatives:
             weapons, loadout, 
             character stats, skills
 unresolved mechanics:
-    dialogue
     hacking
     circuits
     do we buy / unlock more burglar tools?
@@ -3474,7 +3474,6 @@ gameplay questions:
         items, guns
     progression in world?
         other towns connected by subway?
-    dialogue
     hacking
     backpack and duffel bag
 
@@ -3490,3 +3489,6 @@ polish:
     highlight NPCs that are shooting me, and apply clearsight
     remove attack surface cam positioning
     shooting should visually be suspicious
+
+lock icon in skill menu
+highlight unlocked zones in skill menu?

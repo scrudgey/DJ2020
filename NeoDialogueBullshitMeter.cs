@@ -39,12 +39,15 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
     }
     void InitializeStatusContainer(Dictionary<string, int> statusEffects) {
         foreach (Transform child in statusContainer) {
+            if (child.name == "spacer") continue;
+            if (child.name == "button") continue;
+
             Destroy(child.gameObject);
         }
-        CreateStatusElement($"base value", 70, plain: true);
         foreach (KeyValuePair<string, int> entry in statusEffects) {
             CreateStatusElement(entry.Key, entry.Value);
         }
+        CreateStatusElement($"base value", 70, plain: true);
     }
     public IEnumerator SetBullshitThreshold(Dictionary<string, int> statusEffects) {
         InitializeStatusContainer(statusEffects);
@@ -54,6 +57,7 @@ public class NeoDialogueBullshitMeter : MonoBehaviour {
     public void CreateStatusElement(string content, int alarmCount, bool plain = false) {
         GameObject statusObj = GameObject.Instantiate(statusPrefab);
         statusObj.transform.SetParent(statusContainer, false);
+        statusObj.transform.SetAsFirstSibling();
         DialogueStatusEntry status = statusObj.GetComponent<DialogueStatusEntry>();
         status.InitializeNumeric(alarmCount, content, plain: plain);
     }

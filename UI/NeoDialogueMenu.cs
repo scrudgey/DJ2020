@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using Nimrod;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public enum DialogueResult { success, fail, stun }
-    // static public Action<DialogueResult> OnDialogueConclude;
     public NeoDialogueController neoDialogueController;
     public NeoDialogueBullshitMeter bullshitMeter;
     public RectTransform bullshitRect;
@@ -21,16 +21,17 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public NeoDialogueCardController specialCard;
     public NeoDialogueCardController escapeCard;
     public TextMeshProUGUI doubterText;
+    public TextMeshProUGUI personnelDataCount;
     public Color red;
     [Header("buttons")]
     public GameObject continueButton;
     public GameObject endButton;
     public GameObject stallButton;
     public GameObject discardButtonObject;
+    public GameObject easeButtonObject;
     public Button discardButton;
     public GameObject cancelDiscardButton;
-
-    // public Action en 
+    Grammar grammar;
     Stack<SuspicionRecord> unresolvedSuspicionRecords;
 
     SuspicionRecord failedSuspicionRecord;
@@ -41,7 +42,11 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public void Initialize(DialogueInput input, Action<DialogueResult> onConcludeCallback) {
         this.input = input;
         this.concludeCallback = onConcludeCallback;
+        grammar = new Grammar();
+        grammar.Load("suspicion");
+
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
 
         unresolvedSuspicionRecords = new Stack<SuspicionRecord>(input.suspicionRecords.Values);
         continueButton.SetActive(false);
@@ -49,6 +54,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         neoDialogueController.Initialize(input);
         bullshitMeter.Initialize(input);
         bullshitRect.anchoredPosition = new Vector2(-1425.18f, -224f);
+
+        SetPersonnelDataCount();
 
         InitializeCards();
         cardContainerRect.anchoredPosition = new Vector2(cardContainerRect.anchoredPosition.x, -850f);
@@ -58,6 +65,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         IEnumerator easeInBullshit = Toolbox.Ease(null, 0.5f, -1425.18f, -885.66f, PennerDoubleAnimation.SineEaseOut, (amount) => {
             bullshitRect.anchoredPosition = new Vector2(amount, -224f);
         }, unscaledTime: true);
+
         // set current bullshit- controlled by level delta
         IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
 
@@ -75,6 +83,9 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             challenge
             ));
     }
+    void SetPersonnelDataCount() {
+        personnelDataCount.text = GameManager.I.gameData.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.personnel).Count().ToString();
+    }
     void InitializeCards() {
         foreach (Transform child in cardContainer) {
             Destroy(child.gameObject);
@@ -82,6 +93,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         foreach (DialogueCard card in GameManager.I.gameData.levelState.delta.dialogueCards) {
             InstantiateCard(card);
         }
+        DrawUpToHand();
     }
     NeoDialogueCardController InstantiateCard(DialogueCard card) {
         GameObject cardObj = Instantiate(cardPrefab);
@@ -106,18 +118,28 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     IEnumerator StartNextChallenge(SuspicionRecord manualSuspicionRecord = null) {
         yield return null;
         currentChallenge = manualSuspicionRecord == null ? unresolvedSuspicionRecords.Pop() : manualSuspicionRecord;
-        // GameManager.I.gameData.levelState.delta.bullshitLevel += currentChallenge.challengeValue;
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
 
         // rectify item cards
         RectifySpecialCards(currentChallenge);
 
         IEnumerator blitter = neoDialogueController.SetLeftDialogueText(currentChallenge.dialogue.challenge, "");
-        // IEnumerator blitter = neoDialogueController.SetLeftDialogueText(currentChallenge.dialogue.challenge, $"Challenge: {currentChallenge.challengeValue}");
-        // IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
         IEnumerator activateCards = ActivateCards(true);
-        // yield return Toolbox.ChainCoroutines(blitter, bullshitter, activateCards);
+
         yield return Toolbox.ChainCoroutines(blitter, activateCards);
+    }
+
+    void DrawUpToHand() {
+        int numberDialogueCards = GameManager.I.gameData.playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_3CARD) ? 3 : 2;
+        int numberCurrentCards = 0;
+        foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
+            if (!cardController.noStatusEffects) numberCurrentCards++;
+        }
+        while (numberCurrentCards < numberDialogueCards) {
+            numberCurrentCards++;
+            StartCoroutine(DrawNewCard());
+        }
     }
 
     void RectifySpecialCards(SuspicionRecord challenge) {
@@ -152,6 +174,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             dialogueResult = DialogueResult.success;
         }
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
+
 
         continueButtonAction = SayFinalRemark;
         IEnumerator blitter = neoDialogueController.SetLeftDialogueText($"Hmm...", "");
@@ -177,7 +201,13 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             cardContainerRect.anchoredPosition = new Vector2(cardContainerRect.anchoredPosition.x, amount);
         }, unscaledTime: true);
         IEnumerator showStallButton = Toolbox.CoroutineFunc(() => {
-            stallButton.SetActive(GameManager.I.gameData.playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_STALL));
+            if (value) {
+                if (GameManager.I.gameData.levelState.delta.stallsAvailable > 0)
+                    stallButton.SetActive(GameManager.I.gameData.playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_STALL));
+                // easeButtonObject.SetActive(true);
+                MaybeEnableEaseButton();
+                DrawUpToHand();
+            }
         });
         return Toolbox.ChainCoroutines(mover, showStallButton);
     }
@@ -187,6 +217,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         GameManager.I.gameData.levelState.delta.dialogueCards.Remove(cardController.cardData);
         GameManager.I.gameData.levelState.delta.bullshitLevel += cardController.cardData.derivedValue(input);
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
+
         if (GameManager.I.gameData.levelState.delta.lastTactics.Count > 0 && GameManager.I.gameData.levelState.delta.lastTactics.Peek() != cardController.cardData.type) {
             GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         }
@@ -197,8 +229,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{response.tacticType.ToString().ToUpper()}]</color> {response.getContent()}");
 
         IEnumerator removeCard = cardController.RemoveCard();
-
-        IEnumerator newCard = DrawNewCard();
 
         IEnumerator deactivatecards = ActivateCards(false);
 
@@ -230,7 +260,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         StartCoroutine(Toolbox.ChainCoroutines(
             cardPlay,
             removeCard,
-            newCard,
             deactivatecards,
             recalculateCards,
             blitter,
@@ -267,9 +296,15 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         };
     }
 
+    void MaybeEnableEaseButton() {
+        if (GameManager.I.gameData.levelState.delta.bullshitLevel > 0)
+            easeButtonObject.SetActive(GameManager.I.gameData.levelState.delta.easesAvailable > 0);
+    }
+
     public void EscapeCardClick(NeoDialogueCardController cardController) {
         dialogueResult = DialogueResult.stun;
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
 
         IEnumerator cardPlay = cardController.PlayCard();
 
@@ -296,8 +331,9 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public void IDCardClick(NeoDialogueCardController cardController) {
         GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         GameManager.I.gameData.levelState.delta.lastTactics.Push(DialogueTacticType.item);
-        // GameManager.I.gameData.levelState.delta.bullshitLevel -= currentChallenge.challengeValue;
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
+
 
         IEnumerator cardPlay = cardController.PlayCard();
 
@@ -306,8 +342,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         IEnumerator removeCard = cardController.RemoveCard();
 
         IEnumerator deactivatecards = ActivateCards(false);
-        // IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
-
 
         IEnumerator continuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(true); });
         IEnumerator antiContinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
@@ -334,7 +368,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             deactivatecards,
             recalculateCards,
             blitter,
-            // bullshitter,
             continuer
         ));
 
@@ -349,16 +382,16 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     }
 
     public void DataCardClick(NeoDialogueCardController cardController) {
-        // TODO: decrement personnel data
         GameManager.I.gameData.levelState.delta.lastTactics = new Stack<DialogueTacticType>();
         GameManager.I.gameData.levelState.delta.lastTactics.Push(DialogueTacticType.item);
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
 
-        // GameManager.I.gameData.levelState.delta.bullshitLevel -= currentChallenge.challengeValue;
         List<PayData> personnelData = GameManager.I.gameData.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.personnel).ToList();
         if (personnelData.Count > 0) {
             GameManager.I.gameData.levelState.delta.levelAcquiredPaydata.Remove(personnelData[0]);
         }
+        SetPersonnelDataCount();
 
         DialogueTactic response = currentChallenge.getResponse(DialogueTacticType.item);
 
@@ -367,7 +400,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[DATA]</color> {response.getContent()}");
 
         IEnumerator removeCard = cardController.RemoveCard();
-        // IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
 
         IEnumerator deactivatecards = ActivateCards(false);
 
@@ -396,7 +428,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             deactivatecards,
             recalculateCards,
             blitter,
-            // bullshitter,
             continuer
         ));
 
@@ -432,7 +463,6 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             GameManager.I.AddSuspicionRecord(GetFailSuspicion());
             content = "You're coming with me, creep!";
         }
-        // continueButtonAction = () => { Conclude(); };
         IEnumerator anticontinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
         IEnumerator concludingRemark = neoDialogueController.SetLeftDialogueText(content, "");
         IEnumerator continuer = Toolbox.CoroutineFunc(() => { endButton.SetActive(true); });
@@ -504,6 +534,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public void StallCallback() {
         StartCoroutine(neoDialogueController.SetRightDialogueText("Um..."));
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
+
         discardButtonObject.SetActive(true);
         cancelDiscardButton.SetActive(true);
         discardButton.interactable = false;
@@ -512,6 +544,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         }
     }
     public void DiscardCallback() {
+        GameManager.I.gameData.levelState.delta.stallsAvailable--;
         StartCoroutine(neoDialogueController.SetRightDialogueText("<color=#2ed573>[STALL]</color> Hold on, my cell phone is ringing."));
         int numberDiscarded = 0;
         foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
@@ -519,6 +552,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             if (cardController.markedForDiscard) {
                 numberDiscarded++;
                 Destroy(cardController.gameObject);
+                GameManager.I.gameData.levelState.delta.dialogueCards.Remove(cardController.cardData);
             }
             cardController.SetMode(NeoDialogueCardController.Mode.normal);
         }
@@ -527,12 +561,17 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             StartCoroutine(DrawNewCard());
         }
         stallButton.SetActive(false);
+        easeButtonObject.SetActive(false);
+
         discardButtonObject.SetActive(false);
         cancelDiscardButton.SetActive(false);
     }
     public void CancelDiscardCallback() {
         StartCoroutine(neoDialogueController.SetRightDialogueText("Never mind."));
         stallButton.SetActive(true);
+        // easeButtonObject.SetActive(true);
+        MaybeEnableEaseButton();
+
         discardButtonObject.SetActive(false);
         cancelDiscardButton.SetActive(false);
         foreach (NeoDialogueCardController cardController in cardContainer.GetComponentsInChildren<NeoDialogueCardController>()) {
@@ -546,6 +585,23 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
             if (cardController.markedForDiscard) numberSelected++;
         }
         discardButton.interactable = numberSelected > 0;
+    }
+
+    public void EaseButtonCallback() {
+        GameManager.I.gameData.levelState.delta.easesAvailable--;
+        GameManager.I.gameData.levelState.delta.bullshitLevel -= (int)Toolbox.RandomGaussian(20, 30);
+        easeButtonObject.SetActive(false);
+
+        string content = grammar.Parse("{ease}");
+
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[EASE]</color> {content}");
+
+        IEnumerator bullshitter = bullshitMeter.SetTargetBullshit(GameManager.I.gameData.levelState.delta.bullshitLevel, PulseDoubterColor);
+
+        StartCoroutine(Toolbox.ChainCoroutines(
+            blitter,
+            bullshitter
+        ));
     }
 }
 

@@ -34,6 +34,8 @@ public record LevelDelta {
     public List<DialogueCard> dialogueCards;
     public int bullshitLevel;
     public Stack<DialogueTacticType> lastTactics;
+    public int stallsAvailable = 1;
+    public int easesAvailable = 1;
     public static LevelDelta Empty() => new LevelDelta {
         objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
         failedObjectives = new HashSet<Objective>(),

@@ -177,13 +177,20 @@ when to handle success vs fail response?s
     * threshold
     * stall
 * test perks
+* show amount of personnel data
+* add card to hand after hand comes back up    
+* drawing a new card on opening second dialogue
+* stall reappeared after putting cards away?
+* limit number of stall uses
+* convo 1: stall discard -> convo 2: three cards in hand
 
-numbers drawn from shuffled number deck
-move card on mouseover
-show amount of personnel data
-show stack of played tactics
 bonus consumable ? 
-    
+    * only enable when bullshit > 0
+    * only enable ease when stall button enabled
+    * randomize decrease
+    * nimrod output
+    connect up skill
 
-lock icon in skill menu
-highlight unlocked zones in skill menu?
+move card on mouseover
+show stack of played tactics?
+numbers drawn from shuffled number deck
