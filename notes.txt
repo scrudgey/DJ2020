@@ -3480,17 +3480,21 @@ more equipment to bring on mission?
 * remove attack surface cam positioning
     * offset camera a little bit
     * disable mouse aim movement
+    * let NPCS walk through each other
 
+pretty easy to run in guns blazing
+    bonus objectives can dicincentivize this
 
 animate gun holster / unholster
 padlock door doesnt work
 npc dialogue is jumpy
 some things are not stealing
 shooting should visually be suspicious
+shells / crater clearsight
+burglar view should remain in elevator, maybe select attack surfaces
 
-
+fill in names
 polish:
-    let NPCS walk through each other
     reduce frequency of "enemy sighted"
     change sensitivity / eliminate "guess it was nothing"
     better AI navigation / building search
@@ -3499,4 +3503,4 @@ polish:
     better investigative ability when player does something weird like superjump / land
 
     clearsighter v3
-    highlight NPCs that are shooting me
+        highlight NPCs that are shooting me

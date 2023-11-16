@@ -1551,6 +1551,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
 
     public bool IsColliderValidForCollisions(Collider coll) {
+        if (coll.CompareTag("actor")) return false;
         return !ignoredColliders.Contains(coll);
         // return true;
     }

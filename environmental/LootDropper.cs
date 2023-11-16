@@ -13,6 +13,7 @@ public class LootDropper : MonoBehaviour {
     }
 
     public void HandleDestruct() {
+        Destroy(this);
         foreach (LootDropElementWithProbability data in loot) {
             if (Random.Range(0f, 1f) < data.probability) {
                 Vector3 position = transform.position + Vector3.up;
