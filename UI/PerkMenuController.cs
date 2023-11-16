@@ -48,6 +48,7 @@ public class PerkMenuController : MonoBehaviour {
     public TextMeshProUGUI requirementTitleText;
     public GameObject perkviewContainer;
     public RectTransform perkviewRect;
+    // public List<PerkMenuBoxController> perkMenuBoxes;
     [Header("sfx")]
     public AudioClip[] selectPerkSound;
     public AudioClip[] activatePerkSound;

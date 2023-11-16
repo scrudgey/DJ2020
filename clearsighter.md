@@ -23,3 +23,21 @@ a repeating coroutine that updates geometry in chunks.
 let's start with the simplest case: put all static geometry in a tree, and disable things above the player.
 
 support disabling / show all for aim mode, etc.
+
+
+# clearsighter v3
+
+basically should be based around character line of sight
+async batching of raycasts and calculations
+
+a suggestion is that it could be based on horizontal raycasts to find nearest walls: but raycasts from where?
+
+radar-like raycast sweep, and cull based on normal dot product with direction to camera.
+    half of the radar is redundant?
+    the long hallway problem
+
+or raycasts from nodes on a grid toward the camera?
+
+we need to know what nodes are visible to player, 
+
+selectively clearsight based on shooting enemies as well

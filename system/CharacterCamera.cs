@@ -223,6 +223,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 }
                 break;
             case CameraState.burgle:
+                currentFollowingSharpness = followingSharpnessDefault * 3f;
                 currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 10f;
                 break;
             default:
@@ -305,7 +306,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 break;
             case CameraState.burgle:
                 RenderSettings.skybox = wallPressSkybox;
-                ApplyTargetParameters(BurgleParameters(input));
+                // ApplyTargetParameters(BurgleParameters(input));
+                ApplyTargetParameters(NormalParameters(input));
                 volume.profile = aimProfile;
                 SetSkyBoxCamerasEnabled(false);
                 break;
@@ -353,16 +355,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
 
-        Vector3 targetPosition = lastTargetPosition;
-        if (input.state == CharacterState.superJump || input.state == CharacterState.landStun) {
-            zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
-        } else if (transitionTime >= 0.1f && input.targetData != null) {
-            Vector3 screenOffset = input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f);
-            screenOffset *= screenOffset.sqrMagnitude;
-            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y) * followCursorCoefficient;
-            targetPosition = input.targetPosition + worldOffset;
-            lastTargetPosition = targetPosition;
-        }
+
 
         float desiredOrthographicSize = 1f;
         float fieldOfView = 70f;
@@ -379,6 +372,24 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             // Debug.Log($"{input.orthographicSize} {Camera.fieldOfView}");
         }
         currentOrthographicSize = desiredOrthographicSize;
+
+        Vector3 targetPosition = lastTargetPosition;
+        if (input.state == CharacterState.superJump || input.state == CharacterState.landStun) {
+            zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
+        } else if (transitionTime >= 0.1f && input.targetData != null) {
+            Vector3 screenOffset = Vector3.zero;
+            if (state == CameraState.burgle) {
+                // orthographic size is half-size in world units
+                screenOffset = new Vector2(currentOrthographicSize, 0f);
+            } else {
+                screenOffset = (input.targetData.screenPositionNormalized - new Vector2(0.5f, 0.5f));
+                screenOffset *= screenOffset.sqrMagnitude;
+                screenOffset *= followCursorCoefficient;
+            }
+            Vector3 worldOffset = planarRot * new Vector3(screenOffset.x, 0f, screenOffset.y);
+            targetPosition = input.targetPosition + worldOffset;
+            lastTargetPosition = targetPosition;
+        }
 
         return new CameraTargetParameters() {
             fieldOfView = fieldOfView,

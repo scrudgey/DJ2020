@@ -190,6 +190,9 @@ when to handle success vs fail response?s
     * nimrod output
     * connect up skill
 
+running from dialogue did not have expected outcome
+allow ease up during "hmm..." part of conclusion
+
 move card on mouseover
 show stack of played tactics?
 numbers drawn from shuffled number deck
