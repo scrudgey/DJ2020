@@ -37,7 +37,28 @@ radar-like raycast sweep, and cull based on normal dot product with direction to
     the long hallway problem
 
 or raycasts from nodes on a grid toward the camera?
-
 we need to know what nodes are visible to player, 
 
+
+* handle multiple hits on same object
+* handle aboves
+* raycast hits are hitting triggers
+* can we simplify the next/previous batch collections?
+* flickering
+* some system for only updating active handlers
+? we don't need to batch the locating- just the hanlder updates
+* classic interlopers
+
+improve the classic interloper:
+    either only affect things not touched by raycast,
+    or slightly better logic around it
+handle windows
+
+ease disappearance, timed reappearance
+    use state machine in material handler
+
 selectively clearsight based on shooting enemies as well
+
+only raycast in appropriate directions away from camera
+
+SwapExposureBackBuffer could be a proper swap i think?

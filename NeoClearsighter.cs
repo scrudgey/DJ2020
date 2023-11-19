@@ -387,11 +387,6 @@ public class NeoClearsighter : MonoBehaviour {
     IEnumerator HandleInterlopers(int j, HashSet<Renderer> nextInterloperBatch, HashSet<Renderer> nextAboveRenderBatch) {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
 
-        // float margin = 0.5f;
-        // float margin = 0f;
-
-        // Plane detectionPlane = new Plane(-1f * cameraTransform.forward, followTransform.position);
-
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
         Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
 
@@ -462,8 +457,6 @@ public class NeoClearsighter : MonoBehaviour {
                 }
             }
         }
-
-
     }
 
     public Renderer[] GetDynamicRenderers(Collider key) {

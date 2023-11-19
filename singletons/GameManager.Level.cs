@@ -337,7 +337,11 @@ public partial class GameManager : Singleton<GameManager> {
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
         this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
+
+        ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
+        NeoClearsighterV3 clearsighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
+
         playerGunHandler.isPlayerCharacter = true;
 
         ElevatorOccluder elevatorOccluder = GameObject.FindObjectOfType<ElevatorOccluder>();
@@ -348,18 +352,20 @@ public partial class GameManager : Singleton<GameManager> {
         playerOutlineHandler = focus.GetComponentInChildren<PlayerOutlineHandler>();
         playerOutlineHandler?.Bind();
 
-        ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
-        // if (clearSighter == null) {
-        //     // instantiate clearsighter
-        // }
-        if (clearSighter != null && focus != null) {
+        if (clearSighter != null) {
             // clearSighter.Initialize(focus.transform);
             Destroy(clearSighter);
         }
         if (clearSighter2 != null) {
-            clearSighter2.Initialize(focus.transform, characterCamera, playerCharacterController);
-            // Destroy(clearSighter2);
+            // clearSighter2.Initialize(focus.transform, characterCamera, playerCharacterController);
+            Destroy(clearSighter2);
         }
+        if (clearsighterV3 != null) {
+            // Destroy(clearsighterV3);
+            clearsighterV3.Initialize(focus.transform, characterCamera, playerCharacterController);
+        }
+
+
         if (elevatorOccluder != null) {
             elevatorOccluder.Initialize(characterCamera);
         }
@@ -371,6 +377,8 @@ public partial class GameManager : Singleton<GameManager> {
         OnEyeVisibilityChange?.Invoke(gameData.playerState);
     }
     public bool IsObjectVisible(GameObject obj) {
+        // TODO: fix
+        if (clearSighter2 == null) return true;
         return clearSighter2?.IsObjectVisible(obj) ?? true;
     }
     void ClearSceneData() {

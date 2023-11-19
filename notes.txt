@@ -3484,6 +3484,8 @@ more equipment to bring on mission?
 
 pretty easy to run in guns blazing
     bonus objectives can dicincentivize this
+    when alarm is hit, doors come down and turrets pop out
+    player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
 
 animate gun holster / unholster
 padlock door doesnt work
@@ -3499,8 +3501,10 @@ polish:
     change sensitivity / eliminate "guess it was nothing"
     better AI navigation / building search
         when reverting to patrol, we can do better
+        multiple guards chose the same clearpoint to navigate to
 
     better investigative ability when player does something weird like superjump / land
 
     clearsighter v3
         highlight NPCs that are shooting me
+
