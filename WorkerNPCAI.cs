@@ -294,14 +294,20 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     void SightCheckPlayer() {
         Collider player = GameManager.I.playerCollider;
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
-            if (Toolbox.ClearLineOfSight(target.transform.position, player))
-                Perceive(player, byPassVisibilityCheck: true);
+            // if (Toolbox.ClearLineOfSight(target.transform.position, player))
+            //     Perceive(player, byPassVisibilityCheck: true);
+            Toolbox.AsyncClearLineOfSight(target.transform.position, player, (RaycastHit hit) => {
+                if (hit.collider == null || hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
+            });
         }
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
-            if (Toolbox.ClearLineOfSight(target.transform.position, t.newestAddition))
-                Perceive(t.newestAddition);
+            // if (Toolbox.ClearLineOfSight(target.transform.position, t.newestAddition))
+            //     Perceive(t.newestAddition);
+            Toolbox.AsyncClearLineOfSight(target.transform.position, t.newestAddition, (RaycastHit hit) => {
+                if (hit.collider == null || hit.collider == t.newestAddition) Perceive(t.newestAddition);
+            });
         }
     }
 
@@ -309,11 +315,16 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         foreach (Collider collider in target.fieldOfView) {
             if (collider == null)
                 continue;
-            if (Toolbox.ClearLineOfSight(target.transform.position, collider))
-                Perceive(collider);
+            // if (Toolbox.ClearLineOfSight(target.transform.position, collider))
+            //     Perceive(collider);
+            Toolbox.AsyncClearLineOfSight(target.transform.position, collider, (RaycastHit hit) => {
+                if (hit.collider == null || hit.collider == collider) Perceive(collider);
+            });
         }
     }
     void Perceive(Collider other, bool byPassVisibilityCheck = false) {
+        if (other == null) return;
+
         if (hitState == HitState.dead || hitState == HitState.hitstun || hitState == HitState.zapped) {
             return;
         }

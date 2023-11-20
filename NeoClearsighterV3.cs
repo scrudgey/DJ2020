@@ -8,7 +8,6 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class NeoClearsighterV3 : MonoBehaviour {
-
     static readonly int BATCHSIZE = 500;
     WaitForEndOfFrame waitForFrame = new WaitForEndOfFrame();
 
@@ -22,7 +21,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
     NativeArray<RaycastHit> raycastResultsBackBuffer;
     LayerMask defaultLayerMask;
     readonly static int NUMBER_DIRECTIONS = 100;
-    readonly static int NUMBER_SUB_RADARS = 2;
+    readonly static int NUMBER_SUB_RADARS = 3;
     readonly static int jobBatchSize = 10;
     JobHandle gatherJobHandle;
     NativeArray<RaycastCommand> commands;
@@ -168,12 +167,17 @@ public class NeoClearsighterV3 : MonoBehaviour {
         yield return HandleInterlopersRaycast(j, currentBatch, raycastHits);
 
         // static geometry interlopers
-        // yield return HandleInterlopersFrustrum(j, currentBatch, raycastHits);
+        yield return HandleInterlopersFrustrum(j, currentBatch, raycastHits);
 
         // dynamic renderers above me
         yield return HandleDynamicAbove(j, liftedOrigin, currentBatch);
 
-        // reset previous batch
+        yield return waitForFrame;
+
+        // apply transparency
+        yield return ApplyCurrentBatch(currentBatch);
+
+        // reset previous batch to opaque
         yield return ResetPreviousBatch(j);
 
         previousBatch.UnionWith(currentBatch);
@@ -198,7 +202,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
         results = new NativeArray<RaycastHit>(NUMBER_DIRECTIONS, allocator);
 
         // create setup job
-        var setupJob = new RaycastSetupJob();
+        var setupJob = new ClearsightRaycastSetupJob();
         setupJob.EyePos = followTransform.position + Vector3.up;
         setupJob.directions = radarDirections;
         setupJob.indexOffset = NUMBER_DIRECTIONS * subradarIndex;
@@ -208,7 +212,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
         setupJob.Commands = commands;
 
         // create gather job
-        var gatherJob = new RaycastGatherJob();
+        var gatherJob = new ClearsightRaycastGatherJob();
         gatherJob.Results = results;
         gatherJob.output = raycastResultsBackBuffer;
 
@@ -233,24 +237,25 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
     void SwapExposureBackBuffer() {
-        NativeArray<RaycastHit>.Copy(raycastResultsBackBuffer, raycastResults);
+        var tmp = raycastResults;
+        raycastResults = raycastResultsBackBuffer;
+        raycastResultsBackBuffer = tmp;
+        // NativeArray<RaycastHit>.Copy(raycastResultsBackBuffer, raycastResults);
     }
 
     void Update() {
         UpdateExposure();
-
-        // TODO: move this into the main coroutine
     }
 
     IEnumerator HandleStaticAbove(int j, Vector3 liftedOrigin, HashSet<ClearsightRendererHandler> nextAboveRenderBatch) {
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
         Renderer[] above = rendererTree.GetNearby(upRay, 50f);
         for (int i = 0; i < above.Length; i++) {
-            // j++;
-            // if (j > BATCHSIZE) {
-            //     j = 0;
-            //     yield return waitForFrame;
-            // }
+            j++;
+            if (j > BATCHSIZE) {
+                j = 0;
+                yield return waitForFrame;
+            }
             Renderer renderer = above[i];
             if (renderer == null) continue;
             // floor of the collider
@@ -262,8 +267,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 // MakeTransparent(renderer, true);
                 ClearsightRendererHandler handler = handlers[renderer];
                 handler.above = true;
-                handler.ChangeState(ClearsightRendererHandler.State.transparent);
-
+                // handler.ChangeState(ClearsightRendererHandler.State.transparent);
                 nextAboveRenderBatch.Add(handler);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousBatch.Contains(handler)) {
@@ -271,27 +275,24 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 }
             }
         }
-        yield return waitForFrame;
+        // yield return waitForFrame;
     }
 
     IEnumerator HandleInterlopersRaycast(int j, HashSet<ClearsightRendererHandler> currentBatch, HashSet<Renderer> raycastHits) {
-        Vector3 cameraPlanarDirection = myCamera.transform.forward;
-        // Dictionary<Renderer, bool> interloperRenderers = new Dictionary<Renderer, bool>();
-
+        // Vector3 cameraPlanarDirection = myCamera.transform.forward;
+        Vector3 cameraPlanarDirection = myCamera.idealRotation * Vector3.forward;
         subradarIndex++;
         if (subradarIndex >= NUMBER_SUB_RADARS) subradarIndex = 0;
 
         cameraPlanarDirection.y = 0;
         Vector3 start = followTransform.position + Vector3.up;
         for (int i = 0; i < NUMBER_DIRECTIONS; i++) {
-            // j++;
-            // if (j > BATCHSIZE) {
-            //     j = 0;
-            //     yield return waitForFrame;
-            // }
+            j++;
+            if (j > BATCHSIZE) {
+                j = 0;
+                yield return waitForFrame;
+            }
             RaycastHit hit = raycastResults[i];
-            Vector3 end = start + radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)] * hit.distance;
-            Debug.DrawLine(start, end, Color.green);
 
             Renderer renderer;
             if (hit.collider != null && colliderRenderers.TryGetValue(hit.collider, out renderer)) {
@@ -300,28 +301,36 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 if (renderer == null) continue;
                 if (renderer.name == "cutaway") continue;
                 if (currentBatch?.Contains(handler) ?? false) continue;
-
-                TagSystemData tagSystemData = rendererTagData[renderer];
-                if (tagSystemData.dontHideInterloper) continue;
+                if (rendererTagData[renderer].dontHideInterloper) continue;
 
                 Vector3 hitNorm = hit.normal;
                 hitNorm.y = 0;
-                float dot = Vector3.Dot(hitNorm, cameraPlanarDirection);
+                float normDot = Vector3.Dot(hitNorm, cameraPlanarDirection);
+                float rayDot = Vector3.Dot(radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)], cameraPlanarDirection);
 
-                Vector3 rendererPosition = rendererBounds[renderer].center;
-                Vector3 directionToInterloper = rendererPosition - followTransform.position;
+                // Vector3 end = start + radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)] * hit.distance;
 
-                if (dot > 0 && directionToInterloper.y > 0.2f) {
-                    handler.ChangeState(ClearsightRendererHandler.State.transparent);
+                // Vector3 rendererPosition = rendererBounds[renderer].center;
+                // Vector3 directionToInterloper = rendererPosition - followTransform.position;
+
+                // Color color = (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot))) ? Color.green : Color.red;
+                // Debug.DrawLine(start, end, color);
+
+                if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot))
+                     && (rendererBounds[renderer].center - followTransform.position).y > 0.2f) {
+                    // handler.ChangeState(ClearsightRendererHandler.State.transparent);
+                    // Debug.DrawLine(start, end, Color.green);
                     currentBatch.Add(handler);
                     hiddenTransforms.Add(renderer.transform.root);
                     if (previousBatch.Contains(handler)) {
                         previousBatch.Remove(handler);
                     }
+                } else {
+                    // Debug.DrawLine(start, end, Color.red);
                 }
             }
         }
-        yield return waitForFrame;
+        // yield return waitForFrame;
     }
 
     IEnumerator HandleDynamicAbove(int j, Vector3 liftedOrigin, HashSet<ClearsightRendererHandler> currentBatch) {
@@ -330,11 +339,11 @@ public class NeoClearsighterV3 : MonoBehaviour {
             Collider collider = colliderHits[k];
             if (collider == null || collider.name == "cutaway" || collider.gameObject == null || collider.transform.IsChildOf(myTransform) || collider.transform.IsChildOf(followTransform))
                 continue;
-            // j += 1;
-            // if (j > BATCHSIZE) {
-            //     j = 0;
-            //     yield return waitForFrame;
-            // }
+            j += 1;
+            if (j > BATCHSIZE) {
+                j = 0;
+                yield return waitForFrame;
+            }
             Renderer[] renderers = GetDynamicRenderers(collider);
             Transform root = dynamicColliderRoot[collider];
 
@@ -346,9 +355,8 @@ public class NeoClearsighterV3 : MonoBehaviour {
                     if (currentBatch.Contains(handler)) continue;
                     if (renderer.CompareTag("occlusionSpecial")) continue;
 
-
-                    handler.ChangeState(ClearsightRendererHandler.State.transparent);
-
+                    // handler.ChangeState(ClearsightRendererHandler.State.transparent);
+                    handler.above = true;
                     currentBatch.Add(handler);
                     hiddenTransforms.Add(root);
                     if (previousBatch.Contains(handler)) {
@@ -357,7 +365,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 }
             }
         }
-        yield return waitForFrame;
+        // yield return waitForFrame;
     }
 
     IEnumerator HandleInterlopersFrustrum(int j, HashSet<ClearsightRendererHandler> currentBatch, HashSet<Renderer> raycastHits) {
@@ -365,9 +373,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
         Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
-
-        // bool cameraXSide = XPlane.GetSide(cameraTransform.position);
-        // bool cameraZSide = ZPlane.GetSide(cameraTransform.position);
 
         Vector3 planarDisplacement = cameraTransform.position - followTransform.position;
         planarDisplacement.y = 0;
@@ -397,17 +402,11 @@ public class NeoClearsighterV3 : MonoBehaviour {
             if (tagSystemData.dontHideInterloper) continue;
             Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
-
-            // float xParity = cameraXSide ? 1f : -1f;
-            // float zParity = cameraZSide ? 1f : -1f;
-            // bool rendererXSide = XPlane.GetSide(rendererPosition + new Vector3(xParity * rendererBounds[renderer].extents.x, 0f, 0f));
-            // bool rendererZSide = ZPlane.GetSide(rendererPosition + new Vector3(0f, 0f, zParity * rendererBounds[renderer].extents.z));
-
             if (detectionPlane.GetSide(rendererBounds[renderer].center) == detectionSide && directionToInterloper.y > 0.2f) {
                 ClearsightRendererHandler handler = handlers[renderer];
                 if (renderer == null) continue;
                 if (currentBatch?.Contains(handler) ?? false) continue;
-                handler.ChangeState(ClearsightRendererHandler.State.transparent);
+                // handler.ChangeState(ClearsightRendererHandler.State.transparent);
                 currentBatch.Add(handler);
                 hiddenTransforms.Add(renderer.transform.root);
                 if (previousBatch.Contains(handler)) {
@@ -415,16 +414,17 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 }
             }
         }
+        // yield return waitForFrame;
     }
 
     IEnumerator ResetPreviousBatch(int j) {
         HashSet<ClearsightRendererHandler> handlersToRemove = new HashSet<ClearsightRendererHandler>();
         foreach (ClearsightRendererHandler handler in previousBatch) {
-            j++;
-            if (j > BATCHSIZE) {
-                j = 0;
-                yield return waitForFrame;
-            }
+            // j++;
+            // if (j > BATCHSIZE) {
+            //     j = 0;
+            //     yield return waitForFrame;
+            // }
             bool handlerIsDone = handler.Update();
             if (handlerIsDone) {
                 handlersToRemove.Add(handler);
@@ -433,6 +433,14 @@ public class NeoClearsighterV3 : MonoBehaviour {
         foreach (ClearsightRendererHandler handler in handlersToRemove) {
             previousBatch.Remove(handler);
         }
+        yield return null;
+    }
+
+    IEnumerator ApplyCurrentBatch(HashSet<ClearsightRendererHandler> currentBatch) {
+        foreach (ClearsightRendererHandler handler in currentBatch) {
+            handler.ChangeState(ClearsightRendererHandler.State.transparent);
+        }
+        yield return null;
     }
 
     void OnDestroy() {
@@ -481,7 +489,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
                     ClearsightRendererHandler handler = new ClearsightRendererHandler(renderer);
                     handlers[renderer] = handler;
                 }
-
                 // if (!initialMaterials.ContainsKey(renderer)) {
                 //     initialMaterials[renderer] = renderer.sharedMaterial;
                 // }
@@ -497,7 +504,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
 
     Plane[] interloperFrustrum() {
-        float size = 2f;
+        float size = 0.5f;
         // float size = 1f;
 
         // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
@@ -522,7 +529,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
 }
 
 
-struct RaycastSetupJob : IJobParallelFor {
+struct ClearsightRaycastSetupJob : IJobParallelFor {
     public Vector3 EyePos;
     public LayerMask layerMask;
     public int indexOffset;
@@ -539,7 +546,7 @@ struct RaycastSetupJob : IJobParallelFor {
     }
 }
 
-struct RaycastGatherJob : IJobParallelFor {
+struct ClearsightRaycastGatherJob : IJobParallelFor {
     [ReadOnly]
     public NativeArray<RaycastHit> Results;
 
@@ -587,7 +594,7 @@ public class ClearsightRendererHandler {
         if (state == State.opaque) {
             MakeOpaque();
         } else if (state == State.transparent) {
-            frames = 4;
+            frames = 3;
             MakeTransparent();
         }
     }
@@ -599,13 +606,15 @@ public class ClearsightRendererHandler {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             cutawayRenderer.SetActive(true);
         } else {
-            renderer.material = interloperMaterial;
-            float targetAlpha = 0.5f;
-            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            renderer.GetPropertyBlock(propBlock);
-            propBlock.SetFloat("_TargetAlpha", targetAlpha);
-            renderer.SetPropertyBlock(propBlock);
-            renderer.shadowCastingMode = initialShadowCastingMode;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+
+            // renderer.material = interloperMaterial;
+            // float targetAlpha = 0.5f;
+            // MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+            // renderer.GetPropertyBlock(propBlock);
+            // propBlock.SetFloat("_TargetAlpha", targetAlpha);
+            // renderer.SetPropertyBlock(propBlock);
+            // renderer.shadowCastingMode = initialShadowCastingMode;
         }
     }
     void MakeOpaque() {

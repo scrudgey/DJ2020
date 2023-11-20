@@ -50,6 +50,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     // public float RotationSharpness = 100000f;
     public float RotationSharpness = 1f;
     Quaternion targetRotation = Quaternion.identity;
+    public Quaternion idealRotation = Quaternion.identity;
     public float initialRotationOffset = 20f;
     public float verticalRotationOffset = 30f;
 
@@ -616,6 +617,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // }
 
         // apply rotation
+        idealRotation = input.rotation;
         targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
         if (input.snapToRotation != Quaternion.identity) {
             targetRotation = input.snapToRotation;

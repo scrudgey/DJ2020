@@ -313,8 +313,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void SightCheckPlayer() {
         Collider player = GameManager.I.playerCollider;
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
-            if (ClearLineOfSight(player))
-                Perceive(player, byPassVisibilityCheck: true);
+            // if (ClearLineOfSight(player))
+            //     Perceive(player, byPassVisibilityCheck: true);
+            ClearLineOfSight(player, (RaycastHit hit) => {
+                // Debug.Log($"sight check player: {hit.collider} {hit}");
+                if (hit.collider == null || hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
+            });
         }
     }
     void SetInputs(PlayerInput input) {
@@ -322,19 +326,27 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
-            if (ClearLineOfSight(t.newestAddition))
-                Perceive(t.newestAddition);
+            // if (ClearLineOfSight(t.newestAddition))
+            //     Perceive(t.newestAddition);
+            ClearLineOfSight(t.newestAddition, (RaycastHit hit) => {
+                if (hit.collider == null || hit.collider == t.newestAddition) Perceive(t.newestAddition);
+            });
         }
     }
     void PerceiveFieldOfView() {
         foreach (Collider collider in target.fieldOfView) {
             if (collider == null)
                 continue;
-            if (ClearLineOfSight(collider))
-                Perceive(collider);
+            // if (ClearLineOfSight(collider))
+            //     Perceive(collider);
+            ClearLineOfSight(collider, (RaycastHit hit) => {
+                // hit.
+                if (hit.collider == null || hit.collider == collider) Perceive(collider);
+            });
         }
     }
     void Perceive(Collider other, bool byPassVisibilityCheck = false) {
+        if (other == null) return;
         if (hitState == HitState.dead) {
             return;
         }
@@ -470,7 +482,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
 
-    bool ClearLineOfSight(Collider other) {
+    void ClearLineOfSight(Collider other, Action<RaycastHit> callback) {
         Vector3 position = sightOrigin.position; // TODO: configurable
 
         // Vector3[] directions = new Vector3[]{
@@ -492,17 +504,20 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 other.bounds.center - position
             };
         }
-        bool clearLineOfSight = false;
+        // bool clearLineOfSight = false;
         foreach (Vector3 direction in directions) {
             // distance = Math.Min(direction.magnitude, MAXIMUM_SIGHT_RANGE);
             distance = direction.magnitude;
-            if (distance > MAXIMUM_SIGHT_RANGE)
-                return false;
-            Ray ray = new Ray(position, direction);
-            int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.99f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
-            clearLineOfSight |= numberHits == 0;
+            // if (distance > MAXIMUM_SIGHT_RANGE)
+            //     return false;
+            // Ray ray = new Ray(position, direction);
+            // int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.99f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+            // int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.99f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
+            // AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), callback);
+            AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def), callback);
+            // clearLineOfSight |= numberHits == 0;
         }
-        return clearLineOfSight;
+        // return clearLineOfSight;
     }
 
     public DamageResult TakeDamage(Damage damage) {

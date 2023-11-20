@@ -3508,3 +3508,9 @@ polish:
     clearsighter v3
         highlight NPCs that are shooting me
 
+
+* lots of blocking raycasts in sphererobotai
+raycastall and OverlapSphere
+
+lots of garbage created in gamemanager update
+generating a lot of garbage in sphererobotai

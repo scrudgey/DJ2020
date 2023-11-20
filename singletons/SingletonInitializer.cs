@@ -9,6 +9,7 @@ public class SingletonInitializer : MonoBehaviour {
         // PoolManager.InitializeInstance();
         Debug.Log(GameManager.I);
         Debug.Log(PoolManager.I);
+        Debug.Log(AsyncRaycastService.I);
         Destroy(gameObject);
     }
 }

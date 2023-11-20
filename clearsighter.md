@@ -48,11 +48,11 @@ we need to know what nodes are visible to player,
 * some system for only updating active handlers
 ? we don't need to batch the locating- just the hanlder updates
 * classic interlopers
-
-improve the classic interloper:
-    either only affect things not touched by raycast,
-    or slightly better logic around it
-handle windows
+* improve the classic interloper:
+* handle windows
+* check fps impact
+* condition on dot of normal and dot of ray?
+* still flickery wall
 
 ease disappearance, timed reappearance
     use state machine in material handler
@@ -61,4 +61,29 @@ selectively clearsight based on shooting enemies as well
 
 only raycast in appropriate directions away from camera
 
+tune: 
+    n rays
+    n subrays
+    n frames
+
+
 SwapExposureBackBuffer could be a proper swap i think?
+
+support aim, wallpress
+
+support burglar
+
+
+possibly: a grid of points that start by raycasting against static geometry in direction of camera (?) to know what occludes them
+then raycast to each point and know what occludes them, disable those
+this is potentially a very large grid
+
+
+
+
+
+    readonly static int NUMBER_DIRECTIONS = 100;
+    readonly static int NUMBER_SUB_RADARS = 3;
+    readonly static int jobBatchSize = 10;
+    frames = 3
+    0.051

@@ -256,7 +256,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         Vector3 gunPosition = this.gunPosition();
 
         Vector3 trueDirection = gunDirection(input);
-        Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
+        // Debug.DrawRay(gunPosition, trueDirection * 10f, Color.green, 10f);
 
         Ray sightline = new Ray(gunPosition, trueDirection);
         Vector3 baseAimpoint = sightline.GetPoint(10f); // a fixed distance from the gun
@@ -283,7 +283,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 source = transform.position
             };
             bullet.DoImpacts(transform.root);
-            Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
+            // Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
 
             shotgunSpread = gunInstance.template.shotgunSpread;
         }

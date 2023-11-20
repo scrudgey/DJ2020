@@ -21,7 +21,7 @@ public class Bullet {
             if (hit.collider.transform.IsChildOf(shooter))
                 continue;
             if (Impact(hit)) {
-                Debug.DrawLine(gunPosition, hit.point, Color.green, 5f);
+                // Debug.DrawLine(gunPosition, hit.point, Color.green, 5f);
                 if (UnityEngine.Random.Range(0f, 1f) < 0.25f) {
                     SpawnBulletRay(gunPosition, hit.point);
                 }
