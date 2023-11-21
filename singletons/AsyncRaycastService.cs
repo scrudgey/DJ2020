@@ -12,10 +12,17 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
     readonly static int BATCH_SIZE = 50;
     int index;
     int previousIndex;
+
     NativeArray<Vector3> origins;
     NativeArray<Vector3> directions;
     NativeArray<float> distances;
     NativeArray<LayerMask> layerMasks;
+    Action<RaycastHit>[] callbacks;
+
+    NativeArray<Vector3> backBufferOrigins;
+    NativeArray<Vector3> backBufferDirections;
+    NativeArray<float> backBufferDistances;
+    NativeArray<LayerMask> backBufferLayerMasks;
 
     NativeArray<RaycastCommand> commands;
     NativeArray<RaycastHit> raycastResults;
@@ -23,21 +30,25 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
 
     JobHandle gatherJobHandle;
 
-    Action<RaycastHit>[] callbacks;
     Action<RaycastHit>[] previousCallbacks;
 
     void Start() {
         previousIndex = 0;
-        Physics.queriesHitTriggers = false;
 
         var allocator = Allocator.Persistent;
 
-        commands = new NativeArray<RaycastCommand>(BUFFER_SIZE, allocator);
+        // commands = new NativeArray<RaycastCommand>(BUFFER_SIZE, allocator);
 
         origins = new NativeArray<Vector3>(BUFFER_SIZE, allocator);
         directions = new NativeArray<Vector3>(BUFFER_SIZE, allocator);
         distances = new NativeArray<float>(BUFFER_SIZE, allocator);
         layerMasks = new NativeArray<LayerMask>(BUFFER_SIZE, allocator);
+
+        backBufferOrigins = new NativeArray<Vector3>(BUFFER_SIZE, allocator);
+        backBufferDirections = new NativeArray<Vector3>(BUFFER_SIZE, allocator);
+        backBufferDistances = new NativeArray<float>(BUFFER_SIZE, allocator);
+        backBufferLayerMasks = new NativeArray<LayerMask>(BUFFER_SIZE, allocator);
+
         // raycastResults = new NativeArray<RaycastHit>(BUFFER_SIZE, allocator);
         results = new NativeArray<RaycastHit>(BUFFER_SIZE, allocator);
         callbacks = new Action<RaycastHit>[BUFFER_SIZE];
@@ -45,45 +56,37 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
     }
 
     public void RequestRaycast(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, Action<RaycastHit> callback) {
-        // Debug.Log("requesting raycast");
-        // if (index % 10 == 0) {
-        //     Debug.Log($"requesting raycast: {index}");
-        // }
-        origins[index] = origin;
-        directions[index] = direction;
-        distances[index] = distance;
-        layerMasks[index] = layerMask;
+        backBufferOrigins[index] = origin;
+        backBufferDirections[index] = direction;
+        backBufferDistances[index] = distance;
+        backBufferLayerMasks[index] = layerMask;
         callbacks[index] = callback;
         index++;
     }
 
     void Update() {
         gatherJobHandle.Complete();
-        // i need to double buffer the callbacks
-        // Debug.Log($"******* serving results for: {previousIndex}, starting next batch of {index}");
+
+        // distribute raycast results
         for (int i = 0; i < previousIndex; i++) {
             try {
                 RaycastHit hit = results[i];
-
                 previousCallbacks[i].Invoke(hit);
-                if (hit.collider == null) {
-                    Debug.DrawLine(origins[i], origins[i] + (directions[i].normalized * distances[i]), Color.yellow);
-                } else {
-                    Debug.DrawLine(origins[i], hit.point, Color.red);
-                }
+                previousCallbacks[i] = null;
             }
             catch (Exception e) {
-                Debug.Log($"callback failed: {i} {results[i]} {previousCallbacks[i]}");
+                Debug.LogError($"callback failed: {i} {results[i]} {previousCallbacks[i]}");
+                Debug.LogError($"previous index: {previousIndex}, index: {index}");
+                Debug.LogError(e.Message);
             }
         }
 
-        // distribute raycast results
+        SwapBackBuffer();
 
         if (commands.IsCreated)
             commands.Dispose();
         if (raycastResults.IsCreated)
             raycastResults.Dispose();
-
 
         // allocate data shared across jobs
         var allocator = Allocator.TempJob;
@@ -121,18 +124,48 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
 
         // kick jobs
         JobHandle.ScheduleBatchedJobs();
-        // Debug.Log($"async kicked off {index} raycasts");
-        previousIndex = index;
-        Array.Copy(callbacks, previousCallbacks, BUFFER_SIZE);
-        // previousCallbacks = new Action<RaycastHit>[BUFFER_SIZE](callbacks);
-        // callbacks = new Action<RaycastHit>[BUFFER_SIZE];
 
         index = 0;
+    }
+
+    void SwapBackBuffer() {
+        previousIndex = index;
+        Array.Copy(callbacks, previousCallbacks, BUFFER_SIZE);
+
+        var tmp = origins;
+        origins = backBufferOrigins;
+        backBufferOrigins = tmp;
+
+        tmp = directions;
+        directions = backBufferDirections;
+        backBufferDirections = tmp;
+
+        var tmp2 = distances;
+        distances = backBufferDistances;
+        backBufferDistances = tmp2;
+
+        var tmp3 = layerMasks;
+        layerMasks = backBufferLayerMasks;
+        backBufferLayerMasks = tmp3;
+
+        // tmp.r
+        // tmp2 = null;
+        // tmp3 = null;
     }
 
 
     public override void OnDestroy() {
         base.OnDestroy();
+        DisposeOfNativeArrays();
+    }
+    void OnApplicationQuit() {
+        DisposeOfNativeArrays();
+    }
+
+    void DisposeOfNativeArrays() {
+        Debug.Log("disposing of native arrays");
+        gatherJobHandle.Complete();
+
         if (layerMasks.IsCreated)
             layerMasks.Dispose();
         if (origins.IsCreated)
@@ -142,12 +175,19 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
         if (distances.IsCreated)
             distances.Dispose();
 
+        if (backBufferLayerMasks.IsCreated)
+            backBufferLayerMasks.Dispose();
+        if (backBufferOrigins.IsCreated)
+            backBufferOrigins.Dispose();
+        if (backBufferDirections.IsCreated)
+            backBufferDirections.Dispose();
+        if (backBufferDistances.IsCreated)
+            backBufferDistances.Dispose();
+
         if (raycastResults.IsCreated)
             raycastResults.Dispose();
         if (commands.IsCreated)
             commands.Dispose();
-        if (raycastResults.IsCreated)
-            raycastResults.Dispose();
         if (results.IsCreated)
             results.Dispose();
     }
@@ -156,8 +196,6 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
 
 
 struct RaycastSetupJob : IJobParallelFor {
-    // public LayerMask layerMask;
-
     [ReadOnly]
     public NativeArray<LayerMask> layerMasks;
     [ReadOnly]
@@ -166,7 +204,6 @@ struct RaycastSetupJob : IJobParallelFor {
     public NativeArray<Vector3> directions;
     [ReadOnly]
     public NativeArray<float> distances;
-
     [WriteOnly]
     public NativeArray<RaycastCommand> Commands;
 

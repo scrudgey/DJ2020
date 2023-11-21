@@ -211,6 +211,7 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         }
     }
 
+    // TODO: fix this
     void SightCheckPlayer() {
         Collider player = GameManager.I.playerCollider;
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {

@@ -3514,3 +3514,9 @@ raycastall and OverlapSphere
 
 lots of garbage created in gamemanager update
 generating a lot of garbage in sphererobotai
+
+spotted highlight is rather unstable
+parallelize the pulselight
+doors are blocking people again?
+stealing dat001 in tower didn't work
+guard stood facing wall in tower

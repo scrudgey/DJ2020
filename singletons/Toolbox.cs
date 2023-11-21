@@ -643,6 +643,7 @@ public class Toolbox {
         yield return null;
     }
 
+    [Obsolete("use async clearlineofsight.")]
     public static bool ClearLineOfSight(Vector3 position, Collider other, float MAXIMUM_SIGHT_RANGE = 25f) {
         Vector3[] directions = new Vector3[0];
         float distance = 0;

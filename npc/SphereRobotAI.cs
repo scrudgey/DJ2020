@@ -292,7 +292,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             PerceiveFieldOfView();
         }
 
-        // TODO: only lock when direction is closely aligned with direction to player
         if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
             SightCheckPlayer();
         }
@@ -312,12 +311,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     void SightCheckPlayer() {
         Collider player = GameManager.I.playerCollider;
+        // TODO: only lock when direction is closely aligned with direction to player
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
-            // if (ClearLineOfSight(player))
-            //     Perceive(player, byPassVisibilityCheck: true);
             ClearLineOfSight(player, (RaycastHit hit) => {
-                // Debug.Log($"sight check player: {hit.collider} {hit}");
-                if (hit.collider == null || hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
+                if (hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
             });
         }
     }
@@ -326,10 +323,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
-            // if (ClearLineOfSight(t.newestAddition))
-            //     Perceive(t.newestAddition);
             ClearLineOfSight(t.newestAddition, (RaycastHit hit) => {
-                if (hit.collider == null || hit.collider == t.newestAddition) Perceive(t.newestAddition);
+                if (hit.collider == t.newestAddition) Perceive(t.newestAddition);
             });
         }
     }
@@ -337,11 +332,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         foreach (Collider collider in target.fieldOfView) {
             if (collider == null)
                 continue;
-            // if (ClearLineOfSight(collider))
-            //     Perceive(collider);
             ClearLineOfSight(collider, (RaycastHit hit) => {
-                // hit.
-                if (hit.collider == null || hit.collider == collider) Perceive(collider);
+                if (hit.collider == collider) Perceive(collider);
             });
         }
     }
@@ -485,39 +477,20 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void ClearLineOfSight(Collider other, Action<RaycastHit> callback) {
         Vector3 position = sightOrigin.position; // TODO: configurable
 
-        // Vector3[] directions = new Vector3[]{
-        //     other.bounds.center - position,
-        //     (other.bounds.center + other.bounds.extents) - position,
-        //     (other.bounds.center - other.bounds.extents) - position,
-        // };
-        // float distance = Vector3.Distance(other.bounds.center, transform.position);
-
         // Physics.ClosestPoint can only be used with a BoxCollider, SphereCollider, CapsuleCollider and a convex MeshCollider.
-        Vector3[] directions = new Vector3[0];
-        float distance = 0;
-        if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
-            directions = new Vector3[]{
-                other.ClosestPoint(position) - position
-            };
-        } else {
-            directions = new Vector3[]{
-                other.bounds.center - position
-            };
-        }
-        // bool clearLineOfSight = false;
-        foreach (Vector3 direction in directions) {
-            // distance = Math.Min(direction.magnitude, MAXIMUM_SIGHT_RANGE);
-            distance = direction.magnitude;
-            // if (distance > MAXIMUM_SIGHT_RANGE)
-            //     return false;
-            // Ray ray = new Ray(position, direction);
-            // int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.99f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
-            // int numberHits = Physics.RaycastNonAlloc(ray, raycastHits, distance * 0.99f, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
-            // AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), callback);
-            AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def), callback);
-            // clearLineOfSight |= numberHits == 0;
-        }
-        // return clearLineOfSight;
+        Vector3 direction = other.bounds.center - position;
+        // float distance = 0;
+        // if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
+        //     direction = other.ClosestPoint(position) - position;
+        // } else {
+        //     directions = new Vector3[]{
+        //         other.bounds.center - position
+        //     };
+        // }
+        // foreach (Vector3 direction in directions) {
+        float distance = direction.magnitude;
+        AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), callback);
+        // }
     }
 
     public DamageResult TakeDamage(Damage damage) {

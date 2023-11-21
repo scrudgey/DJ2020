@@ -8,6 +8,8 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class NeoClearsighterV3 : MonoBehaviour {
+    enum State { normal, showAll }
+    State state;
     static readonly int BATCHSIZE = 500;
     WaitForEndOfFrame waitForFrame = new WaitForEndOfFrame();
 
@@ -19,29 +21,20 @@ public class NeoClearsighterV3 : MonoBehaviour {
     NativeArray<Vector3> radarDirections;
     NativeArray<RaycastHit> raycastResults;
     NativeArray<RaycastHit> raycastResultsBackBuffer;
-    LayerMask defaultLayerMask;
-    readonly static int NUMBER_DIRECTIONS = 100;
-    readonly static int NUMBER_SUB_RADARS = 3;
-    readonly static int jobBatchSize = 10;
-    JobHandle gatherJobHandle;
     NativeArray<RaycastCommand> commands;
     NativeArray<RaycastHit> results;
+    LayerMask defaultLayerMask;
+    readonly static int NUMBER_DIRECTIONS = 180;
+    readonly static int NUMBER_SUB_RADARS = 2;
+    readonly static int jobBatchSize = 18;
+    JobHandle gatherJobHandle;
     int subradarIndex;
-
     PointOctree<Renderer> rendererTree;
     Dictionary<Renderer, Vector3> rendererPositions;
     Dictionary<Renderer, Bounds> rendererBounds;
-
-    // Dictionary<Renderer, GameObject> cutawayRenderers;
-    // Dictionary<Renderer, Material> interloperMaterials;
-    // Dictionary<Renderer, ShadowCastingMode> initialShadowCastingMode;
-    // Dictionary<Renderer, Material> initialMaterials;
     BoundsOctree<Renderer> rendererBoundsTree;
-
     Dictionary<Collider, Renderer> colliderRenderers;
     HashSet<ClearsightRendererHandler> previousBatch;
-    // HashSet<Renderer> previousInterloperBatch;
-    // HashSet<Renderer> previousDynamicRendererBatch;
     HashSet<Transform> hiddenTransforms;
     Dictionary<Renderer, TagSystemData> rendererTagData;
     Dictionary<Collider, Renderer[]> dynamicColliderToRenderer;
@@ -109,7 +102,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
             rendererBounds[renderer] = renderer.bounds;
             rendererTagData[renderer] = Toolbox.GetTagData(renderer.gameObject);
 
-            ClearsightRendererHandler handler = new ClearsightRendererHandler(renderer);
+            ClearsightRendererHandler handler = new ClearsightRendererHandler(renderer, position, renderer.bounds);
             handlers[renderer] = handler;
             Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
             if (findAnchor != null) {
@@ -144,20 +137,44 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
     IEnumerator HandleGeometry() {
         if (initialized) {
-            yield return HandleGeometryNormal();
+            if ((myCamera.state == CameraState.normal || myCamera.state == CameraState.attractor)) {
+                state = State.normal;
+            } else {
+                state = State.showAll;
+            }
+            switch (state) {
+                default:
+                case State.normal:
+                    yield return HandleGeometryNormal();
+                    break;
+                case State.showAll:
+                    yield return ShowAllGeometry();
+                    break;
+            }
         } else {
             yield return null;
         }
     }
+    IEnumerator ShowAllGeometry() {
+        // reset previous batch
+        yield return ResetPreviousBatch(0);
+        // previousBatch = new HashSet<ClearsightRendererHandler>();
+        hiddenTransforms.Clear();
+        yield return waitForFrame;
+    }
+
+    Vector3 getLiftedOrigin() {
+        Vector3 origin = followTransform.position;
+        origin.y = Mathf.Round(origin.y * 10f) / 10f;
+        float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
+        return origin + new Vector3(0f, lift, 0f);
+    }
+
     IEnumerator HandleGeometryNormal() {
         HashSet<ClearsightRendererHandler> currentBatch = new HashSet<ClearsightRendererHandler>();
         HashSet<Renderer> raycastHits = new HashSet<Renderer>();
 
-        Vector3 origin = followTransform.position;
-        origin.y = Mathf.Round(origin.y * 10f) / 10f;
-
-        float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
-        Vector3 liftedOrigin = origin + new Vector3(0f, lift, 0f);
+        Vector3 liftedOrigin = getLiftedOrigin();
         int j = 0;
 
         // static geometry above me
@@ -266,7 +283,8 @@ public class NeoClearsighterV3 : MonoBehaviour {
             if (position.y > liftedOrigin.y) {
                 // MakeTransparent(renderer, true);
                 ClearsightRendererHandler handler = handlers[renderer];
-                handler.above = true;
+                // handler.above = true;
+                handler.ChangeState(ClearsightRendererHandler.State.above);
                 // handler.ChangeState(ClearsightRendererHandler.State.transparent);
                 nextAboveRenderBatch.Add(handler);
                 hiddenTransforms.Add(renderer.transform.root);
@@ -315,8 +333,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
                 // Color color = (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot))) ? Color.green : Color.red;
                 // Debug.DrawLine(start, end, color);
-
-                if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot))
+                if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot && hit.distance > 4f))
                      && (rendererBounds[renderer].center - followTransform.position).y > 0.2f) {
                     // handler.ChangeState(ClearsightRendererHandler.State.transparent);
                     // Debug.DrawLine(start, end, Color.green);
@@ -355,8 +372,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
                     if (currentBatch.Contains(handler)) continue;
                     if (renderer.CompareTag("occlusionSpecial")) continue;
 
-                    // handler.ChangeState(ClearsightRendererHandler.State.transparent);
-                    handler.above = true;
+                    handler.ChangeState(ClearsightRendererHandler.State.above);
                     currentBatch.Add(handler);
                     hiddenTransforms.Add(root);
                     if (previousBatch.Contains(handler)) {
@@ -418,21 +434,16 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
     IEnumerator ResetPreviousBatch(int j) {
-        HashSet<ClearsightRendererHandler> handlersToRemove = new HashSet<ClearsightRendererHandler>();
         foreach (ClearsightRendererHandler handler in previousBatch) {
             // j++;
             // if (j > BATCHSIZE) {
             //     j = 0;
             //     yield return waitForFrame;
             // }
-            bool handlerIsDone = handler.Update();
-            if (handlerIsDone) {
-                handlersToRemove.Add(handler);
-            }
+            Vector3 playerPosition = getLiftedOrigin();
+            handler.ChangeState(ClearsightRendererHandler.State.opaque);
         }
-        foreach (ClearsightRendererHandler handler in handlersToRemove) {
-            previousBatch.Remove(handler);
-        }
+        previousBatch = new HashSet<ClearsightRendererHandler>();
         yield return null;
     }
 
@@ -444,6 +455,13 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
     void OnDestroy() {
+        DisposeOfNativeArrays();
+    }
+    void OnApplicationQuit() {
+        DisposeOfNativeArrays();
+    }
+    void DisposeOfNativeArrays() {
+        Debug.Log("disposing of native arrays");
         if (radarDirections.IsCreated)
             radarDirections.Dispose();
         if (raycastResults.IsCreated)
@@ -486,7 +504,9 @@ public class NeoClearsighterV3 : MonoBehaviour {
                     rendererTransforms[renderer] = findAnchor;
                 }
                 if (!handlers.ContainsKey(renderer)) {
-                    ClearsightRendererHandler handler = new ClearsightRendererHandler(renderer);
+                    // Vector3 position = rendererPositions[renderer] - new Vector3(0f, rendererBounds[renderer].extents.y, 0f);
+
+                    ClearsightRendererHandler handler = new ClearsightRendererHandler(renderer, renderer.transform.position, renderer.bounds);
                     handlers[renderer] = handler;
                 }
                 // if (!initialMaterials.ContainsKey(renderer)) {
@@ -560,20 +580,26 @@ struct ClearsightRaycastGatherJob : IJobParallelFor {
 
 
 public class ClearsightRendererHandler {
-    public enum State { opaque, transparent }
-
-
-
+    public enum State { opaque, transparent, above }
     public Renderer renderer;
+    Transform myTransform;
+    Vector3 position;
+    Vector3 adjustedPosition;
+    Bounds bounds;
+
     GameObject cutawayRenderer;
     Material interloperMaterial;
     Material initialMaterial;
     ShadowCastingMode initialShadowCastingMode;
     bool isCutaway;
-    public bool above;
     int frames;
-    public ClearsightRendererHandler(Renderer renderer) {
+    int transparentRequests;
+    bool isDynamic;
+    TagSystemData data;
+    public ClearsightRendererHandler(Renderer renderer, Vector3 position, Bounds bounds, bool isDynamic = false) {
         this.renderer = renderer;
+        this.isDynamic = isDynamic;
+        this.myTransform = renderer.transform;
 
         initialMaterial = renderer.sharedMaterial;
         interloperMaterial = NeoClearsighterV3.NewInterloperMaterial(renderer);
@@ -585,59 +611,110 @@ public class ClearsightRendererHandler {
             cutaway.gameObject.SetActive(false);
             cutawayRenderer = cutaway.gameObject;
         }
+        this.position = position;
+        this.bounds = bounds;
+        this.adjustedPosition = position;
+        this.adjustedPosition.y -= bounds.extents.y;
+        this.data = Toolbox.GetTagData(renderer.gameObject);
     }
 
     State state;
     public void ChangeState(State toState) {
-        // if (state == toState) return;
-        state = toState;
-        if (state == State.opaque) {
-            MakeOpaque();
-        } else if (state == State.transparent) {
-            frames = 3;
-            MakeTransparent();
+        if (renderer == null) return;
+
+        switch (toState) {
+            case State.opaque:
+                if (state == toState) return;
+                frames = 0;
+                transparentRequests = 0;
+                MakeOpaque();
+                break;
+            case State.transparent:
+                frames = 3;
+                transparentRequests += 2;
+                if (transparentRequests >= 7) {
+                    MakeTransparent();
+                }
+                break;
+            case State.above:
+                if (state == toState) return;
+                frames = 0;
+                transparentRequests = 0;
+                MakeInvisible();
+                break;
         }
+        state = toState;
     }
 
     void MakeTransparent() {
-        if (above) {
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        if (data.transparentIsInvisible) {
+            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         } else if (isCutaway) {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             cutawayRenderer.SetActive(true);
         } else {
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            renderer.material = interloperMaterial;
+            renderer.shadowCastingMode = initialShadowCastingMode;
 
-            // renderer.material = interloperMaterial;
-            // float targetAlpha = 0.5f;
-            // MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            // renderer.GetPropertyBlock(propBlock);
-            // propBlock.SetFloat("_TargetAlpha", targetAlpha);
-            // renderer.SetPropertyBlock(propBlock);
-            // renderer.shadowCastingMode = initialShadowCastingMode;
+            float targetAlpha = 0.5f;
+            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(propBlock);
+            propBlock.SetFloat("_TargetAlpha", targetAlpha);
+            renderer.SetPropertyBlock(propBlock);
         }
     }
+    void MakeInvisible() {
+        if (isCutaway)
+            cutawayRenderer.SetActive(false);
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+    }
+
     void MakeOpaque() {
         if (renderer == null) return;
         if (isCutaway) {
             cutawayRenderer.SetActive(false);
         }
         if (renderer.CompareTag("occlusionSpecial")) return;
-        if (renderer.name == "elevator_car") {
-            Debug.Log("weird");
-            Debug.Break();
-        }
         renderer.shadowCastingMode = initialShadowCastingMode;
         renderer.material = initialMaterial;
     }
 
-    public bool Update() {
-        if (state == State.transparent) {
+    public bool Update(Vector3 playerPosition) {
+        // Update is called on handlers that were part of a previous batch not touched this frame.
+
+        if (renderer == null) return true;
+        if (isDynamic) {
+            adjustedPosition = myTransform.position;
+            adjustedPosition.y -= bounds.extents.y;
+        }
+        // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
+        // which is player position + 1.5
+        // above = adjustedPosition.y > playerPosition.y;
+        if (adjustedPosition.y > playerPosition.y) {
+            ChangeState(State.above);
+            return false;
+        }
+
+        if (transparentRequests > 10) {
+            transparentRequests = 10;
+        }
+        if (transparentRequests > 0) {
+            transparentRequests--;
+        }
+
+        if (frames > 0) {
             frames--;
-            if (frames <= 0) {
+        } else if (frames < 0) {
+            frames = 0;
+        }
+
+        if (state == State.transparent) {
+            if (frames <= 0 && transparentRequests < 2) {
                 ChangeState(State.opaque);
                 return true;
             }
+
         } else if (state == State.opaque) {
             return true;
         }

@@ -22,7 +22,12 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
         coroutine = StartCoroutine(RunJobRepeatedly());
     }
     void OnDestroy() {
-        // if (textureData.)
+        DisposeOfNativeArrays();
+    }
+    void OnApplicationQuit() {
+        DisposeOfNativeArrays();
+    }
+    void DisposeOfNativeArrays() {
         try {
             textureData.Dispose();
         }
