@@ -2979,6 +2979,12 @@ x ladders
 * billboarded sprites don't work:
 * reenable jtd attractor
 * dialogue
+* clearsighter v3
+* remove attack surface cam positioning
+    * offset camera a little bit
+    * disable mouse aim movement
+    * let NPCS walk through each other
+* lots of blocking raycasts in sphererobotai
 
 
 
@@ -3352,6 +3358,12 @@ doors
     more door types? more explotable latch? more handles and things?
     locks for doubledoors with crash bars
 
+performance:
+    parallelize the pulselight
+    raycastall and OverlapSphere
+    lots of garbage created in gamemanager update
+    generating a lot of garbage in sphererobotai
+    
 
 silencer shows in gameplay
 map pane:
@@ -3475,17 +3487,29 @@ more equipment to bring on mission?
     ninja vanish
 
 
-* clearsighter v3
-* remove attack surface cam positioning
-    * offset camera a little bit
-    * disable mouse aim movement
-    * let NPCS walk through each other
 
 pretty easy to run in guns blazing
     bonus objectives can dicincentivize this
     when alarm is hit, doors come down and turrets pop out
     player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
+polish:
+    reduce frequency of "enemy sighted"
+    change sensitivity / eliminate "guess it was nothing"
+    better AI navigation / building search
+        when reverting to patrol, we can do better
+        multiple guards chose the same clearpoint to navigate to
+    better investigative ability when player does something weird like superjump / land
+    highlight NPCs that are shooting me
+status bar on top shows:
+    credits
+    loots
+    data
+    keys
+    shows when key is used
+    when loot is collected
 
+
+fill in names
 animate gun holster / unholster
 padlock door doesnt work
 npc dialogue is jumpy
@@ -3493,32 +3517,9 @@ some things are not stealing
 shooting should visually be suspicious
 shells / crater clearsight
 burglar view should remain in elevator, maybe select attack surfaces
-
-fill in names
-polish:
-    reduce frequency of "enemy sighted"
-    change sensitivity / eliminate "guess it was nothing"
-    better AI navigation / building search
-        when reverting to patrol, we can do better
-        multiple guards chose the same clearpoint to navigate to
-
-    better investigative ability when player does something weird like superjump / land
-
-        highlight NPCs that are shooting me
-
-
-* lots of blocking raycasts in sphererobotai
-
 spotted highlight is rather unstable
-parallelize the pulselight
 doors are blocking people again?
-
 stealing dat001 in tower didn't work
 guard stood facing wall in tower
-
-
-
-
-raycastall and OverlapSphere
-lots of garbage created in gamemanager update
-generating a lot of garbage in sphererobotai
+! when stealth killed
+armor

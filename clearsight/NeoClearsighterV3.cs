@@ -149,8 +149,28 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 radarDirections[i + (j * NUMBER_DIRECTIONS)] = rotation * Vector3.right;
             }
         }
-
     }
+
+    void OnDestroy() {
+        DisposeOfNativeArrays();
+    }
+    void OnApplicationQuit() {
+        DisposeOfNativeArrays();
+    }
+    void DisposeOfNativeArrays() {
+        Debug.Log("disposing of native arrays");
+        if (radarDirections.IsCreated)
+            radarDirections.Dispose();
+        if (raycastResults.IsCreated)
+            raycastResults.Dispose();
+        if (raycastResultsBackBuffer.IsCreated)
+            raycastResultsBackBuffer.Dispose();
+        if (commands.IsCreated)
+            commands.Dispose();
+        if (results.IsCreated)
+            results.Dispose();
+    }
+
     Vector3 getLiftedOrigin() {
         Vector3 origin = followTransform.position;
         origin.y = Mathf.Round(origin.y * 10f) / 10f;
@@ -359,21 +379,26 @@ public class NeoClearsighterV3 : MonoBehaviour {
             if (hit.collider.name == "cutaway") continue;
 
             raycastHits.Add(hit.collider.transform.root);
-            ClearsightRendererHandler handler = handlers[hit.collider.transform.root];
-            if (currentBatch?.Contains(handler) ?? false) continue;
-            // if (rendererTagData[renderer].dontHideInterloper) continue;
+            if (handlers.ContainsKey(hit.collider.transform.root)) {
+                ClearsightRendererHandler handler = handlers[hit.collider.transform.root];
+                if (currentBatch?.Contains(handler) ?? false) continue;
+                // if (rendererTagData[renderer].dontHideInterloper) continue;
 
-            Vector3 hitNorm = hit.normal;
-            hitNorm.y = 0;
-            float normDot = Vector3.Dot(hitNorm, cameraPlanarDirection);
-            float rayDot = Vector3.Dot(radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)], cameraPlanarDirection);
-            if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot)) //&& hit.distance > 4f
-                 && (handler.bounds.center - followTransform.position).y > 0.2f) {
-                currentBatch.Add(handler);
-                if (previousBatch.Contains(handler)) {
-                    previousBatch.Remove(handler);
+                Vector3 hitNorm = hit.normal;
+                hitNorm.y = 0;
+                float normDot = Vector3.Dot(hitNorm, cameraPlanarDirection);
+                float rayDot = Vector3.Dot(radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)], cameraPlanarDirection);
+                if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot)) //&& hit.distance > 4f
+                     && (handler.bounds.center - followTransform.position).y > 0.2f) {
+                    currentBatch.Add(handler);
+                    if (previousBatch.Contains(handler)) {
+                        previousBatch.Remove(handler);
+                    }
                 }
+            } else {
+                Debug.LogWarning($"renderer root not found : {hit.collider.transform.root}");
             }
+
         }
     }
 
@@ -482,26 +507,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
         yield return null;
     }
 
-    void OnDestroy() {
-        DisposeOfNativeArrays();
-    }
-    void OnApplicationQuit() {
-        DisposeOfNativeArrays();
-    }
-    void DisposeOfNativeArrays() {
-        Debug.Log("disposing of native arrays");
-        if (radarDirections.IsCreated)
-            radarDirections.Dispose();
-        if (raycastResults.IsCreated)
-            raycastResults.Dispose();
-        if (raycastResultsBackBuffer.IsCreated)
-            raycastResultsBackBuffer.Dispose();
-        if (commands.IsCreated)
-            commands.Dispose();
-        if (results.IsCreated)
-            results.Dispose();
-    }
-
     public static Material NewInterloperMaterial(Renderer renderer) {
         Material interloperMaterial = new Material(renderer.sharedMaterial);
         Texture albedo = renderer.sharedMaterial.mainTexture;
@@ -520,12 +525,10 @@ public class NeoClearsighterV3 : MonoBehaviour {
                                                 ).ToArray();
             dynamicColliderToRenderer[key] = renderers;
             dynamicColliderRoot[key] = key.transform.root;
-
             Transform findAnchor = key.transform.root.Find("clearSighterAnchor");
             if (findAnchor != null) {
                 dynamicColliderRoot[key] = findAnchor;
             }
-
             foreach (Renderer renderer in renderers) {
                 rendererTransforms[renderer] = renderer.transform;
                 if (findAnchor != null) {
@@ -535,14 +538,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
                     ClearsightRendererHandler handler = new ClearsightRendererHandler(this, renderer.transform.root, renderer.transform.position, renderer.bounds);
                     handlers[renderer.transform.root] = handler;
                 }
-                // if (!initialMaterials.ContainsKey(renderer)) {
-                //     initialMaterials[renderer] = renderer.sharedMaterial;
-                // }
-                // if (!interloperMaterials.ContainsKey(renderer)) {
-                //     interloperMaterials[renderer] = NewInterloperMaterial(renderer);
-                // }
-                // if (!initialShadowCastingMode.ContainsKey(renderer))
-                //     initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             }
             return renderers;
         }
@@ -577,300 +572,3 @@ public class NeoClearsighterV3 : MonoBehaviour {
 }
 
 
-struct ClearsightRaycastSetupJob : IJobParallelFor {
-    public Vector3 EyePos;
-    public LayerMask layerMask;
-    public int indexOffset;
-
-    [ReadOnly]
-    public NativeArray<Vector3> directions;
-
-    [WriteOnly]
-    public NativeArray<RaycastCommand> Commands;
-
-    public void Execute(int index) {
-        Vector3 vec = directions[index + indexOffset];
-        Commands[index] = new RaycastCommand(EyePos, vec.normalized, 50f, layerMask: layerMask);
-    }
-}
-
-struct ClearsightRaycastGatherJob : IJobParallelFor {
-    [ReadOnly]
-    public NativeArray<RaycastHit> Results;
-
-    [WriteOnly]
-    public NativeArray<RaycastHit> output;
-
-    public void Execute(int index) {
-        output[index] = Results[index];
-    }
-}
-
-
-public class ClearsightRendererHandler {
-    class SubRenderHandler {
-        TagSystemData data;
-        MaterialPropertyBlock propBlock;
-        GameObject cutawayRenderer;
-        Material interloperMaterial;
-        public Material initialMaterial;
-        public ShadowCastingMode initialShadowCastingMode;
-        Bounds bounds;
-        bool isCutaway;
-
-        public Renderer renderer;
-
-        public SubRenderHandler(Renderer renderer) {
-            this.renderer = renderer;
-            propBlock = new MaterialPropertyBlock();
-            renderer.GetPropertyBlock(propBlock);
-            initialMaterial = renderer.sharedMaterial;
-            interloperMaterial = NeoClearsighterV3.NewInterloperMaterial(renderer);
-            initialShadowCastingMode = renderer.shadowCastingMode;
-            if (renderer.CompareTag("cutaway")) {
-                isCutaway = true;
-                Transform cutaway = renderer.transform.parent.Find("cutaway");
-                cutaway.gameObject.SetActive(false);
-                cutawayRenderer = cutaway.gameObject;
-            }
-            this.data = Toolbox.GetTagData(renderer.gameObject);
-        }
-
-        public void MakeTransparent() {
-            if (data.transparentIsInvisible) {
-                renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-            } else if (isCutaway) {
-                FadeOut();
-                cutawayRenderer.SetActive(true);
-            } else {
-                FadeOut();
-            }
-        }
-
-        public void FadeOut() {
-            renderer.material = interloperMaterial;
-            renderer.shadowCastingMode = initialShadowCastingMode;
-        }
-        public void FadeIn() {
-            renderer.material = interloperMaterial;
-            renderer.shadowCastingMode = initialShadowCastingMode;
-        }
-
-        public void MakeInvisible() {
-            if (isCutaway)
-                cutawayRenderer.SetActive(false);
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-        }
-
-        public void MakeOpaque() {
-            if (renderer == null) return;
-            if (isCutaway) {
-                cutawayRenderer.SetActive(false);
-            }
-            if (renderer.CompareTag("occlusionSpecial")) return;
-            FadeIn();
-        }
-
-        public void HandleTimeTick(float alpha) {
-            propBlock.SetFloat("_TargetAlpha", alpha);
-            renderer.SetPropertyBlock(propBlock);
-        }
-
-    }
-
-    public enum State { opaque, transparent, above }
-    // Renderer[] renderers;
-    List<SubRenderHandler> handlers;
-    public Bounds bounds;
-    NeoClearsighterV3 clearsighter;
-    Transform myTransform;
-    Vector3 adjustedPosition;
-
-    int frames;
-    int transparentRequests;
-    bool isDynamic;
-
-    float alpha;
-    bool fadeAlpha;
-
-    public ClearsightRendererHandler(NeoClearsighterV3 clearsighter, Transform root, Vector3 position, Bounds bounds, bool isDynamic = false) {
-        Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
-        this.isDynamic = isDynamic;
-        this.myTransform = root;
-        this.clearsighter = clearsighter;
-        alpha = 1;
-
-        this.bounds = renderers[0].bounds;
-        this.handlers = new List<SubRenderHandler>();
-        foreach (Renderer renderer in renderers) {
-            if (renderer.name == "cutaway") continue;
-            this.bounds.Encapsulate(renderer.bounds);
-            handlers.Add(new SubRenderHandler(renderer));
-        }
-
-        this.adjustedPosition = position;
-        this.adjustedPosition.y -= bounds.extents.y;
-    }
-
-    State state;
-    public void ChangeState(State toState) {
-        switch (toState) {
-            case State.opaque:
-                if (state == toState) return;
-                frames = 0;
-                transparentRequests = 0;
-                MakeOpaque();
-                break;
-            case State.transparent:
-                frames = 3;
-                transparentRequests += 2;
-                if (transparentRequests >= 7) {
-                    MakeTransparent();
-                }
-                break;
-            case State.above:
-                if (state == toState) return;
-                frames = 0;
-                transparentRequests = 0;
-                MakeInvisible();
-                break;
-        }
-        state = toState;
-    }
-
-    void MakeTransparent() {
-        // if (data.transparentIsInvisible) {
-        //     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-        // } else if (isCutaway) {
-        //     FadeOut();
-        //     cutawayRenderer.SetActive(true);
-        // } else {
-        //     FadeOut();
-        // }
-        foreach (SubRenderHandler handler in handlers) {
-            handler.MakeTransparent();
-        }
-
-        FadeOut();
-    }
-
-    void FadeOut() {
-        fadeAlpha = true;
-        // renderer.material = interloperMaterial;
-        // renderer.shadowCastingMode = initialShadowCastingMode;
-        foreach (SubRenderHandler handler in handlers) {
-            handler.FadeOut();
-        }
-        clearsighter.OnTime += HandleTimeTick;
-    }
-    void FadeIn() {
-        fadeAlpha = false;
-        foreach (SubRenderHandler handler in handlers) {
-            handler.FadeIn();
-        }
-        // renderer.material = interloperMaterial;
-        // renderer.shadowCastingMode = initialShadowCastingMode;
-        clearsighter.OnTime += HandleTimeTick;
-    }
-
-    void MakeInvisible() {
-        // if (isCutaway)
-        //     cutawayRenderer.SetActive(false);
-        foreach (SubRenderHandler handler in handlers) {
-            handler.MakeInvisible();
-        }
-        clearsighter.OnTime -= HandleTimeTick;
-        alpha = 0;
-        // renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-    }
-
-    void MakeOpaque() {
-        // if (renderer == null) return;
-        // if (isCutaway) {
-        //     cutawayRenderer.SetActive(false);
-        // }
-        // if (renderer.CompareTag("occlusionSpecial")) return;
-        FadeIn();
-        foreach (SubRenderHandler handler in handlers) {
-            handler.MakeOpaque();
-        }
-    }
-
-
-    public bool Update(Vector3 playerPosition) {
-        // Update is called on handlers that were part of a previous batch not touched this frame.
-        // if (renderer == null) return true;
-        if (isDynamic) {
-            adjustedPosition = myTransform.position;
-            adjustedPosition.y -= bounds.extents.y;
-        }
-        // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
-        // which is player position + 1.5
-        // above = adjustedPosition.y > playerPosition.y;
-        if (adjustedPosition.y > playerPosition.y) {
-            ChangeState(State.above);
-            return false;
-        }
-
-        if (transparentRequests > 10) {
-            transparentRequests = 10;
-        }
-        if (transparentRequests > 0) {
-            transparentRequests--;
-        }
-
-        if (frames > 0) {
-            frames--;
-        } else if (frames < 0) {
-            frames = 0;
-        }
-
-        if (state == State.transparent) {
-            if (frames <= 0 && transparentRequests < 2) {
-                ChangeState(State.opaque);
-                return true;
-            }
-
-        } else if (state == State.opaque) {
-            return true;
-        }
-        return false;
-    }
-
-    void HandleTimeTick(float deltaTime) {
-        if (fadeAlpha) {
-            alpha -= deltaTime * 4;
-        } else {
-            alpha += deltaTime * 4;
-        }
-        if (alpha > 1) alpha = 1;
-        // if (!isCutaway && alpha < 0.5) alpha = 0.5f;
-        if (alpha < 0) alpha = 0;
-
-        foreach (SubRenderHandler handler in handlers) {
-            handler.HandleTimeTick(alpha);
-        }
-
-        // if (!isCutaway && fadeAlpha && alpha <= 0.5) {
-        //     clearsighter.OnTime -= HandleTimeTick;
-        //     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-        // }
-        if (fadeAlpha && alpha <= 0) {
-            clearsighter.OnTime -= HandleTimeTick;
-            // renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-            foreach (SubRenderHandler handler in handlers) {
-                handler.renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-            }
-        }
-        if (!fadeAlpha && alpha >= 1) {
-            clearsighter.OnTime -= HandleTimeTick;
-            foreach (SubRenderHandler handler in handlers) {
-                handler.renderer.shadowCastingMode = handler.initialShadowCastingMode;
-                handler.renderer.material = handler.initialMaterial;
-                // handler.renderer.
-            }
-            // renderer.shadowCastingMode = initialShadowCastingMode;
-            // renderer.material = initialMaterial;
-        }
-    }
-}

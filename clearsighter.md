@@ -77,19 +77,15 @@ tune:
 * ease disappearance, timed reappearance
 * windows still not working
 * cutaway renderer
+* frustrum size? frustrum geometry?
+* change hashsets of renderers to hashsets of transforms
+* handle anchor
+* clean up code
+* sprites??
 
 
-
-handle anchor
-sprites??
-frustrum size? frustrum geometry?
-
+apply clearsightblocker to other windows
 selectively clearsight based on shooting enemies as well / enemies
-
 fix "isvisible" in gamemanager.level
-
-clean up code
-
-change hashsets of renderers to hashsets of transforms
-
 "dont hide interloper" tag
+interloper frustrum should be rotated at an angle consummate with isometric view
