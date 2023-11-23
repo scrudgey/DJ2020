@@ -39,6 +39,17 @@ radar-like raycast sweep, and cull based on normal dot product with direction to
 or raycasts from nodes on a grid toward the camera?
 we need to know what nodes are visible to player, 
 
+possibly: a grid of points that start by raycasting against static geometry in direction of camera (?) to know what occludes them
+then raycast to each point and know what occludes them, disable those
+this is potentially a very large grid
+
+tune: 
+    n rays
+    n subrays
+    n frames
+
+
+
 
 * handle multiple hits on same object
 * handle aboves
@@ -59,24 +70,26 @@ we need to know what nodes are visible to player,
 ? only raycast in appropriate directions away from camera
 * handle above properly
 * handle non-cutaway
+* better burglar solution (above only)
+*    nearby to door disables wall
+* junk still present in basement
+* buildings
+* ease disappearance, timed reappearance
+* windows still not working
+* cutaway renderer
 
-ease disappearance, timed reappearance
-    use state machine in material handler
+
+
+handle anchor
+sprites??
+frustrum size? frustrum geometry?
 
 selectively clearsight based on shooting enemies as well / enemies
-better burglar solution (above only)
-windows still not working
-    nearby to door disables wall
-junk still present in basement
-door/window being hidden is still an issue
-buildings
 
+fix "isvisible" in gamemanager.level
 
-tune: 
-    n rays
-    n subrays
-    n frames
+clean up code
 
-possibly: a grid of points that start by raycasting against static geometry in direction of camera (?) to know what occludes them
-then raycast to each point and know what occludes them, disable those
-this is potentially a very large grid
+change hashsets of renderers to hashsets of transforms
+
+"dont hide interloper" tag

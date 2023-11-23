@@ -3426,7 +3426,6 @@ major initiatives:
     destructible walls
     vehicles
     finalize street 
-    clearsighter polish
     music
         auto leveling, balance, ducking
     missions
@@ -3476,7 +3475,7 @@ more equipment to bring on mission?
     ninja vanish
 
 
-
+* clearsighter v3
 * remove attack surface cam positioning
     * offset camera a little bit
     * disable mouse aim movement
@@ -3505,18 +3504,21 @@ polish:
 
     better investigative ability when player does something weird like superjump / land
 
-    clearsighter v3
         highlight NPCs that are shooting me
 
 
 * lots of blocking raycasts in sphererobotai
-raycastall and OverlapSphere
-
-lots of garbage created in gamemanager update
-generating a lot of garbage in sphererobotai
 
 spotted highlight is rather unstable
 parallelize the pulselight
 doors are blocking people again?
+
 stealing dat001 in tower didn't work
 guard stood facing wall in tower
+
+
+
+
+raycastall and OverlapSphere
+lots of garbage created in gamemanager update
+generating a lot of garbage in sphererobotai
