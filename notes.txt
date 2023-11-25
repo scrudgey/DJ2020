@@ -3363,7 +3363,18 @@ performance:
     raycastall and OverlapSphere
     lots of garbage created in gamemanager update
     generating a lot of garbage in sphererobotai
-    
+
+pretty easy to run in guns blazing
+    bonus objectives can dicincentivize this
+    when alarm is hit, doors come down and turrets pop out
+    player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
+status bar on top shows:
+    credits
+    loots
+    data
+    keys
+    shows when key is used
+    when loot is collected
 
 silencer shows in gameplay
 map pane:
@@ -3453,7 +3464,7 @@ major initiatives:
 shops:
     more fences
     sell guns
-
+    mystery man in bar
 
 more equipment to bring on mission?
     shuriken
@@ -3486,12 +3497,6 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-
-
-pretty easy to run in guns blazing
-    bonus objectives can dicincentivize this
-    when alarm is hit, doors come down and turrets pop out
-    player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
 polish:
     reduce frequency of "enemy sighted"
     change sensitivity / eliminate "guess it was nothing"
@@ -3500,26 +3505,20 @@ polish:
         multiple guards chose the same clearpoint to navigate to
     better investigative ability when player does something weird like superjump / land
     highlight NPCs that are shooting me
-status bar on top shows:
-    credits
-    loots
-    data
-    keys
-    shows when key is used
-    when loot is collected
-
+    stealing dat001 in tower didn't work
+    guard stood facing wall in tower
+    spotted highlight is rather unstable
+    npc dialogue is jumpy
 
 fill in names
 animate gun holster / unholster
 padlock door doesnt work
-npc dialogue is jumpy
 some things are not stealing
 shooting should visually be suspicious
 shells / crater clearsight
-burglar view should remain in elevator, maybe select attack surfaces
-spotted highlight is rather unstable
+burglar view should remain in elevator, maybe selected attack surfaces
 doors are blocking people again?
-stealing dat001 in tower didn't work
-guard stood facing wall in tower
 ! when stealth killed
 armor
+transparent skill menu background over subway doesn't work
+subway cutscene advance

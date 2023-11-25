@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class SubRenderHandler {
-    TagSystemData data;
+    public TagSystemData data;
     MaterialPropertyBlock propBlock;
     GameObject cutawayRenderer;
     Material interloperMaterial;
@@ -33,15 +33,23 @@ public class SubRenderHandler {
             cutaway.gameObject.SetActive(false);
             cutawayRenderer = cutaway.gameObject;
         }
-        this.data = Toolbox.GetTagData(renderer.gameObject);
+        TagSystem system = renderer.GetComponentInParent<TagSystem>();
+        if (system != null) {
+            this.data = system.data;
+        } else {
+            this.data = new TagSystemData();
+        }
+        // this.data = Toolbox.GetTagData(renderer.gameObject);
     }
 
     public void MakeTransparent() {
+        if (data.dontHideInterloper) return;
         if (isCutaway)
             cutawayRenderer.SetActive(true);
         Fade();
     }
     public void Fade() {
+        if (data.dontHideInterloper) return;
         if (data.transparentIsInvisible) {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         } else {
@@ -65,9 +73,9 @@ public class SubRenderHandler {
         Fade();
     }
 
-    public void HandleTimeTick(float alpha) {
+    public void HandleTimeTick(float alpha, bool parentHasCutaway) {
         float myAlpha = alpha;
-        if (!isCutaway) myAlpha = Mathf.Max(myAlpha, 0.7f);
+        if (!isCutaway && !parentHasCutaway) myAlpha = Mathf.Max(myAlpha, 0.7f);
 
         propBlock.SetFloat("_TargetAlpha", myAlpha);
         renderer.SetPropertyBlock(propBlock);

@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class ClearsightRendererHandler {
-    public enum State { opaque, transparent, above }
+    public enum State { opaque, interloper, above }
     List<SubRenderHandler> handlers;
     public Bounds bounds;
     NeoClearsighterV3 clearsighter;
@@ -22,30 +22,49 @@ public class ClearsightRendererHandler {
     float alpha;
     bool fadeAlpha;
 
-    public ClearsightRendererHandler(NeoClearsighterV3 clearsighter, Transform root, Vector3 position, Bounds bounds, bool isDynamic = false) {
+    bool hasCutaway;
+
+
+    public ClearsightRendererHandler(NeoClearsighterV3 clearsighter, Transform root, Vector3 position, bool isDynamic = false) {
         Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
         this.isDynamic = isDynamic;
         this.myTransform = root;
         this.clearsighter = clearsighter;
         alpha = 1;
 
-        this.bounds = renderers[0].bounds;
+        Bounds tmpBounds = renderers[0].bounds;
+
         this.handlers = new List<SubRenderHandler>();
         foreach (Renderer renderer in renderers) {
+            // if (renderer is CanvasRenderer) continue;
+            if (renderer is ParticleSystemRenderer) continue;
+            if (renderer is TrailRenderer) continue;
             if (renderer.name == "cutaway") continue;
-            this.bounds.Encapsulate(renderer.bounds);
-            handlers.Add(new SubRenderHandler(renderer));
+            if (root.name.Contains("laser_block")) {
+                Debug.Log($"laser_block {renderer} {renderer.bounds}");
+            }
+            tmpBounds.Encapsulate(renderer.bounds);
+            SubRenderHandler handler = new SubRenderHandler(renderer);
+            handlers.Add(handler);
+            hasCutaway |= handler.isCutaway;
         }
+
+        this.bounds = tmpBounds;
+
 
         Transform findAnchor = root.Find("clearSighterAnchor");
         if (findAnchor != null) {
-            Debug.Log($"found clear sighter anchor: {root.gameObject} {findAnchor}");
+            // Debug.Log($"found clear sighter anchor: {root.gameObject} {findAnchor}");
             this.adjustedPosition = findAnchor.position;
         } else {
-            this.adjustedPosition = position;
+            this.adjustedPosition = tmpBounds.center;
+            this.adjustedPosition.y -= tmpBounds.extents.y;
         }
 
-        this.adjustedPosition.y -= bounds.extents.y;
+        if (root.name.Contains("laser_block")) {
+            Debug.Log($"laser_block {this.bounds} {this.bounds.center} {this.adjustedPosition}");
+        }
+
     }
 
     State state;
@@ -57,10 +76,10 @@ public class ClearsightRendererHandler {
                 transparentRequests = 0;
                 MakeOpaque();
                 break;
-            case State.transparent:
+            case State.interloper:
                 frames = 3;
                 transparentRequests += 2;
-                if (transparentRequests >= 5) {
+                if (transparentRequests >= 3) {
                     MakeTransparent();
                 }
                 break;
@@ -110,17 +129,21 @@ public class ClearsightRendererHandler {
             handler.MakeOpaque();
         }
     }
-
+    public bool IsAbove(Vector3 playerPosition) {
+        return adjustedPosition.y > playerPosition.y;
+    }
 
     public bool Update(Vector3 playerPosition) {
         // Update is called on handlers that were part of a previous batch not touched this frame.
         if (isDynamic) {
-            adjustedPosition = myTransform.position;
+            // adjustedPosition = myTransform.position;
+            adjustedPosition = bounds.center;
             adjustedPosition.y -= bounds.extents.y;
         }
         // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
         // which is player position + 1.5
-        if (adjustedPosition.y > playerPosition.y) {
+        if (IsAbove(playerPosition)) {
+            // Debug.Log($"{myTransform} {adjustedPosition} {playerPosition}");
             ChangeState(State.above);
             return false;
         }
@@ -138,7 +161,7 @@ public class ClearsightRendererHandler {
             frames = 0;
         }
 
-        if (state == State.transparent) {
+        if (state == State.interloper) {
             if (frames <= 0 && transparentRequests < 2) {
                 ChangeState(State.opaque);
                 return true;
@@ -152,15 +175,15 @@ public class ClearsightRendererHandler {
 
     void HandleTimeTick(float deltaTime) {
         if (fadeAlpha) {
-            alpha -= deltaTime * 5;
+            alpha -= deltaTime * 4;
         } else {
-            alpha += deltaTime * 5;
+            alpha += deltaTime * 4;
         }
         if (alpha > 1) alpha = 1;
         if (alpha < 0) alpha = 0;
 
         foreach (SubRenderHandler handler in handlers) {
-            handler.HandleTimeTick(alpha);
+            handler.HandleTimeTick(alpha, hasCutaway);
         }
         if (fadeAlpha && alpha <= 0) {
             clearsighter.OnTime -= HandleTimeTick;
@@ -174,5 +197,10 @@ public class ClearsightRendererHandler {
                 handler.CompleteFadeIn();
             }
         }
+    }
+
+
+    public bool IsVisible() {
+        return state == State.opaque;
     }
 }

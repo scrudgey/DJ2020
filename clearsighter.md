@@ -82,10 +82,19 @@ tune:
 * handle anchor
 * clean up code
 * sprites??
+? interloper frustrum should be rotated at an angle consummate with isometric view
+    rotation depends.
+* fix "isvisible" in gamemanager.level
+* "dont hide interloper" tag
+* trees
+* apply clearsightblocker to other windows
 
-
-apply clearsightblocker to other windows
 selectively clearsight based on shooting enemies as well / enemies
-fix "isvisible" in gamemanager.level
-"dont hide interloper" tag
-interloper frustrum should be rotated at an angle consummate with isometric view
+    how would this work?
+    some method to add/remove certain gameobjects from clearsighting
+    then either raycast from them or frustrum
+
+handle multiple floors
+    how would this work?
+    fade in the upper floor before we get there
+    when in between floors, disable upper floors

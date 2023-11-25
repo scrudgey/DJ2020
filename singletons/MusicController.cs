@@ -38,12 +38,10 @@ public class MusicController : Singleton<MusicController> {
         }).ToArray();
 
         audioSources.ToList().ForEach(audiosource => audiosource.volume = 0f);
-        // audioSources.Zip(subtracks, (audioSource, subtrack) => audioSource.clip = subtrack);
         foreach (var x in audioSources.Zip(subtracks, Tuple.Create)) {
             x.Item1.clip = x.Item2;
             x.Item1.Play();
         }
-        // audioSources.ToList().ForEach(audiosource => audiosource.Play());
         HandleSuspicionChange();
     }
     public void Stop() {
@@ -66,16 +64,16 @@ public class MusicController : Singleton<MusicController> {
                 audioSources[3].volume = 0;
                 break;
             case Suspiciousness.suspicious:
-                audioSources[0].volume = 0.5f;
-                audioSources[1].volume = 0.5f;
+                audioSources[0].volume = 0.8f;
+                audioSources[1].volume = 0.8f;
                 audioSources[2].volume = 0;
                 audioSources[3].volume = 0;
                 break;
             case Suspiciousness.aggressive:
-                audioSources[0].volume = 0.2f;
-                audioSources[1].volume = 0.2f;
-                audioSources[2].volume = 0.2f;
-                audioSources[3].volume = 0.2f;
+                audioSources[0].volume = 0.7f;
+                audioSources[1].volume = 0.7f;
+                audioSources[2].volume = 0.7f;
+                audioSources[3].volume = 0.7f;
                 break;
         }
 

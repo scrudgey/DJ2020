@@ -340,7 +340,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
-        NeoClearsighterV3 clearsighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
+        this.clearSighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
 
         playerGunHandler.isPlayerCharacter = true;
 
@@ -357,12 +357,14 @@ public partial class GameManager : Singleton<GameManager> {
             Destroy(clearSighter);
         }
         if (clearSighter2 != null) {
+            // 
+            // Debug.Log("hi");
             // clearSighter2.Initialize(focus.transform, characterCamera, playerCharacterController);
             Destroy(clearSighter2);
         }
-        if (clearsighterV3 != null) {
+        if (clearSighterV3 != null) {
             // Destroy(clearsighterV3);
-            clearsighterV3.Initialize(focus.transform, characterCamera, playerCharacterController);
+            clearSighterV3.Initialize(focus.transform, characterCamera, playerCharacterController);
         }
 
 
@@ -378,8 +380,8 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public bool IsObjectVisible(GameObject obj) {
         // TODO: fix
-        if (clearSighter2 == null) return true;
-        return clearSighter2?.IsObjectVisible(obj) ?? true;
+        // if (clearSighter2 == null) return true;
+        return clearSighterV3?.IsObjectVisible(obj) ?? true;
     }
     void ClearSceneData() {
         // this stuff should all belong to level delta

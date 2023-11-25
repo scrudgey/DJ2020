@@ -131,7 +131,8 @@ public partial class GameManager : Singleton<GameManager> {
         float timer = 0f;
         float duration = 4f;
         characterCamera.followCursorCoefficient = 1f;
-        clearSighter2.followTransform = zone.transform;
+        // clearSighter2.followTransform = zone.transform;
+        clearSighterV3.followTransform = zone.transform;
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             Time.timeScale = Mathf.Lerp(Time.timeScale, 0f, 0.01f);
@@ -157,7 +158,10 @@ public partial class GameManager : Singleton<GameManager> {
         }
         Time.timeScale = 1f;
         characterCamera.followCursorCoefficient = 5f;
-        clearSighter2.followTransform = playerObject.transform;
+
+        // clearSighter2.followTransform = playerObject.transform;
+        clearSighterV3.followTransform = playerObject.transform;
+
         yield return null;
     }
 
