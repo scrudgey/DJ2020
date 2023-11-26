@@ -209,7 +209,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
             //     j = 0;
             //     yield return waitForFrame;
             // }
-            handler.ChangeState(ClearsightRendererHandler.State.opaque);
+            handler.ChangeState(ClearsightRendererHandler.State.forceOpaque);
         }
         previousBatch = new HashSet<ClearsightRendererHandler>();
         yield return null;

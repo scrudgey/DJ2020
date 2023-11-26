@@ -12,6 +12,7 @@ public class AlertHandler : MonoBehaviour {
     private Coroutine coroutine;
     private Sprite[] alertSprites;
     static readonly float DISPLAY_TIME = 2f;
+    WaitForSeconds waiter = new WaitForSeconds(0.1f);
     void Awake() {
         spriteRenderer.enabled = false;
     }
@@ -29,25 +30,19 @@ public class AlertHandler : MonoBehaviour {
         coroutine = StartCoroutine(newCoroutine);
     }
     public void ShowAlert(bool useWarnMaterial = false) {
-        // alertRect.localScale = Vector3.one * 2.5F;
-        // alertRect.localPosition = new Vector3(0f, 2f, 0f);
+        // if (!enabled) 
+        Debug.Log("showing alert");
         ResetCoroutine(ShowAlertIcon(useWarnMaterial: useWarnMaterial));
     }
     public void ShowWarn() {
-        // alertRect.localScale = Vector3.one * 2.5F;
-        // alertRect.localPosition = new Vector3(0f, 2f, 0f);
-
+        Debug.Log("showing warn");
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowGiveUp() {
-        // alertRect.localScale = Vector3.one * 2.5F;
-        // alertRect.localPosition = new Vector3(0f, 2f, 0f);
-        // ResetCoroutine(ShowText("<sprite=9>"));
+        Debug.Log("showing give up");
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowRadio() {
-        // alertRect.localScale = Vector3.one * 2f;
-        // alertRect.localPosition = new Vector3(0f, 1.45f, 0f);
         ResetCoroutine(ShowRadioIcon());
     }
     public void HideRadio() {
@@ -55,11 +50,10 @@ public class AlertHandler : MonoBehaviour {
             StopCoroutine(coroutine);
         }
         spriteRenderer.enabled = false;
-        // alertRect.localScale = Vector3.one;
-        // alertRect.localPosition = Vector3.one * 2f;
     }
 
     IEnumerator ShowAlertIcon(bool useWarnMaterial = false) {
+        yield return waiter;
         float appearanceInterval = 0.25f;
         float timer = 0f;
         spriteRenderer.enabled = true;
@@ -133,31 +127,4 @@ public class AlertHandler : MonoBehaviour {
         }
         spriteRenderer.enabled = false;
     }
-
-    // IEnumerator ShowText(string content) {
-    //     float appearanceInterval = 0.25f;
-    //     float timer = 0f;
-    //     // alertIcon.enabled = true;
-    //     textMesh.enabled = true;
-    //     textMesh.text = content;
-    //     while (timer < appearanceInterval) {
-    //         timer += Time.deltaTime;
-    //         Vector2 sizeDelta = new Vector2();
-    //         sizeDelta.x = 1f;
-    //         sizeDelta.y = (float)PennerDoubleAnimation.BackEaseOut(timer, 0f, 1f, appearanceInterval);
-    //         // alertRect.localScale = sizeDelta;
-    //         textMesh.transform.localScale = sizeDelta;
-    //         yield return null;
-    //     }
-    //     while (timer < 2.5f) {
-    //         timer += Time.deltaTime;
-    //         yield return null;
-    //     }
-    //     textMesh.transform.localScale = Vector2.one;
-    //     // alertIcon.enabled = false;
-    //     // textMesh.transform.localScale =
-    //     textMesh.enabled = false;
-    // }
-
-
 }

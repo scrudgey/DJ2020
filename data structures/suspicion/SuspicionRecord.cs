@@ -667,18 +667,18 @@ public class SuspicionRecord {
                     }
         }
     };
-    public static SuspicionRecord tamperEvidenceSuspicion(TamperEvidence evidence) => new SuspicionRecord {
+    public static SuspicionRecord tamperEvidenceSuspicion(string targetName) => new SuspicionRecord {
         content = "equipment was tampered with",
         suspiciousness = Suspiciousness.suspicious,
         lifetime = 120f,
         maxLifetime = 120f,
         allowDataResponse = true,
         dialogue = new SuspicionDialogueParameters {
-            challenge = $"Do you know anything about the {evidence.targetName} that was tampered with?",
+            challenge = $"Do you know anything about the {targetName} that was tampered with?",
             tactics = new List<DialogueTactic>{
                         new DialogueTactic {
                             tacticType = DialogueTacticType.lie,
-                            content = $"I'm the {evidence.targetName} manager and I have seen nothing amiss.",
+                            content = $"I'm the {targetName} manager and I have seen nothing amiss.",
                             successResponse = "Understood.",
                             failResponse = "Oh yeah? You don't look like one."
                         },
@@ -690,15 +690,15 @@ public class SuspicionRecord {
                         },
                          new DialogueTactic{
                             tacticType = DialogueTacticType.redirect,
-                            content = $"Yes, there is a rogue robot around here that is messing with the {evidence.targetName}.",
+                            content = $"Yes, there is a rogue robot around here that is messing with the {targetName}.",
                             successResponse = "I'll tell central about it.",
                             failResponse = "That seems unlikely."
                         },
                         new DialogueTactic {
                             tacticType = DialogueTacticType.challenge,
-                            content = $"What do I look like, the {evidence.targetName} inspector?",
+                            content = $"What do I look like, the {targetName} inspector?",
                             successResponse = "Well, I have to ask.",
-                            failResponse = $"You look like someone who might mess with a {evidence.targetName}."
+                            failResponse = $"You look like someone who might mess with a {targetName}."
                         },
                         new DialogueTactic{
                             tacticType = DialogueTacticType.item,

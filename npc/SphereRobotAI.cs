@@ -84,6 +84,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;
     }
 
+    void HandleHitStateChange(Destructible destructible) {
+        if (destructible.hitState == HitState.dead) {
+            alertHandler.enabled = false;
+        }
+    }
+
     void EnterDefaultState() {
         if (isStrikeTeamMember) {
             switch (GameManager.I.gameData.levelState.delta.strikeTeamBehavior) {
@@ -506,6 +512,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case ReportToHQState:
             case StopAndListenState:
                 // TODO: better logic here?
+                Debug.Log($"I just got shot: hitstate: {hitState} damage: {damage}");
                 alertHandler.ShowAlert(useWarnMaterial: true);
                 // if (GameManager.I.gameData.levelState.anyAlarmActive()) {
                 //     ChangeState(new SearchDirectionState(this, damage, doIntro: false, speedCoefficient: ));
@@ -522,6 +529,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             return;
         if (noise.data.source != null && noise.data.source == transform.root.gameObject)
             return;
+        // TODO: check hitstate?
         recentHeardSuspicious = Toolbox.Max<Suspiciousness>(recentHeardSuspicious, noise.data.suspiciousness);
 
         if (stateMachine != null && stateMachine.currentState != null)
@@ -727,6 +735,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         recentlyInCombat = false;
         recentHeardSuspicious = Suspiciousness.normal;
         lastSuspicionLevel = Suspiciousness.normal;
+        alertHandler.enabled = true;
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;

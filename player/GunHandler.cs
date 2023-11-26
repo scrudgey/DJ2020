@@ -40,6 +40,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool isPlayerCharacter;
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
+    public GameObject tamperEvidenceObject;
+    // public TamperEvidence tamperEvidence;
+    // float tamperEvidenceTimer;
     int numberOfShellsPerReload;
     void Awake() {
         lockOnColliders = new Collider[32];
@@ -113,7 +116,21 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (shootingInaccuracy > 0) {
             shootingInaccuracy = CalculateInaccuracyRecovery(gunInstance, shootingInaccuracy);
         }
+        // if (tamperEvidenceTimer > 0) {
+        //     tamperEvidenceTimer -= Time.deltaTime;
+
+        //     if (tamperEvidenceTimer <= 0) {
+
+        //     }
+        // }
     }
+    // void EnableTamperEvidence(SuspicionRecord suspicionRecord) {
+    //     tamperEvidenceObject.SetActive(true);
+    //     // tamperEvidence.
+    // }
+    // void DisableTamperEvidence() {
+    //     tamperEvidenceObject.SetActive(false);
+    // }
     float CalculateInaccuracyRecovery(GunState gunState, float value) {
         if (gunState == null)
             return 0f;
@@ -376,10 +393,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
 
         if (isPlayerCharacter) {
             CharacterCamera.Shake(gunInstance.getNoise() / 10f, 0.1f);
-            if (!gunInstance.getSilencer()) {
-                SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
-                GameManager.I.AddSuspicionRecord(record);
-            }
+            // if (!gunInstance.getSilencer()) {
+            SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
+            GameManager.I.AddSuspicionRecord(record);
+            // }
         }
 
         TargetPracticeUIHandler.OnShotFired?.Invoke();

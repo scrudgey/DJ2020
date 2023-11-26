@@ -307,8 +307,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 break;
             case CameraState.burgle:
                 RenderSettings.skybox = wallPressSkybox;
-                // ApplyTargetParameters(BurgleParameters(input));
-                ApplyTargetParameters(NormalParameters(input));
+                if (input.currentAttackSurface != null && input.currentAttackSurface.useBurgleCam) {
+                    ApplyTargetParameters(BurgleParameters(input));
+                } else {
+                    ApplyTargetParameters(NormalParameters(input));
+                }
                 volume.profile = aimProfile;
                 SetSkyBoxCamerasEnabled(false);
                 break;

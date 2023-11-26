@@ -212,6 +212,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     float inBushesTimer;
     public bool isStrikeTeamMember;
 
+    private AttackSurface currentAttackSurface;
+
     // static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
     public void TransitionToState(CharacterState newState) {
@@ -749,6 +751,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         if (result == null) return;
         if (result.doBurgle) {
             BurgleTargetData burgleTargetData = new BurgleTargetData(result.attackSurface, burglar);
+            currentAttackSurface = result.attackSurface;
             TransitionToState(CharacterState.burgle);
             GameManager.I.StartBurglar(burgleTargetData);
         } else if (result.crouchDown) {
@@ -1621,7 +1624,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             targetTransform = cameraFollowTransform,
             targetPosition = cameraFollowTransform.position,
             atLeftEdge = atLeftEdge,
-            atRightEdge = atRightEdge
+            atRightEdge = atRightEdge,
+            currentAttackSurface = currentAttackSurface
         };
         return input;
     }

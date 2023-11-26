@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class ClearsightRendererHandler {
-    public enum State { opaque, interloper, above }
+    public enum State { none, opaque, interloper, above, forceOpaque }
     List<SubRenderHandler> handlers;
     public Bounds bounds;
     NeoClearsighterV3 clearsighter;
@@ -20,7 +20,7 @@ public class ClearsightRendererHandler {
     bool isDynamic;
 
     float alpha;
-    bool fadeAlpha;
+    bool fadeInAlpha;
 
     bool hasCutaway;
 
@@ -70,17 +70,26 @@ public class ClearsightRendererHandler {
     State state;
     public void ChangeState(State toState) {
         switch (toState) {
+            case State.forceOpaque:
+                if (state == toState) return;
+                frames = 0;
+                transparentRequests = 0;
+                foreach (SubRenderHandler handler in handlers) {
+                    handler.CompleteFadeIn();
+                }
+                fadeInAlpha = false;
+                break;
             case State.opaque:
                 if (state == toState) return;
                 frames = 0;
                 transparentRequests = 0;
-                MakeOpaque();
+                FadeIn();
                 break;
             case State.interloper:
                 frames = 3;
                 transparentRequests += 2;
                 if (transparentRequests >= 3) {
-                    MakeTransparent();
+                    FadeOut();
                 }
                 break;
             case State.above:
@@ -91,44 +100,33 @@ public class ClearsightRendererHandler {
                 break;
         }
         state = toState;
-    }
 
-    void MakeTransparent() {
-        foreach (SubRenderHandler handler in handlers) {
-            handler.MakeTransparent();
-        }
-        FadeOut();
     }
-
-    void FadeOut() {
-        fadeAlpha = true;
-        foreach (SubRenderHandler handler in handlers) {
-            handler.Fade();
-        }
-        clearsighter.OnTime += HandleTimeTick;
-    }
-    void FadeIn() {
-        fadeAlpha = false;
-        foreach (SubRenderHandler handler in handlers) {
-            handler.Fade();
-        }
-        clearsighter.OnTime += HandleTimeTick;
-    }
-
     void MakeInvisible() {
         foreach (SubRenderHandler handler in handlers) {
-            handler.MakeInvisible();
+            handler.TotallyInvisible();
         }
         clearsighter.OnTime -= HandleTimeTick;
         alpha = 0;
     }
-
-    void MakeOpaque() {
-        FadeIn();
+    void FadeOut() {
+        if (fadeInAlpha) return;
         foreach (SubRenderHandler handler in handlers) {
-            handler.MakeOpaque();
+            handler.FadeTransparent();
         }
+        fadeInAlpha = true;
+        clearsighter.OnTime += HandleTimeTick;
     }
+    void FadeIn() {
+        if (!fadeInAlpha) return;
+        foreach (SubRenderHandler handler in handlers) {
+            handler.FadeOpaque();
+        }
+        fadeInAlpha = false;
+        clearsighter.OnTime += HandleTimeTick;
+    }
+
+
     public bool IsAbove(Vector3 playerPosition) {
         return adjustedPosition.y > playerPosition.y;
     }
@@ -162,20 +160,20 @@ public class ClearsightRendererHandler {
         }
 
         if (state == State.interloper) {
-            if (frames <= 0 && transparentRequests < 2) {
+            if (frames <= 0 && transparentRequests < 5) {
                 ChangeState(State.opaque);
                 return true;
             }
 
-        } else if (state == State.opaque) {
+        } else if (state == State.opaque || state == State.forceOpaque) {
             return true;
         }
         return false;
     }
 
     void HandleTimeTick(float deltaTime) {
-        if (fadeAlpha) {
-            alpha -= deltaTime * 4;
+        if (fadeInAlpha) {
+            alpha -= deltaTime * 2;
         } else {
             alpha += deltaTime * 4;
         }
@@ -183,15 +181,17 @@ public class ClearsightRendererHandler {
         if (alpha < 0) alpha = 0;
 
         foreach (SubRenderHandler handler in handlers) {
-            handler.HandleTimeTick(alpha, hasCutaway);
+            if (!handler.data.dontHideInterloper)
+                handler.HandleTimeTick(alpha, hasCutaway);
         }
-        if (fadeAlpha && alpha <= 0) {
+        if (fadeInAlpha && alpha <= 0) {
             clearsighter.OnTime -= HandleTimeTick;
             foreach (SubRenderHandler handler in handlers) {
-                handler.CompleteFadeOut();
+                if (!handler.data.dontHideInterloper)
+                    handler.CompleteFadeOut(hasCutaway);
             }
         }
-        if (!fadeAlpha && alpha >= 1) {
+        if (!fadeInAlpha && alpha >= 1) {
             clearsighter.OnTime -= HandleTimeTick;
             foreach (SubRenderHandler handler in handlers) {
                 handler.CompleteFadeIn();

@@ -88,13 +88,31 @@ tune:
 * "dont hide interloper" tag
 * trees
 * apply clearsightblocker to other windows
+* aim mode not working
+* doors hidden again
+* alpha limit not working
+
+apply donthideinterloper to more objects
+fade in quicker, fade out slowly
+above is sticky
 
 selectively clearsight based on shooting enemies as well / enemies
     how would this work?
     some method to add/remove certain gameobjects from clearsighting
     then either raycast from them or frustrum
+        when would we add?
+        first guy to start shooting?
+        guy who shoots & hits player- show him momentarily?
 
 handle multiple floors
     how would this work?
-    fade in the upper floor before we get there
-    when in between floors, disable upper floors
+    moving from floor 1 -> 2, given 1,2,3
+        when in between floors, fade in 2. visible: 1,2
+        when in between floors, disable upper floors still: visible: 1,2; hidden: 3
+            we need interloper activity to carve out some visibility in floor 2. 
+        
+    moving from floor 2 -> 1, given 1,2,3
+        when in between floors
+
+    issues today:
+        various objects appear at different times when moving between floors: much better if they all appear at once.

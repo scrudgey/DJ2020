@@ -8,6 +8,7 @@ using UnityEngine;
 public class AttackSurface : MonoBehaviour {
     public string niceName;
     public Camera attackCam;
+    public bool useBurgleCam;
     [HideInInspector]
     public RenderTexture renderTexture;
     public Transform mainCameraPosition;
@@ -47,7 +48,8 @@ public class AttackSurface : MonoBehaviour {
         GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;
         GameObject obj = GameObject.Instantiate(impactPrefab, data.burglar.transform.position, Quaternion.identity);
         tamperEvidence = obj.GetComponent<TamperEvidence>();
-        tamperEvidence.targetName = data.target.name;
+        // tamperEvidence.targetName = data.target.name;
+        tamperEvidence.suspicionRecord = SuspicionRecord.tamperEvidenceSuspicion(data.target.name);
         tamperEvidence.reportText = "HQ respond. Someone has tampered with the equipment.";
         obj.SetActive(false);
     }

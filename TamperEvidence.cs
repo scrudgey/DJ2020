@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class TamperEvidence : MonoBehaviour {
     // public BurgleTargetData data;
-    public string targetName;
+    public SuspicionRecord suspicionRecord;
+    // public string targetName;
     public bool suspicious;
     public bool reported;
     public string reportText;

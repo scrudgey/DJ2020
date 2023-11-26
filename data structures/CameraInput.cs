@@ -24,4 +24,5 @@ public struct CameraInput {
     public Transform targetTransform;
     public bool atLeftEdge;
     public bool atRightEdge;
+    public AttackSurface currentAttackSurface;
 }

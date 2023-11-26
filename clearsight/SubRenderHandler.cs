@@ -19,6 +19,7 @@ public class SubRenderHandler {
     public bool isCutaway;
 
     public Renderer renderer;
+    float myAlpha;
 
     public SubRenderHandler(Renderer renderer) {
         this.renderer = renderer;
@@ -39,55 +40,67 @@ public class SubRenderHandler {
         } else {
             this.data = new TagSystemData();
         }
-        // this.data = Toolbox.GetTagData(renderer.gameObject);
     }
 
-    public void MakeTransparent() {
-        if (data.dontHideInterloper) return;
+    public void FadeTransparent() {
+        if (renderer == null) return;
         if (isCutaway)
             cutawayRenderer.SetActive(true);
         Fade();
     }
-    public void Fade() {
-        if (data.dontHideInterloper) return;
-        if (data.transparentIsInvisible) {
-            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-        } else {
-            renderer.material = interloperMaterial;
-            renderer.shadowCastingMode = initialShadowCastingMode;
-        }
-    }
 
-    public void MakeInvisible() {
+    public void FadeOpaque() {
+        if (renderer == null) return;
         if (isCutaway)
             cutawayRenderer.SetActive(false);
-        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-    }
-
-    public void MakeOpaque() {
-        if (renderer == null) return;
-        if (isCutaway) {
-            cutawayRenderer.SetActive(false);
-        }
-        if (renderer.CompareTag("occlusionSpecial")) return;
         Fade();
     }
 
-    public void HandleTimeTick(float alpha, bool parentHasCutaway) {
-        float myAlpha = alpha;
-        if (!isCutaway && !parentHasCutaway) myAlpha = Mathf.Max(myAlpha, 0.7f);
+    public void Fade() {
+        if (renderer == null) return;
+        if (data.dontHideInterloper) return;
 
+        // if (data.transparentIsInvisible) {
+        //     renderer.material = initialMaterial;
+        //     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        // } else 
+        // {
+        renderer.material = interloperMaterial;
+        renderer.shadowCastingMode = initialShadowCastingMode;
+        // }
+    }
+
+    public void HandleTimeTick(float alpha, bool parentHasCutaway) {
+        if (renderer == null) return;
+        myAlpha = alpha;
+        myAlpha = Math.Max(0.1f, myAlpha);
+        if (!isCutaway && !parentHasCutaway) myAlpha = Mathf.Max(0.7f, myAlpha);
         propBlock.SetFloat("_TargetAlpha", myAlpha);
         renderer.SetPropertyBlock(propBlock);
     }
-
-    public void CompleteFadeOut() {
+    public void TotallyInvisible() {
         if (isCutaway)
+            cutawayRenderer.SetActive(false);
+        renderer.material = initialMaterial;
+        renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+    }
+    public void CompleteFadeOut(bool parentHasCutaway) {
+        if (renderer == null) return;
+        if (!isCutaway && !parentHasCutaway && !data.transparentIsInvisible) {
+            myAlpha = 0.7f;
+            propBlock.SetFloat("_TargetAlpha", myAlpha);
+            renderer.SetPropertyBlock(propBlock);
+        } else {
+            renderer.material = initialMaterial;
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        }
     }
     public void CompleteFadeIn() {
-        renderer.shadowCastingMode = initialShadowCastingMode;
+        if (renderer == null) return;
+        if (isCutaway)
+            cutawayRenderer.SetActive(false);
         renderer.material = initialMaterial;
+        renderer.shadowCastingMode = initialShadowCastingMode;
     }
 
 }

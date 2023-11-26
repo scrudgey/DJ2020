@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LootObject : Interactive {
     public LootData data;
+    public bool isStealing;
     public AudioClip[] pickupSounds;
     GameObject creditIndicator;
     override public void Start() {
@@ -19,7 +20,8 @@ public class LootObject : Interactive {
         bool waveArm = transform.position.y - interactor.transform.position.y > -0.25f;
         bool crouchDown = !waveArm;
         PoolManager.I.GetPool(creditIndicator).GetObject(transform.position);
-        GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(data.lootName));
+        if (isStealing)
+            GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(data.lootName));
         return ItemUseResult.Empty() with {
             crouchDown = crouchDown,
             waveArm = waveArm

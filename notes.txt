@@ -3510,15 +3510,34 @@ polish:
     spotted highlight is rather unstable
     npc dialogue is jumpy
 
-fill in names
-animate gun holster / unholster
-padlock door doesnt work
-some things are not stealing
-shooting should visually be suspicious
-shells / crater clearsight
-burglar view should remain in elevator, maybe selected attack surfaces
-doors are blocking people again?
+
+* fill in names
+* padlock door doesnt work
+* some things are not stealing
+* shooting should visually be aggressive
+* burglar view should remain in elevator, maybe selected attack surfaces
 ! when stealth killed
-armor
+    hard to fix race condition between reaction and damage state
+    probably easier to delay the alert handler a bit, and disable it from sphere controller
 transparent skill menu background over subway doesn't work
 subway cutscene advance
+laser grid is not extending all the way
+getting zapped in the dark
+
+alert should cut out when the character is killed
+
+shells / crater clearsight
+    shells: dynamic sprite renderers with collider, rigidbody
+    crater: sprite renderer decal with no collider, ridigbody
+        this suggests we need a method to register an object with clearsighter.
+            register the shells when they stop moving, etc.
+        can do this via gamemanager.clearsighterv3
+armor
+animate gun holster / unholster
+
+doors are blocking people again?
+
+some suspicion records could be sticky when noticed
+
+
+hvac still doesnt work with clearsight

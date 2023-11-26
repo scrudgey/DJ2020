@@ -36,7 +36,7 @@ public class ReactToTamperState : SphereControlState {
             timeOfLastContact = Time.time,
             lifetime = 5f,
             speechText = evidence.reportText,
-            suspicionRecord = SuspicionRecord.tamperEvidenceSuspicion(evidence)
+            suspicionRecord = evidence.suspicionRecord
         };
         inPosition = false;
         rootTaskNode = new Sequence(
