@@ -100,7 +100,6 @@ public class ClearsightRendererHandler {
                 break;
         }
         state = toState;
-
     }
     void MakeInvisible() {
         foreach (SubRenderHandler handler in handlers) {
@@ -118,7 +117,7 @@ public class ClearsightRendererHandler {
         clearsighter.OnTime += HandleTimeTick;
     }
     void FadeIn() {
-        if (!fadeInAlpha) return;
+        // if (!fadeInAlpha) return;
         foreach (SubRenderHandler handler in handlers) {
             handler.FadeOpaque();
         }
@@ -134,16 +133,14 @@ public class ClearsightRendererHandler {
     public bool Update(Vector3 playerPosition) {
         // Update is called on handlers that were part of a previous batch not touched this frame.
         if (isDynamic) {
-            // adjustedPosition = myTransform.position;
             adjustedPosition = bounds.center;
             adjustedPosition.y -= bounds.extents.y;
         }
         // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
         // which is player position + 1.5
-        if (IsAbove(playerPosition)) {
-            // Debug.Log($"{myTransform} {adjustedPosition} {playerPosition}");
-            ChangeState(State.above);
-            return false;
+        if (state == State.above && !IsAbove(playerPosition)) {
+            ChangeState(State.opaque);
+            return true;
         }
 
         if (transparentRequests > 7) {

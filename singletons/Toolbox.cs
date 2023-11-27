@@ -671,14 +671,19 @@ public class Toolbox {
 
 
     public static void AsyncClearLineOfSight(Vector3 position, Collider other, Action<RaycastHit> callback) {
-        Vector3 direction = Vector3.zero;
-        if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
-            direction = other.ClosestPoint(position) - position;
-        } else {
-            direction = other.bounds.center - position;
-        }
+        // Vector3 direction = Vector3.zero;
+        // if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
+        //     direction = other.ClosestPoint(position) - position;
+        // } else {
+        //     direction = other.bounds.center - position;
+        // }
+        // float distance = direction.magnitude;
+        // Ray ray = new Ray(position, direction);
+        // AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), callback);
+
+
+        Vector3 direction = other.bounds.center - position;
         float distance = direction.magnitude;
-        Ray ray = new Ray(position, direction);
         AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), callback);
     }
 

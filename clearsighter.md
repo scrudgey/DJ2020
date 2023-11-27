@@ -91,10 +91,14 @@ tune:
 * aim mode not working
 * doors hidden again
 * alpha limit not working
+* fade in quicker, fade out slowly
+* above is sticky
+* use alreadyhandled and currentbatch everywhere
+
 
 apply donthideinterloper to more objects
-fade in quicker, fade out slowly
-above is sticky
+buildings a problem again
+
 
 selectively clearsight based on shooting enemies as well / enemies
     how would this work?

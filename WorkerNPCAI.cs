@@ -295,14 +295,14 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         Collider player = GameManager.I.playerCollider;
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
             Toolbox.AsyncClearLineOfSight(target.transform.position, player, (RaycastHit hit) => {
-                if (hit.collider == null || hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
+                if (hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
             });
         }
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
             Toolbox.AsyncClearLineOfSight(target.transform.position, t.newestAddition, (RaycastHit hit) => {
-                if (hit.collider == null || hit.collider == t.newestAddition) Perceive(t.newestAddition);
+                if (hit.collider == t.newestAddition) Perceive(t.newestAddition);
             });
         }
     }
@@ -312,7 +312,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             if (collider == null)
                 continue;
             Toolbox.AsyncClearLineOfSight(target.transform.position, collider, (RaycastHit hit) => {
-                if (hit.collider == null || hit.collider == collider) Perceive(collider);
+                if (hit.collider == collider) Perceive(collider);
             });
         }
     }

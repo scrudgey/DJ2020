@@ -482,21 +482,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
     void ClearLineOfSight(Collider other, Action<RaycastHit> callback) {
         Vector3 position = sightOrigin.position; // TODO: configurable
-
-        // Physics.ClosestPoint can only be used with a BoxCollider, SphereCollider, CapsuleCollider and a convex MeshCollider.
         Vector3 direction = other.bounds.center - position;
-        // float distance = 0;
-        // if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider) {
-        //     direction = other.ClosestPoint(position) - position;
-        // } else {
-        //     directions = new Vector3[]{
-        //         other.bounds.center - position
-        //     };
-        // }
-        // foreach (Vector3 direction in directions) {
         float distance = direction.magnitude;
         AsyncRaycastService.I.RequestRaycast(position, direction, distance, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), callback);
-        // }
     }
 
     public DamageResult TakeDamage(Damage damage) {

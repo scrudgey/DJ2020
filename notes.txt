@@ -3517,14 +3517,15 @@ polish:
 * shooting should visually be aggressive
 * burglar view should remain in elevator, maybe selected attack surfaces
 ! when stealth killed
+    text should cut out when the character is killed
     hard to fix race condition between reaction and damage state
     probably easier to delay the alert handler a bit, and disable it from sphere controller
 transparent skill menu background over subway doesn't work
 subway cutscene advance
 laser grid is not extending all the way
 getting zapped in the dark
+save/load broken
 
-alert should cut out when the character is killed
 
 shells / crater clearsight
     shells: dynamic sprite renderers with collider, rigidbody
@@ -3538,6 +3539,4 @@ animate gun holster / unholster
 doors are blocking people again?
 
 some suspicion records could be sticky when noticed
-
-
 hvac still doesnt work with clearsight

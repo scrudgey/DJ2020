@@ -42,11 +42,15 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
     Dictionary<Transform, ClearsightRendererHandler> handlers;
 
+    HashSet<Tuple<ClearsightRendererHandler, ClearsightRendererHandler.State>> currentBatch = new HashSet<Tuple<ClearsightRendererHandler, ClearsightRendererHandler.State>>();
+    HashSet<Transform> alreadyHandled = new HashSet<Transform>();
     public Action<float> OnTime;
 
 
     Collider[] colliderHits;
     bool initialized;
+
+    int j;
 
     public void Initialize(Transform followTransform, CharacterCamera camera, CharacterController characterController) {
         this.followTransform = followTransform;
@@ -61,6 +65,8 @@ public class NeoClearsighterV3 : MonoBehaviour {
         InitializeTree();
         SetUpRadar();
         initialized = true;
+        j = 0;
+
 
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleGeometry));
     }
@@ -215,57 +221,54 @@ public class NeoClearsighterV3 : MonoBehaviour {
         yield return null;
     }
     IEnumerator HandleAboveOnly() {
-        HashSet<ClearsightRendererHandler> currentBatch = new HashSet<ClearsightRendererHandler>();
-
+        currentBatch.Clear();
+        alreadyHandled.Clear();
         Vector3 liftedOrigin = getLiftedOrigin();
-        int j = 0;
 
         // static geometry above me
-        yield return HandleStaticAbove(j, liftedOrigin, currentBatch);
+        yield return HandleStaticAbove(j, liftedOrigin);
 
         // dynamic renderers above me
-        yield return HandleDynamicAbove(j, liftedOrigin, currentBatch);
+        yield return HandleDynamicAbove(j, liftedOrigin);
 
         yield return waitForFrame;
 
         // apply transparency
-        yield return ApplyCurrentBatch(currentBatch);
+        yield return ApplyCurrentBatch();
 
         // reset previous batch to opaque
         yield return ResetPreviousBatch(j);
 
-        previousBatch.UnionWith(currentBatch);
+        previousBatch.UnionWith(currentBatch.Select(tuple => tuple.Item1));
         yield return waitForFrame;
     }
 
     IEnumerator HandleGeometryNormal() {
-        HashSet<ClearsightRendererHandler> currentBatch = new HashSet<ClearsightRendererHandler>();
-        HashSet<Transform> raycastHits = new HashSet<Transform>();
-
+        currentBatch.Clear();
+        alreadyHandled.Clear();
         Vector3 liftedOrigin = getLiftedOrigin();
-        int j = 0;
 
         // static geometry above me
-        yield return HandleStaticAbove(j, liftedOrigin, currentBatch);
+        yield return HandleStaticAbove(j, liftedOrigin);
 
         // static geometry interlopers
-        yield return HandleInterlopersRaycast(j, currentBatch, raycastHits);
+        yield return HandleInterlopersRaycast(j);
 
         // static geometry interlopers
-        yield return HandleInterlopersFrustrum(j, currentBatch, raycastHits);
+        yield return HandleInterlopersFrustrum(j);
 
         // dynamic renderers above me
-        yield return HandleDynamicAbove(j, liftedOrigin, currentBatch);
+        yield return HandleDynamicAbove(j, liftedOrigin);
 
         yield return waitForFrame;
 
         // apply transparency
-        yield return ApplyCurrentBatch(currentBatch);
+        yield return ApplyCurrentBatch();
 
         // reset previous batch to opaque
         yield return ResetPreviousBatch(j);
 
-        previousBatch.UnionWith(currentBatch);
+        previousBatch.UnionWith(currentBatch.Select(tuple => tuple.Item1));
         yield return waitForFrame;
     }
 
@@ -332,7 +335,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
         OnTime?.Invoke(Time.unscaledDeltaTime);
     }
 
-    IEnumerator HandleStaticAbove(int j, Vector3 liftedOrigin, HashSet<ClearsightRendererHandler> nextAboveRenderBatch) {
+    IEnumerator HandleStaticAbove(int j, Vector3 liftedOrigin) {
         Ray upRay = new Ray(liftedOrigin, Vector3.up);
         Renderer[] above = rendererTree.GetNearby(upRay, 50f);
         for (int i = 0; i < above.Length; i++) {
@@ -343,16 +346,18 @@ public class NeoClearsighterV3 : MonoBehaviour {
             }
             Renderer renderer = above[i];
             if (renderer == null) continue;
-            // floor of the collider
-            // Vector3 position = rendererPositions[renderer] - new Vector3(0f, rendererBounds[renderer].extents.y, 0f);
-            ClearsightRendererHandler handler = handlers[renderer.transform.root];
+
+            Transform root = renderer.transform.root;
+
+            if (alreadyHandled.Contains(root)) continue;
+            ClearsightRendererHandler handler = handlers[root];
 
             // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
             // which is player position + 1.5
             if (handler.IsAbove(liftedOrigin)) {
                 handler.ChangeState(ClearsightRendererHandler.State.above);
-                nextAboveRenderBatch.Add(handler);
-                // hiddenTransforms.Add(renderer.transform.root);
+                currentBatch.Add(Tuple.Create(handler, ClearsightRendererHandler.State.above));
+                alreadyHandled.Add(root);
                 if (previousBatch.Contains(handler)) {
                     previousBatch.Remove(handler);
                 }
@@ -360,7 +365,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
         }
     }
 
-    IEnumerator HandleInterlopersRaycast(int j, HashSet<ClearsightRendererHandler> currentBatch, HashSet<Transform> raycastHits) {
+    IEnumerator HandleInterlopersRaycast(int j) {
         Vector3 cameraPlanarDirection = myCamera.idealRotation * Vector3.forward;
         subradarIndex++;
         if (subradarIndex >= NUMBER_SUB_RADARS) subradarIndex = 0;
@@ -378,11 +383,11 @@ public class NeoClearsighterV3 : MonoBehaviour {
             if (hit.collider == null) continue;
             if (hit.collider.name == "cutaway") continue;
 
-            raycastHits.Add(hit.collider.transform.root);
-            if (handlers.ContainsKey(hit.collider.transform.root)) {
-                ClearsightRendererHandler handler = handlers[hit.collider.transform.root];
-                if (currentBatch?.Contains(handler) ?? false) continue;
-                // if (rendererTagData[renderer].dontHideInterloper) continue;
+            Transform root = hit.collider.transform.root;
+            if (alreadyHandled.Contains(root)) continue;
+
+            if (handlers.ContainsKey(root)) {
+                ClearsightRendererHandler handler = handlers[root];
 
                 Vector3 hitNorm = hit.normal;
                 hitNorm.y = 0;
@@ -390,20 +395,19 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 float rayDot = Vector3.Dot(radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)], cameraPlanarDirection);
                 if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot)) //&& hit.distance > 4f
                      && (handler.bounds.center - followTransform.position).y > 0.2f) {
-                    currentBatch.Add(handler);
+
+                    currentBatch.Add(Tuple.Create(handler, ClearsightRendererHandler.State.interloper));
+                    alreadyHandled.Add(hit.collider.transform.root);
+
                     if (previousBatch.Contains(handler)) {
                         previousBatch.Remove(handler);
                     }
                 }
             }
-            // else {
-            //     Debug.LogWarning($"renderer root not found : {hit.collider.transform.root}");
-            // }
-
         }
     }
 
-    IEnumerator HandleDynamicAbove(int j, Vector3 liftedOrigin, HashSet<ClearsightRendererHandler> currentBatch) {
+    IEnumerator HandleDynamicAbove(int j, Vector3 liftedOrigin) {
         int numberHits = Physics.OverlapSphereNonAlloc(liftedOrigin, 40f, colliderHits, LayerUtil.GetLayerMask(Layer.obj, Layer.bulletPassThrough, Layer.shell, Layer.bulletOnly, Layer.interactive), QueryTriggerInteraction.Ignore);
         for (int k = 0; k < numberHits; k++) {
             Collider collider = colliderHits[k];
@@ -416,18 +420,19 @@ public class NeoClearsighterV3 : MonoBehaviour {
             }
             Renderer[] renderers = GetDynamicRenderers(collider);
             Transform root = dynamicColliderRoot[collider];
+            if (alreadyHandled.Contains(root)) continue;
 
             if (root.position.y > liftedOrigin.y) {
                 foreach (Renderer renderer in renderers) {
-                    ClearsightRendererHandler handler = handlers[renderer.transform.root];
-
                     if (renderer == null) continue;
-                    if (currentBatch.Contains(handler)) continue;
                     if (renderer.CompareTag("occlusionSpecial")) continue;
 
+                    Transform renderRoot = renderer.transform.root;
+                    ClearsightRendererHandler handler = handlers[renderRoot];
                     handler.ChangeState(ClearsightRendererHandler.State.above);
-                    currentBatch.Add(handler);
-                    // hiddenTransforms.Add(root);
+                    currentBatch.Add(Tuple.Create(handler, ClearsightRendererHandler.State.above));
+                    alreadyHandled.Add(root);
+                    alreadyHandled.Add(renderRoot);
                     if (previousBatch.Contains(handler)) {
                         previousBatch.Remove(handler);
                     }
@@ -436,7 +441,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
         }
     }
 
-    IEnumerator HandleInterlopersFrustrum(int j, HashSet<ClearsightRendererHandler> currentBatch, HashSet<Transform> raycastHits) {
+    IEnumerator HandleInterlopersFrustrum(int j) {
         List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
 
         Plane XPlane = new Plane(Vector3.right, followTransform.position);
@@ -462,20 +467,19 @@ public class NeoClearsighterV3 : MonoBehaviour {
             }
 
             Renderer renderer = interlopers[i];
-            if (raycastHits.Contains(renderer.transform.root)) continue;
-            // if (renderer == null) continue;
-            // if (renderer.name == "cutaway") continue;
+            if (renderer == null) continue;
 
-            // TagSystemData tagSystemData = rendererTagData[renderer];
-            // if (tagSystemData.dontHideInterloper) continue;
+            Transform root = renderer.transform.root;
+            if (alreadyHandled.Contains(root)) continue;
 
             Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
             if (detectionPlane.GetSide(rendererBounds[renderer].center) == detectionSide && directionToInterloper.y > 0.2f) {
-                ClearsightRendererHandler handler = handlers[renderer.transform.root];
-                if (renderer == null) continue;
-                if (currentBatch?.Contains(handler) ?? false) continue;
-                currentBatch.Add(handler);
+                ClearsightRendererHandler handler = handlers[root];
+
+                currentBatch.Add(Tuple.Create(handler, ClearsightRendererHandler.State.interloper));
+                alreadyHandled.Add(root);
+
                 // hiddenTransforms.Add(renderer.transform.root);
                 if (previousBatch.Contains(handler)) {
                     previousBatch.Remove(handler);
@@ -498,12 +502,17 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 handlersToRemove.Add(handler);
             }
         }
+        foreach (ClearsightRendererHandler removal in handlersToRemove) {
+            previousBatch.Remove(removal);
+        }
         yield return null;
     }
 
-    IEnumerator ApplyCurrentBatch(HashSet<ClearsightRendererHandler> currentBatch) {
-        foreach (ClearsightRendererHandler handler in currentBatch) {
-            handler.ChangeState(ClearsightRendererHandler.State.interloper);
+    IEnumerator ApplyCurrentBatch() {
+        foreach (Tuple<ClearsightRendererHandler, ClearsightRendererHandler.State> tuple in currentBatch) {
+            ClearsightRendererHandler handler = tuple.Item1;
+            ClearsightRendererHandler.State desiredState = tuple.Item2;
+            handler.ChangeState(desiredState);
         }
         yield return null;
     }

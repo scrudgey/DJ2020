@@ -59,15 +59,8 @@ public class SubRenderHandler {
     public void Fade() {
         if (renderer == null) return;
         if (data.dontHideInterloper) return;
-
-        // if (data.transparentIsInvisible) {
-        //     renderer.material = initialMaterial;
-        //     renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-        // } else 
-        // {
         renderer.material = interloperMaterial;
         renderer.shadowCastingMode = initialShadowCastingMode;
-        // }
     }
 
     public void HandleTimeTick(float alpha, bool parentHasCutaway) {
