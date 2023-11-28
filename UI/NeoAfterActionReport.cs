@@ -4,11 +4,13 @@ using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
 
 public class NeoAfterActionReport : MonoBehaviour {
     GameData gameData;
-    enum State { missionName, reward }
+    enum State { title, missionName, reward, fadeout }
     State state = State.missionName;
     public Image fade;
     public RectTransform reportMask;
@@ -58,8 +60,11 @@ public class NeoAfterActionReport : MonoBehaviour {
     RectTransform adjustMaskToRect;
     int mutableBalance;
     int counterBalance;
+    Coroutine currentCoroutine;
+    float skipTimer = 0f;
     public void Initialize(GameData data) {
         this.gameData = data;
+        skipTimer = 2f;
         fade.color = new Color(0, 0, 0, 1);
         targetHeight = 0f;
         continueButton.SetActive(false);
@@ -68,9 +73,9 @@ public class NeoAfterActionReport : MonoBehaviour {
         mutableBalance = data.playerState.credits - data.levelState.template.creditReward;
         counterBalance = data.levelState.template.creditReward;
 
-        StartCoroutine(
-                ShowTitleAndObjectives(data)
-            );
+        state = State.title;
+
+        currentCoroutine = StartCoroutine(ShowTitleAndObjectives(data));
     }
     void Update() {
         if (adjustMaskToRect != null) {
@@ -80,19 +85,48 @@ public class NeoAfterActionReport : MonoBehaviour {
         }
         if (perkMenuButton.activeInHierarchy) {
             skillPointCounterText.text = $"{GameManager.I.gameData.playerState.skillpoints}";
-            // perkMenuButtonComponent.interactable = GameManager.I.gameData.playerState.skillpoints > 0;
+        }
+
+        if (skipTimer > 0) {
+            skipTimer -= Time.unscaledDeltaTime;
+        }
+
+        if (skipTimer <= 0 && state != State.fadeout && !continueButton.activeInHierarchy && (Keyboard.current.anyKey.isPressed || Mouse.current.leftButton.isPressed || Mouse.current.rightButton.isPressed)) {
+            AdvanceToNextCondition();
+            skipTimer = 1f;
+        }
+    }
+    void AdvanceToNextCondition() {
+        if (currentCoroutine != null) StopCoroutine(currentCoroutine);
+        switch (state) {
+            case State.title:
+                Debug.Log("skip title ");
+                SkipTitleAndObjectives(gameData);
+                break;
+            case State.missionName:
+                Debug.Log("skip missionName");
+                SkipReward(gameData);
+                break;
+            case State.reward:
+                Debug.Log("skip reward");
+                SkipReward(gameData);
+                break;
         }
     }
     public void ContinueButtonCallback() {
         switch (state) {
             case State.missionName:
+                Debug.Log("continue from missionName -> reward");
                 state = State.reward;
                 continueButton.SetActive(false);
-                StartCoroutine(ShowReward(gameData));
+                currentCoroutine = StartCoroutine(ShowReward(gameData));
                 break;
             case State.reward:
+                Debug.Log("continue from reward -> fadeout");
+                state = State.fadeout;
                 continueButton.SetActive(false);
-                StartCoroutine(FadeOut());
+                perkMenuButton.SetActive(false);
+                currentCoroutine = StartCoroutine(FadeOut());
                 break;
         }
     }
@@ -106,6 +140,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         yield return Toolbox.Ease(null, 2f, 0f, 1f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true);
         GameManager.I.StartNewDay();
     }
+
     IEnumerator ShowTitleAndObjectives(GameData data) {
         missionPanel.SetActive(true);
         rewardPanel.SetActive(false);
@@ -163,6 +198,49 @@ public class NeoAfterActionReport : MonoBehaviour {
         yield return new WaitForSeconds(1f);
         missionStatusText.enabled = true;
         yield return EaseInTextColor(missionStatusText);
+        state = State.missionName;
+        continueButton.SetActive(true);
+    }
+    void SkipTitleAndObjectives(GameData data) {
+        missionPanel.SetActive(true);
+        rewardPanel.SetActive(false);
+        missionNameText.text = data.levelState.template.readableMissionName;
+        bylineText.text = data.levelState.template.tagline;
+        missionStatusText.text = "mission complete";
+        ClearMissionInfo();
+
+        float preferredHeight = LayoutUtility.GetPreferredHeight(reportRect);
+        reportMask.sizeDelta = new Vector2(reportRect.rect.width, preferredHeight);
+        adjustMaskToRect = reportRect;
+        missionNameText.enabled = true;
+        missionNameText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        bylineText.enabled = true;
+        bylineText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        objectivesUnderline.enabled = true;
+        objectivesUnderline.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        List<Objective> requiredObjectives = data.levelState.template.objectives;
+        List<Objective> optionalObjectives = data.levelState.template.bonusObjectives;
+        objectivesContainer.gameObject.SetActive(true);
+        foreach (Objective objective in requiredObjectives) {
+            AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(objectivesContainer, objective, data);
+            handler.objectiveText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        }
+        if (optionalObjectives.Count > 0) {
+            spacer1.SetActive(true);
+            optionalObjectivesContainer.gameObject.SetActive(true);
+            optionalObjectivesTitle.enabled = true;
+            optionalObjectivesUnderline.enabled = true;
+            optionalObjectivesTitle.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+            optionalObjectivesUnderline.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+            foreach (Objective objective in optionalObjectives) {
+                AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(optionalObjectivesContainer, objective, data);
+                handler.objectiveText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+            }
+        }
+        spacer2.SetActive(true);
+        missionStatusText.enabled = true;
+        missionStatusText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        state = State.missionName;
         continueButton.SetActive(true);
     }
 
@@ -247,6 +325,45 @@ public class NeoAfterActionReport : MonoBehaviour {
         // rewardAmountText.text = data.levelState.template.creditReward.ToString("#,#");
         // bonusAmountText.text = "0";
         // balanceAmountText.text = data.playerState.credits.ToString("#,#");
+    }
+
+    //sd asdada
+    void SkipReward(GameData data) {
+        bonusObject.SetActive(false);
+        counterObject.SetActive(false);
+        skillPointsObject.SetActive(false);
+        balanceObject.SetActive(false);
+        rewardLine.color = Color.clear;
+        missionContentFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+        ClearMissionInfo();
+        missionPanelImage.color = Color.black;
+        missionPanel.SetActive(false);
+        rewardPanel.SetActive(true);
+        float preferredHeight = LayoutUtility.GetPreferredHeight(rewardRect);
+        reportMask.sizeDelta = new Vector2(rewardRect.rect.width, preferredHeight);
+        adjustMaskToRect = rewardRect;
+
+        rewardObject.SetActive(true);
+        rewardAmountText.text = data.levelState.template.creditReward.ToString("#,#");
+
+        bonusObject.SetActive(true);
+        bonusAmountText.text = "0";
+        rewardLine.color = baseColor;
+
+        balanceObject.SetActive(true);
+        counterObject.SetActive(true);
+        balanceAmountText.text = mutableBalance.ToString("#,#");
+        if (creditParticles != null) {
+            creditParticles.Play();
+        }
+        mutableBalance = data.levelState.template.creditReward;
+        balanceAmountText.text = mutableBalance.ToString("#,#");
+        counterAmountText.gameObject.SetActive(false);
+        counterCreditSymbolObject.SetActive(false);
+        skillPointsObject.SetActive(true);
+        skillPointCounterText.text = $"{data.playerState.skillpoints}";
+        continueButton.SetActive(true);
+        perkMenuButton.SetActive(true);
     }
     void ClearMissionInfo() {
         foreach (Transform child in objectivesContainer) {

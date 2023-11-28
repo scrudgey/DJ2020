@@ -163,17 +163,26 @@ public class NeoClearsighterV3 : MonoBehaviour {
         DisposeOfNativeArrays();
     }
     void DisposeOfNativeArrays() {
-        Debug.Log("disposing of native arrays");
-        if (radarDirections.IsCreated)
+        if (radarDirections.IsCreated) {
             radarDirections.Dispose();
-        if (raycastResults.IsCreated)
+            radarDirections = default;
+        }
+        if (raycastResults.IsCreated) {
             raycastResults.Dispose();
-        if (raycastResultsBackBuffer.IsCreated)
+            raycastResults = default;
+        }
+        if (raycastResultsBackBuffer.IsCreated) {
             raycastResultsBackBuffer.Dispose();
-        if (commands.IsCreated)
+            raycastResultsBackBuffer = default;
+        }
+        if (commands.IsCreated) {
             commands.Dispose();
-        if (results.IsCreated)
+            commands = default;
+        }
+        if (results.IsCreated) {
             results.Dispose();
+            results = default;
+        }
     }
 
     Vector3 getLiftedOrigin() {

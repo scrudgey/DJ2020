@@ -32,7 +32,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     float timeSinceInvestigatedFootsteps;
     float timeSinceInterrogatedStranger;
     public float timeSinceLastSeen;
-    public Collider playerCollider;
+    public Collider seenPlayerCollider;
     public Alertness alertness = Alertness.normal;
     public bool recentlyInCombat;
     public Suspiciousness recentHeardSuspicious;
@@ -71,6 +71,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         motor = GetComponent<KinematicCharacterMotor>();
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
+            characterHurtable.OnHitStateChanged += HandleHitStateChange;
         }
     }
     void Start() {
@@ -82,11 +83,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     override public void OnDestroy() {
         base.OnDestroy();
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;
+        characterHurtable.OnHitStateChanged -= HandleHitStateChange;
     }
 
     void HandleHitStateChange(Destructible destructible) {
         if (destructible.hitState == HitState.dead) {
             alertHandler.enabled = false;
+            speechTextController.enabled = false;
         }
     }
 
@@ -298,8 +301,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             PerceiveFieldOfView();
         }
 
-        if (timeSinceLastSeen < LOCK_ON_TIME && playerCollider != null) {
-            SightCheckPlayer();
+        // we set playercollider when we perceive player
+        if (timeSinceLastSeen < LOCK_ON_TIME && seenPlayerCollider != null) {
+            // Debug.Log($"{Vector3.Dot(target.transform.up, playerCollider.bounds.center - transform.position)} {Vector3.Dot(target.transform.up, playerCollider.bounds.center - transform.position) < 0}");
+            if (Vector3.Dot(target.transform.up, seenPlayerCollider.bounds.center - transform.position) < 0) {
+                SightCheckPlayer(GameManager.I.playerCollider);
+            }
         }
         if (footstepImpulse > 0f) {
             footstepImpulse -= Time.deltaTime;
@@ -315,14 +322,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         }
     }
 
-    void SightCheckPlayer() {
-        Collider player = GameManager.I.playerCollider;
-        // TODO: only lock when direction is closely aligned with direction to player
-        if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
-            ClearLineOfSight(player, (RaycastHit hit) => {
-                if (hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
-            });
-        }
+    void SightCheckPlayer(Collider playerCollider) {
+        // Collider player = ;
+        ClearLineOfSight(playerCollider, (RaycastHit hit) => {
+            // Debug.Log($"sight check player raycast hit: {hit.collider}");
+            if (hit.collider == playerCollider) Perceive(playerCollider, byPassVisibilityCheck: true);
+        });
     }
     void SetInputs(PlayerInput input) {
         characterController.SetInputs(input);
@@ -431,7 +436,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             stateMachine.currentState.OnObjectPerceived(other);
             lastSeenPlayerPosition = new SpaceTimePoint(other.bounds.center);
             timeSinceLastSeen = 0f;
-            playerCollider = other;
+            seenPlayerCollider = other;
             Reaction reaction = ReactToPlayerSuspicion();
             if (reaction == Reaction.attack) { // TODO: investigate routine
                 switch (stateMachine.currentState) {
@@ -500,7 +505,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case ReportToHQState:
             case StopAndListenState:
                 // TODO: better logic here?
-                Debug.Log($"I just got shot: hitstate: {hitState} damage: {damage}");
                 alertHandler.ShowAlert(useWarnMaterial: true);
                 // if (GameManager.I.gameData.levelState.anyAlarmActive()) {
                 //     ChangeState(new SearchDirectionState(this, damage, doIntro: false, speedCoefficient: ));
@@ -528,11 +532,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
             if (noise.data.player) {
                 lastHeardPlayerPosition = new SpaceTimePoint(noise.transform.position);
-                SightCheckPlayer();
+                if (Vector3.Dot(target.transform.up, GameManager.I.playerCollider.bounds.center - transform.position) < 0) {
+                    SightCheckPlayer(GameManager.I.playerCollider);
+                } else {
+
+                }
             }
-            // else {
-            //     lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
-            // }
             lastGunshotHeard = noise;
             SuspicionRecord record = SuspicionRecord.gunshotsHeard();
             GameManager.I.AddSuspicionRecord(record);
@@ -718,12 +723,13 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         lastGunshotHeard = null;
         timeSinceLastSeen = 0f;
-        playerCollider = null;
+        seenPlayerCollider = null;
         // alertness = Alertness.normal;
         recentlyInCombat = false;
         recentHeardSuspicious = Suspiciousness.normal;
         lastSuspicionLevel = Suspiciousness.normal;
         alertHandler.enabled = true;
+        speechTextController.enabled = true;
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;

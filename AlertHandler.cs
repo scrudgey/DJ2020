@@ -23,6 +23,13 @@ public class AlertHandler : MonoBehaviour {
         spriteRenderer.enabled = false;
     }
 
+    void OnDisable() {
+        if (coroutine != null) {
+            StopCoroutine(coroutine);
+        }
+        spriteRenderer.enabled = false;
+    }
+
     void ResetCoroutine(IEnumerator newCoroutine) {
         if (coroutine != null) {
             StopCoroutine(coroutine);

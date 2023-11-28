@@ -44,6 +44,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public ManualHacker manualHacker;
     public Burglar burglar;
     public Footsteps footsteps;
+    public LightLevelProbe lightLevelProbe;
     public AudioSource audioSource;
     public float defaultRadius = 0.10f;
     public Action<CharacterController> OnCharacterDead;
@@ -508,6 +509,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.hitstun:
             case CharacterState.dead:
             case CharacterState.zapped:
+                isCrouching = false;
+                CheckUncrouch();
                 break;
             case CharacterState.burgle:
                 if (input.useItem) {
@@ -1003,7 +1006,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
         switch (state) {
             case CharacterState.zapped:
-                Debug.Log("zapped");
                 break;
             case CharacterState.useItem:
                 currentVelocity = currentVelocity * 0.5f;
@@ -1663,7 +1665,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             wavingArm = waveArmTimer > 0f,
             activeItem = itemHandler?.activeItem,
             isSpeaking = speechTextController?.IsSpeaking() ?? false,
-            armsRaised = armsRaised
+            armsRaised = armsRaised,
+            lightProbeColor = lightLevelProbe?.currentSpriteColor ?? Color.white
         };
     }
     bool IsMovementSticking() => (_lastInput.MoveAxis() != Vector2.zero && inputDirectionHeldTimer < crawlStickiness * 1.2f && isCrouching);

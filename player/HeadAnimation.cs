@@ -22,7 +22,7 @@ public class HeadAnimation : MonoBehaviour, ISkinStateLoader {
         }
         if (sensesTransform != null && input.lookAtDirection != Vector3.zero)
             sensesTransform.forward = input.lookAtDirection;
-
+        spriteRenderer.color = input.lightProbeColor;
         switch (input.state) {
             case CharacterState.wallPress:
                 // TODO: should not belong to animation code

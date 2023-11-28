@@ -163,33 +163,55 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
     }
 
     void DisposeOfNativeArrays() {
-        Debug.Log("disposing of native arrays");
         gatherJobHandle.Complete();
 
-        if (layerMasks.IsCreated)
+        if (layerMasks.IsCreated) {
             layerMasks.Dispose();
-        if (origins.IsCreated)
+            layerMasks = default;
+        }
+        if (origins.IsCreated) {
             origins.Dispose();
-        if (directions.IsCreated)
+            origins = default;
+        }
+        if (directions.IsCreated) {
             directions.Dispose();
-        if (distances.IsCreated)
+            directions = default;
+        }
+        if (distances.IsCreated) {
             distances.Dispose();
+            distances = default;
+        }
 
-        if (backBufferLayerMasks.IsCreated)
+        if (backBufferLayerMasks.IsCreated) {
             backBufferLayerMasks.Dispose();
-        if (backBufferOrigins.IsCreated)
+            backBufferLayerMasks = default;
+        }
+        if (backBufferOrigins.IsCreated) {
             backBufferOrigins.Dispose();
-        if (backBufferDirections.IsCreated)
-            backBufferDirections.Dispose();
-        if (backBufferDistances.IsCreated)
-            backBufferDistances.Dispose();
+            backBufferOrigins = default;
+        }
 
-        if (raycastResults.IsCreated)
+        if (backBufferDirections.IsCreated) {
+            backBufferDirections.Dispose();
+            backBufferDirections = default;
+        }
+        if (backBufferDistances.IsCreated) {
+            backBufferDistances.Dispose();
+            backBufferDistances = default;
+        }
+
+        if (raycastResults.IsCreated) {
             raycastResults.Dispose();
-        if (commands.IsCreated)
+            raycastResults = default;
+        }
+        if (commands.IsCreated) {
             commands.Dispose();
-        if (results.IsCreated)
+            commands = default;
+        }
+        if (results.IsCreated) {
             results.Dispose();
+            results = default;
+        }
     }
 }
 

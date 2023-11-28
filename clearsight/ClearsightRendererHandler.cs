@@ -40,9 +40,7 @@ public class ClearsightRendererHandler {
             if (renderer is ParticleSystemRenderer) continue;
             if (renderer is TrailRenderer) continue;
             if (renderer.name == "cutaway") continue;
-            if (root.name.Contains("laser_block")) {
-                Debug.Log($"laser_block {renderer} {renderer.bounds}");
-            }
+            
             tmpBounds.Encapsulate(renderer.bounds);
             SubRenderHandler handler = new SubRenderHandler(renderer);
             handlers.Add(handler);

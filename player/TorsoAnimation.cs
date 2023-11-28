@@ -46,6 +46,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     }
     public SpriteData UpdateView(AnimationInput input) {
         lastInput = input;
+        spriteRenderer.color = input.lightProbeColor;
 
         switch (input.state) {
             case CharacterState.dead:

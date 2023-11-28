@@ -86,7 +86,5 @@ public class SubwayAnimator : MonoBehaviour {
                 bumpIndex += 1;
             }
         }
-
-
     }
 }

@@ -30,6 +30,7 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
     void DisposeOfNativeArrays() {
         try {
             textureData.Dispose();
+            textureData = default;
         }
         catch (Exception e) {
             // Debug.Log($"texturedata is already disposed: {e}");
@@ -89,9 +90,9 @@ public class LightLevelProbe : MonoBehaviour, IBindable<LightLevelProbe> {
         // Debug.Log($"updating with target light level: {targetLightLevel} {discreteLightLevel}");
         currentSpriteColor = Color.Lerp(currentSpriteColor, targetSpriteColor, 150f * Time.unscaledDeltaTime);
         currentSpriteColor.a = 1f;
-        foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
-            spriteRenderer.color = currentSpriteColor;
-        }
+        // foreach (SpriteRenderer spriteRenderer in spriteRenderers) {
+        //     spriteRenderer.color = currentSpriteColor;
+        // }
         if (OnValueChanged != null) OnValueChanged(this);
     }
 

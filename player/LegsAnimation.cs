@@ -125,7 +125,18 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
 
         lastInput = input;
         crouchTransitionTimer += Time.deltaTime;
+        spriteRenderer.color = input.lightProbeColor;
+        if (hitState != input.hitState) {
+            if (input.hitState == HitState.zapped) {
+                Debug.Log("enable emission");
+                spriteRenderer.material.EnableKeyword("_EMISSION");
+            } else if (hitState == HitState.zapped) {
+                Debug.Log("disable emission");
+                spriteRenderer.material.DisableKeyword("_EMISSION");
+            }
+        }
         hitState = input.hitState;
+
 
 
         // set direction
@@ -135,6 +146,9 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
             isCrouching = input.isCrouching;
             crouchTransitionTimer = 0f;
         }
+        if (hitState == HitState.zapped) {
+            isCrouching = false;
+        }
         float scaleFactor = 1f;
         if (crouchTransitionTimer < 0.1f) {
             scaleFactor = (float)PennerDoubleAnimation.BounceEaseIn(crouchTransitionTimer, 1.1f, -0.1f, 0.1f);
@@ -143,6 +157,8 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         transform.localScale = scale + scaleOffset;
         switch (input.state) {
             case CharacterState.zapped:
+                spriteRenderer.color = Color.white;
+                break;
             case CharacterState.dead:
             case CharacterState.keelOver:
                 break;

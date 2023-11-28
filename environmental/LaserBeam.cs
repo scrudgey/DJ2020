@@ -42,12 +42,10 @@ public class LaserBeam : MonoBehaviour {
         Vector3 direction = laser.up;
         Ray ray = new Ray(transform.position, direction);
         // TODO: nonalloc
-        RaycastHit[] hits = Physics.RaycastAll(ray, maxLaserLength, LayerUtil.GetLayerMask(Layer.def, Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, maxLaserLength, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive), QueryTriggerInteraction.Ignore);
         float length = maxLaserLength / 2f;
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.transform.IsChildOf(transform.root))
-                continue;
-            if (hit.collider.isTrigger)
                 continue;
             length = hit.distance / 2f;
             if (GameManager.I.playerObject != null && hit.collider.transform.IsChildOf(GameManager.I.playerObject.transform)) {

@@ -21,6 +21,9 @@ public class SpeechTextController : MonoBehaviour {
         visibilityTimer = 0f;
         SetRectPositions();
     }
+    void OnDisable() {
+        HideText();
+    }
     void Update() {
         if (haltSpeechTimeout > 0) {
             haltSpeechTimeout -= Time.deltaTime;

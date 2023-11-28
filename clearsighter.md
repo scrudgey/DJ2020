@@ -98,7 +98,7 @@ tune:
 
 apply donthideinterloper to more objects
 buildings a problem again
-
+hvac still doesnt work with clearsight?
 
 selectively clearsight based on shooting enemies as well / enemies
     how would this work?

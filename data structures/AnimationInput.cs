@@ -42,4 +42,5 @@ public struct AnimationInput {
     public Vector3 velocity;
     public bool wavingArm;
     public bool armsRaised;
+    public Color lightProbeColor;
 }

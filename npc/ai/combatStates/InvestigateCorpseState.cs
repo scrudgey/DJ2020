@@ -15,6 +15,7 @@ public class InvestigateCorpseState : SphereControlState {
     public InvestigateCorpseState(SphereRobotAI ai, Corpse corpse, SpeechTextController speechTextController, CharacterController characterController) : base(ai) {
         this.corpse = corpse;
         this.speechTextController = speechTextController;
+        this.characterController = characterController;
         record = SuspicionRecord.bodySuspicion();
     }
     public override void Enter() {
