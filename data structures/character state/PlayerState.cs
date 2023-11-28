@@ -19,23 +19,20 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     // gun
     public List<GunState> allGuns;
+    [JsonConverter(typeof(ObjectListJsonConverter<ItemTemplate>))]
     public List<ItemTemplate> allItems;
     public GunState primaryGun { get; set; }
     public GunState secondaryGun { get; set; }
     public GunState tertiaryGun { get; set; }
     public int activeGun { get; set; }
-    public int numberOfShellsPerReload {
-        get {
-            return PerkNumberOfShellsPerReload();
-        }
+    public int numberOfShellsPerReload() {
+        return PerkNumberOfShellsPerReload();
     }
 
     // health
     public float health { get; set; }
-    public float fullHealthAmount {
-        get {
-            return PerkFullHealthAmount();
-        }
+    public float fullHealthAmount() {
+        return PerkFullHealthAmount();
     }
     public HitState hitState { get; set; }
 

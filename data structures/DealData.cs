@@ -1,9 +1,13 @@
+using Newtonsoft.Json;
 using UnityEngine;
 
 [System.Serializable]
 public record DealData {
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<LootData>))]
     public LootData offerLoot;
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite offerIcon;
+
     public string offerName;
     public int offerCount;
     public int offerValue;

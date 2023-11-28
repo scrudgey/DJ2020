@@ -16,9 +16,18 @@ public class ObjectListJsonConverter<T> : JsonConverter<List<T>> where T : Unity
         JObject jo = JObject.Load(reader);
         JArray etiquetteJArray = (JArray)jo[Constants.LIST];
         foreach (JObject item in etiquetteJArray) {
-            string path = item.GetValue(Constants.PATH).ToString();
-            T result = Resources.Load<T>(path) as T;
-            etiquetteList.Add(result);
+            // if (item.HasValues(Constants.PATH))
+            try {
+
+                string path = item.GetValue(Constants.PATH).ToString();
+                T result = Resources.Load<T>(path) as T;
+                etiquetteList.Add(result);
+            }
+            catch (Exception e) {
+                // Debug.LogError($"error loading object list: {e}");
+                // Debug.LogError($"typeof: {objectType}");
+                etiquetteList.Add(null);
+            }
         }
 
         return etiquetteList;

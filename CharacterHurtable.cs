@@ -143,7 +143,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
     }
     public void LoadCharacterState(ICharacterHurtableState state) {
         this.health = state.health;
-        this.fullHealthAmount = state.fullHealthAmount;
+        // this.fullHealthAmount = state.fullHealthAmount();
         this.hitState = state.hitState;
     }
 }

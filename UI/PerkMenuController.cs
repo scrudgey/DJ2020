@@ -74,7 +74,7 @@ public class PerkMenuController : MonoBehaviour {
     }
 
     void RefreshDisplay(PlayerState state) {
-        playerHealth.text = $"HP: {(int)state.health} / {state.fullHealthAmount}";
+        playerHealth.text = $"HP: {(int)state.health} / {state.fullHealthAmount()}";
         playerLevel.text = $"{state.PlayerLevel()}";
         skillPointIndicator.text = $"{state.skillpoints}";
 

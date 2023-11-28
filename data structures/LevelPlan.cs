@@ -8,6 +8,7 @@ public record LevelPlan {
     public string extractionPointIdn;
     [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> activeTactics;
+    [JsonConverter(typeof(ObjectListJsonConverter<ItemTemplate>))]
     public List<ItemTemplate> items;
     public static LevelPlan Default(List<ItemTemplate> allItems) { // TODO: replace argument with playerstate?
         List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
@@ -27,9 +28,9 @@ public record LevelPlan {
             insertionPointIdn = "",
             extractionPointIdn = "",
             items = itemList,
-            // activeTactics = new List<Tactic>()
+            activeTactics = new List<Tactic>()
             // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
-            activeTactics = new List<Tactic>() { new TacticFakeID() }
+            // activeTactics = new List<Tactic>() { new TacticFakeID() }
         };
     }
 

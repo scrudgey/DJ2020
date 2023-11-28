@@ -3537,5 +3537,16 @@ armor
 animate gun holster / unholster
 doors are blocking people again?
 some suspicion records could be sticky when noticed
+    a different kind of surveillance camera notices suspicion records?
+
+gamemanager level isvisible not working
+escape to hide cursor 
+cursor is weird first time using quick select
+subway scene remove justify text
+reset skill points
+some sort of error with highlights / aimindicatorhandler / uicontroller not unsubscribing properly or smth in world shop point mouseover
 
 
+
+error writing to file: /Users/rfoltz/Library/Application Support/DefaultCompany/wetworks/saveGames/xx 
+System.Collections.Generic.KeyNotFoundException: The given key ' (TacticFakeID)' was not present in the dictionary.

@@ -163,6 +163,9 @@ public class NeoClearsighterV3 : MonoBehaviour {
         DisposeOfNativeArrays();
     }
     void DisposeOfNativeArrays() {
+        // if (!gatherJobHandle.IsCompleted) {
+        gatherJobHandle.Complete();
+        // }
         if (radarDirections.IsCreated) {
             radarDirections.Dispose();
             radarDirections = default;
@@ -340,6 +343,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
     void Update() {
+        if (followTransform == null) return;
         UpdateExposure();
         OnTime?.Invoke(Time.unscaledDeltaTime);
     }

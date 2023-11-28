@@ -49,7 +49,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
             foreach (GameObject prefab in singletonPrefabs) {
                 if (prefab.GetComponent<T>() != null) {
                     prefabPath = "singletons/" + prefab.name;
-                    Debug.Log($"using singleton prefab {prefab.name}");
+                    // Debug.Log($"using singleton prefab {prefab.name}");
                 }
             }
 
@@ -60,9 +60,9 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
                 _instance = singleton.AddComponent<T>();
             singleton.name = "(singleton) " + typeof(T).ToString();
             DontDestroyOnLoad(singleton);
-            Debug.Log("[Singleton] An instance of " + typeof(T) +
-                     " is needed in the scene, so '" + singleton +
-                     "' was created with DontDestroyOnLoad.");
+            // Debug.Log("[Singleton] An instance of " + typeof(T) +
+            //          " is needed in the scene, so '" + singleton +
+            //          "' was created with DontDestroyOnLoad.");
             _instance.transform.SetParent(null);
         } else {
             // Debug.Log("[Singleton] Using instance already created: " +

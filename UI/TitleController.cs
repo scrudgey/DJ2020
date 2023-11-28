@@ -107,7 +107,7 @@ public class TitleController : MonoBehaviour {
         GameManager.I.LoadScene("cityskybox", () => {
             // List<Camera> skycams = new List<Camera>();
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
-                Debug.Log(skycam);
+                // Debug.Log(skycam);
                 // skycams.Add(skycam.myCamera);
                 skycam.Initialize(UICam, new Vector3(0f, 8f, 0f));
                 skycam.transform.rotation = skyCamRotation * skycam.transform.rotation;

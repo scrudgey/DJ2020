@@ -665,7 +665,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         primary = state.primaryGun;
         secondary = state.secondaryGun;
         third = state.tertiaryGun;
-        numberOfShellsPerReload = state.numberOfShellsPerReload;
+        // numberOfShellsPerReload = state.numberOfShellsPerReload;
         SwitchToGun(state.activeGun);
     }
 

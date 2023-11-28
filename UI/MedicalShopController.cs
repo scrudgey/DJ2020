@@ -42,7 +42,7 @@ public class MedicalShopController : MonoBehaviour {
         playerCredits.text = $"{GameManager.I.gameData.playerState.credits}";
         // costToHeal.text = $""
         float health = GameManager.I.gameData.playerState.health;
-        float fullHealth = GameManager.I.gameData.playerState.fullHealthAmount;
+        float fullHealth = GameManager.I.gameData.playerState.fullHealthAmount();
         costToHealObject.SetActive(health < fullHealth);
         healButton.interactable = health < fullHealth;
         costToHeal.text = $"{fullHealth - health}";
@@ -55,12 +55,12 @@ public class MedicalShopController : MonoBehaviour {
 
     public void HealButtonCallback() {
         float health = GameManager.I.gameData.playerState.health;
-        float fullHealth = GameManager.I.gameData.playerState.fullHealthAmount;
+        float fullHealth = GameManager.I.gameData.playerState.fullHealthAmount();
         float cost = fullHealth - health;
         if (GameManager.I.gameData.playerState.credits >= cost) {
             Toolbox.RandomizeOneShot(audioSource, healSounds);
             GameManager.I.gameData.playerState.credits -= (int)cost;
-            GameManager.I.gameData.playerState.health = GameManager.I.gameData.playerState.fullHealthAmount;
+            GameManager.I.gameData.playerState.health = GameManager.I.gameData.playerState.fullHealthAmount();
             storeDialogueController.SetShopownerDialogue("Let's get you patched up.");
         } else {
             storeDialogueController.SetShopownerDialogue("Come back when you have the credits.");
