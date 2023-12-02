@@ -24,7 +24,8 @@ public class TagSystemData {
 
     // if true, I do not hide when above the player
     public bool dontHideInterloper;  // TODO: use layers instead
-    public bool transparentIsInvisible;
+    public bool totallTransparentIsInvisible;
+    public bool partialTransparentIsInvisible;
 
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;

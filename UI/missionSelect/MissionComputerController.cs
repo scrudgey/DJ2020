@@ -246,6 +246,7 @@ public class MissionComputerController : MonoBehaviour {
         GameManager.I.HideMissionSelectMenu();
     }
     public void PlanButtonCallback() {
+        GameManager.I.CloseMenu();
         GameManager.I.ShowMissionPlanner(activeLevelTemplate);
     }
 

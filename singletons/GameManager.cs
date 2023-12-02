@@ -441,6 +441,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
             escapePressedThisFrame = false;
         } else if (gameData.phase == GamePhase.levelPlay || gameData.phase == GamePhase.vrMission) {
+
             if (inputMode == InputMode.burglar) {
 
             } else {
@@ -497,9 +498,9 @@ public partial class GameManager : Singleton<GameManager> {
         inputReceivers.Add(GameManager.I.characterCamera);
     }
 
-    void UpdateCursor(bool uiclick, PlayerInput playerInput) {
+    void UpdateCursor(bool cursorOverUI, PlayerInput playerInput) {
         if (inputMode == InputMode.burglar) {
-            if (!uiclick) {
+            if (!cursorOverUI) {
                 cursorType = CursorType.gun;
             }
         } else {
@@ -507,7 +508,7 @@ public partial class GameManager : Singleton<GameManager> {
                 cursorType = CursorType.pointer;
                 // } else if (playerInput.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false) {
                 //     cursorType = CursorType.pointer;
-            } else if (uiclick) {
+            } else if (cursorOverUI) {
                 cursorType = CursorType.pointer;
             } else {
                 cursorType = CursorType.gun;

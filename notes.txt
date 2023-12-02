@@ -2985,6 +2985,26 @@ x ladders
     * disable mouse aim movement
     * let NPCS walk through each other
 * lots of blocking raycasts in sphererobotai
+* fill in names
+* padlock door doesnt work
+* some things are not stealing
+* shooting should visually be aggressive
+* burglar view should remain in elevator, maybe selected attack surfaces
+* when stealth killed
+* transparent skill menu background over subway doesn't work
+* shooting should make you visible
+* laser grid is not extending all the way
+* subway cutscene advance
+* getting zapped in the dark
+* getting zapped while crouched
+* recompile jack that data / reconnect network
+* save/load broken
+* test save/load with fakeid tactic
+* reset skill points
+* subway scene remove justify text
+* disable quick select in world
+* escape to hide cursor 
+* cursor is weird first time using quick select
 
 
 
@@ -3376,6 +3396,7 @@ status bar on top shows:
     shows when key is used
     when loot is collected
 
+doors are blocking people again?
 silencer shows in gameplay
 map pane:
     show type of location? city view? territory?
@@ -3499,10 +3520,10 @@ more equipment to bring on mission?
 
 polish:
     reduce frequency of "enemy sighted"
-    change sensitivity / eliminate "guess it was nothing"
+    tune sensitivity / eliminate "guess it was nothing"
     better AI navigation / building search
         when reverting to patrol, we can do better
-        multiple guards chose the same clearpoint to navigate to
+        multiple guards chose the same clearpoint to navigate to- more global coordination
     better investigative ability when player does something weird like superjump / land
     highlight NPCs that are shooting me
     stealing dat001 in tower didn't work
@@ -3511,42 +3532,28 @@ polish:
     npc dialogue is jumpy
 
 
-* fill in names
-* padlock door doesnt work
-* some things are not stealing
-* shooting should visually be aggressive
-* burglar view should remain in elevator, maybe selected attack surfaces
-* when stealth killed
-* transparent skill menu background over subway doesn't work
-* shooting should make you visible
-* laser grid is not extending all the way
-* subway cutscene advance
-* getting zapped in the dark
-* getting zapped while crouched
-* recompile jack that data / reconnect network
-
 shells / crater clearsight
     shells: dynamic sprite renderers with collider, rigidbody
     crater: sprite renderer decal with no collider, ridigbody
         this suggests we need a method to register an object with clearsighter.
             register the shells when they stop moving, etc.
         can do this via gamemanager.clearsighterv3
+    major issue: decals are added to object transforms which messes with clearsight logic.
+        workaround: don't parent the object. but this is not ideal, we prefer the decal to move with parent.
+        solution: bite the bullet and implement a method to add decal as subrenderer to correct handler.
+            this likely works just fine.
+            but what happens when we remove the decal?
+                recall to pool: now we need to deactivate this subrenderhandler in particular
+                simple: get the transform root, get the renderhandler, remove the subrenderhandler
+            behavior is different if we are parenting the object or not
 
-save/load broken
 armor
+    an armor rating that is % probability of deflecting a shot
 animate gun holster / unholster
-doors are blocking people again?
 some suspicion records could be sticky when noticed
-    a different kind of surveillance camera notices suspicion records?
+    a different kind of surveillance camera stickies suspicion records?
+ssome sort of error with highlights / aimindicatorhandler / uicontroller not unsubscribing properly or smth in world shop point mouseover
+    gamemanager level isvisible not working?
 
-gamemanager level isvisible not working
-escape to hide cursor 
-cursor is weird first time using quick select
-subway scene remove justify text
-reset skill points
-some sort of error with highlights / aimindicatorhandler / uicontroller not unsubscribing properly or smth in world shop point mouseover
-
-
-
-error writing to file: /Users/rfoltz/Library/Application Support/DefaultCompany/wetworks/saveGames/xx 
-System.Collections.Generic.KeyNotFoundException: The given key ' (TacticFakeID)' was not present in the dictionary.
+day 1: ~40k views, 2667 wishlists
+day 2: ~70k views, 780 wishlists

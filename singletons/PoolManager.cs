@@ -54,8 +54,12 @@ public class PrefabPool {
         objectsInPool.Enqueue(obj);
         objectsActiveInWorld = new Queue<GameObject>(objectsActiveInWorld.Where(x => x != obj));
         obj.transform.SetParent(null);
-        // if (obj.name.ToLower().Contains("npc"))
-        //     Debug.Log($"RECALL active: {objectsActiveInWorld.Count} pooled: {objectsInPool.Count}");
+
+        // TODO: untested
+        // TODO: only when flag is set
+        if (GameManager.I.clearSighterV3 != null) {
+            GameManager.I.clearSighterV3.RemoveStatic(obj.transform.root);
+        }
     }
     public void RecallObjects(GameObject[] objects) {
         foreach (GameObject obj in objects) {
@@ -78,8 +82,6 @@ public class PrefabPool {
         }
         EnableObject(obj);
         objectsActiveInWorld.Enqueue(obj);
-        // if (obj.name.ToLower().Contains("npc"))
-        //     Debug.Log($"GET active: {objectsActiveInWorld.Count} pooled: {objectsInPool.Count}");
         return obj;
     }
     public GameObject GetObject() {
@@ -89,8 +91,6 @@ public class PrefabPool {
         }
         EnableObject(obj);
         objectsActiveInWorld.Enqueue(obj);
-        // if (obj.name.ToLower().Contains("npc"))
-        //     Debug.Log($"GET active: {objectsActiveInWorld.Count} pooled: {objectsInPool.Count}");
         return obj;
     }
 }
@@ -164,6 +164,10 @@ public class PoolManager : Singleton<PoolManager> {
             decal.transform.rotation = Quaternion.FromToRotation(-Vector3.forward, hit.normal);
             decalRandomizer.sprites = decalSprites[type];
             decalRandomizer.Randomize();
+            decal.transform.SetParent(hit.collider.transform, true);
+            if (GameManager.I.clearSighterV3 != null) {
+                GameManager.I.clearSighterV3.AddStatic(decal.transform);
+            }
         }
         return decal;
     }

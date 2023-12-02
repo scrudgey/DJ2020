@@ -55,7 +55,6 @@ public class Bullet {
             // TODO: make this data driven
             if (!tagData.noDecal) {
                 GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.normal);
-                decalObject.transform.SetParent(hit.collider.transform, true);
             }
 
             // spawn sparks by default

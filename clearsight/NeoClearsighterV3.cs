@@ -64,10 +64,8 @@ public class NeoClearsighterV3 : MonoBehaviour {
         defaultLayerMask = LayerUtil.GetLayerMask(Layer.def, Layer.bulletPassThrough, Layer.clearsighterBlock);
         InitializeTree();
         SetUpRadar();
-        initialized = true;
         j = 0;
-
-
+        initialized = true;
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleGeometry));
     }
 
@@ -88,6 +86,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
         previousBatch = new HashSet<ClearsightRendererHandler>();
         // hiddenTransforms = new HashSet<Transform>();
 
+
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
             .Where(renderer => renderer.isPartOfStaticBatch)
             .Concat(
@@ -103,35 +102,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
 
         foreach (Renderer renderer in staticRenderers) {
-            if (renderer.name.Contains("cutaway")) continue;
-            Vector3 position = renderer.bounds.center;
-            rendererTree.Add(renderer, position);
-            rendererBoundsTree.Add(renderer, renderer.bounds);
-            rendererBounds[renderer] = renderer.bounds;
-            rendererPositions[renderer] = renderer.bounds.center - renderer.bounds.extents;
-
-            // rendererTagData[renderer] = Toolbox.GetTagData(renderer.gameObject);
-
-            if (rendererRoots.ContainsKey(renderer.transform.root)) {
-                rendererRoots[renderer.transform.root].Add(renderer);
-            } else {
-                rendererRoots[renderer.transform.root] = new List<Renderer>();
-                rendererRoots[renderer.transform.root].Add(renderer);
-            }
-
-
-            if (!handlers.ContainsKey(renderer.transform.root)) {
-                ClearsightRendererHandler handler = new ClearsightRendererHandler(this, renderer.transform.root, position);
-                handlers[renderer.transform.root] = handler;
-            }
-
-            Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
-            if (findAnchor != null) {
-                rendererPositions[renderer] = findAnchor.position;
-            }
-            foreach (Collider collider in renderer.GetComponentsInChildren<Collider>()) {
-                colliderRenderers[collider] = renderer;
-            }
+            AddNewRendererHandler(renderer);
         }
     }
     void SetUpRadar() {
@@ -186,14 +157,26 @@ public class NeoClearsighterV3 : MonoBehaviour {
             results.Dispose();
             results = default;
         }
+
+        colliderRenderers.Clear();
+        rendererPositions.Clear();
+        rendererTree = null;
+        rendererBounds.Clear();
+        dynamicColliderToRenderer.Clear();
+        dynamicColliderRoot.Clear();
+        rendererTransforms.Clear();
+        rendererBoundsTree = null;
+        rendererRoots.Clear();
+        previousBatch.Clear();
+
+        // TODO: something better?
+        OnTime = null;
     }
 
     Vector3 getLiftedOrigin() {
         Vector3 origin = followTransform.position;
-        // origin.y = Mathf.Round(origin.y * 10f) / 10f;
         float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
         return origin + new Vector3(0f, lift, 0f);
-        // return origin;
     }
     IEnumerator HandleGeometry() {
         if (initialized) {
@@ -306,8 +289,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
         setupJob.EyePos = followTransform.position + Vector3.up;
         setupJob.directions = radarDirections;
         setupJob.indexOffset = NUMBER_DIRECTIONS * subradarIndex;
-        // setupJob.indexOffset = 0;
-        // Debug.Log(setupJob.indexOffset);
         setupJob.layerMask = defaultLayerMask;
         setupJob.Commands = commands;
 
@@ -340,6 +321,8 @@ public class NeoClearsighterV3 : MonoBehaviour {
         var tmp = raycastResults;
         raycastResults = raycastResultsBackBuffer;
         raycastResultsBackBuffer = tmp;
+
+        tmp = default;
     }
 
     void Update() {
@@ -361,10 +344,12 @@ public class NeoClearsighterV3 : MonoBehaviour {
             if (renderer == null) continue;
 
             Transform root = renderer.transform.root;
-
             if (alreadyHandled.Contains(root)) continue;
             ClearsightRendererHandler handler = handlers[root];
 
+            if (renderer.gameObject.name.Contains("bullet")) {
+                Debug.Log($"static above? {handler.IsAbove(liftedOrigin, debug: true)}");
+            }
             // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
             // which is player position + 1.5
             if (handler.IsAbove(liftedOrigin)) {
@@ -492,8 +477,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
                 currentBatch.Add(Tuple.Create(handler, ClearsightRendererHandler.State.interloper));
                 alreadyHandled.Add(root);
-
-                // hiddenTransforms.Add(renderer.transform.root);
                 if (previousBatch.Contains(handler)) {
                     previousBatch.Remove(handler);
                 }
@@ -600,6 +583,88 @@ public class NeoClearsighterV3 : MonoBehaviour {
             return true;
         }
         // ClearsightRendererHandler handler = handlers[]
+    }
+
+
+    public void AddStatic(Transform obj) {
+        if (obj.root == obj) {
+            // object is base- create new RenderHandler
+            foreach (Renderer renderer in obj.GetComponentsInChildren<Renderer>()) {
+                AddNewRendererHandler(renderer);
+            }
+        } else {
+            // object is a child- add SubRenderHandler to RenderHandler
+            AddSubrenderers(obj.gameObject, obj.root);
+        }
+    }
+    public void RemoveStatic(Transform obj) {
+        if (obj.root == obj) {
+            // object is base- remove RenderHandler
+            foreach (Renderer renderer in obj.GetComponentsInChildren<Renderer>()) {
+                RemoveRendererHandler(renderer);
+            }
+        } else {
+            // object is a child- remove SubRenderHandler from RenderHandler
+            RemoveSubRenderers(obj.gameObject, obj.root);
+        }
+    }
+    public void AddSubrenderers(GameObject newObject, Transform parentRoot) {
+        if (handlers.ContainsKey(parentRoot)) {
+            ClearsightRendererHandler handler = handlers[parentRoot];
+            foreach (Renderer renderer in newObject.GetComponentsInChildren<Renderer>()) {
+                handler.AddSubRenderHandler(renderer);
+            }
+        }
+    }
+    public void RemoveSubRenderers(GameObject newObject, Transform parentRoot) {
+        if (handlers.ContainsKey(parentRoot)) {
+            ClearsightRendererHandler handler = handlers[parentRoot];
+            foreach (Renderer renderer in newObject.GetComponentsInChildren<Renderer>()) {
+                handler.RemoveSubRenderHandler(renderer);
+            }
+        }
+    }
+
+    public void AddNewRendererHandler(Renderer renderer) {
+        if (renderer.name.Contains("cutaway")) return;
+        Vector3 position = renderer.bounds.center;
+        rendererTree.Add(renderer, position);
+        rendererBoundsTree.Add(renderer, renderer.bounds);
+        rendererBounds[renderer] = renderer.bounds;
+        rendererPositions[renderer] = renderer.bounds.center - renderer.bounds.extents;
+
+        // root keyed
+        if (rendererRoots.ContainsKey(renderer.transform.root)) {
+            rendererRoots[renderer.transform.root].Add(renderer);
+        } else {
+            rendererRoots[renderer.transform.root] = new List<Renderer>();
+            rendererRoots[renderer.transform.root].Add(renderer);
+        }
+        if (!handlers.ContainsKey(renderer.transform.root)) {
+            // instantiated at the root- it will create a subrenderhandler for each child.
+            ClearsightRendererHandler handler = new ClearsightRendererHandler(this, renderer.transform.root, position);
+            handlers[renderer.transform.root] = handler;
+        }
+
+        Transform findAnchor = renderer.gameObject.transform.root.Find("clearSighterAnchor");
+        if (findAnchor != null) {
+            rendererPositions[renderer] = findAnchor.position;
+        }
+        foreach (Collider collider in renderer.GetComponentsInChildren<Collider>()) {
+            colliderRenderers[collider] = renderer;
+        }
+    }
+
+    public void RemoveRendererHandler(Renderer renderer) {
+        rendererTree.Remove(renderer);
+        rendererBoundsTree.Remove(renderer, renderer.bounds);
+        rendererBounds.Remove(renderer);
+        rendererPositions.Remove(renderer);// [renderer] = renderer.bounds.center - renderer.bounds.extents;
+        rendererRoots.Remove(renderer.transform.root);
+        handlers.Remove(renderer.transform.root);
+        foreach (Collider collider in renderer.GetComponentsInChildren<Collider>()) {
+            colliderRenderers.Remove(collider);
+        }
     }
 }
 

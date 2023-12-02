@@ -9,7 +9,6 @@ public class ResourceEntry {
 }
 public class ResourceReferencePopulator : MonoBehaviour {
     public ResourceReference target;
-    // public List<ResourceEntry> entries;
     public List<UnityEngine.Object> keys;
     public List<string> values;
 }

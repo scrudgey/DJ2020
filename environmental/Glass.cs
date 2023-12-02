@@ -19,7 +19,6 @@ public class Glass : Destructible {
     }
     public DamageResult TakeBulletDamage(BulletDamage damage) {
         GameObject decalObject = PoolManager.I.CreateDecal(damage.hit, PoolManager.DecalType.glass);
-        decalObject.transform.SetParent(transform, true);
         decals.Add(decalObject);
 
         Toolbox.AudioSpeaker(damage.hit.point, hitSounds);

@@ -15,7 +15,6 @@ public class InputController : Singleton<InputController> {
     public Vector2 sensitivity = new Vector2(2f, 2f);
     public Vector2 smoothing = new Vector2(2f, 2f);
     [Header("Inputs")]
-    // public InputActionReference escapeAction;
     public InputActionReference MoveAction;
     public InputActionReference FireAction;
     public InputActionReference AimAction;
@@ -62,8 +61,6 @@ public class InputController : Singleton<InputController> {
     private int incrementOverlayThisFrame;
     private bool useItemThisFrame;
     private bool revealWeaponWheelHeld;
-    // private bool escapePressedThisFrame;
-    // private bool escapePressConsumed;
     Vector2 _smoothMouse;
     Vector2 previousMouseDelta;
     public void HandleMoveAction(InputAction.CallbackContext ctx) {
@@ -73,9 +70,6 @@ public class InputController : Singleton<InputController> {
         firePressedThisFrame = ctx.ReadValueAsButton();
         firePressedHeld = ctx.ReadValueAsButton();
     }
-    // public void HandleEscapeAction(InputAction.CallbackContext ctx) {
-    //     escapePressedThisFrame = ctx.ReadValueAsButton();
-    // }
     public void HandleAimAction(InputAction.CallbackContext ctx) {
         aimPressedThisFrame = ctx.ReadValueAsButton();
     }
@@ -186,8 +180,6 @@ public class InputController : Singleton<InputController> {
     }
 
     void RegisterCallbacks() {
-        // Escape
-        // escapeAction.action.performed += HandleEscapeAction;
         // Move
         MoveAction.action.performed += HandleMoveAction;
         // Fire
@@ -295,8 +287,6 @@ public class InputController : Singleton<InputController> {
         Vector2 viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
-        // if (!revealWeaponWheelHeld) {
-
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
 
         mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
@@ -304,10 +294,6 @@ public class InputController : Singleton<InputController> {
         // Interpolate mouse movement over time to apply smoothing delta.
         _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
         _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
-        // } else {
-        //     _smoothMouse = Vector2.zero;
-        //     mouseDelta = Vector2.zero;
-        // }
 
         CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
         PlayerInput characterInputs = PlayerInput.none;
@@ -317,6 +303,7 @@ public class InputController : Singleton<InputController> {
             incrementItemThisFrame = 0;
             useItemThisFrame = false;
             incrementOverlayThisFrame = 0;
+            revealWeaponWheelHeld = false;
         }
 
         characterInputs = new PlayerInput() {
@@ -346,7 +333,7 @@ public class InputController : Singleton<InputController> {
             zoomInput = zoomInput,
             mouseDown = mouseDown,
             mouseClicked = mouseClick,
-            escapePressed = escapePressedThisFrame, //&& !escapePressConsumed
+            escapePressed = escapePressedThisFrame,
             mousePosition = mousePosition,
             viewPortPoint = viewPortPoint,
             revealWeaponWheel = revealWeaponWheelHeld
@@ -371,7 +358,6 @@ public class InputController : Singleton<InputController> {
         rotateCameraRightPressedThisFrame = false;
         zoomInput = Vector2.zero;
         escapePressedThisFrame = false;
-        // escapePressConsumed = false;
         previousMouseDelta = mouseDelta;
         return characterInputs;
     }

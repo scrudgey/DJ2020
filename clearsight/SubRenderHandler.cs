@@ -59,12 +59,17 @@ public class SubRenderHandler {
     public void Fade() {
         if (renderer == null) return;
         if (data.dontHideInterloper) return;
-        renderer.material = interloperMaterial;
-        renderer.shadowCastingMode = initialShadowCastingMode;
+        if (data.partialTransparentIsInvisible) {
+            renderer.material = initialMaterial;
+            renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        } else {
+            renderer.material = interloperMaterial;
+            renderer.shadowCastingMode = initialShadowCastingMode;
+        }
     }
 
     public void HandleTimeTick(float alpha, bool parentHasCutaway) {
-        if (renderer == null) return;
+        if (renderer == null || data.partialTransparentIsInvisible) return;
         myAlpha = alpha;
         myAlpha = Math.Max(0.1f, myAlpha);
         if (!isCutaway && !parentHasCutaway) myAlpha = Mathf.Max(0.7f, myAlpha);
@@ -79,7 +84,7 @@ public class SubRenderHandler {
     }
     public void CompleteFadeOut(bool parentHasCutaway) {
         if (renderer == null) return;
-        if (!isCutaway && !parentHasCutaway && !data.transparentIsInvisible) {
+        if (!isCutaway && !parentHasCutaway && !data.totallTransparentIsInvisible) {
             myAlpha = 0.7f;
             propBlock.SetFloat("_TargetAlpha", myAlpha);
             renderer.SetPropertyBlock(propBlock);

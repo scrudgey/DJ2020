@@ -94,11 +94,13 @@ tune:
 * fade in quicker, fade out slowly
 * above is sticky
 * use alreadyhandled and currentbatch everywhere
+* buildings a problem again
 
 
 apply donthideinterloper to more objects
-buildings a problem again
 hvac still doesnt work with clearsight?
+figure out a solution for jackthatdata
+
 
 selectively clearsight based on shooting enemies as well / enemies
     how would this work?

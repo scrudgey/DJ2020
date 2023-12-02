@@ -111,31 +111,31 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             Resources.Load("data/loot/industrial/flask") as LootData,
         };
 
-        List<string> perks = new List<string>{
-            "p1_1",
-            "p1_2",
-            // "p1_3",
-            "sh1_1",
-            "sh1_2",
-            // "sh1_3",
-            "p2_1",
-            "p2_2",
-            // "p2_3",
-            "sh2_1",
-            "sh2_2",
-            // "sh2_3",
-            "rifle1_1",
-            "rifle1_2",
-            // "rifle1_3",
-            "smg1_1",
-            "smg1_2",
-            // "smg1_3",
-            "rifle2_1",
-            "stall",
-            "ease"
-            // "smg2"
-        };
-        // perks = new List<string>();
+        // List<string> perks = new List<string>{
+        //     "p1_1",
+        //     "p1_2",
+        //     // "p1_3",
+        //     "sh1_1",
+        //     "sh1_2",
+        //     // "sh1_3",
+        //     "p2_1",
+        //     "p2_2",
+        //     // "p2_3",
+        //     "sh2_1",
+        //     "sh2_2",
+        //     // "sh2_3",
+        //     "rifle1_1",
+        //     "rifle1_2",
+        //     // "rifle1_3",
+        //     "smg1_1",
+        //     "smg1_2",
+        //     // "smg1_3",
+        //     "rifle2_1",
+        //     "stall",
+        //     "ease"
+        //     // "smg2"
+        // };
+        List<string> perks = new List<string>();
 
         return new PlayerState() {
             legSkin = "Jack",
@@ -185,7 +185,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
             // activePerks = new List<string>(),
             activePerks = perks,
-            skillpoints = 20
+            skillpoints = 0
         };
     }
 

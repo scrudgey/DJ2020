@@ -277,7 +277,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     if (hit.collider.transform.IsChildOf(transform.root))
                         continue;
                     GameObject decalObject = PoolManager.I.CreateDecal(hit, PoolManager.DecalType.explosiveScar);
-                    decalObject.transform.SetParent(hit.collider.transform, true);
                 }
                 break;
             case CharacterState.climbing:

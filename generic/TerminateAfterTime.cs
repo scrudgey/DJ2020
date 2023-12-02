@@ -8,23 +8,30 @@ public class TerminateAfterTime : MonoBehaviour, IPoolable {
     void Update() {
         timer += Time.deltaTime;
         if (timer > lifetime) {
-            foreach (Collider collider in GetComponents<Collider>()) {
-                collider.enabled = false;
-            }
-            AudioSource audioSource = GetComponent<AudioSource>();
-            if (audioSource) {
-                audioSource.enabled = false;
-            }
-            Toolbox.DisableIfExists<PlaySound>(gameObject);
-            Toolbox.DisableIfExists<FlipScintillator>(gameObject);
-            Rigidbody rigidbody = GetComponent<Rigidbody>();
-            if (rigidbody != null) {
-                rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-                rigidbody.isKinematic = true;
-                // rigidbody.velocity = Vector3.zero;
-                // rigidbody.inertiaTensorRotation = Quaternion.identity;
-            }
-            this.enabled = false;
+            Terminate();
+        }
+    }
+
+    void Terminate() {
+        foreach (Collider collider in GetComponents<Collider>()) {
+            collider.enabled = false;
+        }
+        AudioSource audioSource = GetComponent<AudioSource>();
+        if (audioSource) {
+            audioSource.enabled = false;
+        }
+        Toolbox.DisableIfExists<PlaySound>(gameObject);
+        Toolbox.DisableIfExists<FlipScintillator>(gameObject);
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        if (rigidbody != null) {
+            rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            rigidbody.isKinematic = true;
+            // rigidbody.velocity = Vector3.zero;
+            // rigidbody.inertiaTensorRotation = Quaternion.identity;
+        }
+        this.enabled = false;
+        if (GameManager.I.clearSighterV3 != null) {
+            GameManager.I.clearSighterV3.AddStatic(transform);
         }
     }
 

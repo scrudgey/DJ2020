@@ -18,7 +18,7 @@ public class ObjectListJsonConverter<T> : JsonConverter<List<T>> where T : Unity
         foreach (JObject item in etiquetteJArray) {
             // if (item.HasValues(Constants.PATH))
             try {
-
+                // item.ContainsKey
                 string path = item.GetValue(Constants.PATH).ToString();
                 T result = Resources.Load<T>(path) as T;
                 etiquetteList.Add(result);
