@@ -3005,7 +3005,16 @@ x ladders
 * disable quick select in world
 * escape to hide cursor 
 * cursor is weird first time using quick select
-
+* shells / crater clearsight
+* some sort of error with highlights / aimindicatorhandler / uicontroller not unsubscribing properly or smth in world shop point mouseover
+* spotted highlight is rather unstable
+* npc dialogue is jumpy
+* update worker ai
+* prefabs
+* update civilian ai 
+* raise the speechtext?
+* update civilian ai to use async raycast
+* pool objects vs clearsighter
 
 
 places randomizer could break down:
@@ -3449,6 +3458,12 @@ door randomizer should specify key id ?
 jazz up elevator controller
     sound effects
     click effect
+armor
+    an armor rating that is % probability of deflecting a shot
+animate gun holster / unholster
+some suspicion records could be sticky when noticed
+    anything related to player behavior and appearance
+    a different kind of surveillance camera stickies suspicion records?
 
 
 
@@ -3475,6 +3490,7 @@ major initiatives:
     missions
         1 way shootout
         productionize office
+        redo apartment after office
     system:
         title
         controls, settings
@@ -3528,32 +3544,19 @@ polish:
     highlight NPCs that are shooting me
     stealing dat001 in tower didn't work
     guard stood facing wall in tower
-    spotted highlight is rather unstable
-    npc dialogue is jumpy
+
+    
 
 
-shells / crater clearsight
-    shells: dynamic sprite renderers with collider, rigidbody
-    crater: sprite renderer decal with no collider, ridigbody
-        this suggests we need a method to register an object with clearsighter.
-            register the shells when they stop moving, etc.
-        can do this via gamemanager.clearsighterv3
-    major issue: decals are added to object transforms which messes with clearsight logic.
-        workaround: don't parent the object. but this is not ideal, we prefer the decal to move with parent.
-        solution: bite the bullet and implement a method to add decal as subrenderer to correct handler.
-            this likely works just fine.
-            but what happens when we remove the decal?
-                recall to pool: now we need to deactivate this subrenderhandler in particular
-                simple: get the transform root, get the renderhandler, remove the subrenderhandler
-            behavior is different if we are parenting the object or not
 
-armor
-    an armor rating that is % probability of deflecting a shot
-animate gun holster / unholster
-some suspicion records could be sticky when noticed
-    a different kind of surveillance camera stickies suspicion records?
-ssome sort of error with highlights / aimindicatorhandler / uicontroller not unsubscribing properly or smth in world shop point mouseover
-    gamemanager level isvisible not working?
+invisible npc
+somehow, cyber data stores are problem again
 
-day 1: ~40k views, 2667 wishlists
-day 2: ~70k views, 780 wishlists
+to really properly handle clearsighter, we need to change things.
+    main clearsighter just collects up all handlers and sends them the commands.
+    it will send one transparent request per fram when handler is in view.
+    it will send one opaque request when handler leaves view.
+        handler does what it will with that information.
+        if it wants to ease states, subscribe to the time tick.
+    right now there is redundancy in Update and HandleTimeTick.
+    

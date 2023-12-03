@@ -10,8 +10,8 @@ public class SphereHoldAtGunpointState : SphereControlState {
     float integratedPlayerMovement;
     float totalPlayerMovement;
 
-    public SphereHoldAtGunpointState(SphereRobotAI ai) : base(ai) {
-        speechTextController = owner.GetComponentInChildren<SpeechTextController>();
+    public SphereHoldAtGunpointState(SphereRobotAI ai, SpeechTextController speechTextController) : base(ai) {
+        this.speechTextController = speechTextController;
     }
     public override void Enter() {
         base.Enter();

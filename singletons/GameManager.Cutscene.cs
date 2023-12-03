@@ -24,7 +24,7 @@ public partial class GameManager : Singleton<GameManager> {
         cutsceneIsRunning = false;
     }
 
-    public void StartSpottedCutscene(GameObject NPC) {
+    public void StartSpottedCutscene(SphereRobotAI NPC) {
         // foreach (SphereRobotAI ai in )
         if (GameObject.FindObjectsOfType<SphereRobotAI>().Any(ai => ai.stateMachine.currentState is SphereInvestigateState)) return;
         StartCutsceneCoroutine(SpottedCutscene(NPC));
@@ -35,17 +35,18 @@ public partial class GameManager : Singleton<GameManager> {
     public void ShowGrateKickCutscene(HVACElement element, CharacterController controller) {
         StartCutsceneCoroutine(KickOutHVACGrateCutscene(element, controller));
     }
-    public IEnumerator SpottedCutscene(GameObject NPC) {
+    public IEnumerator SpottedCutscene(SphereRobotAI NPC) {
         uiController?.HideUI();
         float timer = 0f;
-        SphereRobotSpeaker speaker = NPC.GetComponentInChildren<SphereRobotSpeaker>();
+        // SphereRobotSpeaker speaker = NPC.GetComponentInChildren<SphereRobotSpeaker>();
         float distanceBetweenPeople = (NPC.transform.position - playerObject.transform.position).magnitude;
 
         Vector3 positionBetweenPeople = playerObject.transform.position + ((NPC.transform.position - playerObject.transform.position).normalized * distanceBetweenPeople / 2f);
         positionBetweenPeople += new Vector3(0f, 1f, 0f);
 
-        if (speaker != null) {
-            speaker.DoInvestigateSpeak();
+        if (NPC.speechTextController != null) {
+            // speaker.DoInvestigateSpeak();
+            NPC.speechTextController.Say("<color=#ffa502>Hey! You there!</color>");
         }
 
         characterCamera.followingSharpnessDefault = 1f;
@@ -81,7 +82,7 @@ public partial class GameManager : Singleton<GameManager> {
             yield return null;
         }
 
-        speaker.speechTextController.HideText();
+        NPC.speechTextController?.HideText();
         Time.timeScale = 1f;
         characterCamera.followingSharpnessDefault = 5f;
         uiController?.ShowUI();

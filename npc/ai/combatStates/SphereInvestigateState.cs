@@ -20,10 +20,10 @@ public class SphereInvestigateState : SphereControlState {
     float totalPlayerMovement;
     float saidHeyTimeout;
     CharacterController characterController;
-    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight, CharacterController characterController) : base(ai) {
+    public SphereInvestigateState(SphereRobotAI ai, SpottedHighlight highlight, CharacterController characterController, SpeechTextController speechTextController) : base(ai) {
         this.highlight = highlight;
         this.characterController = characterController;
-        speechTextController = owner.GetComponentInChildren<SpeechTextController>();
+        this.speechTextController = speechTextController;
         report = new HQReport {
             reporter = owner.gameObject,
             desiredAlarmState = HQReport.AlarmChange.raiseAlarm,

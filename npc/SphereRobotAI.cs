@@ -23,7 +23,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public GunHandler gunHandler;
     public AlertHandler alertHandler;
     public SphereRobotBrain stateMachine;
+
     public SpeechTextController speechTextController;
+    public SpottedHighlight highlight;
+
     float perceptionCountdown;
     public SphereCollider patrolZone;
     readonly float PERCEPTION_INTERVAL = 0.025f;
@@ -46,7 +49,6 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     Damage lastDamage;
     // public bool overrideDefaultState;
     private float footstepImpulse;
-    public SpottedHighlight highlight;
     public SpeechEtiquette[] etiquettes;
     public Sprite portrait;
     bool awareOfCorpse;
@@ -72,6 +74,18 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         if (characterHurtable != null) {
             characterHurtable.OnHitStateChanged += ((IHitstateSubscriber)this).HandleHurtableChanged;
             characterHurtable.OnHitStateChanged += HandleHitStateChange;
+        }
+        if (speechTextController == null) {
+            GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/speechOverlay")) as GameObject;
+            SpeechTextController controller = obj.GetComponent<SpeechTextController>();
+            this.speechTextController = controller;
+            controller.followTransform = transform;
+        }
+        if (highlight == null) {
+            GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/spottedHighlight")) as GameObject;
+            SpottedHighlight spottedHighlight = obj.GetComponent<SpottedHighlight>();
+            this.highlight = spottedHighlight;
+            highlight.followTransform = transform;
         }
     }
     void Start() {
@@ -157,8 +171,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             case SphereHoldAtGunpointState:
                 SphereHoldAtGunpointState holdAtGunpointState = (SphereHoldAtGunpointState)routine;
                 if (holdAtGunpointState.isPlayerSuspicious()) {
-                    ChangeState(new SphereAttackState(this, gunHandler, characterController));
-                } else ChangeState(new SphereInvestigateState(this, highlight, characterController));
+                    ChangeState(new SphereAttackState(this, gunHandler, characterController, speechTextController));
+                } else ChangeState(new SphereInvestigateState(this, highlight, characterController, speechTextController));
                 break;
             case SphereInvestigateState:
                 timeSinceInterrogatedStranger = 120f;
@@ -166,16 +180,16 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                 SphereInvestigateState investigateState = (SphereInvestigateState)routine;
                 if (investigateState.dialogueResult == NeoDialogueMenu.DialogueResult.fail) {
                     // TODO: why fails?
-                    ChangeState(new SphereHoldAtGunpointState(this));
+                    ChangeState(new SphereHoldAtGunpointState(this, speechTextController));
                 } else if (investigateState.dialogueResult == NeoDialogueMenu.DialogueResult.stun) {
                     alertHandler.ShowWarn();
                     ChangeState(new StunState(this));
                 } else if (investigateState.isPlayerAggressive()) {
                     alertHandler.ShowWarn();
-                    ChangeState(new SphereHoldAtGunpointState(this));
+                    ChangeState(new SphereHoldAtGunpointState(this, speechTextController));
                 } else if (investigateState.isPlayerSuspicious()) {
                     alertHandler.ShowWarn();
-                    ChangeState(new SphereHoldAtGunpointState(this));
+                    ChangeState(new SphereHoldAtGunpointState(this, speechTextController));
                 } else goto default;
                 break;
             case PauseState:
@@ -449,7 +463,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case SphereInvestigateState:
                     case SphereClearPointsState:
                         alertHandler.ShowAlert();
-                        ChangeState(new SphereAttackState(this, gunHandler, characterController));
+                        ChangeState(new SphereAttackState(this, gunHandler, characterController, speechTextController));
                         break;
                 }
             } else if (reaction == Reaction.investigate) {
@@ -464,8 +478,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
                         if (timeSinceInterrogatedStranger <= 0) {
                             alertHandler.ShowWarn();
-                            GameManager.I.StartSpottedCutscene(gameObject);
-                            ChangeState(new PauseState(this, new SphereInvestigateState(this, highlight, characterController), 1f));
+                            GameManager.I.StartSpottedCutscene(this);
+                            ChangeState(new PauseState(this, new SphereInvestigateState(this, highlight, characterController, speechTextController), 1f));
                         }
                         break;
                 }
@@ -730,6 +744,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         lastSuspicionLevel = Suspiciousness.normal;
         alertHandler.enabled = true;
         speechTextController.enabled = true;
+        highlight.navMeshPath = null;
         stateMachine = new SphereRobotBrain();
         EnterDefaultState();
         characterHurtable.OnHitStateChanged -= ((IHitstateSubscriber)this).HandleHurtableChanged;

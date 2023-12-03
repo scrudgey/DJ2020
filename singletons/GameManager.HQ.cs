@@ -171,7 +171,7 @@ public partial class GameManager : Singleton<GameManager> {
             DeactivateAlarm();
         } else {
             SphereRobotAI ai = Toolbox.RandomFromList(ais);
-            SpeechTextController speechTextController = ai.GetComponentInChildren<SpeechTextController>();
+            SpeechTextController speechTextController = ai.speechTextController;
             ai.ChangeState(new DisableAlarmState(ai, speechTextController));
         }
     }

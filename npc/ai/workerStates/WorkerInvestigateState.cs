@@ -22,9 +22,9 @@ public class WorkerInvestigateState : WorkerNPCControlState {
     float saidHeyTimeout;
     CharacterController characterController;
     public bool gaveUp;
-    public WorkerInvestigateState(WorkerNPCAI ai, CharacterController characterController) : base(ai) {
+    public WorkerInvestigateState(WorkerNPCAI ai, CharacterController characterController, SpeechTextController speechTextController) : base(ai) {
         this.characterController = characterController;
-        speechTextController = owner.GetComponentInChildren<SpeechTextController>();
+        this.speechTextController = speechTextController;
 
     }
     public override void Enter() {

@@ -4,7 +4,8 @@ using UnityEngine.AI;
 public class SphereAttackState : SphereControlState {
     static readonly public string LAST_SEEN_PLAYER_POSITION_KEY = "lastSeenPlayerPosition";
     private TaskNode rootTaskNode;
-    public SphereRobotSpeaker speaker;
+    // public SphereRobotSpeaker speaker;
+    SpeechTextController speechTextController;
     readonly float ATTACK_TIMEOUT = 3f;
     readonly float ROUTINE_TIMEOUT = 10f;
     readonly float MAX_SHOOT_RANGE = 20f;
@@ -13,12 +14,13 @@ public class SphereAttackState : SphereControlState {
     public GunHandler gunHandler;
     Vector3 lastSeenPlayerPosition;
     CharacterController characterController;
-    public SphereAttackState(SphereRobotAI ai, GunHandler gunHandler, CharacterController characterController) : base(ai) {
+    public SphereAttackState(SphereRobotAI ai, GunHandler gunHandler, CharacterController characterController, SpeechTextController speechTextController) : base(ai) {
         this.gunHandler = gunHandler;
         this.characterController = characterController;
-        speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
-        if (speaker != null) {
-            speaker.DoAttackSpeak();
+        // speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
+        this.speechTextController = speechTextController;
+        if (speechTextController != null) {
+            speechTextController.Say("Enemy sighted");
         }
     }
     public override void Enter() {

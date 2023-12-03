@@ -46,6 +46,13 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         motor = GetComponent<KinematicCharacterMotor>();
         motor.SimulatedCharacterMass = UnityEngine.Random.Range(25f, 2500f);
 
+        if (speechTextController == null) {
+            GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/speechOverlay")) as GameObject;
+            SpeechTextController controller = obj.GetComponent<SpeechTextController>();
+            this.speechTextController = controller;
+            controller.followTransform = transform;
+        }
+
         Bind(sightCone.gameObject);
     }
 
@@ -73,6 +80,16 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         }
     }
 
+    public void OnPoolDectivate() {
+        lastSeenPlayerPosition = null;
+        lastHeardDisturbancePosition = null;
+        lastHeardPlayerPosition = null;
+        lastSuspicionLevel = Suspiciousness.normal;
+        alertHandler.enabled = true;
+        speechTextController.enabled = true;
+        stateMachine = new CivilianNPCBrain();
+        EnterDefaultState();
+    }
     public void Initialize() {
         EnterDefaultState();
     }
@@ -211,18 +228,23 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
         }
     }
 
-    // TODO: fix this
     void SightCheckPlayer() {
         Collider player = GameManager.I.playerCollider;
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
-            if (Toolbox.ClearLineOfSight(target.transform.position, player))
-                Perceive(player, byPassVisibilityCheck: true);
+            // if (Toolbox.ClearLineOfSight(target.transform.position, player))
+            //     Perceive(player, byPassVisibilityCheck: true);
+            Toolbox.AsyncClearLineOfSight(target.transform.position, player, (RaycastHit hit) => {
+                if (hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
+            });
         }
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
-            if (Toolbox.ClearLineOfSight(target.transform.position, t.newestAddition))
-                Perceive(t.newestAddition);
+            // if (Toolbox.ClearLineOfSight(target.transform.position, t.newestAddition))
+            //     Perceive(t.newestAddition);
+            Toolbox.AsyncClearLineOfSight(target.transform.position, t.newestAddition, (RaycastHit hit) => {
+                if (hit.collider == t.newestAddition) Perceive(t.newestAddition);
+            });
         }
     }
 

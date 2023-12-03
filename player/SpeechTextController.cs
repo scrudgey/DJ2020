@@ -7,7 +7,6 @@ using UnityEngine;
 public class SpeechTextController : MonoBehaviour {
     public bool scaleWithPlayerDistance;
     public TextMeshProUGUI textMesh;
-    // public RectTransform textRect;
     public List<RectTransform> childRects;
     public RectTransform canvasRect;
     public Transform followTransform;
@@ -15,6 +14,7 @@ public class SpeechTextController : MonoBehaviour {
     float visibilityTimer;
     float haltSpeechTimeout;
     readonly static float FALLOFF_DISTANCE = 10f;
+    Vector3 offset = new Vector3(0f, 2f, 0f);
     void Start() {
         cam = Camera.main;
         HideText();
@@ -24,15 +24,15 @@ public class SpeechTextController : MonoBehaviour {
     void OnDisable() {
         HideText();
     }
-    void Update() {
+    void FixedUpdate() {
         if (haltSpeechTimeout > 0) {
-            haltSpeechTimeout -= Time.deltaTime;
+            haltSpeechTimeout -= Time.fixedDeltaTime;
             HideText();
             return;
         }
         if (visibilityTimer > 0) {
             SetRectPositions();
-            visibilityTimer -= Time.deltaTime;
+            visibilityTimer -= Time.fixedDeltaTime;
             if (visibilityTimer <= 0) {
                 HideText();
             }
@@ -57,7 +57,7 @@ public class SpeechTextController : MonoBehaviour {
         ShowText();
     }
     void SetRectPositions() {
-        childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position));
+        childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position + offset));
     }
 
     void ShowText() {

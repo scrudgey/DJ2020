@@ -9,11 +9,12 @@ public class SpottedHighlight : MonoBehaviour {
     public NavMeshPath navMeshPath;
     public LineRenderer lineRenderer;
     public Material lineMaterial;
+    public Transform followTransform;
     public Transform targetIndicatorTransform;
     public SpriteRenderer targetIndicator;
     public Color red;
     float timer;
-    public void Update() {
+    public void FixedUpdate() {
         lineRenderer.enabled = target != null;
         targetIndicator.enabled = target != null;
         if (target == null)
@@ -45,8 +46,7 @@ public class SpottedHighlight : MonoBehaviour {
         } else {
             lineRenderer.useWorldSpace = true;
             List<Vector3> points = navMeshPath.corners.Select(point => point + new Vector3(0f, 0.1f, 0f)).ToList();
-            // points.Add(target.position);
-            points[0] = transform.position;
+            points[0] = followTransform.position;
             lineRenderer.positionCount = points.Count;
             lineRenderer.SetPositions(points.ToArray());
         }
