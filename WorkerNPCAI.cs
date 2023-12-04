@@ -63,6 +63,18 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         motor = GetComponent<KinematicCharacterMotor>();
         motor.SimulatedCharacterMass = UnityEngine.Random.Range(25f, 2500f);
 
+        if (speechTextController == null) {
+            GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/speechOverlay")) as GameObject;
+            SpeechTextController controller = obj.GetComponent<SpeechTextController>();
+            this.speechTextController = controller;
+            controller.followTransform = transform;
+        }
+        // if (highlight == null) {
+        //     GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/spottedHighlight")) as GameObject;
+        //     SpottedHighlight spottedHighlight = obj.GetComponent<SpottedHighlight>();
+        //     this.highlight = spottedHighlight;
+        // }
+
         Bind(sightCone.gameObject);
     }
     public void SetCurrentLandmark(WorkerLandmark landmark) {
@@ -91,6 +103,19 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public void OnPoolActivate() {
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
+    }
+    public void OnPoolDectivate() {
+        perceptionCountdown = 0f;
+        lastSeenPlayerPosition = null;
+        lastHeardDisturbancePosition = null;
+        lastHeardPlayerPosition = null;
+
+        lastSuspicionLevel = Suspiciousness.normal;
+        alertHandler.enabled = true;
+        speechTextController.enabled = true;
+        stateMachine = new WorkerNPCBrain();
+
+        EnterDefaultState();
     }
     void Update() {
         PlayerInput input = stateMachine.Update();
@@ -407,7 +432,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                     case WorkerLoiterState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
                         if (timeSinceInterrogatedStranger <= 0) {
-                            ChangeState(new WorkerInvestigateState(this, characterController));
+                            ChangeState(new WorkerInvestigateState(this, characterController, speechTextController));
                         }
                         break;
                 }

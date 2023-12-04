@@ -9,26 +9,36 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public class ClearsightRendererHandler {
-    public enum State { none, opaque, interloper, above, forceOpaque }
-    Dictionary<Renderer, SubRenderHandler> handlers;
+    public enum CullingState { normal, interloper, above }
+    public enum RendererState { opaque, transparent, invisible }
     public Bounds bounds;
+    public string name;
     NeoClearsighterV3 clearsighter;
-    public Transform myTransform;
+
+    CullingState state;
+    RendererState currentRendererState;
+    RendererState desiredRendererState;
+
+    Dictionary<Renderer, SubRenderHandler> handlers;
+
     Vector3 adjustedPosition;
-    int frames;
+    int stayTransparentFrames;
     int transparentRequests;
     bool isDynamic;
-
     float alpha;
-    bool fadeInAlpha;
-
     bool hasCutaway;
+
+    bool isSubscribedToTimeUpdate;
 
 
     public ClearsightRendererHandler(NeoClearsighterV3 clearsighter, Transform root, Vector3 position, bool isDynamic = false) {
+        name = root.name;
+        // if (name.Contains("datastore")) {
+        //     Debug.Log($"datastore clearsighter created: {root}");
+        // }
+
         Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
         this.isDynamic = isDynamic;
-        this.myTransform = root;
         this.clearsighter = clearsighter;
         alpha = 1;
 
@@ -36,6 +46,9 @@ public class ClearsightRendererHandler {
 
         this.handlers = new Dictionary<Renderer, SubRenderHandler>();
         foreach (Renderer renderer in renderers) {
+            if (renderer is ParticleSystemRenderer) continue;
+            if (renderer is TrailRenderer) continue;
+            if (renderer.name == "cutaway") continue;
             AddSubRenderHandler(renderer);
             tmpBounds.Encapsulate(renderer.bounds);
         }
@@ -48,18 +61,11 @@ public class ClearsightRendererHandler {
             this.adjustedPosition = tmpBounds.center;
             this.adjustedPosition.y -= tmpBounds.extents.y;
         }
-        if (myTransform.gameObject.name.Contains("bullet")) {
-            Debug.Log($"bullet render handler adjusted position: {this.adjustedPosition} = {tmpBounds.center} - {tmpBounds.extents.y}");
-        }
     }
 
     public void AddSubRenderHandler(Renderer renderer) {
-        if (renderer is ParticleSystemRenderer) return;
-        if (renderer is TrailRenderer) return;
-        if (renderer.name == "cutaway") return;
 
         SubRenderHandler handler = new SubRenderHandler(renderer);
-        // handlers.Add(handler);
         handlers[renderer] = handler;
         hasCutaway |= handler.isCutaway;
     }
@@ -67,140 +73,201 @@ public class ClearsightRendererHandler {
         handlers.Remove(renderer);
     }
 
-    State state;
-    public void ChangeState(State toState) {
+    public void ChangeState(CullingState toState) {
+        if (name.Contains("datastore")) {
+            Debug.Log($"clearsighter {name}: changestate {state} -> {toState}");
+        }
         switch (toState) {
-            case State.forceOpaque:
-                if (state == toState) return;
-                frames = 0;
-                transparentRequests = 0;
-                foreach (SubRenderHandler handler in handlers.Values) {
-                    handler.CompleteFadeIn();
+            case CullingState.normal:
+                if (desiredRendererState != RendererState.opaque) {
+                    FadeIn();
                 }
-                fadeInAlpha = false;
-                break;
-            case State.opaque:
-                if (state == toState) return;
-                frames = 0;
                 transparentRequests = 0;
-                FadeIn();
+                desiredRendererState = RendererState.opaque;
                 break;
-            case State.interloper:
-                frames = 3;
-                transparentRequests += 2;
-                if (transparentRequests >= 3) {
+            case CullingState.interloper:
+                transparentRequests += 1;
+                if ((transparentRequests >= 3 || stayTransparentFrames > 0)
+                    && desiredRendererState != RendererState.transparent
+                    && currentRendererState != RendererState.transparent) {
+                    stayTransparentFrames = 3;
+                    FadeOut();
+                    desiredRendererState = RendererState.transparent;
+                }
+
+                // how to handle easing between states?
+                // we tally transparent requests- if we just went transparent we don't go back to opaque right away
+                // we also need to integrate a few transparent requests before we start fading.
+
+                // since we need to change the requests and stayframes per frame, we need to subscribe to time updates.
+                // just make sure we unsubscribe correctly!
+                // what is the condition there?
+                // it would mean currentRendererState == desiredRendererState and also the integrations are 0.
+
+                // allow us to change desired state and subscribe- easy.
+                // allow frames / requests to determine when we start to fade.
+                //  put all that logic in time update
+                // 
+                // overall this means we need more state.
+                // it means we can have a desired renderer state that is different from the current renderer state
+                //  but not updating alpha yet.
+
+                // the main problem with ubsubscribe when current == desired and frames are 0:
+                // we will continue to request transparent constantly as object is in view.
+                // therefore frames will never be 0 and we will never unsubscribe.
+
+                // desired behavior:
+                // state: normal    render: opaque
+                // transparent request issued : do nothing
+                // transparent request issued : do nothing
+                // transparent request issued : do nothing
+                // transparent request issued : desired state: transparent, subscrube
+                // update: alpha
+                // update: alpha
+                // update: alpha
+                // update: alpha
+                // current state == transparent, ubsubscribe
+
+
+                break;
+            case CullingState.above:
+                if (desiredRendererState != RendererState.invisible) {
                     FadeOut();
                 }
-                break;
-            case State.above:
-                if (state == toState) return;
-                frames = 0;
+                desiredRendererState = RendererState.invisible;
                 transparentRequests = 0;
-                MakeInvisible();
                 break;
+        }
+        if (currentRendererState != desiredRendererState) {
+            // switch (desiredRendererState) {
+            //     case RendererState.opaque:
+            //         break;
+            //     case RendererState.invisible:
+            //         break;
+            //     case RendererState.transparent:
+            //         FadeOut();
+            //         break;
+            // }
+            SubscribeToTimeUpdate();
         }
         state = toState;
     }
+
+    void SubscribeToTimeUpdate() {
+        if (!isSubscribedToTimeUpdate) {
+            isSubscribedToTimeUpdate = true;
+            clearsighter.OnTime += HandleTimeTick;
+        }
+    }
+
     void MakeInvisible() {
         foreach (SubRenderHandler handler in handlers.Values) {
             handler.TotallyInvisible();
         }
-        clearsighter.OnTime -= HandleTimeTick;
-        alpha = 0;
     }
     void FadeOut() {
-        if (fadeInAlpha) return;
         foreach (SubRenderHandler handler in handlers.Values) {
-            handler.FadeTransparent();
+            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
+                handler.FadeTransparent();
         }
-        fadeInAlpha = true;
-        clearsighter.OnTime += HandleTimeTick;
     }
     void FadeIn() {
-        // if (!fadeInAlpha) return;
         foreach (SubRenderHandler handler in handlers.Values) {
             handler.FadeOpaque();
         }
-        fadeInAlpha = false;
-        clearsighter.OnTime += HandleTimeTick;
     }
-
-
-    public bool IsAbove(Vector3 playerPosition, bool debug = false) {
-        if (debug) {
-            Debug.Log($"checking above: {adjustedPosition} > {playerPosition}");
-        }
+    public bool IsAbove(Vector3 playerPosition) {
         return adjustedPosition.y > playerPosition.y;
     }
 
-    public bool Update(Vector3 playerPosition) {
-        // Update is called on handlers that were part of a previous batch not touched this frame.
-        if (isDynamic) {
-            adjustedPosition = bounds.center;
-            adjustedPosition.y -= bounds.extents.y;
-        }
-        // we disable geometry above if the floor of the renderer bounds is above the lifted origin point
-        // which is player position + 1.5
-        if (state == State.above && !IsAbove(playerPosition)) {
-            ChangeState(State.opaque);
-            return true;
-        }
-
+    void HandleTimeTick(float deltaTime) {
         if (transparentRequests > 7) {
             transparentRequests = 7;
         }
         if (transparentRequests > 0) {
             transparentRequests--;
         }
-
-        if (frames > 0) {
-            frames--;
-        } else if (frames < 0) {
-            frames = 0;
+        if (stayTransparentFrames > 0) {
+            stayTransparentFrames--;
+        } else if (stayTransparentFrames < 0) {
+            stayTransparentFrames = 0;
         }
 
-        if (state == State.interloper) {
-            if (frames <= 0 && transparentRequests < 5) {
-                ChangeState(State.opaque);
-                return true;
+        if (desiredRendererState == RendererState.opaque && stayTransparentFrames > 0) {
+            return;
+        }
+
+        if (currentRendererState != desiredRendererState) {
+            // we are in transition
+
+            // update alpha
+            switch (desiredRendererState) {
+                case RendererState.opaque:
+                    alpha += deltaTime * 4;
+                    break;
+                case RendererState.invisible:
+                case RendererState.transparent:
+                    alpha -= deltaTime * 2;
+                    break;
             }
+            if (alpha > 1) alpha = 1;
+            if (alpha < 0) alpha = 0;
 
-        } else if (state == State.opaque || state == State.forceOpaque) {
-            return true;
-        }
-        return false;
-    }
-
-    void HandleTimeTick(float deltaTime) {
-        if (fadeInAlpha) {
-            alpha -= deltaTime * 2;
-        } else {
-            alpha += deltaTime * 4;
-        }
-        if (alpha > 1) alpha = 1;
-        if (alpha < 0) alpha = 0;
-
-        foreach (SubRenderHandler handler in handlers.Values) {
-            if (!handler.data.dontHideInterloper)
+            // apply alpha to all sub renderers
+            foreach (SubRenderHandler handler in handlers.Values) {
                 handler.HandleTimeTick(alpha, hasCutaway);
-        }
-        if (fadeInAlpha && alpha <= 0) {
-            clearsighter.OnTime -= HandleTimeTick;
-            foreach (SubRenderHandler handler in handlers.Values) {
-                if (!handler.data.dontHideInterloper)
-                    handler.CompleteFadeOut(hasCutaway);
             }
-        }
-        if (!fadeInAlpha && alpha >= 1) {
-            clearsighter.OnTime -= HandleTimeTick;
-            foreach (SubRenderHandler handler in handlers.Values) {
-                handler.CompleteFadeIn();
+
+            // conclude transition conditionally
+            switch (desiredRendererState) {
+                case RendererState.transparent:
+                    if (alpha <= 0.1) {
+                        foreach (SubRenderHandler handler in handlers.Values) {
+                            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
+                                handler.CompleteFadeOut(hasCutaway);
+                        }
+                        currentRendererState = RendererState.transparent;
+                    }
+                    break;
+                case RendererState.opaque:
+                    if (alpha >= 1) {
+                        foreach (SubRenderHandler handler in handlers.Values) {
+                            handler.CompleteFadeIn();
+                        }
+                        currentRendererState = RendererState.opaque;
+                    }
+                    break;
+                case RendererState.invisible:
+                    if (alpha <= 0) {
+                        MakeInvisible();
+                        foreach (SubRenderHandler handler in handlers.Values) {
+                            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
+                                handler.CompleteFadeOut(hasCutaway);
+                        }
+                        currentRendererState = RendererState.invisible;
+                    }
+                    break;
             }
+        } else if (currentRendererState == desiredRendererState) {
+            isSubscribedToTimeUpdate = false;
+            clearsighter.OnTime -= HandleTimeTick;
         }
     }
-
 
     public bool IsVisible() {
-        return state == State.opaque || state == State.none || state == State.forceOpaque;
+        return currentRendererState == RendererState.opaque;
     }
 }
+
+
+
+
+
+// if (state == CullingState.interloper) {
+//     if (stayTransparentFrames <= 0 && transparentRequests < 5) {
+//         ChangeState(CullingState.opaque);
+//         return true;
+//     }
+// } else if (state == CullingState.opaque || state == CullingState.forceOpaque) {
+//     return true;
+// }

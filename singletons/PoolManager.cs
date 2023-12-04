@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 public class PrefabPool {
+    public bool applyStaticClearsight;
     protected GameObject prefab;
     private int maxConcurrentObjects = 100;
     public Queue<GameObject> objectsInPool;
@@ -57,7 +58,7 @@ public class PrefabPool {
 
         // TODO: untested
         // TODO: only when flag is set
-        if (GameManager.I.clearSighterV3 != null) {
+        if (applyStaticClearsight && GameManager.I.clearSighterV3 != null) {
             GameManager.I.clearSighterV3.RemoveStatic(obj.transform.root);
         }
     }
@@ -98,7 +99,8 @@ public class PrefabPool {
 
 public class PoolManager : Singleton<PoolManager> {
     private Dictionary<string, PrefabPool> prefabPools = new Dictionary<string, PrefabPool>();
-
+    // GameObject bulletHolePrefab = Resources.Load("prefabs/fx/bullethole") as GameObject;
+    GameObject bulletHolePrefab;
     public enum DecalType { normal, glass, blood, explosiveScar }
     public static readonly Dictionary<DecalType, string> decalPaths = new Dictionary<DecalType, string>{
         {DecalType.normal, "sprites/particles/bulletholes_normal"},
@@ -157,7 +159,11 @@ public class PoolManager : Singleton<PoolManager> {
         }
     }
     public GameObject CreateDecal(RaycastHit hit, DecalType type) {
-        PrefabPool pool = GetPool("prefabs/fx/bullethole"); // TODO: fix?
+        if (bulletHolePrefab == null) {
+            bulletHolePrefab = Resources.Load("prefabs/fx/bullethole") as GameObject;
+        }
+        PrefabPool pool = GetPool(bulletHolePrefab); // TODO: fix?
+        pool.applyStaticClearsight = true;
         GameObject decal = pool.GetObject(hit.point + (hit.normal * 0.025f));
         if (decal != null) {
             RandomizeSprite decalRandomizer = decal.GetComponent<RandomizeSprite>();

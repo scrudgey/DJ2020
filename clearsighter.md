@@ -100,6 +100,7 @@ tune:
 apply donthideinterloper to more objects
 hvac still doesnt work with clearsight?
 figure out a solution for jackthatdata
+zwrite off when transparent?
 
 
 selectively clearsight based on shooting enemies as well / enemies

@@ -3016,6 +3016,9 @@ x ladders
 * update civilian ai to use async raycast
 * pool objects vs clearsighter
 
+* invisible npc
+* somehow, cyber data stores are problem again
+
 
 places randomizer could break down:
     we have the wrong objective on it
@@ -3481,6 +3484,7 @@ gameplay questions:
     backpack and duffel bag
 
 major initiatives:
+    data and hacking
     cyberware
     destructible walls
     vehicles
@@ -3500,6 +3504,8 @@ major initiatives:
             character stats, skills
 shops:
     more fences
+    hacker
+        software, hardware
     sell guns
     mystery man in bar
 
@@ -3535,28 +3541,17 @@ more equipment to bring on mission?
     ninja vanish
 
 polish:
-    reduce frequency of "enemy sighted"
-    tune sensitivity / eliminate "guess it was nothing"
-    better AI navigation / building search
-        when reverting to patrol, we can do better
-        multiple guards chose the same clearpoint to navigate to- more global coordination
     better investigative ability when player does something weird like superjump / land
     highlight NPCs that are shooting me
     stealing dat001 in tower didn't work
     guard stood facing wall in tower
+    main issue with clearsighter right now is sometimes things stay transparent.
+    raise the wallpress camera- too low.
 
-    
 
 
-
-invisible npc
-somehow, cyber data stores are problem again
-
-to really properly handle clearsighter, we need to change things.
-    main clearsighter just collects up all handlers and sends them the commands.
-    it will send one transparent request per fram when handler is in view.
-    it will send one opaque request when handler leaves view.
-        handler does what it will with that information.
-        if it wants to ease states, subscribe to the time tick.
-    right now there is redundancy in Update and HandleTimeTick.
-    
+reduce frequency of "enemy sighted"
+tune sensitivity / eliminate "guess it was nothing"
+better AI navigation / building search
+    when reverting to patrol, we can do better
+    multiple guards chose the same clearpoint to navigate to- more global coordination
