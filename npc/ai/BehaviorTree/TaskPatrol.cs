@@ -19,23 +19,24 @@ namespace AI {
         HashSet<int> keyIds;
         bool reverse;
         CharacterController characterController;
+        SpherePatrolState spherePatrolState;
         public TaskPatrol(Transform transform,
-                            PatrolRoute patrolRoute,
-                            PatrolType patrolType,
-                            HashSet<int> keyIds,
-                            CharacterController characterController) : base() {
+                          PatrolRoute patrolRoute,
+                          PatrolType patrolType,
+                          HashSet<int> keyIds,
+                          CharacterController characterController,
+                          SpherePatrolState spherePatrolState) : base() {
             this.patrolRoute = patrolRoute;
             this.transform = transform;
             this.keyIds = keyIds;
             this.type = patrolType;
             this.characterController = characterController;
+            this.spherePatrolState = spherePatrolState;
             setupRootNode();
         }
         public override TaskState DoEvaluate(ref PlayerInput input) {
             TaskState result = rootNode.DoEvaluate(ref input);
             if (result == TaskState.success && navPoints.Count == 0) {
-                // if (patrolRoute.type == PatrolRoute.PatrolRouteType.pingPong)
-                //     reverse = !reverse;
                 setupRootNode();
             }
             return result;
@@ -57,7 +58,10 @@ namespace AI {
                 .First();
 
             while (navPoints.Peek() != closestPoint && navPoints.Count > 0) {
-                Vector3 position = navPoints.Pop();
+                spherePatrolState.lastVisistedPatrolPoint = navPoints.Pop();
+            }
+            if (navPoints.Peek() == spherePatrolState.lastVisistedPatrolPoint && navPoints.Count > 0) {
+                navPoints.Pop();
             }
 
             TaskMoveToKey taskMoveToKey = type switch {
@@ -73,7 +77,7 @@ namespace AI {
 
             this.rootNode = new TaskUntilFailRepeater(new Sequence(
                 new TaskConditional(() => isDoneWaiting()),
-                new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY),
+                new TaskPopFromStack<Vector3>(navPoints, NAV_POINT_KEY, (Vector3 position) => spherePatrolState.lastVisistedPatrolPoint = position),
                 taskMoveToKey
             ));
             this.rootNode.SetData(NAV_POINT_KEY, navPoints.Peek());

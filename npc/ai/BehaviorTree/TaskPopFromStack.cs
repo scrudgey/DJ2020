@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
 using UnityEngine;
 using UnityEngine.AI;
-
 
 namespace AI {
 
@@ -11,6 +11,12 @@ namespace AI {
         Stack<T> stack;
         string valueKey;
         bool emptyStack;
+        Action<T> onPop;
+        public TaskPopFromStack(Stack<T> stack, string valueKey, Action<T> onPop) : base() {
+            this.onPop = onPop;
+            this.stack = stack;
+            this.valueKey = valueKey;
+        }
         public TaskPopFromStack(Stack<T> stack, string valueKey) : base() {
             this.stack = stack;
             this.valueKey = valueKey;
@@ -30,6 +36,7 @@ namespace AI {
         }
         void DoPopFromStack() {
             if (stack.Count > 0) {
+                onPop?.Invoke(stack.Peek());
                 T t = stack.Pop();
                 parent.SetData(valueKey, t);
                 emptyStack = false;

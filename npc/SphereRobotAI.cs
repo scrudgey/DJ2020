@@ -664,31 +664,34 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
 
         Suspiciousness playerSuspicion = GameManager.I.GetTotalSuspicion();
 
-        if (GameManager.I.gameData.levelState.template.sensitivityLevel <= SensitivityLevel.semiprivateProperty) {
-            if (reachedFootstepThreshold && recentlyInCombat && notBoredOfFootsteps) {
-                switch (stateMachine.currentState) {
-                    case SphereMoveState:
-                    case SpherePatrolState:
-                    case FollowTheLeaderState:
-                    case SphereClearPointsState:
-                        // timeSinceInvestigatedFootsteps = 10f;
-                        alertHandler.ShowWarn();
-                        ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
-                        break;
-                }
+        if (GameManager.I.gameData.levelState.template.sensitivityLevel <= SensitivityLevel.semiprivateProperty &&
+            reachedFootstepThreshold &&
+            recentlyInCombat &&
+            notBoredOfFootsteps) {
+            switch (stateMachine.currentState) {
+                case SphereMoveState:
+                case SpherePatrolState:
+                case FollowTheLeaderState:
+                case SphereClearPointsState:
+                    // timeSinceInvestigatedFootsteps = 10f;
+                    alertHandler.ShowWarn();
+                    ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
+                    break;
             }
-        } else if (GameManager.I.gameData.levelState.template.sensitivityLevel >= SensitivityLevel.privateProperty && playerSuspicion >= Suspiciousness.suspicious) {
-            if (reachedFootstepThreshold && notBoredOfFootsteps)
-                switch (stateMachine.currentState) {
-                    case SphereMoveState:
-                    case SpherePatrolState:
-                    case FollowTheLeaderState:
-                    case SphereClearPointsState:
-                        // timeSinceInvestigatedFootsteps = 10f;
-                        alertHandler.ShowWarn();
-                        ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
-                        break;
-                }
+        } else if (GameManager.I.gameData.levelState.template.sensitivityLevel >= SensitivityLevel.privateProperty &&
+                playerSuspicion >= Suspiciousness.suspicious &&
+                reachedFootstepThreshold &&
+                notBoredOfFootsteps) {
+            switch (stateMachine.currentState) {
+                case SphereMoveState:
+                case SpherePatrolState:
+                case FollowTheLeaderState:
+                case SphereClearPointsState:
+                    // timeSinceInvestigatedFootsteps = 10f;
+                    alertHandler.ShowWarn();
+                    ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
+                    break;
+            }
         }
     }
 

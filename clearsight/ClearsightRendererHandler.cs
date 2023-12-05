@@ -146,7 +146,7 @@ public class ClearsightRendererHandler {
             return;
         }
 
-        if (currentRendererState != desiredRendererState) {
+        if (!AlphaEasingIsComplete()) {
             // we are in transition
 
             // update alpha
@@ -197,7 +197,7 @@ public class ClearsightRendererHandler {
                     }
                     break;
             }
-        } else if (currentRendererState == desiredRendererState) {
+        } else { //if (currentRendererState == desiredRendererState) 
             isSubscribedToTimeUpdate = false;
             clearsighter.OnTime -= HandleTimeTick;
         }
@@ -205,6 +205,18 @@ public class ClearsightRendererHandler {
 
     public bool IsVisible() {
         return currentRendererState == RendererState.opaque;
+    }
+
+    bool AlphaEasingIsComplete() {
+        switch (desiredRendererState) {
+            case RendererState.transparent:
+                return (alpha <= 0.1);
+            case RendererState.opaque:
+                return (alpha >= 1);
+            case RendererState.invisible:
+                return (alpha <= 0);
+        }
+        return true;
     }
 }
 

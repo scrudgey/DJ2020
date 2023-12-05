@@ -3024,6 +3024,8 @@ x ladders
 * load grammar files from npc template
 * spawnpoint in yamachi
 * stealing dat001 in tower didn't work
+* main issue with clearsighter right now is sometimes things stay transparent.
+* when reverting to patrol, we can do better
 
 
 
@@ -3497,6 +3499,7 @@ major initiatives:
     destructible walls
     vehicles
     finalize street 
+    robots
     music
         auto leveling, balance, ducking
     missions
@@ -3548,16 +3551,6 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-
-
-
-better AI navigation / building search
-    when reverting to patrol, we can do better
-    multiple guards chose the same clearpoint to navigate to- more global coordination
-better investigative ability when player does something weird like superjump / land
-highlight NPCs that are shooting me
-main issue with clearsighter right now is sometimes things stay transparent.
-
 status bar on top shows:
     credits
     loots
@@ -3565,3 +3558,9 @@ status bar on top shows:
     keys
     shows when key is used
     when loot is collected
+
+
+
+multiple guards chose the same clearpoint to navigate to- more global coordination
+better investigative ability when player does something weird like superjump / land
+highlight NPCs that are shooting me
