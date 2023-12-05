@@ -20,7 +20,7 @@ public class SphereAttackState : SphereControlState {
         // speaker = owner.GetComponentInChildren<SphereRobotSpeaker>();
         this.speechTextController = speechTextController;
         if (speechTextController != null) {
-            speechTextController.Say("Enemy sighted");
+            speechTextController.SayAttack();
         }
     }
     public override void Enter() {

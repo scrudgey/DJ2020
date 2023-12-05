@@ -32,11 +32,11 @@ public class SphereRobotSpeaker : MonoBehaviour {
 
     public void DoAttackSpeak() {
         Toolbox.RandomizeOneShot(audioSource, angrySpeakSounds);
-        speechTextController.Say("Enemy sighted");
+        speechTextController.SayAttack();
     }
 
     public void DoInvestigateSpeak() {
         Toolbox.RandomizeOneShot(audioSource, angrySpeakSounds);
-        speechTextController.Say("<color=#ffa502>Hey! You there!</color>");
+        speechTextController.SaySpotted();
     }
 }

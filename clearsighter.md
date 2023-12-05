@@ -123,3 +123,46 @@ handle multiple floors
 
     issues today:
         various objects appear at different times when moving between floors: much better if they all appear at once.
+
+
+
+
+
+
+
+
+
+
+
+                // how to handle easing between states?
+                // we tally transparent requests- if we just went transparent we don't go back to opaque right away
+                // we also need to integrate a few transparent requests before we start fading.
+
+                // since we need to change the requests and stayframes per frame, we need to subscribe to time updates.
+                // just make sure we unsubscribe correctly!
+                // what is the condition there?
+                // it would mean currentRendererState == desiredRendererState and also the integrations are 0.
+
+                // allow us to change desired state and subscribe- easy.
+                // allow frames / requests to determine when we start to fade.
+                //  put all that logic in time update
+                // 
+                // overall this means we need more state.
+                // it means we can have a desired renderer state that is different from the current renderer state
+                //  but not updating alpha yet.
+
+                // the main problem with ubsubscribe when current == desired and frames are 0:
+                // we will continue to request transparent constantly as object is in view.
+                // therefore frames will never be 0 and we will never unsubscribe.
+
+                // desired behavior:
+                // state: normal    render: opaque
+                // transparent request issued : do nothing
+                // transparent request issued : do nothing
+                // transparent request issued : do nothing
+                // transparent request issued : desired state: transparent, subscrube
+                // update: alpha
+                // update: alpha
+                // update: alpha
+                // update: alpha
+                // current state == transparent, ubsubscribe

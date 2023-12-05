@@ -25,7 +25,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void StartSpottedCutscene(SphereRobotAI NPC) {
-        // foreach (SphereRobotAI ai in )
         if (GameObject.FindObjectsOfType<SphereRobotAI>().Any(ai => ai.stateMachine.currentState is SphereInvestigateState)) return;
         StartCutsceneCoroutine(SpottedCutscene(NPC));
     }
@@ -38,15 +37,13 @@ public partial class GameManager : Singleton<GameManager> {
     public IEnumerator SpottedCutscene(SphereRobotAI NPC) {
         uiController?.HideUI();
         float timer = 0f;
-        // SphereRobotSpeaker speaker = NPC.GetComponentInChildren<SphereRobotSpeaker>();
         float distanceBetweenPeople = (NPC.transform.position - playerObject.transform.position).magnitude;
 
         Vector3 positionBetweenPeople = playerObject.transform.position + ((NPC.transform.position - playerObject.transform.position).normalized * distanceBetweenPeople / 2f);
         positionBetweenPeople += new Vector3(0f, 1f, 0f);
 
         if (NPC.speechTextController != null) {
-            // speaker.DoInvestigateSpeak();
-            NPC.speechTextController.Say("<color=#ffa502>Hey! You there!</color>");
+            NPC.speechTextController.SaySpotted();
         }
 
         characterCamera.followingSharpnessDefault = 1f;

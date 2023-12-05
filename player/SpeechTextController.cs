@@ -1,21 +1,37 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using Nimrod;
 using TMPro;
 using UnityEngine;
 public class SpeechTextController : MonoBehaviour {
+    static public float PHRASE_DELAY = 3f;
+    static public Dictionary<string, float> phraseTimes;
     public bool scaleWithPlayerDistance;
     public TextMeshProUGUI textMesh;
     public List<RectTransform> childRects;
     public RectTransform canvasRect;
     public Transform followTransform;
     public Camera cam;
+    public List<string> grammarFiles;
+    public Sprite portrait;
+
+    Grammar grammar;
     float visibilityTimer;
     float haltSpeechTimeout;
     readonly static float FALLOFF_DISTANCE = 10f;
     Vector3 offset = new Vector3(0f, 2f, 0f);
     void Start() {
+        grammar = new Grammar();
+        if (grammarFiles.Count > 0) {
+            foreach (string filename in grammarFiles) {
+                grammar.Load(filename);
+            }
+        } else {
+            grammar.Load("speech_default");
+        }
         cam = Camera.main;
         HideText();
         visibilityTimer = 0f;
@@ -51,6 +67,9 @@ public class SpeechTextController : MonoBehaviour {
         HideText();
     }
 
+    public void Say(string phrase, string color) {
+        Say($"<color={color}>{phrase}</color>");
+    }
     public void Say(string phrase) {
         textMesh.text = phrase;
         visibilityTimer = 5f;
@@ -70,36 +89,56 @@ public class SpeechTextController : MonoBehaviour {
     public bool IsSpeaking() {
         return textMesh.enabled;
     }
-    // void SetRectPosition() {
-    //     Rect camRect = cam.pixelRect;
+    public void SayGrammar(string key) {
+        if (CheckPhraseTimes(key)) {
+            string phrase = grammar.Parse($"{{{key}}}");
+            Say(phrase);
+        }
+    }
+    public void SayGrammar(string key, string color) {
+        if (CheckPhraseTimes(key)) {
+            string phrase = grammar.Parse($"{{{key}}}");
+            Say(phrase, color);
+        }
+    }
 
-    //     // world coordinates
-    //     Vector2 orig = followTransform.position;// + offset;
+    public void SayAttack() {
+        SayGrammar("attack", "#ff4757");
+    }
+    public void SaySpotted() {
+        SayGrammar("spotted");
+    }
+    public void SayFreeze() {
+        SayGrammar("spotted", "#ffa502");
+    }
+    public void SayHoldIt() {
+        SayGrammar("holdit", "#ffa502");
+    }
+    public void SayWhatWasThat() {
+        SayGrammar("what-was-that");
+    }
+    public void SayGuessItWasNothing() {
+        SayGrammar("guess-nothing");
+    }
+    public void SayPageGuard() {
+        SayGrammar("page-guard", "#ff4757");
+    }
 
-    //     // viewport coordinates: range from (0, 1)
-    //     Vector2 pos = Camera.main.WorldToViewportPoint(orig);
 
-    //     // clamp the y coordinate
-    //     pos.y = Mathf.Clamp(pos.y, 0.05f, 0.95f);
-    //     pos.x = Mathf.Clamp(pos.x, 0.05f, 0.95f);
-
-    //     Vector2 screenPos = new Vector2(
-    //         pos.x * canvasRect.sizeDelta.x,
-    //         pos.y * canvasRect.sizeDelta.y
-    //         );
-    //     // prevent going off screen on the left
-    //     screenPos.x = Mathf.Max(screenPos.x, textRect.rect.width / 2f);
-
-    //     // prevent going off screen on the right
-    //     screenPos.x = Mathf.Min(screenPos.x, canvasRect.rect.width - (textRect.rect.width / 2f));
-
-    //     // prevent ging below the screen
-    //     screenPos.y = Mathf.Max(screenPos.y, textRect.rect.height / 2f);
-
-    //     // prevent going above the screen
-    //     screenPos.y = Mathf.Min(screenPos.y, camRect.height - (textRect.rect.height / 2f));
-
-    //     textRect.position = screenPos;
-    //     // textRect.anchoredPosition = screenPos;
-    // }
+    bool CheckPhraseTimes(string phrase) {
+        if (phraseTimes == null) {
+            phraseTimes = new Dictionary<string, float>();
+        }
+        float timeNow = Time.timeSinceLevelLoad;
+        if (phraseTimes.ContainsKey(phrase)) {
+            float lastSaidTime = phraseTimes[phrase];
+            if (timeNow - lastSaidTime > PHRASE_DELAY) {
+                phraseTimes[phrase] = timeNow;
+                return true;
+            } else return false;
+        } else {
+            phraseTimes[phrase] = timeNow;
+            return true;
+        }
+    }
 }

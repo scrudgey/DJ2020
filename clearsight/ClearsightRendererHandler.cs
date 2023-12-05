@@ -33,10 +33,6 @@ public class ClearsightRendererHandler {
 
     public ClearsightRendererHandler(NeoClearsighterV3 clearsighter, Transform root, Vector3 position, bool isDynamic = false) {
         name = root.name;
-        // if (name.Contains("datastore")) {
-        //     Debug.Log($"datastore clearsighter created: {root}");
-        // }
-
         Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
         this.isDynamic = isDynamic;
         this.clearsighter = clearsighter;
@@ -74,9 +70,6 @@ public class ClearsightRendererHandler {
     }
 
     public void ChangeState(CullingState toState) {
-        if (name.Contains("datastore")) {
-            Debug.Log($"clearsighter {name}: changestate {state} -> {toState}");
-        }
         switch (toState) {
             case CullingState.normal:
                 if (desiredRendererState != RendererState.opaque) {
@@ -94,41 +87,6 @@ public class ClearsightRendererHandler {
                     FadeOut();
                     desiredRendererState = RendererState.transparent;
                 }
-
-                // how to handle easing between states?
-                // we tally transparent requests- if we just went transparent we don't go back to opaque right away
-                // we also need to integrate a few transparent requests before we start fading.
-
-                // since we need to change the requests and stayframes per frame, we need to subscribe to time updates.
-                // just make sure we unsubscribe correctly!
-                // what is the condition there?
-                // it would mean currentRendererState == desiredRendererState and also the integrations are 0.
-
-                // allow us to change desired state and subscribe- easy.
-                // allow frames / requests to determine when we start to fade.
-                //  put all that logic in time update
-                // 
-                // overall this means we need more state.
-                // it means we can have a desired renderer state that is different from the current renderer state
-                //  but not updating alpha yet.
-
-                // the main problem with ubsubscribe when current == desired and frames are 0:
-                // we will continue to request transparent constantly as object is in view.
-                // therefore frames will never be 0 and we will never unsubscribe.
-
-                // desired behavior:
-                // state: normal    render: opaque
-                // transparent request issued : do nothing
-                // transparent request issued : do nothing
-                // transparent request issued : do nothing
-                // transparent request issued : desired state: transparent, subscrube
-                // update: alpha
-                // update: alpha
-                // update: alpha
-                // update: alpha
-                // current state == transparent, ubsubscribe
-
-
                 break;
             case CullingState.above:
                 if (desiredRendererState != RendererState.invisible) {
@@ -139,15 +97,6 @@ public class ClearsightRendererHandler {
                 break;
         }
         if (currentRendererState != desiredRendererState) {
-            // switch (desiredRendererState) {
-            //     case RendererState.opaque:
-            //         break;
-            //     case RendererState.invisible:
-            //         break;
-            //     case RendererState.transparent:
-            //         FadeOut();
-            //         break;
-            // }
             SubscribeToTimeUpdate();
         }
         state = toState;

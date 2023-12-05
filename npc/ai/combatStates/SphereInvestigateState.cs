@@ -133,7 +133,7 @@ public class SphereInvestigateState : SphereControlState {
             }
         } else {
             if (saidHeyTimeout <= 0) {
-                speechTextController.Say("<color=#ff4757>Hey! Hold it!</color>");
+                speechTextController.SayHoldIt();
                 saidHeyTimeout = 60f;
             }
             if (!lookingAtPlayer()) {

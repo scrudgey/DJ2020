@@ -23,7 +23,7 @@ public class StopAndListenState : SphereControlState {
     }
     public override void Enter() {
         changeStateCountDown = ROUTINE_TIMEOUT;
-        speechTextController.Say("What was that?");
+        speechTextController.SayWhatWasThat();
     }
     void SetupRootNode() {
 
@@ -94,7 +94,7 @@ public class StopAndListenState : SphereControlState {
             return new SearchDirectionState(owner, lastNoise, characterController, doIntro: false);
         } else {
             // Debug.Log("guess it was nothing");
-            speechTextController.Say("Guess it was nothing.");
+            speechTextController.SayGuessItWasNothing();
             return previousState;
         }
     }

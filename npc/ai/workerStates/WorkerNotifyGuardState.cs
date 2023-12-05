@@ -91,7 +91,7 @@ public class WorkerNotifyGuardState : WorkerNPCControlState {
             saidHeyTimeout -= Time.deltaTime;
         }
         if (saidHeyTimeout <= 0) {
-            speechTextController.Say("<color=#ff4757>Guard! Guard!</color>");
+            speechTextController.SayPageGuard();
             saidHeyTimeout = 60f;
             NoiseData data = new NoiseData() {
                 volume = 10,

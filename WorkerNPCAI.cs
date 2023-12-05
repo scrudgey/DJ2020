@@ -28,7 +28,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     [Header("character")]
     public Alertness alertness = Alertness.normal;
     public SpeechEtiquette[] etiquettes;
-    public Sprite portrait;
+    // public Sprite portrait;
 
     [Header("specifics")]
     public Transform guardPoint;
@@ -441,7 +441,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
 
     public DialogueCharacterInput MyCharacterInput() => new DialogueCharacterInput() {
-        portrait = portrait,
+        portrait = speechTextController.portrait,
         etiquettes = etiquettes,
         alertness = alertness,
         name = dialogueName

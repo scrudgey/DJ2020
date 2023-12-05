@@ -3015,9 +3015,17 @@ x ladders
 * raise the speechtext?
 * update civilian ai to use async raycast
 * pool objects vs clearsighter
-
 * invisible npc
 * somehow, cyber data stores are problem again
+* it should be red
+* it should have varied phrases (use nimrod)
+* reduce frequency of "enemy sighted"
+* tune sensitivity / eliminate "guess it was nothing"
+* load grammar files from npc template
+* spawnpoint in yamachi
+* stealing dat001 in tower didn't work
+
+
 
 
 places randomizer could break down:
@@ -3400,13 +3408,6 @@ pretty easy to run in guns blazing
     bonus objectives can dicincentivize this
     when alarm is hit, doors come down and turrets pop out
     player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
-status bar on top shows:
-    credits
-    loots
-    data
-    keys
-    shows when key is used
-    when loot is collected
 
 doors are blocking people again?
 silencer shows in gameplay
@@ -3467,23 +3468,30 @@ animate gun holster / unholster
 some suspicion records could be sticky when noticed
     anything related to player behavior and appearance
     a different kind of surveillance camera stickies suspicion records?
+worker dialogue tree
+better map  
+    higher res
+    better scroll
+guard stood facing wall in tower
 
 
 
-unresolved mechanics:
+
+unresolved mechanics / gameplay questions:
     hacking
     circuits
     do we buy / unlock more burglar tools?
-gameplay questions:
     progression in burglar tools?
     progression in shops? 
         items, guns
     progression in world?
         other towns connected by subway?
-    hacking
     backpack and duffel bag
 
 major initiatives:
+    anime effects
+    ?minimap
+    pause screen
     data and hacking
     cyberware
     destructible walls
@@ -3494,7 +3502,7 @@ major initiatives:
     missions
         1 way shootout
         productionize office
-        redo apartment after office
+            redo apartment after office
     system:
         title
         controls, settings
@@ -3540,18 +3548,20 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-polish:
-    better investigative ability when player does something weird like superjump / land
-    highlight NPCs that are shooting me
-    stealing dat001 in tower didn't work
-    guard stood facing wall in tower
-    main issue with clearsighter right now is sometimes things stay transparent.
-    raise the wallpress camera- too low.
 
 
 
-reduce frequency of "enemy sighted"
-tune sensitivity / eliminate "guess it was nothing"
 better AI navigation / building search
     when reverting to patrol, we can do better
     multiple guards chose the same clearpoint to navigate to- more global coordination
+better investigative ability when player does something weird like superjump / land
+highlight NPCs that are shooting me
+main issue with clearsighter right now is sometimes things stay transparent.
+
+status bar on top shows:
+    credits
+    loots
+    data
+    keys
+    shows when key is used
+    when loot is collected

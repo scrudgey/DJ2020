@@ -50,7 +50,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     // public bool overrideDefaultState;
     private float footstepImpulse;
     public SpeechEtiquette[] etiquettes;
-    public Sprite portrait;
+    // public Sprite portrait;
     bool awareOfCorpse;
     Collider[] nearbyOthers;
     RaycastHit[] raycastHits;
@@ -661,28 +661,29 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         footstepImpulse += noise.data.volume * 2f;
         bool reachedFootstepThreshold = footstepImpulse > 6f;
         bool notBoredOfFootsteps = timeSinceInvestigatedFootsteps <= 0 && timeSinceInterrogatedStranger <= 0;
-        if (GameManager.I.gameData.levelState.template.sensitivityLevel == SensitivityLevel.publicProperty) {
+
+        Suspiciousness playerSuspicion = GameManager.I.GetTotalSuspicion();
+
+        if (GameManager.I.gameData.levelState.template.sensitivityLevel <= SensitivityLevel.semiprivateProperty) {
             if (reachedFootstepThreshold && recentlyInCombat && notBoredOfFootsteps) {
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
                     case SphereClearPointsState:
-
                         // timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
                         break;
                 }
             }
-        } else if (GameManager.I.gameData.levelState.template.sensitivityLevel >= SensitivityLevel.privateProperty) {
+        } else if (GameManager.I.gameData.levelState.template.sensitivityLevel >= SensitivityLevel.privateProperty && playerSuspicion >= Suspiciousness.suspicious) {
             if (reachedFootstepThreshold && notBoredOfFootsteps)
                 switch (stateMachine.currentState) {
                     case SphereMoveState:
                     case SpherePatrolState:
                     case FollowTheLeaderState:
                     case SphereClearPointsState:
-
                         // timeSinceInvestigatedFootsteps = 10f;
                         alertHandler.ShowWarn();
                         ChangeState(new StopAndListenState(this, stateMachine.currentState, speechTextController, characterController));
@@ -751,7 +752,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // TODO: reset gun state...?!?
     }
     public DialogueCharacterInput myCharacterInput() => new DialogueCharacterInput {
-        portrait = portrait,
+        portrait = speechTextController.portrait,
         etiquettes = etiquettes,
         alertness = alertness,
         name = dialogueName

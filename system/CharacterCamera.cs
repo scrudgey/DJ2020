@@ -441,7 +441,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         if (input.state == CharacterState.popout) LROffset = -1f * LROffset;
 
         Vector3 distOffset = input.wallNormal * TargetDistance;
-        Vector3 heightOffset = new Vector3(0, -0.5f, 0);
+        // Vector3 heightOffset = new Vector3(0, -0.5f, 0);
+        Vector3 heightOffset = Vector3.zero;
 
         if (input.crouchHeld) {
             heightOffset = new Vector3(0, -0.75f, 0);

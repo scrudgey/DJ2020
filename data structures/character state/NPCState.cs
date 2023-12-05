@@ -39,8 +39,11 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
             ai.physicalKeys = new HashSet<int>(template.physicalKeys);
             ai.alertness = template.alertness;
             ai.etiquettes = template.etiquettes;
-            ai.portrait = template.portrait;
+            // ai.portrait = template.portrait;
             ai.dialogueName = template.dialogueName;
+
+            ai.speechTextController.portrait = template.portrait;
+            ai.speechTextController.grammarFiles = template.grammarFiles;
         }
 
         WorkerNPCAI workerNPCAI = npcObject.GetComponent<WorkerNPCAI>();
@@ -48,14 +51,16 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
             // workerNPCAI.physicalKeys = new HashSet<int>(template.physicalKeys);
             workerNPCAI.alertness = template.alertness;
             workerNPCAI.etiquettes = template.etiquettes;
-            workerNPCAI.portrait = template.portrait;
+            // workerNPCAI.portrait = template.portrait;
             workerNPCAI.dialogueName = template.dialogueName;
+            workerNPCAI.speechTextController.portrait = template.portrait;
+            workerNPCAI.speechTextController.grammarFiles = template.grammarFiles;
+
         }
 
         LevelRandomSound randomSound = npcObject.GetComponent<LevelRandomSound>();
         if (randomSound != null) {
             randomSound.enabled = template.radioChatter;
-
         }
     }
 

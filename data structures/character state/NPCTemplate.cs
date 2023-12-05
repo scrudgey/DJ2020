@@ -37,6 +37,7 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     public SpeechEtiquette[] etiquettes;
     [field: SerializeField]
     public Sprite portrait;
+    public List<string> grammarFiles;
 
     public List<int> physicalKeys;
 

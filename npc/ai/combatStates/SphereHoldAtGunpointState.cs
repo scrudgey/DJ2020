@@ -17,7 +17,7 @@ public class SphereHoldAtGunpointState : SphereControlState {
         base.Enter();
         lastSeenPlayerPosition = Vector3.zero;
         integratedPlayerMovement = 1.5f;
-        speechTextController.Say("<color=#ff4757>Freeze! Don't move!</color>");
+        speechTextController.SayFreeze();
     }
     public bool isPlayerVisible() {
         return timeSinceSawPlayer < 0.15f;
