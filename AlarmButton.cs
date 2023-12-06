@@ -20,7 +20,7 @@ public class AlarmButton : Interactive {
         };
     }
     public void PressButton() {
-        GameManager.I.SetAlarmNodeState(alarmComponent, true);
+        GameManager.I.SetAlarmNodeTriggered(alarmComponent, true);
         Toolbox.RandomizeOneShot(audioSource, useButtonSounds);
     }
     public void OnAlarmChange(AlarmComponent node) {

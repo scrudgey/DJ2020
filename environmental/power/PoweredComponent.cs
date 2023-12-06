@@ -14,6 +14,10 @@ public class PoweredComponent : GraphNodeComponent<PoweredComponent, PowerNode> 
         }
     }
     public override PowerNode GetNode() => GameManager.I.GetPowerNode(idn);
+    public override void ApplyNodeState(PowerNode node) {
+        power = node.powered;
+        nodeEnabled = node.getEnabled();
+    }
     protected virtual void OnPowerChange() { }
 #if UNITY_EDITOR
     protected override void OnDrawGizmos() {

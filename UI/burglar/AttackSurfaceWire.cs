@@ -42,7 +42,7 @@ public class AttackSurfaceWire : MonoBehaviour {
             };
         }
         foreach (AlarmComponent component in alarmComponentsToActivate) {
-            GameManager.I.SetAlarmNodeState(component, true);
+            GameManager.I.SetAlarmNodeTriggered(component, true);
             result = result with {
                 success = true,
                 feedbackText = resultText,

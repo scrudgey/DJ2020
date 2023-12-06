@@ -32,7 +32,6 @@ public class SphereInvestigateState : SphereControlState {
             lifetime = 6f,
             speechText = "HQ respond. Intruder spotted. Raise the alarm.",
         };
-        // DialogueController.OnDialogueConclude += HandleDialogueResult;
     }
     public override void Enter() {
         base.Enter();

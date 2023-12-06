@@ -22,7 +22,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void ActivateHQRadioNode() {
         AlarmRadio terminal = levelRadioTerminal();
         if (terminal != null) {
-            SetAlarmNodeState(terminal, true);
+            SetAlarmNodeTriggered(terminal, true);
         }
     }
     void ChangeHQPhase(HQPhase newPhase) {
@@ -67,8 +67,8 @@ public partial class GameManager : Singleton<GameManager> {
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = GameManager.I.gameData.levelState.template.strikeTeamBehavior;
         ChangeHQPhase(HQPhase.normal);
         foreach (AlarmComponent alarmComponent in FindObjectsOfType<AlarmComponent>()) {
-            if (GetAlarmNodeState(alarmComponent)) {
-                SetAlarmNodeState(alarmComponent, false);
+            if (GetAlarmNodeTriggered(alarmComponent)) {
+                SetAlarmNodeTriggered(alarmComponent, false);
             }
         }
     }
@@ -192,6 +192,8 @@ public partial class GameManager : Singleton<GameManager> {
         return timer;
     }
     public void UpdateGraphs() {
+        // method for time-updating graph state
+
         float alarmTimerOrig = alarmCountdown();
 
         gameData?.levelState?.delta.alarmGraph?.Update();

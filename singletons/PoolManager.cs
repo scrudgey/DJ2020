@@ -57,7 +57,6 @@ public class PrefabPool {
         obj.transform.SetParent(null);
 
         // TODO: untested
-        // TODO: only when flag is set
         if (applyStaticClearsight && GameManager.I.clearSighterV3 != null) {
             GameManager.I.clearSighterV3.RemoveStatic(obj.transform.root);
         }

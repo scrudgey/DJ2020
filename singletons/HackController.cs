@@ -73,7 +73,7 @@ public class HackController : Singleton<HackController>, IBindable<HackControlle
             data.timer += Time.deltaTime * GameManager.I.gameData.playerState.hackSpeedCoefficient;
             // data.
             if (data.timer > data.lifetime) {
-                GameManager.I.SetCyberNodeState(data.node, true);
+                GameManager.I.SetCyberNodeCompromised(data.node, true);
                 data.done = true;
                 audioSource.PlayOneShot(hackFinished);
             }

@@ -25,7 +25,7 @@ public class VRDataStore : Interactive {
     }
     public void Open() {
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        GameManager.I.SetCyberNodeState(cyberComponent, false);
+        GameManager.I.SetCyberNodeCompromised(cyberComponent, false);
         OnDataStoreOpened?.Invoke(this);
     }
     public void PlayParticles() {

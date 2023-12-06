@@ -30,7 +30,7 @@ public class LaserTripwire : AlarmComponent {
             return;
         // GameManager.I.ActivateAlarm();
         AlarmNode node = GameManager.I.GetAlarmNode(idn);
-        GameManager.I.SetAlarmNodeState(node, true);
+        GameManager.I.SetAlarmNodeTriggered(node, true);
         cooldown = 5f;
         Toolbox.RandomizeOneShot(audioSource, spottedSound);
         foreach (LaserData data in laserData) {

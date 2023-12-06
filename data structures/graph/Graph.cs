@@ -19,7 +19,9 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
         edgeArrays = new HashSet<string[]>();
         edges = new SerializableDictionary<string, HashSet<string>>();
     }
-
+    public T GetNode(string idn) {
+        return nodes.ContainsKey(idn) ? nodes[idn] : null;
+    }
     public void AddEdge(Node from, Node to) {
         AddLink(from, to);
         AddLink(to, from);

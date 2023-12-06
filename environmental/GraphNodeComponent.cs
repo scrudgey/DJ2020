@@ -29,6 +29,8 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         OnStateChange?.Invoke((T)this);
     }
 
+    public abstract void ApplyNodeState(U node);
+
     void OnDisable() {
         DisableSource();
     }

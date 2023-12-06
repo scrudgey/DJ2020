@@ -24,7 +24,10 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
     }
 
     public override CyberNode GetNode() => GameManager.I.GetCyberNode(idn);
-
+    public override void ApplyNodeState(CyberNode node) {
+        compromised = node.compromised;
+        nodeEnabled = node.getEnabled();
+    }
 
 #if UNITY_EDITOR
     protected override void OnDrawGizmos() {

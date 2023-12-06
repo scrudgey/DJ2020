@@ -38,6 +38,11 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode> {
             powerComponent.OnStateChange -= OnPowerChange;
         }
     }
+    public override void ApplyNodeState(AlarmNode node) {
+        alarmTriggered = node.alarmTriggered;
+        countdownTimer = node.countdownTimer;
+        nodeEnabled = node.getEnabled();
+    }
     public virtual bool alarmTriggered {
         get { return _alarmTriggered; }
         set {

@@ -7,11 +7,14 @@ using UnityEngine;
 
 [System.Serializable]
 public class CyberGraph : Graph<CyberNode, CyberGraph> {
-    public void Refresh() {
-        foreach (CyberNode node in nodes.Values) {
-            CyberComponent component = GameManager.I.GetCyberComponent(node.idn);
-            if (component != null)
-                component.nodeEnabled = node.getEnabled();
-        }
+    public bool IsCyberNodeVulnerable(CyberNode node) {
+        if (node.compromised)
+            return false;
+        if (nodes.ContainsKey(node.idn)) {
+            foreach (CyberNode neighbor in Neighbors(node)) {
+                if (neighbor.compromised) return true;
+            }
+            return false;
+        } else return false;
     }
 }

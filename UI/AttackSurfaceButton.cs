@@ -45,7 +45,7 @@ public class AttackSurfaceButton : AttackSurfaceElement {
             Toolbox.RandomizeOneShot(audioSource, buttonPressedSound);
             string feedbackText = "";
             if (alarmComponent != null) {
-                GameManager.I.SetAlarmNodeState(alarmComponent, false);
+                GameManager.I.SetAlarmNodeTriggered(alarmComponent, false);
                 feedbackText = "alarm reset";
             }
             if (elevatorController != null) {

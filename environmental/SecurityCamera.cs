@@ -103,7 +103,7 @@ public class SecurityCamera : IBinder<SightCone> {
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (GameManager.I.IsPlayerVisible(distance)) {
             AlarmNode alarmNode = GameManager.I.GetAlarmNode(alarmComponent.idn);
-            GameManager.I.SetAlarmNodeState(alarmNode, true);
+            GameManager.I.SetAlarmNodeTriggered(alarmNode, true);
             alertHandler.ShowAlert();
             cooldown = 5f;
             Toolbox.RandomizeOneShot(audioSource, spottedSound);

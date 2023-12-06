@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// TODO: abstract this out
 public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, CyberNodeIndicator> {
     public override void SetEdgeGraphicState() {
         base.SetEdgeGraphicState();
