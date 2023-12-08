@@ -14,8 +14,6 @@ using UnityEngine.SceneManagement;
 [CustomEditor(typeof(LevelDataUtil))]
 [CanEditMultipleObjects]
 public class LevelDataUtilEditor : Editor {
-    // public string levelName = "test";
-    // public LevelTemplate levelData;
     LevelDataUtil t;
     SerializedObject GetTarget;
     SerializedProperty levelData;
@@ -31,11 +29,7 @@ public class LevelDataUtilEditor : Editor {
         floorNumberProperty = GetTarget.FindProperty("floorNumber"); // Find the List in our script and create a refrence of it
     }
     public override void OnInspectorGUI() {
-
         EditorGUILayout.PropertyField(levelData);
-        // levelData = (LevelTemplate)base.serializedObject.FindProperty("levelData").objectReferenceValue;
-
-        // levelName = EditorGUILayout.TextField("level name", levelName);
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         if (template != null) {
             string levelName = template.levelName;
@@ -86,7 +80,6 @@ public class LevelDataUtilEditor : Editor {
         foreach (var group in components.GroupBy(component => component.gameObject)) {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
-
             Vector3 position = group.First().NodePosition();
 
             // new node with idn
@@ -94,31 +87,18 @@ public class LevelDataUtilEditor : Editor {
                 sceneName = sceneName,
                 idn = idn,
                 position = position,
-                // enabled = true,
-                icon = NodeIcon.normal
+                enabled = true,
             };
-            node.setEnabled(true);
             graph.nodes[idn] = node;
 
             foreach (V component in group) {
-                if (component.nodeTitle != "") {
-                    node.nodeTitle = component.nodeTitle;
-                }
-                if (component.icon != NodeIcon.normal)
-                    node.icon = component.icon;
                 Debug.Log($"{idn}: {component}");
-                // set the component's id
+                node.nodeTitle = component.nodeTitle;
                 component.idn = idn;
-                EditorUtility.SetDirty(component);
-
-                node.type = component switch {
-                    PowerSource => NodeType.powerSource,
-                    InternetSource => NodeType.WAN,
-                    _ => NodeType.normal
-                };
-
+                component.enabled = true;
                 // allow the subclass to add class-specific configuration
                 component.ConfigureNode(node);
+                EditorUtility.SetDirty(component);
             }
         }
         foreach (V component in components) {

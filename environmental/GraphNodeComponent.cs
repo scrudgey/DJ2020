@@ -7,7 +7,6 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     public string idn;
     public string nodeTitle;
     public bool nodeEnabled;
-    public NodeIcon icon;
 
     public T[] edges = new T[0];
 

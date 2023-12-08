@@ -20,6 +20,7 @@ public class PowerSource : PoweredComponent {
     }
     public override void ConfigureNode(PowerNode node) {
         node.powered = true;
+        node.type = NodeType.powerSource;
     }
     public override void OnDestroy() {
         base.OnDestroy();

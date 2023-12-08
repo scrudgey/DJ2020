@@ -11,7 +11,7 @@ public class CyberRandomizer : MonoBehaviour {
     public void ApplyState(LevelTemplate levelTemplate) {
         if (dataStore != null) {
             dataStore.payData = Toolbox.RandomFromList(template.payDatas);
-            dataStore.RefreshState();
+            // dataStore.RefreshState();
         }
     }
 

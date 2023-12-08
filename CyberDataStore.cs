@@ -2,20 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-public class CyberDataStore : MonoBehaviour {
+public class CyberDataStore : CyberComponent {
     public AudioSource audioSource;
-
     public AudioClip openSound;
-    public CyberComponent cyberComponent;
     public ParticleSystem particles;
-
     public PayData payData;
     public DataFileIndicator dataFileIndicator;
     bool opened;
 
     public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        cyberComponent.OnStateChange += HandleCyberStateChange;
         RefreshState();
     }
     public void RefreshState() {
@@ -23,11 +19,9 @@ public class CyberDataStore : MonoBehaviour {
             dataFileIndicator.Refresh(payData);
         }
     }
-    public void HandleCyberStateChange(CyberComponent component) {
-        // Debug.Log($"datastore state changed: {component} {component.compromised} {component.idn}");
-        if (component.compromised) {
+    public override void HandleCompromisedChanged() {
+        if (compromised) {
             Open();
-            // datafileIndicator.SetActive(false);
             dataFileIndicator.SetIconVisibility(false);
         }
     }
@@ -43,8 +37,8 @@ public class CyberDataStore : MonoBehaviour {
         particles.Play();
     }
 
-    void OnDestroy() {
-        cyberComponent.OnStateChange -= HandleCyberStateChange;
+    override public void OnDestroy() {
+        base.OnDestroy();
         // check if we invalidate an objective
         if (GameManager.I == null || GameManager.I.gameData.levelState == null || GameManager.I.gameData.levelState.template == null) return;
         foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {

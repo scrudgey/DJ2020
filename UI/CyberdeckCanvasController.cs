@@ -186,7 +186,7 @@ public class CyberdeckCanvasController : MonoBehaviour {
 
 
     public void DataThiefButtonCallback() {
-        SetUpProgressBar("Downloading...", attachedDataStore.cyberComponent.GetNode());
+        SetUpProgressBar("Downloading...", attachedDataStore.GetNode());
     }
 
     public void CameraHackButtonCallback() {

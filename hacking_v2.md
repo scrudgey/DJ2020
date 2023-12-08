@@ -43,11 +43,12 @@ data can be located in physical object outside cyberspace
 
 different types of nodes
     pay data - yields $
-    objective 
-    personnel - useful in dialogue
-    map - adds visibility
-    password - potential to unlock nodes
+    objective  data
+    personnel data - useful in dialogue
+    map data - adds visibility
+    password data - potential to unlock nodes
     none / empty - routers, etc.
+    utility - camera, alarm
 
 iconography
     data node should be stacks
@@ -85,6 +86,9 @@ discover
 unlock
     hack password
     enter known password
+
+exploit
+    converts a vulnerable unlocked node into a compromised node
 
 activate
     toggle security camera on/off
@@ -165,6 +169,14 @@ discoverability in planning mode
 
 
 
+# UI
+
+various line conditions:
+
+1. compromised edge
+2. selected edge
+3. mouseover edge
+4. unselected unmoused edge
 
 
 
@@ -173,7 +185,6 @@ discoverability in planning mode
 
 
 # code refresh
-
 
 node enabled/disabled
 vs. compromised / not
@@ -189,10 +200,6 @@ SetCyberNodeState:
         VR node open
         WAN node start (this should be baked into node state)
         hack controller
-
-SetNodeEnabled
-
-
 
 trace out all code paths from:
 load:
@@ -222,7 +229,195 @@ a cyber component is destroyed
     OnDestroy -> GameManager.I?.SetNodeEnabled
         this fetches component, sets enabled on component and node, refreshes graph as necessary.
 
-
-
 Q: how are nodes linked?
 Q: what possibility of linked / cascading updates?
+Q: when do we drop all the stored state of the overlay?
+
+
+
+we have now abstracted everything such that a clean slate approach can be attempted.
+
+1. icons for each type of thing.
+    data model support!
+    node type
+    perma-compromised node
+
+1.5 locked / unlocked nodes
+    affects visibility of node type
+
+2. support discoverability of edges.
+
+2.5 mouseover highlight edges
+
+3. selection / navigation
+
+update cyber component model:
+* datastore
+cash register
+alarm component reference
+
+
+            // Gradient newGradient = new Gradient();
+            // GradientColorKey[] colorKey;
+            // GradientAlphaKey[] alphaKey;
+            // // Populate the color keys at the relative time 0 and 1 (0 and 100%)
+            // colorKey = new GradientColorKey[2];
+            // colorKey[0].color = indicator1.image.color;
+            // colorKey[0].time = 0.0f;
+            // colorKey[1].color = indicator2.image.color;
+            // colorKey[1].time = 1.0f;
+
+            // // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
+            // alphaKey = new GradientAlphaKey[2];
+            // alphaKey[0].alpha = indicator1.image.color.a;
+            // alphaKey[0].time = 0.0f;
+            // alphaKey[1].alpha = indicator2.image.color.a;
+            // alphaKey[1].time = 1.0f;
+
+            // newGradient.SetKeys(colorKey, alphaKey);
+            // renderer.colorGradient = newGradient;
+
+
+because cyber node indicator needs to have information about data, it needs to configure with the component as well.
+and eventually we will need to bring in levelplan / levelstate as well for discoverability.
+
+what data information is shown on ui?
+* type
+* value: value is type?
+- filename
+what is shown when locked?
+* type
+* lock 
+
+what is shown when locked?
+
+### visibility
+visibility -1:
+    node not visible
+
+visibility level 0:
+    node visible, no information
+
+visibility level 1: 
+    node type is known
+        data / normal / utility
+
+visibility level 2:
+    connections known
+
+### data visibility
+data visibility 0:
+    data node is known
+
+data visibility 1:
+    data type is known
+
+data visibility 2:
+    data info is known
+        value
+        type / number of map data
+
+### lock visibility
+lock visibility:
+    lock level: 0, 1, 2, 3
+
+scenario: a player discovers a node (computer) while walking around
+    (UI fx: node discovered)
+the node is at visibility 0: no information, locked
+lock level 1.0
+user connects cyberdeck
+    it is locked, but we can still run scanner v1.0
+    to run others (datathief, compromise) we need to unlock it first.
+user runs scanner v1.0 and discovers it is a datanode, containing $$ paydata.
+    (visibility level 1, data visibility 2)
+to access the data, we need to unlock the node.
+user runs ice cutter v1.0 and it takes a few seconds to break the encryption
+now user runs datathief, and the download begins
+in a few seconds, the download completes.
+the data now stolen, the UI reflects that the data node is now empty.
+
+
+## node state
+node status:
+    invulnerable -> vulnerable -> unlocked -> compromised
+
+visibility:
+    unknown -> known -> identified -> mapped
+
+lock level: 
+    0, 1, 2, 3
+
+data sink: yes/no
+
+invulnerable: basic state of all nodes
+vulnerable: connected to a compromised node
+    cyberdeck
+    WAN
+    compromised node
+unlocked: password level 0
+compromised: user has deployed exploit
+
+## software use patterns
+
+scan:       deploy against any vulnerable node
+unlock:     deploy against any vulnerable locked node
+download:   deploy against any vulnerable unlocked node connected to player or WAN
+exploit:    deploy against any vulnerable unlocked node
+
+viruses are unique:
+    deploy against any vulnerable node
+    they hop and 
+
+
+in order to run datathief:
+    node needs to be unlocked
+    node needs to be vulnerable
+    download takes an amount of time, adjusted by cyberdeck speed
+in order to run scanner:
+    node needs to be vulnerable
+in order to run compromise:
+    node needs to be unlocked
+in order to run password breaker:
+    node needs to be vulnerable
+
+
+
+because scan can be deployed against an invulnerable node, this means that all the node information 
+type, content, links, etc.
+can be displayed whether or not node is locked.
+hence, lock is separate UI element.
+
+questions:
+    1. does unlocking the node increase visibility?
+        maybe
+    2. scanning doesn't require unlock, but other attacks do?
+        yes
+    3. what other attacks exist besides scan?
+        scan, unlock, download, exploit
+    4. state model for visibility
+        it could go right on level delta graph
+        but at least some of it comes from level planning phase too.
+            in theory, player can view graph network on the map,
+            unlock more graph visibility on the map by paying someone,
+            and then construct their plan around the location of the objective.
+
+            the plan needs to stay permanent- since the player paid for it.
+            but anything not in the plan is randomized.
+    5. scanner & visibility
+        does visibility increment? or just set?
+        is visibility capped by scanner version?
+        does visibility target specific information? i.e. data type, connections, etc
+
+UI goal 1:
+    display nodes respecting visibility
+    node icon just shows type: normal, utility, datastore, empty datastore
+    all details go into info pane!
+    color indicates node status
+        invulnerable -> blue
+        vulnerable -> yellow
+        compromised -> red
+    lock is indicated as well
+    lock strength is indicated.
+
+UI goal 2:
+    info pane

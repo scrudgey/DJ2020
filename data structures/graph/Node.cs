@@ -10,8 +10,7 @@ public class Node {
     public string nodeTitle;
     public bool enabled;
     public Vector3 position;
-    public NodeIcon icon;
-    public NodeType type;
+    // public NodeIcon icon;
     public Node() { }
     public virtual bool getEnabled() {
         return enabled;
@@ -22,5 +21,4 @@ public class Node {
 }
 
 
-public enum NodeType { none, normal, powerSource, WAN }
 public enum NodeIcon { normal, power, mains }

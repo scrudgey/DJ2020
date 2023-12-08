@@ -29,6 +29,10 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
         nodeEnabled = node.getEnabled();
     }
 
+    public virtual void HandleCompromisedChanged() {
+
+    }
+
 #if UNITY_EDITOR
     protected override void OnDrawGizmos() {
         foreach (CyberComponent other in edges) {

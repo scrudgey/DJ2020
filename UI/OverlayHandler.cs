@@ -35,13 +35,11 @@ public class OverlayHandler : MonoBehaviour {
         powerOverlay.colorSet = powerOverlayColors;
     }
     public void Bind() {
-        // TODO: this is weird.
         GameManager.OnOverlayChange += HandleOverlayChange;
         GameManager.OnPowerGraphChange += RefreshPowerGraph;
         GameManager.OnCyberGraphChange += RefreshCyberGraph;
         GameManager.OnAlarmGraphChange += RefreshAlarmGraph;
 
-        // TODO: cyber
         RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
         RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);

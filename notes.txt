@@ -3565,7 +3565,9 @@ multiple guards chose the same clearpoint to navigate to- more global coordinati
 better investigative ability when player does something weird like superjump / land
 highlight NPCs that are shooting me
 
+we should display floor number.
+    helps with readability when jumping around in network
+    helps with orientation re: map
 
-
-
+some sort of pseudo-3d offset map in the escape menu
 

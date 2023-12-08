@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HackDisplay : IBinder<HackController> {
-    // public HackController target { get; set; }
     public Camera cam;
     public GameObject hackIndicatorPrefab;
     List<HackIndicator> indicators = new List<HackIndicator>();
@@ -20,7 +19,6 @@ public class HackDisplay : IBinder<HackController> {
             indicators.Add(hackPanelEntry);
         }
         Bind(HackController.I.gameObject);
-        // HandleValueChanged(HackController.I);
     }
     override public void HandleValueChanged(HackController hackController) {
         int index = 0;

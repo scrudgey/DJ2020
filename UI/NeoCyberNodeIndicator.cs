@@ -5,13 +5,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
+public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Color compromisedColor;
     public AudioSource audioSource;
     public AudioClip mouseOver;
     public AudioClip mouseOverVulnerable;
     [Header("sprites")]
     public Sprite normalIcon;
+    public Sprite payDataIcon;
+    public Sprite objectiveDataIcon;
+    public Sprite personnelDataIcon;
+    public Sprite locationDataIcon;
+    public Sprite passwordDataIcon;
+    public Sprite utilityIcon;
+    public Sprite lockedIcon;
     protected override void SetGraphicalState(CyberNode node) {
         image.sprite = normalIcon;
 
@@ -39,13 +46,13 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         }
 
         CyberOverlay cb = (CyberOverlay)overlay;
-        cb.NodeMouseOverCallback(this);
+        // cb.NodeMouseOverCallback(this);
     }
     public override void OnPointerExit(PointerEventData eventData) {
         base.OnPointerExit(eventData);
 
         CyberOverlay cb = (CyberOverlay)overlay;
-        cb.NodeMouseExitCallback(this);
+        // cb.NodeMouseExitCallback(this);
 
         // notify hack controller that vulnerability changed
         HackController.I.HandleVulnerableNetworkNode(null);

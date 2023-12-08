@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class PoweredComponent : GraphNodeComponent<PoweredComponent, PowerNode> {
+    public NodeIcon icon;
+
     private bool _power;
     public bool power {
         get { return _power; }
