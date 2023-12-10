@@ -18,11 +18,11 @@ public class PowerGraph : Graph<PowerNode, PowerGraph> {
             // Debug.Log($"power source: {source.idn}");
             DFS(source);
         }
-        foreach (PowerNode node in nodes.Values) {
-            PoweredComponent component = GameManager.I.GetPowerComponent(node.idn);
-            if (component != null)
-                component.nodeEnabled = node.getEnabled();
-        }
+        // foreach (PowerNode node in nodes.Values) {
+        //     PoweredComponent component = GameManager.I.GetPowerComponent(node.idn);
+        //     if (component != null)
+        //         component.nodeEnabled = node.getEnabled();
+        // }
     }
     void DFS(PowerNode node) {
         node.powered = true;

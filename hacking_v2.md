@@ -338,7 +338,10 @@ the data now stolen, the UI reflects that the data node is now empty.
 
 
 ## node state
-node status:
+node type:
+    normal, utility, datastore
+
+node status (dynamic):
     invulnerable -> vulnerable -> unlocked -> compromised
 
 visibility:
@@ -348,6 +351,9 @@ lock level:
     0, 1, 2, 3
 
 data sink: yes/no
+
+data stolen: yes/no
+
 
 invulnerable: basic state of all nodes
 vulnerable: connected to a compromised node
@@ -421,3 +427,104 @@ UI goal 1:
 
 UI goal 2:
     info pane
+
+
+
+state model:
+plan info is persistent across runs.
+
+during gameplay, at level load, we:
+    1. load the graph
+    2. apply the plan info
+    3. randomize the rest as indicated by level.
+
+during plan, we:
+    1. load the graph
+    2. apply plan info
+    everything not in the plan is hidden/unknown
+
+keep the graph just in delta: this doesn't work for plan.
+keep the graph just in plan: too much persistence.
+so we need a general model.
+
+we either load the graph and apply plan,
+or load the graph, apply plan, and apply randomization
+
+applying plan + randomization means populating data files, a concept that does not exist at the level of graph today!
+but since we want to represent this independent of the state of the level (maybe it isn't even loaded!)
+that means we need to promote datafile to the level of the graph model.
+    https://stackoverflow.com/questions/12237268/how-to-implement-xml-serialization-with-inherited-classes-in-c-sharp
+    this makes it cleanest for sure:
+        we will have the graph model and we will mutate it by applying plan and/or randomizer.
+        then we can represent it in planning phase, in in-game map, in the level, etc.
+        single source of truth for all state.
+graphstate includes the graph template but also: 
+    hacks in progress, downloads in progress, viruses, etc.
+    visibility knowledge.
+    node deltas. 
+when we save the graph template from the editor, data files may or may not be set.
+this means that in the case of (for example) planning mode, when we apply just the plan to the template, some (most) data nodes will not have data files.
+    it also means in plan mode we want to somehow represent that data file info, info which previously was said to live in the info panel only!
+
+
+
+plan could also be more general than just network: it could reveal the randomized location of other objectives for example.
+
+graph template:
+    nodes
+    data node subclass
+        data file may or may not be null
+randomization:
+    required data file
+        acceptable nodes: any, subset
+        data template
+    infill data file
+        data template:
+            random types
+            random values
+
+details of randomization can wait-- just be aware of the potential downfalls and complications.
+work it out later.
+
+this is a lot of new ideas and information. how to proceed?
+1. allow subclasses of nodes in graph.
+    allow cyberdatanode to specify datafile.
+    change therefore everything else around this.
+    levelstate includes a graphstate.
+
+
+right now i want to simplify and unify ApplyNodeState and OnStateChange
+
+what is the point of graph node components at all?
+1. to give nodes a location in space
+2. when a gameobject is destroyed, to notify graph state
+3. give level gen util something to key off of
+
+then:
+1. NO component should inherit from nodecomponent. keep it separate and top-level. one per gameobject.
+2. when writing graph file, connect each child component via idn.
+    after graph load, all each component to bind to node via idn lookup.
+    when graph changes, component state changes to reflect.
+    possibly eliminate transfernodeState functions.
+    the support components (alarm button, alarm sensors, etc.) subscribe to changes
+3. data store is a special type of cybernodecomponent.
+    it is GraphNodeComponent<CyberDataComponent, CyberDataNode>
+    the only question: is there any point in separating the monobehavior component stuff? no for now.
+    eliminate paydata from here.
+        (how to set specific datafile from editor? use randomizer interfaces.)
+4. consider alarm sensors: frequently they use game level state to affect graph state.
+    in this case we propagate from world model to data model.
+
+can Node be record class?
+
+when building graph, get all subcomponents that implement an interface NodeBinder and populate their idns
+then at runtime after loading graph bind all NodeBinders
+NodeBinder uses their Node reference directly to call setter methods that trigger graph updates
+and graph updates cause the NodeBinder to recieve an update
+and nothing in the NodeComponent is used.
+
+
+* handle on component destroy -> disable node
+* alarm component state
+* powered component state
+* handle attack surface wires

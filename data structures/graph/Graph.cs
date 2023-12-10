@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 using UnityEngine;
 
 [System.Serializable]
-public class Graph<T, W> where T : Node where W : Graph<T, W> {
+public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     public string levelName;
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
@@ -22,21 +22,21 @@ public class Graph<T, W> where T : Node where W : Graph<T, W> {
     public T GetNode(string idn) {
         return nodes.ContainsKey(idn) ? nodes[idn] : null;
     }
-    public void AddEdge(Node from, Node to) {
+    public void AddEdge(Node<T> from, Node<T> to) {
         AddLink(from, to);
         AddLink(to, from);
         edgePairs.Add(new HashSet<string> { from.idn, to.idn });
         edgeArrays.Add(new string[2] { from.idn, to.idn });
     }
 
-    void AddLink(Node from, Node to) {
+    void AddLink(Node<T> from, Node<T> to) {
         if (!edges.ContainsKey(from.idn)) {
             edges[from.idn] = new HashSet<string>();
         }
         edges[from.idn].Add(to.idn);
     }
 
-    public List<T> Neighbors(Node source) {
+    public List<T> Neighbors(Node<T> source) {
         return edges
         .GetValueOrDefault(source.idn, new HashSet<string>())
         .Select(idn => nodes.GetValueOrDefault(idn, null))

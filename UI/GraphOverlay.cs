@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node where V : NodeIndicator<U, T> {
+public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
     public UIColorSet colorSet;
     public Camera cam;
     public GameObject nodeIndicatorPrefab;

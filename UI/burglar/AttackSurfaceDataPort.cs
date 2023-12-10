@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackSurfaceDataPort : AttackSurfaceElement {
+public class AttackSurfaceDataPort : AttackSurfaceElement, INodeBinder<CyberNode> {
+    public CyberNode node { get; set; }
     public AudioSource audioSource;
     public AudioClip attachSound;
     public CyberDataStore dataStore;
-    public CyberComponent cyberComponent;
+
+    public void HandleNodeChange() { }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.usb) {
@@ -16,7 +18,7 @@ public class AttackSurfaceDataPort : AttackSurfaceElement {
                 feedbackText = "connected dataport",
                 element = this,
                 attachedDataStore = dataStore,
-                attachedCyberComponent = cyberComponent
+                attachedCyberNode = node
             };
         }
         return BurglarAttackResult.None;

@@ -11,69 +11,33 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
-    // these things should belong to level delta
-    public static Dictionary<string, PoweredComponent> poweredComponents;
-    public static Dictionary<string, CyberComponent> cyberComponents;
-    public static Dictionary<string, AlarmComponent> alarmComponents;
-
-    public void SetNodeEnabled<T, U>(T graphNodeComponent, bool state) where T : GraphNodeComponent<T, U> where U : Node {
-        if (isLoadingLevel) return;
-
-        string idn = graphNodeComponent.idn;
-
-        Node node = graphNodeComponent switch {
-            PoweredComponent => GetPowerNode(idn),
-            CyberComponent => GetCyberNode(idn),
-            AlarmComponent => GetAlarmNode(idn),
-            GraphNodeComponent<PoweredComponent, PowerNode> => GetPowerNode(idn),
-            GraphNodeComponent<CyberComponent, CyberNode> => GetCyberNode(idn),
-            GraphNodeComponent<AlarmComponent, AlarmNode> => GetAlarmNode(idn),
-            _ => null
-        };
-
-        if (node != null) {
-            node.setEnabled(state);
-            graphNodeComponent.nodeEnabled = state;
-            switch (graphNodeComponent) {
-                case PoweredComponent:
-                    RefreshPowerGraph();
-                    break;
-                case CyberComponent:
-                    RefreshCyberGraph();
-                    break;
-                case AlarmComponent:
-                    AlarmNode alarmNode = (AlarmNode)node;
-                    alarmNode.alarmTriggered = false;
-                    alarmNode.countdownTimer = 0f;
-                    RefreshAlarmGraph();
-                    break;
-            };
+    public void SetNodeEnabled<U>(Node<U> node, bool value) where U : Node<U> {
+        if (applicationIsQuitting) return;
+        node.setEnabled(value);
+        switch (node) {
+            case CyberNode:
+                RefreshCyberGraph();
+                break;
+            case PowerNode:
+                RefreshPowerGraph();
+                break;
+            case AlarmNode:
+                RefreshAlarmGraph();
+                break;
         }
     }
-
-
 
     /* POWER NODE */
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         if (applicationIsQuitting) return;
         string idn = poweredComponent.idn;
-
         if (gameData.levelState != null && gameData.levelState.delta.powerGraph != null && gameData.levelState.delta.powerGraph.nodes.ContainsKey(idn)) {
             gameData.levelState.delta.powerGraph.nodes[idn].powered = state;
             RefreshPowerGraph();
         }
     }
 
-
-
     /* CYBER NODE  */
-    public void SetCyberNodeCompromised(CyberComponent cyberComponent, bool state) {
-        if (applicationIsQuitting) return;
-        CyberNode node = GetCyberNode(cyberComponent.idn);
-        if (node != null) {
-            SetCyberNodeCompromised(node, state);
-        }
-    }
     public void SetCyberNodeCompromised(CyberNode node, bool state) {
         if (applicationIsQuitting) return;
         node.compromised = state;
@@ -82,8 +46,6 @@ public partial class GameManager : Singleton<GameManager> {
     public bool IsCyberNodeVulnerable(CyberNode node) {
         return gameData.levelState?.delta.cyberGraph?.IsCyberNodeVulnerable(node) ?? false;
     }
-
-
 
     /* ALARM NODE */
     public void SetAlarmNodeTriggered(AlarmComponent alarmComponent, bool state) {
@@ -103,14 +65,6 @@ public partial class GameManager : Singleton<GameManager> {
             } else {
                 node.countdownTimer = 0f;
             }
-            RefreshAlarmGraph();
-        }
-    }
-    public void SetAlarmOverride(AlarmComponent component) {
-        string idn = component.idn;
-        AlarmNode node = GetAlarmNode(idn);
-        if (node != null) {
-            node.overrideState = AlarmNode.AlarmOverrideState.disabled;
             RefreshAlarmGraph();
         }
     }
@@ -168,20 +122,20 @@ public partial class GameManager : Singleton<GameManager> {
 
 
 
-
+    // TODO: remove these functions?
     void TransferPowerStateFromGraphToComponents() {
         foreach (KeyValuePair<string, PowerNode> kvp in gameData.levelState.delta.powerGraph.nodes) {
-            GetPowerComponent(kvp.Key)?.ApplyNodeState(kvp.Value);
+            kvp.Value.ValueChanged();
         }
     }
     void TransferCyberStateFromGraphToComponents() {
         foreach (KeyValuePair<string, CyberNode> kvp in gameData.levelState.delta.cyberGraph.nodes) {
-            GetCyberComponent(kvp.Key)?.ApplyNodeState(kvp.Value);
+            kvp.Value.ValueChanged();
         }
     }
     void TransferAlarmStateFromGraphToComponents() {
         foreach (KeyValuePair<string, AlarmNode> kvp in gameData.levelState.delta.alarmGraph.nodes) {
-            GetAlarmComponent(kvp.Key)?.ApplyNodeState(kvp.Value);
+            kvp.Value.ValueChanged();
         }
     }
     public CyberNode GetCyberNode(string idn) {
@@ -192,14 +146,5 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public AlarmNode GetAlarmNode(string idn) {
         return gameData?.levelState?.delta.alarmGraph?.GetNode(idn) ?? null;
-    }
-    public AlarmComponent GetAlarmComponent(string idn) {
-        return alarmComponents?.ContainsKey(idn) ?? false ? alarmComponents[idn] : null;
-    }
-    public PoweredComponent GetPowerComponent(string idn) {
-        return poweredComponents?.ContainsKey(idn) ?? false ? poweredComponents[idn] : null;
-    }
-    public CyberComponent GetCyberComponent(string idn) {
-        return cyberComponents?.ContainsKey(idn) ?? false ? cyberComponents[idn] : null;
     }
 }

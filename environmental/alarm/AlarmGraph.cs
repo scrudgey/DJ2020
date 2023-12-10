@@ -19,13 +19,13 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
         activeEdges = new HashSet<HashSet<string>>();
 
         // refresh alarm terminals
-        foreach (AlarmNode node in nodes.Values) {
-            AlarmComponent component = GameManager.I.GetAlarmComponent(node.idn);
-            if (component == null)
-                continue;
+        // foreach (AlarmNode node in nodes.Values) {
+        //     AlarmComponent component = GameManager.I.GetAlarmComponent(node.idn);
+        //     if (component == null)
+        //         continue;
 
-            component.nodeEnabled = node.getEnabled();
-        }
+        //     component.nodeEnabled = node.getEnabled();
+        // }
 
         AlarmNode[] sources = nodes.Values.Where(node => node.alarmTriggered).ToArray();
         foreach (AlarmNode source in sources) {
@@ -35,7 +35,7 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
     }
 
     public bool anyAlarmTerminalActivated() => nodes.Values
-            .Where(node => GameManager.I.GetAlarmComponent(node.idn) is AlarmTerminal)
+            .Where(node => node.nodeType == AlarmNode.AlarmNodeType.terminal)
             .Any(node => node.alarmTriggered);
 
     void DFS(AlarmNode node, HashSet<HashSet<string>> visitedEdges, HashSet<string> visitedNodes) {
@@ -45,14 +45,11 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
                     continue;
                 visitedNodes.Add(neighborID);
                 visitedEdges.Add(new HashSet<string> { node.idn, neighborID });
-                AlarmComponent neighborComponent = GameManager.I.GetAlarmComponent(neighborID);
-                AlarmNode terminalNode = GameManager.I.GetAlarmNode(neighborID);
+                AlarmNode terminalNode = nodes[neighborID];
                 if (!terminalNode.getEnabled())
                     continue;
-                if (neighborComponent is AlarmTerminal) {
+                if (terminalNode.nodeType == AlarmNode.AlarmNodeType.terminal) {
                     terminalNode.alarmTriggered = true;
-                    AlarmTerminal terminal = (AlarmTerminal)neighborComponent;
-                    terminal.Activate();
                     foreach (HashSet<string> pair in visitedEdges) {
                         activeEdges.Add(pair);
                     }

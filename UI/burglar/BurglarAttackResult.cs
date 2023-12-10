@@ -12,8 +12,7 @@ public record BurglarAttackResult {
     public NoiseData noiseData;
 
     public AttackSurfaceElement element;
-    public CyberDataStore attachedDataStore;
-    public CyberComponent attachedCyberComponent;
+    public CyberNode attachedCyberNode;
     public List<Vector3> lockPositions;
     public AttackSurfaceVentCover panel;
     public ElectricalDamage electricDamage;

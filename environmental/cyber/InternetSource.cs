@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InternetSource : CyberComponent {
-    public override void EnableSource() {
-        base.EnableSource();
-        GameManager.I.SetCyberNodeCompromised(this, true);
-    }
-    public override void ConfigureNode(CyberNode node) {
+    public override CyberNode NewNode() {
+        CyberNode node = base.NewNode();
         node.compromised = true;
+        return node;
     }
 }

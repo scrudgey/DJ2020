@@ -36,7 +36,7 @@ public class RandomPayDataInitializer {
     public void Apply() {
         CyberDataStore dataStore = Toolbox.RandomFromList(dataStores);
         Debug.Log($"apply random paydata state: {objectiveData.targetPaydata.name} -> {dataStore.gameObject}");
-        dataStore.payData = objectiveData.targetPaydata;
+        dataStore.node.payData = objectiveData.targetPaydata;
         dataStore.RefreshState();
     }
 }

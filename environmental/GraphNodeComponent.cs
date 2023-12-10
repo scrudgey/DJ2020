@@ -3,12 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node {
+public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node<U>, new() {
     public string idn;
     public string nodeTitle;
     public bool nodeEnabled;
-
+    [HideInInspector]
+    public U node;
     public T[] edges = new T[0];
+    public virtual U NewNode() {
+        return new U() {
+            idn = idn,
+            position = NodePosition(),
+            enabled = true,
+            nodeTitle = nodeTitle
+        };
+    }
+
+    public virtual void HandleNodeChange() {
+
+    }
 
     public Vector3 NodePosition() {
         Transform nodePositioner = transform.Find("node");
@@ -20,16 +33,11 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     public Action<T> OnStateChange;
 
     public virtual void DisableSource() {
-        GameManager.I?.SetNodeEnabled<T, U>((T)this, false);
-        OnStateChange?.Invoke((T)this);
+        GameManager.I?.SetNodeEnabled<U>(node, false);
     }
     public virtual void EnableSource() {
-        GameManager.I?.SetNodeEnabled<T, U>((T)this, true);
-        OnStateChange?.Invoke((T)this);
+        GameManager.I?.SetNodeEnabled<U>(node, true);
     }
-
-    public abstract void ApplyNodeState(U node);
-
     void OnDisable() {
         DisableSource();
     }
@@ -40,11 +48,6 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     virtual public void OnDestroy() {
         DisableSource();
     }
-    public virtual void ConfigureNode(U node) {
-
-    }
-
-    public abstract U GetNode();
 
 #if UNITY_EDITOR
     protected virtual void OnDrawGizmos() {
@@ -55,4 +58,16 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         }
     }
 #endif
+}
+
+
+
+public interface INodeBinder<U> where U : Node<U> {
+    public U node { get; set; }
+    public void HandleNodeChange();
+    public void Bind(U target) {
+        node = target;
+        node.Bind(HandleNodeChange);
+        HandleNodeChange();
+    }
 }

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using UnityEngine;
-public class SecurityCamera : IBinder<SightCone> {
+public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
     enum State { rotateLeft, lookLeft, rotateRight, lookRight }
     State state;
+    public AlarmNode node { get; set; }
     public Transform cameraTransform;
-    public AlarmComponent alarmComponent;
     public SightCone sightCone;
     public Transform sightOrigin;
     public AlertHandler alertHandler;
@@ -35,27 +35,22 @@ public class SecurityCamera : IBinder<SightCone> {
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         audioSource.volume = 0.5f;
-        alarmComponent.OnStateChange += HandleAlarmStateChange;
     }
     void Start() {
         Bind(sightCone.gameObject);
         initialRotation = cameraTransform.rotation;
-        alarmNodeEnabled = alarmComponent.enabled;
     }
-    override public void OnDestroy() {
-        base.OnDestroy();
-        alarmComponent.OnStateChange -= HandleAlarmStateChange;
-    }
-    void HandleAlarmStateChange(AlarmComponent component) {
-        alarmNodeEnabled = component.nodeEnabled;
+    public void HandleNodeChange() {
+        alarmNodeEnabled = node.getEnabled();
         spriteLight.enabled = alarmNodeEnabled;
         IRCone.enabled = alarmNodeEnabled;
         if (!alarmNodeEnabled) {
             audioSource.Stop();
         }
-        // Debug.Log($"{component.idn} security camera setting alarm state change enabled: {alarmNodeEnabled} ");
     }
-
+    override public void OnDestroy() {
+        base.OnDestroy();
+    }
     public override void HandleValueChanged(SightCone t) {
         if (!alarmNodeEnabled)
             return;
@@ -102,8 +97,8 @@ public class SecurityCamera : IBinder<SightCone> {
         }
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (GameManager.I.IsPlayerVisible(distance)) {
-            AlarmNode alarmNode = GameManager.I.GetAlarmNode(alarmComponent.idn);
-            GameManager.I.SetAlarmNodeTriggered(alarmNode, true);
+            // AlarmNode alarmNode = GameManager.I.GetAlarmNode(alarmComponent.idn);
+            GameManager.I.SetAlarmNodeTriggered(node, true);
             alertHandler.ShowAlert();
             cooldown = 5f;
             Toolbox.RandomizeOneShot(audioSource, spottedSound);

@@ -21,8 +21,7 @@ public class CyberdeckCanvasController : MonoBehaviour {
     [Header("software")]
     public GameObject virusButton;
     public GameObject downloadButton;
-    CyberDataStore attachedDataStore;
-    CyberComponent targetComponent;
+    CyberNode targetNode;
     // CyberDataStore attachedDataStore;
     HackData currentHackData;
     void Start() {
@@ -53,14 +52,14 @@ public class CyberdeckCanvasController : MonoBehaviour {
     }
 
     void ShowAttackComplete() {
-        if (attachedDataStore != null) {
+
+        if (targetNode.type == CyberNodeType.datanode) {
             ShowDownloadComplete();
         } else {
             ShowUploadComplete();
         }
         currentHackData = null;
-        attachedDataStore = null;
-        targetComponent = null;
+        targetNode = null;
     }
 
     void ShowDownloadComplete() {
@@ -68,8 +67,8 @@ public class CyberdeckCanvasController : MonoBehaviour {
         progressText1.enabled = true;
         progressText2.enabled = true;
         progressText1.text = "Downloaded file:";
-        if (attachedDataStore != null)
-            progressText2.text = attachedDataStore.payData.filename;
+        if (targetNode.type == CyberNodeType.datanode)
+            progressText2.text = targetNode.payData.filename;
     }
     void ShowUploadComplete() {
         progressBarParent.gameObject.SetActive(false);
@@ -81,13 +80,11 @@ public class CyberdeckCanvasController : MonoBehaviour {
 
     public void HandleConnection(BurglarAttackResult result) {
         if (result != null) {
-            attachedDataStore = result.attachedDataStore;
-            targetComponent = result.attachedCyberComponent;
+            targetNode = result.attachedCyberNode;
         } else {
-            attachedDataStore = null;
-            targetComponent = null;
+            targetNode = null;
         }
-        if (attachedDataStore != null || targetComponent != null) {
+        if (targetNode != null) {
             StartCoroutine(BlinkDetect((bool value) => bodyDetect.SetActive(value), ShowBodyMenu));
         } else {
             ShowBodyText();
@@ -117,10 +114,10 @@ public class CyberdeckCanvasController : MonoBehaviour {
     }
 
     void ShowSoftwareButtons() {
-        if (attachedDataStore != null) {
+        if (targetNode != null && targetNode.type == CyberNodeType.datanode) {
             virusButton.SetActive(false);
             downloadButton.SetActive(true);
-        } else if (targetComponent != null) {
+        } else if (targetNode != null) {
             virusButton.SetActive(true);
             downloadButton.SetActive(false);
         }
@@ -186,11 +183,11 @@ public class CyberdeckCanvasController : MonoBehaviour {
 
 
     public void DataThiefButtonCallback() {
-        SetUpProgressBar("Downloading...", attachedDataStore.GetNode());
+        SetUpProgressBar("Downloading...", targetNode);
     }
 
     public void CameraHackButtonCallback() {
-        SetUpProgressBar("Uploading virus...", targetComponent.GetNode());
+        SetUpProgressBar("Uploading virus...", targetNode);
     }
 
     void SetUpProgressBar(string progressTitle, CyberNode targetNode) {

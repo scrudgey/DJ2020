@@ -20,7 +20,7 @@ public partial class GameManager : Singleton<GameManager> {
     List<CharacterController> strikeTeamMembers;
 
     public void ActivateHQRadioNode() {
-        AlarmRadio terminal = levelRadioTerminal();
+        AlarmNode terminal = levelRadioTerminal();
         if (terminal != null) {
             SetAlarmNodeTriggered(terminal, true);
         }
@@ -80,16 +80,23 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return false;
     }
-    public AlarmRadio levelRadioTerminal() => alarmComponents.Values
-                    .Where(node => node != null & node is AlarmRadio)
-                    .Select(component => (AlarmRadio)component)
+    public AlarmNode levelRadioTerminal() => gameData.levelState.delta.alarmGraph.nodes.Values
+                    .Where(node => node.nodeType == AlarmNode.AlarmNodeType.radio)
                     .FirstOrDefault();
 
     public void RemoveAlarmNode(string idn) {
-        AlarmComponent component = GetAlarmComponent(idn);
-        alarmComponents.Remove(idn);
-        Destroy(component.gameObject);
-        Debug.Log($"removing alarm node {idn}");
+        // TODO: this won't really work!
+        AlarmComponent component = null;
+        foreach (AlarmComponent candidate in GameObject.FindObjectsOfType<AlarmComponent>()) {
+            if (candidate.idn == idn) {
+                component = candidate;
+                break;
+            }
+        }
+        if (component != null) {
+            Destroy(component.gameObject);
+            Debug.Log($"removing alarm node {idn}");
+        }
     }
 
     public void OpenReportTicket(GameObject reporter, HQReport report) {

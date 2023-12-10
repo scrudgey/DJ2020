@@ -4,7 +4,8 @@ using System.Linq;
 using UnityEngine;
 
 
-public class LaserTripwire : AlarmComponent {
+public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
+    public AlarmNode node { get; set; }
     [System.Serializable]
     public class LaserData {
         public LaserBeam laser;
@@ -17,8 +18,7 @@ public class LaserTripwire : AlarmComponent {
     AudioSource audioSource;
     public AudioSource buzzSoundSource;
 
-    public override void Start() {
-        base.Start();
+    public void Start() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         foreach (LaserData data in laserData) {
             data.laser.tripWire = this;
@@ -28,8 +28,6 @@ public class LaserTripwire : AlarmComponent {
     public void LaserTripCallback() {
         if (cooldown > 0)
             return;
-        // GameManager.I.ActivateAlarm();
-        AlarmNode node = GameManager.I.GetAlarmNode(idn);
         GameManager.I.SetAlarmNodeTriggered(node, true);
         cooldown = 5f;
         Toolbox.RandomizeOneShot(audioSource, spottedSound);
@@ -46,8 +44,8 @@ public class LaserTripwire : AlarmComponent {
         }
     }
 
-    override public void DisableSource() {
-        base.DisableSource();
+    public void DisableSource() {
+        // base.DisableSource();
         foreach (LaserData data in laserData) {
             data.laser.gameObject.SetActive(false);
             data.emissionSprite.enabled = false;
@@ -56,12 +54,15 @@ public class LaserTripwire : AlarmComponent {
             audioSource.Stop();
         buzzSoundSource.Stop();
     }
-    override public void EnableSource() {
-        base.EnableSource();
+    public void EnableSource() {
+        // base.EnableSource();
         foreach (LaserData data in laserData) {
             data.laser.gameObject.SetActive(data.enabled);
         }
         if (audioSource != null)
             audioSource.Play();
+    }
+
+    public void HandleNodeChange() {
     }
 }

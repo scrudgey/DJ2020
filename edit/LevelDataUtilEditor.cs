@@ -42,9 +42,9 @@ public class LevelDataUtilEditor : Editor {
                 CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
                 AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
 
-                foreach (Node node in powerGraph.nodes.Values) {
-                    Debug.Log($"writing power graph: {node.idn} {levelName}");
-                }
+                // foreach (Node node in powerGraph.nodes.Values) {
+                //     Debug.Log($"writing power graph: {node.idn} {levelName}");
+                // }
 
                 powerGraph.Write(levelName, sceneName);
                 cyberGraph.Write(levelName, sceneName);
@@ -71,36 +71,30 @@ public class LevelDataUtilEditor : Editor {
     }
 
 
-    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node, new() where V : GraphNodeComponent<V, U> {
+    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node<U>, new() where V : GraphNodeComponent<V, U> {
         T graph = new T();
 
         V[] components = GameObject.FindObjectsOfType<V>();
         string sceneName = SceneManager.GetActiveScene().name;
 
-        foreach (var group in components.GroupBy(component => component.gameObject)) {
+        foreach (V component in components) {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
-            Vector3 position = group.First().NodePosition();
-
+            Vector3 position = component.NodePosition();
+            Debug.Log($"{idn}: {component}");
+            component.idn = idn;
+            component.enabled = true;
             // new node with idn
-            U node = new U {
-                sceneName = sceneName,
-                idn = idn,
-                position = position,
-                enabled = true,
-            };
+            U node = component.NewNode();
+            node.sceneName = sceneName;
             graph.nodes[idn] = node;
-
-            foreach (V component in group) {
-                Debug.Log($"{idn}: {component}");
-                node.nodeTitle = component.nodeTitle;
-                component.idn = idn;
-                component.enabled = true;
-                // allow the subclass to add class-specific configuration
-                component.ConfigureNode(node);
-                EditorUtility.SetDirty(component);
-            }
+            EditorUtility.SetDirty(component);
+            // foreach (INodeBinder<U> nodeBinder in component.GetComponentsInChildren<INodeBinder<U>>()) {
+            //     nodeBinder.idn = idn;
+            // }
         }
+
+
         foreach (V component in components) {
             if (component == null)
                 continue;

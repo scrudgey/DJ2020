@@ -9,10 +9,10 @@ public class CyberRandomizer : MonoBehaviour {
     public CyberDataStore dataStore;
 
     public void ApplyState(LevelTemplate levelTemplate) {
-        if (dataStore != null) {
-            dataStore.payData = Toolbox.RandomFromList(template.payDatas);
-            // dataStore.RefreshState();
-        }
+        // if (dataStore != null) {
+        // dataStore.payData = Toolbox.RandomFromList(template.payDatas);
+        // dataStore.RefreshState();
+        // }
     }
 
 #if UNITY_EDITOR

@@ -4,7 +4,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class NodePopupBox<T, U> : MonoBehaviour where T : Node where U : Graph<T, U> {
+public class NodePopupBox<T, U> : MonoBehaviour where T : Node<T> where U : Graph<T, U> {
     enum State { hidden, easeIn, show, easeOut }
     State state;
     float stateTime;

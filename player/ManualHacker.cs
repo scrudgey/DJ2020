@@ -63,7 +63,7 @@ public class ManualHacker : MonoBehaviour {
             return null;
         } else return cyberComponents
             .ToList()
-            .Where((KeyValuePair<Collider, CyberComponent> kvp) => IsNodeVulnerable(kvp.Value.GetNode()))
+            .Where((KeyValuePair<Collider, CyberComponent> kvp) => IsNodeVulnerable(kvp.Value.node))
             .Select((KeyValuePair<Collider, CyberComponent> kvp) => new ManualHackTargetData(kvp.Value))
             .DefaultIfEmpty(null)
             .First(); // TODO: weigh the targets in some way, return deterministic
@@ -102,7 +102,7 @@ public class ManualHacker : MonoBehaviour {
 
     public List<CyberNode> GetVulnerableNodes() => cyberComponents
         .ToList()
-        .Select((KeyValuePair<Collider, CyberComponent> kvp) => kvp.Value.GetNode())
+        .Select((KeyValuePair<Collider, CyberComponent> kvp) => kvp.Value.node)
         .Where(IsNodeVulnerable)
 
         .ToList();

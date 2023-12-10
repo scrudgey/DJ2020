@@ -2,30 +2,35 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class VRDataStore : Interactive {
+public class VRDataStore : Interactive, INodeBinder<CyberNode> {
+    public CyberNode node { get; set; }
     public AudioSource audioSource;
     public AudioClip openSound;
-    public CyberComponent cyberComponent;
     public Action<VRDataStore> OnDataStoreOpened;
     public SpriteRenderer calloutSprite;
     public ParticleSystem particles;
     public override void Start() {
         base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        cyberComponent.OnStateChange += HandleCyberStateChange;
+        // cyberComponent.OnStateChange += HandleCyberStateChange;
         DeactivateCallout();
     }
-    void OnDestroy() {
-        cyberComponent.OnStateChange -= HandleCyberStateChange;
-    }
-    public void HandleCyberStateChange(CyberComponent component) {
-        if (component.compromised) {
+    // void OnDestroy() {
+    //     cyberComponent.OnStateChange -= HandleCyberStateChange;
+    // }
+    public void HandleNodeChange() {
+        if (node.compromised) {
             Open();
         }
     }
+    // public void HandleCyberStateChange(CyberComponent component) {
+    //     if (component.compromised) {
+    //         Open();
+    //     }
+    // }
     public void Open() {
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        GameManager.I.SetCyberNodeCompromised(cyberComponent, false);
+        // GameManager.I.SetCyberNodeCompromised(cyberComponent, false);
         OnDataStoreOpened?.Invoke(this);
     }
     public void PlayParticles() {

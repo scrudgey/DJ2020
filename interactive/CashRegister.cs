@@ -2,19 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CashRegister : Interactive {
+public class CashRegister : Interactive, INodeBinder<CyberNode> {
+    public CyberNode node { get; set; }
     public bool opened;
     public AudioSource audioSource;
     public AudioClip openSound;
-    public CyberComponent cyberComponent;
     public GameObject credstickPrefab;
     public override void Start() {
         base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        cyberComponent.OnStateChange += HandleCyberStateChange;
+        // cyberComponent.OnStateChange += HandleCyberStateChange;
     }
-    void OnDestroy() {
-        cyberComponent.OnStateChange -= HandleCyberStateChange;
+    // void OnDestroy() {
+    //     cyberComponent.OnStateChange -= HandleCyberStateChange;
+    // }
+    public void HandleNodeChange() {
+        if (node.compromised) Open();
     }
     public override ItemUseResult DoAction(Interactor interactor) {
         Open();
@@ -36,9 +39,9 @@ public class CashRegister : Interactive {
         rigidbody.velocity = velocity;
     }
 
-    public void HandleCyberStateChange(CyberComponent component) {
-        if (component.compromised) {
-            Open();
-        }
-    }
+    // public void HandleCyberStateChange(CyberComponent component) {
+    //     if (component.compromised) {
+    //         Open();
+    //     }
+    // }
 }

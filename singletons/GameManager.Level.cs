@@ -381,9 +381,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void ClearSceneData() {
         // this stuff should all belong to level delta
-        poweredComponents = new Dictionary<string, PoweredComponent>();
-        cyberComponents = new Dictionary<string, CyberComponent>();
-        alarmComponents = new Dictionary<string, AlarmComponent>();
         lastStrikeTeamMember = null;
 
         // TODO: this stuff should belong to level state
@@ -435,19 +432,37 @@ public partial class GameManager : Singleton<GameManager> {
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
-            poweredComponents[component.idn] = component;
+            PowerNode node = GetPowerNode(component.idn);
+            component.node = node;
+            node.Bind(component.HandleNodeChange);
+            component.HandleNodeChange();
+            foreach (INodeBinder<PowerNode> binder in component.GetComponentsInChildren<INodeBinder<PowerNode>>()) {
+                binder.Bind(node);
+            }
         }
 
         // connect up cyber grids
         Debug.Log("connecting cyber grid...");
-        foreach (CyberComponent component in GameObject.FindObjectsOfType<CyberComponent>()) {
-            cyberComponents[component.idn] = component;
+        foreach (CyberComponent component in FindObjectsOfType<CyberComponent>()) {
+            CyberNode node = GetCyberNode(component.idn);
+            component.node = node;
+            node.Bind(component.HandleNodeChange);
+            component.HandleNodeChange();
+            foreach (INodeBinder<CyberNode> binder in component.GetComponentsInChildren<INodeBinder<CyberNode>>()) {
+                binder.Bind(node);
+            }
         }
 
         // connect up alarm grids
         Debug.Log("connecting alarm grid...");
-        foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
-            alarmComponents[component.idn] = component;
+        foreach (AlarmComponent component in FindObjectsOfType<AlarmComponent>()) {
+            AlarmNode node = GetAlarmNode(component.idn);
+            component.node = node;
+            node.Bind(component.HandleNodeChange);
+            component.HandleNodeChange();
+            foreach (INodeBinder<AlarmNode> binder in component.GetComponentsInChildren<INodeBinder<AlarmNode>>()) {
+                binder.Bind(node);
+            }
         }
 
         RefreshPowerGraph();
