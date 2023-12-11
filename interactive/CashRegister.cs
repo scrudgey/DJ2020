@@ -11,11 +11,7 @@ public class CashRegister : Interactive, INodeBinder<CyberNode> {
     public override void Start() {
         base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        // cyberComponent.OnStateChange += HandleCyberStateChange;
     }
-    // void OnDestroy() {
-    //     cyberComponent.OnStateChange -= HandleCyberStateChange;
-    // }
     public void HandleNodeChange() {
         if (node.compromised) Open();
     }
@@ -38,10 +34,4 @@ public class CashRegister : Interactive, INodeBinder<CyberNode> {
 
         rigidbody.velocity = velocity;
     }
-
-    // public void HandleCyberStateChange(CyberComponent component) {
-    //     if (component.compromised) {
-    //         Open();
-    //     }
-    // }
 }

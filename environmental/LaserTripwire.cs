@@ -45,7 +45,6 @@ public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
     }
 
     public void DisableSource() {
-        // base.DisableSource();
         foreach (LaserData data in laserData) {
             data.laser.gameObject.SetActive(false);
             data.emissionSprite.enabled = false;
@@ -55,7 +54,6 @@ public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
         buzzSoundSource.Stop();
     }
     public void EnableSource() {
-        // base.EnableSource();
         foreach (LaserData data in laserData) {
             data.laser.gameObject.SetActive(data.enabled);
         }

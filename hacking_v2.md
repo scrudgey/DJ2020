@@ -167,6 +167,9 @@ software / hardware interaction
 
 discoverability in planning mode
 
+somewhere in here: randomization of datanodes
+
+
 
 
 # UI

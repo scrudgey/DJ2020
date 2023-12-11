@@ -42,10 +42,6 @@ public class LevelDataUtilEditor : Editor {
                 CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
                 AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
 
-                // foreach (Node node in powerGraph.nodes.Values) {
-                //     Debug.Log($"writing power graph: {node.idn} {levelName}");
-                // }
-
                 powerGraph.Write(levelName, sceneName);
                 cyberGraph.Write(levelName, sceneName);
                 alarmGraph.Write(levelName, sceneName);
@@ -89,9 +85,6 @@ public class LevelDataUtilEditor : Editor {
             node.sceneName = sceneName;
             graph.nodes[idn] = node;
             EditorUtility.SetDirty(component);
-            // foreach (INodeBinder<U> nodeBinder in component.GetComponentsInChildren<INodeBinder<U>>()) {
-            //     nodeBinder.idn = idn;
-            // }
         }
 
 

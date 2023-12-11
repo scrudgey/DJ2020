@@ -97,7 +97,6 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
         }
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (GameManager.I.IsPlayerVisible(distance)) {
-            // AlarmNode alarmNode = GameManager.I.GetAlarmNode(alarmComponent.idn);
             GameManager.I.SetAlarmNodeTriggered(node, true);
             alertHandler.ShowAlert();
             cooldown = 5f;

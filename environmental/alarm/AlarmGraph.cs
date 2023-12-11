@@ -7,7 +7,6 @@ using UnityEngine;
 
 [System.Serializable]
 public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
-
     public HashSet<HashSet<string>> activeEdges = new HashSet<HashSet<string>>();
 
     public void Update() {
@@ -17,16 +16,6 @@ public class AlarmGraph : Graph<AlarmNode, AlarmGraph> {
     }
     public void Refresh() {
         activeEdges = new HashSet<HashSet<string>>();
-
-        // refresh alarm terminals
-        // foreach (AlarmNode node in nodes.Values) {
-        //     AlarmComponent component = GameManager.I.GetAlarmComponent(node.idn);
-        //     if (component == null)
-        //         continue;
-
-        //     component.nodeEnabled = node.getEnabled();
-        // }
-
         AlarmNode[] sources = nodes.Values.Where(node => node.alarmTriggered).ToArray();
         foreach (AlarmNode source in sources) {
             if (source.getEnabled())
