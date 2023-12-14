@@ -11,6 +11,7 @@ public class CyberNode : Node<CyberNode> {
     public int lockLevel;
     public bool dataSink;
     public bool dataStolen;
+    public bool utilityActive;
     public CyberNodeStatus status;
     public int visibility;
     public CyberNode() { }

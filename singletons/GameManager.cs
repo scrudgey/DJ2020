@@ -480,6 +480,9 @@ public partial class GameManager : Singleton<GameManager> {
         CameraInput input = default;
         if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
             input = uiController.GetOverlayCameraInput();
+            if (uiController.mouseOverScrollBox) {
+                playerInput.zoomInput = Vector2.zero;
+            }
             characterCamera.SetInputs(playerInput);
         } else {
             input = playerCharacterController.BuildCameraInput();

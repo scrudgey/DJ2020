@@ -623,29 +623,32 @@ first draft: ignore free movement for now.
 * neighbors
     * one button per neighbor
     * scrollrect
+* icons
+* indicator in overlay display
+* clear neighbor mouseover when jumping nodes
+* status text & title could be colored according to status
+* dont zoom when mouse over neighbor scroll view
+* node name & type should be different in all cases
+* info node pane changes:
+    * utility node
 
-
-
-indicator in overlay display
-utility node
-icons
 paydata
-dont zoom when mouse over neighbor scroll view
-clear neighbor mouseover when jumping nodes
-
-
-
 power node info pane
 alarm node info pane
 
 visibility
 
+conditional edge highlighting
+    unselected node: darker, transparent, thinner
+    selected node: full edge
+
+
+sumologic, datadog, crowdstrike
+    security, visibility
 
 
 
-
-
-
+graphs are jumpy on first reveal
 
 changing overlay
     preserve node if a corresponding node exists, otherwise deselect.

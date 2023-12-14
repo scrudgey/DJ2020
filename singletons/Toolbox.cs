@@ -7,6 +7,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 // random from list
 // play a sound with random pitch from randomized list
 // maybe use loudspeaker object
@@ -757,6 +758,15 @@ public class Toolbox {
             yield return null;
         }
         component.enabled = true;
+    }
+
+    public static IEnumerator BlinkVis(Image image, Action inbetweener, float blinkInterval = 0.05f) {
+        WaitForSecondsRealtime waiter = new WaitForSecondsRealtime(blinkInterval / 2f);
+        image.enabled = false;
+        yield return waiter;
+        inbetweener();
+        yield return waiter;
+        image.enabled = true;
     }
 }
 

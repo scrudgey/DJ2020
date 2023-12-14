@@ -9,6 +9,7 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
         CyberNode node = base.NewNode();
         node.type = nodeType;
         node.lockLevel = lockLevel;
+        node.utilityActive = true;
         return node;
     }
     override public void OnDestroy() {

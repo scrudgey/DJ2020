@@ -28,6 +28,8 @@ public class OverlayHandler : MonoBehaviour {
     public INodeCameraProvider selectedNode;
     public RectTransform infoPaneRect;
     public NodeInfoPaneDisplay infoPaneDisplay;
+    public NodeSelectionIndicator selectionIndicator;
+    public UIController uIController;
     Coroutine showInfoRoutine;
     bool infoPaneDisplayed;
     public Camera cam {
@@ -39,6 +41,7 @@ public class OverlayHandler : MonoBehaviour {
     }
     void Awake() {
         powerOverlay.colorSet = powerOverlayColors;
+        selectionIndicator.HideSelection();
     }
     public void Bind() {
         GameManager.OnOverlayChange += HandleOverlayChange;
@@ -140,9 +143,11 @@ public class OverlayHandler : MonoBehaviour {
     }
     public void NodeSelectCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
         selectedNode = indicator;
+        selectionIndicator.ActivateSelection(indicator);
+        cyberOverlay.NeighborButtonMouseExit();
         switch (indicator) {
             case NeoCyberNodeIndicator cybernode:
-                infoPaneDisplay.ConfigureCyberNode(cybernode.node, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+                infoPaneDisplay.ConfigureCyberNode(cybernode, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
                 break;
             case PowerNodeIndicator:
                 break;
@@ -158,6 +163,7 @@ public class OverlayHandler : MonoBehaviour {
         infoPaneDisplayed = false;
         ShowInfoPane(false);
         selectedNode = null;
+        selectionIndicator.HideSelection();
     }
     public void ShowInfoPane(bool value) {
         if (showInfoRoutine != null) {

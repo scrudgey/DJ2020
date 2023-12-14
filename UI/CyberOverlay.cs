@@ -9,6 +9,8 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Color vulnerableColor;
     public Color compromisedColor;
 
+    HashSet<string> neighborEdge;
+
     public override void SetEdgeGraphicState() {
         base.SetEdgeGraphicState();
         foreach (HashSet<string> edge in graph.edgePairs) {
@@ -54,6 +56,8 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
 
 
     public void NeighborButtonClick(string idn) {
+        NeighborButtonMouseExit();
+
         CyberNode node = graph.nodes[idn];
         NeoCyberNodeIndicator indicator = GetIndicator(node);
         overlayHandler.NodeSelectCallback(indicator);
@@ -63,9 +67,12 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
         LineRenderer renderer = GetLineRenderer(edge);
         renderer.material.color = Color.white;
+        neighborEdge = edge;
     }
-    public void NeighborButtonMouseExit(string sourceidn, string neighboridn) {
-        HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
-        SetEdgeState(edge);
+    public void NeighborButtonMouseExit() {
+        if (neighborEdge != null) {
+            SetEdgeState(neighborEdge);
+        }
+        // HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
     }
 }

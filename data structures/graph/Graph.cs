@@ -86,7 +86,6 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                 graph = graph == null ? Load(textAsset) : graph + Load(textAsset) as W;
                 graphCount += 1;
             }
-
         }
         if (graphCount == 0) {
             Debug.LogError($"no graphs found for level {levelName} at {levelPath} with prefix {prefix}...");

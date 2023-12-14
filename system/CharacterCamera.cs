@@ -107,7 +107,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         zoomCoefficientTarget -= input.zoomInput.y * Time.unscaledDeltaTime * 0.1f;
         zoomCoefficientTarget = Math.Clamp(zoomCoefficientTarget, 0.25f, 1.0f);
         zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f);
-        // Debug.Log($"zoom coefficients: {zoomCoefficientTarget} {zoomCoefficient} {zoomVelocity}");
     }
     void Awake() {
         Transform = this.transform;
@@ -392,7 +391,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = Vector3.zero;
             if (state == CameraState.overlayView) {
-                screenOffset = new Vector2(currentOrthographicSize / 2f, 0f);
+                screenOffset = new Vector2(currentOrthographicSize / 3f, 0f);
             } else if (state == CameraState.burgle) {
                 // orthographic size is half-size in world units
                 screenOffset = new Vector2(currentOrthographicSize, 0f);

@@ -38,6 +38,7 @@ public class UIController : MonoBehaviour {
     public SaveIndicatorController saveIndicatorController;
     public WeaponWheelController weaponWheelController;
     public TargetPracticeUIHandler targetPracticeUIHandler;
+    public bool mouseOverScrollBox;
     bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -47,6 +48,7 @@ public class UIController : MonoBehaviour {
         // cameras
         canvas.worldCamera = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
+        overlayHandler.uIController = this;
         overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
         lockRadiusIndicatorHandler.UICamera = Camera.main;

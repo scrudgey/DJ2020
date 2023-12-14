@@ -13,7 +13,6 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     public OverlayHandler overlayHandler { get; set; }
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
-
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
     void Awake() {
         foreach (Transform child in transform) {
