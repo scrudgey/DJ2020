@@ -82,6 +82,8 @@ public partial class GameManager : Singleton<GameManager> {
         if (applicationIsQuitting) return;
         if (gameData.levelState.delta.cyberGraph == null) return;
 
+        gameData.levelState.delta.cyberGraph.Refresh();
+
         // transfer from state -> components
         TransferCyberStateFromGraphToComponents();
 

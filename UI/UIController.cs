@@ -189,4 +189,12 @@ public class UIController : MonoBehaviour {
         // saveIndicatorController.ShowSaveIndicator();
     }
 
+    public bool OverlayNodeIsSelected() {
+        return overlayHandler.selectedNode != null;
+    }
+
+    public CameraInput GetOverlayCameraInput() {
+        return overlayHandler.selectedNode.GetCameraInput();
+    }
+
 }

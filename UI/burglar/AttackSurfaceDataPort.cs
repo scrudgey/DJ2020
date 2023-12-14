@@ -6,7 +6,6 @@ public class AttackSurfaceDataPort : AttackSurfaceElement, INodeBinder<CyberNode
     public CyberNode node { get; set; }
     public AudioSource audioSource;
     public AudioClip attachSound;
-    public CyberDataStore dataStore;
 
     public void HandleNodeChange() { }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
@@ -17,7 +16,6 @@ public class AttackSurfaceDataPort : AttackSurfaceElement, INodeBinder<CyberNode
                 success = true,
                 feedbackText = "connected dataport",
                 element = this,
-                attachedDataStore = dataStore,
                 attachedCyberNode = node
             };
         }

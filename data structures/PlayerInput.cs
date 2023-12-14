@@ -51,9 +51,8 @@ public struct PlayerInput {
     public static PlayerInput none = new PlayerInput {
         Fire = FireInputs.none
     };
-    public Vector2 MoveAxis() {
-        return new Vector2(MoveAxisRight, MoveAxisForward);
-    }
+    public Vector2 MoveAxis() => new Vector2(MoveAxisRight, MoveAxisForward);
+    public Vector3 MoveInputVector() => Vector3.ClampMagnitude(new Vector3(MoveAxisRight, 0f, MoveAxisForward), 1f);
 }
 
 public struct OverrideInput {

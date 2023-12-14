@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler where T : Node<T> where U : Graph<T, U> {
+public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, INodeCameraProvider where T : Node<T> where U : Graph<T, U> {
+    static readonly Vector2 HALFSIES = Vector2.one / 2f;
     public Image image;
     public RectTransform rectTransform;
     public Color enabledColor;
@@ -35,6 +36,28 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         onMouseExit?.Invoke(this);
     }
     public virtual void OnPointerClick(PointerEventData pointerEventData) {
+        overlay.overlayHandler.NodeSelectCallback(this);
+    }
 
+    public CameraInput GetCameraInput() {
+        CursorData data = CursorData.none;
+        data.screenPositionNormalized = HALFSIES;
+        return new CameraInput {
+            deltaTime = Time.deltaTime,
+            wallNormal = Vector3.zero,
+            lastWallInput = Vector2.zero,
+            crouchHeld = false,
+            playerPosition = node.position,
+            state = CharacterState.overlayView,
+            targetData = data,
+            playerDirection = Vector3.zero,
+            popoutParity = PopoutParity.left,
+            aimCameraRotation = Quaternion.identity,
+            targetTransform = null,
+            targetPosition = node.position,
+            atLeftEdge = false,
+            atRightEdge = false,
+            currentAttackSurface = null
+        };
     }
 }

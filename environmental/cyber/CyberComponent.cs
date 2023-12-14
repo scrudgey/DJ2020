@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
     public CyberNodeType nodeType;
+    public int lockLevel;
     public override CyberNode NewNode() {
         CyberNode node = base.NewNode();
         node.type = nodeType;
+        node.lockLevel = lockLevel;
         return node;
     }
     override public void OnDestroy() {

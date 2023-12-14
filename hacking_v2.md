@@ -182,8 +182,25 @@ various line conditions:
 4. unselected unmoused edge
 
 
+# readibility
 
+the basic idea behind readibility is that we need to separate camera movement due to player
+from camera movement to inspect graph.
 
+questions:
+how to allow graph inspection at a glance? being tied to player location is a problem.
+how to handle overlapping nodes?
+when a node is drawn on top of the object: what then?
+
+1. navigate to center of mass of graph and adjust zoom
+2. snap nodes to a grid, and add a small callout line to the object they control
+3. allow nodes to interact via 2d physics and add callout line
+4. click on a node: jump camera to that node.
+    info pane contains buttons to jump to neighbors
+
+free camera mode?
+    WASD or some buttons on screen move camera?
+        blinking -> arrows on edges to indicate?
 
 
 
@@ -357,7 +374,6 @@ data sink: yes/no
 
 data stolen: yes/no
 
-
 invulnerable: basic state of all nodes
 vulnerable: connected to a compromised node
     cyberdeck
@@ -375,8 +391,7 @@ exploit:    deploy against any vulnerable unlocked node
 
 viruses are unique:
     deploy against any vulnerable node
-    they hop and 
-
+    they hop and activate against all connected nodes
 
 in order to run datathief:
     node needs to be unlocked
@@ -518,7 +533,7 @@ then:
 4. consider alarm sensors: frequently they use game level state to affect graph state.
     in this case we propagate from world model to data model.
 
-can Node be record class?
+can Node be record class? no: we prefer to store references.
 
 when building graph, get all subcomponents that implement an interface NodeBinder and populate their idns
 then at runtime after loading graph bind all NodeBinders
@@ -531,3 +546,110 @@ and nothing in the NodeComponent is used.
 * alarm component state
 * powered component state
 * handle attack surface wires
+* datafile indicator is apparently incorrect
+* wan icon is incorrect
+* alarm central and laser grid should be utility
+* camera -> utility
+* node locations incorrect
+* set all node types in editor
+* implement first round of data model changes
+* in cyber UI:
+    * icons
+    * locks
+    * datafile present
+    * color indicates status
+
+* data indicator is hard to read
+* locks:
+* set lock and data color?
+* line thickness & color is incorrect
+* set line color:
+    * from compromised -> vulnerable: orange
+    * from compromised -> compromised: red
+
+
+snap line points
+basic selection / navigability
+    -> needs to interact w camera
+disable hacking as it works today
+
+
+
+# navigability 
+
+regular mode:
+    input from input controller
+    input -> character controller
+    camera input from character controller
+    camera input -> camera
+overlay:
+    input from input controller
+    if overlay is active:
+        input -> camera??? (something new here?)
+    if a node is selected:
+        camera input from overlay controller
+        camera inpur -> camera ?
+
+problem: WASD free movement conflicts when player takes out cyberdeck tool and cyber overlay comes up.
+problem: when cyber overlay is active, player movement stops.
+    only stop movement once a node is selected
+    deselect node when:
+        player clicks close button on info panel
+        player closes cyber overlay
+one possible solution:
+    intermediate cyber overlay shows nodes and allows player to move around and connect to a node, but does not switch to 
+    full cyber overlay mode until player clicks on a node.
+        mouseover targets different nodes- controls like a gun - exclusive of guns
+        nodes highlight in a way when player is in range- connects when mouseover- node changes color to indicate vulnerable
+        click node-  drop into cyber overlay
+first draft: ignore free movement for now.
+
+
+
+* when a node is active: 
+    * camera input comes from cyber overlay
+    * player is not controlled.
+* allow zooming in/out
+* there is some sort of offset.
+* show info pane
+    * show close button
+* configure info pane
+    * title: name
+    * icon
+    * type
+    * status
+    * datafile
+    * lock
+* neighbors
+    * one button per neighbor
+    * scrollrect
+
+
+
+indicator in overlay display
+utility node
+icons
+paydata
+dont zoom when mouse over neighbor scroll view
+clear neighbor mouseover when jumping nodes
+
+
+
+power node info pane
+alarm node info pane
+
+visibility
+
+
+
+
+
+
+
+
+changing overlay
+    preserve node if a corresponding node exists, otherwise deselect.
+make nodes button-like
+    mouseover effect indicates clickability
+    cursor changes
+    edges are highlighted

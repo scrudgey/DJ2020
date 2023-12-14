@@ -30,5 +30,4 @@ public class PowerNodeIndicator : NodeIndicator<PowerNode, PowerGraph> {
             image.color = disabledColor;
         }
     }
-
 }

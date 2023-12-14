@@ -467,23 +467,29 @@ public partial class GameManager : Singleton<GameManager> {
 
     void DoInputs() {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
+
         PlayerInput playerInput = PlayerInput.none;
         if (Time.timeScale > 0) {
             playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
             if (gameData.levelState != null)
                 uiController?.UpdateWithPlayerInput(ref playerInput);
         }
-        // Debug.Log(playerInput.selectgun);
-        foreach (IInputReceiver i in inputReceivers) {
-            Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
-            playerInput.lookAtDirection = directionToCursor;
-            i.SetInputs(playerInput);
-            // i.SetInputs(playerInput with { lookAtDirection = directionToCursor });
-        }
+
         UpdateCursor(uiclick, playerInput);
 
-        // still not 100% clean here
-        CameraInput input = playerCharacterController.BuildCameraInput();
+        CameraInput input = default;
+        if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
+            input = uiController.GetOverlayCameraInput();
+            characterCamera.SetInputs(playerInput);
+        } else {
+            input = playerCharacterController.BuildCameraInput();
+            foreach (IInputReceiver i in inputReceivers) {
+                Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
+                playerInput.lookAtDirection = directionToCursor;
+                i.SetInputs(playerInput);
+            }
+        }
+
         characterCamera.UpdateWithInput(input);
 
         if (playerInput.incrementOverlay != 0) {

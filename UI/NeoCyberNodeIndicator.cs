@@ -6,72 +6,60 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
+    public Image iconImage;
+    public Image outlineImage;
+    [Header("colors")]
+    public Color invulnerableColor;
+    public Color vulnerableColor;
     public Color compromisedColor;
-    public AudioSource audioSource;
-    public AudioClip mouseOver;
-    public AudioClip mouseOverVulnerable;
+    [Header("decor")]
+    public CyberNodeIndicatorLockWidget lockWidget;
+    public CyberNodeIndicatorDataWidget dataWidget;
     [Header("sprites")]
     public Sprite normalIcon;
-    public Sprite payDataIcon;
-    public Sprite objectiveDataIcon;
-    public Sprite personnelDataIcon;
-    public Sprite locationDataIcon;
-    public Sprite passwordDataIcon;
+    public Sprite wanIcon;
+    public Sprite datastoreIcon;
     public Sprite utilityIcon;
-    public Sprite lockedIcon;
     protected override void SetGraphicalState(CyberNode node) {
         image.sprite = normalIcon;
 
-        if (node.getEnabled()) {
-            if (!node.compromised) {
-                image.color = enabledColor;
-            } else {
-                image.color = compromisedColor;
-            }
+        switch (node.type) {
+            case CyberNodeType.normal:
+                iconImage.sprite = normalIcon;
+                break;
+            case CyberNodeType.datanode:
+                iconImage.sprite = datastoreIcon;
+                break;
+            case CyberNodeType.utility:
+                iconImage.sprite = utilityIcon;
+                break;
+            case CyberNodeType.WAN:
+                iconImage.sprite = wanIcon;
+                break;
+        }
+
+        Color nodeColor = node.status switch {
+            CyberNodeStatus.invulnerable => invulnerableColor,
+            CyberNodeStatus.vulnerable => vulnerableColor,
+            CyberNodeStatus.compromised => compromisedColor,
+            _ => invulnerableColor
+        };
+        if (!node.getEnabled()) nodeColor = disabledColor;
+
+        iconImage.color = nodeColor;
+        outlineImage.color = nodeColor;
+        lockWidget.SetColor(nodeColor);
+        dataWidget.SetColor(nodeColor);
+
+        lockWidget.gameObject.SetActive(node.lockLevel > 0);
+        if (node.lockLevel > 0) {
+            lockWidget.SetLockLevel(node.lockLevel);
+        }
+
+        if (node.type == CyberNodeType.datanode) {
+            dataWidget.gameObject.SetActive(!node.dataStolen);
         } else {
-            image.color = disabledColor;
+            dataWidget.gameObject.SetActive(false);
         }
-    }
-
-    public override void OnPointerEnter(PointerEventData eventData) {
-        base.OnPointerEnter(eventData);
-        if (GameManager.I.IsCyberNodeVulnerable(node)) {
-            // showSelectionIndicator = false;
-            audioSource.PlayOneShot(mouseOverVulnerable);
-
-            // notify hack controller that vulnerability changed
-            HackController.I.HandleVulnerableNetworkNode(node);
-        } else {
-            audioSource.PlayOneShot(mouseOver);
-        }
-
-        CyberOverlay cb = (CyberOverlay)overlay;
-        // cb.NodeMouseOverCallback(this);
-    }
-    public override void OnPointerExit(PointerEventData eventData) {
-        base.OnPointerExit(eventData);
-
-        CyberOverlay cb = (CyberOverlay)overlay;
-        // cb.NodeMouseExitCallback(this);
-
-        // notify hack controller that vulnerability changed
-        HackController.I.HandleVulnerableNetworkNode(null);
-    }
-
-    public override void OnPointerClick(PointerEventData pointerEventData) {
-        base.OnPointerClick(pointerEventData);
-        if (GameManager.I.IsCyberNodeVulnerable(node)) {
-            HackInput input = new HackInput {
-                targetNode = node,
-                type = HackType.network
-            };
-            HackController.I.HandleHackInput(input);
-        }
-    }
-
-    public List<CyberNode> GetVulnerableNodes() {
-        if (GameManager.I.IsCyberNodeVulnerable(node)) {
-            return new List<CyberNode> { node };
-        } else return new List<CyberNode>();
     }
 }

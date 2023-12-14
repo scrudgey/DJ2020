@@ -21,7 +21,8 @@ public enum CharacterState {
     useItem,
     zapped,
     hvac,
-    hvacAim
+    hvacAim,
+    overlayView
 }
 public enum ClimbingState {
     Anchoring,
@@ -438,7 +439,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         armsRaised = input.armsRaised;
         // Clamp input
         // TODO: this is weird
-        Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(input.MoveAxisRight, 0f, input.MoveAxisForward), 1f);
+        Vector3 moveInputVector = input.MoveInputVector();
         if (moveInputVector != Vector3.zero) {
             crouchStick = false;
         }

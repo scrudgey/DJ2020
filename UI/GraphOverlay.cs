@@ -10,6 +10,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     protected Graph<U, T> graph;
     public Material lineRendererMaterial;
     public Material marchingAntsMaterial;
+    public OverlayHandler overlayHandler { get; set; }
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
 
@@ -72,7 +73,7 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     }
 
     void SetLinePositions(LineRenderer renderer, U node1, U node2) {
-        // bool yFlag = Mathf.Abs(node1.position.x - node2.position.x) > 2f;
+        bool yFlag = Mathf.Abs(node1.position.x - node2.position.x) > 2f;
         bool xFlag = Mathf.Abs(node1.position.x - node2.position.x) > 1f;
         bool zFlag = Mathf.Abs(node1.position.z - node2.position.z) > 1f;
 
@@ -80,18 +81,21 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         points.Add(node1.position);
         // if (yFlag)
         points.Add(new Vector3(node1.position.x, node2.position.y, node1.position.z));
-        if (xFlag)
-            points.Add(new Vector3(node2.position.x, node2.position.y, node1.position.z));
+        // if (xFlag)
+        points.Add(new Vector3(node2.position.x, node2.position.y, node1.position.z));
 
-        if (zFlag)
-            points.Add(new Vector3(node2.position.x, node2.position.y, node2.position.z));
+        // if (zFlag)
+        points.Add(new Vector3(node2.position.x, node2.position.y, node2.position.z));
 
         points.Add(node2.position);
+
+        // TODO: snap
+
         renderer.positionCount = points.Count;
         renderer.SetPositions(points.ToArray());
     }
 
-    V GetIndicator(U node) {
+    protected V GetIndicator(U node) {
         if (indicators.ContainsKey(node)) {
             return indicators[node];
         } else {
@@ -128,11 +132,13 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         renderer.endColor = Color.white;
         renderer.alignment = LineAlignment.View;
         renderer.textureMode = LineTextureMode.Stretch;
+        renderer.numCapVertices = 5;
+        renderer.numCornerVertices = 5;
         renderer.shadowBias = 0.5f;
         renderer.generateLightingData = false;
-        renderer.widthCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0f, 0.01f), new Keyframe(1f, 0.01f) });
+        // renderer.widthCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(1f, 1f) });
         // renderer.widthMultiplier = 0.2f;
-        renderer.widthMultiplier = 1f;
+        renderer.widthMultiplier = 0.05f;
         renderer.materials = new Material[1] { lineRendererMaterial };
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
@@ -140,10 +146,13 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         // renderer.reflectionProbeUsage = false;
         renderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
         renderer.allowOcclusionWhenDynamic = false;
-        renderer.sortingLayerName = "UI";
-        renderer.sortingOrder = 100;
+        // renderer.sortingLayerName = "linerender";
+        // renderer.sortingOrder = 100;
 
-        renderer.widthCurve = new AnimationCurve(new Keyframe(0, 0.05f), new Keyframe(1, 0.05f));
+        renderer.gameObject.layer = LayerUtil.GetLayer(Layer.linerender);
+
+        renderer.widthCurve = new AnimationCurve(new Keyframe(0, 1f), new Keyframe(1, 1f));
+        Debug.Log(renderer.sortingLayerName);
         return renderer;
     }
 }

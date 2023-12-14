@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,11 @@ public class OverlayHandler : MonoBehaviour {
     public UIColorSet alarmOverlayColors;
     public AudioClip[] overlayButtonSounds;
     public AudioSource audioSource;
+    public INodeCameraProvider selectedNode;
+    public RectTransform infoPaneRect;
+    public NodeInfoPaneDisplay infoPaneDisplay;
+    Coroutine showInfoRoutine;
+    bool infoPaneDisplayed;
     public Camera cam {
         get { return _cam; }
         set {
@@ -39,6 +45,10 @@ public class OverlayHandler : MonoBehaviour {
         GameManager.OnPowerGraphChange += RefreshPowerGraph;
         GameManager.OnCyberGraphChange += RefreshCyberGraph;
         GameManager.OnAlarmGraphChange += RefreshAlarmGraph;
+
+        powerOverlay.overlayHandler = this;
+        cyberOverlay.overlayHandler = this;
+        alarmOverlay.overlayHandler = this;
 
         RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
@@ -128,4 +138,42 @@ public class OverlayHandler : MonoBehaviour {
         GameManager.I.SetOverlay(newOverlay);
         Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds, randomPitchWidth: 0.05f);
     }
+    public void NodeSelectCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
+        selectedNode = indicator;
+        switch (indicator) {
+            case NeoCyberNodeIndicator cybernode:
+                infoPaneDisplay.ConfigureCyberNode(cybernode.node, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+                break;
+            case PowerNodeIndicator:
+                break;
+            case AlarmNodeIndicator:
+                break;
+        }
+        if (!infoPaneDisplayed) {
+            infoPaneDisplayed = true;
+            ShowInfoPane(true);
+        }
+    }
+    public void InfoPaneDoneButtonCallback() {
+        infoPaneDisplayed = false;
+        ShowInfoPane(false);
+        selectedNode = null;
+    }
+    public void ShowInfoPane(bool value) {
+        if (showInfoRoutine != null) {
+            StopCoroutine(showInfoRoutine);
+        }
+        showInfoRoutine = StartCoroutine(EaseInInfoPane(value));
+    }
+
+    IEnumerator EaseInInfoPane(bool value) {
+        float y = infoPaneRect.anchoredPosition.y;
+        float startX = infoPaneRect.anchoredPosition.x;
+        float finishX = value ? 0 : 550;
+        yield return Toolbox.Ease(null, 0.5f, startX, finishX, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+            infoPaneRect.anchoredPosition = new Vector2(amount, y);
+        }, unscaledTime: true);
+    }
+
+
 }

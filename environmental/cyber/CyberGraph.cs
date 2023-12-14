@@ -17,4 +17,22 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             return false;
         } else return false;
     }
+
+    public CyberNodeStatus GetStatus(CyberNode node) {
+        if (node.compromised) {
+            return CyberNodeStatus.compromised;
+        } else {
+            if (IsCyberNodeVulnerable(node)) {
+                return CyberNodeStatus.vulnerable;
+            } else {
+                return CyberNodeStatus.invulnerable;
+            }
+        }
+    }
+
+    public void Refresh() {
+        foreach (CyberNode node in nodes.Values) {
+            node.status = GetStatus(node);
+        }
+    }
 }
