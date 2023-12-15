@@ -1,62 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NodeInfoPaneDisplay : MonoBehaviour {
+public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
     public TextMeshProUGUI title;
-    public TextMeshProUGUI type;
-    public TextMeshProUGUI status;
     public TextMeshProUGUI lockStatus;
     public Image icon;
-    public NodeDataInfoDisplay dataInfoDisplay;
-    public NodeUtilityInterfaceDisplay utilityInterfaceDisplay;
     public GameObject neighborContainer;
     public Transform neighborbuttonContainer;
     public GameObject neighborButtonPrefab;
-    [Header("colors")]
-    public Color invulnerableColor;
-    public Color vulnerableColor;
-    public Color compromisedColor;
-    CyberNode node;
-    CyberOverlay handler;
+    [HideInInspector]
+    public U node;
+    [HideInInspector]
+    public GraphOverlay<T, U, V> handler;
+    [HideInInspector]
+    public V indicator;
 
     // TODO: support visibility
-    // TODO: support utility node
-    public void ConfigureCyberNode(NeoCyberNodeIndicator indicator, CyberGraph graph, CyberOverlay handler) {
+    public void Configure(V indicator, T graph, GraphOverlay<T, U, V> handler) {
         this.node = indicator.node;
         this.handler = handler;
-
+        this.indicator = indicator;
         title.text = node.nodeTitle;
-        type.text = $"{node.type}";
-        status.text = $"{node.status}";
-        lockStatus.text = $"lock: {node.lockLevel}";
         icon.sprite = indicator.iconImage.sprite;
+        ConfigureNode();
+        ConfigureNeighbors(graph);
+    }
+    public abstract void ConfigureNode();
 
-        Color statusColor = node.status switch {
-            CyberNodeStatus.invulnerable => invulnerableColor,
-            CyberNodeStatus.vulnerable => vulnerableColor,
-            CyberNodeStatus.compromised => compromisedColor,
-            _ => invulnerableColor
-        };
-        icon.color = statusColor;
-        title.color = statusColor;
-        type.color = statusColor;
-        status.color = statusColor;
-
-        if (node.type == CyberNodeType.datanode && node.payData != null) {
-            dataInfoDisplay.Configure(node.payData);
-            dataInfoDisplay.gameObject.SetActive(true);
-            utilityInterfaceDisplay.gameObject.SetActive(false);
-        } else if (node.type == CyberNodeType.utility) {
-            utilityInterfaceDisplay.Configure(node);
-            dataInfoDisplay.gameObject.SetActive(false);
-            utilityInterfaceDisplay.gameObject.SetActive(true);
-        } else {
-            dataInfoDisplay.gameObject.SetActive(false);
-            utilityInterfaceDisplay.gameObject.SetActive(false);
-        }
+    protected void ConfigureNeighbors(T graph) {
 
         foreach (Transform child in neighborbuttonContainer) {
             Destroy(child.gameObject);
@@ -80,10 +52,9 @@ public class NodeInfoPaneDisplay : MonoBehaviour {
     public void NeighborButtonMouseOver(string idn) {
         handler.NeighborButtonMouseOver(node.idn, idn);
     }
-    public void NeighborButtonMouseExit(string idn) {
+    public void NeighborButtonMouseExit() {
         handler.NeighborButtonMouseExit();
     }
-
     public void MouseOverScrollBox() {
         handler.overlayHandler.uIController.mouseOverScrollBox = true;
     }

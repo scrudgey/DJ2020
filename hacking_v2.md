@@ -631,28 +631,74 @@ first draft: ignore free movement for now.
 * node name & type should be different in all cases
 * info node pane changes:
     * utility node
+* power node info pane
+* alarm node info pane
+* lock text should be blue
+* wire up rest of alarm / power node info panes
+* changing overlay
+    * selecting no overlay should hide info pane
+    * changing overlay should deselect active node
 
-paydata
-power node info pane
-alarm node info pane
-
-visibility
 
 conditional edge highlighting
     unselected node: darker, transparent, thinner
     selected node: full edge
-
-
-sumologic, datadog, crowdstrike
-    security, visibility
-
-
-
-graphs are jumpy on first reveal
-
-changing overlay
-    preserve node if a corresponding node exists, otherwise deselect.
 make nodes button-like
     mouseover effect indicates clickability
     cursor changes
     edges are highlighted
+
+
+
+paydata
+visibility
+
+
+graphs are jumpy on first reveal
+preserve node if a corresponding node exists, otherwise deselect.
+
+
+
+
+
+
+
+
+
+paydata load is tricky. we need to dress the graph with randomization. s
+    given that we don't expect to save paydata, this is probably okay.
+    but it means that cyber graph loading is handled differently!
+there are three parts:
+    baked level template
+        graph initial state with no paydata
+        randomizer info
+    gamedata
+        level plan: tactic info that reveals some node state / visibility
+    level instance
+        graph instance
+
+we want to initialize the level graph instance in a way that respects all the other information.
+during plan phase:
+    load graph template from level template
+    apply information from level plan
+during mission phase:
+    load graph template from level template
+    apply information from level plan
+    apply randomization from level template on uninitialized nodes
+
+randomizer:
+    set in level gen util, or somewhere
+    a set:
+        required paydata
+        possible nodes
+    infill:
+        paydata random template
+
+    alert if # nodes < # paydata
+    alert if two sets contain overlapping nodes
+    generates:
+        (idn, paydata) 
+    to apply:
+        load graph template
+        for each idn:
+            load paydata, add to node

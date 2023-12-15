@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
-    public Image iconImage;
     public Image outlineImage;
     [Header("colors")]
     public Color invulnerableColor;
@@ -21,9 +20,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Sprite datastoreIcon;
     public Sprite utilityIcon;
     protected override void SetGraphicalState(CyberNode node) {
-        image.sprite = normalIcon;
-
-        switch (node.type) {
+    switch (node.type) {
             case CyberNodeType.normal:
                 iconImage.sprite = normalIcon;
                 break;

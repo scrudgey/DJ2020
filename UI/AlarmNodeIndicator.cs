@@ -13,15 +13,15 @@ public class AlarmNodeIndicator : NodeIndicator<AlarmNode, AlarmGraph> {
     [Header("sprites")]
     public Sprite normalIcon;
     protected override void SetGraphicalState(AlarmNode node) {
-        image.sprite = normalIcon;
+        iconImage.sprite = normalIcon;
 
         if (!node.getEnabled()) {
-            image.color = deadColor;
+            iconImage.color = deadColor;
         } else if (node.alarmTriggered) {
-            image.color = enabledColor;
+            iconImage.color = enabledColor;
             timerRect.sizeDelta = new Vector2(node.countdownTimer / 30f * bkgRect.rect.width, 1f);
         } else {
-            image.color = disabledColor;
+            iconImage.color = disabledColor;
         }
 
         if (node.countdownTimer > 0f) {

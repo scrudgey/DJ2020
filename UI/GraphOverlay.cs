@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
+public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
     public UIColorSet colorSet;
     public Camera cam;
     public GameObject nodeIndicatorPrefab;
@@ -11,6 +11,8 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
     public Material lineRendererMaterial;
     public Material marchingAntsMaterial;
     public OverlayHandler overlayHandler { get; set; }
+    HashSet<string> neighborEdge;
+
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
@@ -62,16 +64,24 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
             U node2 = graph.nodes[nodes[1]];
             if (node1.sceneName != sceneName || node2.sceneName != sceneName)
                 continue;
-
-            V indicator1 = GetIndicator(node1);
-            V indicator2 = GetIndicator(node2);
+            // V indicator1 = GetIndicator(node1);
+            // V indicator2 = GetIndicator(node2);
             LineRenderer renderer = GetLineRenderer(edge);
             SetLinePositions(renderer, node1, node2);
-            renderer.colorGradient = Toolbox.Gradient2Color(indicator1.image.color, indicator2.image.color);
+            SetEdgeState(renderer, node1, node2);
         }
     }
+    public void SetEdgeState(HashSet<string> edge) {
+        string[] nodes = edge.ToArray();
+        U node1 = graph.nodes[nodes[0]];
+        U node2 = graph.nodes[nodes[1]];
+        LineRenderer renderer = GetLineRenderer(edge);
+        SetEdgeState(renderer, node1, node2);
+    }
 
-    void SetLinePositions(LineRenderer renderer, U node1, U node2) {
+    public abstract void SetEdgeState(LineRenderer renderer, U node1, U node2);
+
+    protected void SetLinePositions(LineRenderer renderer, U node1, U node2) {
         bool yFlag = Mathf.Abs(node1.position.x - node2.position.x) > 2f;
         bool xFlag = Mathf.Abs(node1.position.x - node2.position.x) > 1f;
         bool zFlag = Mathf.Abs(node1.position.z - node2.position.z) > 1f;
@@ -153,5 +163,26 @@ public class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where
         renderer.widthCurve = new AnimationCurve(new Keyframe(0, 1f), new Keyframe(1, 1f));
         Debug.Log(renderer.sortingLayerName);
         return renderer;
+    }
+
+
+    public void NeighborButtonClick(string idn) {
+        NeighborButtonMouseExit();
+        U node = graph.nodes[idn];
+        V indicator = GetIndicator(node);
+        overlayHandler.NodeSelectCallback(indicator);
+    }
+
+    public void NeighborButtonMouseOver(string sourceidn, string neighboridn) {
+        HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
+        LineRenderer renderer = GetLineRenderer(edge);
+        renderer.material.color = Color.white;
+        neighborEdge = edge;
+    }
+    public void NeighborButtonMouseExit() {
+        if (neighborEdge != null) {
+            SetEdgeState(neighborEdge);
+        }
+        // HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
     }
 }

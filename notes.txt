@@ -3571,3 +3571,9 @@ we should display floor number.
 
 some sort of pseudo-3d offset map in the escape menu
 
+
+
+
+put trailer on steam page
+publish trailer on twitter
+update the steam page graphic

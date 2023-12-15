@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, INodeCameraProvider where T : Node<T> where U : Graph<T, U> {
     static readonly Vector2 HALFSIES = Vector2.one / 2f;
-    public Image image;
+    public Image iconImage;
     public RectTransform rectTransform;
     public Color enabledColor;
     public Color disabledColor;

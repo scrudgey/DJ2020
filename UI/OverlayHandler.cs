@@ -26,12 +26,14 @@ public class OverlayHandler : MonoBehaviour {
     public AudioClip[] overlayButtonSounds;
     public AudioSource audioSource;
     public INodeCameraProvider selectedNode;
-    public RectTransform infoPaneRect;
-    public NodeInfoPaneDisplay infoPaneDisplay;
+    // public RectTransform infoPaneRect;
+    public CyberNodeInfoPaneDisplay cyberInfoPaneDisplay;
+    public PowerNodeInfoDisplay powerInfoPaneDisplay;
+    public AlarmNodeInfoDisplay alarmInfoPaneDisplay;
     public NodeSelectionIndicator selectionIndicator;
     public UIController uIController;
+    GameObject activeInfoPane;
     Coroutine showInfoRoutine;
-    bool infoPaneDisplayed;
     public Camera cam {
         get { return _cam; }
         set {
@@ -121,6 +123,8 @@ public class OverlayHandler : MonoBehaviour {
         } else {
             outlineImage.enabled = true;
         }
+        ShowInfoPane(null);
+        activeInfoPane = null;
     }
 
     public void NextOverlayButton() {
@@ -145,37 +149,60 @@ public class OverlayHandler : MonoBehaviour {
         selectedNode = indicator;
         selectionIndicator.ActivateSelection(indicator);
         cyberOverlay.NeighborButtonMouseExit();
+        powerOverlay.NeighborButtonMouseExit();
+        alarmOverlay.NeighborButtonMouseExit();
+        GameObject infoPane = null;
         switch (indicator) {
             case NeoCyberNodeIndicator cybernode:
-                infoPaneDisplay.ConfigureCyberNode(cybernode, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+                cyberInfoPaneDisplay.Configure(cybernode, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+                infoPane = cyberInfoPaneDisplay.gameObject;
                 break;
-            case PowerNodeIndicator:
+            case PowerNodeIndicator powernode:
+                powerInfoPaneDisplay.Configure(powernode, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
+                infoPane = powerInfoPaneDisplay.gameObject;
                 break;
-            case AlarmNodeIndicator:
+            case AlarmNodeIndicator alarmnode:
+                alarmInfoPaneDisplay.Configure(alarmnode, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
+                infoPane = alarmInfoPaneDisplay.gameObject;
                 break;
         }
-        if (!infoPaneDisplayed) {
-            infoPaneDisplayed = true;
-            ShowInfoPane(true);
+        if (infoPane != activeInfoPane) {
+            ShowInfoPane(infoPane);
+            activeInfoPane = infoPane;
         }
     }
     public void InfoPaneDoneButtonCallback() {
-        infoPaneDisplayed = false;
-        ShowInfoPane(false);
+        // infoPaneDisplayed = false;
+        activeInfoPane = null;
+        ShowInfoPane(null);
         selectedNode = null;
         selectionIndicator.HideSelection();
     }
-    public void ShowInfoPane(bool value) {
+    public void ShowInfoPane(GameObject infoPane) {
         if (showInfoRoutine != null) {
             StopCoroutine(showInfoRoutine);
         }
-        showInfoRoutine = StartCoroutine(EaseInInfoPane(value));
+
+        if (infoPane != activeInfoPane) {
+            if (activeInfoPane != null) {
+                showInfoRoutine = StartCoroutine(Toolbox.ChainCoroutines(
+                    EaseInInfoPane(false, activeInfoPane),
+                    EaseInInfoPane(true, infoPane)
+                ));
+            } else {
+                showInfoRoutine = StartCoroutine(EaseInInfoPane(true, infoPane));
+            }
+        } else {
+            showInfoRoutine = StartCoroutine(EaseInInfoPane(true, infoPane));
+        }
     }
 
-    IEnumerator EaseInInfoPane(bool value) {
+    IEnumerator EaseInInfoPane(bool value, GameObject pane) {
+        RectTransform infoPaneRect = pane.GetComponent<RectTransform>();
+
         float y = infoPaneRect.anchoredPosition.y;
         float startX = infoPaneRect.anchoredPosition.x;
-        float finishX = value ? 0 : 550;
+        float finishX = value ? -550 : -14;
         yield return Toolbox.Ease(null, 0.5f, startX, finishX, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             infoPaneRect.anchoredPosition = new Vector2(amount, y);
         }, unscaledTime: true);

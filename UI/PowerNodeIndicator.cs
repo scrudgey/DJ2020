@@ -13,21 +13,21 @@ public class PowerNodeIndicator : NodeIndicator<PowerNode, PowerGraph> {
     protected override void SetGraphicalState(PowerNode node) {
         switch (node.type) {
             case NodeType.none:
-                image.sprite = normalIcon;
+                iconImage.sprite = normalIcon;
                 break;
             case NodeType.powerSource:
-                image.sprite = powerIcon;
+                iconImage.sprite = powerIcon;
                 break;
         }
 
         if (node.getEnabled()) {
             if (node.powered) {
-                image.color = enabledColor;
+                iconImage.color = enabledColor;
             } else {
-                image.color = unpoweredColor;
+                iconImage.color = unpoweredColor;
             }
         } else {
-            image.color = disabledColor;
+            iconImage.color = disabledColor;
         }
     }
 }

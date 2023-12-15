@@ -13,16 +13,16 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     [Header("sprites")]
     public Sprite normalIcon;
     protected override void SetGraphicalState(CyberNode node) {
-        image.sprite = normalIcon;
+        iconImage.sprite = normalIcon;
 
         if (node.getEnabled()) {
             if (!node.compromised) {
-                image.color = enabledColor;
+                iconImage.color = enabledColor;
             } else {
-                image.color = compromisedColor;
+                iconImage.color = compromisedColor;
             }
         } else {
-            image.color = disabledColor;
+            iconImage.color = disabledColor;
         }
     }
 
