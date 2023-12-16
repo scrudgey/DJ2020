@@ -745,10 +745,10 @@ public class Toolbox {
         return Mathf.Clamp(std * sigma + mean, minValue, maxValue);
     }
 
-    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7) {
+    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7, bool unlimited = false) {
         float timer = 0f;
         int cycles = 0;
-        while (cycles < pulses) {
+        while (cycles < pulses && !unlimited) {
             timer += Time.unscaledDeltaTime;
             if (timer > 0.1f) {
                 timer -= 0.05f;

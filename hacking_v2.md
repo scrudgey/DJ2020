@@ -146,12 +146,12 @@ or to any node you have access to on the net
 
 # milestone 1
 
-readable network
-    show connections on mouseover
-    allow a node to be clicked / highlighted
-    when a node is highlighted, slide out an info panel with info on the right
+* readable network
+    * show connections on mouseover
+    * allow a node to be clicked / highlighted
+    * when a node is highlighted, slide out an info panel with info on the right
 
-discoverability
+visibility
 
 cyberdeck tool item
 
@@ -638,21 +638,20 @@ first draft: ignore free movement for now.
 * changing overlay
     * selecting no overlay should hide info pane
     * changing overlay should deselect active node
-
-
-conditional edge highlighting
-    unselected node: darker, transparent, thinner
-    selected node: full edge
-make nodes button-like
-    mouseover effect indicates clickability
-    cursor changes
-    edges are highlighted
+* conditional edge highlighting
+    * mouse over node: highlight edges
+    * selected node: highlight edge
+    * unselected node: darker, transparent, thinner
+* make nodes button-like
+    * mouseover effect indicates clickability
+    * cursor changes
+    * edges are highlighted
 
 
 
 paydata
 visibility
-
+marching ants on threat indication
 
 graphs are jumpy on first reveal
 preserve node if a corresponding node exists, otherwise deselect.
@@ -664,6 +663,7 @@ preserve node if a corresponding node exists, otherwise deselect.
 
 
 
+## paydata load / randomization
 
 paydata load is tricky. we need to dress the graph with randomization. s
     given that we don't expect to save paydata, this is probably okay.
@@ -672,7 +672,7 @@ there are three parts:
     baked level template
         graph initial state with no paydata
         randomizer info
-    gamedata
+    gamedata (plan)
         level plan: tactic info that reveals some node state / visibility
     level instance
         graph instance
@@ -702,3 +702,23 @@ randomizer:
         load graph template
         for each idn:
             load paydata, add to node
+
+## visibility
+
+how does visibility work?
+
+it must be present in plan (gamedata) state to inform the planning phase.
+not present in graph by default, like paydata: constructed as part of graph state.
+
+it must be present when displaying graph in the UI
+    provides extra conditional logic when drawing nodes, edges, and info pane.
+
+it is generated at the same time as randomization, in the same way:
+during plan phase:
+    load graph template from level template
+    apply visibility from level plan
+during mission phase:
+    load graph template from level template
+    apply visibility from level plan
+    apply randomization from level template on uninitialized nodes
+

@@ -20,7 +20,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Sprite datastoreIcon;
     public Sprite utilityIcon;
     protected override void SetGraphicalState(CyberNode node) {
-    switch (node.type) {
+        switch (node.type) {
             case CyberNodeType.normal:
                 iconImage.sprite = normalIcon;
                 break;

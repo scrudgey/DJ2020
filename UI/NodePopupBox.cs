@@ -30,12 +30,12 @@ public class NodePopupBox<T, U> : MonoBehaviour where T : Node<T> where U : Grap
     void Start() {
         EnterState(state);
         Configure(indicator.node);
-        indicator.onMouseOver += HandleNodeMouseOver;
-        indicator.onMouseExit += HandleNodeMouseExit;
+        // indicator.onMouseOver += HandleNodeMouseOver;
+        // indicator.onMouseExit += HandleNodeMouseExit;
     }
     void OnDestroy() {
-        indicator.onMouseOver -= HandleNodeMouseOver;
-        indicator.onMouseExit -= HandleNodeMouseExit;
+        // indicator.onMouseOver -= HandleNodeMouseOver;
+        // indicator.onMouseExit -= HandleNodeMouseExit;
     }
     public void Configure(T node) {
         SetGraphicalState(node);

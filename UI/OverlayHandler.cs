@@ -26,11 +26,12 @@ public class OverlayHandler : MonoBehaviour {
     public AudioClip[] overlayButtonSounds;
     public AudioSource audioSource;
     public INodeCameraProvider selectedNode;
-    // public RectTransform infoPaneRect;
+    public INodeCameraProvider mouseOverNode;
     public CyberNodeInfoPaneDisplay cyberInfoPaneDisplay;
     public PowerNodeInfoDisplay powerInfoPaneDisplay;
     public AlarmNodeInfoDisplay alarmInfoPaneDisplay;
     public NodeSelectionIndicator selectionIndicator;
+    public NodeMouseOverIndicator mouseOverIndicator;
     public UIController uIController;
     GameObject activeInfoPane;
     Coroutine showInfoRoutine;
@@ -44,6 +45,7 @@ public class OverlayHandler : MonoBehaviour {
     void Awake() {
         powerOverlay.colorSet = powerOverlayColors;
         selectionIndicator.HideSelection();
+        mouseOverIndicator.HideSelection();
     }
     public void Bind() {
         GameManager.OnOverlayChange += HandleOverlayChange;
@@ -123,6 +125,7 @@ public class OverlayHandler : MonoBehaviour {
         } else {
             outlineImage.enabled = true;
         }
+        selectedNode = null;
         ShowInfoPane(null);
         activeInfoPane = null;
     }
@@ -148,6 +151,7 @@ public class OverlayHandler : MonoBehaviour {
     public void NodeSelectCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
         selectedNode = indicator;
         selectionIndicator.ActivateSelection(indicator);
+        mouseOverIndicator.HideSelection();
         cyberOverlay.NeighborButtonMouseExit();
         powerOverlay.NeighborButtonMouseExit();
         alarmOverlay.NeighborButtonMouseExit();
@@ -171,12 +175,22 @@ public class OverlayHandler : MonoBehaviour {
             activeInfoPane = infoPane;
         }
     }
+    public void NodeMouseOverCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
+        if (indicator != selectedNode) {
+            mouseOverIndicator.ActivateSelection(indicator);
+        }
+    }
+    public void NodeMouseExitCallback() {
+        mouseOverNode = null;
+        mouseOverIndicator.HideSelection();
+    }
     public void InfoPaneDoneButtonCallback() {
         // infoPaneDisplayed = false;
         activeInfoPane = null;
         ShowInfoPane(null);
         selectedNode = null;
         selectionIndicator.HideSelection();
+        mouseOverIndicator.HideSelection();
     }
     public void ShowInfoPane(GameObject infoPane) {
         if (showInfoRoutine != null) {
@@ -192,7 +206,7 @@ public class OverlayHandler : MonoBehaviour {
             } else {
                 showInfoRoutine = StartCoroutine(EaseInInfoPane(true, infoPane));
             }
-        } else {
+        } else if (infoPane != null) {
             showInfoRoutine = StartCoroutine(EaseInInfoPane(true, infoPane));
         }
     }

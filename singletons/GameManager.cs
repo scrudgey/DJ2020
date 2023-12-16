@@ -80,8 +80,8 @@ public partial class GameManager : Singleton<GameManager> {
         showConsole.action.performed += HandleShowConsleAction;
         escapeAction.action.performed += HandleEscapeAction;
 
-        CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
-        CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
+        // CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
+        // CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
     public void StartNewGame(string filename) {
         timePlayed = 0f;
@@ -129,8 +129,8 @@ public partial class GameManager : Singleton<GameManager> {
         showConsole.action.performed -= HandleShowConsleAction;
         escapeAction.action.performed -= HandleEscapeAction;
 
-        CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
-        CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
+        // CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
+        // CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
     }
     public void TransitionToPhase(GamePhase newState) {
         if (newState == gameData.phase)
@@ -537,14 +537,14 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
-    public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
-        cursorType = CursorType.pointer;
-        TransitionToInputMode(InputMode.cyber); // TODO: ?
-    }
-    public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
-        cursorType = CursorType.gun;
-        TransitionToInputMode(InputMode.gun);
-    }
+    // public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
+    //     cursorType = CursorType.pointer;
+    //     TransitionToInputMode(InputMode.cyber); // TODO: ?
+    // }
+    // public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
+    //     cursorType = CursorType.gun;
+    //     TransitionToInputMode(InputMode.gun);
+    // }
 
     public void StartBurglar(BurgleTargetData data) {
         // TODO: enter menu state

@@ -38,14 +38,14 @@ public class CyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             audioSource.PlayOneShot(mouseOver);
         }
 
-        CyberOverlay cb = (CyberOverlay)overlay;
-        cb.NodeMouseOverCallback(this);
+        // CyberOverlay cb = (CyberOverlay)overlay;
+        // cb.NodeMouseOverCallback(this);
     }
     public override void OnPointerExit(PointerEventData eventData) {
         base.OnPointerExit(eventData);
 
-        CyberOverlay cb = (CyberOverlay)overlay;
-        cb.NodeMouseExitCallback(this);
+        // CyberOverlay cb = (CyberOverlay)overlay;
+        // cb.NodeMouseExitCallback(this);
 
         // notify hack controller that vulnerability changed
         HackController.I.HandleVulnerableNetworkNode(null);

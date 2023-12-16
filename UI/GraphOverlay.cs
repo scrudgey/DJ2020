@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U, V> where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
+public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
     public UIColorSet colorSet;
     public Camera cam;
     public GameObject nodeIndicatorPrefab;
     protected Graph<U, T> graph;
     public Material lineRendererMaterial;
     public Material marchingAntsMaterial;
-    public OverlayHandler overlayHandler { get; set; }
     HashSet<string> neighborEdge;
-
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
+    protected V mousedOverIndicator;
+    public OverlayHandler overlayHandler;
     void Awake() {
         foreach (Transform child in transform) {
             Destroy(child.gameObject);
@@ -29,7 +29,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U,
         if (indicators.Count() == 0) return;
         foreach (KeyValuePair<U, V> kvp in indicators) {
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            kvp.Value.Configure(kvp.Key, graph, this);
+            kvp.Value.Configure(kvp.Key, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
             kvp.Value.SetScreenPosition(screenPoint);
         }
     }
@@ -50,7 +50,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U,
                 continue;
             V indicator = GetIndicator(node);
             indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
-            indicator.Configure(node, graph, this);
+            indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
         }
     }
     public virtual void SetEdgeGraphicState() {
@@ -64,8 +64,6 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U,
             U node2 = graph.nodes[nodes[1]];
             if (node1.sceneName != sceneName || node2.sceneName != sceneName)
                 continue;
-            // V indicator1 = GetIndicator(node1);
-            // V indicator2 = GetIndicator(node2);
             LineRenderer renderer = GetLineRenderer(edge);
             SetLinePositions(renderer, node1, node2);
             SetEdgeState(renderer, node1, node2);
@@ -112,7 +110,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U,
             GameObject newIndicator = GameObject.Instantiate(nodeIndicatorPrefab);
             V indicator = newIndicator.GetComponent<V>();
             indicator.SetScreenPosition(screenPoint);
-            indicator.Configure(node, graph, this);
+            indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
             indicator.rectTransform.SetParent(transform, false);
             indicators[node] = indicator;
             return indicator;
@@ -166,13 +164,21 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U,
     }
 
 
+    public virtual void NodeMouseOverCallback(NodeIndicator<U, T> indicator) {
+        mousedOverIndicator = (V)indicator;
+        overlayHandler.NodeMouseOverCallback(indicator);
+    }
+    public virtual void NodeMouseExitCallback(NodeIndicator<U, T> indicator) {
+        mousedOverIndicator = null;
+        overlayHandler.NodeMouseExitCallback();
+    }
+
     public void NeighborButtonClick(string idn) {
         NeighborButtonMouseExit();
         U node = graph.nodes[idn];
         V indicator = GetIndicator(node);
         overlayHandler.NodeSelectCallback(indicator);
     }
-
     public void NeighborButtonMouseOver(string sourceidn, string neighboridn) {
         HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
         LineRenderer renderer = GetLineRenderer(edge);
@@ -183,6 +189,5 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour, IGraphOverlay<T, U,
         if (neighborEdge != null) {
             SetEdgeState(neighborEdge);
         }
-        // HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
     }
 }

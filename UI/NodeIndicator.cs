@@ -11,14 +11,14 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public Color enabledColor;
     public Color disabledColor;
     public T node;
-    public Action<NodeIndicator<T, U>> onMouseOver;
-    public Action<NodeIndicator<T, U>> onMouseExit;
-    public static Action<NodeIndicator<T, U>> staticOnMouseOver;
-    public static Action<NodeIndicator<T, U>> staticOnMouseExit;
-    public IGraphOverlay<U, T, NodeIndicator<T, U>> overlay;
-    public void Configure(T node, Graph<T, U> graph, IGraphOverlay<U, T, NodeIndicator<T, U>> overlay) {
+    Action<NodeIndicator<T, U>> onMouseOver;
+    Action<NodeIndicator<T, U>> onMouseExit;
+    OverlayHandler overlayHandler;
+    public void Configure(T node, Graph<T, U> graph, OverlayHandler overlayHandler, Action<NodeIndicator<T, U>> onMouseOver, Action<NodeIndicator<T, U>> onMouseExit) {
         this.node = node;
-        this.overlay = overlay;
+        this.overlayHandler = overlayHandler;
+        this.onMouseOver = onMouseOver;
+        this.onMouseExit = onMouseExit;
         SetGraphicalState(node);
     }
     protected virtual void SetGraphicalState(T node) {
@@ -28,15 +28,13 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         rectTransform.position = position;
     }
     public virtual void OnPointerEnter(PointerEventData eventData) {
-        staticOnMouseOver?.Invoke(this);
         onMouseOver?.Invoke(this);
     }
     public virtual void OnPointerExit(PointerEventData eventData) {
-        staticOnMouseExit?.Invoke(this);
         onMouseExit?.Invoke(this);
     }
     public virtual void OnPointerClick(PointerEventData pointerEventData) {
-        overlay.overlayHandler.NodeSelectCallback(this);
+        overlayHandler.NodeSelectCallback(this);
     }
 
     public CameraInput GetCameraInput() {
