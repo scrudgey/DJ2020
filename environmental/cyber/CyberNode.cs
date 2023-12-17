@@ -13,7 +13,6 @@ public class CyberNode : Node<CyberNode> {
     public bool dataStolen;
     public bool utilityActive;
     public CyberNodeStatus status;
-    public int visibility;
     public CyberNode() { }
 }
 

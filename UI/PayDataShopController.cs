@@ -71,7 +71,7 @@ public class PayDataShopController : MonoBehaviour {
         selectedButton = button;
         sellButton.interactable = true;
         filenameText.text = button.payData.filename;
-        fileContentText.text = button.payData.content.text;
+        // fileContentText.text = button.payData.content.text;
         valueText.text = $"{button.payData.value}";
         Toolbox.RandomizeOneShot(audioSource, selectDataSound);
     }

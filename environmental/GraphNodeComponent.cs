@@ -15,7 +15,8 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
             idn = idn,
             position = NodePosition(),
             enabled = true,
-            nodeTitle = nodeTitle
+            nodeTitle = nodeTitle,
+            visibility = NodeVisibility.mapped
         };
     }
 

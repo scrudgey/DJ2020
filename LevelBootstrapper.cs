@@ -63,13 +63,13 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapWorld() {
         Debug.Log($"bootstrapping world ...");
         GameManager.I.gameData = GameData.TestInitialData();
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT001") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT002") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/delta_memo") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/GLOB003") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/hosaka1") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/VBS_log") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/viral13") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT001") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT002") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/delta_memo") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/GLOB003") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/hosaka1") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/VBS_log") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/viral13") as PayData);
 
         // GameManager.I.gameData.playerState.health = 50f;
         GameManager.I.SetMarketData();

@@ -12,10 +12,10 @@ public class Node<U> where U : Node<U> {
     public string nodeTitle;
     public bool enabled;
     public Vector3 position;
+    public NodeVisibility visibility;
 
     [NonSerialized]
     Action OnValueChanged;
-    // public NodeIcon icon;
     public Node() { }
     public virtual bool getEnabled() {
         return enabled;
@@ -33,4 +33,4 @@ public class Node<U> where U : Node<U> {
 
 
 
-public enum NodeIcon { normal, power, mains }
+public enum NodeVisibility { unknown, known, mapped }

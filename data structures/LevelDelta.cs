@@ -20,7 +20,6 @@ public record LevelDelta {
     [JsonIgnore]
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
     public HashSet<Objective> failedObjectives;
-    [JsonConverter(typeof(ObjectListJsonConverter<PayData>))]
     public List<PayData> levelAcquiredPaydata;
     public HashSet<string> levelInteractedObjects;
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]

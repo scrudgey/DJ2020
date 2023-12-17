@@ -146,28 +146,31 @@ or to any node you have access to on the net
 
 # milestone 1
 
+redo graph, graph state, model, UI, navigability, readibility, interface
+
 * readable network
     * show connections on mouseover
     * allow a node to be clicked / highlighted
     * when a node is highlighted, slide out an info panel with info on the right
 
-visibility
-
-cyberdeck tool item
-
-# milestone 2
+* visibility
 
 complete UI iconography
 
-# milestone 3
-
-software / hardware interaction
-
-# milestone 4
+# milestone 2
+    tactic / level planning / map view
 
 discoverability in planning mode
-
 somewhere in here: randomization of datanodes
+
+# milestone 3
+    software, hardware, hacking, downloading, shops, playerstate
+    software / hardware interaction
+cyberdeck tool item
+
+
+
+
 
 
 
@@ -566,46 +569,8 @@ and nothing in the NodeComponent is used.
 * set line color:
     * from compromised -> vulnerable: orange
     * from compromised -> compromised: red
-
-
-snap line points
-basic selection / navigability
-    -> needs to interact w camera
-disable hacking as it works today
-
-
-
-# navigability 
-
-regular mode:
-    input from input controller
-    input -> character controller
-    camera input from character controller
-    camera input -> camera
-overlay:
-    input from input controller
-    if overlay is active:
-        input -> camera??? (something new here?)
-    if a node is selected:
-        camera input from overlay controller
-        camera inpur -> camera ?
-
-problem: WASD free movement conflicts when player takes out cyberdeck tool and cyber overlay comes up.
-problem: when cyber overlay is active, player movement stops.
-    only stop movement once a node is selected
-    deselect node when:
-        player clicks close button on info panel
-        player closes cyber overlay
-one possible solution:
-    intermediate cyber overlay shows nodes and allows player to move around and connect to a node, but does not switch to 
-    full cyber overlay mode until player clicks on a node.
-        mouseover targets different nodes- controls like a gun - exclusive of guns
-        nodes highlight in a way when player is in range- connects when mouseover- node changes color to indicate vulnerable
-        click node-  drop into cyber overlay
-first draft: ignore free movement for now.
-
-
-
+* basic selection / navigability
+* disable hacking as it works today
 * when a node is active: 
     * camera input comes from cyber overlay
     * player is not controlled.
@@ -646,19 +611,44 @@ first draft: ignore free movement for now.
     * mouseover effect indicates clickability
     * cursor changes
     * edges are highlighted
+* paydata
+* visibility
+* remove cyberrandomizer
+* remove level initializer
+* remove associated files:
+    * cyberrandomizertemplate
+    * RandomPayDataInitializer
+* data info colors
 
 
+# navigability 
 
-paydata
-visibility
-marching ants on threat indication
+regular mode:
+    input from input controller
+    input -> character controller
+    camera input from character controller
+    camera input -> camera
+overlay:
+    input from input controller
+    if overlay is active:
+        input -> camera??? (something new here?)
+    if a node is selected:
+        camera input from overlay controller
+        camera inpur -> camera ?
 
-graphs are jumpy on first reveal
-preserve node if a corresponding node exists, otherwise deselect.
-
-
-
-
+problem: WASD free movement conflicts when player takes out cyberdeck tool and cyber overlay comes up.
+problem: when cyber overlay is active, player movement stops.
+    only stop movement once a node is selected
+    deselect node when:
+        player clicks close button on info panel
+        player closes cyber overlay
+one possible solution:
+    intermediate cyber overlay shows nodes and allows player to move around and connect to a node, but does not switch to 
+    full cyber overlay mode until player clicks on a node.
+        mouseover targets different nodes- controls like a gun - exclusive of guns
+        nodes highlight in a way when player is in range- connects when mouseover- node changes color to indicate vulnerable
+        click node-  drop into cyber overlay
+first draft: ignore free movement for now.
 
 
 
@@ -703,6 +693,68 @@ randomizer:
         for each idn:
             load paydata, add to node
 
+in theory, paydata could be fully randomized via nimrod:
+    random filename, random attributes
+    in this case, it is not a scriptableobject any more.
+    additionally, we know there are "fixed" paydata of fixed properties that are objectives.
+        in which case there is a different route to paydata: defined or partially defined properties.
+        in that case objectives must define part of a paydata, and the rest is random?
+the most important thing is objectives are guaranteed placed
+    not overlapping
+something like a set of paydatas, and a set of cyber components to place in.
+then, any objective related to paydata that was not covered- random placement.
+then, infill for all other nodes.
+
+paydata.random
+paydata(objective)
+
+where does the spec live?
+    it needs a reference to the level components.
+    it will be a component 
+
+how does it all work?
+    planning mode: load level graph
+    apply plan state:
+        this is: a list of idn -> paydata
+        this can include objective paydata
+        it can also be randomized
+    purchase tactic:
+        "reveal" objective location: 
+            choose a datanode location for objective paydata
+            place this in the plan state
+        revea others:
+            generate new paydata
+            place this in plan state
+
+load level:
+    load graph
+    apply level plan state
+    apply randomization
+        randomization must be aware if objective is already placed by plan.!
+        otherwise, infill according to level plan
+
+implement:
+    * randomization
+        * apply random paydata to all nodes
+    * selective randomization
+        * apply objective paydata to nodes first, then randomization infill
+    tactics
+        do not place objective data if it is included in tactics (it is already placed)
+    better randomization
+        level template can specify randomization parameters for level data- price range, type preference etc.
+
+1. apply randomization to all nodes
+2. apply level plan state
+3. apply any objective not yet placed.
+
+how does randomization work?
+    who owns the code?
+    does it involve level state?
+
+
+
+
+
 ## visibility
 
 how does visibility work?
@@ -721,4 +773,64 @@ during mission phase:
     load graph template from level template
     apply visibility from level plan
     apply randomization from level template on uninitialized nodes
+
+before worrying about graph state, we can store this state (visibility and paydata) on the nodes.
+and we can apply it to the graph directly.
+for now, visibility will be an int.
+
+visibility:
+    unknown -> known -> identified -> mapped
+
+unknown: invisible
+known: visible
+identified: type known? content known?
+mapped: connections known
+
+it seems there should be a visibility where the node is known but the type is not.
+but does this make sense? the player will be able to see it is a datastore.
+
+otoh we could have a stage where the "content" is known:
+but this only makes sense for data nodes.
+
+when you map a node, the connections must go to visibility 1 minimum. 
+
+
+-1. load mission vs. mission plan
+    applying level plan state does not only happen on levelstate instantiate.
+    we have plan in scope in mission planner- so we can load the graph, apply state.
+0. default values
+    some levels by default are all visible.
+    others are not.
+    this goes into level template- 
+        load the graph
+        apply level template
+1. how is visibility going to get into the level plan?
+    all things start out according to default
+    purchasing a tactic places some stuff in the plan visibility 
+
+to test, we can try out different default visibility levels  in test template.
+
+
+
+
+
+
+
+
+# TODO/ WIP
+
+iconography for data types
+snap line points
+a mapped node ends on an unknown node: new visibility type
+apply clearsighter to node in focus
+graphs are jumpy on first reveal
+refresh nodes when jumping via neighbor button
+
+? preserve node selection if a corresponding node exists, otherwise deselect.
+reconnect e.g. tower
+
+marching ants on threat indication
+    threat indication is not on mouseover! on mouseover button or whatever.
+
+
 

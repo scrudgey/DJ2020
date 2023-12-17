@@ -9,6 +9,7 @@ public class LevelTemplate : ScriptableObject {
     public enum StrikeTeamCompletionThreshold { timer, clear }
     public enum StrikeTeamResponseBehavior { clear, investigate }
     public enum StrikeTeamCompletionBehavior { patrol, leave }
+    public enum GraphVisibilityDefault { all, none, partial }
 
     [Header("level and scene")]
     public string levelName;
@@ -37,7 +38,9 @@ public class LevelTemplate : ScriptableObject {
 
     [Header("gameplay parameters")]
     public SensitivityLevel sensitivityLevel;
-
+    public GraphVisibilityDefault cyberGraphVisibilityDefault;
+    public GraphVisibilityDefault alarmGraphVisibiltyDefault;
+    public GraphVisibilityDefault powerGraphVisibilityDefault;
     public int maxInitialNPC;
     public int minNPC;
     public AudioClip alarmAudioClip;

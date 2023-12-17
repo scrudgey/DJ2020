@@ -29,16 +29,17 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
     public abstract void ConfigureNode();
 
     protected void ConfigureNeighbors(T graph) {
-
         foreach (Transform child in neighborbuttonContainer) {
             Destroy(child.gameObject);
         }
         if (graph.edges.ContainsKey(node.idn) && graph.edges[node.idn].Count > 0) {
             foreach (string neighborId in graph.edges[node.idn]) {
+                U node = graph.nodes[neighborId];
+                if (node.visibility == NodeVisibility.unknown) continue; // TODO: populate ? placeholder
                 GameObject obj = GameObject.Instantiate(neighborButtonPrefab) as GameObject;
                 obj.transform.SetParent(neighborbuttonContainer, false);
                 NeighborButton button = obj.GetComponent<NeighborButton>();
-                button.Configure(this, graph.nodes[neighborId]);
+                button.Configure(this, node);
             }
             neighborContainer.SetActive(true);
         } else {

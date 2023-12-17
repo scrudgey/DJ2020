@@ -14,19 +14,38 @@ public class LevelState : PerkIdConstants {
 
     public static LevelState Instantiate(LevelTemplate template, LevelPlan plan, PlayerState playerState) {
         int numberDialogueCards = playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_3CARD) ? 3 : 2;
+
+        CyberGraph cyberGraph = CyberGraph.LoadAll(template.levelName);
+        PowerGraph powerGraph = PowerGraph.LoadAll(template.levelName);
+        AlarmGraph alarmGraph = AlarmGraph.LoadAll(template.levelName);
+
+
+        // TODO: move this to after level load to match with paydata instantiation?
+        cyberGraph.Apply(template.cyberGraphVisibilityDefault);
+        powerGraph.Apply(template.powerGraphVisibilityDefault);
+        alarmGraph.Apply(template.alarmGraphVisibiltyDefault);
+
+        cyberGraph.Apply(plan);
+        powerGraph.Apply(plan);
+        alarmGraph.Apply(plan);
+
+        // cyberGraph.InfillRandomData();/
+
+
         return new LevelState {
             template = template,
             plan = plan,
             delta = LevelDelta.Empty() with {
                 phase = LevelDelta.MissionPhase.action,
-                powerGraph = PowerGraph.LoadAll(template.levelName),
-                cyberGraph = CyberGraph.LoadAll(template.levelName),
-                alarmGraph = AlarmGraph.LoadAll(template.levelName),
+                powerGraph = powerGraph,
+                cyberGraph = cyberGraph,
+                alarmGraph = alarmGraph,
                 disguise = plan.startWithDisguise(),
                 dialogueCards = Enumerable.Range(0, numberDialogueCards).Select((i) => playerState.NewDialogueCard()).ToList(),
                 objectivesState = template.objectives.Concat(template.bonusObjectives)
                 .ToDictionary(t => t, t => ObjectiveStatus.inProgress),
-                levelAcquiredPaydata = new List<PayData> { Resources.Load("data/paydata/personnel_data") as PayData }
+                // levelAcquiredPaydata = new List<PayData> { Resources.Load("data/paydata/personnel_data") as PayData }
+                levelAcquiredPaydata = new List<PayData> { }
             }
         };
     }

@@ -8,8 +8,6 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
 
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> loots;
-
-    [JsonConverter(typeof(ObjectListJsonConverter<PayData>))]
     public List<PayData> payDatas;
 
     // skin

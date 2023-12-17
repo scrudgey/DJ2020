@@ -49,8 +49,13 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             if (node.sceneName != sceneName)
                 continue;
             V indicator = GetIndicator(node);
-            indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
-            indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
+            if (node.visibility == NodeVisibility.unknown) {
+                indicator.gameObject.SetActive(false);
+            } else {
+                indicator.gameObject.SetActive(true);
+                indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
+                indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
+            }
         }
     }
     public virtual void SetEdgeGraphicState() {
@@ -65,8 +70,12 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             if (node1.sceneName != sceneName || node2.sceneName != sceneName)
                 continue;
             LineRenderer renderer = GetLineRenderer(edge);
-            SetLinePositions(renderer, node1, node2);
-            SetEdgeState(renderer, node1, node2);
+            if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
+                SetLinePositions(renderer, node1, node2);
+                SetEdgeState(renderer, node1, node2);
+            } else {
+                renderer.enabled = false;
+            }
         }
     }
     public void SetEdgeState(HashSet<string> edge) {
@@ -159,7 +168,6 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         renderer.gameObject.layer = LayerUtil.GetLayer(Layer.linerender);
 
         renderer.widthCurve = new AnimationCurve(new Keyframe(0, 1f), new Keyframe(1, 1f));
-        Debug.Log(renderer.sortingLayerName);
         return renderer;
     }
 
