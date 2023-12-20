@@ -828,13 +828,16 @@ to test, we can try out different default visibility levels  in test template.
 * refresh nodes when jumping via neighbor button
 * apply clearsighter to node in focus
 * node info indicator
+* WAN offscreen
+* show number of known / total nodes
+* overlay selection box outlines should change color
+* draw line partway?
+* there needs to be some hint about which nodes can still be explored for edges
+* returning from node view leaves player transparent
+* lingering indicator when changing overlay
 
-WAN offscreen
-show number of known / total nodes
-overlay selection box outlines should change color
 
 graphs are jumpy on first reveal
-there needs to be some hint about which nodes can still be explored for edges
 
 
 ? preserve node selection if a corresponding node exists, otherwise deselect.
@@ -844,3 +847,13 @@ marching ants on threat indication
     threat indication is not on mouseover! on mouseover button or whatever.
 
 
+start hacking!
+
+when hack tool is out:
+    put away gun
+    reveal nearby cyber nodes
+    mouse over cyber node to connect wire?
+    click cyber node to connect wire?
+    connected nodes become vulnerable
+    on click:
+        open cyber overlay

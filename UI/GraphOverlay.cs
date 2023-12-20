@@ -69,7 +69,9 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
                 SetLinePositions(renderer, node1, node2);
                 SetEdgeState(renderer, node1, node2);
             } else {
-                renderer.enabled = false;
+                SetTruncatedLinePositions(renderer, node1, node2);
+                SetEdgeState(renderer, node1, node2);
+                // renderer.enabled = false;
             }
         }
     }
@@ -87,9 +89,9 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         Vector3 position1 = Toolbox.Round(node1.position, decimalPlaces: 1);
         Vector3 position2 = Toolbox.Round(node2.position, decimalPlaces: 1);
 
-        bool yFlag = Mathf.Abs(position1.y - position2.y) > 2f;
-        bool xFlag = Mathf.Abs(position1.x - position2.x) > 1f;
-        bool zFlag = Mathf.Abs(position1.z - position2.z) > 1f;
+        // bool yFlag = Mathf.Abs(position1.y - position2.y) > 2f;
+        // bool xFlag = Mathf.Abs(position1.x - position2.x) > 1f;
+        // bool zFlag = Mathf.Abs(position1.z - position2.z) > 1f;
 
         List<Vector3> points = new List<Vector3>();
         points.Add(position1);
@@ -104,6 +106,23 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
 
         // TODO: snap
 
+        renderer.positionCount = points.Count;
+        renderer.SetPositions(points.ToArray());
+    }
+
+    protected void SetTruncatedLinePositions(LineRenderer renderer, U node1, U node2) {
+        Vector3 position1 = Toolbox.Round(node1.position, decimalPlaces: 1);
+        Vector3 position2 = Toolbox.Round(node2.position, decimalPlaces: 1);
+
+        // do like regular line positioning- but measure the distance at each point.
+        // feels good to write garbage code sometimes
+        // float distanceBudget = 1f;
+        FiniteLineBuilder lineBuilder = new FiniteLineBuilder(position1, 1f);
+        lineBuilder.AddPoint(new Vector3(position1.x, position2.y, position1.z));
+        lineBuilder.AddPoint(new Vector3(position2.x, position2.y, position1.z));
+        lineBuilder.AddPoint(new Vector3(position2.x, position2.y, position2.z));
+
+        List<Vector3> points = lineBuilder.GetPoints();
         renderer.positionCount = points.Count;
         renderer.SetPositions(points.ToArray());
     }
@@ -194,5 +213,37 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         if (neighborEdge != null) {
             SetEdgeState(neighborEdge);
         }
+    }
+}
+
+
+public class FiniteLineBuilder {
+    List<Vector3> points;
+    Vector3 currentPoint;
+    float distanceBudget;
+    public FiniteLineBuilder(Vector3 initialPoint, float distancebudget) {
+        this.currentPoint = initialPoint;
+        this.distanceBudget = distancebudget;
+        this.points = new List<Vector3>();
+        points.Add(initialPoint);
+    }
+
+    public void AddPoint(Vector3 nextPoint) {
+        if (distanceBudget <= 0) return;
+        Vector3 displacement = (nextPoint - currentPoint);
+
+        float distance = Mathf.Min(distanceBudget, displacement.magnitude);
+
+        Vector3 finalPoint = currentPoint + (distance * displacement.normalized);
+
+        points.Add(finalPoint);
+
+        currentPoint = finalPoint;
+
+        distanceBudget -= distance;
+    }
+
+    public List<Vector3> GetPoints() {
+        return points;
     }
 }

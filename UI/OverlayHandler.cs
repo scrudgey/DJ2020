@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class UIColorSet {
     public Color deadColor;
 }
 public class OverlayHandler : MonoBehaviour {
-    public GameObject outline;
+    [Header("aspects")]
     public Image outlineImage;
     public Image titleBoxImage;
     public TextMeshProUGUI titleText;
@@ -25,6 +26,12 @@ public class OverlayHandler : MonoBehaviour {
     public UIColorSet cyberOverlayColors;
     public UIColorSet alarmOverlayColors;
     public AudioClip[] overlayButtonSounds;
+    public TextMeshProUGUI nodesDiscoveredText;
+    public GameObject nodeDiscoveryBox;
+
+    public Image[] colorImages;
+    public TextMeshProUGUI[] colorTexts;
+    [Header("details")]
     public AudioSource audioSource;
     public INodeCameraProvider selectedNode;
     public INodeCameraProvider mouseOverNode;
@@ -87,34 +94,56 @@ public class OverlayHandler : MonoBehaviour {
         switch (type) {
             case OverlayType.none:
             default:
+                foreach (Image image in colorImages) {
+                    image.color = powerOverlayColors.enabledColor;
+                }
+                foreach (TextMeshProUGUI text in colorTexts) {
+                    text.color = powerOverlayColors.enabledColor;
+                }
+                nodeDiscoveryBox.SetActive(false);
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "None";
                 break;
             case OverlayType.power:
-                outlineImage.color = powerOverlayColors.enabledColor;
-                titleText.color = powerOverlayColors.enabledColor;
+                foreach (Image image in colorImages) {
+                    image.color = powerOverlayColors.enabledColor;
+                }
+                foreach (TextMeshProUGUI text in colorTexts) {
+                    text.color = powerOverlayColors.enabledColor;
+                }
                 powerOverlay.gameObject.SetActive(true);
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Power";
+                SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
                 break;
             case OverlayType.cyber:
-                outlineImage.color = cyberOverlayColors.enabledColor;
-                titleText.color = cyberOverlayColors.enabledColor;
+                foreach (Image image in colorImages) {
+                    image.color = cyberOverlayColors.enabledColor;
+                }
+                foreach (TextMeshProUGUI text in colorTexts) {
+                    text.color = cyberOverlayColors.enabledColor;
+                }
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(true);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Network";
+                SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
                 break;
             case OverlayType.alarm:
-                outlineImage.color = alarmOverlayColors.enabledColor;
-                titleText.color = alarmOverlayColors.enabledColor;
+                foreach (Image image in colorImages) {
+                    image.color = alarmOverlayColors.enabledColor;
+                }
+                foreach (TextMeshProUGUI text in colorTexts) {
+                    text.color = alarmOverlayColors.enabledColor;
+                }
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(true);
                 titleText.text = "Alarm";
+                SetDiscoveryText(GameManager.I.gameData.levelState.delta.alarmGraph);
                 break;
         }
         if (!enabled) {
@@ -127,9 +156,18 @@ public class OverlayHandler : MonoBehaviour {
         } else {
             outlineImage.enabled = true;
         }
+        selectionIndicator.HideSelection();
+        mouseOverIndicator.HideSelection();
         SetSelectedNode(null);
         ShowInfoPane(null);
         activeInfoPane = null;
+    }
+
+    public void SetDiscoveryText<T, U>(Graph<T, U> graph) where U : Graph<T, U> where T : Node<T> {
+        nodeDiscoveryBox.SetActive(true);
+        int knownNodes = graph.nodes.Values.Where(node => node.visibility > NodeVisibility.mystery).Count();
+        int totalNodes = graph.nodes.Count();
+        nodesDiscoveredText.text = $"discovered: {knownNodes}/{totalNodes}";
     }
 
     public void NextOverlayButton() {

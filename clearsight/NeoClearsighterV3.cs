@@ -266,10 +266,10 @@ public class NeoClearsighterV3 : MonoBehaviour {
         yield return HandleStaticAbove(j, playerPosition);
 
         // static geometry interlopers
-        yield return HandleInterlopersRaycast(j);
+        yield return HandleInterlopersRaycast(j, playerPosition);
 
         // static geometry interlopers
-        yield return HandleInterlopersFrustrum(j);
+        yield return HandleInterlopersFrustrum(j, playerPosition);
 
         // dynamic renderers above me
         yield return HandleDynamicAbove(j, playerPosition);
@@ -377,13 +377,13 @@ public class NeoClearsighterV3 : MonoBehaviour {
         }
     }
 
-    IEnumerator HandleInterlopersRaycast(int j) {
+    IEnumerator HandleInterlopersRaycast(int j, Vector3 playerposition) {
         Vector3 cameraPlanarDirection = myCamera.idealRotation * Vector3.forward;
         subradarIndex++;
         if (subradarIndex >= NUMBER_SUB_RADARS) subradarIndex = 0;
 
         cameraPlanarDirection.y = 0;
-        Vector3 start = followTransform.position + Vector3.up;
+        Vector3 start = playerposition + Vector3.up;
         for (int i = 0; i < NUMBER_DIRECTIONS; i++) {
             j++;
             if (j > BATCHSIZE) {
@@ -406,7 +406,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
                 float normDot = Vector3.Dot(hitNorm, cameraPlanarDirection);
                 float rayDot = Vector3.Dot(radarDirections[i + (subradarIndex * NUMBER_DIRECTIONS)], cameraPlanarDirection);
                 if (normDot > 0 && (rayDot < 0 || (rayDot > 0 && normDot < 1 - rayDot)) //&& hit.distance > 4f
-                     && (handler.bounds.center - followTransform.position).y > 0.2f) {
+                     && (handler.bounds.center - playerposition).y > 0.2f) {
 
                     currentBatch[handler] = ClearsightRendererHandler.CullingState.interloper;
                     alreadyHandledRootTransforms.Add(root);
@@ -441,13 +441,13 @@ public class NeoClearsighterV3 : MonoBehaviour {
         }
     }
 
-    IEnumerator HandleInterlopersFrustrum(int j) {
-        List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum());
+    IEnumerator HandleInterlopersFrustrum(int j, Vector3 playerposition) {
+        List<Renderer> interlopers = rendererBoundsTree.GetWithinFrustum(interloperFrustrum(playerposition));
 
-        Plane XPlane = new Plane(Vector3.right, followTransform.position);
-        Plane ZPlane = new Plane(Vector3.forward, followTransform.position);
+        Plane XPlane = new Plane(Vector3.right, playerposition);
+        Plane ZPlane = new Plane(Vector3.forward, playerposition);
 
-        Vector3 planarDisplacement = cameraTransform.position - followTransform.position;
+        Vector3 planarDisplacement = cameraTransform.position - playerposition;
         planarDisplacement.y = 0;
         planarDisplacement = planarDisplacement.normalized;
 
@@ -473,7 +473,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
             if (alreadyHandledRootTransforms.Contains(root)) continue;
 
             Vector3 rendererPosition = rendererBounds[renderer].center;
-            Vector3 directionToInterloper = rendererPosition - followTransform.position;
+            Vector3 directionToInterloper = rendererPosition - playerposition;
             if (detectionPlane.GetSide(rendererBounds[renderer].center) == detectionSide && directionToInterloper.y > 0.2f) {
                 ClearsightRendererHandler handler = handlers[root];
                 currentBatch[handler] = ClearsightRendererHandler.CullingState.interloper;
@@ -503,29 +503,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
         return interloperMaterial;
     }
 
-    // public ClearsightRendererHandler GetDynamicRenderers(Collider key) {
-
-    //     if (handlers.ContainsKey(key)) {
-    //         return dynamicColliderToRenderer[key];
-    //     } else {
-    //         Renderer[] renderers = key.transform.root.GetComponentsInChildren<Renderer>().Where(x => x != null &&
-    //                                             !(x is ParticleSystemRenderer) &&
-    //                                             !(x is LineRenderer)
-    //                                             ).ToArray();
-    //         dynamicColliderToRenderer[key] = renderers;
-    //         // dynamicColliderRoot[key] = key.transform.root;
-    //         V
-    //         Transform findAnchor = key.transform.root.Find("clearSighterAnchor");
-    //         // if (findAnchor != null) {
-    //         //     dynamicColliderRoot[key] = findAnchor;
-    //         // }
-    //         if (!handlers.ContainsKey(key.transform.root)) {
-    //             ClearsightRendererHandler handler = new ClearsightRendererHandler(this, key.transform.root, dynamicColliderRoot[key].position, isDynamic: true);
-    //             handlers[key.transform.root] = handler;
-    //         }
-    //         return renderers;
-    //     }
-    // }
     ClearsightRendererHandler GetDynamicHandler(Collider key) {
         // TODO: what to do if this is called on a static renderer?
         if (handlers.ContainsKey(key.transform.root)) {
@@ -545,12 +522,12 @@ public class NeoClearsighterV3 : MonoBehaviour {
         }
     }
 
-    Plane[] interloperFrustrum() {
+    Plane[] interloperFrustrum(Vector3 playerPosition) {
         float size = 0.15f;
         // float size = 1f;
         // float size = 4f;
 
-        Vector3 followPosition = followTransform.position;
+        Vector3 followPosition = playerPosition;
 
         // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
         float distance = (cameraTransform.position - followPosition).magnitude;
