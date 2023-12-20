@@ -17,14 +17,22 @@ public class NodeDataInfoDisplay : MonoBehaviour {
     public Sprite iconLocation;
     public Sprite iconObjective;
 
+    // TODO: support data stolen
     public void Configure(PayData data) {
         filename.text = data.filename;
         dataType.text = $"{data.type}";
-        valueamount.tag = $"{data.value}";
+        valueamount.text = $"{data.value}";
         creditIndicator.SetActive(data.type == PayData.DataType.pay);
         valueamount.gameObject.SetActive(data.type == PayData.DataType.pay);
 
-        // TODO: set icons
-        // TODO: support data stolen
+        icon.sprite = data.type switch {
+            PayData.DataType.location => iconLocation,
+            PayData.DataType.objective => iconObjective,
+            PayData.DataType.password => iconPassword,
+            PayData.DataType.pay => iconPay,
+            PayData.DataType.personnel => iconPersonnel,
+            _ => iconPay
+        };
+
     }
 }

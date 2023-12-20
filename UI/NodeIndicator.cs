@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,6 +12,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public Color enabledColor;
     public Color disabledColor;
     public T node;
+    Graph<T, U> graph;
     Action<NodeIndicator<T, U>> onMouseOver;
     Action<NodeIndicator<T, U>> onMouseExit;
     OverlayHandler overlayHandler;
@@ -19,12 +21,36 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         this.overlayHandler = overlayHandler;
         this.onMouseOver = onMouseOver;
         this.onMouseExit = onMouseExit;
-        SetGraphicalState(node);
+        this.graph = graph;
+        if (node.visibility == NodeVisibility.unknown) {
+            gameObject.SetActive(false);
+        } else {
+            gameObject.SetActive(true);
+            SetGraphicalState(node);
+        }
     }
     protected virtual void SetGraphicalState(T node) {
 
     }
     public void SetScreenPosition(Vector3 position) {
+        if (graph == null || node == null) return;
+
+        // keep on the screen if:
+        //  one of my edges points to the selected node
+        //  overlay handler selected node is a node indicator.
+        //  i am a node indicator.
+
+        bool keepOnScreen = overlayHandler.selectedNode != null && graph.edges.ContainsKey(node.idn) ?
+           graph.edges[node.idn].Contains(overlayHandler.selectedNode.GetNodeId()) : false;
+
+        keepOnScreen = keepOnScreen || node.alwaysOnScreen;
+
+        if (keepOnScreen) {
+            position.x = Math.Max(position.x, 0);
+            position.x = Math.Min(position.x, 1905);
+            position.y = Math.Max(position.y, 0);
+            position.y = Math.Min(position.y, 1065);
+        }
         rectTransform.position = position;
     }
     public virtual void OnPointerEnter(PointerEventData eventData) {
@@ -57,5 +83,9 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             atRightEdge = false,
             currentAttackSurface = null
         };
+    }
+
+    public string GetNodeId() {
+        return node.idn;
     }
 }

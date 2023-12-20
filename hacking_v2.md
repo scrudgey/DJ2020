@@ -819,18 +819,28 @@ to test, we can try out different default visibility levels  in test template.
 
 # TODO/ WIP
 
-iconography for data types
-snap line points
-a mapped node ends on an unknown node: new visibility type
-apply clearsighter to node in focus
+* iconography for data types
+* snap line points
+* a mapped node ends on an unknown node: new visibility type
+* node info display for mystery node
+* lock interaction with data / node content
+* WAN starts out always known
+* refresh nodes when jumping via neighbor button
+* apply clearsighter to node in focus
+* node info indicator
+
+WAN offscreen
+show number of known / total nodes
+overlay selection box outlines should change color
+
 graphs are jumpy on first reveal
-refresh nodes when jumping via neighbor button
+there needs to be some hint about which nodes can still be explored for edges
+
 
 ? preserve node selection if a corresponding node exists, otherwise deselect.
+? maybe vulnerable edge is red?
 reconnect e.g. tower
-
 marching ants on threat indication
     threat indication is not on mouseover! on mouseover button or whatever.
-
 
 

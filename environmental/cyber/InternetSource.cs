@@ -8,6 +8,9 @@ public class InternetSource : CyberComponent {
         node.compromised = true;
         node.type = CyberNodeType.WAN;
         node.lockLevel = 0;
+        node.visibility = NodeVisibility.mapped;
+        node.fixedVisibility = true;
+        node.alwaysOnScreen = true;
         return node;
     }
 }

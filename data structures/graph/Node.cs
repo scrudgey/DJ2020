@@ -13,6 +13,8 @@ public class Node<U> where U : Node<U> {
     public bool enabled;
     public Vector3 position;
     public NodeVisibility visibility;
+    public bool fixedVisibility;
+    public bool alwaysOnScreen;
 
     [NonSerialized]
     Action OnValueChanged;
@@ -33,4 +35,4 @@ public class Node<U> where U : Node<U> {
 
 
 
-public enum NodeVisibility { unknown, known, mapped }
+public enum NodeVisibility { unknown, mystery, known, mapped }

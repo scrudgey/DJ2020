@@ -133,26 +133,27 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
 
 
     public void Apply(LevelTemplate.GraphVisibilityDefault visibilityDefault) {
-        Debug.Log($"{this} <- {visibilityDefault}");
         switch (visibilityDefault) {
             case LevelTemplate.GraphVisibilityDefault.all:
                 foreach (KeyValuePair<string, T> kvp in nodes) {
+                    if (kvp.Value.fixedVisibility) continue;
                     kvp.Value.visibility = NodeVisibility.mapped;
                 }
                 break;
             case LevelTemplate.GraphVisibilityDefault.none:
                 foreach (KeyValuePair<string, T> kvp in nodes) {
+                    if (kvp.Value.fixedVisibility) continue;
                     kvp.Value.visibility = NodeVisibility.unknown;
                 }
                 break;
             case LevelTemplate.GraphVisibilityDefault.partial:
                 foreach (KeyValuePair<string, T> kvp in nodes) {
+                    if (kvp.Value.fixedVisibility) continue;
                     kvp.Value.visibility = UnityEngine.Random.Range(0f, 1f) switch {
                         < 0.3f => NodeVisibility.unknown,
                         < 0.6f => NodeVisibility.known,
                         _ => NodeVisibility.mapped
                     };
-                    Debug.Log(kvp.Value.visibility);
                 }
                 break;
         }

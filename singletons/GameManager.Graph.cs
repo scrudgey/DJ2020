@@ -149,4 +149,23 @@ public partial class GameManager : Singleton<GameManager> {
     public AlarmNode GetAlarmNode(string idn) {
         return gameData?.levelState?.delta.alarmGraph?.GetNode(idn) ?? null;
     }
+
+    public GameObject GetNodeComponent(string idn) {
+        PoweredComponent[] poweredComponents = FindObjectsOfType<PoweredComponent>();
+        PoweredComponent poweredComponent = poweredComponents.Where(component => component.idn == idn).FirstOrDefault();
+        if (poweredComponent != null) {
+            return poweredComponent.gameObject;
+        }
+        CyberComponent[] cyberComponents = FindObjectsOfType<CyberComponent>();
+        CyberComponent cyberComponent = cyberComponents.Where(component => component.idn == idn).FirstOrDefault();
+        if (cyberComponent != null) {
+            return cyberComponent.gameObject;
+        }
+        AlarmComponent[] alarmComponents = FindObjectsOfType<AlarmComponent>();
+        AlarmComponent alarmComponent = alarmComponents.Where(component => component.idn == idn).FirstOrDefault();
+        if (alarmComponent != null) {
+            return alarmComponent.gameObject;
+        }
+        return null;
+    }
 }

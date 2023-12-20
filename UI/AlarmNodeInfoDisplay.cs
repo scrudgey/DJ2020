@@ -28,5 +28,16 @@ public class AlarmNodeInfoDisplay : NodeInfoPaneDisplay<AlarmGraph, AlarmNode, A
             countdownText.text = $"";
         }
     }
+    public override void ConfigureMysteryNode() {
+
+        title.text = "unknown";
+        icon.sprite = mysteryIcon;
+        lockStatus.text = "";
+        nodeTypeText.text = "";
+        triggeredText.text = "";
+
+        icon.color = mysteryColor;
+        title.color = mysteryColor;
+    }
 
 }

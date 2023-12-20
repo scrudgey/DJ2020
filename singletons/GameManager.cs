@@ -480,6 +480,7 @@ public partial class GameManager : Singleton<GameManager> {
         CameraInput input = default;
         if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
             input = uiController.GetOverlayCameraInput();
+            // clearSighterV3.temporaryFollowTransform = 
             if (uiController.mouseOverScrollBox) {
                 playerInput.zoomInput = Vector2.zero;
             }
@@ -536,16 +537,6 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
     }
-
-    // public void HandleCyberNodeMouseOver(NodeIndicator<CyberNode, CyberGraph> indicator) {
-    //     cursorType = CursorType.pointer;
-    //     TransitionToInputMode(InputMode.cyber); // TODO: ?
-    // }
-    // public void HandleCyberNodeMouseExit(NodeIndicator<CyberNode, CyberGraph> indicator) {
-    //     cursorType = CursorType.gun;
-    //     TransitionToInputMode(InputMode.gun);
-    // }
-
     public void StartBurglar(BurgleTargetData data) {
         // TODO: enter menu state
         activeBurgleTargetData = data;

@@ -18,4 +18,16 @@ public class PowerNodeInfoDisplay : NodeInfoPaneDisplay<PowerGraph, PowerNode, P
             poweredText.text = "unpowered";
         }
     }
+
+
+    public override void ConfigureMysteryNode() {
+        title.text = "unknown";
+        icon.sprite = mysteryIcon;
+        lockStatus.text = "";
+        nodeTypeText.text = "";
+        poweredText.text = "";
+
+        icon.color = mysteryColor;
+        title.color = mysteryColor;
+    }
 }

@@ -49,13 +49,8 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             if (node.sceneName != sceneName)
                 continue;
             V indicator = GetIndicator(node);
-            if (node.visibility == NodeVisibility.unknown) {
-                indicator.gameObject.SetActive(false);
-            } else {
-                indicator.gameObject.SetActive(true);
-                indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
-                indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
-            }
+            indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
+            indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
         }
     }
     public virtual void SetEdgeGraphicState() {
@@ -89,21 +84,23 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public abstract void SetEdgeState(LineRenderer renderer, U node1, U node2);
 
     protected void SetLinePositions(LineRenderer renderer, U node1, U node2) {
-        bool yFlag = Mathf.Abs(node1.position.x - node2.position.x) > 2f;
-        bool xFlag = Mathf.Abs(node1.position.x - node2.position.x) > 1f;
-        bool zFlag = Mathf.Abs(node1.position.z - node2.position.z) > 1f;
+        Vector3 position1 = Toolbox.Round(node1.position, decimalPlaces: 1);
+        Vector3 position2 = Toolbox.Round(node2.position, decimalPlaces: 1);
+
+        bool yFlag = Mathf.Abs(position1.y - position2.y) > 2f;
+        bool xFlag = Mathf.Abs(position1.x - position2.x) > 1f;
+        bool zFlag = Mathf.Abs(position1.z - position2.z) > 1f;
 
         List<Vector3> points = new List<Vector3>();
-        points.Add(node1.position);
+        points.Add(position1);
         // if (yFlag)
-        points.Add(new Vector3(node1.position.x, node2.position.y, node1.position.z));
+        points.Add(new Vector3(position1.x, position2.y, position1.z));
         // if (xFlag)
-        points.Add(new Vector3(node2.position.x, node2.position.y, node1.position.z));
-
+        points.Add(new Vector3(position2.x, position2.y, position1.z));
         // if (zFlag)
-        points.Add(new Vector3(node2.position.x, node2.position.y, node2.position.z));
+        points.Add(new Vector3(position2.x, position2.y, position2.z));
 
-        points.Add(node2.position);
+        points.Add(position2);
 
         // TODO: snap
 

@@ -52,6 +52,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
     int j;
 
+
     public void Initialize(Transform followTransform, CharacterCamera camera, CharacterController characterController) {
         this.followTransform = followTransform;
         this.myCamera = camera;
@@ -67,6 +68,19 @@ public class NeoClearsighterV3 : MonoBehaviour {
         j = 0;
         initialized = true;
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleGeometry));
+    }
+    void Start() {
+        OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
+    }
+
+    void HandleNodeFocusChange(INodeCameraProvider indicator) {
+        if (indicator == null) {
+            followTransform = GameManager.I.playerObject.transform;
+        } else {
+            string nodeId = indicator.GetNodeId();
+            GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);
+            followTransform = newFocus.transform;
+        }
     }
 
     void InitializeTree() {
@@ -128,6 +142,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
     void OnDestroy() {
+        OverlayHandler.OnSelectedNodeChange -= HandleNodeFocusChange;
         DisposeOfNativeArrays();
     }
     void OnApplicationQuit() {
@@ -174,12 +189,17 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
     Vector3 getLiftedOrigin() {
         Vector3 origin = followTransform.position;
-        float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
-        return origin + new Vector3(0f, lift, 0f);
+        if (myCamera.state == CameraState.overlayView) {
+            return origin;
+        } else {
+            float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
+            return origin + new Vector3(0f, lift, 0f);
+        }
+
     }
     IEnumerator HandleGeometry() {
         if (initialized) {
-            if ((myCamera.state == CameraState.normal || myCamera.state == CameraState.attractor)) {
+            if ((myCamera.state == CameraState.normal || myCamera.state == CameraState.attractor || myCamera.state == CameraState.overlayView)) {
                 state = State.normal;
             } else if (myCamera.state == CameraState.burgle) {
                 state = State.aboveOnly;
@@ -530,20 +550,22 @@ public class NeoClearsighterV3 : MonoBehaviour {
         // float size = 1f;
         // float size = 4f;
 
+        Vector3 followPosition = followTransform.position;
+
         // Ordering: [0] = Left, [1] = Right, [2] = Down, [3] = Up, [4] = Near, [5] = Far
-        float distance = (cameraTransform.position - followTransform.position).magnitude;
+        float distance = (cameraTransform.position - followPosition).magnitude;
         float angle = (float)Math.Atan((myCamera.Camera.orthographicSize) / distance) * (180f / (float)Math.PI);
 
         Vector3 leftNormal = Quaternion.AngleAxis(1f * angle, cameraTransform.up) * cameraTransform.right;
         Vector3 rightNormal = Quaternion.AngleAxis(-1f * angle, cameraTransform.up) * (-1f * cameraTransform.right);
 
-        Plane left = new Plane(leftNormal, followTransform.position - size * cameraTransform.right);
-        Plane right = new Plane(rightNormal, followTransform.position + size * cameraTransform.right);
+        Plane left = new Plane(leftNormal, followPosition - size * cameraTransform.right);
+        Plane right = new Plane(rightNormal, followPosition + size * cameraTransform.right);
 
-        Plane down = new Plane(cameraTransform.up, followTransform.position - size * cameraTransform.up);
-        Plane up = new Plane(-1f * cameraTransform.up, followTransform.position + size * cameraTransform.up);
+        Plane down = new Plane(cameraTransform.up, followPosition - size * cameraTransform.up);
+        Plane up = new Plane(-1f * cameraTransform.up, followPosition + size * cameraTransform.up);
         Plane near = new Plane(cameraTransform.forward, cameraTransform.position);
-        Plane far = new Plane(-1f * cameraTransform.forward, followTransform.position);
+        Plane far = new Plane(-1f * cameraTransform.forward, followPosition);
 
         // Toolbox.DrawPlane(followTransform.position - size * cameraTransform.right, left);
         // Toolbox.DrawPlane(followTransform.position + size * cameraTransform.right, right);

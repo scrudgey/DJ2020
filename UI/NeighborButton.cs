@@ -20,15 +20,12 @@ public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         text.text = neighbor.idn.Substring(0, 10);
     }
     public void Click() {
-        // display.NeighborButtonClick(idn);
         neighborClick.Invoke(idn);
     }
     public virtual void OnPointerEnter(PointerEventData eventData) {
-        // display.NeighborButtonMouseOver(idn);
         neighborMouseover.Invoke(idn);
     }
     public virtual void OnPointerExit(PointerEventData eventData) {
-        // display.NeighborButtonMouseExit(idn);
         neighborMouseExit.Invoke();
     }
 }

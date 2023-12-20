@@ -13,11 +13,14 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
     public Color invulnerableColor;
     public Color vulnerableColor;
     public Color compromisedColor;
+    public GameObject lockBlock;
 
     public override void ConfigureNode() {
         type.text = $"{indicator.node.type}";
         status.text = $"{indicator.node.status}";
         lockStatus.text = $"lock: {indicator.node.lockLevel}";
+        // lockBlock.SetActive(indicator.node.lockLevel > 0);
+        lockBlock.SetActive(false);
 
         Color statusColor = indicator.node.status switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
@@ -42,5 +45,22 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
             dataInfoDisplay.gameObject.SetActive(false);
             utilityInterfaceDisplay.gameObject.SetActive(false);
         }
+    }
+
+    public override void ConfigureMysteryNode() {
+
+        title.text = "unknown";
+        icon.sprite = mysteryIcon;
+        type.text = $"???";
+        status.text = "";
+        lockStatus.text = "";
+
+        icon.color = mysteryColor;
+        title.color = mysteryColor;
+        type.color = mysteryColor;
+        status.color = mysteryColor;
+
+        dataInfoDisplay.gameObject.SetActive(false);
+        utilityInterfaceDisplay.gameObject.SetActive(false);
     }
 }

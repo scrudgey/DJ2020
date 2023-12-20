@@ -15,6 +15,9 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
     public GraphOverlay<T, U, V> handler;
     [HideInInspector]
     public V indicator;
+    public Sprite mysteryIcon;
+    public Color mysteryColor;
+
 
     // TODO: support visibility
     public void Configure(V indicator, T graph, GraphOverlay<T, U, V> handler) {
@@ -23,11 +26,18 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
         this.indicator = indicator;
         title.text = node.nodeTitle;
         icon.sprite = indicator.iconImage.sprite;
-        ConfigureNode();
-        ConfigureNeighbors(graph);
+        if (node.visibility == NodeVisibility.mystery) {
+            ConfigureMysteryNode();
+            foreach (Transform child in neighborbuttonContainer) {
+                Destroy(child.gameObject);
+            }
+        } else {
+            ConfigureNode();
+            ConfigureNeighbors(graph);
+        }
     }
     public abstract void ConfigureNode();
-
+    public abstract void ConfigureMysteryNode();
     protected void ConfigureNeighbors(T graph) {
         foreach (Transform child in neighborbuttonContainer) {
             Destroy(child.gameObject);

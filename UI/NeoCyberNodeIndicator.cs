@@ -11,6 +11,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Color invulnerableColor;
     public Color vulnerableColor;
     public Color compromisedColor;
+    public Color mysteryColor;
     [Header("decor")]
     public CyberNodeIndicatorLockWidget lockWidget;
     public CyberNodeIndicatorDataWidget dataWidget;
@@ -19,7 +20,12 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Sprite wanIcon;
     public Sprite datastoreIcon;
     public Sprite utilityIcon;
+    public Sprite mysteryIcon;
     protected override void SetGraphicalState(CyberNode node) {
+        if (node.visibility == NodeVisibility.mystery) {
+            SetMysteryState(node);
+            return;
+        }
         switch (node.type) {
             case CyberNodeType.normal:
                 iconImage.sprite = normalIcon;
@@ -58,5 +64,19 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         } else {
             dataWidget.gameObject.SetActive(false);
         }
+    }
+
+    protected void SetMysteryState(CyberNode node) {
+        iconImage.sprite = mysteryIcon;
+
+        Color nodeColor = Color.gray;
+
+        iconImage.color = nodeColor;
+        outlineImage.color = nodeColor;
+        lockWidget.SetColor(nodeColor);
+        dataWidget.SetColor(nodeColor);
+
+        lockWidget.gameObject.SetActive(false);
+        dataWidget.gameObject.SetActive(false);
     }
 }

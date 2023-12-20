@@ -34,6 +34,13 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         foreach (CyberNode node in nodes.Values) {
             node.status = GetStatus(node);
         }
+        foreach (KeyValuePair<string, CyberNode> kvp in nodes) {
+            if (kvp.Value.visibility == NodeVisibility.unknown) {
+                if (edges.ContainsKey(kvp.Key) && edges[kvp.Key].Any(idn => nodes[idn].visibility == NodeVisibility.mapped)) {
+                    kvp.Value.visibility = NodeVisibility.mystery;
+                }
+            }
+        }
     }
 
 
