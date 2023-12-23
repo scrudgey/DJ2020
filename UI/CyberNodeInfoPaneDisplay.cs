@@ -17,12 +17,12 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
 
     public override void ConfigureNode() {
         type.text = $"{indicator.node.type}";
-        status.text = $"{indicator.node.status}";
+        status.text = $"{indicator.node.getStatus()}";
         lockStatus.text = $"lock: {indicator.node.lockLevel}";
         // lockBlock.SetActive(indicator.node.lockLevel > 0);
         lockBlock.SetActive(false);
 
-        Color statusColor = indicator.node.status switch {
+        Color statusColor = indicator.node.getStatus() switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
             CyberNodeStatus.vulnerable => vulnerableColor,
             CyberNodeStatus.compromised => compromisedColor,

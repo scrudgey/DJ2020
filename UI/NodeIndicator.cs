@@ -22,14 +22,9 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         this.onMouseOver = onMouseOver;
         this.onMouseExit = onMouseExit;
         this.graph = graph;
-        if (node.visibility == NodeVisibility.unknown) {
-            gameObject.SetActive(false);
-        } else {
-            gameObject.SetActive(true);
-            SetGraphicalState(node);
-        }
+        SetGraphicalState(node);
     }
-    protected virtual void SetGraphicalState(T node) {
+    public virtual void SetGraphicalState(T node) {
 
     }
     public void SetScreenPosition(Vector3 position) {

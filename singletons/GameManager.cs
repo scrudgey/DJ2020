@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop, perkMenu }
-public enum OverlayType { none, power, cyber, alarm }
+public enum OverlayType { none, power, cyber, alarm, limitedCyber }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
 public struct PointerData {
@@ -74,14 +74,13 @@ public partial class GameManager : Singleton<GameManager> {
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
     public GunHandler playerGunHandler;
+    public ManualHacker playerManualHacker;
+    public ItemHandler playerItemHandler;
     public void Start() {
         cursorType = CursorType.pointer;
         showDebugRays = true;
         showConsole.action.performed += HandleShowConsleAction;
         escapeAction.action.performed += HandleEscapeAction;
-
-        // CyberNodeIndicator.staticOnMouseOver += HandleCyberNodeMouseOver;
-        // CyberNodeIndicator.staticOnMouseExit += HandleCyberNodeMouseExit;
     }
     public void StartNewGame(string filename) {
         timePlayed = 0f;
@@ -120,17 +119,11 @@ public partial class GameManager : Singleton<GameManager> {
     void HandleEscapeAction(InputAction.CallbackContext ctx) {
         escapePressedThisFrame = ctx.ReadValueAsButton();
     }
-    // void LateUpdate() {
-    //     numberFrames += 1;
-    // }
 
     public override void OnDestroy() {
         base.OnDestroy();
         showConsole.action.performed -= HandleShowConsleAction;
         escapeAction.action.performed -= HandleEscapeAction;
-
-        // CyberNodeIndicator.staticOnMouseOver -= HandleCyberNodeMouseOver;
-        // CyberNodeIndicator.staticOnMouseExit -= HandleCyberNodeMouseExit;
     }
     public void TransitionToPhase(GamePhase newState) {
         if (newState == gameData.phase)
@@ -380,7 +373,6 @@ public partial class GameManager : Singleton<GameManager> {
         SetOverlay(newType);
     }
     public void SetOverlay(OverlayType newType) {
-        // gameData.overlayIndex = (int)newType;
         activeOverlayType = newType;
         bool overlayEnabled = inputMode != InputMode.aim && inputMode != InputMode.wallpressAim && inputMode != InputMode.burglar;
         OnOverlayChange?.Invoke(newType, overlayEnabled);
@@ -484,7 +476,13 @@ public partial class GameManager : Singleton<GameManager> {
             if (uiController.mouseOverScrollBox) {
                 playerInput.zoomInput = Vector2.zero;
             }
+            foreach (IInputReceiver i in inputReceivers) {
+                // Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
+                // playerInput.lookAtDirection = directionToCursor;
+                i.SetInputs(PlayerInput.none);
+            }
             characterCamera.SetInputs(playerInput);
+
         } else {
             input = playerCharacterController.BuildCameraInput();
             foreach (IInputReceiver i in inputReceivers) {

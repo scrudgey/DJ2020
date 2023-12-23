@@ -10,8 +10,6 @@ public class NodeSelectionIndicator : MonoBehaviour {
     WaitForSecondsRealtime waiter = new WaitForSecondsRealtime(0.2f);
     RectTransform followRect;
     public void ActivateSelection<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
-        Debug.Log("activate selection");
-
         gameObject.SetActive(true);
         image.color = Color.white;
         rectTransform.anchoredPosition = indicator.rectTransform.anchoredPosition;
@@ -26,7 +24,6 @@ public class NodeSelectionIndicator : MonoBehaviour {
             rectTransform.anchoredPosition = followRect.anchoredPosition;
     }
     public void HideSelection() {
-        Debug.Log("hide selection");
         gameObject.SetActive(false);
         followRect = null;
     }

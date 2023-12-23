@@ -115,7 +115,7 @@ public class WeaponWheelController : MonoBehaviour {
     }
     void CloseMenu(ref PlayerInput input) {
         if (dialogueCoroutine != null) StopCoroutine(dialogueCoroutine);
-        Debug.Log($"closing menu with theta {selectedOption}");
+        // Debug.Log($"closing menu with theta {selectedOption}");
         if (selectedOption == null) {
             return;
         } else if (selectedOption.gun == GameManager.I.gameData.playerState.primaryGun) {

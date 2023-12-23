@@ -133,7 +133,7 @@ public partial class GameManager : Singleton<GameManager> {
         state.delta.cyberGraph.ApplyObjectiveData(dataObjectives);
 
 
-        
+
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
@@ -339,6 +339,8 @@ public partial class GameManager : Singleton<GameManager> {
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
         this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
+        this.playerManualHacker = focus.GetComponentInChildren<ManualHacker>();
+        this.playerItemHandler = focus.GetComponentInChildren<ItemHandler>();
 
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();

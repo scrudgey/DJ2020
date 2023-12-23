@@ -32,9 +32,6 @@ namespace UI {
         PrefabPool ammoPipPool;
         bool displayIsOpen;
         Coroutine openDisplayCoroutine;
-        // void Start() {
-        //     StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
-        // }
         public void Initialize() {
             displayIsOpen = true;
             ammoSpentPool = PoolManager.I.RegisterPool(ammoSpentPrefab, 20);

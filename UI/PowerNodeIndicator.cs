@@ -10,7 +10,7 @@ public class PowerNodeIndicator : NodeIndicator<PowerNode, PowerGraph> {
     public Sprite normalIcon;
     public Sprite powerIcon;
     public Sprite mainsIcon;
-    protected override void SetGraphicalState(PowerNode node) {
+    public override void SetGraphicalState(PowerNode node) {
         switch (node.type) {
             case NodeType.none:
                 iconImage.sprite = normalIcon;

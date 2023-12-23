@@ -12,7 +12,7 @@ public class AlarmNodeIndicator : NodeIndicator<AlarmNode, AlarmGraph> {
     public RectTransform bkgRect;
     [Header("sprites")]
     public Sprite normalIcon;
-    protected override void SetGraphicalState(AlarmNode node) {
+    public override void SetGraphicalState(AlarmNode node) {
         iconImage.sprite = normalIcon;
 
         if (!node.getEnabled()) {

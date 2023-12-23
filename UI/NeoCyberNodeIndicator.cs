@@ -21,7 +21,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Sprite datastoreIcon;
     public Sprite utilityIcon;
     public Sprite mysteryIcon;
-    protected override void SetGraphicalState(CyberNode node) {
+    public override void SetGraphicalState(CyberNode node) {
         if (node.visibility == NodeVisibility.mystery) {
             SetMysteryState(node);
             return;
@@ -41,7 +41,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
                 break;
         }
 
-        Color nodeColor = node.status switch {
+        Color nodeColor = node.getStatus() switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
             CyberNodeStatus.vulnerable => vulnerableColor,
             CyberNodeStatus.compromised => compromisedColor,
@@ -78,5 +78,30 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
 
         lockWidget.gameObject.SetActive(false);
         dataWidget.gameObject.SetActive(false);
+    }
+
+    public override void OnPointerClick(PointerEventData pointerEventData) {
+        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            GameManager.I.SetOverlay(OverlayType.cyber);
+            // handle node connections
+        }
+        base.OnPointerClick(pointerEventData);
+    }
+
+    public override void OnPointerEnter(PointerEventData eventData) {
+        base.OnPointerEnter(eventData);
+        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            GameManager.I.playerManualHacker.Connect(node);
+        } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.playerManualHacker.targetNode == null) {
+            GameManager.I.playerManualHacker.Connect(node);
+        }
+    }
+    public override void OnPointerExit(PointerEventData eventData) {
+        base.OnPointerExit(eventData);
+        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            GameManager.I.playerManualHacker.Disconnect();
+        } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.uiController.overlayHandler.selectedNode == null) {
+            GameManager.I.playerManualHacker.Disconnect();
+        }
     }
 }

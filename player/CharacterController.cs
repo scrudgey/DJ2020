@@ -583,7 +583,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                         playerInput = input,
                         activeItem = itemHandler?.activeItem
                     };
-                    manualHacker?.SetInputs(manualHackInput);
                     burglar?.SetInputs(manualHackInput);
 
                     // bool gunHolstered = gunHandler.HasGun();

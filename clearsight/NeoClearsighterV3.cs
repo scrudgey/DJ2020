@@ -261,12 +261,13 @@ public class NeoClearsighterV3 : MonoBehaviour {
         currentBatch.Clear();
         alreadyHandledRootTransforms.Clear();
         playerPosition = getLiftedOrigin();
+        Vector3 basePosition = followTransform.position;
 
         // static geometry above me
         yield return HandleStaticAbove(j, playerPosition);
 
         // static geometry interlopers
-        yield return HandleInterlopersRaycast(j, playerPosition);
+        yield return HandleInterlopersRaycast(j, basePosition);
 
         // static geometry interlopers
         yield return HandleInterlopersFrustrum(j, playerPosition);
@@ -384,6 +385,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
 
         cameraPlanarDirection.y = 0;
         Vector3 start = playerposition + Vector3.up;
+        // Vector3 start = playerposition;
         for (int i = 0; i < NUMBER_DIRECTIONS; i++) {
             j++;
             if (j > BATCHSIZE) {
@@ -513,7 +515,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
             } else {
                 ClearsightRendererHandler handler = null;
                 foreach (Renderer renderer in key.transform.root.GetComponentsInChildren<Renderer>()) {
-                    handler = AddNewRendererHandler(renderer);
+                    handler = AddNewRendererHandler(renderer, isDynamic: true);
                     if (handler != null) break;
                 }
                 colliderRenderers[key] = handler;
@@ -599,16 +601,18 @@ public class NeoClearsighterV3 : MonoBehaviour {
         }
     }
 
-    public ClearsightRendererHandler AddNewRendererHandler(Renderer renderer) {
+    public ClearsightRendererHandler AddNewRendererHandler(Renderer renderer, bool isDynamic = false) {
         if (renderer.name.Contains("cutaway")) return null;
         if (handlers.ContainsKey(renderer.transform.root)) {
             return handlers[renderer.transform.root];
         } else {
             Vector3 position = renderer.bounds.center;
-            rendererTree.Add(renderer, position);
-            rendererBoundsTree.Add(renderer, renderer.bounds);
+            if (!isDynamic) {
+                rendererTree.Add(renderer, position);
+                rendererBoundsTree.Add(renderer, renderer.bounds);
+                rendererPositions[renderer] = renderer.bounds.center - renderer.bounds.extents;
+            }
             rendererBounds[renderer] = renderer.bounds;
-            rendererPositions[renderer] = renderer.bounds.center - renderer.bounds.extents;
 
             // root keyed
             if (rendererRoots.ContainsKey(renderer.transform.root)) {

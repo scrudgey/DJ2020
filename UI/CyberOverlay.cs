@@ -13,6 +13,11 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Color dimCompromisedColor;
 
     override public void SetEdgeState(LineRenderer renderer, CyberNode node1, CyberNode node2) {
+        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            renderer.enabled = false;
+            return;
+        }
+        renderer.enabled = true;
         bool doHighlight = mousedOverIndicator != null && (mousedOverIndicator.node == node1 || mousedOverIndicator.node == node2);
         NeoCyberNodeIndicator indicator1 = GetIndicator(node1);
         NeoCyberNodeIndicator indicator2 = GetIndicator(node2);
@@ -20,17 +25,40 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             doHighlight = true;
         }
 
-        if (node1.status == CyberNodeStatus.vulnerable && node2.status == CyberNodeStatus.compromised) {
+        if (node1.getStatus() == CyberNodeStatus.vulnerable && node2.getStatus() == CyberNodeStatus.compromised) {
             renderer.material.color = doHighlight ? vulnerableColor : dimVulnerableColor;
-        } else if (node2.status == CyberNodeStatus.vulnerable && node1.status == CyberNodeStatus.compromised) {
+        } else if (node2.getStatus() == CyberNodeStatus.vulnerable && node1.getStatus() == CyberNodeStatus.compromised) {
             renderer.material.color = doHighlight ? vulnerableColor : dimVulnerableColor;
-        } else if (node2.status == CyberNodeStatus.compromised && node1.status == CyberNodeStatus.compromised) {
+        } else if (node2.getStatus() == CyberNodeStatus.compromised && node1.getStatus() == CyberNodeStatus.compromised) {
             renderer.material.color = doHighlight ? compromisedColor : dimCompromisedColor;
         } else {
             renderer.material.color = doHighlight ? invulnerableColor : dimInvulnerableColor;
         }
     }
-
+    public override void OnOverlayActivate() {
+        SetEdgeGraphicState();
+    }
+    public override void UpdateNodes() {
+        if (GameManager.I.activeOverlayType == OverlayType.cyber) {
+            base.UpdateNodes();
+        } else if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            LimitedUpdate();
+        }
+    }
+    void LimitedUpdate() {
+        Vector3 playerPosition = GameManager.I.playerPosition;
+        foreach (KeyValuePair<CyberNode, NeoCyberNodeIndicator> kvp in indicators) {
+            Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
+            kvp.Value.SetScreenPosition(screenPoint);
+            float distance = Vector3.Distance(kvp.Key.position, playerPosition);
+            if (distance < 3) {
+                kvp.Value.gameObject.SetActive(true);
+                kvp.Value.SetGraphicalState(kvp.Key);
+            } else {
+                kvp.Value.gameObject.SetActive(false);
+            }
+        }
+    }
     public override void NodeMouseOverCallback(NodeIndicator<CyberNode, CyberGraph> indicator) {
         base.NodeMouseOverCallback(indicator);
         SetEdgeGraphicState();

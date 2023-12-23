@@ -619,6 +619,45 @@ and nothing in the NodeComponent is used.
     * cyberrandomizertemplate
     * RandomPayDataInitializer
 * data info colors
+* iconography for data types
+* snap line points
+* a mapped node ends on an unknown node: new visibility type
+* node info display for mystery node
+* lock interaction with data / node content
+* WAN starts out always known
+* refresh nodes when jumping via neighbor button
+* apply clearsighter to node in focus
+* node info indicator
+* WAN offscreen
+* show number of known / total nodes
+* overlay selection box outlines should change color
+* draw line partway?
+* there needs to be some hint about which nodes can still be explored for edges
+* returning from node view leaves player transparent
+* lingering indicator when changing overlay
+* when hack tool is out:
+    * put away gun
+    * reveal nearby cyber nodes
+    * on click:
+        * open cyber overlay
+* show nearby nodes:
+    * this is cyber overlay but in a different mode.
+    * only show some nodes.
+    discover nearby nodes
+* mouse over node:
+    * if no connected node:
+    * draw line from player to node
+* mouse exit node:
+    * remove line
+* clik node:
+    * disconnect any connected node
+    * connect clicked node
+* connected node:
+    * state is >= vulnerable
+    * draw line from player to node
+* disconnect node when:
+    * player moves out of range
+    * item is deselected
 
 
 # navigability 
@@ -819,23 +858,8 @@ to test, we can try out different default visibility levels  in test template.
 
 # TODO/ WIP
 
-* iconography for data types
-* snap line points
-* a mapped node ends on an unknown node: new visibility type
-* node info display for mystery node
-* lock interaction with data / node content
-* WAN starts out always known
-* refresh nodes when jumping via neighbor button
-* apply clearsighter to node in focus
-* node info indicator
-* WAN offscreen
-* show number of known / total nodes
-* overlay selection box outlines should change color
-* draw line partway?
-* there needs to be some hint about which nodes can still be explored for edges
-* returning from node view leaves player transparent
-* lingering indicator when changing overlay
-
+handling of mystery node neighbors is incorrect
+    from regular node i jumped to mystery: mystery should provide a neighbor button back to other node.
 
 graphs are jumpy on first reveal
 
@@ -847,13 +871,12 @@ marching ants on threat indication
     threat indication is not on mouseover! on mouseover button or whatever.
 
 
-start hacking!
+# start hacking!
 
-when hack tool is out:
-    put away gun
-    reveal nearby cyber nodes
-    mouse over cyber node to connect wire?
-    click cyber node to connect wire?
-    connected nodes become vulnerable
-    on click:
-        open cyber overlay
+* item pane overlaps overlay buttons
+* gun pane too
+* floating burglar callout
+* player goes invisible
+* [x] for overlay
+
+discover nodes

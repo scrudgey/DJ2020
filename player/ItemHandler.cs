@@ -126,7 +126,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);
                 break;
             case CyberDeck:
-                GameManager.I.SetOverlay(OverlayType.cyber);
+                GameManager.I.SetOverlay(OverlayType.limitedCyber);
                 break;
             case IRGoggles goggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = true;
@@ -143,7 +143,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             return;
         switch (item) {
             case CyberDeck:
-                GameManager.I.SetOverlay(OverlayType.none);
+                if (GameManager.I.activeOverlayType == OverlayType.limitedCyber)
+                    GameManager.I.SetOverlay(OverlayType.none);
+                GameManager.I.playerManualHacker.Disconnect();
                 break;
             case IRGoggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;

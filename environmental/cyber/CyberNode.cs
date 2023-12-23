@@ -12,7 +12,15 @@ public class CyberNode : Node<CyberNode> {
     public bool dataSink;
     public bool dataStolen;
     public bool utilityActive;
+    public bool isManualHackerTarget;
     public CyberNodeStatus status;
+    public CyberNodeStatus getStatus() {
+        if (compromised) {
+            return CyberNodeStatus.compromised;
+        } else if (isManualHackerTarget && status < CyberNodeStatus.vulnerable) {
+            return CyberNodeStatus.vulnerable;
+        } else return status;
+    }
     public CyberNode() { }
 }
 

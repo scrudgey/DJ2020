@@ -44,11 +44,11 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
-            // BaseItem.LoadItem("deck"),
+            ItemTemplate.LoadItem("deck"),
             // ItemTemplate.LoadItem("C4"),
-            ItemTemplate.LoadItem("goggles"),
-            ItemTemplate.LoadItem("rocket"),
-            ItemTemplate.LoadItem("grenade"),
+            // ItemTemplate.LoadItem("goggles"),
+            // ItemTemplate.LoadItem("rocket"),
+            // ItemTemplate.LoadItem("grenade"),
         };
 
         // initialize game state

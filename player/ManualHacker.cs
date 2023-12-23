@@ -18,11 +18,9 @@ public class ManualHackTargetData {
     };
 }
 public class ManualHacker : MonoBehaviour {
-    public SphereCollider sphereCollider;
-    public CapsuleCollider characterCollider;
-    public Action<ManualHackTargetData> OnActionDone;
-    public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
-    bool hackToolDeployed;
+    Transform myTransform;
+    public CyberNode targetNode;
+    [Header("configure")]
     public LineRenderer lineRenderer;
     public Material wireUnfurlMaterial;
     public Material wireAttachedMaterial;
@@ -36,93 +34,42 @@ public class ManualHacker : MonoBehaviour {
     bool deploySoundPlayed;
     bool attachSoundPlayed;
     void Start() {
+        myTransform = transform;
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        targetNode = null;
     }
-    public void AddInteractive(Collider other) {
-        CyberComponent component = other.GetComponent<CyberComponent>();
-        if (component) {
-            cyberComponents[other] = component;
-        }
-        RemoveNullCyberComponents();
-        HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-    }
-    public void RemoveInteractive(Collider other) {
-        if (cyberComponents.ContainsKey(other)) {
-            cyberComponents.Remove(other);
-        }
-        RemoveNullCyberComponents();
-        HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-    }
-
-    public ManualHackTargetData ActiveTarget() {
-        RemoveNullCyberComponents();
-        if (!hackToolDeployed) {
-            return null;
-        }
-        if (cyberComponents.Count == 0) {
-            return null;
-        } else return cyberComponents
-            .ToList()
-            .Where((KeyValuePair<Collider, CyberComponent> kvp) => IsNodeVulnerable(kvp.Value.node))
-            .Select((KeyValuePair<Collider, CyberComponent> kvp) => new ManualHackTargetData(kvp.Value))
-            .DefaultIfEmpty(null)
-            .First(); // TODO: weigh the targets in some way, return deterministic
-    }
-
-    bool IsNodeVulnerable(CyberNode node) {
-        // TODO: compute various checks to see if node is indeed vulnerable
-        return hackToolDeployed && !node.compromised && Vector3.Distance(node.position, transform.position) < sphereCollider.radius;
-    }
-    void RemoveNullCyberComponents() => cyberComponents =
-        cyberComponents
-            .Where(f => f.Value != null && f.Key != null)
-            .ToDictionary(x => x.Key, x => x.Value);
-
-    void OnTriggerEnter(Collider other) => AddInteractive(other);
-
-    void OnTriggerExit(Collider other) => RemoveInteractive(other);
-
-    public void SetInputs(ManualHackInput inputs) {
-        bool refresh = false;
-        if (inputs.activeItem != null && hackToolDeployed != inputs.activeItem.EnablesManualHack()) {
-            hackToolDeployed = inputs.activeItem.EnablesManualHack();
-            refresh = true;
-        }
-        if (refresh) {
-            HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-        }
-        if (inputs.playerInput.useItem) {
-            ManualHackTargetData data = ActiveTarget();
-            // Debug.Log($"active target: {data}");
-            if (data == null) return;
-            HackController.I.HandleHackInput(data.ToManualHackInput());
-            OnActionDone?.Invoke(data);
-        }
-    }
-
-    public List<CyberNode> GetVulnerableNodes() => cyberComponents
-        .ToList()
-        .Select((KeyValuePair<Collider, CyberComponent> kvp) => kvp.Value.node)
-        .Where(IsNodeVulnerable)
-
-        .ToList();
-
     void Update() {
-        CyberNode node = GetVulnerableNodes().DefaultIfEmpty(null).FirstOrDefault();
-        if (node != null) {
+        if (targetNode != null) {
             timer += Time.deltaTime;
-            UpdateWire(node);
+            UpdateWire(targetNode);
+
+            if (Vector3.Distance(myTransform.position, targetNode.position) > 3f) {
+                Disconnect();
+            }
         } else {
             timer = 0f;
             deploySoundPlayed = false;
             attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
-        float radius = GameManager.I?.gameData?.playerState?.hackRadius ?? 1.5f;
-        sphereCollider.radius = radius;
+        // float radius = GameManager.I?.gameData?.playerState?.hackRadius ?? 1.5f;
+        // sphereCollider.radius = radius;
     }
+
+    public void Connect(CyberNode target) {
+        targetNode = target;
+        target.isManualHackerTarget = true;
+    }
+    public void Disconnect() {
+        if (targetNode != null) {
+            targetNode.isManualHackerTarget = false;
+        }
+        targetNode = null;
+    }
+
     void UpdateWire(CyberNode node) {
-        Vector3 playerPos = characterCollider.bounds.center;
+        // Vector3 playerPos = characterCollider.bounds.center;
+        Vector3 playerPos = myTransform.position;
         lineRenderer.enabled = true;
         Vector3[] points = new Vector3[2];
         if (timer < 0.25) {

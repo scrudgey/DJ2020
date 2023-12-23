@@ -24,25 +24,39 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public void DisableOverlay() {
         indicators = new Dictionary<U, V>();
     }
+    public virtual void OnOverlayActivate() {
+
+    }
 
     void FixedUpdate() {
         if (indicators.Count() == 0) return;
-        foreach (KeyValuePair<U, V> kvp in indicators) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            kvp.Value.Configure(kvp.Key, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
-            kvp.Value.SetScreenPosition(screenPoint);
-        }
+        UpdateNodes();
     }
+
     public void Refresh(T graph) {
         this.graph = graph;
         if (graph == null || cam == null) {
             DisableOverlay();
             return;
         }
+        RefreshNodes();
+    }
+    public virtual void UpdateNodes() {
+        foreach (KeyValuePair<U, V> kvp in indicators) {
+            Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
+            if (kvp.Key.visibility == NodeVisibility.unknown) {
+                kvp.Value.gameObject.SetActive(false);
+            } else {
+                kvp.Value.gameObject.SetActive(true);
+            }
+            kvp.Value.SetScreenPosition(screenPoint);
+            kvp.Value.SetGraphicalState(kvp.Key);
+        }
+    }
+    public virtual void RefreshNodes() {
         ConfigureNodes();
         SetEdgeGraphicState();
     }
-
     public virtual void ConfigureNodes() {
         string sceneName = SceneManager.GetActiveScene().name;
         foreach (U node in graph.nodes.Values) {
@@ -51,6 +65,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             V indicator = GetIndicator(node);
             indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
             indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
+
         }
     }
     public virtual void SetEdgeGraphicState() {
@@ -117,7 +132,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         // do like regular line positioning- but measure the distance at each point.
         // feels good to write garbage code sometimes
         // float distanceBudget = 1f;
-        FiniteLineBuilder lineBuilder = new FiniteLineBuilder(position1, 1f);
+        FiniteLineBuilder lineBuilder = new FiniteLineBuilder(position1, 0.75f);
         lineBuilder.AddPoint(new Vector3(position1.x, position2.y, position1.z));
         lineBuilder.AddPoint(new Vector3(position2.x, position2.y, position1.z));
         lineBuilder.AddPoint(new Vector3(position2.x, position2.y, position2.z));

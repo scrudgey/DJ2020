@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using Items;
 using TMPro;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
-
 [System.Serializable]
 public class UIColorSet {
     public Color enabledColor;
@@ -28,7 +29,7 @@ public class OverlayHandler : MonoBehaviour {
     public AudioClip[] overlayButtonSounds;
     public TextMeshProUGUI nodesDiscoveredText;
     public GameObject nodeDiscoveryBox;
-
+    public GameObject closeButtonObject;
     public Image[] colorImages;
     public TextMeshProUGUI[] colorTexts;
     [Header("details")]
@@ -94,6 +95,10 @@ public class OverlayHandler : MonoBehaviour {
         switch (type) {
             case OverlayType.none:
             default:
+                if (GameManager.I.playerItemHandler.activeItem is CyberDeck) {
+                    GameManager.I.SetOverlay(OverlayType.limitedCyber);
+                    return;
+                }
                 foreach (Image image in colorImages) {
                     image.color = powerOverlayColors.enabledColor;
                 }
@@ -105,6 +110,7 @@ public class OverlayHandler : MonoBehaviour {
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "None";
+                closeButtonObject.SetActive(false);
                 break;
             case OverlayType.power:
                 foreach (Image image in colorImages) {
@@ -118,7 +124,10 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Power";
                 SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
+                powerOverlay.OnOverlayActivate();
+                closeButtonObject.SetActive(true);
                 break;
+            case OverlayType.limitedCyber:
             case OverlayType.cyber:
                 foreach (Image image in colorImages) {
                     image.color = cyberOverlayColors.enabledColor;
@@ -131,6 +140,8 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Network";
                 SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
+                cyberOverlay.OnOverlayActivate();
+                closeButtonObject.SetActive(true);
                 break;
             case OverlayType.alarm:
                 foreach (Image image in colorImages) {
@@ -144,14 +155,17 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(true);
                 titleText.text = "Alarm";
                 SetDiscoveryText(GameManager.I.gameData.levelState.delta.alarmGraph);
+                alarmOverlay.OnOverlayActivate();
+                closeButtonObject.SetActive(true);
                 break;
         }
+
         if (!enabled) {
             powerOverlay.gameObject.SetActive(false);
             cyberOverlay.gameObject.SetActive(false);
             alarmOverlay.gameObject.SetActive(false);
             outlineImage.enabled = false;
-        } else if (type == OverlayType.none) {
+        } else if (type == OverlayType.none || type == OverlayType.limitedCyber) {
             outlineImage.enabled = false;
         } else {
             outlineImage.enabled = true;
@@ -233,7 +247,6 @@ public class OverlayHandler : MonoBehaviour {
         mouseOverIndicator.HideSelection();
     }
     public void InfoPaneDoneButtonCallback() {
-        // infoPaneDisplayed = false;
         ShowInfoPane(null);
         activeInfoPane = null;
         SetSelectedNode(null);
@@ -244,7 +257,7 @@ public class OverlayHandler : MonoBehaviour {
         if (showInfoRoutine != null) {
             StopCoroutine(showInfoRoutine);
         }
-
+        Debug.Log($"show info pane: {infoPane}");
         if (infoPane != activeInfoPane) {
             if (infoPane == null) {
                 showInfoRoutine = StartCoroutine(EaseInInfoPane(false, activeInfoPane));
@@ -272,5 +285,7 @@ public class OverlayHandler : MonoBehaviour {
         }, unscaledTime: true);
     }
 
-
+    public void CloseButtonCallback() {
+        GameManager.I.SetOverlay(OverlayType.none);
+    }
 }

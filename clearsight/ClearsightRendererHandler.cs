@@ -60,7 +60,6 @@ public class ClearsightRendererHandler {
     }
 
     public void AddSubRenderHandler(Renderer renderer) {
-
         SubRenderHandler handler = new SubRenderHandler(renderer);
         handlers[renderer] = handler;
         hasCutaway |= handler.isCutaway;
