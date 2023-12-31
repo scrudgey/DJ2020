@@ -18,6 +18,7 @@ public class ManualHackTargetData {
     };
 }
 public class ManualHacker : MonoBehaviour {
+    public bool deployed;
     Transform myTransform;
     public CyberNode targetNode;
     [Header("configure")]
@@ -52,11 +53,13 @@ public class ManualHacker : MonoBehaviour {
             attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
-        // float radius = GameManager.I?.gameData?.playerState?.hackRadius ?? 1.5f;
-        // sphereCollider.radius = radius;
     }
 
     public void Connect(CyberNode target) {
+        // TODO: check deployed, check distance
+        if (!deployed) return;
+        if (Vector3.Distance(target.position, transform.position) > 3f) return;
+        Disconnect();
         targetNode = target;
         target.isManualHackerTarget = true;
     }

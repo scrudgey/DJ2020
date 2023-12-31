@@ -19,7 +19,6 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
     public Color mysteryColor;
 
 
-    // TODO: support visibility
     public void Configure(V indicator, T graph, GraphOverlay<T, U, V> handler) {
         this.node = indicator.node;
         this.handler = handler;

@@ -12,11 +12,11 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public Color enabledColor;
     public Color disabledColor;
     public T node;
-    Graph<T, U> graph;
+    protected U graph;
     Action<NodeIndicator<T, U>> onMouseOver;
     Action<NodeIndicator<T, U>> onMouseExit;
     OverlayHandler overlayHandler;
-    public void Configure(T node, Graph<T, U> graph, OverlayHandler overlayHandler, Action<NodeIndicator<T, U>> onMouseOver, Action<NodeIndicator<T, U>> onMouseExit) {
+    public void Configure(T node, U graph, OverlayHandler overlayHandler, Action<NodeIndicator<T, U>> onMouseOver, Action<NodeIndicator<T, U>> onMouseExit) {
         this.node = node;
         this.overlayHandler = overlayHandler;
         this.onMouseOver = onMouseOver;

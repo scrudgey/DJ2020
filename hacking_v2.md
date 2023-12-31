@@ -155,20 +155,18 @@ redo graph, graph state, model, UI, navigability, readibility, interface
 
 * visibility
 
-complete UI iconography
+* complete UI iconography
 
 # milestone 2
+software, hardware, hacking, downloading, shops, playerstate
+software / hardware interaction
+* cyberdeck tool item
+
+# milestone 3
     tactic / level planning / map view
 
 discoverability in planning mode
 somewhere in here: randomization of datanodes
-
-# milestone 3
-    software, hardware, hacking, downloading, shops, playerstate
-    software / hardware interaction
-cyberdeck tool item
-
-
 
 
 
@@ -276,8 +274,8 @@ we have now abstracted everything such that a clean slate approach can be attemp
 
 update cyber component model:
 * datastore
-cash register
-alarm component reference
+* cash register
+* alarm component reference
 
 
             // Gradient newGradient = new Gradient();
@@ -658,6 +656,11 @@ and nothing in the NodeComponent is used.
 * disconnect node when:
     * player moves out of range
     * item is deselected
+* item pane overlaps overlay buttons
+* gun pane too
+* floating burglar callout
+* player goes invisible
+* [x] for overlay
 
 
 # navigability 
@@ -847,9 +850,52 @@ when you map a node, the connections must go to visibility 1 minimum.
     all things start out according to default
     purchasing a tactic places some stuff in the plan visibility 
 
-to test, we can try out different default visibility levels  in test template.
+## cyberdeck interface
 
+contains your software 
+contains stolen data?
 
+hardware info
+    upload / download speed?
+        upload speed: speed of applying software
+        download speed: speed of grabbing data
+    storage?
+        * programs: self explanatory
+        → data: limit the amount of data to steal. is this worth it?
+            force player to decide which data files to steal: prioritize with scanning, etc.
+            that is nice! and incentivizes buying more storage
+            complication: 
+                1. interface for displaying data, size etc, deleting
+                2. communicate: cant download when full
+    uploads/downloads in progress
+        combine with speed, use a bar meter. 
+            show possibilities at the same time as showing in-use.
+    flavor terminal?
+        this would be nice to have but screen real estate is limited and it would be a big effort
+    hardware interface should change depending on whether an upload is in progress or not.
+        if upload is in progress, we should not present software options to the player.
+            hide extra software, grey out buttons etc?
+            replace base buttons with "upload in progress" dialogue- give option to cancel
+
+software:
+    * basic actions are always present
+        * scan, crack, download
+    stronger software is consumable and the cyberdeck has limited slots:
+        virus, compromise
+    show info on selected software (popup)
+        * iconography for scan, unlock, download, exploit
+        * level: I, II, III
+        * effect
+        type: targeted / virus (show in iconography?)
+        virus: hops / speed etc.
+        bonus against node types?
+    interface: 
+        deploy software (popup)
+
+scan:       deploy against any vulnerable node
+unlock:     deploy against any vulnerable locked node
+download:   deploy against any vulnerable unlocked node connected to player or WAN
+exploit:    deploy against any vulnerable unlocked node
 
 
 
@@ -858,25 +904,46 @@ to test, we can try out different default visibility levels  in test template.
 
 # TODO/ WIP
 
-handling of mystery node neighbors is incorrect
-    from regular node i jumped to mystery: mystery should provide a neighbor button back to other node.
-
-graphs are jumpy on first reveal
-
-
 ? preserve node selection if a corresponding node exists, otherwise deselect.
 ? maybe vulnerable edge is red?
-reconnect e.g. tower
-marching ants on threat indication
-    threat indication is not on mouseover! on mouseover button or whatever.
 
+handling of mystery node neighbors is incorrect
+    from regular node i jumped to mystery: mystery should provide a neighbor button back to other node.
+graphs are jumpy on first reveal
+reconnect e.g. tower
 
 # start hacking!
+* refresh info pane
+* refresh graph
+    * show cyberdeck when vulnerable node is selected
+* use software on nodes
+        * icebreaker on locked node to remove lock
+        * download on unlocked data node
+        * pwn on unlocked node
+        * scan on *
+* open cyberdeck panel when vulnerable node is connected
+* do not connect wire to node that is too far away 
+* do not connect wire when cyberdeck is put away
+* hide cyberdeck when overlay closed
+* cyberdeck connected to node -> make vulnerable -> navigate away and back -> cyberdeck controller not active
+    * represent player/deck as compromised node, with line
+    * check cyberdeck visibility before show.hide
 
-* item pane overlaps overlay buttons
-* gun pane too
-* floating burglar callout
-* player goes invisible
-* [x] for overlay
+implement:
+    * disable software to indicate what is possible at any time
+    * software takes time to run 
+        * progress bar on node
+        progress bar on cyberdeck controller
+        shows an effect on the node
+
+nodes can display lock, file type more prominently now
+
+use password
+    this can be on the info panel?
 
 discover nodes
+marching ants on threat indication
+marching ants indicate upload/download in progress
+
+take a screenshot and compare UI sizes
+

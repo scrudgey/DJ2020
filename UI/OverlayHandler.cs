@@ -43,6 +43,13 @@ public class OverlayHandler : MonoBehaviour {
     public NodeMouseOverIndicator mouseOverIndicator;
     public UIController uIController;
     public static Action<INodeCameraProvider> OnSelectedNodeChange;
+
+    NeoCyberNodeIndicator selectedCyberNodeIndicator;
+    AlarmNodeIndicator selectedAlarmNodeIndicator;
+    PowerNodeIndicator selectedPowerNodeIndicator;
+    [Header("cyberdeck")]
+    public CyberdeckUIController cyberdeckController;
+
     GameObject activeInfoPane;
     Coroutine showInfoRoutine;
     public Camera cam {
@@ -56,6 +63,7 @@ public class OverlayHandler : MonoBehaviour {
         powerOverlay.colorSet = powerOverlayColors;
         selectionIndicator.HideSelection();
         mouseOverIndicator.HideSelection();
+        cyberdeckController.Hide();
     }
     public void Bind() {
         GameManager.OnOverlayChange += HandleOverlayChange;
@@ -66,6 +74,8 @@ public class OverlayHandler : MonoBehaviour {
         powerOverlay.overlayHandler = this;
         cyberOverlay.overlayHandler = this;
         alarmOverlay.overlayHandler = this;
+
+        cyberdeckController.Initialize(this, GameManager.I.gameData.levelState.delta.cyberGraph);
 
         RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
@@ -82,14 +92,22 @@ public class OverlayHandler : MonoBehaviour {
     public void RefreshPowerGraph(PowerGraph graph) {
         powerOverlay.cam = cam;
         powerOverlay.Refresh(graph);
+        if (selectedPowerNodeIndicator != null)
+            powerInfoPaneDisplay.Configure(selectedPowerNodeIndicator, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
     }
     public void RefreshCyberGraph(CyberGraph graph) {
         cyberOverlay.cam = cam;
         cyberOverlay.Refresh(graph);
+        if (selectedCyberNodeIndicator != null) {
+            cyberdeckController.Refresh(selectedCyberNodeIndicator);
+            cyberInfoPaneDisplay.Configure(selectedCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+        }
     }
     public void RefreshAlarmGraph(AlarmGraph graph) {
         alarmOverlay.cam = cam;
         alarmOverlay.Refresh(graph);
+        if (selectedAlarmNodeIndicator != null)
+            alarmInfoPaneDisplay.Configure(selectedAlarmNodeIndicator, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
     }
     public void HandleOverlayChange(OverlayType type, bool enabled) {
         switch (type) {
@@ -111,6 +129,7 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "None";
                 closeButtonObject.SetActive(false);
+                cyberdeckController.Hide();
                 break;
             case OverlayType.power:
                 foreach (Image image in colorImages) {
@@ -126,6 +145,7 @@ public class OverlayHandler : MonoBehaviour {
                 SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
                 powerOverlay.OnOverlayActivate();
                 closeButtonObject.SetActive(true);
+                cyberdeckController.Hide();
                 break;
             case OverlayType.limitedCyber:
             case OverlayType.cyber:
@@ -138,7 +158,7 @@ public class OverlayHandler : MonoBehaviour {
                 powerOverlay.gameObject.SetActive(false);
                 cyberOverlay.gameObject.SetActive(true);
                 alarmOverlay.gameObject.SetActive(false);
-                titleText.text = "Network";
+                titleText.text = type == OverlayType.cyber ? "Network" : "None";
                 SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
                 cyberOverlay.OnOverlayActivate();
                 closeButtonObject.SetActive(true);
@@ -157,6 +177,7 @@ public class OverlayHandler : MonoBehaviour {
                 SetDiscoveryText(GameManager.I.gameData.levelState.delta.alarmGraph);
                 alarmOverlay.OnOverlayActivate();
                 closeButtonObject.SetActive(true);
+                cyberdeckController.Hide();
                 break;
         }
 
@@ -212,17 +233,21 @@ public class OverlayHandler : MonoBehaviour {
         GameObject infoPane = null;
         switch (indicator) {
             case NeoCyberNodeIndicator cybernode:
-                cyberInfoPaneDisplay.Configure(cybernode, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+                selectedCyberNodeIndicator = cybernode;
+                if (GameManager.I.playerManualHacker.deployed) {
+                    GameManager.I.playerManualHacker.Connect(cybernode.node);
+                }
                 infoPane = cyberInfoPaneDisplay.gameObject;
                 RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
+                HandleCyberDeckChange(cybernode);
                 break;
             case PowerNodeIndicator powernode:
-                powerInfoPaneDisplay.Configure(powernode, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
+                selectedPowerNodeIndicator = powernode;
                 infoPane = powerInfoPaneDisplay.gameObject;
                 RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
                 break;
             case AlarmNodeIndicator alarmnode:
-                alarmInfoPaneDisplay.Configure(alarmnode, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
+                selectedAlarmNodeIndicator = alarmnode;
                 infoPane = alarmInfoPaneDisplay.gameObject;
                 RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
                 break;
@@ -230,6 +255,14 @@ public class OverlayHandler : MonoBehaviour {
         if (infoPane != activeInfoPane) {
             ShowInfoPane(infoPane);
             activeInfoPane = infoPane;
+        }
+    }
+
+    void HandleCyberDeckChange(NeoCyberNodeIndicator cyberIndicator) {
+        if (cyberIndicator.node.getStatus() >= CyberNodeStatus.vulnerable) {
+            cyberdeckController.Show();
+        } else {
+            cyberdeckController.Hide();
         }
     }
     public void NodeMouseOverCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {

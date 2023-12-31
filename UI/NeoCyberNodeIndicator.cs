@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
 public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Image outlineImage;
     [Header("colors")]
@@ -21,6 +21,10 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Sprite datastoreIcon;
     public Sprite utilityIcon;
     public Sprite mysteryIcon;
+    [Header("progress bar")]
+    public GameObject progressBarObject;
+    public RectTransform progressBarRect;
+    public RectTransform progressBarParent;
     public override void SetGraphicalState(CyberNode node) {
         if (node.visibility == NodeVisibility.mystery) {
             SetMysteryState(node);
@@ -64,8 +68,19 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         } else {
             dataWidget.gameObject.SetActive(false);
         }
-    }
 
+        SetNetworkActionProgress();
+    }
+    void SetNetworkActionProgress() {
+        if (graph.networkActions != null && graph.networkActions.ContainsKey(node) && graph.networkActions[node].Count > 0) {
+            ShowProgressBar(true);
+            NetworkAction networkAction = graph.networkActions[node][0];
+            float progess = networkAction.timer / networkAction.lifetime;
+            SetProgress(progess);
+        } else {
+            ShowProgressBar(false);
+        }
+    }
     protected void SetMysteryState(CyberNode node) {
         iconImage.sprite = mysteryIcon;
 
@@ -78,6 +93,8 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
 
         lockWidget.gameObject.SetActive(false);
         dataWidget.gameObject.SetActive(false);
+
+        SetNetworkActionProgress();
     }
 
     public override void OnPointerClick(PointerEventData pointerEventData) {
@@ -103,5 +120,13 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.uiController.overlayHandler.selectedNode == null) {
             GameManager.I.playerManualHacker.Disconnect();
         }
+    }
+
+    void ShowProgressBar(bool visible) {
+        progressBarObject.SetActive(visible);
+    }
+    void SetProgress(float progress) {
+        float width = progressBarParent.rect.width * progress;
+        progressBarRect.sizeDelta = new Vector2(width, 50f);
     }
 }

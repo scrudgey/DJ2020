@@ -7,7 +7,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public UIColorSet colorSet;
     public Camera cam;
     public GameObject nodeIndicatorPrefab;
-    protected Graph<U, T> graph;
+    protected T graph;
     public Material lineRendererMaterial;
     public Material marchingAntsMaterial;
     HashSet<string> neighborEdge;
@@ -18,6 +18,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public OverlayHandler overlayHandler;
     void Awake() {
         foreach (Transform child in transform) {
+            if (child.name.ToLower().Contains("permanent")) continue;
             Destroy(child.gameObject);
         }
     }
@@ -39,7 +40,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             DisableOverlay();
             return;
         }
-        RefreshNodes();
+        RefreshIndicators();
     }
     public virtual void UpdateNodes() {
         foreach (KeyValuePair<U, V> kvp in indicators) {
@@ -53,11 +54,11 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             kvp.Value.SetGraphicalState(kvp.Key);
         }
     }
-    public virtual void RefreshNodes() {
-        ConfigureNodes();
-        SetEdgeGraphicState();
+    public virtual void RefreshIndicators() {
+        RefreshNodes();
+        RefreshEdgeGraphicState();
     }
-    public virtual void ConfigureNodes() {
+    public virtual void RefreshNodes() {
         string sceneName = SceneManager.GetActiveScene().name;
         foreach (U node in graph.nodes.Values) {
             if (node.sceneName != sceneName)
@@ -68,7 +69,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
 
         }
     }
-    public virtual void SetEdgeGraphicState() {
+    public virtual void RefreshEdgeGraphicState() {
         string sceneName = SceneManager.GetActiveScene().name;
         if (graph.nodes.Count() == 0 || indicators.Count == 0) {
             return;

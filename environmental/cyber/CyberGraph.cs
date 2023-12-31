@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +8,16 @@ using UnityEngine;
 
 [System.Serializable]
 public class CyberGraph : Graph<CyberNode, CyberGraph> {
+
+    [System.NonSerialized]
+    [XmlIgnore]
+    public Action<Dictionary<CyberNode, List<NetworkAction>>> NetworkActionsChanged;
+    [System.NonSerialized]
+    [XmlIgnore]
+    public Action<NetworkAction> NetworkActionUpdate;
+    [System.NonSerialized]
+    [XmlIgnore]
+    public Dictionary<CyberNode, List<NetworkAction>> networkActions;
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)
             return false;
@@ -69,5 +80,62 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             target.payData = objective.targetPaydata;
             dataNodes.Remove(target);
         }
+    }
+    public void AddNetworkAction(NetworkAction action) {
+        if (networkActions == null) {
+            networkActions = new Dictionary<CyberNode, List<NetworkAction>>();
+        }
+        if (!networkActions.ContainsKey(action.toNode)) {
+            networkActions[action.toNode] = new List<NetworkAction>();
+        }
+        networkActions[action.toNode].Add(action);
+        NetworkActionsChanged?.Invoke(networkActions);
+    }
+    public void UpdateNetworkActions(float timeDelta) {
+        bool anyComplete = false;
+        if (networkActions == null) {
+            networkActions = new Dictionary<CyberNode, List<NetworkAction>>();
+        }
+        foreach (List<NetworkAction> actions in networkActions.Values) {
+            List<NetworkAction> completedActions = new List<NetworkAction>();
+            foreach (NetworkAction action in actions) {
+                action.Update(timeDelta);
+                if (action.complete) {
+                    completedActions.Add(action);
+                    anyComplete = true;
+                }
+                NetworkActionUpdate?.Invoke(action);
+            }
+            foreach (NetworkAction action in completedActions) {
+                actions.Remove(action);
+            }
+        }
+        if (anyComplete) {
+            GameManager.I.RefreshCyberGraph();
+            NetworkActionsChanged?.Invoke(networkActions);
+        }
+    }
+}
+
+[System.Serializable]
+public class NetworkAction {
+    public string title;
+    public SoftwareEffect effect;
+    public float timer;
+    public float lifetime;
+    public CyberNode fromNode;
+    public CyberNode toNode;
+    public float timerRate = 1f;
+    public bool complete;
+    public void Update(float deltaTime) {
+        timer += timerRate * deltaTime;
+        if (timer >= lifetime) {
+            DoComplete();
+        }
+    }
+
+    void DoComplete() {
+        complete = true;
+        effect.ApplyToNode(toNode);
     }
 }

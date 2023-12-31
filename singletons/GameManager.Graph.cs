@@ -11,6 +11,20 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public partial class GameManager : Singleton<GameManager> {
+    public void UpdateGraphs() {
+        // method for time-updating graph state
+
+        float alarmTimerOrig = alarmCountdown();
+
+        gameData?.levelState?.delta.alarmGraph?.Update();
+
+        float alarmTimer = alarmCountdown();
+        if (alarmTimer <= 0 && alarmTimerOrig > 0) {
+            InitiateAlarmShutdown();
+        }
+
+        gameData?.levelState?.delta.cyberGraph?.UpdateNetworkActions(Time.deltaTime);
+    }
     public void SetNodeEnabled<U>(Node<U> node, bool value) where U : Node<U> {
         if (applicationIsQuitting) return;
         node.setEnabled(value);

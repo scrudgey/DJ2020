@@ -4,6 +4,9 @@ using System.Linq;
 using UnityEngine;
 
 public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndicator> {
+    public RectTransform cyberdeckIndicator;
+    public LineRenderer cyberdeckLineRenderer;
+    // public CyberNode selectedCyberNode;
     [Header("colors")]
     public Color invulnerableColor;
     public Color vulnerableColor;
@@ -12,6 +15,41 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Color dimVulnerableColor;
     public Color dimCompromisedColor;
 
+    public override void UpdateNodes() {
+        if (GameManager.I.activeOverlayType == OverlayType.cyber) {
+            base.UpdateNodes();
+        } else if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            LimitedUpdate();
+        }
+
+        SetPlayerNodeIndicator();
+    }
+    void SetPlayerNodeIndicator() {
+        if (GameManager.I.playerManualHacker.deployed) {
+            Vector3 playerPosition = GameManager.I.playerManualHacker.transform.position;
+            Vector3 screenPoint = cam.WorldToScreenPoint(playerPosition);
+
+            cyberdeckIndicator.gameObject.SetActive(true);
+            cyberdeckIndicator.position = screenPoint;
+
+            if (GameManager.I.playerManualHacker.targetNode != null) {
+                List<Vector3> points = new List<Vector3>();
+                points.Add(GameManager.I.playerManualHacker.transform.position);
+                points.Add(GameManager.I.playerManualHacker.targetNode.position);
+                cyberdeckLineRenderer.positionCount = points.Count;
+                cyberdeckLineRenderer.material.color = vulnerableColor;
+                cyberdeckLineRenderer.SetPositions(points.ToArray());
+                cyberdeckLineRenderer.enabled = true;
+
+            } else {
+                cyberdeckLineRenderer.enabled = false;
+            }
+        } else {
+            cyberdeckIndicator.gameObject.SetActive(false);
+            cyberdeckLineRenderer.enabled = false;
+        }
+
+    }
     override public void SetEdgeState(LineRenderer renderer, CyberNode node1, CyberNode node2) {
         if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
             renderer.enabled = false;
@@ -36,14 +74,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         }
     }
     public override void OnOverlayActivate() {
-        SetEdgeGraphicState();
-    }
-    public override void UpdateNodes() {
-        if (GameManager.I.activeOverlayType == OverlayType.cyber) {
-            base.UpdateNodes();
-        } else if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
-            LimitedUpdate();
-        }
+        RefreshEdgeGraphicState();
     }
     void LimitedUpdate() {
         Vector3 playerPosition = GameManager.I.playerPosition;
@@ -61,7 +92,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
     public override void NodeMouseOverCallback(NodeIndicator<CyberNode, CyberGraph> indicator) {
         base.NodeMouseOverCallback(indicator);
-        SetEdgeGraphicState();
+        RefreshEdgeGraphicState();
         // this code properly belongs somewhere else.
         // if (GameManager.I.IsCyberNodeVulnerable(indicator.node)) {
         //     foreach (HashSet<string> edge in graph.edgePairs) {
@@ -79,7 +110,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
     public override void NodeMouseExitCallback(NodeIndicator<CyberNode, CyberGraph> indicator) {
         base.NodeMouseExitCallback(indicator);
-        SetEdgeGraphicState();
+        RefreshEdgeGraphicState();
     }
 
 
