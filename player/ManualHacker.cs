@@ -56,18 +56,21 @@ public class ManualHacker : MonoBehaviour {
     }
 
     public void Connect(CyberNode target) {
-        // TODO: check deployed, check distance
         if (!deployed) return;
         if (Vector3.Distance(target.position, transform.position) > 3f) return;
-        Disconnect();
+        Disconnect(dontRefreshCyberGraph: true);
         targetNode = target;
         target.isManualHackerTarget = true;
+        GameManager.I.RefreshCyberGraph();
     }
-    public void Disconnect() {
+    public void Disconnect(bool dontRefreshCyberGraph = false) {
         if (targetNode != null) {
             targetNode.isManualHackerTarget = false;
         }
         targetNode = null;
+        if (!dontRefreshCyberGraph) {
+            GameManager.I.RefreshCyberGraph();
+        }
     }
 
     void UpdateWire(CyberNode node) {

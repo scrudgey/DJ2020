@@ -17,17 +17,21 @@ public class CyberdeckUIController : MonoBehaviour {
     NeoCyberNodeIndicator indicator;
     List<CyberdeckHackProgressBar> progressBars;
     Coroutine showCoroutine;
-    bool shown;
+    // bool shown;
+    enum State { hidden, progressOnly, full }
+    State state;
     OverlayHandler handler;
     CyberGraph graph;
     void Start() {
-        shown = false;
-        ShowHideRect(false);
+        // shown = false;
+        state = State.hidden;
+        // ShowHideRect(false);
     }
     public void Initialize(OverlayHandler handler, CyberGraph graph) {
         this.handler = handler;
         this.graph = graph;
         PopulateSoftwareButtons();
+        PopulateHackIndicators(new Dictionary<CyberNode, List<NetworkAction>>());
         graph.NetworkActionsChanged += HandleNetworkActionChange;
         graph.NetworkActionUpdate += HandleNetworkActionUpdate;
     }
@@ -61,15 +65,21 @@ public class CyberdeckUIController : MonoBehaviour {
     }
 
     public void Show() {
-        if (!shown) {
-            shown = true;
+        if (state != State.full) {
+            state = State.full;
             ShowHideRect(true);
         }
     }
     public void Hide() {
-        if (shown) {
-            shown = false;
+        if (state != State.hidden) {
+            state = State.hidden;
             ShowHideRect(false);
+        }
+    }
+    public void ShowOnlyProgress() {
+        if (state != State.progressOnly) {
+            state = State.progressOnly;
+            ShowHideRect(true, progressOnly: true);
         }
     }
     void PopulateSoftwareButtons() {
@@ -80,7 +90,7 @@ public class CyberdeckUIController : MonoBehaviour {
         AddSoftwareButton(new SoftwareEffect() {
             type = SoftwareEffect.Type.compromise,
             level = 1,
-            name = "crack"
+            name = "crack.exe"
         });
     }
 
@@ -93,16 +103,21 @@ public class CyberdeckUIController : MonoBehaviour {
         buttons.Add(button);
     }
 
-    void ShowHideRect(bool show) {
+    void ShowHideRect(bool show, bool progressOnly = false) {
         if (showCoroutine != null) {
             StopCoroutine(showCoroutine);
         }
-        showCoroutine = StartCoroutine(MoveRect(show));
+        showCoroutine = StartCoroutine(MoveRect(show, progressOnly: progressOnly));
     }
 
-    IEnumerator MoveRect(bool value) {
-        float startPoint = value ? -422 : 5f;
-        float endPoint = value ? 5f : -422;
+    IEnumerator MoveRect(bool value, bool progressOnly = false) {
+        float startPoint = rectTransform.anchoredPosition.y;
+        float endPoint;
+        if (progressOnly) {
+            endPoint = -176;
+        } else {
+            endPoint = value ? 5f : (-1f * rectTransform.rect.height - 20f);
+        }
         return Toolbox.Ease(null, 0.5f, startPoint, endPoint, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             Vector3 newPosition = rectTransform.anchoredPosition;
             newPosition.y = amount;
@@ -114,9 +129,9 @@ public class CyberdeckUIController : MonoBehaviour {
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
             NetworkAction networkAction = new NetworkAction() {
-                title = "hacking...",
+                title = $"uploading {button.effect.name}...",
                 effect = button.effect,
-                lifetime = 2f,
+                lifetime = 10f,
                 fromNode = null,
                 toNode = indicator.node,
                 timerRate = 1f,

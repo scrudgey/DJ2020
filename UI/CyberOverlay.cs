@@ -25,7 +25,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         SetPlayerNodeIndicator();
     }
     void SetPlayerNodeIndicator() {
-        if (GameManager.I.playerManualHacker.deployed) {
+        if (GameManager.I.playerManualHacker.deployed && GameManager.I.activeOverlayType == OverlayType.cyber) {
             Vector3 playerPosition = GameManager.I.playerManualHacker.transform.position;
             Vector3 screenPoint = cam.WorldToScreenPoint(playerPosition);
 

@@ -115,6 +115,14 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             NetworkActionsChanged?.Invoke(networkActions);
         }
     }
+    public List<NetworkAction> ActiveNetworkActions() {
+        List<NetworkAction> output = new List<NetworkAction>();
+        if (networkActions == null) return output;
+        foreach (KeyValuePair<CyberNode, List<NetworkAction>> kvp in networkActions) {
+            output.AddRange(kvp.Value);
+        }
+        return output;
+    }
 }
 
 [System.Serializable]

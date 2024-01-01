@@ -16,6 +16,9 @@ public class Node<U> where U : Node<U> {
     public bool fixedVisibility;
     public bool alwaysOnScreen;
 
+    public virtual NodeVisibility GetVisibility() {
+        return visibility;
+    }
     [NonSerialized]
     Action OnValueChanged;
     public Node() { }

@@ -47,7 +47,7 @@ public class SoftwareButton : MonoBehaviour {
 
 [System.Serializable]
 public class SoftwareEffect {
-    public enum Type { scan, download, unlock, compromise }
+    public enum Type { scan, download, unlock, compromise, none }
     public Type type;
     public int level;
     public string name;

@@ -127,7 +127,8 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 break;
             case CyberDeck:
                 GameManager.I.playerManualHacker.deployed = true;
-                GameManager.I.SetOverlay(OverlayType.limitedCyber);
+                if (GameManager.I.activeOverlayType == OverlayType.none)
+                    GameManager.I.SetOverlay(OverlayType.limitedCyber);
                 break;
             case IRGoggles goggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = true;

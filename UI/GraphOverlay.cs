@@ -45,7 +45,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public virtual void UpdateNodes() {
         foreach (KeyValuePair<U, V> kvp in indicators) {
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            if (kvp.Key.visibility == NodeVisibility.unknown) {
+            if (kvp.Key.GetVisibility() == NodeVisibility.unknown) {
                 kvp.Value.gameObject.SetActive(false);
             } else {
                 kvp.Value.gameObject.SetActive(true);

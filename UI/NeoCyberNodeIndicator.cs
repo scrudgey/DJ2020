@@ -15,35 +15,51 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     [Header("decor")]
     public CyberNodeIndicatorLockWidget lockWidget;
     public CyberNodeIndicatorDataWidget dataWidget;
-    [Header("sprites")]
-    public Sprite normalIcon;
-    public Sprite wanIcon;
-    public Sprite datastoreIcon;
-    public Sprite utilityIcon;
-    public Sprite mysteryIcon;
+    public GraphIconReference icons;
     [Header("progress bar")]
     public GameObject progressBarObject;
     public RectTransform progressBarRect;
     public RectTransform progressBarParent;
+    [Header("effects")]
+    // public GameObject scanEffectObject;
+    public Image scanEffectImage;
+    public Animation scanEffectAnimator;
+    public GameObject downloadEffectObject;
+    public GameObject unlockEffectObject;
+    public GameObject crackEffectObject;
+
+    void SetEffect(SoftwareEffect.Type type) {
+        // scanEffectObject.SetActive(false);
+        scanEffectImage.enabled = false;
+        downloadEffectObject.SetActive(false);
+        unlockEffectObject.SetActive(false);
+        crackEffectObject.SetActive(false);
+        switch (type) {
+            default:
+            case SoftwareEffect.Type.none:
+                break;
+            case SoftwareEffect.Type.scan:
+                // scanEffectObject.SetActive(true);
+                scanEffectImage.enabled = true;
+                scanEffectAnimator.Play("animateScanEffect");
+                break;
+            case SoftwareEffect.Type.download:
+                downloadEffectObject.SetActive(true);
+                break;
+            case SoftwareEffect.Type.unlock:
+                unlockEffectObject.SetActive(true);
+                break;
+            case SoftwareEffect.Type.compromise:
+                crackEffectObject.SetActive(true);
+                break;
+        }
+    }
     public override void SetGraphicalState(CyberNode node) {
         if (node.visibility == NodeVisibility.mystery) {
             SetMysteryState(node);
             return;
         }
-        switch (node.type) {
-            case CyberNodeType.normal:
-                iconImage.sprite = normalIcon;
-                break;
-            case CyberNodeType.datanode:
-                iconImage.sprite = datastoreIcon;
-                break;
-            case CyberNodeType.utility:
-                iconImage.sprite = utilityIcon;
-                break;
-            case CyberNodeType.WAN:
-                iconImage.sprite = wanIcon;
-                break;
-        }
+        iconImage.sprite = icons.CyberNodeSprite(node);
 
         Color nodeColor = node.getStatus() switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
@@ -77,12 +93,14 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             NetworkAction networkAction = graph.networkActions[node][0];
             float progess = networkAction.timer / networkAction.lifetime;
             SetProgress(progess);
+            SetEffect(networkAction.effect.type);
         } else {
             ShowProgressBar(false);
+            SetEffect(SoftwareEffect.Type.none);
         }
     }
     protected void SetMysteryState(CyberNode node) {
-        iconImage.sprite = mysteryIcon;
+        iconImage.sprite = icons.CyberNodeSprite(node);
 
         Color nodeColor = Color.gray;
 

@@ -102,6 +102,7 @@ public class OverlayHandler : MonoBehaviour {
             cyberdeckController.Refresh(selectedCyberNodeIndicator);
             cyberInfoPaneDisplay.Configure(selectedCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
         }
+        HandleCyberDeckChange(selectedCyberNodeIndicator);
     }
     public void RefreshAlarmGraph(AlarmGraph graph) {
         alarmOverlay.cam = cam;
@@ -110,6 +111,9 @@ public class OverlayHandler : MonoBehaviour {
             alarmInfoPaneDisplay.Configure(selectedAlarmNodeIndicator, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
     }
     public void HandleOverlayChange(OverlayType type, bool enabled) {
+        selectedAlarmNodeIndicator = null;
+        selectedCyberNodeIndicator = null;
+        selectedPowerNodeIndicator = null;
         switch (type) {
             case OverlayType.none:
             default:
@@ -206,7 +210,12 @@ public class OverlayHandler : MonoBehaviour {
     }
 
     public void NextOverlayButton() {
-        int overlayIndex = (int)GameManager.I.activeOverlayType + 1;
+        int overlayIndex;
+        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            overlayIndex = 1;
+        } else {
+            overlayIndex = (int)GameManager.I.activeOverlayType + 1;
+        }
         if (overlayIndex > 3) {
             overlayIndex = 0;
         }
@@ -215,7 +224,12 @@ public class OverlayHandler : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds);
     }
     public void PreviousOverlayButton() {
-        int overlayIndex = (int)GameManager.I.activeOverlayType - 1;
+        int overlayIndex;
+        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            overlayIndex = 3;
+        } else {
+            overlayIndex = (int)GameManager.I.activeOverlayType - 1;
+        }
         if (overlayIndex < 0) {
             overlayIndex = 3;
         }
@@ -239,7 +253,6 @@ public class OverlayHandler : MonoBehaviour {
                 }
                 infoPane = cyberInfoPaneDisplay.gameObject;
                 RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
-                HandleCyberDeckChange(cybernode);
                 break;
             case PowerNodeIndicator powernode:
                 selectedPowerNodeIndicator = powernode;
@@ -259,8 +272,20 @@ public class OverlayHandler : MonoBehaviour {
     }
 
     void HandleCyberDeckChange(NeoCyberNodeIndicator cyberIndicator) {
-        if (cyberIndicator.node.getStatus() >= CyberNodeStatus.vulnerable) {
-            cyberdeckController.Show();
+        if (cyberIndicator == null) {
+            MaybeHideCyberdeck();
+        } else {
+            if (cyberIndicator.node.getStatus() >= CyberNodeStatus.vulnerable) {
+                cyberdeckController.Show();
+            } else {
+                MaybeHideCyberdeck();
+            }
+        }
+
+    }
+    void MaybeHideCyberdeck() {
+        if (GameManager.I.gameData.levelState.delta.cyberGraph.ActiveNetworkActions().Count > 0) {
+            cyberdeckController.ShowOnlyProgress();
         } else {
             cyberdeckController.Hide();
         }
@@ -283,14 +308,26 @@ public class OverlayHandler : MonoBehaviour {
         ShowInfoPane(null);
         activeInfoPane = null;
         SetSelectedNode(null);
+        selectedAlarmNodeIndicator = null;
+        selectedCyberNodeIndicator = null;
+        selectedPowerNodeIndicator = null;
+        if (GameManager.I.playerManualHacker.deployed) {
+            // selectedCyberNodeIndicator = 
+            foreach (NeoCyberNodeIndicator indicator in GameObject.FindObjectsOfType<NeoCyberNodeIndicator>()) {
+                if (indicator.node == GameManager.I.playerManualHacker.targetNode) {
+                    selectedCyberNodeIndicator = indicator;
+                    break;
+                }
+            }
+        }
         selectionIndicator.HideSelection();
         mouseOverIndicator.HideSelection();
+        RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
     public void ShowInfoPane(GameObject infoPane) {
         if (showInfoRoutine != null) {
             StopCoroutine(showInfoRoutine);
         }
-        Debug.Log($"show info pane: {infoPane}");
         if (infoPane != activeInfoPane) {
             if (infoPane == null) {
                 showInfoRoutine = StartCoroutine(EaseInInfoPane(false, activeInfoPane));

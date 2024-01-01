@@ -913,6 +913,7 @@ graphs are jumpy on first reveal
 reconnect e.g. tower
 
 # start hacking!
+
 * refresh info pane
 * refresh graph
     * show cyberdeck when vulnerable node is selected
@@ -928,22 +929,36 @@ reconnect e.g. tower
 * cyberdeck connected to node -> make vulnerable -> navigate away and back -> cyberdeck controller not active
     * represent player/deck as compromised node, with line
     * check cyberdeck visibility before show.hide
-
-implement:
+* implement:
     * disable software to indicate what is possible at any time
     * software takes time to run 
         * progress bar on node
-        progress bar on cyberdeck controller
-        shows an effect on the node
+        * progress bar on cyberdeck controller
+* take out cyberdeck, select a target, close overlay and walk away: cyberdeck UI still visible
+* show cyberdeck progress even if selected node is not vulnerable
+* when close info pane but manual hacker still connected, cyberdeck is still targeting the old node
+* open cyberdeck - mouse over target (no change) - close overlay - mouse over target - now cyberdeck ui shows
+* attach software buttons to cyberdeck interface
+* move node info down
+* overlay << and >> is broken
+* finish progress bar: icons, title
+* show icon name in progress bar
 
-nodes can display lock, file type more prominently now
 
-use password
-    this can be on the info panel?
-
-discover nodes
+shows an effect on the node
+    * scan
+    unlock
+    download
+    hack
+    
+handle download
 marching ants on threat indication
 marching ants indicate upload/download in progress
 
+
+nodes can display lock, file & file type more prominently now
+use password
+    this can be on the info panel?
+discover nodes
 take a screenshot and compare UI sizes
 

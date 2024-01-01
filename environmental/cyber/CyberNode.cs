@@ -14,6 +14,13 @@ public class CyberNode : Node<CyberNode> {
     public bool utilityActive;
     public bool isManualHackerTarget;
     public CyberNodeStatus status;
+    public override NodeVisibility GetVisibility() {
+        if (isManualHackerTarget && visibility == NodeVisibility.unknown) {
+            return NodeVisibility.mystery;
+        } else {
+            return base.GetVisibility();
+        }
+    }
     public CyberNodeStatus getStatus() {
         if (compromised) {
             return CyberNodeStatus.compromised;
