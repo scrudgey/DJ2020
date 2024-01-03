@@ -58,6 +58,9 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             return;
         }
         iconImage.sprite = icons.CyberNodeSprite(node);
+        if (node.type == CyberNodeType.datanode && node.dataStolen) {
+            iconImage.enabled = false;
+        }
 
         Color nodeColor = node.getStatus() switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
@@ -69,19 +72,21 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
 
         iconImage.color = nodeColor;
         outlineImage.color = nodeColor;
-        lockWidget.SetColor(nodeColor);
-        dataWidget.SetColor(nodeColor);
+        lockWidget.gameObject.SetActive(false);
+        dataWidget.gameObject.SetActive(false);
+        // lockWidget.SetColor(nodeColor);
+        // dataWidget.SetColor(nodeColor);
 
-        lockWidget.gameObject.SetActive(node.lockLevel > 0);
-        if (node.lockLevel > 0) {
-            lockWidget.SetLockLevel(node.lockLevel);
-        }
+        // lockWidget.gameObject.SetActive(node.lockLevel > 0);
+        // if (node.lockLevel > 0) {
+        //     lockWidget.SetLockLevel(node.lockLevel);
+        // }
 
-        if (node.type == CyberNodeType.datanode) {
-            dataWidget.gameObject.SetActive(!node.dataStolen);
-        } else {
-            dataWidget.gameObject.SetActive(false);
-        }
+        // if (node.type == CyberNodeType.datanode) {
+        //     dataWidget.gameObject.SetActive(!node.dataStolen);
+        // } else {
+        //     dataWidget.gameObject.SetActive(false);
+        // }
 
         SetNetworkActionProgress();
     }

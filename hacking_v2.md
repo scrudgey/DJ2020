@@ -958,6 +958,7 @@ reconnect e.g. tower
     * retire cyberdatastore
     * spremove paydata when done, don't download from stolen paydata store
     * if effect is download, change progress bar to go the other way
+* nodes can display lock, file & file type more prominently now
 
 
 
@@ -967,9 +968,9 @@ shows an effect on the node
     download: animated icon
     hack: laughing skull
 
-nodes can display lock, file & file type more prominently now
+sound effects
 use password
     this can be on the info panel?
 discover nodes
-take a screenshot and compare UI sizes
+? take a screenshot and compare UI sizes
 

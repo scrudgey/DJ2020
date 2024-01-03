@@ -150,6 +150,7 @@ public class CyberdeckUIController : MonoBehaviour {
             };
 
             if (button.effect.type == SoftwareEffect.Type.download) {
+                networkAction.title = $"downloading {indicator.node.payData.filename}...";
                 networkAction.path = graph.GetPathToNearestDownloadPoint(indicator.node);
                 if (indicator.node.isManualHackerTarget) {
                     networkAction.fromPlayerNode = true;

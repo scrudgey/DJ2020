@@ -10,8 +10,18 @@ public class GraphIconReference : ScriptableObject {
     public Sprite datastoreIcon;
     public Sprite utilityIcon;
     public Sprite mysteryIcon;
+    public Sprite lockIcon;
+    [Header("datatype icons")]
+    public Sprite iconPay;
+    public Sprite iconPersonnel;
+    public Sprite iconPassword;
+    public Sprite iconLocation;
+    public Sprite iconObjective;
 
     public Sprite CyberNodeSprite(CyberNode node) {
+        if (node.lockLevel > 0) {
+            return lockIcon;
+        }
         if (node.visibility == NodeVisibility.mystery) {
             return mysteryIcon;
         }
@@ -20,11 +30,22 @@ public class GraphIconReference : ScriptableObject {
             case CyberNodeType.normal:
                 return normalIcon;
             case CyberNodeType.datanode:
-                return datastoreIcon;
+                return DataSprite(node.payData.type);
             case CyberNodeType.utility:
                 return utilityIcon;
             case CyberNodeType.WAN:
                 return wanIcon;
         }
+    }
+
+    public Sprite DataSprite(PayData.DataType dataType) {
+        return dataType switch {
+            PayData.DataType.location => iconLocation,
+            PayData.DataType.objective => iconObjective,
+            PayData.DataType.password => iconPassword,
+            PayData.DataType.pay => iconPay,
+            PayData.DataType.personnel => iconPersonnel,
+            _ => iconPay
+        };
     }
 }

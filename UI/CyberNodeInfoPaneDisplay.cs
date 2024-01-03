@@ -33,7 +33,9 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
         type.color = statusColor;
         status.color = statusColor;
 
-        if (indicator.node.type == CyberNodeType.datanode && indicator.node.payData != null) {
+        if (indicator.node.lockLevel > 0){
+
+        } else if (indicator.node.type == CyberNodeType.datanode && indicator.node.payData != null) {
             dataInfoDisplay.Configure(indicator.node.payData, indicator.node.dataStolen);
             dataInfoDisplay.gameObject.SetActive(true);
             utilityInterfaceDisplay.gameObject.SetActive(false);
