@@ -6,6 +6,9 @@ using UnityEngine;
 public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndicator> {
     public RectTransform cyberdeckIndicator;
     public LineRenderer cyberdeckLineRenderer;
+    public Material normalCyberdeckLineMaterial;
+    public Material marchingAntsCyberdeckLineMaterial;
+    public Color marchingAntsColor;
     // public CyberNode selectedCyberNode;
     [Header("colors")]
     public Color invulnerableColor;
@@ -15,7 +18,21 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Color dimVulnerableColor;
     public Color dimCompromisedColor;
 
+    float marchingAntsTimer;
+
+    bool subscribed;
+    void OnDestroy() {
+        if (subscribed) {
+            graph.NetworkActionComplete -= HandleCompleteNetworkAction;
+        }
+    }
+
     public override void UpdateNodes() {
+        marchingAntsTimer += Time.fixedDeltaTime;
+        if (!subscribed) {
+            subscribed = true;
+            graph.NetworkActionComplete += HandleCompleteNetworkAction;
+        }
         if (GameManager.I.activeOverlayType == OverlayType.cyber) {
             base.UpdateNodes();
         } else if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
@@ -23,9 +40,12 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         }
 
         SetPlayerNodeIndicator();
+
+        DrawMarchingAnts();
     }
     void SetPlayerNodeIndicator() {
         if (GameManager.I.playerManualHacker.deployed && GameManager.I.activeOverlayType == OverlayType.cyber) {
+            GameManager.I.playerManualHacker.lineRenderer.enabled = false;
             Vector3 playerPosition = GameManager.I.playerManualHacker.transform.position;
             Vector3 screenPoint = cam.WorldToScreenPoint(playerPosition);
 
@@ -37,16 +57,30 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
                 points.Add(GameManager.I.playerManualHacker.transform.position);
                 points.Add(GameManager.I.playerManualHacker.targetNode.position);
                 cyberdeckLineRenderer.positionCount = points.Count;
-                cyberdeckLineRenderer.material.color = vulnerableColor;
                 cyberdeckLineRenderer.SetPositions(points.ToArray());
-                cyberdeckLineRenderer.enabled = true;
 
+                if (graph.ActiveNetworkActions().Any(networkAction => networkAction.fromPlayerNode)) {
+                    cyberdeckLineRenderer.material = marchingAntsCyberdeckLineMaterial;
+                    cyberdeckLineRenderer.material.color = marchingAntsColor;
+                    cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
+                } else {
+                    cyberdeckLineRenderer.material = normalCyberdeckLineMaterial;
+                    if (GameManager.I.playerManualHacker.targetNode.getStatus() == CyberNodeStatus.compromised) {
+                        cyberdeckLineRenderer.material.color = compromisedColor;
+                    } else {
+                        cyberdeckLineRenderer.material.color = vulnerableColor;
+                    }
+                }
+
+                cyberdeckLineRenderer.enabled = true;
             } else {
                 cyberdeckLineRenderer.enabled = false;
             }
         } else {
             cyberdeckIndicator.gameObject.SetActive(false);
             cyberdeckLineRenderer.enabled = false;
+            GameManager.I.playerManualHacker.lineRenderer.enabled = true;
+
         }
 
     }
@@ -113,5 +147,44 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         RefreshEdgeGraphicState();
     }
 
+    void DrawMarchingAnts() {
+        foreach (NetworkAction action in graph.ActiveNetworkActions()) {
+            CyberNode currentnode = action.toNode;
+            for (int i = 0; i < action.path.Count; i++) {
+                CyberNode nextNode = action.path[i];
+                NeoCyberNodeIndicator indicator = indicators[nextNode];
+                // indicator.marchingAntsLineRender.enabled = true;
+                HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
+                LineRenderer renderer = GetLineRenderer(edge);
+                renderer.material = marchingAntsMaterial;
+                // renderer.gameObject.SetActive(false);
+
+                // indicator.marchingAntsLineRender.positionCount = renderer.positionCount;
+                // Vector3[] positions = new Vector3[renderer.positionCount];
+                // renderer.GetPositions(positions);
+                // indicator.marchingAntsLineRender.SetPositions(positions);
+
+                indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
+                currentnode = nextNode;
+            }
+        }
+    }
+
+    void HandleCompleteNetworkAction(NetworkAction networkAction) {
+        // foreach (CyberNode node in networkAction.path) {
+        //     NeoCyberNodeIndicator indicator = indicators[node];
+        //     // indicator.marchingAntsLineRender.enabled = false;
+        //     indicator.
+        // }
+        CyberNode currentnode = networkAction.toNode;
+        for (int i = 0; i < networkAction.path.Count; i++) {
+            CyberNode nextNode = networkAction.path[i];
+            HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
+            LineRenderer renderer = GetLineRenderer(edge);
+            // renderer.gameObject.SetActive(true);
+            renderer.material = lineRendererMaterial;
+            currentnode = nextNode;
+        }
+    }
 
 }

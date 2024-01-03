@@ -943,17 +943,23 @@ reconnect e.g. tower
 * overlay << and >> is broken
 * finish progress bar: icons, title
 * show icon name in progress bar
+* marching ants on upload
+* marching ants points
+* marching ants indicate upload/download in progress
+* marching ants on player upload
+* change player line renderer color when connected node is compromised
+* marching ants for multiple uploads?
+* marching ants material: don't use chevron
+* variable lifetimes for different software
+* player invisible when connecting to node
 
+downloads
 
 shows an effect on the node
     * scan
-    unlock
-    download
-    hack
-    
-handle download
-marching ants on threat indication
-marching ants indicate upload/download in progress
+    unlock: wiggle key? password?
+    download: animated icon
+    hack: laughing skull
 
 
 nodes can display lock, file & file type more prominently now
@@ -961,4 +967,5 @@ use password
     this can be on the info panel?
 discover nodes
 take a screenshot and compare UI sizes
+
 

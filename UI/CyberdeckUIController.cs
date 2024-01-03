@@ -127,16 +127,30 @@ public class CyberdeckUIController : MonoBehaviour {
     public void SoftwareButtonCallback(SoftwareButton button) {
         if (indicator == null) { return; }
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
+        // TODO: this logic will belong somewhere else
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
+
+            float lifetime = button.effect.type switch {
+                SoftwareEffect.Type.compromise => 10f,
+                SoftwareEffect.Type.download => 1f,
+                SoftwareEffect.Type.scan => 3f,
+                SoftwareEffect.Type.unlock => 5f,
+                _ => 1f
+            };
+
             NetworkAction networkAction = new NetworkAction() {
                 title = $"uploading {button.effect.name}...",
                 effect = button.effect,
-                lifetime = 10f,
-                fromNode = null,
+                lifetime = lifetime,
                 toNode = indicator.node,
                 timerRate = 1f,
+                path = new List<CyberNode>()
             };
-            // graph.networkActions.Add(networkAction);
+            if (indicator.node.isManualHackerTarget) {
+                networkAction.fromPlayerNode = true;
+            } else {
+                networkAction.path.Add(graph.GetNearestCompromisedNode(indicator.node));
+            }
             graph.AddNetworkAction(networkAction);
             GameManager.I.RefreshCyberGraph();
             handler.NodeSelectCallback(indicator);

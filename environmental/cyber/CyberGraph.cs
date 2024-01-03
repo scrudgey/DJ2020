@@ -17,6 +17,9 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
     public Action<NetworkAction> NetworkActionUpdate;
     [System.NonSerialized]
     [XmlIgnore]
+    public Action<NetworkAction> NetworkActionComplete;
+    [System.NonSerialized]
+    [XmlIgnore]
     public Dictionary<CyberNode, List<NetworkAction>> networkActions;
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)
@@ -108,6 +111,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             }
             foreach (NetworkAction action in completedActions) {
                 actions.Remove(action);
+                NetworkActionComplete?.Invoke(action);
             }
         }
         if (anyComplete) {
@@ -123,6 +127,19 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         }
         return output;
     }
+    public IEnumerable<List<CyberNode>> ActiveNetworkPaths() {
+        return networkActions.Values.SelectMany(networkActionList => networkActionList.Select(act => act.path));
+    }
+
+    public CyberNode GetNearestCompromisedNode(CyberNode origin) {
+        foreach (String neighborId in edges[origin.idn]) {
+            CyberNode neighbor = nodes[neighborId];
+            if (neighbor.getStatus() == CyberNodeStatus.compromised) {
+                return neighbor;
+            }
+        }
+        return null;
+    }
 }
 
 [System.Serializable]
@@ -131,8 +148,11 @@ public class NetworkAction {
     public SoftwareEffect effect;
     public float timer;
     public float lifetime;
-    public CyberNode fromNode;
+    // public CyberNode fromNode;
     public CyberNode toNode;
+    public bool fromPlayerNode;
+    public bool toPlayerNode;
+    public List<CyberNode> path;
     public float timerRate = 1f;
     public bool complete;
     public void Update(float deltaTime) {

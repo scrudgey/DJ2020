@@ -12,6 +12,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public Material marchingAntsMaterial;
     HashSet<string> neighborEdge;
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
+    Dictionary<HashSet<string>, LineRenderer> marchingAntsRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
     protected V mousedOverIndicator;
@@ -102,6 +103,13 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public abstract void SetEdgeState(LineRenderer renderer, U node1, U node2);
 
     protected void SetLinePositions(LineRenderer renderer, U node1, U node2) {
+        List<Vector3> points = pointsBetweenNodes(node1, node2);
+
+        renderer.positionCount = points.Count;
+        renderer.SetPositions(points.ToArray());
+    }
+
+    protected List<Vector3> pointsBetweenNodes(U node1, U node2) {
         Vector3 position1 = Toolbox.Round(node1.position, decimalPlaces: 1);
         Vector3 position2 = Toolbox.Round(node2.position, decimalPlaces: 1);
 
@@ -120,10 +128,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
 
         points.Add(position2);
 
-        // TODO: snap
-
-        renderer.positionCount = points.Count;
-        renderer.SetPositions(points.ToArray());
+        return points;
     }
 
     protected void SetTruncatedLinePositions(LineRenderer renderer, U node1, U node2) {
@@ -168,6 +173,16 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             return renderer;
         }
     }
+    protected LineRenderer GetMarchingAntsLineRenderer(HashSet<string> edge) {
+        if (marchingAntsRenderers.ContainsKey(edge)) {
+            return marchingAntsRenderers[edge];
+        } else {
+            LineRenderer renderer = InitializeLineRenderer();
+            marchingAntsRenderers[edge] = renderer;
+            lineRendererArrays[edge.ToArray()] = renderer;
+            return renderer;
+        }
+    }
 
     LineRenderer InitializeLineRenderer() {
         GameObject newChild = new GameObject($"lineRenderer_{lineRenderers.Count}");
@@ -179,7 +194,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         renderer.startColor = Color.white;
         renderer.endColor = Color.white;
         renderer.alignment = LineAlignment.View;
-        renderer.textureMode = LineTextureMode.Stretch;
+        renderer.textureMode = LineTextureMode.Tile;
         renderer.numCapVertices = 5;
         renderer.numCornerVertices = 5;
         renderer.shadowBias = 0.5f;

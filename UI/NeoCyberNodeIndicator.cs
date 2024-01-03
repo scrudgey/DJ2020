@@ -20,8 +20,9 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public GameObject progressBarObject;
     public RectTransform progressBarRect;
     public RectTransform progressBarParent;
+    // public LineRenderer marchingAntsLineRender;
+    public Material lineMaterial;
     [Header("effects")]
-    // public GameObject scanEffectObject;
     public Image scanEffectImage;
     public Animation scanEffectAnimator;
     public GameObject downloadEffectObject;

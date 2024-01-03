@@ -190,10 +190,10 @@ public class NeoClearsighterV3 : MonoBehaviour {
     Vector3 getLiftedOrigin() {
         Vector3 origin = followTransform.position;
         if (myCamera.state == CameraState.overlayView) {
-            return origin;
+            return origin + 0.5f * Vector3.up;
         } else {
             float lift = characterController.state == CharacterState.hvac ? 0f : 1.5f;
-            return origin + new Vector3(0f, lift, 0f);
+            return origin + lift * Vector3.up;
         }
 
     }
