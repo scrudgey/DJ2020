@@ -15,7 +15,7 @@ public class CyberDataStore : MonoBehaviour, INodeBinder<CyberNode> {
     }
     public void HandleNodeChange() {
         if (node.compromised) {
-            Open();
+            // Open();
             dataFileIndicator.SetIconVisibility(false);
             RefreshState();
         }
@@ -23,14 +23,14 @@ public class CyberDataStore : MonoBehaviour, INodeBinder<CyberNode> {
     public void RefreshState() {
         dataFileIndicator?.Refresh(node.payData);
     }
-    public void Open() {
-        if (opened) return;
-        PlayParticles();
-        Toolbox.RandomizeOneShot(audioSource, openSound);
-        Debug.Log($"stealing paydata: {node.payData.filename}");
-        GameManager.I.AddPayDatas(node.payData);
-        opened = true;
-    }
+    // public void Open() {
+    //     if (opened) return;
+    //     PlayParticles();
+    //     Toolbox.RandomizeOneShot(audioSource, openSound);
+    //     Debug.Log($"stealing paydata: {node.payData.filename}");
+    //     GameManager.I.AddPayDatas(node.payData);
+    //     opened = true;
+    // }
     public void PlayParticles() {
         particles.Play();
     }

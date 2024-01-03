@@ -127,14 +127,15 @@ public class CyberdeckUIController : MonoBehaviour {
     public void SoftwareButtonCallback(SoftwareButton button) {
         if (indicator == null) { return; }
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
-        // TODO: this logic will belong somewhere else
+        // TODO: this logic will belong somewhere else- player state
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
 
             float lifetime = button.effect.type switch {
                 SoftwareEffect.Type.compromise => 10f,
-                SoftwareEffect.Type.download => 1f,
+                SoftwareEffect.Type.download => 10f,
                 SoftwareEffect.Type.scan => 3f,
-                SoftwareEffect.Type.unlock => 5f,
+                // SoftwareEffect.Type.unlock => 5f,
+                SoftwareEffect.Type.unlock => 1f,
                 _ => 1f
             };
 
@@ -144,18 +145,26 @@ public class CyberdeckUIController : MonoBehaviour {
                 lifetime = lifetime,
                 toNode = indicator.node,
                 timerRate = 1f,
-                path = new List<CyberNode>()
+                path = new List<CyberNode>(),
+                payData = indicator.node.payData
             };
-            if (indicator.node.isManualHackerTarget) {
+
+            if (button.effect.type == SoftwareEffect.Type.download) {
+                networkAction.path = graph.GetPathToNearestDownloadPoint(indicator.node);
+                if (indicator.node.isManualHackerTarget) {
+                    networkAction.fromPlayerNode = true;
+                }
+            } else if (indicator.node.isManualHackerTarget) {
                 networkAction.fromPlayerNode = true;
             } else {
                 networkAction.path.Add(graph.GetNearestCompromisedNode(indicator.node));
             }
+
+
             graph.AddNetworkAction(networkAction);
             GameManager.I.RefreshCyberGraph();
             handler.NodeSelectCallback(indicator);
         }
-
     }
 
     void HandleNetworkActionChange(Dictionary<CyberNode, List<NetworkAction>> networkActions) {

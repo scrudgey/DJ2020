@@ -20,7 +20,6 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public GameObject progressBarObject;
     public RectTransform progressBarRect;
     public RectTransform progressBarParent;
-    // public LineRenderer marchingAntsLineRender;
     public Material lineMaterial;
     [Header("effects")]
     public Image scanEffectImage;
@@ -30,7 +29,6 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public GameObject crackEffectObject;
 
     void SetEffect(SoftwareEffect.Type type) {
-        // scanEffectObject.SetActive(false);
         scanEffectImage.enabled = false;
         downloadEffectObject.SetActive(false);
         unlockEffectObject.SetActive(false);
@@ -40,7 +38,6 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             case SoftwareEffect.Type.none:
                 break;
             case SoftwareEffect.Type.scan:
-                // scanEffectObject.SetActive(true);
                 scanEffectImage.enabled = true;
                 scanEffectAnimator.Play("animateScanEffect");
                 break;

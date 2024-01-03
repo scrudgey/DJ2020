@@ -952,8 +952,14 @@ reconnect e.g. tower
 * marching ants material: don't use chevron
 * variable lifetimes for different software
 * player invisible when connecting to node
+* downloads
+    * change path when software effect is download
+    * download when download software hits, not when compromised
+    * retire cyberdatastore
+    * spremove paydata when done, don't download from stolen paydata store
+    * if effect is download, change progress bar to go the other way
 
-downloads
+
 
 shows an effect on the node
     * scan
@@ -961,11 +967,9 @@ shows an effect on the node
     download: animated icon
     hack: laughing skull
 
-
 nodes can display lock, file & file type more prominently now
 use password
     this can be on the info panel?
 discover nodes
 take a screenshot and compare UI sizes
-
 

@@ -140,30 +140,71 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         }
         return null;
     }
-}
 
-[System.Serializable]
-public class NetworkAction {
-    public string title;
-    public SoftwareEffect effect;
-    public float timer;
-    public float lifetime;
-    // public CyberNode fromNode;
-    public CyberNode toNode;
-    public bool fromPlayerNode;
-    public bool toPlayerNode;
-    public List<CyberNode> path;
-    public float timerRate = 1f;
-    public bool complete;
-    public void Update(float deltaTime) {
-        timer += timerRate * deltaTime;
-        if (timer >= lifetime) {
-            DoComplete();
+    public List<CyberNode> GetPathToNearestDownloadPoint(CyberNode origin) {
+        // node.powered = true;
+        HashSet<string> pathids = DFS(origin, new HashSet<HashSet<string>>(), new HashSet<string>(), new HashSet<string>());
+        List<CyberNode> output = new List<CyberNode>();
+        foreach (string idn in pathids) {
+            output.Add(nodes[idn]);
         }
+        Debug.Log($"DFS output length: {pathids.Count}");
+        return output;
     }
 
-    void DoComplete() {
-        complete = true;
-        effect.ApplyToNode(toNode);
+    HashSet<string> DFS(CyberNode node, HashSet<HashSet<string>> visitedEdges, HashSet<string> visitedNodes, HashSet<string> path) {
+        Debug.Log($"DFS {path.Count} -> {node.idn}");
+        if (visitedNodes.Contains(node.idn)) {
+            return new HashSet<string>();
+        } else {
+            visitedNodes.Add(node.idn);
+        }
+        if (edges.ContainsKey(node.idn))
+            foreach (string neighborID in edges[node.idn]) {
+                if (visitedNodes.Contains(neighborID)) {
+                    continue;
+                }
+                path.Add(neighborID);
+                visitedEdges.Add(new HashSet<string> { node.idn, neighborID });
+                CyberNode terminalNode = nodes[neighborID];
+                if (!terminalNode.getEnabled()) {
+                    path.Remove(neighborID);
+                    continue;
+                }
+                if (terminalNode.dataSink) {
+                    return path;
+                } else {
+                    HashSet<HashSet<string>> newEdges = visitedEdges.ToHashSet();
+                    HashSet<string> newNodes = visitedNodes.ToHashSet();
+                    HashSet<string> newPath = path.ToHashSet();
+                    HashSet<string> output = DFS(nodes[neighborID], newEdges, newNodes, newPath);
+                    if (output.Count == 0) {
+                        path.Remove(neighborID);
+                        continue;
+                    } else {
+                        return output;
+                    }
+                }
+            }
+        return new HashSet<string>();
     }
+
+
+
+    // def find_path_to_friend(network, src, dest):
+    //     queue = [src]
+    //     visited = defaultdict(bool)
+    //     path = []
+    //     while len(queue) != 0:
+    //       node = queue.pop(0)
+    //       path.append(node)
+    //       visited[node] = True
+    //       if node in network:
+    //         for adj in network[node]:
+    //           if adj == dest:
+    //             return path + [dest]
+    //           if not visited[adj]:
+    //             queue.append(adj)
+    //     return None
+
 }

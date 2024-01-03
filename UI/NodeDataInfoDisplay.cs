@@ -18,13 +18,31 @@ public class NodeDataInfoDisplay : MonoBehaviour {
     public Sprite iconObjective;
 
     // TODO: support data stolen
-    public void Configure(PayData data) {
+    public void Configure(PayData data, bool isStolen) {
+        if (isStolen) {
+            ConfigureStolen();
+        } else {
+            ConfigureNormal(data);
+        }
+
+    }
+    void ConfigureStolen() {
+        filename.text = "empty";
+        dataType.text = $"";
+        valueamount.text = $"-";
+        creditIndicator.SetActive(false);
+        valueamount.gameObject.SetActive(false);
+        icon.sprite = null;
+        icon.enabled = false;
+
+    }
+    void ConfigureNormal(PayData data) {
         filename.text = data.filename;
         dataType.text = $"{data.type}";
         valueamount.text = $"{data.value}";
         creditIndicator.SetActive(data.type == PayData.DataType.pay);
         valueamount.gameObject.SetActive(data.type == PayData.DataType.pay);
-
+        icon.enabled = true;
         icon.sprite = data.type switch {
             PayData.DataType.location => iconLocation,
             PayData.DataType.objective => iconObjective,

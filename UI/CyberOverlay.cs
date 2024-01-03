@@ -9,7 +9,6 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Material normalCyberdeckLineMaterial;
     public Material marchingAntsCyberdeckLineMaterial;
     public Color marchingAntsColor;
-    // public CyberNode selectedCyberNode;
     [Header("colors")]
     public Color invulnerableColor;
     public Color vulnerableColor;
@@ -153,17 +152,9 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             for (int i = 0; i < action.path.Count; i++) {
                 CyberNode nextNode = action.path[i];
                 NeoCyberNodeIndicator indicator = indicators[nextNode];
-                // indicator.marchingAntsLineRender.enabled = true;
                 HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
                 LineRenderer renderer = GetLineRenderer(edge);
                 renderer.material = marchingAntsMaterial;
-                // renderer.gameObject.SetActive(false);
-
-                // indicator.marchingAntsLineRender.positionCount = renderer.positionCount;
-                // Vector3[] positions = new Vector3[renderer.positionCount];
-                // renderer.GetPositions(positions);
-                // indicator.marchingAntsLineRender.SetPositions(positions);
-
                 indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
                 currentnode = nextNode;
             }
@@ -171,11 +162,6 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
 
     void HandleCompleteNetworkAction(NetworkAction networkAction) {
-        // foreach (CyberNode node in networkAction.path) {
-        //     NeoCyberNodeIndicator indicator = indicators[node];
-        //     // indicator.marchingAntsLineRender.enabled = false;
-        //     indicator.
-        // }
         CyberNode currentnode = networkAction.toNode;
         for (int i = 0; i < networkAction.path.Count; i++) {
             CyberNode nextNode = networkAction.path[i];

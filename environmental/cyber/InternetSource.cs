@@ -11,6 +11,7 @@ public class InternetSource : CyberComponent {
         node.visibility = NodeVisibility.mapped;
         node.fixedVisibility = true;
         node.alwaysOnScreen = true;
+        node.dataSink = true;
         return node;
     }
 }

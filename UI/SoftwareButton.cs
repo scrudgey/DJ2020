@@ -59,6 +59,8 @@ public class SoftwareEffect {
             case Type.download:
                 if (node.type == CyberNodeType.datanode) {
                     Debug.Log($"download " + node.payData);
+                    GameManager.I.AddPayDatas(node.payData);
+                    node.dataStolen = true;
                 }
                 break;
             case Type.unlock:
