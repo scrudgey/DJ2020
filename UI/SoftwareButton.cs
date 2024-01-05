@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class SoftwareButton : MonoBehaviour {
+
+public class SoftwareButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     public bool initializeOnStart;
     public CyberdeckUIController cyberdeckController;
     public Button button;
@@ -40,35 +42,79 @@ public class SoftwareButton : MonoBehaviour {
         caption.text = effect.name;
         levelCaption.text = effect.level.ToString();
     }
-    public void OnClick() {
-        cyberdeckController.SoftwareButtonCallback(this);
-    }
-}
 
-[System.Serializable]
-public class SoftwareEffect {
-    public enum Type { scan, download, unlock, compromise, none }
-    public Type type;
-    public int level;
-    public string name;
-    public void ApplyToNode(CyberNode node) {
-        switch (type) {
-            case Type.scan:
-                node.visibility = NodeVisibility.mapped;
+    public void Configure(CyberNode node, CyberGraph graph) {
+        bool targetIsDatastore = node.type == CyberNodeType.datanode;
+        bool targetIsLocked = node.lockLevel > 0;
+        bool targetIsUnknown = node.visibility < NodeVisibility.mapped;
+        bool dataIsStolen = node.dataStolen;
+        bool nearestCompromised = graph.GetNearestCompromisedNode(node) != null || node.isManualHackerTarget;
+        switch (effect.type) {
+            case SoftwareEffect.Type.scan:
+                button.interactable = targetIsUnknown;
                 break;
-            case Type.download:
-                if (node.type == CyberNodeType.datanode) {
-                    Debug.Log($"download " + node.payData);
-                    GameManager.I.AddPayDatas(node.payData);
-                    node.dataStolen = true;
-                }
+            case SoftwareEffect.Type.download:
+                button.interactable = targetIsDatastore && !targetIsLocked & !dataIsStolen && nearestCompromised;
                 break;
-            case Type.unlock:
-                node.lockLevel = 0;
+            case SoftwareEffect.Type.unlock:
+                button.interactable = targetIsLocked && nearestCompromised;
                 break;
-            case Type.compromise:
-                node.compromised = true;
+            case SoftwareEffect.Type.compromise:
+                button.interactable = !targetIsLocked && nearestCompromised;
                 break;
         }
     }
+    public void OnClick() {
+        cyberdeckController.SoftwareButtonCallback(this);
+    }
+    public void OnPointerEnter(PointerEventData eventData) {
+        cyberdeckController.SoftwareButtonMouseover(this);
+    }
+    public void OnPointerExit(PointerEventData eventData) {
+        cyberdeckController.SoftwareButtonMouseExit(this);
+    }
+
+    // TODO: this logic will belong somewhere else- player state
+    public NetworkAction GetNetworkAction(CyberNode node, CyberGraph graph) {
+        float lifetime = effect.type switch {
+            SoftwareEffect.Type.compromise => 10f,
+            SoftwareEffect.Type.download => 10f,
+            SoftwareEffect.Type.scan => 3f,
+            // SoftwareEffect.Type.unlock => 5f,
+            SoftwareEffect.Type.unlock => 6f,
+            _ => 1f
+        };
+
+        NetworkAction networkAction = new NetworkAction() {
+            title = $"uploading {effect.name}...",
+            effect = effect,
+            lifetime = lifetime,
+            toNode = node,
+            timerRate = 1f,
+            path = new List<CyberNode>(),
+            payData = node.payData
+        };
+        if (effect.type == SoftwareEffect.Type.scan) {
+            networkAction.path = graph.GetPathToNearestCompromised(node);
+            if (node.isManualHackerTarget) {
+                networkAction.fromPlayerNode = true;
+            }
+        } else if (effect.type == SoftwareEffect.Type.download) {
+            networkAction.title = $"downloading {node.payData.filename}...";
+            networkAction.path = graph.GetPathToNearestDownloadPoint(node);
+            if (node.isManualHackerTarget) {
+                networkAction.fromPlayerNode = true;
+            }
+        } else if (node.isManualHackerTarget) {
+            networkAction.fromPlayerNode = true;
+        } else {
+            networkAction.path.Add(node);
+            networkAction.path.Add(graph.GetNearestCompromisedNode(node));
+        }
+
+        return networkAction;
+    }
+
+
 }
+

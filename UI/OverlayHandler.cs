@@ -44,9 +44,9 @@ public class OverlayHandler : MonoBehaviour {
     public UIController uIController;
     public static Action<INodeCameraProvider> OnSelectedNodeChange;
 
-    NeoCyberNodeIndicator selectedCyberNodeIndicator;
-    AlarmNodeIndicator selectedAlarmNodeIndicator;
-    PowerNodeIndicator selectedPowerNodeIndicator;
+    public NeoCyberNodeIndicator selectedCyberNodeIndicator;
+    public AlarmNodeIndicator selectedAlarmNodeIndicator;
+    public PowerNodeIndicator selectedPowerNodeIndicator;
     [Header("cyberdeck")]
     public CyberdeckUIController cyberdeckController;
 
@@ -275,7 +275,12 @@ public class OverlayHandler : MonoBehaviour {
         if (cyberIndicator == null) {
             MaybeHideCyberdeck();
         } else {
-            if (cyberIndicator.node.getStatus() >= CyberNodeStatus.vulnerable) {
+            CyberNode node = cyberIndicator.node;
+
+            // check if node is not discovered and there is a path from node to any compromised node or manual hacker target
+            if (node.visibility < NodeVisibility.mapped && GameManager.I.gameData.levelState.delta.cyberGraph.GetPathToNearestCompromised(node).Count > 0) {
+                cyberdeckController.Show();
+            } else if (node.getStatus() >= CyberNodeStatus.vulnerable) {
                 cyberdeckController.Show();
             } else {
                 MaybeHideCyberdeck();

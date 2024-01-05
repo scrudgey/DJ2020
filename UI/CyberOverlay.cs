@@ -40,7 +40,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
 
         SetPlayerNodeIndicator();
 
-        DrawMarchingAnts();
+        DrawMarchingAntsForAllActiveActions();
     }
     void SetPlayerNodeIndicator() {
         if (GameManager.I.playerManualHacker.deployed && GameManager.I.activeOverlayType == OverlayType.cyber) {
@@ -126,51 +126,57 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public override void NodeMouseOverCallback(NodeIndicator<CyberNode, CyberGraph> indicator) {
         base.NodeMouseOverCallback(indicator);
         RefreshEdgeGraphicState();
-        // this code properly belongs somewhere else.
-        // if (GameManager.I.IsCyberNodeVulnerable(indicator.node)) {
-        //     foreach (HashSet<string> edge in graph.edgePairs) {
-        //         string[] nodes = edge.ToArray();
-        //         CyberNode node1 = graph.nodes[nodes[0]];
-        //         CyberNode node2 = graph.nodes[nodes[1]];
-        //         if (indicator.node == node1 || indicator.node == node2) {
-        //             if (node1.compromised || node2.compromised) {
-        //                 LineRenderer renderer = GetLineRenderer(edge);
-        //                 renderer.material.color = colorSet.deadColor;
-        //             }
-        //         }
-        //     }
-        // }
     }
     public override void NodeMouseExitCallback(NodeIndicator<CyberNode, CyberGraph> indicator) {
         base.NodeMouseExitCallback(indicator);
         RefreshEdgeGraphicState();
     }
 
-    void DrawMarchingAnts() {
-        foreach (NetworkAction action in graph.ActiveNetworkActions()) {
-            CyberNode currentnode = action.toNode;
-            for (int i = 0; i < action.path.Count; i++) {
-                CyberNode nextNode = action.path[i];
-                NeoCyberNodeIndicator indicator = indicators[nextNode];
-                HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
-                LineRenderer renderer = GetLineRenderer(edge);
-                renderer.material = marchingAntsMaterial;
-                indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
-                currentnode = nextNode;
-            }
+
+    public void DrawThreat(NetworkAction networkAction) {
+        if (networkAction.path.Count > 1) {
+            DrawMatchingAntsOnPath(networkAction);
         }
     }
-
+    public void EraseThreat(NetworkAction networkAction) {
+        if (networkAction.path.Count > 1) {
+            EraseMatchingAntsOnPath(networkAction);
+            RefreshEdgeGraphicState();
+        }
+    }
+    void DrawMarchingAntsForAllActiveActions() {
+        foreach (NetworkAction action in graph.ActiveNetworkActions()) {
+            if (action.path.Count < 2) continue; // no path / path to player cyberdeck
+            DrawMatchingAntsOnPath(action);
+        }
+    }
     void HandleCompleteNetworkAction(NetworkAction networkAction) {
+        if (networkAction.path.Count < 2) return; // no path / path to player cyberdeck
+        EraseMatchingAntsOnPath(networkAction);
+    }
+
+    void EraseMatchingAntsOnPath(NetworkAction networkAction) {
         CyberNode currentnode = networkAction.toNode;
         for (int i = 0; i < networkAction.path.Count; i++) {
             CyberNode nextNode = networkAction.path[i];
             HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
             LineRenderer renderer = GetLineRenderer(edge);
-            // renderer.gameObject.SetActive(true);
             renderer.material = lineRendererMaterial;
             currentnode = nextNode;
         }
     }
+    void DrawMatchingAntsOnPath(NetworkAction action) {
+        CyberNode currentnode = action.toNode;
+        for (int i = 0; i < action.path.Count; i++) {
+            CyberNode nextNode = action.path[i];
+            NeoCyberNodeIndicator indicator = indicators[nextNode];
+            HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
+            LineRenderer renderer = GetLineRenderer(edge);
+            renderer.material = marchingAntsMaterial;
+            indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
+            currentnode = nextNode;
+        }
+    }
+
 
 }

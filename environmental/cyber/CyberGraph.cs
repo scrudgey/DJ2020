@@ -107,6 +107,13 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
                     completedActions.Add(action);
                     anyComplete = true;
                 }
+
+                if (action.fromPlayerNode && !action.toNode.isManualHackerTarget) {
+                    // broken path
+                    anyComplete = true;
+                    completedActions.Add(action);
+                }
+
                 NetworkActionUpdate?.Invoke(action);
             }
             foreach (NetworkAction action in completedActions) {
@@ -119,6 +126,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             NetworkActionsChanged?.Invoke(networkActions);
         }
     }
+
     public List<NetworkAction> ActiveNetworkActions() {
         List<NetworkAction> output = new List<NetworkAction>();
         if (networkActions == null) return output;
@@ -142,69 +150,59 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
     }
 
     public List<CyberNode> GetPathToNearestDownloadPoint(CyberNode origin) {
-        // node.powered = true;
-        HashSet<string> pathids = DFS(origin, new HashSet<HashSet<string>>(), new HashSet<string>(), new HashSet<string>());
+        HashSet<string> pathids = DFS(origin, new HashSet<string>(), new HashSet<string>(),
+            (CyberNode node) => node.dataSink || node.isManualHackerTarget);
         List<CyberNode> output = new List<CyberNode>();
         foreach (string idn in pathids) {
             output.Add(nodes[idn]);
         }
-        Debug.Log($"DFS output length: {pathids.Count}");
+        // Debug.Log($"DFS output: {pathids.Count}");
+        return output;
+    }
+    public List<CyberNode> GetPathToNearestCompromised(CyberNode origin) {
+        HashSet<string> pathids = DFS(origin, new HashSet<string>(), new HashSet<string>(),
+            (CyberNode node) => node.getStatus() == CyberNodeStatus.compromised || node.isManualHackerTarget);
+        List<CyberNode> output = new List<CyberNode>();
+        foreach (string idn in pathids) {
+            output.Add(nodes[idn]);
+        }
+        // Debug.Log($"DFS output: {pathids.Count}");
         return output;
     }
 
-    HashSet<string> DFS(CyberNode node, HashSet<HashSet<string>> visitedEdges, HashSet<string> visitedNodes, HashSet<string> path) {
-        Debug.Log($"DFS {path.Count} -> {node.idn}");
+    HashSet<string> DFS(CyberNode node, HashSet<string> visitedNodes, HashSet<string> path, Func<CyberNode, bool> targetEvaluator) {
         if (visitedNodes.Contains(node.idn)) {
             return new HashSet<string>();
         } else {
             visitedNodes.Add(node.idn);
         }
+
+        path.Add(node.idn);
+        if (targetEvaluator(node)) {
+            return path;
+        }
+
         if (edges.ContainsKey(node.idn))
             foreach (string neighborID in edges[node.idn]) {
                 if (visitedNodes.Contains(neighborID)) {
                     continue;
                 }
-                path.Add(neighborID);
-                visitedEdges.Add(new HashSet<string> { node.idn, neighborID });
-                CyberNode terminalNode = nodes[neighborID];
-                if (!terminalNode.getEnabled()) {
-                    path.Remove(neighborID);
+
+                CyberNode neighborNode = nodes[neighborID];
+                if (!neighborNode.getEnabled()) {
                     continue;
                 }
-                if (terminalNode.dataSink) {
-                    return path;
+
+                HashSet<string> newNodes = visitedNodes.ToHashSet();
+                HashSet<string> newPath = path.ToHashSet();
+                HashSet<string> output = DFS(neighborNode, newNodes, newPath, targetEvaluator);
+                if (output.Count == 0) {
+                    continue;
                 } else {
-                    HashSet<HashSet<string>> newEdges = visitedEdges.ToHashSet();
-                    HashSet<string> newNodes = visitedNodes.ToHashSet();
-                    HashSet<string> newPath = path.ToHashSet();
-                    HashSet<string> output = DFS(nodes[neighborID], newEdges, newNodes, newPath);
-                    if (output.Count == 0) {
-                        path.Remove(neighborID);
-                        continue;
-                    } else {
-                        return output;
-                    }
+                    return output;
                 }
             }
         return new HashSet<string>();
     }
-
-
-
-    // def find_path_to_friend(network, src, dest):
-    //     queue = [src]
-    //     visited = defaultdict(bool)
-    //     path = []
-    //     while len(queue) != 0:
-    //       node = queue.pop(0)
-    //       path.append(node)
-    //       visited[node] = True
-    //       if node in network:
-    //         for adj in network[node]:
-    //           if adj == dest:
-    //             return path + [dest]
-    //           if not visited[adj]:
-    //             queue.append(adj)
-    //     return None
 
 }

@@ -6,11 +6,12 @@ using UnityEngine.UI;
 public class NodeMouseOverIndicator : MonoBehaviour {
     public RectTransform rectTransform;
     public Image image;
+    public Color color;
     Coroutine routine;
     RectTransform followRect;
     public void ActivateSelection<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
         gameObject.SetActive(true);
-        image.color = Color.white;
+        image.color = color;
         rectTransform.anchoredPosition = indicator.rectTransform.anchoredPosition;
         if (routine != null) {
             StopCoroutine(routine);
@@ -28,7 +29,7 @@ public class NodeMouseOverIndicator : MonoBehaviour {
     }
 
     IEnumerator blinkSelection() {
-        rectTransform.sizeDelta = new Vector2(80f, 80f);
+        rectTransform.sizeDelta = 90f * Vector2.one;
         return Toolbox.BlinkEmphasis(image, unlimited: true);
     }
 }

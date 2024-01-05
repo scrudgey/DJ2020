@@ -24,15 +24,19 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     [Header("effects")]
     public Image scanEffectImage;
     public Animation scanEffectAnimator;
-    public GameObject downloadEffectObject;
-    public GameObject unlockEffectObject;
-    public GameObject crackEffectObject;
+
+    public Image downloadEffectImage;
+
+    public Image unlockEffectImage;
+    public Animation unlockEffectAnimator;
+
+    public Image crackEffectImage;
 
     void SetEffect(SoftwareEffect.Type type) {
         scanEffectImage.enabled = false;
-        downloadEffectObject.SetActive(false);
-        unlockEffectObject.SetActive(false);
-        crackEffectObject.SetActive(false);
+        downloadEffectImage.enabled = false;
+        unlockEffectImage.enabled = false;
+        crackEffectImage.enabled = false;
         switch (type) {
             default:
             case SoftwareEffect.Type.none:
@@ -42,13 +46,14 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
                 scanEffectAnimator.Play("animateScanEffect");
                 break;
             case SoftwareEffect.Type.download:
-                downloadEffectObject.SetActive(true);
+                downloadEffectImage.enabled = true;
                 break;
             case SoftwareEffect.Type.unlock:
-                unlockEffectObject.SetActive(true);
+                unlockEffectImage.enabled = true;
+                unlockEffectAnimator.Play("animateUnlockEffect");
                 break;
             case SoftwareEffect.Type.compromise:
-                crackEffectObject.SetActive(true);
+                crackEffectImage.enabled = true;
                 break;
         }
     }

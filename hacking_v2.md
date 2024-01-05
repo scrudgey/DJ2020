@@ -959,18 +959,54 @@ reconnect e.g. tower
     * spremove paydata when done, don't download from stolen paydata store
     * if effect is download, change progress bar to go the other way
 * nodes can display lock, file & file type more prominently now
-
-
-
-shows an effect on the node
+* selection box color and size
+? take a screenshot and compare UI sizes
+* shows an effect on the node
     * scan
-    unlock: wiggle key? password?
-    download: animated icon
-    hack: laughing skull
+    * unlock: wiggle key? password?
+    * download: animated icon
+* tune download pathing
+    * allow downloading to player node
+    * break transfer if player disconnects
+    * requires a known path of any length to data sink
+    * change progress bar display
+* you can scan any node as long as there is a known path of any length to compromised node or player
+    * break upload if disconnects
+    * this means that the cyberdeck is shown ... at all times?
+*highlighting path
 
-sound effects
+paths require KNOWN EDGES
+
+discover nodes
+    when cyberdeck is out, show scanning icon
+    when node is in range, discover it
+    discover fx / sfx
+    start level with minimal nodes discovered
+
+??? interaction between lock & visibility 
+    it is unclear what the node visibility is.
+        a node might have all its edges discovered from elsewhere but not be visible
+        likewise it might be visible but i can't tell because node is locked.
+    it feels like i should be able to scan to see what's behind the lock before i try to unlocking
+        if true, then we need to be able to display lock & icon at same time on node
+        or: lock is visible on node indicator
+
+make utility node controls take effect
+
 use password
     this can be on the info panel?
-discover nodes
-? take a screenshot and compare UI sizes
+
+objective complete should close info display or something
+hack: laughing skull effect
+sound effects
+i think undiscovered nodes still have line renderers at (0,0)
+
+
+
+# viruses
+
+# stats, upgrades, & shops 
+
+
+
 

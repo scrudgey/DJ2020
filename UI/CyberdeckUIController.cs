@@ -4,6 +4,8 @@ using System.Linq;
 using Easings;
 using UnityEngine;
 public class CyberdeckUIController : MonoBehaviour {
+    public CyberOverlay cyberOverlay;
+    public OverlayHandler overlayHandler;
     public RectTransform rectTransform;
     public Transform softwareContainer;
     public GameObject softwareButtonPrefab;
@@ -42,25 +44,8 @@ public class CyberdeckUIController : MonoBehaviour {
     public void Refresh(NeoCyberNodeIndicator indicator) {
         this.indicator = indicator;
         if (indicator == null) return;
-        bool targetIsDatastore = indicator.node.type == CyberNodeType.datanode;
-        bool targetIsLocked = indicator.node.lockLevel > 0;
-        bool targetIsUnknown = indicator.node.visibility < NodeVisibility.mapped;
-        bool dataIsStolen = indicator.node.dataStolen;
         foreach (SoftwareButton button in buttons.Concat(builtInButtons)) {
-            switch (button.effect.type) {
-                case SoftwareEffect.Type.scan:
-                    button.button.interactable = targetIsUnknown;
-                    break;
-                case SoftwareEffect.Type.download:
-                    button.button.interactable = targetIsDatastore && !targetIsLocked & !dataIsStolen;
-                    break;
-                case SoftwareEffect.Type.unlock:
-                    button.button.interactable = targetIsLocked;
-                    break;
-                case SoftwareEffect.Type.compromise:
-                    button.button.interactable = !targetIsLocked;
-                    break;
-            }
+            button.Configure(indicator.node, graph);
         }
     }
 
@@ -127,41 +112,8 @@ public class CyberdeckUIController : MonoBehaviour {
     public void SoftwareButtonCallback(SoftwareButton button) {
         if (indicator == null) { return; }
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
-        // TODO: this logic will belong somewhere else- player state
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
-
-            float lifetime = button.effect.type switch {
-                SoftwareEffect.Type.compromise => 10f,
-                SoftwareEffect.Type.download => 10f,
-                SoftwareEffect.Type.scan => 3f,
-                // SoftwareEffect.Type.unlock => 5f,
-                SoftwareEffect.Type.unlock => 1f,
-                _ => 1f
-            };
-
-            NetworkAction networkAction = new NetworkAction() {
-                title = $"uploading {button.effect.name}...",
-                effect = button.effect,
-                lifetime = lifetime,
-                toNode = indicator.node,
-                timerRate = 1f,
-                path = new List<CyberNode>(),
-                payData = indicator.node.payData
-            };
-
-            if (button.effect.type == SoftwareEffect.Type.download) {
-                networkAction.title = $"downloading {indicator.node.payData.filename}...";
-                networkAction.path = graph.GetPathToNearestDownloadPoint(indicator.node);
-                if (indicator.node.isManualHackerTarget) {
-                    networkAction.fromPlayerNode = true;
-                }
-            } else if (indicator.node.isManualHackerTarget) {
-                networkAction.fromPlayerNode = true;
-            } else {
-                networkAction.path.Add(graph.GetNearestCompromisedNode(indicator.node));
-            }
-
-
+            NetworkAction networkAction = button.GetNetworkAction(indicator.node, graph);
             graph.AddNetworkAction(networkAction);
             GameManager.I.RefreshCyberGraph();
             handler.NodeSelectCallback(indicator);
@@ -194,5 +146,17 @@ public class CyberdeckUIController : MonoBehaviour {
                 progressBar.HandleNetworkActionChange(networkAction);
             }
         }
+    }
+
+    public void SoftwareButtonMouseover(SoftwareButton button) {
+        // cyberOverlay.
+        CyberNode node = overlayHandler.selectedCyberNodeIndicator.node;
+        CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
+        cyberOverlay.DrawThreat(button.GetNetworkAction(node, graph));
+    }
+    public void SoftwareButtonMouseExit(SoftwareButton button) {
+        CyberNode node = overlayHandler.selectedCyberNodeIndicator.node;
+        CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
+        cyberOverlay.EraseThreat(button.GetNetworkAction(node, graph));
     }
 }

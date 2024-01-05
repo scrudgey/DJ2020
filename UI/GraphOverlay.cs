@@ -76,20 +76,38 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             return;
         }
         foreach (HashSet<string> edge in graph.edgePairs) {
-            string[] nodes = edge.ToArray();
-            U node1 = graph.nodes[nodes[0]];
-            U node2 = graph.nodes[nodes[1]];
-            if (node1.sceneName != sceneName || node2.sceneName != sceneName)
-                continue;
-            LineRenderer renderer = GetLineRenderer(edge);
-            if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
-                SetLinePositions(renderer, node1, node2);
-                SetEdgeState(renderer, node1, node2);
-            } else {
-                SetTruncatedLinePositions(renderer, node1, node2);
-                SetEdgeState(renderer, node1, node2);
-                // renderer.enabled = false;
-            }
+            SetEdgeGraphicState(edge, sceneName);
+            // string[] nodes = edge.ToArray();
+            // U node1 = graph.nodes[nodes[0]];
+            // U node2 = graph.nodes[nodes[1]];
+            // if (node1.sceneName != sceneName || node2.sceneName != sceneName)
+            //     continue;
+            // LineRenderer renderer = GetLineRenderer(edge);
+            // if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
+            //     SetLinePositions(renderer, node1, node2);
+            //     SetEdgeState(renderer, node1, node2);
+            // } else {
+            //     SetTruncatedLinePositions(renderer, node1, node2);
+            //     SetEdgeState(renderer, node1, node2);
+            //     // renderer.enabled = false;
+            // }
+        }
+    }
+
+    protected void SetEdgeGraphicState(HashSet<string> edge, string sceneName) {
+        string[] nodes = edge.ToArray();
+        U node1 = graph.nodes[nodes[0]];
+        U node2 = graph.nodes[nodes[1]];
+        if (node1.sceneName != sceneName || node2.sceneName != sceneName)
+            return;
+        LineRenderer renderer = GetLineRenderer(edge);
+        if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
+            SetLinePositions(renderer, node1, node2);
+            SetEdgeState(renderer, node1, node2);
+        } else {
+            SetTruncatedLinePositions(renderer, node1, node2);
+            SetEdgeState(renderer, node1, node2);
+            // renderer.enabled = false;
         }
     }
     public void SetEdgeState(HashSet<string> edge) {

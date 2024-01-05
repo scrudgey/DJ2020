@@ -13,6 +13,12 @@ public class CyberdeckHackProgressBar : MonoBehaviour {
     public TextMeshProUGUI caption;
     public TextMeshProUGUI targetNameCaption;
     public GraphIconReference icons;
+    [Header("left")]
+    public GameObject leftIconObject;
+    public Image leftIcon;
+    public Image leftNodeIcon;
+    public TextMeshProUGUI leftNameCaption;
+    public Sprite playerSprite;
 
     public void Initialize(NetworkAction action) {
         this.networkAction = action;
@@ -20,6 +26,20 @@ public class CyberdeckHackProgressBar : MonoBehaviour {
             progressBar.gameObject.SetActive(false);
         } else {
             progressBarOpposite.gameObject.SetActive(false);
+        }
+
+        targetIcon.sprite = icons.CyberNodeSprite(action.toNode);
+        targetNameCaption.text = action.toNode.nodeTitle;
+
+        if (action.fromPlayerNode) {
+            leftIconObject.SetActive(false);
+            leftIcon.enabled = true;
+            leftIcon.sprite = playerSprite;
+        } else {
+            leftIconObject.SetActive(true);
+            leftIcon.enabled = false;
+            leftNodeIcon.sprite = icons.CyberNodeSprite(action.path[action.path.Count - 1]);
+            leftNameCaption.text = action.path[action.path.Count - 1].nodeTitle;
         }
     }
     public void HandleNetworkActionChange(NetworkAction action) {
@@ -31,7 +51,5 @@ public class CyberdeckHackProgressBar : MonoBehaviour {
         progressBar.sizeDelta = new Vector2(width, 20f);
         progressBarOpposite.sizeDelta = new Vector2(width, 20f);
 
-        targetIcon.sprite = icons.CyberNodeSprite(action.toNode);
-        targetNameCaption.text = action.toNode.nodeTitle;
     }
 }

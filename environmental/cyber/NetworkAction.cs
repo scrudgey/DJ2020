@@ -12,10 +12,8 @@ public class NetworkAction {
     public SoftwareEffect effect;
     public float timer;
     public float lifetime;
-    // public CyberNode fromNode;
     public CyberNode toNode;
     public bool fromPlayerNode;
-    public bool toPlayerNode;
     public List<CyberNode> path;
     public float timerRate = 1f;
     public bool complete;
