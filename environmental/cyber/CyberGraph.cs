@@ -191,6 +191,9 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
                 CyberNode neighborNode = nodes[neighborID];
                 if (!neighborNode.getEnabled()) {
                     continue;
+                } else if (node.visibility != NodeVisibility.mapped && neighborNode.visibility != NodeVisibility.mapped) {
+                    // neither node is mapped- edge is unknwon
+                    continue;
                 }
 
                 HashSet<string> newNodes = visitedNodes.ToHashSet();

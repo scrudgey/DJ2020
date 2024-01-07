@@ -973,35 +973,47 @@ reconnect e.g. tower
 * you can scan any node as long as there is a known path of any length to compromised node or player
     * break upload if disconnects
     * this means that the cyberdeck is shown ... at all times?
-*highlighting path
+* highlighting path
+* paths require KNOWN EDGES
+* discover nodes
+    * when cyberdeck is out, show scanning icon
+    * when node is in range, discover it
+    * start level with minimal nodes discovered
+    * discover fx / sfx
+* it feels like i should be able to scan to see what's behind the lock before i try to unlocking
+* unlocking should provide basic visibility
+* likewise it might be visible but i can't tell because node is locked.
 
-paths require KNOWN EDGES
 
-discover nodes
-    when cyberdeck is out, show scanning icon
-    when node is in range, discover it
-    discover fx / sfx
-    start level with minimal nodes discovered
+i think undiscovered nodes still have line renderers at (0,0)
+retire hackhandler
+a node might have all its edges discovered from elsewhere but not be "mapped"
+it should be clear if a node has undiscovered edges
+hack: laughing skull effect
+objective complete should close info display or something
 
-??? interaction between lock & visibility 
-    it is unclear what the node visibility is.
-        a node might have all its edges discovered from elsewhere but not be visible
-        likewise it might be visible but i can't tell because node is locked.
-    it feels like i should be able to scan to see what's behind the lock before i try to unlocking
-        if true, then we need to be able to display lock & icon at same time on node
-        or: lock is visible on node indicator
+* sound effects
+    * node mouseover
+    * node select
+    software start
+    software finish
+
+attack vector path does not include player renderer
+
 
 make utility node controls take effect
-
-use password
-    this can be on the info panel?
-
-objective complete should close info display or something
-hack: laughing skull effect
-sound effects
-i think undiscovered nodes still have line renderers at (0,0)
+use password on info panel
 
 
+# lock vs unlock, software levels, gameplay
+how does software levels work?
+using network to scout the location is good- compromising nodes might be done tactically
+and it means that generally we still need to get up close to hack objects, unless very high level: good
+maybe hacks can be targeted against specific types
+    compromise camera, etc.
+
+
+# ICE
 
 # viruses
 

@@ -21,6 +21,9 @@ public class ManualHacker : MonoBehaviour {
     public bool deployed;
     Transform myTransform;
     public CyberNode targetNode;
+    public GameObject visualEffect;
+    public GameObject discoveryParticleEffect;
+    PrefabPool discoveryParticlePool;
     [Header("configure")]
     public LineRenderer lineRenderer;
     public Material wireUnfurlMaterial;
@@ -32,28 +35,42 @@ public class ManualHacker : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip wireDeploy;
     public AudioClip wireAttach;
+    public AudioClip discoverySound;
     bool deploySoundPlayed;
     bool attachSoundPlayed;
     void Start() {
         myTransform = transform;
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         targetNode = null;
+        discoveryParticlePool = PoolManager.I.GetPool(discoveryParticleEffect);
     }
     void Update() {
         if (targetNode != null) {
             timer += Time.deltaTime;
             UpdateWire(targetNode);
-
             if (Vector3.Distance(myTransform.position, targetNode.position) > 3f) {
                 Disconnect();
             }
         } else {
             timer = 0f;
-            deploySoundPlayed = false;
-            attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
+        visualEffect.SetActive(deployed);
+        if (deployed) {
+            Vector3 playerPosition = GameManager.I.playerPosition;
+            foreach (CyberNode node in GameManager.I.gameData.levelState.delta.cyberGraph.nodes.Values) {
+                float distance = Vector3.Distance(node.position, playerPosition);
+                if (distance < 3) {
+                    bool wasDiscovered = node.BeDiscovered();
+                    if (wasDiscovered) {
+                        Toolbox.RandomizeOneShot(audioSource, discoverySound);
+                        discoveryParticlePool.GetObject(node.position);
+                    }
+                }
+            }
+        }
     }
+
 
     public void Connect(CyberNode target) {
         if (!deployed) return;
@@ -71,10 +88,11 @@ public class ManualHacker : MonoBehaviour {
         if (!dontRefreshCyberGraph) {
             GameManager.I.RefreshCyberGraph();
         }
+        deploySoundPlayed = false;
+        attachSoundPlayed = false;
     }
 
     void UpdateWire(CyberNode node) {
-        // Vector3 playerPos = characterCollider.bounds.center;
         Vector3 playerPos = myTransform.position;
         lineRenderer.enabled = true;
         Vector3[] points = new Vector3[2];

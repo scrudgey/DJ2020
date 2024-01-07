@@ -47,6 +47,9 @@ public class OverlayHandler : MonoBehaviour {
     public NeoCyberNodeIndicator selectedCyberNodeIndicator;
     public AlarmNodeIndicator selectedAlarmNodeIndicator;
     public PowerNodeIndicator selectedPowerNodeIndicator;
+    [Header("sound effects")]
+    public AudioClip[] mouseOverSound;
+    public AudioClip[] nodeSelectSound;
     [Header("cyberdeck")]
     public CyberdeckUIController cyberdeckController;
 
@@ -238,6 +241,9 @@ public class OverlayHandler : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds, randomPitchWidth: 0.05f);
     }
     public void NodeSelectCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
+        if (selectedNode != indicator) {
+            Toolbox.RandomizeOneShot(audioSource, nodeSelectSound);
+        }
         SetSelectedNode(indicator);
         selectionIndicator.ActivateSelection(indicator);
         mouseOverIndicator.HideSelection();
@@ -298,6 +304,7 @@ public class OverlayHandler : MonoBehaviour {
     public void NodeMouseOverCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
         if (indicator != selectedNode) {
             mouseOverIndicator.ActivateSelection(indicator);
+            Toolbox.RandomizeOneShot(audioSource, mouseOverSound);
         }
     }
 

@@ -22,6 +22,9 @@ public class SoftwareEffect {
                 break;
             case Type.unlock:
                 node.lockLevel = 0;
+                if (node.visibility == NodeVisibility.unknown || node.visibility == NodeVisibility.mystery) {
+                    node.visibility = NodeVisibility.known;
+                }
                 break;
             case Type.compromise:
                 node.compromised = true;

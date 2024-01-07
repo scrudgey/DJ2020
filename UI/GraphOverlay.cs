@@ -77,20 +77,6 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         }
         foreach (HashSet<string> edge in graph.edgePairs) {
             SetEdgeGraphicState(edge, sceneName);
-            // string[] nodes = edge.ToArray();
-            // U node1 = graph.nodes[nodes[0]];
-            // U node2 = graph.nodes[nodes[1]];
-            // if (node1.sceneName != sceneName || node2.sceneName != sceneName)
-            //     continue;
-            // LineRenderer renderer = GetLineRenderer(edge);
-            // if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
-            //     SetLinePositions(renderer, node1, node2);
-            //     SetEdgeState(renderer, node1, node2);
-            // } else {
-            //     SetTruncatedLinePositions(renderer, node1, node2);
-            //     SetEdgeState(renderer, node1, node2);
-            //     // renderer.enabled = false;
-            // }
         }
     }
 

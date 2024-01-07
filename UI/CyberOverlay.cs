@@ -9,6 +9,8 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Material normalCyberdeckLineMaterial;
     public Material marchingAntsCyberdeckLineMaterial;
     public Color marchingAntsColor;
+    [Header("sound effects")]
+    public AudioClip[] finishDownloadSound;
     [Header("colors")]
     public Color invulnerableColor;
     public Color vulnerableColor;
@@ -23,6 +25,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     void OnDestroy() {
         if (subscribed) {
             graph.NetworkActionComplete -= HandleCompleteNetworkAction;
+            graph.NetworkActionsChanged -= HandleNetworkActionsChange;
         }
     }
 
@@ -31,6 +34,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         if (!subscribed) {
             subscribed = true;
             graph.NetworkActionComplete += HandleCompleteNetworkAction;
+            graph.NetworkActionsChanged += HandleNetworkActionsChange;
         }
         if (GameManager.I.activeOverlayType == OverlayType.cyber) {
             base.UpdateNodes();
@@ -44,44 +48,72 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
     void SetPlayerNodeIndicator() {
         if (GameManager.I.playerManualHacker.deployed && GameManager.I.activeOverlayType == OverlayType.cyber) {
-            GameManager.I.playerManualHacker.lineRenderer.enabled = false;
+            // GameManager.I.playerManualHacker.lineRenderer.enabled = false;
             Vector3 playerPosition = GameManager.I.playerManualHacker.transform.position;
             Vector3 screenPoint = cam.WorldToScreenPoint(playerPosition);
 
             cyberdeckIndicator.gameObject.SetActive(true);
             cyberdeckIndicator.position = screenPoint;
+            cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
 
-            if (GameManager.I.playerManualHacker.targetNode != null) {
-                List<Vector3> points = new List<Vector3>();
-                points.Add(GameManager.I.playerManualHacker.transform.position);
-                points.Add(GameManager.I.playerManualHacker.targetNode.position);
-                cyberdeckLineRenderer.positionCount = points.Count;
-                cyberdeckLineRenderer.SetPositions(points.ToArray());
 
-                if (graph.ActiveNetworkActions().Any(networkAction => networkAction.fromPlayerNode)) {
-                    cyberdeckLineRenderer.material = marchingAntsCyberdeckLineMaterial;
-                    cyberdeckLineRenderer.material.color = marchingAntsColor;
-                    cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
-                } else {
-                    cyberdeckLineRenderer.material = normalCyberdeckLineMaterial;
-                    if (GameManager.I.playerManualHacker.targetNode.getStatus() == CyberNodeStatus.compromised) {
-                        cyberdeckLineRenderer.material.color = compromisedColor;
-                    } else {
-                        cyberdeckLineRenderer.material.color = vulnerableColor;
-                    }
-                }
+            // if (GameManager.I.playerManualHacker.targetNode != null) {
+            //     List<Vector3> points = new List<Vector3>();
+            //     points.Add(GameManager.I.playerManualHacker.transform.position);
+            //     points.Add(GameManager.I.playerManualHacker.targetNode.position);
 
-                cyberdeckLineRenderer.enabled = true;
-            } else {
-                cyberdeckLineRenderer.enabled = false;
-            }
+            //     cyberdeckLineRenderer.enabled = true;
+            //     cyberdeckLineRenderer.positionCount = points.Count;
+            //     cyberdeckLineRenderer.SetPositions(points.ToArray());
+
+            // if (graph.ActiveNetworkActions().Any(networkAction => networkAction.fromPlayerNode)) {
+            //     cyberdeckLineRenderer.material = marchingAntsCyberdeckLineMaterial;
+            //     cyberdeckLineRenderer.material.color = marchingAntsColor;
+            //     cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
+            // } else {
+            //     cyberdeckLineRenderer.material = normalCyberdeckLineMaterial;
+            //     if (GameManager.I.playerManualHacker.targetNode.getStatus() == CyberNodeStatus.compromised) {
+            //         cyberdeckLineRenderer.material.color = compromisedColor;
+            //     } else {
+            //         cyberdeckLineRenderer.material.color = vulnerableColor;
+            //     }
+            // }
+            // } else {
+            //     cyberdeckLineRenderer.enabled = false;
+            // }
         } else {
             cyberdeckIndicator.gameObject.SetActive(false);
-            cyberdeckLineRenderer.enabled = false;
-            GameManager.I.playerManualHacker.lineRenderer.enabled = true;
-
+            // cyberdeckLineRenderer.enabled = false;
+            // GameManager.I.playerManualHacker.lineRenderer.enabled = true;
         }
+    }
+    public override void RefreshEdgeGraphicState() {
+        base.RefreshEdgeGraphicState();
+        if (GameManager.I.playerManualHacker.targetNode != null) {
+            List<Vector3> points = new List<Vector3>();
+            points.Add(GameManager.I.playerManualHacker.transform.position);
+            points.Add(GameManager.I.playerManualHacker.targetNode.position);
 
+            cyberdeckLineRenderer.enabled = true;
+            cyberdeckLineRenderer.positionCount = points.Count;
+            cyberdeckLineRenderer.SetPositions(points.ToArray());
+            // cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
+
+            if (graph.ActiveNetworkActions().Any(networkAction => networkAction.fromPlayerNode)) {
+                cyberdeckLineRenderer.material = marchingAntsCyberdeckLineMaterial;
+                cyberdeckLineRenderer.material.color = marchingAntsColor;
+                // cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
+            } else {
+                cyberdeckLineRenderer.material = normalCyberdeckLineMaterial;
+                if (GameManager.I.playerManualHacker.targetNode.getStatus() == CyberNodeStatus.compromised) {
+                    cyberdeckLineRenderer.material.color = compromisedColor;
+                } else {
+                    cyberdeckLineRenderer.material.color = vulnerableColor;
+                }
+            }
+        } else {
+            cyberdeckLineRenderer.enabled = false;
+        }
     }
     override public void SetEdgeState(LineRenderer renderer, CyberNode node1, CyberNode node2) {
         if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
@@ -150,7 +182,11 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             DrawMatchingAntsOnPath(action);
         }
     }
+    void HandleNetworkActionsChange(Dictionary<CyberNode, List<NetworkAction>> actions) {
+        RefreshEdgeGraphicState();
+    }
     void HandleCompleteNetworkAction(NetworkAction networkAction) {
+        Toolbox.RandomizeOneShot(overlayHandler.audioSource, finishDownloadSound);
         if (networkAction.path.Count < 2) return; // no path / path to player cyberdeck
         EraseMatchingAntsOnPath(networkAction);
     }
@@ -164,6 +200,9 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             renderer.material = lineRendererMaterial;
             currentnode = nextNode;
         }
+        // if (networkAction.fromPlayerNode) {
+
+        // }
     }
     void DrawMatchingAntsOnPath(NetworkAction action) {
         CyberNode currentnode = action.toNode;
@@ -176,7 +215,8 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
             currentnode = nextNode;
         }
+        // if (action.fromPlayerNode) {
+
+        // }
     }
-
-
 }

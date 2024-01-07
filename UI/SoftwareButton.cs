@@ -96,9 +96,10 @@ public class SoftwareButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         };
         if (effect.type == SoftwareEffect.Type.scan) {
             networkAction.path = graph.GetPathToNearestCompromised(node);
-            if (node.isManualHackerTarget) {
+            if (node.isManualHackerTarget) { //|| networkAction.path[networkAction.path.Count - 1].isManualHackerTarget
                 networkAction.fromPlayerNode = true;
             }
+
         } else if (effect.type == SoftwareEffect.Type.download) {
             networkAction.title = $"downloading {node.payData.filename}...";
             networkAction.path = graph.GetPathToNearestDownloadPoint(node);
@@ -111,6 +112,9 @@ public class SoftwareButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             networkAction.path.Add(node);
             networkAction.path.Add(graph.GetNearestCompromisedNode(node));
         }
+        // if (networkAction.path.Count > 1 && networkAction.path[networkAction.path.Count - 1].isManualHackerTarget) {
+        //     networkAction.fromPlayerNode = true;
+        // }
 
         return networkAction;
     }

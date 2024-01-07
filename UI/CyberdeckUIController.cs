@@ -9,6 +9,8 @@ public class CyberdeckUIController : MonoBehaviour {
     public RectTransform rectTransform;
     public Transform softwareContainer;
     public GameObject softwareButtonPrefab;
+    [Header("sound effects")]
+    public AudioClip[] startDownloadSound;
 
     [Header("buttons")]
     List<SoftwareButton> buttons;
@@ -114,9 +116,11 @@ public class CyberdeckUIController : MonoBehaviour {
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
             NetworkAction networkAction = button.GetNetworkAction(indicator.node, graph);
+            Debug.Log(networkAction);
             graph.AddNetworkAction(networkAction);
             GameManager.I.RefreshCyberGraph();
             handler.NodeSelectCallback(indicator);
+            Toolbox.RandomizeOneShot(overlayHandler.audioSource, startDownloadSound);
         }
     }
 

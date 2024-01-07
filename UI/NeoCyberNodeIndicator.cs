@@ -14,6 +14,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public Color mysteryColor;
     [Header("decor")]
     public CyberNodeIndicatorLockWidget lockWidget;
+    public Image lockWidget2;
     public CyberNodeIndicatorDataWidget dataWidget;
     public GraphIconReference icons;
     [Header("progress bar")]
@@ -79,6 +80,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         outlineImage.color = nodeColor;
         lockWidget.gameObject.SetActive(false);
         dataWidget.gameObject.SetActive(false);
+        lockWidget2.enabled = node.lockLevel > 0;
         // lockWidget.SetColor(nodeColor);
         // dataWidget.SetColor(nodeColor);
 

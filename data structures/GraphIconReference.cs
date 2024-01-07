@@ -19,10 +19,10 @@ public class GraphIconReference : ScriptableObject {
     public Sprite iconObjective;
 
     public Sprite CyberNodeSprite(CyberNode node) {
-        if (node.lockLevel > 0) {
-            return lockIcon;
-        }
-        if (node.visibility == NodeVisibility.mystery) {
+        // if (node.lockLevel > 0) {
+        //     return lockIcon;
+        // }
+        if (node.visibility < NodeVisibility.known) {
             return mysteryIcon;
         }
         switch (node.type) {
