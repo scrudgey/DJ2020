@@ -12,8 +12,10 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public Material marchingAntsMaterial;
     HashSet<string> neighborEdge;
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
+    Dictionary<(string, string), LineRenderer> soloLineRenders = new Dictionary<(string, string), LineRenderer>();
+    // Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<HashSet<string>, LineRenderer> marchingAntsRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
-    Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
+    // Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
     protected V mousedOverIndicator;
     public OverlayHandler overlayHandler;
@@ -86,14 +88,27 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         U node2 = graph.nodes[nodes[1]];
         if (node1.sceneName != sceneName || node2.sceneName != sceneName)
             return;
-        LineRenderer renderer = GetLineRenderer(edge);
         if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
+            LineRenderer renderer = GetLineRenderer(edge);
             SetLinePositions(renderer, node1, node2);
             SetEdgeState(renderer, node1, node2);
+            LineRenderer nodeRenderer1 = GetSoloLineRenderer(node1.idn, node2.idn);
+            LineRenderer nodeRenderer2 = GetSoloLineRenderer(node2.idn, node1.idn);
+            nodeRenderer1.enabled = false;
+            nodeRenderer2.enabled = false;
         } else {
-            SetTruncatedLinePositions(renderer, node1, node2);
-            SetEdgeState(renderer, node1, node2);
-            // renderer.enabled = false;
+            if (node1.visibility == NodeVisibility.known || node1.visibility == NodeVisibility.mystery) {
+                LineRenderer nodeRenderer = GetSoloLineRenderer(node1.idn, node2.idn);
+                SetTruncatedLinePositions(nodeRenderer, node1, node2);
+                SetEdgeState(nodeRenderer, node1, node2);
+                nodeRenderer.enabled = true;
+            }
+            if (node2.visibility == NodeVisibility.known || node2.visibility == NodeVisibility.mystery) {
+                LineRenderer nodeRenderer = GetSoloLineRenderer(node2.idn, node1.idn);
+                SetTruncatedLinePositions(nodeRenderer, node2, node1);
+                SetEdgeState(nodeRenderer, node1, node2);
+                nodeRenderer.enabled = true;
+            }
         }
     }
     public void SetEdgeState(HashSet<string> edge) {
@@ -173,7 +188,17 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         } else {
             LineRenderer renderer = InitializeLineRenderer();
             lineRenderers[edge] = renderer;
-            lineRendererArrays[edge.ToArray()] = renderer;
+            // lineRendererArrays[edge.ToArray()] = renderer;
+            return renderer;
+        }
+    }
+    protected LineRenderer GetSoloLineRenderer(string nodeid1, string nodeid2) {
+        if (soloLineRenders.ContainsKey((nodeid1, nodeid2))) {
+            return soloLineRenders[(nodeid1, nodeid2)];
+        } else {
+            LineRenderer renderer = InitializeLineRenderer();
+            soloLineRenders[(nodeid1, nodeid2)] = renderer;
+            // lineRendererArrays[edge.ToArray()] = renderer;
             return renderer;
         }
     }
@@ -183,7 +208,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         } else {
             LineRenderer renderer = InitializeLineRenderer();
             marchingAntsRenderers[edge] = renderer;
-            lineRendererArrays[edge.ToArray()] = renderer;
+            // lineRendererArrays[edge.ToArray()] = renderer;
             return renderer;
         }
     }

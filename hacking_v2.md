@@ -907,13 +907,10 @@ exploit:    deploy against any vulnerable unlocked node
 ? preserve node selection if a corresponding node exists, otherwise deselect.
 ? maybe vulnerable edge is red?
 
-handling of mystery node neighbors is incorrect
-    from regular node i jumped to mystery: mystery should provide a neighbor button back to other node.
+from regular node i jumped to mystery: mystery should provide a neighbor button back to other node.
 graphs are jumpy on first reveal
-reconnect e.g. tower
 
-# start hacking!
-
+* reconnect e.g. tower
 * refresh info pane
 * refresh graph
     * show cyberdeck when vulnerable node is selected
@@ -983,10 +980,10 @@ reconnect e.g. tower
 * it feels like i should be able to scan to see what's behind the lock before i try to unlocking
 * unlocking should provide basic visibility
 * likewise it might be visible but i can't tell because node is locked.
+* retire hackhandler
 
 
 i think undiscovered nodes still have line renderers at (0,0)
-retire hackhandler
 a node might have all its edges discovered from elsewhere but not be "mapped"
 it should be clear if a node has undiscovered edges
 hack: laughing skull effect
@@ -1000,6 +997,7 @@ objective complete should close info display or something
 
 attack vector path does not include player renderer
 
+hide overlay stuff when dialogue menu opens
 
 make utility node controls take effect
 use password on info panel

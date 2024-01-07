@@ -12,10 +12,10 @@ public class ManualHackTargetData {
     public ManualHackTargetData(CyberComponent target) {
         this.target = target;
     }
-    public HackInput ToManualHackInput() => new HackInput {
-        targetNode = GameManager.I.GetCyberNode(target.idn),
-        type = HackType.manual
-    };
+    // public HackInput ToManualHackInput() => new HackInput {
+    //     targetNode = GameManager.I.GetCyberNode(target.idn),
+    //     type = HackType.manual
+    // };
 }
 public class ManualHacker : MonoBehaviour {
     public bool deployed;

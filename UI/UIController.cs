@@ -22,7 +22,7 @@ public class UIController : MonoBehaviour {
     public ActionLogHandler actionLogHandler;
     public OverlayHandler overlayHandler;
     public GameObject UIEditorCamera;
-    public HackDisplay hackDisplay;
+    // public HackDisplay hackDisplay;
     public VisibilityUIHandler visibilityUIHandler;
     public SuspicionIndicatorHandler suspicionIndicatorHandler;
     public HealthIndicatorController healthIndicatorController;
@@ -55,7 +55,7 @@ public class UIController : MonoBehaviour {
         lockIndicatorHandler.UICamera = Camera.main;
         playerCalloutHandler.UICamera = Camera.main;
         playerArrowCalloutHandler.UICamera = Camera.main;
-        hackDisplay.cam = Camera.main;
+        // hackDisplay.cam = Camera.main;
         caption.text = "";
 
         GameManager.OnFocusChanged += BindToNewTarget;

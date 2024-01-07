@@ -3560,7 +3560,6 @@ status bar on top shows:
     when loot is collected
 
 
-
 multiple guards chose the same clearpoint to navigate to- more global coordination
 better investigative ability when player does something weird like superjump / land
 highlight NPCs that are shooting me
@@ -3572,8 +3571,6 @@ we should display floor number.
 some sort of pseudo-3d offset map in the escape menu
 
 
-
-
-put trailer on steam page
+* put trailer on steam page
 publish trailer on twitter
 update the steam page graphic

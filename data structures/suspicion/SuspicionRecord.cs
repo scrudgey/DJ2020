@@ -753,48 +753,48 @@ public class SuspicionRecord {
         }
     };
 
-    public static SuspicionRecord tamperingSuspicion(HackData data) => new SuspicionRecord {
-        content = "tampering with equipment",
-        suspiciousness = Suspiciousness.suspicious,
-        lifetime = 3f,
-        maxLifetime = 3f,
-        allowDataResponse = true,
-        dialogue = new SuspicionDialogueParameters {
-            challenge = $"What are you doing with that {data.node.nodeTitle}?",
-            tactics = new List<DialogueTactic>{
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.lie,
-                            content = $"I'm the {data.node.nodeTitle} inspector.",
-                            successResponse = "Carry on.",
-                            failResponse = "Oh yeah? You don't look like one."
-                        },
-                         new DialogueTactic{
-                            tacticType = DialogueTacticType.deny,
-                            content = $"I don't even know what a {data.node.nodeTitle} is.",
-                            successResponse = "Yes, you do seem like a simple person.",
-                            failResponse = "I don't believe that for a second."
-                        },
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.challenge,
-                            content = "Listen, do you want to tell my boss that this job won't get finished?",
-                            successResponse = "I don't mean to interfere.",
-                            failResponse = "Get your boss on the phone and we'll talk."
-                        },
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.redirect,
-                            content = "Look behind you, a three-headed monkey!",
-                            successResponse = "Where?!",
-                            failResponse = "You honestly ,think I'd fall for that?"
-                        },
-                         new DialogueTactic{
-                            tacticType = DialogueTacticType.item,
-                            content = $"Yes, {{name}} in facilities has authorized me to conduct a full audit of the {data.node.nodeTitle}.",
-                            successResponse = "Okay, just be quick about it.",
-                            failResponse = "You honestly think I'd fall for that?"
-                        },
-                    }
-        }
-    };
+    // public static SuspicionRecord tamperingSuspicion(HackData data) => new SuspicionRecord {
+    //     content = "tampering with equipment",
+    //     suspiciousness = Suspiciousness.suspicious,
+    //     lifetime = 3f,
+    //     maxLifetime = 3f,
+    //     allowDataResponse = true,
+    //     dialogue = new SuspicionDialogueParameters {
+    //         challenge = $"What are you doing with that {data.node.nodeTitle}?",
+    //         tactics = new List<DialogueTactic>{
+    //                     new DialogueTactic{
+    //                         tacticType = DialogueTacticType.lie,
+    //                         content = $"I'm the {data.node.nodeTitle} inspector.",
+    //                         successResponse = "Carry on.",
+    //                         failResponse = "Oh yeah? You don't look like one."
+    //                     },
+    //                      new DialogueTactic{
+    //                         tacticType = DialogueTacticType.deny,
+    //                         content = $"I don't even know what a {data.node.nodeTitle} is.",
+    //                         successResponse = "Yes, you do seem like a simple person.",
+    //                         failResponse = "I don't believe that for a second."
+    //                     },
+    //                     new DialogueTactic{
+    //                         tacticType = DialogueTacticType.challenge,
+    //                         content = "Listen, do you want to tell my boss that this job won't get finished?",
+    //                         successResponse = "I don't mean to interfere.",
+    //                         failResponse = "Get your boss on the phone and we'll talk."
+    //                     },
+    //                     new DialogueTactic{
+    //                         tacticType = DialogueTacticType.redirect,
+    //                         content = "Look behind you, a three-headed monkey!",
+    //                         successResponse = "Where?!",
+    //                         failResponse = "You honestly ,think I'd fall for that?"
+    //                     },
+    //                      new DialogueTactic{
+    //                         tacticType = DialogueTacticType.item,
+    //                         content = $"Yes, {{name}} in facilities has authorized me to conduct a full audit of the {data.node.nodeTitle}.",
+    //                         successResponse = "Okay, just be quick about it.",
+    //                         failResponse = "You honestly think I'd fall for that?"
+    //                     },
+    //                 }
+    //     }
+    // };
     public static SuspicionRecord tamperingSuspicion() => new SuspicionRecord {
         content = "tampering with equipment",
         suspiciousness = Suspiciousness.suspicious,

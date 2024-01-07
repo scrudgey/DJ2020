@@ -23,7 +23,7 @@ public class CyberdeckCanvasController : MonoBehaviour {
     public GameObject downloadButton;
     CyberNode targetNode;
     // CyberDataStore attachedDataStore;
-    HackData currentHackData;
+    // HackData currentHackData;
     void Start() {
         bodyText.SetActive(true);
         bodyDetect.SetActive(false);
@@ -35,20 +35,20 @@ public class CyberdeckCanvasController : MonoBehaviour {
     }
 
     void Update() {
-        if (currentHackData != null) {
-            float totalWidth = progressBarParent.rect.width;
-            float progress = currentHackData.timer / currentHackData.lifetime;
-            progress = (float)PennerDoubleAnimation.QuintEaseInOut(progress, 0f, 1f, 1f);
-            float width = progress * totalWidth;
-            progressBar.sizeDelta = new Vector2(width, 1f);
-            int progressInt = (int)(progress * 100);
-            progressText2.text = $"{progressInt} %";
-            if (progress >= 1) {
-                ShowAttackComplete();
-            }
-        } else {
-            progressBar.sizeDelta = new Vector2(0f, 1f);
-        }
+        // if (currentHackData != null) {
+        //     float totalWidth = progressBarParent.rect.width;
+        //     float progress = currentHackData.timer / currentHackData.lifetime;
+        //     progress = (float)PennerDoubleAnimation.QuintEaseInOut(progress, 0f, 1f, 1f);
+        //     float width = progress * totalWidth;
+        //     progressBar.sizeDelta = new Vector2(width, 1f);
+        //     int progressInt = (int)(progress * 100);
+        //     progressText2.text = $"{progressInt} %";
+        //     if (progress >= 1) {
+        //         ShowAttackComplete();
+        //     }
+        // } else {
+        //     progressBar.sizeDelta = new Vector2(0f, 1f);
+        // }
     }
 
     void ShowAttackComplete() {
@@ -58,7 +58,7 @@ public class CyberdeckCanvasController : MonoBehaviour {
         } else {
             ShowUploadComplete();
         }
-        currentHackData = null;
+        // currentHackData = null;
         targetNode = null;
     }
 
@@ -191,12 +191,12 @@ public class CyberdeckCanvasController : MonoBehaviour {
     }
 
     void SetUpProgressBar(string progressTitle, CyberNode targetNode) {
-        HackInput hackInput = new HackInput() {
-            targetNode = targetNode,
-            type = HackType.manual
-        };
+        // HackInput hackInput = new HackInput() {
+        //     targetNode = targetNode,
+        //     type = HackType.manual
+        // };
 
-        currentHackData = HackController.I.HandleHackInput(hackInput);
+        // currentHackData = HackController.I.HandleHackInput(hackInput);
 
         progressBarParent.gameObject.SetActive(true);
         progressText1.enabled = true;
@@ -208,12 +208,12 @@ public class CyberdeckCanvasController : MonoBehaviour {
     }
 
     public void CancelHackInProgress() {
-        if (currentHackData != null) {
-            // HackInput hackInput = new HackInput() {
-            //     targetNode = targetNode,
-            //     type = HackType.manual
-            // };
-            HackController.I.RemoveHack(currentHackData);
-        }
+        // if (currentHackData != null) {
+        //     // HackInput hackInput = new HackInput() {
+        //     //     targetNode = targetNode,
+        //     //     type = HackType.manual
+        //     // };
+        //     HackController.I.RemoveHack(currentHackData);
+        // }
     }
 }
