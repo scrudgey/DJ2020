@@ -38,4 +38,6 @@ public class Node<U> where U : Node<U> {
 
 
 
-public enum NodeVisibility { unknown, mystery, known, mapped }
+public enum NodeVisibility { unknown, mystery, known }
+
+public enum EdgeVisibility { unknown, known }

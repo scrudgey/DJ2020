@@ -97,6 +97,7 @@ public class OverlayHandler : MonoBehaviour {
         powerOverlay.Refresh(graph);
         if (selectedPowerNodeIndicator != null)
             powerInfoPaneDisplay.Configure(selectedPowerNodeIndicator, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
+        SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
     }
     public void RefreshCyberGraph(CyberGraph graph) {
         cyberOverlay.cam = cam;
@@ -106,12 +107,14 @@ public class OverlayHandler : MonoBehaviour {
             cyberInfoPaneDisplay.Configure(selectedCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
         }
         HandleCyberDeckChange(selectedCyberNodeIndicator);
+        SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
     public void RefreshAlarmGraph(AlarmGraph graph) {
         alarmOverlay.cam = cam;
         alarmOverlay.Refresh(graph);
         if (selectedAlarmNodeIndicator != null)
             alarmInfoPaneDisplay.Configure(selectedAlarmNodeIndicator, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
+        SetDiscoveryText(GameManager.I.gameData.levelState.delta.alarmGraph);
     }
     public void HandleOverlayChange(OverlayType type, bool enabled) {
         selectedAlarmNodeIndicator = null;
@@ -149,7 +152,6 @@ public class OverlayHandler : MonoBehaviour {
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Power";
-                SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
                 powerOverlay.OnOverlayActivate();
                 closeButtonObject.SetActive(true);
                 cyberdeckController.Hide();
@@ -166,7 +168,6 @@ public class OverlayHandler : MonoBehaviour {
                 cyberOverlay.gameObject.SetActive(true);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = type == OverlayType.cyber ? "Network" : "None";
-                SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
                 cyberOverlay.OnOverlayActivate();
                 closeButtonObject.SetActive(true);
                 break;
@@ -181,7 +182,6 @@ public class OverlayHandler : MonoBehaviour {
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(true);
                 titleText.text = "Alarm";
-                SetDiscoveryText(GameManager.I.gameData.levelState.delta.alarmGraph);
                 alarmOverlay.OnOverlayActivate();
                 closeButtonObject.SetActive(true);
                 cyberdeckController.Hide();
@@ -207,7 +207,7 @@ public class OverlayHandler : MonoBehaviour {
 
     public void SetDiscoveryText<T, U>(Graph<T, U> graph) where U : Graph<T, U> where T : Node<T> {
         nodeDiscoveryBox.SetActive(true);
-        int knownNodes = graph.nodes.Values.Where(node => node.visibility > NodeVisibility.mystery).Count();
+        int knownNodes = graph.nodes.Values.Where(node => node.visibility >= NodeVisibility.mystery).Count();
         int totalNodes = graph.nodes.Count();
         nodesDiscoveredText.text = $"discovered: {knownNodes}/{totalNodes}";
     }
@@ -284,7 +284,7 @@ public class OverlayHandler : MonoBehaviour {
             CyberNode node = cyberIndicator.node;
 
             // check if node is not discovered and there is a path from node to any compromised node or manual hacker target
-            if (node.visibility < NodeVisibility.mapped && GameManager.I.gameData.levelState.delta.cyberGraph.GetPathToNearestCompromised(node).Count > 0) {
+            if (node.visibility < NodeVisibility.known && GameManager.I.gameData.levelState.delta.cyberGraph.GetPathToNearestCompromised(node).Count > 0) {
                 cyberdeckController.Show();
             } else if (node.getStatus() >= CyberNodeStatus.vulnerable) {
                 cyberdeckController.Show();

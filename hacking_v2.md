@@ -981,23 +981,26 @@ graphs are jumpy on first reveal
 * unlocking should provide basic visibility
 * likewise it might be visible but i can't tell because node is locked.
 * retire hackhandler
-
-
-i think undiscovered nodes still have line renderers at (0,0)
-a node might have all its edges discovered from elsewhere but not be "mapped"
-it should be clear if a node has undiscovered edges
-hack: laughing skull effect
-objective complete should close info display or something
-
-* sound effects
-    * node mouseover
+* it should be clear if a node has undiscovered edges
     * node select
-    software start
-    software finish
+* some line renderers at (0,0)
+* update discovered count
+* a node might have all its edges discovered from elsewhere but not be "mapped"
+* locked nodeinfo still show known edges
+* show placeholder for unknown edges
+locked nodeinfo show data type
+* hide overlay stuff when dialogue menu opens
+* objective complete should close info display or something
+* hack: laughing skull effect
+
+
+software start sfx
+software finish sfx
+
+
 
 attack vector path does not include player renderer
 
-hide overlay stuff when dialogue menu opens
 
 make utility node controls take effect
 use password on info panel

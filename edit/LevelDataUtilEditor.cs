@@ -96,6 +96,10 @@ public class LevelDataUtilEditor : Editor {
                     continue;
                 U source = graph.nodes[component.idn];
                 U neighbor = graph.nodes[link.idn];
+                if (component.idn == link.idn) {
+                    Debug.Log($"adding self-edge disallowed: {component.idn}");
+                    continue;
+                }
                 graph.AddEdge(source, neighbor);
             }
         }

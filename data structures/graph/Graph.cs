@@ -12,17 +12,20 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
     public HashSet<HashSet<string>> edgePairs;
+    public SerializableDictionary<(string, string), EdgeVisibility> edgeVisibility;
     public HashSet<string[]> edgeArrays;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
         edgePairs = new HashSet<HashSet<string>>(HashSet<string>.CreateSetComparer());
         edgeArrays = new HashSet<string[]>();
         edges = new SerializableDictionary<string, HashSet<string>>();
+        edgeVisibility = new SerializableDictionary<(string, string), EdgeVisibility>();
     }
     public T GetNode(string idn) {
         return nodes.ContainsKey(idn) ? nodes[idn] : null;
     }
     public void AddEdge(Node<T> from, Node<T> to) {
+        if (from == to) return;
         AddLink(from, to);
         AddLink(to, from);
         edgePairs.Add(new HashSet<string> { from.idn, to.idn });
@@ -30,6 +33,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     }
 
     void AddLink(Node<T> from, Node<T> to) {
+        if (from == to) return;
         if (!edges.ContainsKey(from.idn)) {
             edges[from.idn] = new HashSet<string>();
         }
@@ -133,36 +137,77 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
 
 
     public void Apply(LevelTemplate.GraphVisibilityDefault visibilityDefault) {
+        foreach (KeyValuePair<string, T> kvp in nodes) {
+            if (edges.ContainsKey(kvp.Value.idn))
+                foreach (string neighborId in edges[kvp.Value.idn]) {
+                    SetEdgeVisibility(kvp.Value.idn, neighborId, EdgeVisibility.unknown);
+                }
+        }
+
         switch (visibilityDefault) {
             case LevelTemplate.GraphVisibilityDefault.all:
-                foreach (KeyValuePair<string, T> kvp in nodes) {
-                    if (kvp.Value.fixedVisibility) continue;
-                    kvp.Value.visibility = NodeVisibility.mapped;
+                foreach (HashSet<string> edge in edgePairs) {
+                    string[] ids = edge.ToArray();
+                    SetEdgeVisibility(ids[0], ids[1], EdgeVisibility.known);
                 }
                 break;
             case LevelTemplate.GraphVisibilityDefault.none:
                 foreach (KeyValuePair<string, T> kvp in nodes) {
-                    if (kvp.Value.fixedVisibility) continue;
                     kvp.Value.visibility = NodeVisibility.unknown;
+                }
+                foreach (HashSet<string> edge in edgePairs) {
+                    string[] ids = edge.ToArray();
+                    SetEdgeVisibility(ids[0], ids[1], EdgeVisibility.unknown);
                 }
                 break;
             case LevelTemplate.GraphVisibilityDefault.partial:
                 foreach (KeyValuePair<string, T> kvp in nodes) {
-                    if (kvp.Value.fixedVisibility) continue;
                     kvp.Value.visibility = UnityEngine.Random.Range(0f, 1f) switch {
                         < 0.3f => NodeVisibility.unknown,
-                        < 0.6f => NodeVisibility.known,
-                        _ => NodeVisibility.mapped
+                        _ => NodeVisibility.known,
                     };
                 }
+                foreach (HashSet<string> edge in edgePairs) {
+                    string[] ids = edge.ToArray();
+                    EdgeVisibility vis = UnityEngine.Random.Range(0f, 1f) switch {
+                        < 0.3f => EdgeVisibility.unknown,
+                        _ => EdgeVisibility.known,
+                    };
+                    SetEdgeVisibility(ids[0], ids[1], vis);
+                }
                 break;
+        }
+
+        foreach (KeyValuePair<string, T> kvp in nodes) {
+            if (kvp.Value.fixedVisibility) {
+                kvp.Value.visibility = NodeVisibility.known;
+                foreach (string neighborId in edges[kvp.Value.idn]) {
+                    SetEdgeVisibility(kvp.Value.idn, neighborId, EdgeVisibility.known);
+                }
+            }
         }
     }
     public void Apply(LevelPlan levelPlan) {
         // TODO: apply plan paydata
+        // TODO: set edge visibility
+
         // apply plan visibility
         ApplyVisibilityState(levelPlan.nodeVisibility);
     }
 
     // TODO: apply randomizer
+    public void SetEdgeVisibility(string id1, string id2, EdgeVisibility visibility) {
+        edgeVisibility[(id1, id2)] = visibility;
+        edgeVisibility[(id2, id1)] = visibility;
+        // nodes[id1].visibility = (NodeVisibility)Mathf.Max((in))
+        if (visibility == EdgeVisibility.known) {
+            if (nodes[id1].visibility < NodeVisibility.mystery) {
+                nodes[id1].visibility = NodeVisibility.mystery;
+            }
+            if (nodes[id2].visibility < NodeVisibility.mystery) {
+                nodes[id2].visibility = NodeVisibility.mystery;
+            }
+        }
+
+    }
 }

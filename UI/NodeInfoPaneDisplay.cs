@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
     public TextMeshProUGUI title;
     public TextMeshProUGUI lockStatus;
@@ -43,12 +43,11 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
         }
         if (graph.edges.ContainsKey(node.idn) && graph.edges[node.idn].Count > 0) {
             foreach (string neighborId in graph.edges[node.idn]) {
-                U node = graph.nodes[neighborId];
-                if (node.visibility == NodeVisibility.unknown) continue; // TODO: populate ? placeholder
+                U neighborNode = graph.nodes[neighborId];
                 GameObject obj = GameObject.Instantiate(neighborButtonPrefab) as GameObject;
                 obj.transform.SetParent(neighborbuttonContainer, false);
                 NeighborButton button = obj.GetComponent<NeighborButton>();
-                button.Configure(this, node);
+                button.Configure(this, neighborNode, graph.edgeVisibility[(node.idn, neighborId)]);
             }
             neighborContainer.SetActive(true);
         } else {

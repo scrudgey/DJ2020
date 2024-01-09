@@ -4,6 +4,7 @@ using Easings;
 using UnityEngine;
 public class ObjectiveCanvasController : MonoBehaviour {
     public Transform objectivesContainer;
+    public OverlayHandler overlayHandler;
     public GameObject objectiveIndicatorPrefab;
     public Canvas canvas;
     Coroutine showCoroutine;
@@ -56,6 +57,7 @@ public class ObjectiveCanvasController : MonoBehaviour {
         }
     }
     IEnumerator ShowCanvas() {
+        overlayHandler.ShowInfoPane(null); // hide info pane
         float timer = 0f;
         canvas.enabled = true;
         containerRect.anchoredPosition = new Vector2(containerRect.rect.width, 0f);

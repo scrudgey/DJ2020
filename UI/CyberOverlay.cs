@@ -166,19 +166,19 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
 
 
     public void DrawThreat(NetworkAction networkAction) {
-        if (networkAction.path.Count > 1) {
+        if (networkAction.path.ToHashSet().Count > 1) {
             DrawMatchingAntsOnPath(networkAction);
         }
     }
     public void EraseThreat(NetworkAction networkAction) {
-        if (networkAction.path.Count > 1) {
+        if (networkAction.path.ToHashSet().Count > 1) {
             EraseMatchingAntsOnPath(networkAction);
             RefreshEdgeGraphicState();
         }
     }
     void DrawMarchingAntsForAllActiveActions() {
         foreach (NetworkAction action in graph.ActiveNetworkActions()) {
-            if (action.path.Count < 2) continue; // no path / path to player cyberdeck
+            if (action.path.ToHashSet().Count < 2) continue; // no path / path to player cyberdeck
             DrawMatchingAntsOnPath(action);
         }
     }
@@ -187,7 +187,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
     void HandleCompleteNetworkAction(NetworkAction networkAction) {
         Toolbox.RandomizeOneShot(overlayHandler.audioSource, finishDownloadSound);
-        if (networkAction.path.Count < 2) return; // no path / path to player cyberdeck
+        if (networkAction.path.ToHashSet().Count < 2) return; // no path / path to player cyberdeck
         EraseMatchingAntsOnPath(networkAction);
     }
 
@@ -195,19 +195,18 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         CyberNode currentnode = networkAction.toNode;
         for (int i = 0; i < networkAction.path.Count; i++) {
             CyberNode nextNode = networkAction.path[i];
+            if (nextNode == currentnode) continue;
             HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
             LineRenderer renderer = GetLineRenderer(edge);
             renderer.material = lineRendererMaterial;
             currentnode = nextNode;
         }
-        // if (networkAction.fromPlayerNode) {
-
-        // }
     }
     void DrawMatchingAntsOnPath(NetworkAction action) {
         CyberNode currentnode = action.toNode;
         for (int i = 0; i < action.path.Count; i++) {
             CyberNode nextNode = action.path[i];
+            if (nextNode == currentnode) continue;
             NeoCyberNodeIndicator indicator = indicators[nextNode];
             HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
             LineRenderer renderer = GetLineRenderer(edge);
@@ -215,8 +214,5 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
             currentnode = nextNode;
         }
-        // if (action.fromPlayerNode) {
-
-        // }
     }
 }

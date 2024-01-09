@@ -88,7 +88,9 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         U node2 = graph.nodes[nodes[1]];
         if (node1.sceneName != sceneName || node2.sceneName != sceneName)
             return;
-        if (node1.visibility == NodeVisibility.mapped || node2.visibility == NodeVisibility.mapped) {
+        // bool bothNodesVisible = node1.visibility >= NodeVisibility.mystery && node2.visibility >= NodeVisibility.mystery;
+        // to draw an edge: both nodes visible
+        if (graph.edgeVisibility[(node1.idn, node2.idn)] == EdgeVisibility.known) {
             LineRenderer renderer = GetLineRenderer(edge);
             SetLinePositions(renderer, node1, node2);
             SetEdgeState(renderer, node1, node2);
@@ -97,13 +99,13 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             nodeRenderer1.enabled = false;
             nodeRenderer2.enabled = false;
         } else {
-            if (node1.visibility == NodeVisibility.known || node1.visibility == NodeVisibility.mystery) {
+            if (node1.visibility >= NodeVisibility.mystery) {
                 LineRenderer nodeRenderer = GetSoloLineRenderer(node1.idn, node2.idn);
                 SetTruncatedLinePositions(nodeRenderer, node1, node2);
                 SetEdgeState(nodeRenderer, node1, node2);
                 nodeRenderer.enabled = true;
             }
-            if (node2.visibility == NodeVisibility.known || node2.visibility == NodeVisibility.mystery) {
+            if (node2.visibility >= NodeVisibility.mystery) {
                 LineRenderer nodeRenderer = GetSoloLineRenderer(node2.idn, node1.idn);
                 SetTruncatedLinePositions(nodeRenderer, node2, node1);
                 SetEdgeState(nodeRenderer, node1, node2);
@@ -187,8 +189,9 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             return lineRenderers[edge];
         } else {
             LineRenderer renderer = InitializeLineRenderer();
+            string[] edges = edge.ToArray();
+            renderer.name = $"edge_{edges[0]}_{edges[1]}";
             lineRenderers[edge] = renderer;
-            // lineRendererArrays[edge.ToArray()] = renderer;
             return renderer;
         }
     }
@@ -197,8 +200,8 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             return soloLineRenders[(nodeid1, nodeid2)];
         } else {
             LineRenderer renderer = InitializeLineRenderer();
+            renderer.name = $"solo_{nodeid1}_{nodeid2}";
             soloLineRenders[(nodeid1, nodeid2)] = renderer;
-            // lineRendererArrays[edge.ToArray()] = renderer;
             return renderer;
         }
     }
@@ -207,8 +210,9 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             return marchingAntsRenderers[edge];
         } else {
             LineRenderer renderer = InitializeLineRenderer();
+            string[] edges = edge.ToArray();
+            renderer.name = $"marchingants_{edges[0]}_{edges[1]}";
             marchingAntsRenderers[edge] = renderer;
-            // lineRendererArrays[edge.ToArray()] = renderer;
             return renderer;
         }
     }

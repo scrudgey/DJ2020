@@ -20,7 +20,6 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
         status.text = $"{indicator.node.getStatus()}";
         lockStatus.text = $"lock: {indicator.node.lockLevel}";
         lockBlock.SetActive(indicator.node.lockLevel > 0);
-        // lockBlock.SetActive(false);
 
         Color statusColor = indicator.node.getStatus() switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
@@ -33,7 +32,7 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
         type.color = statusColor;
         status.color = statusColor;
 
-        if (indicator.node.lockLevel > 0){
+        if (indicator.node.lockLevel > 0) {
 
         } else if (indicator.node.type == CyberNodeType.datanode && indicator.node.payData != null) {
             dataInfoDisplay.Configure(indicator.node.payData, indicator.node.dataStolen);

@@ -221,6 +221,7 @@ public partial class GameManager : Singleton<GameManager> {
                     LoadScene("NeoDialogueMenu", callback, unloadAll: false);
                 }
                 CloseBurglar();
+                SetOverlay(OverlayType.none);
                 uiController.HideUI();
                 break;
             case MenuType.VRMissionFinish:

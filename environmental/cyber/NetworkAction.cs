@@ -18,15 +18,15 @@ public class NetworkAction {
     public float timerRate = 1f;
     public bool complete;
     public PayData payData;
-    public void Update(float deltaTime) {
+    public void Update(float deltaTime, CyberGraph graph) {
         timer += timerRate * deltaTime;
         if (timer >= lifetime) {
-            DoComplete();
+            DoComplete(graph);
         }
     }
 
-    void DoComplete() {
+    void DoComplete(CyberGraph graph) {
         complete = true;
-        effect.ApplyToNode(toNode);
+        effect.ApplyToNode(toNode, graph);
     }
 }

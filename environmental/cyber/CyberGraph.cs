@@ -48,13 +48,13 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         foreach (CyberNode node in nodes.Values) {
             node.status = GetStatus(node);
         }
-        foreach (KeyValuePair<string, CyberNode> kvp in nodes) {
-            if (kvp.Value.visibility == NodeVisibility.unknown) {
-                if (edges.ContainsKey(kvp.Key) && edges[kvp.Key].Any(idn => nodes[idn].visibility == NodeVisibility.mapped)) {
-                    kvp.Value.visibility = NodeVisibility.mystery;
-                }
-            }
-        }
+        // foreach (KeyValuePair<string, CyberNode> kvp in nodes) {
+        //     if (kvp.Value.visibility == NodeVisibility.unknown) {
+        //         if (edges.ContainsKey(kvp.Key) && edges[kvp.Key].Any(idn => nodes[idn].visibility == NodeVisibility.mapped)) {
+        //             kvp.Value.visibility = NodeVisibility.mystery;
+        //         }
+        //     }
+        // }
     }
 
 
@@ -102,7 +102,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         foreach (List<NetworkAction> actions in networkActions.Values) {
             List<NetworkAction> completedActions = new List<NetworkAction>();
             foreach (NetworkAction action in actions) {
-                action.Update(timeDelta);
+                action.Update(timeDelta, this);
                 if (action.complete) {
                     completedActions.Add(action);
                     anyComplete = true;
@@ -191,7 +191,8 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
                 CyberNode neighborNode = nodes[neighborID];
                 if (!neighborNode.getEnabled()) {
                     continue;
-                } else if (node.visibility != NodeVisibility.mapped && neighborNode.visibility != NodeVisibility.mapped) {
+                    // } else if (node.visibility != NodeVisibility.mapped && neighborNode.visibility != NodeVisibility.mapped) {
+                } else if (edgeVisibility[(node.idn, neighborID)] == EdgeVisibility.unknown) {
                     // neither node is mapped- edge is unknwon
                     continue;
                 }

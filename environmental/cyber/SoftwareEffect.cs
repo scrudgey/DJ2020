@@ -9,10 +9,14 @@ public class SoftwareEffect {
     public Type type;
     public int level;
     public string name;
-    public void ApplyToNode(CyberNode node) {
+    public void ApplyToNode(CyberNode node, CyberGraph graph) {
         switch (type) {
             case Type.scan:
-                node.visibility = NodeVisibility.mapped;
+                node.visibility = NodeVisibility.known;
+                foreach (string neighborId in graph.edges[node.idn]) {
+                    graph.SetEdgeVisibility(node.idn, neighborId, EdgeVisibility.known);
+
+                }
                 break;
             case Type.download:
                 if (node.type == CyberNodeType.datanode) {
