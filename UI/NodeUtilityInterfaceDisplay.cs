@@ -24,13 +24,13 @@ public class NodeUtilityInterfaceDisplay : MonoBehaviour {
 
     public void OnButtonClick() {
         value = true;
-        node.utilityActive = value;
+        GameManager.I.SetCyberNodeUtilityState(node, value);
         SetButtons(value);
     }
 
     public void OffButtonClick() {
         value = false;
-        node.utilityActive = value;
+        GameManager.I.SetCyberNodeUtilityState(node, value);
         SetButtons(value);
     }
 

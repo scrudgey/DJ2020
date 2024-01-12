@@ -3574,3 +3574,13 @@ some sort of pseudo-3d offset map in the escape menu
 * put trailer on steam page
 publish trailer on twitter
 update the steam page graphic
+
+
+* power grid
+* alarm grid
+test that these work as expected still
+disabling utility while alarm in progress should stop alarm
+compromising a node should permanent set utility off?
+
+reconnect all levels
+keys & status bar

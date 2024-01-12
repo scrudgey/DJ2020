@@ -78,14 +78,15 @@ public class SoftwareButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     // TODO: this logic will belong somewhere else- player state
     public NetworkAction GetNetworkAction(CyberNode node, CyberGraph graph) {
-        float lifetime = effect.type switch {
-            SoftwareEffect.Type.compromise => 10f,
-            SoftwareEffect.Type.download => 10f,
-            SoftwareEffect.Type.scan => 3f,
-            // SoftwareEffect.Type.unlock => 5f,
-            SoftwareEffect.Type.unlock => 6f,
-            _ => 1f
-        };
+        // float lifetime = effect.type switch {
+        //     SoftwareEffect.Type.compromise => 10f,
+        //     SoftwareEffect.Type.download => 10f,
+        //     SoftwareEffect.Type.scan => 3f,
+        //     // SoftwareEffect.Type.unlock => 5f,
+        //     SoftwareEffect.Type.unlock => 6f,
+        //     _ => 1f
+        // };
+        float lifetime = 0.5f;
 
         NetworkAction networkAction = new NetworkAction() {
             title = $"uploading {effect.name}...",

@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode>, INodeBinder<PowerNode>, INodeBinder<CyberNode> {
+public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode>, INodeBinder<PowerNode>, INodeBinder<CyberNode>, INodeBinder<AlarmNode> {
     PowerNode INodeBinder<PowerNode>.node { get; set; }
     CyberNode INodeBinder<CyberNode>.node { get; set; }
+    AlarmNode INodeBinder<AlarmNode>.node { get; set; }
+
     public AlarmNode.AlarmNodeType nodeType;
     public PulseLight pulseLight;
     private TamperEvidence sensorTripIndicator;
@@ -21,23 +23,23 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode>, INo
     }
     void INodeBinder<CyberNode>.HandleNodeChange() {
         INodeBinder<CyberNode> x = (INodeBinder<CyberNode>)this;
-        cyberCompromised = x.node.compromised;
+        cyberCompromised = !x.node.utilityActive;
         ApplyCyberPowerState();
     }
-    public override AlarmNode NewNode() {
-        AlarmNode alarmNode = base.NewNode();
-        alarmNode.nodeType = nodeType;
-        return alarmNode;
-    }
-    public override void HandleNodeChange() {
-        base.HandleNodeChange();
-        bool alarmTriggered = node.alarmTriggered;
+    void INodeBinder<AlarmNode>.HandleNodeChange() {
+        AlarmNode alarmnode = ((INodeBinder<AlarmNode>)this).node;
+        bool alarmTriggered = alarmnode.alarmTriggered;
         if (pulseLight != null) {
             pulseLight.doPulse = alarmTriggered;
         }
         if (sensorTripIndicator != null) {
             sensorTripIndicator.suspicious = alarmTriggered;
         }
+    }
+    public override AlarmNode NewNode() {
+        AlarmNode alarmNode = base.NewNode();
+        alarmNode.nodeType = nodeType;
+        return alarmNode;
     }
     public virtual void Start() {
         if (pulseLight != null) {

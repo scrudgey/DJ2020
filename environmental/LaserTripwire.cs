@@ -4,8 +4,10 @@ using System.Linq;
 using UnityEngine;
 
 
-public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
-    public AlarmNode node { get; set; }
+public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode>, INodeBinder<CyberNode> {
+    AlarmNode INodeBinder<AlarmNode>.node { get; set; }
+    CyberNode INodeBinder<CyberNode>.node { get; set; }
+
     [System.Serializable]
     public class LaserData {
         public LaserBeam laser;
@@ -18,7 +20,14 @@ public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
     AudioSource audioSource;
     public AudioSource buzzSoundSource;
 
+    bool alarmNodeEnabled;
+    bool cyberNodeEnabled;
+    bool overallEnabled;
+
     public void Start() {
+        alarmNodeEnabled = true;
+        cyberNodeEnabled = true;
+        UpdateEnabled();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         foreach (LaserData data in laserData) {
             data.laser.tripWire = this;
@@ -26,9 +35,9 @@ public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
         }
     }
     public void LaserTripCallback() {
-        if (cooldown > 0)
+        if (cooldown > 0 || !overallEnabled)
             return;
-        GameManager.I.SetAlarmNodeTriggered(node, true);
+        GameManager.I.SetAlarmNodeTriggered(((INodeBinder<AlarmNode>)this).node, true);
         cooldown = 5f;
         Toolbox.RandomizeOneShot(audioSource, spottedSound);
         foreach (LaserData data in laserData) {
@@ -61,6 +70,21 @@ public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {
             audioSource.Play();
     }
 
-    public void HandleNodeChange() {
+
+    void INodeBinder<AlarmNode>.HandleNodeChange() {
+        alarmNodeEnabled = ((INodeBinder<AlarmNode>)this).node.getEnabled();
+        UpdateEnabled();
+    }
+    void INodeBinder<CyberNode>.HandleNodeChange() {
+        cyberNodeEnabled = ((INodeBinder<CyberNode>)this).node.utilityActive;
+        Debug.Log(cyberNodeEnabled);
+        UpdateEnabled();
+    }
+
+    void UpdateEnabled() {
+        overallEnabled = alarmNodeEnabled && cyberNodeEnabled;
+        if (!overallEnabled) {
+            audioSource.Stop();
+        }
     }
 }

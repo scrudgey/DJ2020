@@ -10,11 +10,10 @@ public class AlarmNodeIndicator : NodeIndicator<AlarmNode, AlarmGraph> {
     public GameObject timerObject;
     public RectTransform timerRect;
     public RectTransform bkgRect;
-    [Header("sprites")]
-    public Sprite normalIcon;
+    public GraphIconReference iconReference;
     public override void SetGraphicalState(AlarmNode node) {
-        iconImage.sprite = normalIcon;
-
+        // iconImage.sprite = normalIcon;
+        iconImage.sprite = iconReference.AlarmNodeSprite(node);
         if (!node.getEnabled()) {
             iconImage.color = deadColor;
         } else if (node.alarmTriggered) {

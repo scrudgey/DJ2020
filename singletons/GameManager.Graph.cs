@@ -57,6 +57,11 @@ public partial class GameManager : Singleton<GameManager> {
         node.compromised = state;
         RefreshCyberGraph();
     }
+    public void SetCyberNodeUtilityState(CyberNode node, bool state) {
+        if (applicationIsQuitting) return;
+        node.utilityActive = state;
+        RefreshCyberGraph();
+    }
     public bool IsCyberNodeVulnerable(CyberNode node) {
         return gameData.levelState?.delta.cyberGraph?.IsCyberNodeVulnerable(node) ?? false;
     }

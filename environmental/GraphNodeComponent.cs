@@ -20,9 +20,9 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         };
     }
 
-    public virtual void HandleNodeChange() {
+    // public virtual void HandleNodeChange() {
 
-    }
+    // }
 
     public Vector3 NodePosition() {
         Transform nodePositioner = transform.Find("node");

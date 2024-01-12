@@ -988,22 +988,48 @@ graphs are jumpy on first reveal
 * a node might have all its edges discovered from elsewhere but not be "mapped"
 * locked nodeinfo still show known edges
 * show placeholder for unknown edges
-locked nodeinfo show data type
+* locked nodeinfo show data type
 * hide overlay stuff when dialogue menu opens
 * objective complete should close info display or something
 * hack: laughing skull effect
-
+* make utility node controls take effect
+    * alarm node
+    * cash reg
+    * laser grid
+* power source buzzer component
 
 software start sfx
 software finish sfx
 
-
+customize utility panel in info panel in some way
+use password on info panel
 
 attack vector path does not include player renderer
 
+# other grids
 
-make utility node controls take effect
-use password on info panel
+power 
+
+alarm
+
+# basic balance
+
+limit use of software consumable 
+software levels interact with nodes / lock levels
+network fights back
+    a snoop agent wanders the network, detects compromised nodes
+    a trigger connects to / monitors nodes, sets off alarm when one is compromised
+    maintenance agent resets compromised nodes
+
+# advanced hacking
+
+load software during loadout phase
+
+cyberdeck shows info about software in some way before running
+
+maybe connect up software buttons and info panel in some way
+    maybe a breakout menu when a node is clicked?
+
 
 
 # lock vs unlock, software levels, gameplay

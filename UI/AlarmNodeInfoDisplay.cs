@@ -4,16 +4,20 @@ using TMPro;
 using UnityEngine;
 
 public class AlarmNodeInfoDisplay : NodeInfoPaneDisplay<AlarmGraph, AlarmNode, AlarmNodeIndicator> {
+    public Color normalColor;
     public TextMeshProUGUI nodeTypeText;
     public TextMeshProUGUI triggeredText;
     public TextMeshProUGUI countdownText;
     public override void ConfigureNode() {
+        icon.color = normalColor;
+        title.color = normalColor;
+
         switch (node.nodeType) {
             case AlarmNode.AlarmNodeType.normal:
-                nodeTypeText.text = "alarm node";
+                nodeTypeText.text = "sensor";
                 break;
             case AlarmNode.AlarmNodeType.terminal:
-                nodeTypeText.text = "alarm terminal";
+                nodeTypeText.text = "terminal";
                 break;
             case AlarmNode.AlarmNodeType.radio:
                 nodeTypeText.text = "radio";

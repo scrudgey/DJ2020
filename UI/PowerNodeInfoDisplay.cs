@@ -4,10 +4,14 @@ using TMPro;
 using UnityEngine;
 
 public class PowerNodeInfoDisplay : NodeInfoPaneDisplay<PowerGraph, PowerNode, PowerNodeIndicator> {
+    public Color normalColor;
     public TextMeshProUGUI nodeTypeText;
     public TextMeshProUGUI poweredText;
     public override void ConfigureNode() {
-        if (node.type == NodeType.powerSource) {
+        icon.color = normalColor;
+        title.color = normalColor;
+
+        if (node.type == PowerNode.NodeType.powerSource) {
             nodeTypeText.text = $"power source: y";
         } else {
             nodeTypeText.text = $"power source: n";

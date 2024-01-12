@@ -11,7 +11,7 @@ public class PowerGraph : Graph<PowerNode, PowerGraph> {
         nodes.Values.ToList().ForEach(node => node.powered = false);
 
         // run the algorithm
-        PowerNode[] sources = nodes.Values.Where(node => node.type == NodeType.powerSource && node.getEnabled()).ToArray();
+        PowerNode[] sources = nodes.Values.Where(node => node.type == PowerNode.NodeType.powerSource && node.getEnabled()).ToArray();
 
         foreach (PowerNode source in sources) {
             // Debug.Log($"power source: {source.idn}");

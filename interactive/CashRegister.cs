@@ -13,7 +13,7 @@ public class CashRegister : Interactive, INodeBinder<CyberNode> {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
     }
     public void HandleNodeChange() {
-        if (node.compromised) Open();
+        if (!node.utilityActive) Open();
     }
     public override ItemUseResult DoAction(Interactor interactor) {
         Open();

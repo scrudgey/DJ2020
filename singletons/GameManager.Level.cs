@@ -442,8 +442,6 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
             PowerNode node = GetPowerNode(component.idn);
             component.node = node;
-            node.Bind(component.HandleNodeChange);
-            component.HandleNodeChange();
             foreach (INodeBinder<PowerNode> binder in component.GetComponentsInChildren<INodeBinder<PowerNode>>()) {
                 binder.Bind(node);
             }
@@ -454,8 +452,6 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (CyberComponent component in FindObjectsOfType<CyberComponent>()) {
             CyberNode node = GetCyberNode(component.idn);
             component.node = node;
-            node.Bind(component.HandleNodeChange);
-            component.HandleNodeChange();
             foreach (INodeBinder<CyberNode> binder in component.GetComponentsInChildren<INodeBinder<CyberNode>>()) {
                 binder.Bind(node);
             }
@@ -466,8 +462,6 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (AlarmComponent component in FindObjectsOfType<AlarmComponent>()) {
             AlarmNode node = GetAlarmNode(component.idn);
             component.node = node;
-            node.Bind(component.HandleNodeChange);
-            component.HandleNodeChange();
             foreach (INodeBinder<AlarmNode> binder in component.GetComponentsInChildren<INodeBinder<AlarmNode>>()) {
                 binder.Bind(node);
             }

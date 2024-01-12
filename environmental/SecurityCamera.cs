@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using UnityEngine;
-public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
+public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode>, INodeBinder<CyberNode> {
     enum State { rotateLeft, lookLeft, rotateRight, lookRight }
     State state;
-    public AlarmNode node { get; set; }
+    AlarmNode INodeBinder<AlarmNode>.node { get; set; }
+    CyberNode INodeBinder<CyberNode>.node { get; set; }
     public Transform cameraTransform;
     public SightCone sightCone;
     public Transform sightOrigin;
@@ -31,20 +32,35 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
 
     public AttackSurfaceElement[] attachedElements;
     bool alarmNodeEnabled;
+    bool cyberNodeEnabled;
+    bool overallEnabled;
 
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         audioSource.volume = 0.5f;
     }
     void Start() {
+        alarmNodeEnabled = true;
+        cyberNodeEnabled = true;
+        UpdateEnabled();
         Bind(sightCone.gameObject);
         initialRotation = cameraTransform.rotation;
     }
-    public void HandleNodeChange() {
-        alarmNodeEnabled = node.getEnabled();
-        spriteLight.enabled = alarmNodeEnabled;
-        IRCone.enabled = alarmNodeEnabled;
-        if (!alarmNodeEnabled) {
+    void INodeBinder<AlarmNode>.HandleNodeChange() {
+        alarmNodeEnabled = ((INodeBinder<AlarmNode>)this).node.getEnabled();
+        UpdateEnabled();
+    }
+    void INodeBinder<CyberNode>.HandleNodeChange() {
+        cyberNodeEnabled = ((INodeBinder<CyberNode>)this).node.utilityActive;
+        UpdateEnabled();
+    }
+
+    void UpdateEnabled() {
+        overallEnabled = alarmNodeEnabled && cyberNodeEnabled;
+
+        spriteLight.enabled = overallEnabled;
+        IRCone.enabled = overallEnabled;
+        if (!overallEnabled) {
             audioSource.Stop();
         }
     }
@@ -52,7 +68,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
         base.OnDestroy();
     }
     public override void HandleValueChanged(SightCone t) {
-        if (!alarmNodeEnabled)
+        if (!overallEnabled)
             return;
         if (t.newestAddition != null) {
             if (TargetVisible(t.newestAddition))
@@ -97,7 +113,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
         }
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (GameManager.I.IsPlayerVisible(distance)) {
-            GameManager.I.SetAlarmNodeTriggered(node, true);
+            GameManager.I.SetAlarmNodeTriggered(((INodeBinder<AlarmNode>)this).node, true);
             alertHandler.ShowAlert();
             cooldown = 5f;
             Toolbox.RandomizeOneShot(audioSource, spottedSound);
@@ -111,7 +127,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;
         }
-        if (!alarmNodeEnabled)
+        if (!overallEnabled)
             return;
         if (doRotate) {
             timer += Time.deltaTime;
