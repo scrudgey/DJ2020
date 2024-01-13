@@ -437,6 +437,7 @@ public partial class GameManager : Singleton<GameManager> {
         InitializePlayerAndController(plan);
 
 
+
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using UnityEngine;
-public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode>, INodeBinder<CyberNode> {
+public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
     enum State { rotateLeft, lookLeft, rotateRight, lookRight }
     State state;
-    AlarmNode INodeBinder<AlarmNode>.node { get; set; }
-    CyberNode INodeBinder<CyberNode>.node { get; set; }
+    public AlarmNode node { get; set; }
     public Transform cameraTransform;
     public SightCone sightCone;
     public Transform sightOrigin;
@@ -29,38 +28,26 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode>, INodeB
     public float turnDuration;
     public float lookDuration;
     readonly float MAXIMUM_SIGHT_RANGE = 50f;
-
     public AttackSurfaceElement[] attachedElements;
-    bool alarmNodeEnabled;
-    bool cyberNodeEnabled;
-    bool overallEnabled;
 
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         audioSource.volume = 0.5f;
     }
     void Start() {
-        alarmNodeEnabled = true;
-        cyberNodeEnabled = true;
         UpdateEnabled();
         Bind(sightCone.gameObject);
         initialRotation = cameraTransform.rotation;
     }
-    void INodeBinder<AlarmNode>.HandleNodeChange() {
-        alarmNodeEnabled = ((INodeBinder<AlarmNode>)this).node.getEnabled();
-        UpdateEnabled();
-    }
-    void INodeBinder<CyberNode>.HandleNodeChange() {
-        cyberNodeEnabled = ((INodeBinder<CyberNode>)this).node.utilityActive;
+    public void HandleNodeChange() {
         UpdateEnabled();
     }
 
     void UpdateEnabled() {
-        overallEnabled = alarmNodeEnabled && cyberNodeEnabled;
-
-        spriteLight.enabled = overallEnabled;
-        IRCone.enabled = overallEnabled;
-        if (!overallEnabled) {
+        if (node == null) return;
+        spriteLight.enabled = node.overallEnabled;
+        IRCone.enabled = node.overallEnabled;
+        if (!node.overallEnabled) {
             audioSource.Stop();
         }
     }
@@ -68,7 +55,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode>, INodeB
         base.OnDestroy();
     }
     public override void HandleValueChanged(SightCone t) {
-        if (!overallEnabled)
+        if (node == null || !node.overallEnabled)
             return;
         if (t.newestAddition != null) {
             if (TargetVisible(t.newestAddition))
@@ -127,7 +114,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode>, INodeB
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;
         }
-        if (!overallEnabled)
+        if (!node.overallEnabled)
             return;
         if (doRotate) {
             timer += Time.deltaTime;

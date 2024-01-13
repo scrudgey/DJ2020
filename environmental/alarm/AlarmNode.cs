@@ -10,7 +10,12 @@ public class AlarmNode : Node<AlarmNode> {
     public AlarmNodeType nodeType;
     public bool alarmTriggered;
     public float countdownTimer;
+    public bool overallEnabled = true;
     public AlarmNode() { }
+
+    public override bool getEnabled() {
+        return overallEnabled && base.getEnabled();
+    }
 
     public void Update() {
         if (countdownTimer > 0f) {

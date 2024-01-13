@@ -45,9 +45,9 @@ public class LevelBootstrapper : MonoBehaviour {
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
             ItemTemplate.LoadItem("deck"),
-            // ItemTemplate.LoadItem("C4"),
-            // ItemTemplate.LoadItem("goggles"),
-            // ItemTemplate.LoadItem("rocket"),
+            ItemTemplate.LoadItem("C4"),
+            ItemTemplate.LoadItem("goggles"),
+            ItemTemplate.LoadItem("rocket"),
             // ItemTemplate.LoadItem("grenade"),
         };
 

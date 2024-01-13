@@ -6,24 +6,15 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode>, INo
     PowerNode INodeBinder<PowerNode>.node { get; set; }
     CyberNode INodeBinder<CyberNode>.node { get; set; }
     AlarmNode INodeBinder<AlarmNode>.node { get; set; }
-
+    public bool debug;
     public AlarmNode.AlarmNodeType nodeType;
     public PulseLight pulseLight;
     private TamperEvidence sensorTripIndicator;
-    bool cyberCompromised;
-    bool powerPowered;
-    public void Awake() {
-        powerPowered = true;
-        cyberCompromised = false;
-    }
+
     void INodeBinder<PowerNode>.HandleNodeChange() {
-        INodeBinder<PowerNode> x = (INodeBinder<PowerNode>)this;
-        powerPowered = x.node.powered;
         ApplyCyberPowerState();
     }
     void INodeBinder<CyberNode>.HandleNodeChange() {
-        INodeBinder<CyberNode> x = (INodeBinder<CyberNode>)this;
-        cyberCompromised = !x.node.utilityActive;
         ApplyCyberPowerState();
     }
     void INodeBinder<AlarmNode>.HandleNodeChange() {
@@ -50,10 +41,29 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode>, INo
         }
     }
     void ApplyCyberPowerState() {
-        if (cyberCompromised || !powerPowered) {
-            DisableSource();
-        } else {
+        CyberNode cyberNode = ((INodeBinder<CyberNode>)this).node;
+        AlarmNode alarmNode = ((INodeBinder<AlarmNode>)this).node;
+        PowerNode powerNode = ((INodeBinder<PowerNode>)this).node;
+
+        bool cyberNodeEnabled = cyberNode == null ? true : !cyberNode.compromised && cyberNode.utilityActive;
+        bool alarmNodeEnabled = alarmNode == null ? true : alarmNode.enabled;
+        bool powerNodeEnabled = powerNode == null ? true : powerNode.getEnabled() && powerNode.powered;
+
+        node.overallEnabled = cyberNodeEnabled && alarmNodeEnabled && powerNodeEnabled;
+
+        if (debug) {
+            Debug.Log($"[ALARM COMPONENT] cybernode:{cyberNode}\talarmnode:{alarmNode}\tpowernode:{powerNode}");
+            Debug.Log($"[ALARM COMPONENT] cyber enabled:{cyberNodeEnabled}\talarm enabled:{alarmNodeEnabled}\tpower enabled:{powerNodeEnabled}");
+            if (alarmNode != null)
+                Debug.Log($"[ALARM COMPONENT] alarm node overall: {alarmNode.overallEnabled} alarm node enabled: {alarmNode.enabled}");
+            Debug.Log($"[ALARM COMPONENT] overall enabled: {node.overallEnabled}");
+        }
+
+        if (node.overallEnabled) {
             EnableSource();
+        } else {
+            DisableSource();
+            GameManager.I.SetAlarmNodeTriggered(node, false);
         }
     }
 

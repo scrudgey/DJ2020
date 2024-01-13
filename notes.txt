@@ -3578,9 +3578,17 @@ update the steam page graphic
 
 * power grid
 * alarm grid
-test that these work as expected still
+* test that these work as expected still
+* stop buzz sound / hide lights when laser grid is disabled
+
 disabling utility while alarm in progress should stop alarm
+
 compromising a node should permanent set utility off?
+
+it is not at all clear that i have to toggle that thingy in information panel to disable the alarm system! it even confused me!
+    1. no node UI information re: utility status
+    2. something doesn't feel right about lock / compromised
+        lock is not clear from node UI- there could be a "LOCKED" statement
 
 reconnect all levels
 keys & status bar
