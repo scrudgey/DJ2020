@@ -3026,7 +3026,13 @@ x ladders
 * stealing dat001 in tower didn't work
 * main issue with clearsighter right now is sometimes things stay transparent.
 * when reverting to patrol, we can do better
-
+* put trailer on steam page
+* power grid
+* alarm grid
+* test that these work as expected still
+* stop buzz sound / hide lights when laser grid is disabled
+* disabling utility while alarm in progress should stop alarm
+* compromising a node should permanent set utility off?
 
 
 
@@ -3551,44 +3557,38 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-status bar on top shows:
-    credits
-    loots
-    data
-    keys
-    shows when key is used
-    when loot is collected
-
 
 multiple guards chose the same clearpoint to navigate to- more global coordination
 better investigative ability when player does something weird like superjump / land
 highlight NPCs that are shooting me
 
+# keys & status bar
+    status bar on top shows:
+        credits
+        loots
+        data
+        keys
+            password data
+        when loot is collected
+    clicking opens pause / status screen to appropriate tab
+
 we should display floor number.
     helps with readability when jumping around in network
     helps with orientation re: map
 
+network info in map in planning mode
+
 some sort of pseudo-3d offset map in the escape menu
 
+reconnect all levels
+    * jtd
+    * office
+    * tower
+    * yamachi
 
-* put trailer on steam page
 publish trailer on twitter
 update the steam page graphic
 
 
-* power grid
-* alarm grid
-* test that these work as expected still
-* stop buzz sound / hide lights when laser grid is disabled
-
-disabling utility while alarm in progress should stop alarm
-
-compromising a node should permanent set utility off?
-
-it is not at all clear that i have to toggle that thingy in information panel to disable the alarm system! it even confused me!
-    1. no node UI information re: utility status
-    2. something doesn't feel right about lock / compromised
-        lock is not clear from node UI- there could be a "LOCKED" statement
-
-reconnect all levels
-keys & status bar
+no icons in power view
+yamachi level started w/o/ objective data

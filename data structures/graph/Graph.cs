@@ -181,9 +181,10 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         foreach (KeyValuePair<string, T> kvp in nodes) {
             if (kvp.Value.fixedVisibility) {
                 kvp.Value.visibility = NodeVisibility.known;
-                foreach (string neighborId in edges[kvp.Value.idn]) {
-                    SetEdgeVisibility(kvp.Value.idn, neighborId, EdgeVisibility.known);
-                }
+                if (edges.ContainsKey(kvp.Value.idn))
+                    foreach (string neighborId in edges[kvp.Value.idn]) {
+                        SetEdgeVisibility(kvp.Value.idn, neighborId, EdgeVisibility.known);
+                    }
             }
         }
     }

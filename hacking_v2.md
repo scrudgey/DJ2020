@@ -1006,6 +1006,14 @@ use password on info panel
 
 attack vector path does not include player renderer
 
+it is not at all clear that i have to toggle that thingy in information panel to disable the alarm system! it even confused me!
+    1. no node UI information re: utility status
+    2. something doesn't feel right about lock / compromised
+        lock is not clear from node UI- there could be a "LOCKED" statement
+
+orange reserved for unlocked
+
+
 # other grids
 
 power 

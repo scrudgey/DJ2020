@@ -77,15 +77,14 @@ public partial class GameManager : Singleton<GameManager> {
     public void SetAlarmNodeTriggered(AlarmNode node, bool state) {
         if (applicationIsQuitting) return;
         if (node == null) return;
-        if (node.getEnabled()) {
-            node.alarmTriggered = state;
-            if (state) {
-                node.countdownTimer = 30f;
-            } else {
-                node.countdownTimer = 0f;
-            }
-            RefreshAlarmGraph();
+        if (state && node.getEnabled()) {
+            node.alarmTriggered = true;
+            node.countdownTimer = 30f;
+        } else {
+            node.alarmTriggered = false;
+            node.countdownTimer = 0f;
         }
+        RefreshAlarmGraph();
     }
     public bool GetAlarmNodeTriggered(AlarmComponent alarmComponent) {
         if (applicationIsQuitting) return false;
