@@ -132,9 +132,6 @@ public partial class GameManager : Singleton<GameManager> {
 
         state.delta.cyberGraph.ApplyObjectiveData(dataObjectives);
 
-
-
-
         MusicController.I.LoadTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);

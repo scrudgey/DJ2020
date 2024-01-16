@@ -82,6 +82,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             CyberNode target = Toolbox.RandomFromList(dataNodes);
             target.payData = objective.targetPaydata;
             dataNodes.Remove(target);
+            Debug.Log($"[objective data] applying objective data {objective.name}:{objective.targetPaydata} -> {target.nodeTitle}:{target.idn}");
         }
     }
     public void AddNetworkAction(NetworkAction action) {

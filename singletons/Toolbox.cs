@@ -507,10 +507,17 @@ public class Toolbox {
     }
 
     public static Texture2D RenderToTexture2D(RenderTexture rTex) {
-        Texture2D tex = new Texture2D(1024, 1024, TextureFormat.RGB24, false);
+        Texture2D tex = new Texture2D(1024, 1024, TextureFormat.RGBA32, false);
         // ReadPixels looks at the active RenderTexture.
         RenderTexture.active = rTex;
         tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        for (int i = 0, j = tex.width; i < j; i += 1) {
+            for (int k = 0, l = tex.height; k < l; k += 1) {
+                if (tex.GetPixel(i, k) == Color.black) {
+                    tex.SetPixel(i, k, Color.clear);
+                }
+            }
+        }
         tex.Apply();
         return tex;
     }

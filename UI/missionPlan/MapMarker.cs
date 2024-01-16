@@ -30,6 +30,7 @@ public class MapMarker : MonoBehaviour {
     public static void WriteMapImage(string levelName, string sceneName, Texture2D tex, int floorNumber) {
         byte[] bytes = tex.EncodeToPNG();
         string path = MapMarker.MapPath(levelName, sceneName, floorNumber);
+        Debug.Log($"writing {path}...");
         System.IO.File.WriteAllBytes(path, bytes);
     }
 

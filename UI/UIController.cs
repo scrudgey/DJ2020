@@ -38,6 +38,7 @@ public class UIController : MonoBehaviour {
     public SaveIndicatorController saveIndicatorController;
     public WeaponWheelController weaponWheelController;
     public TargetPracticeUIHandler targetPracticeUIHandler;
+    public UIStatusBarHandler statusBarHandler;
     public bool mouseOverScrollBox;
     bool burglarMode;
     void Awake() {
@@ -55,6 +56,7 @@ public class UIController : MonoBehaviour {
         lockIndicatorHandler.UICamera = Camera.main;
         playerCalloutHandler.UICamera = Camera.main;
         playerArrowCalloutHandler.UICamera = Camera.main;
+        statusBarHandler.UICamera = Camera.main;
         // hackDisplay.cam = Camera.main;
         caption.text = "";
 
@@ -73,6 +75,7 @@ public class UIController : MonoBehaviour {
         weaponWheelController.HideWheel();
         weaponWheelController.Initialize();
         targetPracticeUIHandler.canvas.enabled = false;
+        statusBarHandler.Initialize();
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);

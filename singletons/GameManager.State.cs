@@ -9,26 +9,42 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<LootData, GameData> OnLootChange;
     public static Action<PayData, GameData> OnPayDataChange;
     public static Action<int, String> OnItemPickup;
+    public static Action<StatusUpdateData> OnGameStateChange;
     int lastObjectivesStatusHashCode;
 
-    public void AddPayDatas(PayData data) {
+    public void AddPayDatas(PayData data, Vector3 position) {
         gameData.levelState.delta.levelAcquiredPaydata.Add(data);
         CheckObjectives();
         OnPayDataChange?.Invoke(data, gameData);
+        OnGameStateChange?.Invoke(new StatusUpdateData() {
+            type = StatusUpdateData.StatusType.data,
+            increment = 1,
+            originLocation = position
+        });
     }
 
-    public void AddCredits(int amount) {
+    public void AddCredits(int amount, Vector3 position) {
         // gameData.playerState.credits += amount;
         gameData.levelState.delta.levelAcquiredCredits += amount;
         CheckObjectives();
         OnItemPickup?.Invoke(1, $"{amount}");
+        OnGameStateChange?.Invoke(new StatusUpdateData() {
+            type = StatusUpdateData.StatusType.credit,
+            increment = amount,
+            originLocation = position
+        });
     }
-    public void CollectLoot(LootData data) {
+    public void CollectLoot(LootData data, Vector3 position) {
         gameData.levelState.delta.levelAcquiredLoot.Add(data);
         OnLootChange?.Invoke(data, gameData);
         CheckObjectives();
+        OnGameStateChange?.Invoke(new StatusUpdateData() {
+            type = StatusUpdateData.StatusType.loot,
+            increment = 1,
+            originLocation = position
+        });
     }
-    public void AddKey(int keyId, DoorLock.LockType type) {
+    public void AddKey(int keyId, DoorLock.LockType type, Vector3 position) {
         switch (type) {
             case DoorLock.LockType.physical:
                 AddPhysicalKey(keyId);
@@ -37,6 +53,11 @@ public partial class GameManager : Singleton<GameManager> {
                 AddKeyCard(keyId);
                 break;
         }
+        OnGameStateChange?.Invoke(new StatusUpdateData() {
+            type = StatusUpdateData.StatusType.key,
+            increment = 1,
+            originLocation = position
+        });
     }
     public void AddPhysicalKey(int keyId) {
         gameData.playerState.physicalKeys.Add(keyId);

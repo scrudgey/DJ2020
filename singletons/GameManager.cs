@@ -230,6 +230,7 @@ public partial class GameManager : Singleton<GameManager> {
                 }
                 break;
             case MenuType.escapeMenu:
+                // TODO: change this?
                 if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
                     LoadScene("EscapeMenu", callback, unloadAll: false);
                 }
