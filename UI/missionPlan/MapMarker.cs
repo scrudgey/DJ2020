@@ -68,6 +68,7 @@ public record MapMarkerData {
     public string markerName;
     public string description;
     public Vector2 position;
+    public Vector3 worldPosition;
 }
 
 

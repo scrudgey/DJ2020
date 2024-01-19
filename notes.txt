@@ -3612,20 +3612,27 @@ information to show:
 
 Don’t think I’ve ever done this, but could you have the shader round the texture coords to the nearest 1/100th? Something like: 
 IN.uv.x = (frac(IN.uv.x/100)*100; (same for y, unless frac is a vector operation.)
-
 Then get fancy and have the 100 be a 
 
-map screen:
-    allow player to move view, rotate, zoom
-    show location of player 
-    show  other map markers
-    show legend
-    select floor
 
-
-1. dynamically load map display per level
+* dynamically load map display per level
     update a few more map images
-2. allow player to change floors
-2. allow player to move, rotate, zoom
-3. display player location
-4. display other locations
+* allow player to change floors
+* display other locations
+* display player location
+
+allow player to 
+    * rotate
+    move
+    zoom
+visibility of floors
+show legend
+
+
+display player location:
+    player location is dynamic
+
+when overlaying a map marker on the map, the position is dynamic.
+    map marker positions must update
+    map marker positions must be placed in 3d projected onto 2d map image display.
+        map marker (world position) -> quad location (x, z) -> camera 

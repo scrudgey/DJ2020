@@ -70,15 +70,15 @@ Shader "Custom/MaskedUIBlur" {
  
                     #define GRABPIXEL(weight,kernelx) tex2Dproj( _HBlur, UNITY_PROJ_COORD(float4(i.uvgrab.x + _HBlur_TexelSize.x * kernelx * _Size * alpha, i.uvgrab.y, i.uvgrab.z, i.uvgrab.w))) * weight
  
-                    // sum += GRABPIXEL(0.05, -4.0) ;
-                    // sum += GRABPIXEL(0.09, -3.0) ;
-                    // sum += GRABPIXEL(0.12, -2.0) ;
-                    // sum += GRABPIXEL(0.15, -1.0) ;
-                    // sum += GRABPIXEL(0.18,  0.0) ;
-                    // sum += GRABPIXEL(0.15, +1.0) ;
-                    // sum += GRABPIXEL(0.12, +2.0) ;
-                    // sum += GRABPIXEL(0.09, +3.0) ;
-                    // sum += GRABPIXEL(0.05, +4.0) ;
+                    sum += GRABPIXEL(0.05, -4.0) ;
+                    sum += GRABPIXEL(0.09, -3.0) ;
+                    sum += GRABPIXEL(0.12, -2.0) ;
+                    sum += GRABPIXEL(0.15, -1.0) ;
+                    sum += GRABPIXEL(0.18,  0.0) ;
+                    sum += GRABPIXEL(0.15, +1.0) ;
+                    sum += GRABPIXEL(0.12, +2.0) ;
+                    sum += GRABPIXEL(0.09, +3.0) ;
+                    sum += GRABPIXEL(0.05, +4.0) ;
 
 
                     // sum += GRABPIXEL(1, -4.0) ;
@@ -95,9 +95,9 @@ Shader "Custom/MaskedUIBlur" {
                     // sum += GRABPIXEL(0.05, -4.0) ;
                     // sum += GRABPIXEL(0.09, -3.0) ;
                     // sum += GRABPIXEL(0.12, -2.0) ;
-                    sum += GRABPIXEL(1, -1.0) ;
-                    sum += GRABPIXEL(1,  0.0) ;
-                    sum += GRABPIXEL(1, +1.0) ;
+                    // sum += GRABPIXEL(1, -1.0) ;
+                    // sum += GRABPIXEL(1,  0.0) ;
+                    // sum += GRABPIXEL(1, +1.0) ;
                     // sum += GRABPIXEL(0.12, +2.0) ;
                     // sum += GRABPIXEL(0.09, +3.0) ;
                     // sum += GRABPIXEL(0.05, +4.0) ;
@@ -166,15 +166,15 @@ Shader "Custom/MaskedUIBlur" {
  
                     #define GRABPIXEL(weight,kernely) tex2Dproj( _VBlur, UNITY_PROJ_COORD(float4(i.uvgrab.x, i.uvgrab.y + _VBlur_TexelSize.y * kernely * _Size * alpha, i.uvgrab.z, i.uvgrab.w))) * weight
  
-                    // sum += GRABPIXEL(0.05, -4.0) ;
-                    // sum += GRABPIXEL(0.09, -3.0) ;
-                    // sum += GRABPIXEL(0.12, -2.0) ;
-                    // sum += GRABPIXEL(0.15, -1.0) ;
-                    // sum += GRABPIXEL(0.18,  0.0) ;
-                    // sum += GRABPIXEL(0.15, +1.0) ;
-                    // sum += GRABPIXEL(0.12, +2.0) ;
-                    // sum += GRABPIXEL(0.09, +3.0) ;
-                    // sum += GRABPIXEL(0.05, +4.0) ;
+                    sum += GRABPIXEL(0.05, -4.0) ;
+                    sum += GRABPIXEL(0.09, -3.0) ;
+                    sum += GRABPIXEL(0.12, -2.0) ;
+                    sum += GRABPIXEL(0.15, -1.0) ;
+                    sum += GRABPIXEL(0.18,  0.0) ;
+                    sum += GRABPIXEL(0.15, +1.0) ;
+                    sum += GRABPIXEL(0.12, +2.0) ;
+                    sum += GRABPIXEL(0.09, +3.0) ;
+                    sum += GRABPIXEL(0.05, +4.0) ;
 
 
                     // sum += GRABPIXEL(1, -4.0) ;
@@ -191,9 +191,9 @@ Shader "Custom/MaskedUIBlur" {
                     // sum += GRABPIXEL(0.05, -4.0) ;
                     // sum += GRABPIXEL(0.09, -3.0) ;
                     // sum += GRABPIXEL(0.12, -2.0) ;
-                    sum += GRABPIXEL(1, -1.0) ;
-                    sum += GRABPIXEL(1,  0.0) ;
-                    sum += GRABPIXEL(1, +1.0) ;
+                    // sum += GRABPIXEL(1, -1.0) ;
+                    // sum += GRABPIXEL(1,  0.0) ;
+                    // sum += GRABPIXEL(1, +1.0) ;
                     // sum += GRABPIXEL(0.12, +2.0) ;
                     // sum += GRABPIXEL(0.09, +3.0) ;
                     // sum += GRABPIXEL(0.05, +4.0) ;

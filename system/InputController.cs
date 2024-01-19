@@ -42,6 +42,7 @@ public class InputController : Singleton<InputController> {
 
     private Vector2 inputVector;
     private bool firePressedHeld;
+    private bool rightClickHeld;
     private bool mouseDown;
     private bool mouseClickedThisFrame;
     private bool firePressedThisFrame;
@@ -126,6 +127,7 @@ public class InputController : Singleton<InputController> {
     public void HandleActionButtonAction(InputAction.CallbackContext ctx) {
         if (ctx.ReadValueAsButton()) {
             actionButtonPressedThisFrame = ctx.ReadValueAsButton();
+            rightClickHeld = ctx.ReadValueAsButton();
         }
     }
     public void HandleNextItemAction(InputAction.CallbackContext ctx) {
@@ -154,6 +156,9 @@ public class InputController : Singleton<InputController> {
     public void HandleFireActionCanceled(InputAction.CallbackContext ctx) {
         firePressedHeld = false;
         mouseDown = false;
+    }
+    public void HandleRightClickActionCanceled(InputAction.CallbackContext ctx) {
+        rightClickHeld = false;
     }
     public void HandleCrouchActionCanceled(InputAction.CallbackContext ctx) {
         crouchHeld = false;
@@ -215,6 +220,7 @@ public class InputController : Singleton<InputController> {
         useItem.action.performed += HandleUseItemAction;
         // Button up
         FireAction.action.canceled += HandleFireActionCanceled;
+        actionButton.action.canceled += HandleRightClickActionCanceled;
         CrouchAction.action.canceled += HandleCrouchActionCanceled;
         RunAction.action.canceled += HandleRunActionCanceled;
         MoveAction.action.canceled += HandleMoveActionCanceled;
@@ -262,6 +268,7 @@ public class InputController : Singleton<InputController> {
         useItem.action.performed -= HandleUseItemAction;
         // Button up
         FireAction.action.canceled -= HandleFireActionCanceled;
+        actionButton.action.canceled -= HandleRightClickActionCanceled;
         CrouchAction.action.canceled -= HandleCrouchActionCanceled;
         RunAction.action.canceled -= HandleRunActionCanceled;
         MoveAction.action.canceled -= HandleMoveActionCanceled;
@@ -306,6 +313,8 @@ public class InputController : Singleton<InputController> {
             revealWeaponWheelHeld = false;
         }
 
+        Debug.Log(rightClickHeld);
+
         characterInputs = new PlayerInput() {
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
@@ -332,6 +341,7 @@ public class InputController : Singleton<InputController> {
             rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
             zoomInput = zoomInput,
             mouseDown = mouseDown,
+            rightMouseDown = rightClickHeld,
             mouseClicked = mouseClick,
             escapePressed = escapePressedThisFrame,
             mousePosition = mousePosition,

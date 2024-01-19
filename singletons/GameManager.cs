@@ -463,42 +463,49 @@ public partial class GameManager : Singleton<GameManager> {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
 
         PlayerInput playerInput = PlayerInput.none;
+        playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
+
+        // TODO: probably a better way of handling this
         if (Time.timeScale > 0) {
-            playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
+
             if (gameData.levelState != null)
                 uiController?.UpdateWithPlayerInput(ref playerInput);
+            // }
+
+            UpdateCursor(uiclick, playerInput);
+
+            CameraInput input = default;
+            if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
+                input = uiController.GetOverlayCameraInput();
+                // clearSighterV3.temporaryFollowTransform = 
+                if (uiController.mouseOverScrollBox) {
+                    playerInput.zoomInput = Vector2.zero;
+                }
+                foreach (IInputReceiver i in inputReceivers) {
+                    // Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
+                    // playerInput.lookAtDirection = directionToCursor;
+                    i.SetInputs(PlayerInput.none);
+                }
+                characterCamera.SetInputs(playerInput);
+
+            } else {
+                input = playerCharacterController.BuildCameraInput();
+                foreach (IInputReceiver i in inputReceivers) {
+                    Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
+                    playerInput.lookAtDirection = directionToCursor;
+                    i.SetInputs(playerInput);
+                }
+            }
+
+            characterCamera.UpdateWithInput(input);
         }
-
-        UpdateCursor(uiclick, playerInput);
-
-        CameraInput input = default;
-        if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
-            input = uiController.GetOverlayCameraInput();
-            // clearSighterV3.temporaryFollowTransform = 
-            if (uiController.mouseOverScrollBox) {
-                playerInput.zoomInput = Vector2.zero;
-            }
-            foreach (IInputReceiver i in inputReceivers) {
-                // Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
-                // playerInput.lookAtDirection = directionToCursor;
-                i.SetInputs(PlayerInput.none);
-            }
-            characterCamera.SetInputs(playerInput);
-
-        } else {
-            input = playerCharacterController.BuildCameraInput();
-            foreach (IInputReceiver i in inputReceivers) {
-                Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
-                playerInput.lookAtDirection = directionToCursor;
-                i.SetInputs(playerInput);
-            }
-        }
-
-        characterCamera.UpdateWithInput(input);
 
         if (playerInput.incrementOverlay != 0) {
             IncrementOverlay(playerInput.incrementOverlay);
         }
+
+        // kind of weird
+        EscapeMenuController.UpdateWithPlayerInput(playerInput);
     }
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();

@@ -55,6 +55,11 @@ public class LevelTemplate : ScriptableObject {
     public StrikeTeamCompletionThreshold strikeCompletionThreshold;
     public StrikeTeamCompletionBehavior strikeTeamCompletion;
 
+    [Header("map")]
+    public Vector3 mapOrigin;
+    public Vector3 mapUnitNorth;
+    public Vector3 mapUnitEast;
+
 
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/missions/{name}/{name}") as LevelTemplate);

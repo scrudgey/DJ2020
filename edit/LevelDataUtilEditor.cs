@@ -77,7 +77,7 @@ public class LevelDataUtilEditor : Editor {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
             Vector3 position = component.NodePosition();
-            Debug.Log($"{idn}: {component}");
+            // Debug.Log($"{idn}: {component}");
             component.idn = idn;
             component.enabled = true;
             // new node with idn
@@ -147,11 +147,22 @@ public class LevelDataUtilEditor : Editor {
             string idn = guid.ToString();
             marker.data.position = mapCam.WorldToViewportPoint(marker.transform.position);
             marker.data.idn = idn;
+            marker.data.worldPosition = marker.transform.position;
             datas.Add(marker.data);
             EditorUtility.SetDirty(marker);
         }
         Debug.Log($"writing {datas.Count} map marker data...");
         MapMarker.WriteMapMetaData(levelName, sceneName, datas);
+
+
+        Vector3 mapOrigin = mapCam.WorldToViewportPoint(Vector3.zero);
+        Vector3 mapNorthPoint = mapCam.WorldToViewportPoint(new Vector3(1f, 0f, 0f));
+        Vector3 mapEastPoint = mapCam.WorldToViewportPoint(new Vector3(0f, 0f, 1f));
+        template.mapOrigin = mapOrigin;
+        template.mapUnitNorth = mapNorthPoint - mapOrigin;
+        template.mapUnitEast = mapEastPoint - mapOrigin;
+
+        EditorUtility.SetDirty(template);
     }
 
 }

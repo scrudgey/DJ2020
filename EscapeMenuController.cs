@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 public class EscapeMenuController : MonoBehaviour {
+    static PlayerInput playerInput;
+
     public GameObject UIEditorCamera;
     public Transform objectivesContainer;
     public GameObject objectiveIndicatorPrefab;
-
+    public MapDisplay3DView mapDisplayView;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
@@ -21,7 +25,13 @@ public class EscapeMenuController : MonoBehaviour {
             PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();
             controller.Configure(objective, gameData);
         }
+        mapDisplayView.Initialize(gameData.levelState.template);
     }
+
+    void Update() {
+        mapDisplayView.UpdateWithInput(playerInput);
+    }
+
     public void ContinueButtonCallback() {
         GameManager.I.CloseMenu();
     }
@@ -35,5 +45,9 @@ public class EscapeMenuController : MonoBehaviour {
 
     public void SkillMenuCallback() {
         GameManager.I.ShowPerkMenu();
+    }
+
+    public static void UpdateWithPlayerInput(PlayerInput input) {
+        playerInput = input;
     }
 }
