@@ -313,8 +313,6 @@ public class InputController : Singleton<InputController> {
             revealWeaponWheelHeld = false;
         }
 
-        Debug.Log(rightClickHeld);
-
         characterInputs = new PlayerInput() {
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,

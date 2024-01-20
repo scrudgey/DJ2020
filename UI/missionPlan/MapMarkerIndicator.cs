@@ -95,21 +95,9 @@ public class MapMarkerIndicator : MonoBehaviour {
         rectTransform.anchoredPosition = data.position * parentRect.rect.width;
     }
     public void SetPosition(Vector3 worldPosition, int floorNumber, LevelTemplate template, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect) {
-        // transform to quad position
-        Vector2 quadPosition = new Vector2(
-            template.mapUnitNorth.x * worldPosition.x,
-            template.mapUnitEast.y * worldPosition.z) + new Vector2(template.mapOrigin.x, template.mapOrigin.y);
+        Vector3 generatorPosition = mapDisplay3Dgenerator.WorldToQuadPosition(worldPosition, floorNumber);
 
-        // transform to map generator position
-        MeshRenderer quad = mapDisplay3Dgenerator.quads[0];
-        Vector3 generatorPosition = new Vector3(
-                quad.bounds.extents.x * quadPosition.x * 2,
-                0f,
-                quad.bounds.extents.z * quadPosition.y * 2) + quad.transform.position - quad.bounds.extents;
-
-        generatorPosition.y += floorNumber * 0.125f;
-
-        Debug.DrawLine(worldPosition, generatorPosition, Color.red, 1f);
+        // Debug.DrawLine(worldPosition, generatorPosition, Color.red, 1f);
 
         Vector3 viewPosition = mapDisplay3Dgenerator.mapCamera.WorldToViewportPoint(generatorPosition);
 

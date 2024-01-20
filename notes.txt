@@ -3626,6 +3626,7 @@ Then get fancy and have the 100 be a
     * zoom
 * visibility of floors
 
+properly handle floor level for player
 show legend
 flavor
 zoom buttons
@@ -3634,3 +3635,7 @@ mode buttons
     click two: reset to (0, 0) with rotation
 show objective makers
 connect objectives with markers in map when clicked
+
+time to separate model, view, and control.
+    view binds to map display 3d view
+    marker is part of view, markerdata is part of model

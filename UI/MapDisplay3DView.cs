@@ -4,7 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class MapDisplay3DView : MonoBehaviour {
+public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public MapDisplay3DGenerator mapDisplay3Dgenerator;
     [Header("floor indicators")]
     public Transform floorPipContainer;
@@ -45,9 +45,10 @@ public class MapDisplay3DView : MonoBehaviour {
                 pip.enabled = false;
             }
         }
-        InitializeMapMarkers(template);
 
         mapDisplay3Dgenerator.Initialize(this, template, mapImages);
+
+        InitializeMapMarkers(template);
     }
 
     public void UpdateWithInput(PlayerInput playerInput) {
@@ -68,7 +69,7 @@ public class MapDisplay3DView : MonoBehaviour {
         foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
             kvp.Value.SetPosition(kvp.Key.worldPosition, kvp.Key.floorNumber, template, mapDisplay3Dgenerator, markerContainer);
         }
-        playerMarker.SetPosition(GameManager.I.playerPosition, 0, template, mapDisplay3Dgenerator, markerContainer);
+        playerMarker?.SetPosition(GameManager.I.playerPosition, 0, template, mapDisplay3Dgenerator, markerContainer);
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
     }
 

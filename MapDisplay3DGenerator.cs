@@ -1,9 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class MapDisplay3DGenerator : MonoBehaviour {
+public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenerator> {
+    enum Mode { playerfocus, rotate }
+    public Action<MapDisplay3DGenerator> OnValueChanged { get; set; }
+    Mode mode;
     MapDisplay3DView mapDisplayView;
     public List<MeshRenderer> quads;
     public Material materialFloorHidden;
@@ -27,15 +31,15 @@ public class MapDisplay3DGenerator : MonoBehaviour {
     Vector3 origin;
     float zoomFloatAmount;
     int zoomLevel;
+    LevelTemplate template;
     public void Initialize(MapDisplay3DView mapDisplayView, LevelTemplate template, List<Texture2D> mapImages) {
         this.mapDisplayView = mapDisplayView;
         this.mapImages = mapImages;
+        this.template = template;
 
         numberFloors = mapImages.Count;
         currentFloor = 0;
         theta = 3.925f;
-        thetaVelocity = 0.5f;
-        origin = Vector3.zero;
 
         for (int i = 0; i < quads.Count; i++) {
             MeshRenderer renderer = quads[i];
@@ -50,6 +54,7 @@ public class MapDisplay3DGenerator : MonoBehaviour {
         zoomFloatAmount = 1.5f;
         SetZoomLevel(1);
         SelectFloor(0, 0);
+        ChangeMode(Mode.rotate);
     }
 
 
@@ -66,15 +71,16 @@ public class MapDisplay3DGenerator : MonoBehaviour {
             origin += translation * timeDelta * mapCamera.orthographicSize;
             origin = Vector3.ClampMagnitude(origin, 1f);
         }
-        zoomFloatAmount += input.zoomInput.y * timeDelta;
+        HandleZoomInput(input.zoomInput.y * timeDelta);
+    }
+    void HandleZoomInput(float increment) {
+        zoomFloatAmount += increment;
         zoomFloatAmount = Mathf.Min(zoomFloatAmount, 4f);
         zoomFloatAmount = Mathf.Max(zoomFloatAmount, 0f);
 
-        // Debug.Log($"{zoomFloatAmount} {(int)zoomFloatAmount}");
         if ((int)zoomFloatAmount != zoomLevel) {
             SetZoomLevel((int)zoomFloatAmount);
         }
-
     }
     void Update() {
         theta += thetaVelocity * Time.unscaledDeltaTime;
@@ -83,8 +89,6 @@ public class MapDisplay3DGenerator : MonoBehaviour {
         } else if (theta > 6.28) {
             theta -= 6.28f;
         }
-        // theta = Mathf.Min(theta, )
-        // TODO: allow floating origin
 
         float y = 1.375f + (0.125f * currentFloor);
         float x = 1.412f * Mathf.Cos(theta);
@@ -101,7 +105,6 @@ public class MapDisplay3DGenerator : MonoBehaviour {
         Quaternion targetRotation = Quaternion.Euler(rotX, rotY, rotZ);
 
         Vector3 targetPosition = new Vector3(x, y, z) + origin;
-        // Vector3 updatedPosition = Vector3.Lerp(cameraTransform.localPosition, targetPosition, 0.5f);
         Vector3 updatedPosition = targetPosition;
 
         cameraTransform.localPosition = updatedPosition;
@@ -116,6 +119,30 @@ public class MapDisplay3DGenerator : MonoBehaviour {
         SelectFloor(currentFloor, targetFloor);
     }
 
+    public void ZoomIncrementButtonCallback(int increment) {
+        HandleZoomInput(increment);
+    }
+    public void ModeButtonCallback() {
+        Mode newMode = mode switch {
+            Mode.playerfocus => Mode.rotate,
+            Mode.rotate => Mode.playerfocus,
+            _ => Mode.rotate
+        };
+        ChangeMode(newMode);
+    }
+    void ChangeMode(Mode newMode) {
+        mode = newMode;
+        switch (mode) {
+            case Mode.playerfocus:
+                origin = WorldToQuadPosition(GameManager.I.playerPosition, 0);
+                thetaVelocity = 0f;
+                break;
+            case Mode.rotate:
+                thetaVelocity = 0.5f;
+                origin = Vector3.zero;
+                break;
+        }
+    }
     void SelectFloor(int fromFloor, int toFloor) {
         for (int i = 0; i < quads.Count; i++) {
             MeshRenderer renderer = quads[i];
@@ -133,7 +160,6 @@ public class MapDisplay3DGenerator : MonoBehaviour {
                 renderer.material.mainTexture = mapImages[i];
             }
         }
-
         mapDisplayView.OnFloorSelected(fromFloor, toFloor);
         currentFloor = toFloor;
     }
@@ -171,5 +197,23 @@ public class MapDisplay3DGenerator : MonoBehaviour {
     }
     public string GetStatsString() {
         return $"{zoomFloatAmount:F2}\n{theta:F2}\n({origin.x:F2}, {origin.z:F2})";
+    }
+
+    public Vector3 WorldToQuadPosition(Vector3 worldPosition, int floorNumber) {
+        // transform to quad position
+        Vector2 quadPosition = new Vector2(
+            template.mapUnitNorth.x * worldPosition.x,
+            template.mapUnitEast.y * worldPosition.z) + new Vector2(template.mapOrigin.x, template.mapOrigin.y);
+
+        // transform to map generator position
+        MeshRenderer quad = quads[0];
+        Vector3 generatorPosition = new Vector3(
+                quad.bounds.extents.x * quadPosition.x * 2,
+                0f,
+                quad.bounds.extents.z * quadPosition.y * 2) + quad.transform.position - quad.bounds.extents;
+
+        generatorPosition.y += floorNumber * 0.125f;
+
+        return generatorPosition;
     }
 }
