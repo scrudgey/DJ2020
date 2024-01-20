@@ -5,17 +5,17 @@ public class PixelUpscaleRender : MonoBehaviour {
     public Camera myCamera;
     public Material material;
     public bool applyFilter;
-    public RenderTexture half;
-    public RenderTexture intermediate;
+    public RenderTexture small;
+    public RenderTexture large;
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
-        half.filterMode = FilterMode.Point;
+        small.filterMode = FilterMode.Point;
         source.filterMode = FilterMode.Point;
         destination.filterMode = FilterMode.Point;
         if (applyFilter) {
-            Graphics.Blit(source, intermediate, material);
-            Graphics.Blit(intermediate, half);
+            Graphics.Blit(source, large, material);
+            Graphics.Blit(large, small);
         } else {
-            Graphics.Blit(source, half);
+            Graphics.Blit(source, small);
         }
     }
 }

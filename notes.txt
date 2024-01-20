@@ -3620,19 +3620,17 @@ Then get fancy and have the 100 be a
 * allow player to change floors
 * display other locations
 * display player location
-
-allow player to 
+* allow player to 
     * rotate
-    move
-    zoom
-visibility of floors
+    * move
+    * zoom
+* visibility of floors
+
 show legend
-
-
-display player location:
-    player location is dynamic
-
-when overlaying a map marker on the map, the position is dynamic.
-    map marker positions must update
-    map marker positions must be placed in 3d projected onto 2d map image display.
-        map marker (world position) -> quad location (x, z) -> camera 
+flavor
+zoom buttons
+mode buttons
+    click one: center on player
+    click two: reset to (0, 0) with rotation
+show objective makers
+connect objectives with markers in map when clicked

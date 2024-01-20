@@ -9,6 +9,7 @@ public class MapDisplay3DView : MonoBehaviour {
     [Header("floor indicators")]
     public Transform floorPipContainer;
     public TextMeshProUGUI floorNumberCaption;
+    public TextMeshProUGUI statsView;
     public Color selectedColor;
     public Color deselectedColor;
     [Header("map markers")]
@@ -22,7 +23,7 @@ public class MapDisplay3DView : MonoBehaviour {
     List<Image> floorPips;
     bool mouseOverMap;
     bool mapEngaged;
-    public enum MouseHeldType { left, right }
+    public enum MouseHeldType { none, left, right }
     MouseHeldType mouseHeldType;
 
     List<MapMarkerData> mapData;
@@ -58,14 +59,17 @@ public class MapDisplay3DView : MonoBehaviour {
             mouseHeldType = MouseHeldType.left;
         } else if (!playerInput.mouseDown && !playerInput.rightMouseDown) {
             mapEngaged = false;
+            mouseHeldType = MouseHeldType.none;
         }
-        if (mapEngaged) {
+
+        if (mouseOverMap || mapEngaged) {
             mapDisplay3Dgenerator.UpdateWithInput(playerInput, Time.unscaledDeltaTime, mouseHeldType);
         }
         foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
             kvp.Value.SetPosition(kvp.Key.worldPosition, kvp.Key.floorNumber, template, mapDisplay3Dgenerator, markerContainer);
         }
         playerMarker.SetPosition(GameManager.I.playerPosition, 0, template, mapDisplay3Dgenerator, markerContainer);
+        statsView.text = mapDisplay3Dgenerator.GetStatsString();
     }
 
 
@@ -76,7 +80,7 @@ public class MapDisplay3DView : MonoBehaviour {
         mouseOverMap = false;
     }
     public void OnFloorSelected(int fromFloor, int toFloor) {
-        floorNumberCaption.text = $"floor {toFloor}";
+        floorNumberCaption.text = $"{template.sceneDescriptor}: floor {toFloor}";
         floorPips[fromFloor].color = deselectedColor;
         floorPips[toFloor].color = selectedColor;
         DisplayMapMarkers(toFloor);
