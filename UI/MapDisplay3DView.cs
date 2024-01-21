@@ -16,109 +16,82 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public RectTransform markerContainer;
     public GameObject mapMarkerPrefab;
     public RectTransform mapRect;
-
     Dictionary<MapMarkerData, MapMarkerIndicator> indicators;
     MapMarkerIndicator playerMarker;
-
     List<Image> floorPips;
-    bool mouseOverMap;
-    bool mapEngaged;
-    public enum MouseHeldType { none, left, right }
-    MouseHeldType mouseHeldType;
-
-    List<MapMarkerData> mapData;
-
     int numberFloors;
     LevelTemplate template;
-    public void Initialize(LevelTemplate template) {
-        this.template = template;
-        List<Texture2D> mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
-        mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
-        numberFloors = mapImages.Count;
+    LevelPlan plan;
 
+    public void Initialize(LevelState levelState) {
+        this.template = levelState.template;
+        this.plan = levelState.plan;
         floorPips = new List<Image>();
-        for (int i = floorPipContainer.childCount - 1; i >= 0; i--) {
-            Transform pipChild = floorPipContainer.GetChild(i);
-            Image pip = pipChild.GetComponent<Image>();
-            floorPips.Add(pip);
-            if (i > numberFloors) {
-                pip.enabled = false;
-            }
-        }
 
-        mapDisplay3Dgenerator.Initialize(this, template, mapImages);
-
-        InitializeMapMarkers(template);
-    }
-
-    public void UpdateWithInput(PlayerInput playerInput) {
-        if (playerInput.rightMouseDown && mouseOverMap && !mapEngaged) {
-            mapEngaged = true;
-            mouseHeldType = MouseHeldType.right;
-        } else if (playerInput.mouseDown && mouseOverMap && !mapEngaged) {
-            mapEngaged = true;
-            mouseHeldType = MouseHeldType.left;
-        } else if (!playerInput.mouseDown && !playerInput.rightMouseDown) {
-            mapEngaged = false;
-            mouseHeldType = MouseHeldType.none;
-        }
-
-        if (mouseOverMap || mapEngaged) {
-            mapDisplay3Dgenerator.UpdateWithInput(playerInput, Time.unscaledDeltaTime, mouseHeldType);
-        }
-        foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
-            kvp.Value.SetPosition(kvp.Key.worldPosition, kvp.Key.floorNumber, template, mapDisplay3Dgenerator, markerContainer);
-        }
-        playerMarker?.SetPosition(GameManager.I.playerPosition, 0, template, mapDisplay3Dgenerator, markerContainer);
-        statsView.text = mapDisplay3Dgenerator.GetStatsString();
-    }
-
-
-    public void OnMouseOverMap() {
-        mouseOverMap = true;
-    }
-    public void OnMouseExitMap() {
-        mouseOverMap = false;
-    }
-    public void OnFloorSelected(int fromFloor, int toFloor) {
-        floorNumberCaption.text = $"{template.sceneDescriptor}: floor {toFloor}";
-        floorPips[fromFloor].color = deselectedColor;
-        floorPips[toFloor].color = selectedColor;
-        DisplayMapMarkers(toFloor);
-    }
-    void InitializeMapMarkers(LevelTemplate template) {
         foreach (Transform child in markerContainer) {
             if (child.name == "mapview") continue;
             Destroy(child.gameObject);
         }
         indicators = new Dictionary<MapMarkerData, MapMarkerIndicator>();
-        foreach (MapMarkerData data in mapData) {
-            GameObject objM = GameObject.Instantiate(mapMarkerPrefab);
-            objM.transform.SetParent(markerContainer, false);
-            MapMarkerIndicator indicator = objM.GetComponent<MapMarkerIndicator>();
-            indicator.Configure(data, template, mapDisplay3Dgenerator, markerContainer);
-            indicators[data] = indicator;
 
-            // why is this required?
-            foreach (MonoBehaviour component in objM.GetComponentsInChildren<MonoBehaviour>()) {
-                component.enabled = true;
+        for (int i = floorPipContainer.childCount - 1; i >= 0; i--) {
+            Transform pipChild = floorPipContainer.GetChild(i);
+            Image pip = pipChild.GetComponent<Image>();
+            floorPips.Add(pip);
+        }
+
+        mapDisplay3Dgenerator.Initialize(levelState.template);
+        Bind(mapDisplay3Dgenerator.gameObject);
+    }
+    MapMarkerIndicator SpawnNewMapMarker() {
+        GameObject objM = GameObject.Instantiate(mapMarkerPrefab);
+        objM.transform.SetParent(markerContainer, false);
+        MapMarkerIndicator indicator = objM.GetComponent<MapMarkerIndicator>();
+
+        // // why is this required?
+        // foreach (MonoBehaviour component in objM.GetComponentsInChildren<MonoBehaviour>()) {
+        //     component.enabled = true;
+        // }
+        return indicator;
+    }
+
+    //view
+    override public void HandleValueChanged(MapDisplay3DGenerator generator) {
+        for (int i = floorPipContainer.childCount - 1; i >= 0; i--) {
+            Image floorPip = floorPips[i];
+            if (i > generator.numberFloors) {
+                floorPip.enabled = false;
+            }
+            if (i == generator.currentFloor) {
+                floorPip.color = selectedColor;
+            } else {
+                floorPip.color = deselectedColor;
             }
         }
+        floorNumberCaption.text = $"{template.sceneDescriptor}: floor {generator.currentFloor}";
 
-        GameObject obj = GameObject.Instantiate(mapMarkerPrefab);
-        obj.transform.SetParent(markerContainer, false);
-        playerMarker = obj.GetComponent<MapMarkerIndicator>();
-        playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
-        foreach (MonoBehaviour component in obj.GetComponentsInChildren<MonoBehaviour>()) {
-            component.enabled = true;
-        }
-    }
-    void DisplayMapMarkers(int floor) {
         foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
-            kvp.Value.gameObject.SetActive(kvp.Key.floorNumber == floor);
+            kvp.Value.gameObject.SetActive(kvp.Key.floorNumber == generator.currentFloor);
             // if (kvp.Key.floorNumber == floor && (kvp.Value == extractionIndicator || kvp.Value == insertionIndicator)) {
             //     kvp.Value.ShowSelection(true);
             // }
         }
+
+        foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
+            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint) continue;
+            if (!indicators.ContainsKey(data)) {
+                MapMarkerIndicator indicator = SpawnNewMapMarker();
+                indicator.Configure(data, ignoreInsertion: true);
+                indicators[data] = indicator;
+            }
+            indicators[data].SetPosition(data.worldPosition, data.floorNumber, mapDisplay3Dgenerator, markerContainer);
+        }
+        if (playerMarker == null) {
+            playerMarker = SpawnNewMapMarker();
+            playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
+        }
+        playerMarker.SetPosition(GameManager.I.playerPosition, 0, mapDisplay3Dgenerator, markerContainer);
+
+        statsView.text = mapDisplay3Dgenerator.GetStatsString();
     }
 }

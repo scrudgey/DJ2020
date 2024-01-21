@@ -8,9 +8,9 @@ public class PixelUpscaleRender : MonoBehaviour {
     public RenderTexture small;
     public RenderTexture large;
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
-        small.filterMode = FilterMode.Point;
-        source.filterMode = FilterMode.Point;
-        destination.filterMode = FilterMode.Point;
+        // small.filterMode = FilterMode.Point;
+        // source.filterMode = FilterMode.Point;
+        // destination.filterMode = FilterMode.Point;
         if (applyFilter) {
             Graphics.Blit(source, large, material);
             Graphics.Blit(large, small);

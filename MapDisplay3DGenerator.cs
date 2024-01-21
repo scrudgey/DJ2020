@@ -5,14 +5,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenerator> {
-    enum Mode { playerfocus, rotate }
+    public enum Mode { none, playerfocus, rotate }
     public Action<MapDisplay3DGenerator> OnValueChanged { get; set; }
-    Mode mode;
-    MapDisplay3DView mapDisplayView;
+    public Mode mode;
     public List<MeshRenderer> quads;
     public Material materialFloorHidden;
     public Material materialFloorHighlight;
     List<Texture2D> mapImages;
+    public List<MapMarkerData> mapData;
     [Header("camera")]
     public Camera mapCamera;
     public Transform cameraTransform;
@@ -24,21 +24,20 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     public RenderTexture texture_1024;
     public RenderTexture texture_2048;
     // public Vector3 
-    int currentFloor;
-    int numberFloors;
+    public int currentFloor;
+    public int numberFloors;
     float theta;
     float thetaVelocity;
     Vector3 origin;
     float zoomFloatAmount;
     int zoomLevel;
     LevelTemplate template;
-    public void Initialize(MapDisplay3DView mapDisplayView, LevelTemplate template, List<Texture2D> mapImages) {
-        this.mapDisplayView = mapDisplayView;
-        this.mapImages = mapImages;
+    public void Initialize(LevelTemplate template) {
         this.template = template;
-
+        mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
+        mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
         numberFloors = mapImages.Count;
-        currentFloor = 0;
+        // TODO: set theta based on character camera rotation offset
         theta = 3.925f;
 
         for (int i = 0; i < quads.Count; i++) {
@@ -53,35 +52,10 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         }
         zoomFloatAmount = 1.5f;
         SetZoomLevel(1);
-        SelectFloor(0, 0);
+        SelectFloor(0);
         ChangeMode(Mode.rotate);
     }
 
-
-    public void UpdateWithInput(PlayerInput input, float timeDelta, MapDisplay3DView.MouseHeldType mouseHeldType) {
-        if (mouseHeldType == MapDisplay3DView.MouseHeldType.right) {
-            thetaVelocity = 0f;
-            theta += input.mouseDelta.x * timeDelta;
-        } else if (mouseHeldType == MapDisplay3DView.MouseHeldType.left) {
-            thetaVelocity = 0f;
-            Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(mapCamera.transform.rotation * Vector3.forward, Vector3.up).normalized;
-            Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
-            Vector3 inputDirection = new Vector3(input.mouseDelta.x, 0, input.mouseDelta.y);
-            Vector3 translation = -1f * (cameraPlanarRotation * inputDirection);
-            origin += translation * timeDelta * mapCamera.orthographicSize;
-            origin = Vector3.ClampMagnitude(origin, 1f);
-        }
-        HandleZoomInput(input.zoomInput.y * timeDelta);
-    }
-    void HandleZoomInput(float increment) {
-        zoomFloatAmount += increment;
-        zoomFloatAmount = Mathf.Min(zoomFloatAmount, 4f);
-        zoomFloatAmount = Mathf.Max(zoomFloatAmount, 0f);
-
-        if ((int)zoomFloatAmount != zoomLevel) {
-            SetZoomLevel((int)zoomFloatAmount);
-        }
-    }
     void Update() {
         theta += thetaVelocity * Time.unscaledDeltaTime;
         if (theta < -6.28) {
@@ -111,30 +85,11 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         cameraTransform.localRotation = targetRotation;
     }
 
-
-    public void FloorIncrementButtonCallback(int increment) {
-        int targetFloor = currentFloor + increment;
-        targetFloor = Mathf.Max(0, targetFloor);
-        targetFloor = Mathf.Min(targetFloor, numberFloors - 1);
-        SelectFloor(currentFloor, targetFloor);
-    }
-
-    public void ZoomIncrementButtonCallback(int increment) {
-        HandleZoomInput(increment);
-    }
-    public void ModeButtonCallback() {
-        Mode newMode = mode switch {
-            Mode.playerfocus => Mode.rotate,
-            Mode.rotate => Mode.playerfocus,
-            _ => Mode.rotate
-        };
-        ChangeMode(newMode);
-    }
     void ChangeMode(Mode newMode) {
         mode = newMode;
         switch (mode) {
             case Mode.playerfocus:
-                origin = WorldToQuadPosition(GameManager.I.playerPosition, 0);
+                origin = WorldToGeneratorPosition(GameManager.I.playerPosition, 0, debug: true) - transform.position;
                 thetaVelocity = 0f;
                 break;
             case Mode.rotate:
@@ -143,7 +98,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
                 break;
         }
     }
-    void SelectFloor(int fromFloor, int toFloor) {
+    void SelectFloor(int toFloor) {
         for (int i = 0; i < quads.Count; i++) {
             MeshRenderer renderer = quads[i];
             if (i >= mapImages.Count) {
@@ -160,10 +115,8 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
                 renderer.material.mainTexture = mapImages[i];
             }
         }
-        mapDisplayView.OnFloorSelected(fromFloor, toFloor);
         currentFloor = toFloor;
     }
-
     void SetZoomLevel(int level) {
         // small: 1024 large:   2045    camera: 1
         // small: 512  large: 1024     camera: 0.5
@@ -199,14 +152,13 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         return $"{zoomFloatAmount:F2}\n{theta:F2}\n({origin.x:F2}, {origin.z:F2})";
     }
 
-    public Vector3 WorldToQuadPosition(Vector3 worldPosition, int floorNumber) {
-        // transform to quad position
-        Vector2 quadPosition = new Vector2(
-            template.mapUnitNorth.x * worldPosition.x,
-            template.mapUnitEast.y * worldPosition.z) + new Vector2(template.mapOrigin.x, template.mapOrigin.y);
+    public Vector3 WorldToGeneratorPosition(Vector3 worldPosition, int floorNumber, bool debug = false) {
+
+        Vector2 quadPosition = WorldToQuadPosition(worldPosition);
 
         // transform to map generator position
         MeshRenderer quad = quads[0];
+
         Vector3 generatorPosition = new Vector3(
                 quad.bounds.extents.x * quadPosition.x * 2,
                 0f,
@@ -214,6 +166,60 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
         generatorPosition.y += floorNumber * 0.125f;
 
+        if (debug) {
+            Debug.Log(worldPosition);
+            Debug.Log(quadPosition);
+            Debug.Log(generatorPosition);
+            Debug.DrawLine(worldPosition, quadPosition, Color.white, 5f);
+            Debug.DrawLine(quadPosition, generatorPosition, Color.white, 5f);
+        }
+
         return generatorPosition;
+    }
+
+    public Vector2 WorldToQuadPosition(Vector3 worldPosition) {
+        return new Vector2(
+            template.mapUnitNorth.x * worldPosition.x,
+            template.mapUnitEast.y * worldPosition.z) + new Vector2(template.mapOrigin.x, template.mapOrigin.y);
+    }
+
+    public void UpdateWithInput(MapInput input) {
+        theta += input.thetaDelta;
+        if (input.thetaDelta != 0)
+            thetaVelocity = 0f;
+
+        Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(mapCamera.transform.rotation * Vector3.forward, Vector3.up).normalized;
+        Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Vector3.up);
+
+        if (input.translationInput != Vector2.zero) {
+            Vector3 inputDirection = new Vector3(input.translationInput.x, 0, input.translationInput.y);
+            Vector3 translation = -1f * (cameraPlanarRotation * inputDirection);
+            origin += translation * mapCamera.orthographicSize;
+            origin = Vector3.ClampMagnitude(origin, 1f);
+        }
+
+        HandleZoomInput(input.zoomFloatIncrement + input.zoomIncrement);
+
+        HandleFloorIncrement(input.floorIncrement);
+
+        if (input.modeChange != Mode.none) {
+            ChangeMode(input.modeChange);
+        }
+
+        OnValueChanged?.Invoke(this);
+    }
+    void HandleZoomInput(float increment) {
+        zoomFloatAmount += increment;
+        zoomFloatAmount = Mathf.Min(zoomFloatAmount, 4f);
+        zoomFloatAmount = Mathf.Max(zoomFloatAmount, 0f);
+        if ((int)zoomFloatAmount != zoomLevel) {
+            SetZoomLevel((int)zoomFloatAmount);
+        }
+    }
+    void HandleFloorIncrement(int increment) {
+        int targetFloor = currentFloor + increment;
+        targetFloor = Mathf.Max(0, targetFloor);
+        targetFloor = Mathf.Min(targetFloor, numberFloors - 1);
+        SelectFloor(targetFloor);
     }
 }

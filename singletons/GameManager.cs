@@ -44,6 +44,7 @@ public partial class GameManager : Singleton<GameManager> {
     public static Action<CursorType> OnCursorTypeChange;
     public static Action<String> OnCaptionChange;
     public static Action<PlayerState> OnEyeVisibilityChange;
+    public static Action<PlayerInput> OnPlayerInput;
     // UI state
     private bool toggleConsoleThisFrame;
     private bool escapePressedThisFrame;
@@ -505,7 +506,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         // kind of weird
-        EscapeMenuController.UpdateWithPlayerInput(playerInput);
+        OnPlayerInput?.Invoke(playerInput);
     }
     public void SetInputReceivers(GameObject playerObject) {
         inputReceivers = new List<IInputReceiver>();

@@ -29,10 +29,10 @@ public class MapMarkerIndicator : MonoBehaviour {
         selectedIndicator.enabled = false;
     }
 
-    public void Configure(MapMarkerData data) {
-        Configure(data.markerName, data.markerType, data.markerIcon);
+    public void Configure(MapMarkerData data, bool ignoreInsertion = false) {
+        Configure(data.markerName, data.markerType, data.markerIcon, ignoreInsertion: ignoreInsertion);
     }
-    public void Configure(string markerName, MapMarkerData.MapMarkerType markerType, MapMarkerData.MapMarkerIcon markerIcon) {
+    public void Configure(string markerName, MapMarkerData.MapMarkerType markerType, MapMarkerData.MapMarkerIcon markerIcon, bool ignoreInsertion = false) {
         text.text = markerName;
 
         switch (markerType) {
@@ -81,23 +81,23 @@ public class MapMarkerIndicator : MonoBehaviour {
         } else if (markerIcon == MapMarkerData.MapMarkerIcon.arrowRight) {
             icon.transform.rotation = Quaternion.Euler(0f, 0f, 270f);
         }
+
+        if (ignoreInsertion) {
+            if (markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+                gameObject.SetActive(false);
+            }
+            if (markerType == MapMarkerData.MapMarkerType.extractionPoint) {
+                text.text = "extraction point";
+            }
+        }
+
     }
 
-    public void Configure(MapMarkerData data, RectTransform parentRect) {
-        Configure(data);
-        SetPosition(data, parentRect);
-    }
-    public void Configure(MapMarkerData data, LevelTemplate template, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect) {
-        Configure(data);
-        SetPosition(data.worldPosition, data.floorNumber, template, mapDisplay3Dgenerator, parentRect);
-    }
     public void SetPosition(MapMarkerData data, RectTransform parentRect) {
         rectTransform.anchoredPosition = data.position * parentRect.rect.width;
     }
-    public void SetPosition(Vector3 worldPosition, int floorNumber, LevelTemplate template, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect) {
-        Vector3 generatorPosition = mapDisplay3Dgenerator.WorldToQuadPosition(worldPosition, floorNumber);
-
-        // Debug.DrawLine(worldPosition, generatorPosition, Color.red, 1f);
+    public void SetPosition(Vector3 worldPosition, int floorNumber, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect, bool debug = false) {
+        Vector3 generatorPosition = mapDisplay3Dgenerator.WorldToGeneratorPosition(worldPosition, floorNumber, debug: debug);
 
         Vector3 viewPosition = mapDisplay3Dgenerator.mapCamera.WorldToViewportPoint(generatorPosition);
 

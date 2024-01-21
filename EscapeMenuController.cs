@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 public class EscapeMenuController : MonoBehaviour {
-    static PlayerInput playerInput;
-
     public GameObject UIEditorCamera;
     public Transform objectivesContainer;
     public GameObject objectiveIndicatorPrefab;
@@ -25,11 +23,7 @@ public class EscapeMenuController : MonoBehaviour {
             PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();
             controller.Configure(objective, gameData);
         }
-        mapDisplayView.Initialize(gameData.levelState.template);
-    }
-
-    void Update() {
-        mapDisplayView.UpdateWithInput(playerInput);
+        mapDisplayView.Initialize(gameData.levelState);
     }
 
     public void ContinueButtonCallback() {
@@ -42,12 +36,7 @@ public class EscapeMenuController : MonoBehaviour {
     public void HandleEscapeAction(InputAction.CallbackContext ctx) {
         ContinueButtonCallback();
     }
-
     public void SkillMenuCallback() {
         GameManager.I.ShowPerkMenu();
-    }
-
-    public static void UpdateWithPlayerInput(PlayerInput input) {
-        playerInput = input;
     }
 }

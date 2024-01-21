@@ -3625,17 +3625,26 @@ Then get fancy and have the 100 be a
     * move
     * zoom
 * visibility of floors
+* time to separate model, view, and control.
+* zoom buttons
+* mode buttons
+    * click two: reset to (0, 0) with rotation
+* click one: center on player
+
+* don't show insertion point
+* show only selected extraction point
+* label extraction point "extraction point"
+
+only show selected extraction point
 
 properly handle floor level for player
-show legend
-flavor
-zoom buttons
-mode buttons
-    click one: center on player
-    click two: reset to (0, 0) with rotation
+    define floor level per scene: part of level template
+
+show network stuff
+
 show objective makers
 connect objectives with markers in map when clicked
 
-time to separate model, view, and control.
-    view binds to map display 3d view
-    marker is part of view, markerdata is part of model
+show legend
+
+flavor
