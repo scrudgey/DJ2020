@@ -52,7 +52,7 @@ public class MissionPlanMapController : MonoBehaviour {
             GameObject obj = GameObject.Instantiate(mapMarkerPrefab);
             obj.transform.SetParent(mapImage.transform, false);
             MapMarkerIndicator indicator = obj.GetComponent<MapMarkerIndicator>();
-            indicator.Configure(data, mapRect);
+            indicator.Configure(data);
             indicators[data] = indicator;
             // why is this required?
             foreach (MonoBehaviour component in obj.GetComponentsInChildren<MonoBehaviour>()) {

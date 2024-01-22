@@ -29,10 +29,10 @@ public class MapMarkerIndicator : MonoBehaviour {
         selectedIndicator.enabled = false;
     }
 
-    public void Configure(MapMarkerData data, bool ignoreInsertion = false) {
-        Configure(data.markerName, data.markerType, data.markerIcon, ignoreInsertion: ignoreInsertion);
+    public void Configure(MapMarkerData data) {
+        Configure(data.markerName, data.markerType, data.markerIcon);
     }
-    public void Configure(string markerName, MapMarkerData.MapMarkerType markerType, MapMarkerData.MapMarkerIcon markerIcon, bool ignoreInsertion = false) {
+    public void Configure(string markerName, MapMarkerData.MapMarkerType markerType, MapMarkerData.MapMarkerIcon markerIcon) {
         text.text = markerName;
 
         switch (markerType) {
@@ -82,14 +82,14 @@ public class MapMarkerIndicator : MonoBehaviour {
             icon.transform.rotation = Quaternion.Euler(0f, 0f, 270f);
         }
 
-        if (ignoreInsertion) {
-            if (markerType == MapMarkerData.MapMarkerType.insertionPoint) {
-                gameObject.SetActive(false);
-            }
-            if (markerType == MapMarkerData.MapMarkerType.extractionPoint) {
-                text.text = "extraction point";
-            }
-        }
+        // if (ignoreInsertion) {
+        //     if (markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+        //         gameObject.SetActive(false);
+        //     }
+        //     if (markerType == MapMarkerData.MapMarkerType.extractionPoint) {
+        //         text.text = "extraction point";
+        //     }
+        // }
 
     }
 

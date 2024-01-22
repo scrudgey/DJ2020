@@ -3634,17 +3634,16 @@ Then get fancy and have the 100 be a
 * don't show insertion point
 * show only selected extraction point
 * label extraction point "extraction point"
+* only show selected extraction point
+* properly handle floor level for player
+    * define floor level per scene: part of level template
 
-only show selected extraction point
 
-properly handle floor level for player
-    define floor level per scene: part of level template
-
+show legend
 show network stuff
 
 show objective makers
 connect objectives with markers in map when clicked
 
-show legend
 
 flavor

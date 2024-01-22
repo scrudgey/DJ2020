@@ -79,9 +79,14 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint) continue;
+            if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) continue;
+
             if (!indicators.ContainsKey(data)) {
                 MapMarkerIndicator indicator = SpawnNewMapMarker();
-                indicator.Configure(data, ignoreInsertion: true);
+
+                string indicatorText = data.markerType == MapMarkerData.MapMarkerType.extractionPoint ? "extraction point" : data.markerName;
+
+                indicator.Configure(indicatorText, data.markerType, data.markerIcon);
                 indicators[data] = indicator;
             }
             indicators[data].SetPosition(data.worldPosition, data.floorNumber, mapDisplay3Dgenerator, markerContainer);
@@ -90,7 +95,8 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             playerMarker = SpawnNewMapMarker();
             playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
         }
-        playerMarker.SetPosition(GameManager.I.playerPosition, 0, mapDisplay3Dgenerator, markerContainer);
+        int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
+        playerMarker.SetPosition(GameManager.I.playerPosition, playerFloor, mapDisplay3Dgenerator, markerContainer);
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
     }

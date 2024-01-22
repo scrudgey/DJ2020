@@ -54,6 +54,11 @@ public class LevelBootstrapper : MonoBehaviour {
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData();
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems), GameManager.I.gameData.playerState);
+
+        // select a random extraction point
+        string extractionIdn = Toolbox.RandomFromList(GameObject.FindObjectsOfType<ExtractionZone>().Select(zone => zone.data.idn).ToList());
+        level.plan.extractionPointIdn = extractionIdn;
+
         GameManager.I.gameData.levelState = level;
 
         // start the game state

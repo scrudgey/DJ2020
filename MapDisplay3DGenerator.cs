@@ -52,8 +52,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         }
         zoomFloatAmount = 1.5f;
         SetZoomLevel(1);
-        SelectFloor(0);
-        ChangeMode(Mode.rotate);
+        int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
+        SelectFloor(playerFloor);
+        ChangeMode(Mode.playerfocus);
     }
 
     void Update() {
@@ -89,7 +90,10 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         mode = newMode;
         switch (mode) {
             case Mode.playerfocus:
-                origin = WorldToGeneratorPosition(GameManager.I.playerPosition, 0, debug: true) - transform.position;
+                int floor = template.GetFloorForPosition(GameManager.I.playerPosition);
+                origin = WorldToGeneratorPosition(GameManager.I.playerPosition, floor, debug: true) - transform.position;
+                int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
+                SelectFloor(playerFloor);
                 thetaVelocity = 0f;
                 break;
             case Mode.rotate:

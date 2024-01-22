@@ -17,6 +17,7 @@ public class LevelTemplate : ScriptableObject {
     public string sceneName;
     public string sceneDescriptor;
     public int mapviewInitialFloor = 1;
+    public List<float> floorHeights;
     public string tagline;
     public MusicTrack musicTrack;
     [Header("text")]
@@ -68,5 +69,16 @@ public class LevelTemplate : ScriptableObject {
         string path = $"data/missions/{name}/{name}";
         Debug.Log($"template path: {path}");
         return Resources.Load<LevelTemplate>(path) as LevelTemplate;
+    }
+
+    public int GetFloorForPosition(Vector3 position) {
+        int index = -1;
+        foreach (float floorHeight in floorHeights) {
+            if (floorHeight >= position.y) {
+                return index;
+            }
+            index++;
+        }
+        return index;
     }
 }

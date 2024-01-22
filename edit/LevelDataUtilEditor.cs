@@ -20,6 +20,7 @@ public class LevelDataUtilEditor : Editor {
     SerializedProperty mapCameraProperty;
     SerializedProperty mapTextureProperty;
     SerializedProperty floorNumberProperty;
+    SerializedProperty floorWidgetProperty;
     void OnEnable() {
         t = (LevelDataUtil)target;
         GetTarget = new SerializedObject(t);
@@ -27,9 +28,11 @@ public class LevelDataUtilEditor : Editor {
         mapCameraProperty = GetTarget.FindProperty("mapCamera"); // Find the List in our script and create a refrence of it
         mapTextureProperty = GetTarget.FindProperty("mapTexture"); // Find the List in our script and create a refrence of it
         floorNumberProperty = GetTarget.FindProperty("floorNumber"); // Find the List in our script and create a refrence of it
+        floorWidgetProperty = GetTarget.FindProperty("floorWidget");
     }
     public override void OnInspectorGUI() {
         EditorGUILayout.PropertyField(levelData);
+        EditorGUILayout.PropertyField(floorWidgetProperty);
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         if (template != null) {
             string levelName = template.levelName;
@@ -51,6 +54,11 @@ public class LevelDataUtilEditor : Editor {
             EditorGUILayout.Space();
             EditorGUILayout.Separator();
             EditorGUILayout.PropertyField(floorNumberProperty);
+            if (GUILayout.Button("Set floor level")) {
+                // SaveMapData();
+                int floorNumber = floorNumberProperty.intValue;
+                SetFloorHeight(template, floorNumber);
+            }
             EditorGUILayout.PropertyField(mapCameraProperty);
             EditorGUILayout.PropertyField(mapTextureProperty);
             if (GUILayout.Button("Write map image")) {
@@ -137,6 +145,7 @@ public class LevelDataUtilEditor : Editor {
         mapCam.targetTexture = null;
         Texture2D tex = Toolbox.RenderToTexture2D(renderTexture);
         MapMarker.WriteMapImage(levelName, sceneName, tex, floorNumber);
+
     }
     void SaveMapMetaData(Camera mapCam, LevelTemplate template) {
         string levelName = template.levelName;
@@ -161,6 +170,16 @@ public class LevelDataUtilEditor : Editor {
         template.mapOrigin = mapOrigin;
         template.mapUnitNorth = mapNorthPoint - mapOrigin;
         template.mapUnitEast = mapEastPoint - mapOrigin;
+
+        EditorUtility.SetDirty(template);
+    }
+
+    void SetFloorHeight(LevelTemplate template, int floorNumber) {
+        Transform floorWidget = (Transform)floorWidgetProperty.objectReferenceValue;
+        while (template.floorHeights.Count < floorNumber + 1) {
+            template.floorHeights.Add(0);
+        }
+        template.floorHeights[floorNumber] = floorWidget.position.y;
 
         EditorUtility.SetDirty(template);
     }
