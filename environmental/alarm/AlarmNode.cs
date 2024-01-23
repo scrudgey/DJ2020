@@ -26,4 +26,12 @@ public class AlarmNode : Node<AlarmNode> {
             }
         }
     }
+
+    public override MarkerConfiguration GetConfiguration(GraphIconReference graphIconReference) {
+        return new MarkerConfiguration() {
+            icon = graphIconReference.AlarmNodeSprite(this),
+            color = graphIconReference.minimapAlarmColor,
+            worldPosition = position
+        };
+    }
 }

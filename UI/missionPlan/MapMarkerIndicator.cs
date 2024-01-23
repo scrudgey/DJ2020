@@ -96,11 +96,8 @@ public class MapMarkerIndicator : MonoBehaviour {
     public void SetPosition(MapMarkerData data, RectTransform parentRect) {
         rectTransform.anchoredPosition = data.position * parentRect.rect.width;
     }
-    public void SetPosition(Vector3 worldPosition, int floorNumber, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect, bool debug = false) {
-        Vector3 generatorPosition = mapDisplay3Dgenerator.WorldToGeneratorPosition(worldPosition, floorNumber, debug: debug);
-
-        Vector3 viewPosition = mapDisplay3Dgenerator.mapCamera.WorldToViewportPoint(generatorPosition);
-
+    public void SetPosition(Vector3 worldPosition, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect) {
+        Vector3 viewPosition = mapDisplay3Dgenerator.WorldToViewportPoint(worldPosition);
         rectTransform.anchoredPosition = viewPosition * parentRect.rect.width;
     }
 

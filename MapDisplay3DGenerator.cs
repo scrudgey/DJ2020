@@ -1,18 +1,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenerator> {
     public enum Mode { none, playerfocus, rotate }
     public Action<MapDisplay3DGenerator> OnValueChanged { get; set; }
+    public MapDisplayController.MapDisplayLegendType legendType;
     public Mode mode;
     public List<MeshRenderer> quads;
     public Material materialFloorHidden;
     public Material materialFloorHighlight;
     List<Texture2D> mapImages;
     public List<MapMarkerData> mapData;
+    public Dictionary<string, MarkerConfiguration> nodeData;
+    public GraphIconReference graphIconReference;
     [Header("camera")]
     public Camera mapCamera;
     public Transform cameraTransform;
@@ -23,6 +27,10 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     public RenderTexture texture_512;
     public RenderTexture texture_1024;
     public RenderTexture texture_2048;
+    [Header("network")]
+    public GameObject lineRenderObjectPrefab;
+    public Transform graphContainer;
+
     // public Vector3 
     public int currentFloor;
     public int numberFloors;
@@ -32,10 +40,17 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     float zoomFloatAmount;
     int zoomLevel;
     LevelTemplate template;
-    public void Initialize(LevelTemplate template) {
-        this.template = template;
+    LevelState state;
+
+    CyberGraph currentCyberGraph;
+    PowerGraph currentPowerGraph;
+    AlarmGraph currentAlarmGraph;
+    public void Initialize(LevelState state) {
+        this.template = state.template;
+        this.state = state;
         mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
-        mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+        // mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+        nodeData = new Dictionary<string, MarkerConfiguration>();
         numberFloors = mapImages.Count;
         // TODO: set theta based on character camera rotation offset
         theta = 3.925f;
@@ -91,7 +106,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         switch (mode) {
             case Mode.playerfocus:
                 int floor = template.GetFloorForPosition(GameManager.I.playerPosition);
-                origin = WorldToGeneratorPosition(GameManager.I.playerPosition, floor, debug: true) - transform.position;
+                origin = WorldToGeneratorPosition(GameManager.I.playerPosition) - transform.position;
                 int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
                 SelectFloor(playerFloor);
                 thetaVelocity = 0f;
@@ -120,6 +135,14 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             }
         }
         currentFloor = toFloor;
+        // DisplayGraph(state.delta.cyberGraph);
+        if (currentAlarmGraph != null) {
+            DisplayGraph(currentAlarmGraph);
+        } else if (currentCyberGraph != null) {
+            DisplayGraph(currentCyberGraph);
+        } else if (currentPowerGraph != null) {
+            DisplayGraph(currentPowerGraph);
+        }
     }
     void SetZoomLevel(int level) {
         // small: 1024 large:   2045    camera: 1
@@ -156,7 +179,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         return $"{zoomFloatAmount:F2}\n{theta:F2}\n({origin.x:F2}, {origin.z:F2})";
     }
 
-    public Vector3 WorldToGeneratorPosition(Vector3 worldPosition, int floorNumber, bool debug = false) {
+    public Vector3 WorldToGeneratorPosition(Vector3 worldPosition, bool debug = false) {
+
+        int floorNumber = template.GetFloorForPosition(worldPosition);
 
         Vector2 quadPosition = WorldToQuadPosition(worldPosition);
 
@@ -179,6 +204,10 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         }
 
         return generatorPosition;
+    }
+    public Vector2 WorldToViewportPoint(Vector3 worldPosition) {
+        Vector3 generatorPosition = WorldToGeneratorPosition(worldPosition);
+        return mapCamera.WorldToViewportPoint(generatorPosition);
     }
 
     public Vector2 WorldToQuadPosition(Vector3 worldPosition) {
@@ -225,5 +254,99 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         targetFloor = Mathf.Max(0, targetFloor);
         targetFloor = Mathf.Min(targetFloor, numberFloors - 1);
         SelectFloor(targetFloor);
+    }
+
+    public void DisplayGraph<T, W>(Graph<T, W> graph) where T : Node<T> where W : Graph<T, W> {
+        ClearGraph();
+        foreach (HashSet<string> edge in graph.edgePairs) {
+            string[] nodes = edge.ToArray();
+            T node1 = graph.nodes[nodes[0]];
+            T node2 = graph.nodes[nodes[1]];
+
+            int floor1 = template.GetFloorForPosition(node1.position);
+            int floor2 = template.GetFloorForPosition(node2.position);
+
+            if (floor1 != currentFloor || floor2 != currentFloor) continue;
+
+            // if (node1.sceneName != sceneName || node2.sceneName != sceneName)
+            //     return;
+            if (graph.edgeVisibility[(node1.idn, node2.idn)] == EdgeVisibility.known) {
+                LineRenderer renderer = GetLineRenderer(node1, node2);
+                SetLinePositions(renderer, node1, node2);
+            }
+        }
+
+        foreach (T node in graph.nodes.Values) {
+            switch (node) {
+                case CyberNode cybernode:
+                    nodeData[node.idn] = cybernode.GetConfiguration(graphIconReference);
+                    break;
+                case AlarmNode alarmNode:
+                    nodeData[node.idn] = alarmNode.GetConfiguration(graphIconReference);
+                    break;
+                case PowerNode powerNode:
+                    nodeData[node.idn] = powerNode.GetConfiguration(graphIconReference);
+                    break;
+            }
+        }
+
+        switch (graph) {
+            case CyberGraph cyberGraph:
+                currentCyberGraph = cyberGraph;
+                break;
+            case PowerGraph powerGraph:
+                currentPowerGraph = powerGraph;
+                break;
+            case AlarmGraph alarmGraph:
+                currentAlarmGraph = alarmGraph;
+                break;
+        }
+    }
+    LineRenderer GetLineRenderer<T>(T node1, T node2) where T : Node<T> {
+        GameObject lineObject = GameObject.Instantiate(lineRenderObjectPrefab, node1.position, Quaternion.identity);
+        LineRenderer renderer = lineObject.GetComponent<LineRenderer>();
+        lineObject.transform.SetParent(graphContainer);
+        return renderer;
+    }
+    void SetLinePositions<T>(LineRenderer renderer, T node1, T node2) where T : Node<T> {
+        List<Vector3> points = new List<Vector3>();
+
+        Vector3 position1 = Toolbox.Round(node1.position, decimalPlaces: 1);
+        Vector3 position2 = Toolbox.Round(node2.position, decimalPlaces: 1);
+
+        points.Add(position1);
+        points.Add(new Vector3(position2.x, position1.y, position1.z));
+        points.Add(new Vector3(position2.x, position2.y, position2.z));
+        points.Add(position2);
+
+        points = points.Select(point => WorldToGeneratorPosition(point)).ToList();
+
+        renderer.positionCount = points.Count;
+        renderer.SetPositions(points.ToArray());
+    }
+
+    public void ClearGraph() {
+        nodeData = new Dictionary<string, MarkerConfiguration>();
+        foreach (Transform child in graphContainer) {
+            Destroy(child.gameObject);
+        }
+        currentCyberGraph = null;
+        currentAlarmGraph = null;
+        currentPowerGraph = null;
+    }
+    public void ClearMarkers() {
+        mapData = new List<MapMarkerData>();
+    }
+    public void LoadMarkers() {
+        mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+    }
+    public void DisplayCyberGraph() {
+        DisplayGraph(state.delta.cyberGraph);
+    }
+    public void DisplayPowerGraph() {
+        DisplayGraph(state.delta.powerGraph);
+    }
+    public void DisplayAlarmGraph() {
+        DisplayGraph(state.delta.alarmGraph);
     }
 }

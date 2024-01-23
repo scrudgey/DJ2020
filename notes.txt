@@ -3607,14 +3607,13 @@ information to show:
 
 
     network info in map in planning mode
-    some sort of pseudo-3d offset map in the escape menu
 
 
 Don’t think I’ve ever done this, but could you have the shader round the texture coords to the nearest 1/100th? Something like: 
 IN.uv.x = (frac(IN.uv.x/100)*100; (same for y, unless frac is a vector operation.)
 Then get fancy and have the 100 be a 
 
-
+    * some sort of pseudo-3d offset map in the escape menu
 * dynamically load map display per level
     update a few more map images
 * allow player to change floors
@@ -3630,17 +3629,27 @@ Then get fancy and have the 100 be a
 * mode buttons
     * click two: reset to (0, 0) with rotation
 * click one: center on player
-
 * don't show insertion point
 * show only selected extraction point
 * label extraction point "extraction point"
 * only show selected extraction point
 * properly handle floor level for player
     * define floor level per scene: part of level template
+* show network stuff
+* refresh graph edges when floor changes
+* toggle markers / network on and off
+* clear ou empty markers
+    * line thickness / 
+* show legend
+    * click again- hide
+    * hughlught legend
+    * map markers colors
+    * camera icon too big
 
 
-show legend
-show network stuff
+ readibility
+    colors for network
+    fade current flo0r?
 
 show objective makers
 connect objectives with markers in map when clicked

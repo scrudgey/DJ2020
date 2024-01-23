@@ -6,7 +6,7 @@ using Newtonsoft;
 using UnityEngine;
 
 [System.Serializable]
-public class Node<U> where U : Node<U> {
+public class Node<U> : IMarkerProvider where U : Node<U> {
     public string sceneName;
     public string idn;
     public string nodeTitle;
@@ -15,7 +15,9 @@ public class Node<U> where U : Node<U> {
     public NodeVisibility visibility;
     public bool fixedVisibility;
     public bool alwaysOnScreen;
-
+    public virtual MarkerConfiguration GetConfiguration(GraphIconReference graphIconReference) {
+        return new MarkerConfiguration();
+    }
     public virtual NodeVisibility GetVisibility() {
         return visibility;
     }

@@ -37,6 +37,14 @@ public class CyberNode : Node<CyberNode> {
         } else return status;
     }
     public CyberNode() { }
+
+    public override MarkerConfiguration GetConfiguration(GraphIconReference graphIconReference) {
+        return new MarkerConfiguration() {
+            icon = graphIconReference.CyberNodeSprite(this),
+            color = graphIconReference.minimapCyberColor,
+            worldPosition = position
+        };
+    }
 }
 
 

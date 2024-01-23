@@ -15,8 +15,17 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     [Header("map markers")]
     public RectTransform markerContainer;
     public GameObject mapMarkerPrefab;
+    public GameObject nodeMarkerPrefab;
     public RectTransform mapRect;
+    [Header("legend indicators")]
+    public Image legendMarkersIndicator;
+    public Image legendCyberIndicator;
+    public Image legendPowerIndicator;
+    public Image legendAlarmIndicator;
+    public Color legendActiveColor;
+    public Color legendInactiveColor;
     Dictionary<MapMarkerData, MapMarkerIndicator> indicators;
+    Dictionary<string, MiniMapNodeMarker> nodeMarkers;
     MapMarkerIndicator playerMarker;
     List<Image> floorPips;
     int numberFloors;
@@ -33,6 +42,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             Destroy(child.gameObject);
         }
         indicators = new Dictionary<MapMarkerData, MapMarkerIndicator>();
+        nodeMarkers = new Dictionary<string, MiniMapNodeMarker>();
 
         for (int i = floorPipContainer.childCount - 1; i >= 0; i--) {
             Transform pipChild = floorPipContainer.GetChild(i);
@@ -40,19 +50,33 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             floorPips.Add(pip);
         }
 
-        mapDisplay3Dgenerator.Initialize(levelState.template);
+        mapDisplay3Dgenerator.Initialize(levelState);
         Bind(mapDisplay3Dgenerator.gameObject);
     }
     MapMarkerIndicator SpawnNewMapMarker() {
         GameObject objM = GameObject.Instantiate(mapMarkerPrefab);
         objM.transform.SetParent(markerContainer, false);
         MapMarkerIndicator indicator = objM.GetComponent<MapMarkerIndicator>();
-
-        // // why is this required?
-        // foreach (MonoBehaviour component in objM.GetComponentsInChildren<MonoBehaviour>()) {
-        //     component.enabled = true;
-        // }
         return indicator;
+    }
+
+    void RemoveMarker(MapMarkerData key) {
+        MapMarkerIndicator indicator = indicators[key];
+        Destroy(indicator.gameObject);
+        indicators.Remove(key);
+    }
+
+    MiniMapNodeMarker SpawnNodeMarker() {
+        GameObject objM = GameObject.Instantiate(nodeMarkerPrefab);
+        objM.transform.SetParent(markerContainer, false);
+        MiniMapNodeMarker indicator = objM.GetComponent<MiniMapNodeMarker>();
+        return indicator;
+    }
+
+    void RemoveNodeMarker(string key) {
+        MiniMapNodeMarker indicator = nodeMarkers[key];
+        Destroy(indicator.gameObject);
+        nodeMarkers.Remove(key);
     }
 
     //view
@@ -72,9 +96,9 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
         foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
             kvp.Value.gameObject.SetActive(kvp.Key.floorNumber == generator.currentFloor);
-            // if (kvp.Key.floorNumber == floor && (kvp.Value == extractionIndicator || kvp.Value == insertionIndicator)) {
-            //     kvp.Value.ShowSelection(true);
-            // }
+        }
+        foreach (KeyValuePair<string, MiniMapNodeMarker> kvp in nodeMarkers) {
+            kvp.Value.gameObject.SetActive(kvp.Value.floor == generator.currentFloor);
         }
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
@@ -89,15 +113,79 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 indicator.Configure(indicatorText, data.markerType, data.markerIcon);
                 indicators[data] = indicator;
             }
-            indicators[data].SetPosition(data.worldPosition, data.floorNumber, mapDisplay3Dgenerator, markerContainer);
+            indicators[data].SetPosition(data.worldPosition, mapDisplay3Dgenerator, markerContainer);
         }
+        List<MapMarkerData> keysToRemove = new List<MapMarkerData>();
+        foreach (MapMarkerData key in indicators.Keys) {
+            if (!mapDisplay3Dgenerator.mapData.Contains(key)) {
+                keysToRemove.Add(key);
+            }
+        }
+        foreach (MapMarkerData key in keysToRemove) {
+            RemoveMarker(key);
+        }
+
+        foreach (KeyValuePair<string, MarkerConfiguration> kvp in mapDisplay3Dgenerator.nodeData) {
+            if (!nodeMarkers.ContainsKey(kvp.Key)) {
+                MiniMapNodeMarker marker = SpawnNodeMarker();
+                int floor = template.GetFloorForPosition(kvp.Value.worldPosition);
+                marker.Configure(kvp.Value, generator, floor);
+                nodeMarkers[kvp.Key] = marker;
+            }
+            nodeMarkers[kvp.Key].SetPosition(mapDisplay3Dgenerator, markerContainer);
+        }
+        List<string> nodeKeysToRemove = new List<string>();
+        foreach (string key in nodeMarkers.Keys) {
+            if (!mapDisplay3Dgenerator.nodeData.ContainsKey(key)) {
+                nodeKeysToRemove.Add(key);
+            }
+        }
+        foreach (string key in nodeKeysToRemove) {
+            RemoveNodeMarker(key);
+        }
+
         if (playerMarker == null) {
             playerMarker = SpawnNewMapMarker();
             playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
         }
-        int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
-        playerMarker.SetPosition(GameManager.I.playerPosition, playerFloor, mapDisplay3Dgenerator, markerContainer);
+        playerMarker.SetPosition(GameManager.I.playerPosition, mapDisplay3Dgenerator, markerContainer);
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
+
+        HandleLegendMarkers();
+    }
+
+
+    // TODO: combine this with handle value changed- reflect loaded graph nodes.
+    void DisplayGraph<T, W>(Graph<T, W> graph) where T : Node<T> where W : Graph<T, W> {
+        foreach (T node in graph.nodes.Values) {
+            int floor = template.GetFloorForPosition(node.position);
+            if (floor == mapDisplay3Dgenerator.currentFloor) {
+
+            }
+        }
+    }
+
+
+    void HandleLegendMarkers() {
+        legendMarkersIndicator.color = legendInactiveColor;
+        legendCyberIndicator.color = legendInactiveColor;
+        legendPowerIndicator.color = legendInactiveColor;
+        legendAlarmIndicator.color = legendInactiveColor;
+
+        switch (mapDisplay3Dgenerator.legendType) {
+            case MapDisplayController.MapDisplayLegendType.markers:
+                legendMarkersIndicator.color = legendActiveColor;
+                break;
+            case MapDisplayController.MapDisplayLegendType.alarm:
+                legendAlarmIndicator.color = legendActiveColor;
+                break;
+            case MapDisplayController.MapDisplayLegendType.cyber:
+                legendCyberIndicator.color = legendActiveColor;
+                break;
+            case MapDisplayController.MapDisplayLegendType.power:
+                legendPowerIndicator.color = legendActiveColor;
+                break;
+        }
     }
 }

@@ -12,6 +12,7 @@ public class MapInput {
 }
 
 public class MapDisplayController : MonoBehaviour {
+    public enum MapDisplayLegendType { none, markers, cyber, power, alarm }
     public MapDisplay3DGenerator mapDisplay3DGenerator;
     bool mouseOverMap;
     bool mapEngaged;
@@ -84,5 +85,45 @@ public class MapDisplayController : MonoBehaviour {
         modeChangeThisFrame = MapDisplay3DGenerator.Mode.none;
         thetaDeltaThisFrame = 0;
         translationInput = Vector2.zero;
+    }
+
+    public void LegendTypeCallback(string type) {
+        MapDisplayLegendType newLegendType = type switch {
+            "marker" => MapDisplayLegendType.markers,
+            "cyber" => MapDisplayLegendType.cyber,
+            "power" => MapDisplayLegendType.power,
+            "alarm" => MapDisplayLegendType.alarm,
+            _ => MapDisplayLegendType.none
+        };
+        SwitchLegend(newLegendType);
+    }
+
+    void SwitchLegend(MapDisplayLegendType newType) {
+        if (newType == mapDisplay3DGenerator.legendType) {
+            newType = MapDisplayLegendType.none;
+        }
+        mapDisplay3DGenerator.legendType = newType;
+        switch (newType) {
+            case MapDisplayLegendType.none:
+                mapDisplay3DGenerator.ClearGraph();
+                mapDisplay3DGenerator.ClearMarkers();
+                break;
+            case MapDisplayLegendType.markers:
+                mapDisplay3DGenerator.ClearGraph();
+                mapDisplay3DGenerator.LoadMarkers();
+                break;
+            case MapDisplayLegendType.alarm:
+                mapDisplay3DGenerator.ClearMarkers();
+                mapDisplay3DGenerator.DisplayAlarmGraph();
+                break;
+            case MapDisplayLegendType.cyber:
+                mapDisplay3DGenerator.ClearMarkers();
+                mapDisplay3DGenerator.DisplayCyberGraph();
+                break;
+            case MapDisplayLegendType.power:
+                mapDisplay3DGenerator.ClearMarkers();
+                mapDisplay3DGenerator.DisplayPowerGraph();
+                break;
+        }
     }
 }
