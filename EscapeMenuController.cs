@@ -23,6 +23,7 @@ public class EscapeMenuController : MonoBehaviour {
             PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();
             controller.Configure(objective, gameData);
         }
+
         mapDisplayView.Initialize(gameData.levelState);
     }
 

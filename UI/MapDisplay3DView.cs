@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public MapDisplay3DGenerator mapDisplay3Dgenerator;
+    public MapDisplayController mapDisplayController;
     [Header("floor indicators")]
     public Transform floorPipContainer;
     public TextMeshProUGUI floorNumberCaption;
@@ -32,9 +33,13 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     LevelTemplate template;
     LevelPlan plan;
 
-    public void Initialize(LevelState levelState) {
-        this.template = levelState.template;
-        this.plan = levelState.plan;
+    public void Initialize(LevelState state) {
+        Initialize(state.template, state.plan);
+        mapDisplay3Dgenerator.Initialize(state);
+    }
+    public void Initialize(LevelTemplate template, LevelPlan plan) {
+        this.template = template;
+        this.plan = plan;
         floorPips = new List<Image>();
 
         foreach (Transform child in markerContainer) {
@@ -50,8 +55,10 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             floorPips.Add(pip);
         }
 
-        mapDisplay3Dgenerator.Initialize(levelState);
+        mapDisplay3Dgenerator.Initialize(template); // TODO: broken network graphs
         Bind(mapDisplay3Dgenerator.gameObject);
+
+        mapDisplayController.Initialize();
     }
     MapMarkerIndicator SpawnNewMapMarker() {
         GameObject objM = GameObject.Instantiate(mapMarkerPrefab);

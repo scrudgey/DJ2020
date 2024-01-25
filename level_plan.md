@@ -230,15 +230,32 @@ try a different angle:
             grab the data provider by idn
                 use the data provider to instantiate the object
             set objective incomplete
+            position provider:
+                send selected position
+        viewing map:
             
-            
+it is mostly clear except for plan state.
+template: set objectives state in level gen
+gameplay: set objective delta in level initialize.
                 
 
 
+start by moving 3d map into planning mode.
+decided on escape menu: does it have selectable markers like planning mode?
 
-
-
+fix: load graphs during runtime
 
 
 
 how does the solution work for different objective types? 
+    objective data
+        during cybergraph.apply(plan) we can adjust visibility of nodes accordingly.
+        we can also modify the plan objective data when intel unlocks data node.
+    objective assassination:
+        in theory, data provider can be the same as loot provider. just needs a position.
+        during gameplay, the objective delta binds to the instantiated moving target.
+        objective position() can provide that information on request.
+
+
+
+don't show player location in mission planning

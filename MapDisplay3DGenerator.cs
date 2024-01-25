@@ -40,14 +40,26 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     float zoomFloatAmount;
     int zoomLevel;
     LevelTemplate template;
-    LevelState state;
+
+    CyberGraph cyberGraph;
+    PowerGraph powerGraph;
+    AlarmGraph alarmGraph;
 
     CyberGraph currentCyberGraph;
     PowerGraph currentPowerGraph;
     AlarmGraph currentAlarmGraph;
+
     public void Initialize(LevelState state) {
-        this.template = state.template;
-        this.state = state;
+        Initialize(state.template);
+        cyberGraph = state.delta.cyberGraph;
+        powerGraph = state.delta.powerGraph;
+        alarmGraph = state.delta.alarmGraph;
+    }
+    public void Initialize(LevelTemplate template) {
+        this.template = template;
+        // this.state = state;
+        // TODO: somehow, display graph information from plan
+
         mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
         // mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
         nodeData = new Dictionary<string, MarkerConfiguration>();
@@ -231,9 +243,11 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             origin = Vector3.ClampMagnitude(origin, 1f);
         }
 
-        HandleZoomInput(input.zoomFloatIncrement + input.zoomIncrement);
+        if (input.zoomFloatIncrement + input.zoomIncrement != 0)
+            HandleZoomInput(input.zoomFloatIncrement + input.zoomIncrement);
 
-        HandleFloorIncrement(input.floorIncrement);
+        if (input.floorIncrement != 0)
+            HandleFloorIncrement(input.floorIncrement);
 
         if (input.modeChange != Mode.none) {
             ChangeMode(input.modeChange);
@@ -341,12 +355,12 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
     }
     public void DisplayCyberGraph() {
-        DisplayGraph(state.delta.cyberGraph);
+        DisplayGraph(cyberGraph);
     }
     public void DisplayPowerGraph() {
-        DisplayGraph(state.delta.powerGraph);
+        DisplayGraph(powerGraph);
     }
     public void DisplayAlarmGraph() {
-        DisplayGraph(state.delta.alarmGraph);
+        DisplayGraph(alarmGraph);
     }
 }

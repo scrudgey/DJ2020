@@ -287,7 +287,6 @@ public class GunStatHandler : MonoBehaviour {
         // float max = statMaxes[]
         float max = statMaxes[statType];
         float totalWidth = mainContainer.rect.width;
-        Debug.Log($"{statValue} {maxValue} {statType} -> {totalWidth} {(statValue / max) * totalWidth}");
         return (statValue / max) * totalWidth;
     }
 }

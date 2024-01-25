@@ -402,6 +402,15 @@ public partial class GameManager : Singleton<GameManager> {
 
         if (gameData.phase == GamePhase.world) {
             DoInputs();
+        } else if (gameData.phase == GamePhase.plan) {
+            // this is pretty hacky!
+            PlayerInput playerInput = InputController.I.HandleCharacterInput(false, escapePressedThisFrame);
+            OnPlayerInput?.Invoke(playerInput);
+            if (resetMouseControl) {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                resetMouseControl = false;
+            }
         } else if (gameData.phase == GamePhase.levelPlay || gameData.phase == GamePhase.vrMission) {
             UpdateSuspicion();
             UpdateAlarm();
@@ -463,8 +472,7 @@ public partial class GameManager : Singleton<GameManager> {
     void DoInputs() {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
 
-        PlayerInput playerInput = PlayerInput.none;
-        playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
+        PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
 
         // TODO: probably a better way of handling this
         if (Time.timeScale > 0) {

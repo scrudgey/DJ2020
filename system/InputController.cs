@@ -13,6 +13,7 @@ public class InputController : Singleton<InputController> {
     [Header("mouse")]
 
     public Vector2 sensitivity = new Vector2(2f, 2f);
+    // public Vector2 sensitivity = new Vector2(20000f, 20000f);
     public Vector2 smoothing = new Vector2(2f, 2f);
     [Header("Inputs")]
     public InputActionReference MoveAction;
@@ -291,7 +292,6 @@ public class InputController : Singleton<InputController> {
             firePressedHeld = false;
         }
         Vector2 mousePosition = Mouse.current.position.ReadValue();
-        Vector2 viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
@@ -302,7 +302,16 @@ public class InputController : Singleton<InputController> {
         _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
         _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
 
-        CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
+        // TODO: this is weird
+        Vector2 viewPortPoint = Vector2.zero;
+        CursorData targetData = CursorData.none;
+        Quaternion cameraRotation = Quaternion.identity;
+        if (OrbitCamera != null) {
+            viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
+            targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
+            cameraRotation = OrbitCamera.isometricRotation;
+        }
+
         PlayerInput characterInputs = PlayerInput.none;
         if (GameManager.I.gameData.phase == GamePhase.world) {
             selectGunThisFrame = 0;

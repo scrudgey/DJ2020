@@ -24,7 +24,8 @@ public class MissionPlanController : MonoBehaviour {
     public GameObject tacticPane;
     [Header("Controllers")]
     public MissionPlanLoadoutController loadoutController;
-    public MissionPlanMapController mapController;
+    // public MissionPlanMapController mapController;
+    public MapDisplay3DView mapDisplay;
     public MissionPlanTacticsController tacticsController;
     public MissionPlanOverviewController overviewController;
     [Header("Highlights")]
@@ -69,7 +70,8 @@ public class MissionPlanController : MonoBehaviour {
         this.template = template;
         plan = gameData.GetLevelPlan(template);
         loadoutController.Initialize(data, template, plan);
-        mapController.Initialize(data, template, plan);
+        // mapController.Initialize(data, template, plan);
+        mapDisplay.Initialize(template, plan);
         tacticsController.Initialize(data, template, plan);
         overviewController.Initialize(data, template, plan);
         SwitchPanes(PaneType.overview);

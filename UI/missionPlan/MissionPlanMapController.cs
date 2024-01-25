@@ -104,7 +104,7 @@ public class MissionPlanMapController : MonoBehaviour {
                     MapMarkerData.MapMarkerType.pointOfInterest => interestPointContainer
                 };
                 obj.transform.SetParent(column, false);
-                selector.Configure(this, data);
+                selector.Configure(data, ColumnItemCallback);
 
                 if (data.idn == plan.insertionPointIdn) {
                     SelectInsertionPoint(selector, indicators[data]);
