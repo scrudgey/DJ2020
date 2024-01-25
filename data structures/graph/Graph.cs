@@ -136,7 +136,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     }
 
 
-    public void Apply(LevelTemplate.GraphVisibilityDefault visibilityDefault) {
+    public void ApplyVisibilityDefault(LevelTemplate.GraphVisibilityDefault visibilityDefault) {
         foreach (KeyValuePair<string, T> kvp in nodes) {
             if (edges.ContainsKey(kvp.Value.idn))
                 foreach (string neighborId in edges[kvp.Value.idn]) {

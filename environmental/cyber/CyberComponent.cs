@@ -17,6 +17,8 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
         // check if we invalidate an objective
         if (GameManager.I == null || GameManager.I.gameData.levelState == null || GameManager.I.gameData.levelState.template == null) return;
         CyberNode node = GameManager.I.GetCyberNode(idn);
+
+        // TODO: this feels really weird
         foreach (Objective objective in GameManager.I.gameData.levelState.template.objectives) {
             if (objective is ObjectiveData) {
                 ObjectiveData objectiveData = (ObjectiveData)objective;

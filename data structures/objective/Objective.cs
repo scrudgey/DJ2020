@@ -4,6 +4,7 @@ using UnityEngine;
 
 [System.Serializable]
 public abstract class Objective : ScriptableObject {
+    public enum Visibility { unknown, known }
     public string title;
     [TextArea(15, 20)]
     public string decsription;
@@ -27,4 +28,6 @@ public abstract class Objective : ScriptableObject {
         ObjectiveStatus.inProgress => "FAILED",
         _ => "NONE"
     };
+
+    // abstract public Vector3 Location();
 }

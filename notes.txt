@@ -3573,46 +3573,6 @@ more equipment to bring on mission?
     * keys
 * thing when when loot is collected
 * clicking opens pause / status screen to appropriate tab
-
-
-
-publish trailer on twitter
-update the steam page graphic
-
-multiple guards chose the same clearpoint to navigate to- more global coordination
-better investigative ability when player does something weird like superjump / land
-highlight NPCs that are shooting me
-
-
-
-we should display floor number.
-    helps with readability when jumping around in network
-    helps with orientation re: map
-
-
-
-
-# pause/status menu
-
-information to show:
-    data
-    keys
-    loots
-    credots
-    map
-    objectives
-
-    player status / inventory / health / etc. ?
-        hook for skil tree
-
-
-    network info in map in planning mode
-
-
-Don’t think I’ve ever done this, but could you have the shader round the texture coords to the nearest 1/100th? Something like: 
-IN.uv.x = (frac(IN.uv.x/100)*100; (same for y, unless frac is a vector operation.)
-Then get fancy and have the 100 be a 
-
     * some sort of pseudo-3d offset map in the escape menu
 * dynamically load map display per level
     update a few more map images
@@ -3647,12 +3607,50 @@ Then get fancy and have the 100 be a
     * camera icon too big
 
 
+
+publish trailer on twitter
+update the steam page graphic
+
+multiple guards chose the same clearpoint to navigate to- more global coordination
+better investigative ability when player does something weird like superjump / land
+highlight NPCs that are shooting me
+
+we should display floor number.
+    helps with readability when jumping around in network
+    helps with orientation re: map
+
+
+
+# pause/status menu
+    information to show:
+        data
+        keys
+        loots
+        credots
+        map
+        objectives
+        player status / inventory / health / etc. ?
+            hook for skil tree
+        * network info in map in planning mode
+
+
+flavor
+? markers have visibility?
+
+
+two separate ideas:
+    1. show objectives on the map: important
+    2. connect the map information with objective information
+        this implies buttons that click jump to map
+        this is similar to map planning mode
+        we are replacing map planning mode with 3d map: we can replace jumps as well.
+        the only different functionality is in choosing the insert / extract points. we can move this out!
+
+
+
  readibility
     colors for network
     fade current flo0r?
 
-show objective makers
-connect objectives with markers in map when clicked
 
-
-flavor
+show objective makers: see level_plan.md

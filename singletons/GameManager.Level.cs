@@ -119,18 +119,18 @@ public partial class GameManager : Singleton<GameManager> {
             doorRandomizer.ApplyState(state.template);
         }
 
+
+
+        // randomize cyber state:
         state.delta.cyberGraph.InfillRandomData();
-
         // TODO: apply level plan tactic information
-
-
         // TODO: filter out anything placed by level plan tactic information
         List<ObjectiveData> dataObjectives = state.template.objectives
             .Where(objective => objective is ObjectiveData)
             .Select(objective => (ObjectiveData)objective)
             .ToList();
-
         state.delta.cyberGraph.ApplyObjectiveData(dataObjectives);
+
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 

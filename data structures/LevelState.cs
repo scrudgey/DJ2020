@@ -21,9 +21,9 @@ public class LevelState : PerkIdConstants {
 
 
         // TODO: move this to after level load to match with paydata instantiation?
-        cyberGraph.Apply(template.cyberGraphVisibilityDefault);
-        powerGraph.Apply(template.powerGraphVisibilityDefault);
-        alarmGraph.Apply(template.alarmGraphVisibiltyDefault);
+        cyberGraph.ApplyVisibilityDefault(template.cyberGraphVisibilityDefault);
+        powerGraph.ApplyVisibilityDefault(template.powerGraphVisibilityDefault);
+        alarmGraph.ApplyVisibilityDefault(template.alarmGraphVisibiltyDefault);
 
         cyberGraph.Apply(plan);
         powerGraph.Apply(plan);
