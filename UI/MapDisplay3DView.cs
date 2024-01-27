@@ -164,21 +164,24 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
         if (mode == Mode.plan) {
             foreach (Objective objective in template.objectives) {
-                if (objective.visibility == Objective.Visibility.unknown) continue;
+                if (objective.visibility == Objective.Visibility.unknown && !plan.objectiveLocations.ContainsKey(objective.name)) {
+                    if (objectiveIndicators.ContainsKey(objective))
+                        objectiveIndicators[objective].gameObject.SetActive(false);
+                    continue;
+                }
 
                 // if objective is visible at template level, it must have only one position I guess (??)
-
                 if (!objectiveIndicators.ContainsKey(objective)) {
                     MapMarkerIndicator objectiveIndicator = SpawnNewMapMarker();
                     objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.extractionPoint, MapMarkerData.MapMarkerIcon.circle);
                     objectiveIndicators[objective] = objectiveIndicator;
                 }
 
-                string idn = objective.potentialSpawnPoints[0];
+                string idn = plan.objectiveLocations.ContainsKey(objective.name) ? plan.objectiveLocations[objective.name] : objective.potentialSpawnPoints[0];
                 Vector3 position = objective.SpawnPointLocation(idn);
+
                 objectiveIndicators[objective].SetPosition(position, mapDisplay3Dgenerator, markerContainer);
                 objectiveIndicators[objective].gameObject.SetActive(template.GetFloorForPosition(position) == generator.currentFloor);
-                break;
             }
         } else if (mode == Mode.mission) {
             foreach (ObjectiveDelta delta in state.delta.objectiveDeltas) {

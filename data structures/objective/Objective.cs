@@ -29,4 +29,11 @@ public abstract class Objective : ScriptableObject {
     }
 
     public abstract ObjectiveDelta ToDelta(LevelState state);
+
+    public virtual string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
+        if (plan.objectiveLocations.ContainsKey(name)) {
+            return plan.objectiveLocations[name];
+        }
+        return Toolbox.RandomFromList(potentialSpawnPoints);
+    }
 }

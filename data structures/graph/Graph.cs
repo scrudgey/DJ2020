@@ -77,7 +77,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
 
     public static W LoadAll(string levelName) {
         string levelPath = Path.Combine("data", "missions", levelName);
-        Debug.Log($"loading all graphs at {levelPath}...");
+        // Debug.Log($"loading all graphs at {levelPath}...");
         string prefix = PowerGraphPrefix();
 
         UnityEngine.Object[] graphTextAssets = Resources.LoadAll(levelPath, typeof(TextAsset));
@@ -86,7 +86,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         foreach (UnityEngine.Object obj in graphTextAssets) {
             TextAsset textAsset = (TextAsset)obj;
             if (textAsset.name.ToLower().StartsWith($"graph_{prefix}")) {
-                Debug.Log($"loading {textAsset.name}...");
+                // Debug.Log($"loading {textAsset.name}...");
                 graph = graph == null ? Load(textAsset) : graph + Load(textAsset) as W;
                 graphCount += 1;
             }

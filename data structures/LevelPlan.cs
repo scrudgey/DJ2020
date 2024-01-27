@@ -15,8 +15,9 @@ public record LevelPlan {
 
     public SerializableDictionary<string, NodeVisibility> nodeVisibility;
 
-    // TODO: paydata state
     public SerializableDictionary<string, PayData> nodePayData;
+
+    public SerializableDictionary<string, string> objectiveLocations;
 
     public static LevelPlan Default(List<ItemTemplate> allItems) { // TODO: replace argument with playerstate?
         List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
@@ -37,9 +38,10 @@ public record LevelPlan {
             extractionPointIdn = "",
             items = itemList,
             nodeVisibility = new SerializableDictionary<string, NodeVisibility>(),
-            // activeTactics = new List<Tactic>()
+            objectiveLocations = new SerializableDictionary<string, string>(),
+            activeTactics = new List<Tactic>(),
             // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
-            activeTactics = new List<Tactic>() { Resources.Load("data/tactics/fakeID") as Tactic }
+            // activeTactics = new List<Tactic>() { Resources.Load("data/tactics/fakeID") as Tactic }
         };
     }
 

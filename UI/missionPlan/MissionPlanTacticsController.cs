@@ -63,28 +63,16 @@ public class MissionPlanTacticsController : MonoBehaviour {
         List<string> activeTacticNames = plan.activeTactics.Select(tactic => tactic.title).ToList();
 
         foreach (Tactic tactic in template.availableTactics) {
-            // if (activeTacticNames.Contains(tactic.title)) continue;
             GameObject obj = Instantiate(availbleEntryPrefab);
             obj.transform.SetParent(availableEntriesContainer, false);
             PurchaseTacticEntry purchaseTacticEntry = obj.GetComponent<PurchaseTacticEntry>();
             PurchaseTacticEntry.Status status = activeTacticNames.Contains(tactic.title) ? PurchaseTacticEntry.Status.purchased : PurchaseTacticEntry.Status.forSale;
             purchaseTacticEntry.Initialize(this, tactic, status);
-            // if (activeEntry == null) {
-            //     AvailableEntryCallback(purchaseTacticEntry);
-            // }
         }
     }
     void SetupActiveTactics(LevelPlan plan) {
-        // foreach (Transform child in activeEntriesContainer) {
-        //     if (child.gameObject.name.ToLower().Contains("title") ||
-        //         child.gameObject.name.ToLower().Contains("divider") ||
-        //         child.gameObject.name.ToLower().Contains("spacer") ||
-        //         child.gameObject.name.ToLower().Contains("credits")) continue;
-        //     Destroy(child.gameObject);
-        // }
         foreach (Tactic tactic in plan.activeTactics) {
             GameObject obj = Instantiate(activeEntryPrefab);
-            // obj.transform.SetParent(activeEntriesContainer, false);
             ActiveTacticView activeTacticView = obj.GetComponent<ActiveTacticView>();
             activeTacticView.Initialize(tactic);
         }
@@ -94,7 +82,6 @@ public class MissionPlanTacticsController : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, openDialogueSound);
         activeEntry = entry;
         ShowDialogue(entry);
-        // ConfigurePurchaseDialogue(entry.tactic);
     }
     void SetCreditsText() {
         creditsText.text = $"{data.playerState.credits}";
@@ -131,6 +118,7 @@ public class MissionPlanTacticsController : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, purchaseSound);
         data.playerState.credits -= tactic.cost;
         plan.activeTactics.Add(tactic);
+        tactic.ApplyPurchaseState(template, plan);
         SetupPurchases(template, plan);
         SetupActiveTactics(plan);
         SetCreditsText();

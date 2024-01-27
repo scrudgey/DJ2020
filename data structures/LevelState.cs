@@ -93,11 +93,6 @@ public class LevelState : PerkIdConstants {
     public bool PlayerHasID() => plan.activeTactics.Any(tactic => tactic is TacticFakeID);
 
     public int NumberPreviousTacticType(DialogueTacticType type) {
-        // if (delta.lastTactics.Count == 0) {
-        //     return 0;
-        // } else if (delta.lastTactics.Peek() == type) {
-        //     return delta.lastTactics.Count;
-        // } else return 0;
         return delta.lastTactics.Where(tactic => tactic == type).Count();
     }
 }

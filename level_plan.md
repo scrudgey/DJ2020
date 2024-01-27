@@ -268,11 +268,6 @@ how does the solution work for different objective types?
 decide on escape menu: does it have selectable markers like planning mode? 
     might as well redesign plan mode tools
 
-allow plan mode to modify objective deltas, visibility, etc
-    the basic idea here: objectives may have one or more potential locations to spawn from
-        objective loot: potentialSpawnPoints
-        objective data: cyber data nodes
-    
 
 
 
@@ -282,3 +277,29 @@ data objectives can select the same target node
 partial visibility cyber graph doesn't work in mission plan mode
 optional objectives - after action report
 discover objective data node - discover objective
+
+
+
+
+allow plan mode to modify objective deltas, visibility, etc
+    the basic idea here: 
+    objectives may have one or more potential locations to spawn from
+    objective may have a single location but be unknown
+        objective loot: potentialSpawnPoints
+        objective data: cyber data nodes
+    in the plan, we will purchase a tactic. this state will be reflected in plan.
+    the plan will have to store information per objective.
+        the information specifics will depend on objective type
+            objective data: idn of a specific data node
+            objective loot: idn of a specific potentialSpawnPoints idn
+                (potentialSpawnPoints is also used by objective use item to identify the interactive )
+    if information is set for the objective, its visibility is known as well.
+        template visibility might be unknown, plan visibility is known -> objective delta visibility is known.
+
+implement:
+    * tactic can select and place idn in mission plan per objective
+    * when creating delta for objective loot, data, use mission plan information
+    * set visibility
+    3. map view should take plan visibility into account
+
+can't we use cyber node  locations for spawnpointlocations on objective data type? cleaner
