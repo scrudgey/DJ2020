@@ -31,7 +31,8 @@ public class AlarmNode : Node<AlarmNode> {
         return new MarkerConfiguration() {
             icon = graphIconReference.AlarmNodeSprite(this),
             color = graphIconReference.minimapAlarmColor,
-            worldPosition = position
+            worldPosition = position,
+            nodeVisibility = visibility
         };
     }
 }

@@ -71,20 +71,14 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             kvp.Value.payData = PayData.RandomPaydata();
         }
     }
-
-    // public void ApplyObjectiveData(List<ObjectiveData> objectives) {
-    //     List<CyberNode> dataNodes = nodes.Values.Where(node => node.type == CyberNodeType.datanode).ToList();
-    //     foreach (ObjectiveData objective in objectives) {
-    //         if (dataNodes.Count == 0) {
-    //             Debug.LogError("Not enough data nodes to support level objectives! Mission is not possible.");
-    //             break;
-    //         }
-    //         CyberNode target = Toolbox.RandomFromList(dataNodes);
-    //         target.payData = objective.targetPaydata;
-    //         dataNodes.Remove(target);
-    //         Debug.Log($"[objective data] applying objective data {objective.name}:{objective.targetPaydata} -> {target.nodeTitle}:{target.idn}");
-    //     }
-    // }
+    public void InfillDummyData() {
+        foreach (KeyValuePair<string, CyberNode> kvp in nodes) {
+            kvp.Value.payData = PayData.DummyPaydata();
+        }
+    }
+    public void InfillDummyObjective(ObjectiveData objectiveData) {
+        nodes[objectiveData.potentialSpawnPoints[0]].payData = PayData.DummyObjective(objectiveData);
+    }
     public void AddNetworkAction(NetworkAction action) {
         if (networkActions == null) {
             networkActions = new Dictionary<CyberNode, List<NetworkAction>>();

@@ -50,18 +50,15 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     AlarmGraph currentAlarmGraph;
 
     public void Initialize(LevelState state) {
-        Initialize(state.template);
+        Initialize(state.template, state.plan);
         cyberGraph = state.delta.cyberGraph;
         powerGraph = state.delta.powerGraph;
         alarmGraph = state.delta.alarmGraph;
         // TODO: set theta based on character camera rotation offset
-    }
-    public void Initialize(LevelTemplate template) {
-        this.template = template;
 
-        // cyberGraph = state.delta.cyberGraph;
-        // powerGraph = state.delta.powerGraph;
-        // alarmGraph = state.delta.alarmGraph;
+    }
+    public void Initialize(LevelTemplate template, LevelPlan plan) {
+        this.template = template;
 
         cyberGraph = CyberGraph.LoadAll(template.levelName);
         powerGraph = PowerGraph.LoadAll(template.levelName);
@@ -70,6 +67,21 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         cyberGraph.ApplyVisibilityDefault(template.cyberGraphVisibilityDefault);
         powerGraph.ApplyVisibilityDefault(template.powerGraphVisibilityDefault);
         alarmGraph.ApplyVisibilityDefault(template.alarmGraphVisibiltyDefault);
+
+        cyberGraph.InfillDummyData();
+
+        foreach (ObjectiveData objectiveData in template.objectives.Concat(template.bonusObjectives).Where(objective => objective is ObjectiveData)) {
+            if (objectiveData.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objectiveData.name)) {
+
+                string idn = objectiveData.potentialSpawnPoints[0];
+                if (plan.objectiveLocations.ContainsKey(objectiveData.name)) {
+                    idn = plan.objectiveLocations[objectiveData.name];
+                }
+
+                cyberGraph.InfillDummyObjective(objectiveData);
+                cyberGraph.nodes[idn].visibility = NodeVisibility.known;
+            }
+        }
 
         // TODO: apply plan information?
         // cyberGraph.Apply(plan);

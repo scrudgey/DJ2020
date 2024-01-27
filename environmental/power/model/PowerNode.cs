@@ -15,7 +15,8 @@ public class PowerNode : Node<PowerNode> {
         return new MarkerConfiguration() {
             icon = graphIconReference.PowerNodeSprite(this),
             color = graphIconReference.minimapPowerColor,
-            worldPosition = position
+            worldPosition = position,
+            nodeVisibility = visibility
         };
     }
 }

@@ -272,6 +272,10 @@ how does the solution work for different objective types?
 * optional objectives - after action report
 * discover objective data node -> discover objective
 ? "spawn points" is actually more generic than that- but not sure what to call it?
+* flying loot indicator is a lock icon?
+* partial visibility cyber graph doesn't work in mission plan mode
+* zero visibility cyber graph represents a bunch of nodes as ? in mission mode
+* test that knowing the data objective reveals the node
 
 decide on escape menu: does it have selectable markers like planning mode? 
     might as well redesign plan mode tools
@@ -279,7 +283,5 @@ decide on escape menu: does it have selectable markers like planning mode?
 ## bugs
 data objectives can select the same target node
     the solution has to work at the template + plan level
-partial visibility cyber graph doesn't work in mission plan mode
 
-flying loot indicator is a lock icon?
-
+## tactics can reveal graph information

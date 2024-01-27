@@ -7,6 +7,7 @@ public class MiniMapNodeMarker : MonoBehaviour {
     public Image outline;
     public Image icon;
     public int floor;
+    public NodeVisibility nodeVisibility;
     Vector3 worldPosition;
     public void Configure(MarkerConfiguration configuration, MapDisplay3DGenerator generator, int floor) {
         icon.sprite = configuration.icon;
@@ -14,6 +15,7 @@ public class MiniMapNodeMarker : MonoBehaviour {
         outline.color = configuration.color;
         this.worldPosition = configuration.worldPosition;
         this.floor = floor;
+        this.nodeVisibility = configuration.nodeVisibility;
     }
 
     public void SetPosition(MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect) {
@@ -27,4 +29,5 @@ public class MarkerConfiguration {
     public Sprite icon;
     public Color color;
     public Vector3 worldPosition;
+    public NodeVisibility nodeVisibility;
 }

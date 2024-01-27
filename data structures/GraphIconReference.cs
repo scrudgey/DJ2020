@@ -24,6 +24,7 @@ public class GraphIconReference : ScriptableObject {
     public Sprite iconPassword;
     public Sprite iconLocation;
     public Sprite iconObjective;
+    public Sprite iconGenericData;
     [Header("colors")]
     public Color minimapCyberColor;
     public Color minimapAlarmColor;
@@ -83,6 +84,7 @@ public class GraphIconReference : ScriptableObject {
             PayData.DataType.password => iconPassword,
             PayData.DataType.pay => iconPay,
             PayData.DataType.personnel => iconPersonnel,
+            PayData.DataType.unknown => iconGenericData,
             _ => iconPay
         };
     }

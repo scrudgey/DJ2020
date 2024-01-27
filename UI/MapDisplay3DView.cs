@@ -65,7 +65,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             floorPips.Add(pip);
         }
 
-        mapDisplay3Dgenerator.Initialize(template); // TODO: broken network graphs
+        mapDisplay3Dgenerator.Initialize(template, plan); // TODO: broken network graphs
         Bind(mapDisplay3Dgenerator.gameObject);
 
         mapDisplayController.Initialize();
@@ -115,7 +115,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             kvp.Value.gameObject.SetActive(kvp.Key.floorNumber == generator.currentFloor);
         }
         foreach (KeyValuePair<string, MiniMapNodeMarker> kvp in nodeMarkers) {
-            kvp.Value.gameObject.SetActive(kvp.Value.floor == generator.currentFloor);
+            kvp.Value.gameObject.SetActive(kvp.Value.floor == generator.currentFloor && kvp.Value.nodeVisibility == NodeVisibility.known);
         }
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {

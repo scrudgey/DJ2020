@@ -8,7 +8,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class PayData {
-    public enum DataType { pay, personnel, password, location, objective }
+    public enum DataType { pay, personnel, password, location, objective, unknown }
     public static DataType[] acceptableRandomTypes = new DataType[]{
         DataType.pay, DataType.personnel, DataType.password, DataType.location
     };
@@ -30,6 +30,20 @@ public class PayData {
             type = RandomDataType(),
             filename = grammar.Parse("{filename}"),
             value = UnityEngine.Random.Range(50, 3000)
+        };
+    }
+    public static PayData DummyPaydata() {
+        return new PayData {
+            type = DataType.unknown,
+            filename = "???",
+            value = 0
+        };
+    }
+    public static PayData DummyObjective(ObjectiveData objective) {
+        return new PayData {
+            type = DataType.objective,
+            filename = objective.targetPaydata.filename,
+            value = 0
         };
     }
 

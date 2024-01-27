@@ -52,7 +52,8 @@ public class CyberNode : Node<CyberNode> {
         return new MarkerConfiguration() {
             icon = graphIconReference.CyberNodeSprite(this),
             color = graphIconReference.minimapCyberColor,
-            worldPosition = position
+            worldPosition = position,
+            nodeVisibility = visibility
         };
     }
 
