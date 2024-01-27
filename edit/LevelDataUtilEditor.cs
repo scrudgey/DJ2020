@@ -67,6 +67,9 @@ public class LevelDataUtilEditor : Editor {
             if (GUILayout.Button("Write map marker data")) {
                 SaveMapData();
             }
+            if (GUILayout.Button("Write objective data")) {
+                SetObjectiveData(template);
+            }
         } else {
             Debug.LogError("set level template before writing level data");
         }
@@ -134,6 +137,32 @@ public class LevelDataUtilEditor : Editor {
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         SaveMapMetaData(mapCam, template);
         AssetDatabase.Refresh();
+    }
+
+    public void SetObjectiveData(LevelTemplate template) {
+        foreach (Objective objective in template.objectives) {
+            switch (objective) {
+                case ObjectiveGetLoot lootget:
+                    lootget.spawnPointLocations = new List<Vector3>();
+                    lootget.potentialSpawnPoints = new List<string>();
+                    EditorUtility.SetDirty(objective);
+                    break;
+            }
+        }
+        foreach (ObjectiveLootSpawnpoint lootSpawnpoint in GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>()) {
+            Guid guid = Guid.NewGuid();
+            string idn = guid.ToString();
+            lootSpawnpoint.idn = idn;
+
+            Objective objective = lootSpawnpoint.objective;
+
+            objective.potentialSpawnPoints.Add(idn);
+            objective.spawnPointLocations.Add(lootSpawnpoint.transform.position);
+
+            EditorUtility.SetDirty(lootSpawnpoint);
+        }
+
+        EditorUtility.SetDirty(template);
     }
 
     void SaveMapSnapshot(Camera mapCam, RenderTexture renderTexture, LevelTemplate template, int floorNumber) {

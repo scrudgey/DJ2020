@@ -21,7 +21,6 @@ public record LevelDelta {
     public Dictionary<Objective, ObjectiveStatus> objectivesState;
     public HashSet<Objective> failedObjectives;
     public List<PayData> levelAcquiredPaydata;
-    public HashSet<string> levelInteractedObjects;
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> levelAcquiredLoot;
     public int levelAcquiredCredits;
@@ -29,9 +28,8 @@ public record LevelDelta {
     public bool alarmTerminalActive;
     public float strikeTeamMissionTimer;
     public LevelTemplate.StrikeTeamResponseBehavior strikeTeamBehavior;
-
+    public List<ObjectiveDelta> objectiveDeltas;
     // dialogue
-
     public List<DialogueCard> dialogueCards;
     public int bullshitLevel;
     public Stack<DialogueTacticType> lastTactics;
@@ -41,9 +39,9 @@ public record LevelDelta {
         objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
         failedObjectives = new HashSet<Objective>(),
         levelAcquiredPaydata = new List<PayData>(),
-        levelInteractedObjects = new HashSet<string>(),
         levelAcquiredLoot = new List<LootData>(),
         dialogueCards = new List<DialogueCard>(),
-        lastTactics = new Stack<DialogueTacticType>()
+        lastTactics = new Stack<DialogueTacticType>(),
+        objectiveDeltas = new List<ObjectiveDelta>()
     };
 }

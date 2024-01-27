@@ -54,17 +54,32 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         cyberGraph = state.delta.cyberGraph;
         powerGraph = state.delta.powerGraph;
         alarmGraph = state.delta.alarmGraph;
+        // TODO: set theta based on character camera rotation offset
     }
     public void Initialize(LevelTemplate template) {
         this.template = template;
-        // this.state = state;
-        // TODO: somehow, display graph information from plan
+
+        // cyberGraph = state.delta.cyberGraph;
+        // powerGraph = state.delta.powerGraph;
+        // alarmGraph = state.delta.alarmGraph;
+
+        cyberGraph = CyberGraph.LoadAll(template.levelName);
+        powerGraph = PowerGraph.LoadAll(template.levelName);
+        alarmGraph = AlarmGraph.LoadAll(template.levelName);
+
+        cyberGraph.ApplyVisibilityDefault(template.cyberGraphVisibilityDefault);
+        powerGraph.ApplyVisibilityDefault(template.powerGraphVisibilityDefault);
+        alarmGraph.ApplyVisibilityDefault(template.alarmGraphVisibiltyDefault);
+
+        // TODO: apply plan information?
+        // cyberGraph.Apply(plan);
+        // powerGraph.Apply(plan);
+        // alarmGraph.Apply(plan);
 
         mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
         // mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
         nodeData = new Dictionary<string, MarkerConfiguration>();
         numberFloors = mapImages.Count;
-        // TODO: set theta based on character camera rotation offset
         theta = 3.925f;
 
         for (int i = 0; i < quads.Count; i++) {

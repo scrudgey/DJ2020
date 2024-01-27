@@ -208,7 +208,7 @@ try a different angle:
             set the uuid
             take all objectives on the data provider:
                 add this uuid to the objective list of positions
-
+ 
     in plan mode:
         template -> objectives -> list of positions and selected position.
         plan -> per objective -> list of selected positions
@@ -237,15 +237,6 @@ try a different angle:
 it is mostly clear except for plan state.
 template: set objectives state in level gen
 gameplay: set objective delta in level initialize.
-                
-
-
-start by moving 3d map into planning mode.
-decided on escape menu: does it have selectable markers like planning mode?
-
-fix: load graphs during runtime
-
-
 
 how does the solution work for different objective types? 
     objective data
@@ -258,4 +249,29 @@ how does the solution work for different objective types?
 
 
 
-don't show player location in mission planning
+
+
+
+# todo / implementation
+
+* start by moving 3d map into planning mode.
+* fix: load graphs during runtime
+* don't show player location in mission planning
+* instantiate objective delta inside level delta, use to track objective state
+* figure out how to make map mode work in plan and gameplay both
+* extend this model to all other objective types.
+* load graphs during mission planning with applied visibility
+
+
+use deltas in gameplay to determine objective status
+
+data objectives can select the same target node
+"spawn points" is actually more generic than that- but not sure what to call it
+partial visibility cyber graph doesn't work in mission plan mode
+
+decide on escape menu: does it have selectable markers like planning mode? 
+    might as well redesign plan mode tools
+
+
+
+allow plan mode to modify objective deltas, visibility, etc

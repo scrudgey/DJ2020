@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Serialization;
 using UnityEngine;
-
-
 [System.Serializable]
 public class CyberNode : Node<CyberNode> {
     public bool compromised;    // TODO: why this instead of status? status is derived.
@@ -14,6 +15,9 @@ public class CyberNode : Node<CyberNode> {
     public bool utilityActive;
     public bool isManualHackerTarget;
     public CyberNodeStatus status;
+    [System.NonSerialized]
+    [XmlIgnore]
+    public Action OnDataStolen;
     public bool BeDiscovered() {
         if (visibility == NodeVisibility.unknown || visibility == NodeVisibility.mystery) {
             visibility = NodeVisibility.known;
@@ -44,6 +48,12 @@ public class CyberNode : Node<CyberNode> {
             color = graphIconReference.minimapCyberColor,
             worldPosition = position
         };
+    }
+
+    public void DownloadData() {
+        GameManager.I.AddPayDatas(payData, position);
+        dataStolen = true;
+        OnDataStolen?.Invoke();
     }
 }
 

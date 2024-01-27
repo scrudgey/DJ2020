@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,15 @@ public abstract class Interactive : Highlightable {
     public Interactor interactor;
     public string interactiveId;
 
+    public Action OnUsed;
+
     public virtual string ResponseString() {
         return $"did {actionPrompt}";
     }
     public ItemUseResult DoActionAndUpdateState(Interactor interactor) {
-        GameManager.I.gameData.levelState.delta.levelInteractedObjects.Add(interactiveId);
+        // GameManager.I.gameData.levelState.delta.levelInteractedObjects.Add(interactiveId);
         GameManager.I.CheckObjectives();
+        OnUsed?.Invoke();
         return DoAction(interactor);
     }
     public abstract ItemUseResult DoAction(Interactor interactor);

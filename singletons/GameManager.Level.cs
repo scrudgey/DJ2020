@@ -119,17 +119,30 @@ public partial class GameManager : Singleton<GameManager> {
             doorRandomizer.ApplyState(state.template);
         }
 
+        state.spawnPoints = GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>().ToDictionary(s => s.idn, s => s);
 
 
         // randomize cyber state:
         state.delta.cyberGraph.InfillRandomData();
+
+        // initialize objectives
+        foreach (Objective objective in state.template.objectives) {
+            // switch (objective) {
+            //     case ObjectiveGetLoot lootget:
+            ObjectiveDelta delta = objective.ToDelta(state);
+            state.delta.objectiveDeltas.Add(delta);
+            //         break;
+            // }
+        }
+
         // TODO: apply level plan tactic information
         // TODO: filter out anything placed by level plan tactic information
-        List<ObjectiveData> dataObjectives = state.template.objectives
-            .Where(objective => objective is ObjectiveData)
-            .Select(objective => (ObjectiveData)objective)
-            .ToList();
-        state.delta.cyberGraph.ApplyObjectiveData(dataObjectives);
+        // TODO: this functionality will be replaced by delta initialization
+        // List<ObjectiveData> dataObjectives = state.template.objectives
+        //     .Where(objective => objective is ObjectiveData)
+        //     .Select(objective => (ObjectiveData)objective)
+        //     .ToList();
+        // state.delta.cyberGraph.ApplyObjectiveData(dataObjectives);
 
 
         MusicController.I.LoadTrack(state.template.musicTrack);

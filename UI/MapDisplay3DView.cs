@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
+    enum Mode { plan, mission }
+    Mode mode;
     public MapDisplay3DGenerator mapDisplay3Dgenerator;
     public MapDisplayController mapDisplayController;
     [Header("floor indicators")]
@@ -27,17 +29,23 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public Color legendInactiveColor;
     Dictionary<MapMarkerData, MapMarkerIndicator> indicators;
     Dictionary<string, MiniMapNodeMarker> nodeMarkers;
+    Dictionary<Objective, MapMarkerIndicator> objectiveIndicators;
+    Dictionary<string, ObjectiveLootSpawnpoint> objectiveLocations;
     MapMarkerIndicator playerMarker;
     List<Image> floorPips;
     int numberFloors;
     LevelTemplate template;
     LevelPlan plan;
+    LevelState state;
 
     public void Initialize(LevelState state) {
+        this.state = state;
         Initialize(state.template, state.plan);
         mapDisplay3Dgenerator.Initialize(state);
+        mode = Mode.mission;
     }
     public void Initialize(LevelTemplate template, LevelPlan plan) {
+        mode = Mode.plan;
         this.template = template;
         this.plan = plan;
         floorPips = new List<Image>();
@@ -48,6 +56,8 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         }
         indicators = new Dictionary<MapMarkerData, MapMarkerIndicator>();
         nodeMarkers = new Dictionary<string, MiniMapNodeMarker>();
+        objectiveIndicators = new Dictionary<Objective, MapMarkerIndicator>();
+        objectiveLocations = GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>().ToDictionary(s => s.idn, s => s);
 
         for (int i = floorPipContainer.childCount - 1; i >= 0; i--) {
             Transform pipChild = floorPipContainer.GetChild(i);
@@ -151,11 +161,46 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             RemoveNodeMarker(key);
         }
 
-        if (playerMarker == null) {
-            playerMarker = SpawnNewMapMarker();
-            playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
+
+        if (mode == Mode.plan) {
+            foreach (Objective objective in template.objectives) {
+                if (objective.visibility == Objective.Visibility.unknown) continue;
+
+                // if objective is visible at template level, it must have only one position I guess (??)
+
+                if (!objectiveIndicators.ContainsKey(objective)) {
+                    MapMarkerIndicator objectiveIndicator = SpawnNewMapMarker();
+                    objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.extractionPoint, MapMarkerData.MapMarkerIcon.circle);
+                    objectiveIndicators[objective] = objectiveIndicator;
+                }
+
+                string idn = objective.potentialSpawnPoints[0];
+                Vector3 position = objective.SpawnPointLocation(idn);
+                objectiveIndicators[objective].SetPosition(position, mapDisplay3Dgenerator, markerContainer);
+                objectiveIndicators[objective].gameObject.SetActive(template.GetFloorForPosition(position) == generator.currentFloor);
+                break;
+            }
+        } else if (mode == Mode.mission) {
+            foreach (ObjectiveDelta delta in state.delta.objectiveDeltas) {
+                if (delta.visibility == Objective.Visibility.unknown) continue;
+                if (!objectiveIndicators.ContainsKey(delta.template)) {
+                    MapMarkerIndicator objectiveIndicator = SpawnNewMapMarker();
+                    objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.extractionPoint, MapMarkerData.MapMarkerIcon.circle);
+                    objectiveIndicators[delta.template] = objectiveIndicator;
+                }
+                Vector3 position = delta.GetPosition();
+                objectiveIndicators[delta.template].SetPosition(position, mapDisplay3Dgenerator, markerContainer);
+                objectiveIndicators[delta.template].gameObject.SetActive(template.GetFloorForPosition(position) == generator.currentFloor);
+            }
+
+            if (playerMarker == null) {
+                playerMarker = SpawnNewMapMarker();
+                playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
+            }
+            playerMarker.SetPosition(GameManager.I.playerPosition, mapDisplay3Dgenerator, markerContainer);
+            playerMarker.gameObject.SetActive(template.GetFloorForPosition(GameManager.I.playerPosition) == generator.currentFloor);
+
         }
-        playerMarker.SetPosition(GameManager.I.playerPosition, mapDisplay3Dgenerator, markerContainer);
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
 

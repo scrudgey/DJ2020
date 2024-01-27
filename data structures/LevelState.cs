@@ -12,6 +12,9 @@ public class LevelState : PerkIdConstants {
     public LevelPlan plan;
     public LevelDelta delta;
 
+    // this is weird: and temporary state.
+    public Dictionary<string, ObjectiveLootSpawnpoint> spawnPoints;
+
     public static LevelState Instantiate(LevelTemplate template, LevelPlan plan, PlayerState playerState) {
         int numberDialogueCards = playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_3CARD) ? 3 : 2;
 
@@ -19,8 +22,6 @@ public class LevelState : PerkIdConstants {
         PowerGraph powerGraph = PowerGraph.LoadAll(template.levelName);
         AlarmGraph alarmGraph = AlarmGraph.LoadAll(template.levelName);
 
-
-        // TODO: move this to after level load to match with paydata instantiation?
         cyberGraph.ApplyVisibilityDefault(template.cyberGraphVisibilityDefault);
         powerGraph.ApplyVisibilityDefault(template.powerGraphVisibilityDefault);
         alarmGraph.ApplyVisibilityDefault(template.alarmGraphVisibiltyDefault);
