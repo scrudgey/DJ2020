@@ -182,7 +182,10 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             }
         } else if (mode == Mode.mission) {
             foreach (ObjectiveDelta delta in state.delta.objectiveDeltas) {
-                if (delta.visibility == Objective.Visibility.unknown) continue;
+                if (delta.visibility == Objective.Visibility.unknown || delta.status != ObjectiveStatus.inProgress) {
+                    objectiveIndicators[delta.template].gameObject.SetActive(false);
+                    continue;
+                }
                 if (!objectiveIndicators.ContainsKey(delta.template)) {
                     MapMarkerIndicator objectiveIndicator = SpawnNewMapMarker();
                     objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.extractionPoint, MapMarkerData.MapMarkerIcon.circle);
@@ -206,18 +209,6 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
         HandleLegendMarkers();
     }
-
-
-    // TODO: combine this with handle value changed- reflect loaded graph nodes.
-    void DisplayGraph<T, W>(Graph<T, W> graph) where T : Node<T> where W : Graph<T, W> {
-        foreach (T node in graph.nodes.Values) {
-            int floor = template.GetFloorForPosition(node.position);
-            if (floor == mapDisplay3Dgenerator.currentFloor) {
-
-            }
-        }
-    }
-
 
     void HandleLegendMarkers() {
         legendMarkersIndicator.color = legendInactiveColor;

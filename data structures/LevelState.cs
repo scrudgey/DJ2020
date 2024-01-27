@@ -43,8 +43,8 @@ public class LevelState : PerkIdConstants {
                 alarmGraph = alarmGraph,
                 disguise = plan.startWithDisguise(),
                 dialogueCards = Enumerable.Range(0, numberDialogueCards).Select((i) => playerState.NewDialogueCard()).ToList(),
-                objectivesState = template.objectives.Concat(template.bonusObjectives)
-                .ToDictionary(t => t, t => ObjectiveStatus.inProgress),
+                // objectivesState = template.objectives.Concat(template.bonusObjectives)
+                // .ToDictionary(t => t, t => ObjectiveStatus.inProgress),
                 // levelAcquiredPaydata = new List<PayData> { Resources.Load("data/paydata/personnel_data") as PayData }
                 levelAcquiredPaydata = new List<PayData> { }
             }

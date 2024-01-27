@@ -17,7 +17,7 @@ public class EscapeMenuController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         GameData gameData = GameManager.I.gameData;
-        foreach (Objective objective in gameData.levelState.template.objectives) {
+        foreach (ObjectiveDelta objective in gameData.levelState.delta.objectiveDeltas) {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
             obj.transform.SetParent(objectivesContainer, false);
             PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();

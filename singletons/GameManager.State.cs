@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
-    public static Action<GameData, Dictionary<Objective, ObjectiveStatus>> OnObjectivesChange;
+    public static Action<ObjectiveDelta> OnObjectivesChange;
     public static Action<LootData, GameData> OnLootChange;
     public static Action<PayData, GameData> OnPayDataChange;
     public static Action<int, String> OnItemPickup;
@@ -14,7 +14,6 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void AddPayDatas(PayData data, Vector3 position) {
         gameData.levelState.delta.levelAcquiredPaydata.Add(data);
-        CheckObjectives();
         OnPayDataChange?.Invoke(data, gameData);
         OnGameStateChange?.Invoke(new StatusUpdateData() {
             type = StatusUpdateData.StatusType.data,
@@ -24,9 +23,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void AddCredits(int amount, Vector3 position) {
-        // gameData.playerState.credits += amount;
         gameData.levelState.delta.levelAcquiredCredits += amount;
-        CheckObjectives();
         OnItemPickup?.Invoke(1, $"{amount}");
         OnGameStateChange?.Invoke(new StatusUpdateData() {
             type = StatusUpdateData.StatusType.credit,
@@ -37,7 +34,6 @@ public partial class GameManager : Singleton<GameManager> {
     public void CollectLoot(LootData data, Vector3 position) {
         gameData.levelState.delta.levelAcquiredLoot.Add(data);
         OnLootChange?.Invoke(data, gameData);
-        CheckObjectives();
         OnGameStateChange?.Invoke(new StatusUpdateData() {
             type = StatusUpdateData.StatusType.loot,
             increment = 1,
@@ -61,32 +57,21 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void AddPhysicalKey(int keyId) {
         gameData.playerState.physicalKeys.Add(keyId);
-        CheckObjectives();
         OnItemPickup?.Invoke(0, $"{keyId}");
     }
     public void AddKeyCard(int keyId) {
         gameData.playerState.keycards.Add(keyId);
-        CheckObjectives();
         OnItemPickup?.Invoke(0, $"{keyId}");
     }
     public void CompleteAllObjectives() {
 
     }
-    public void CheckObjectives() {
+
+    public void CheckObjectives(ObjectiveDelta changedDelta) {
         if (gameData.phase != GamePhase.levelPlay) return;
-        Dictionary<Objective, ObjectiveStatus> changedObjectiveStatuses = new Dictionary<Objective, ObjectiveStatus>();
 
-        foreach (Objective objective in gameData.levelState.template.objectives) {
-            ObjectiveStatus oldStatus = gameData.levelState.delta.objectivesState[objective];
-            ObjectiveStatus newStatus = objective.Status(gameData);
-            if (oldStatus != newStatus) {
-                changedObjectiveStatuses[objective] = newStatus;
-            }
-            gameData.levelState.delta.objectivesState[objective] = newStatus;
-        }
-
-        List<ObjectiveStatus> statuses = gameData.levelState.template.objectives
-            .Select(objective => objective.Status(gameData)).ToList();
+        List<ObjectiveStatus> statuses = gameData.levelState.delta.objectiveDeltas
+            .Select(objective => objective.status).ToList();
 
         ObjectiveStatus newTotalStatus;
         if (statuses.Any(status => status == ObjectiveStatus.failed)) {
@@ -97,9 +82,8 @@ public partial class GameManager : Singleton<GameManager> {
             newTotalStatus = ObjectiveStatus.inProgress;
         }
 
-        if (newTotalStatus != gameData.levelState.delta.objectiveStatus) {
-            gameData.levelState.delta.objectiveStatus = newTotalStatus;
-            // notify watchers
+        if (newTotalStatus != gameData.levelState.delta.missionStatus) {
+            gameData.levelState.delta.missionStatus = newTotalStatus;
             if (newTotalStatus == ObjectiveStatus.complete) {
                 HandleAllObjectivesComplete();
             } else if (newTotalStatus == ObjectiveStatus.failed) {
@@ -109,7 +93,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         int newHashCode = Toolbox.ListHashCode<ObjectiveStatus>(statuses);
         if (lastObjectivesStatusHashCode != newHashCode) {
-            OnObjectivesChange?.Invoke(gameData, changedObjectiveStatuses);
+            OnObjectivesChange?.Invoke(changedDelta);
         }
         lastObjectivesStatusHashCode = newHashCode;
     }
@@ -125,7 +109,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void FailObjective(Objective objective) {
         if (GameManager.I.isLoadingLevel) return;
-        gameData.levelState.delta.failedObjectives.Add(objective);
         HandleObjectiveFailed();
     }
     public void HandleObjectiveFailed() {

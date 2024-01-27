@@ -8,7 +8,7 @@ public class ObjectiveCanvasController : MonoBehaviour {
     public GameObject objectiveIndicatorPrefab;
     public Canvas canvas;
     Coroutine showCoroutine;
-    public Dictionary<Objective, ObjectiveIndicatorController> controllers;
+    public Dictionary<ObjectiveDelta, ObjectiveIndicatorController> controllers;
     public RectTransform containerRect;
     public void Initialize() {
         foreach (Transform child in objectivesContainer) {
@@ -18,8 +18,8 @@ public class ObjectiveCanvasController : MonoBehaviour {
     }
 
     public void Initialize(GameData gameData) {
-        controllers = new Dictionary<Objective, ObjectiveIndicatorController>();
-        foreach (Objective objective in gameData.levelState.template.objectives) {
+        controllers = new Dictionary<ObjectiveDelta, ObjectiveIndicatorController>();
+        foreach (ObjectiveDelta objective in gameData.levelState.delta.objectiveDeltas) {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
             obj.transform.SetParent(objectivesContainer, false);
             ObjectiveIndicatorController controller = obj.GetComponent<ObjectiveIndicatorController>();
@@ -30,24 +30,21 @@ public class ObjectiveCanvasController : MonoBehaviour {
 
     public void Bind(GameData data) {
         GameManager.OnObjectivesChange += HandleObjectivesChange;
-        HandleObjectivesChange(data, null);
+        HandleObjectivesChange(null);
     }
     void OnDestroy() {
         GameManager.OnObjectivesChange -= HandleObjectivesChange;
     }
-    public void HandleObjectivesChange(GameData data, Dictionary<Objective, ObjectiveStatus> changedStatuses) {
+    public void HandleObjectivesChange(ObjectiveDelta changedStatuses) {
         int index = 0;
-        foreach (KeyValuePair<Objective, ObjectiveIndicatorController> kvp in controllers) {
-            kvp.Value.Configure(kvp.Key, data, index);
+        foreach (KeyValuePair<ObjectiveDelta, ObjectiveIndicatorController> kvp in controllers) {
+            kvp.Value.Configure(kvp.Key, index);
             index += 1;
         }
         ShowCanvasCoroutine();
 
         if (changedStatuses != null) {
-            foreach (KeyValuePair<Objective, ObjectiveStatus> kvp in changedStatuses) {
-                Debug.Log($"changed status {kvp.Key} {kvp.Value}");
-                controllers[kvp.Key].IndicateValueChanged();
-            }
+            controllers[changedStatuses].IndicateValueChanged();
         }
     }
 

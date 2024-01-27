@@ -2,10 +2,18 @@ using System;
 using UnityEngine;
 
 public class ObjectiveDelta {
-    public ObjectiveStatus status;
+    ObjectiveStatus _status;
+    public ObjectiveStatus status {
+        get { return _status; }
+        set {
+            _status = value;
+            GameManager.I.CheckObjectives(this);
+        }
+    }
     public Objective.Visibility visibility;
     public Objective template;
     public Func<Vector3> GetPosition;
+
     public ObjectiveDelta(Objective objective, Func<Vector3> GetPosition) {
         this.template = objective;
         this.GetPosition = GetPosition;

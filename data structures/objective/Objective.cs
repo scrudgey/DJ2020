@@ -13,15 +13,6 @@ public abstract class Objective : ScriptableObject {
     public Sprite objectiveImage;
     public List<string> potentialSpawnPoints;
     public List<Vector3> spawnPointLocations;
-    public ObjectiveStatus Status(GameData data) {
-        if (data.levelState.delta.failedObjectives.Contains(this)) {
-            return ObjectiveStatus.failed;
-        } else {
-            return EvaluateStatus(data);
-        }
-    }
-    abstract protected ObjectiveStatus EvaluateStatus(GameData data);
-    abstract public float Progress(GameData data);
 
     public static string ReadableFinalStatus(ObjectiveStatus status) => status switch {
         ObjectiveStatus.canceled => "CANCELED",
@@ -38,6 +29,4 @@ public abstract class Objective : ScriptableObject {
     }
 
     public abstract ObjectiveDelta ToDelta(LevelState state);
-
-    // abstract public Vector3 Location();
 }

@@ -17,7 +17,7 @@ public class MissionFailMenuController : MonoBehaviour {
     }
     public void Initialize(GameData data) {
         this.gameData = data;
-        foreach (Objective objective in data.levelState.template.objectives) {
+        foreach (ObjectiveDelta objective in data.levelState.delta.objectiveDeltas) {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
             obj.transform.SetParent(objectivesContainer, false);
             PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();

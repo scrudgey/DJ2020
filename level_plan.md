@@ -261,17 +261,24 @@ how does the solution work for different objective types?
 * figure out how to make map mode work in plan and gameplay both
 * extend this model to all other objective types.
 * load graphs during mission planning with applied visibility
+* use deltas in gameplay to determine objective status
 
-
-use deltas in gameplay to determine objective status
-
-data objectives can select the same target node
 "spawn points" is actually more generic than that- but not sure what to call it
-partial visibility cyber graph doesn't work in mission plan mode
 
 decide on escape menu: does it have selectable markers like planning mode? 
     might as well redesign plan mode tools
 
-
-
 allow plan mode to modify objective deltas, visibility, etc
+    the basic idea here: objectives may have one or more potential locations to spawn from
+        objective loot: potentialSpawnPoints
+        objective data: cyber data nodes
+    
+
+
+
+## bugs
+handle mission failed for objective data
+data objectives can select the same target node
+partial visibility cyber graph doesn't work in mission plan mode
+optional objectives - after action report
+discover objective data node - discover objective

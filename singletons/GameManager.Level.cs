@@ -125,32 +125,18 @@ public partial class GameManager : Singleton<GameManager> {
         // randomize cyber state:
         state.delta.cyberGraph.InfillRandomData();
 
-        // initialize objectives
+        // initialize objectives- this will affect graph visibility
         foreach (Objective objective in state.template.objectives) {
-            // switch (objective) {
-            //     case ObjectiveGetLoot lootget:
             ObjectiveDelta delta = objective.ToDelta(state);
             state.delta.objectiveDeltas.Add(delta);
-            //         break;
-            // }
         }
-
-        // TODO: apply level plan tactic information
-        // TODO: filter out anything placed by level plan tactic information
-        // TODO: this functionality will be replaced by delta initialization
-        // List<ObjectiveData> dataObjectives = state.template.objectives
-        //     .Where(objective => objective is ObjectiveData)
-        //     .Select(objective => (ObjectiveData)objective)
-        //     .ToList();
-        // state.delta.cyberGraph.ApplyObjectiveData(dataObjectives);
-
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);
 
-        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.template.objectives
-            .Select(objective => objective.Status(gameData)).ToList());
+        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.objectiveDeltas
+            .Select(objective => objective.status).ToList());
 
         if (doCutscene)
             StartCutsceneCoroutine(StartMissionCutscene());

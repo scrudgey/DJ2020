@@ -7,17 +7,7 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/Objectives/ObjectiveGetLoot")]
 public class ObjectiveGetLoot : Objective {
-    public string targeLootName;
     public GameObject targetLootPrefab;
-    protected override ObjectiveStatus EvaluateStatus(GameData data) {
-        if (data.levelState.delta.levelAcquiredLoot.Any(loot => loot.lootName.ToLower().Equals(targeLootName.ToLower()))) {
-            return ObjectiveStatus.complete;
-        } else {
-            return ObjectiveStatus.inProgress;
-        }
-    }
-    public override float Progress(GameData data) => 0f;
-
     public override ObjectiveDelta ToDelta(LevelState state) {
         string targetIdn = Toolbox.RandomFromList(potentialSpawnPoints);
 

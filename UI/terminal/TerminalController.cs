@@ -83,7 +83,7 @@ namespace UI {
         public void Objectives(string[] args) {
             // float timescale = float.Parse(args[0]);
             // Time.timeScale = timescale;
-            GameManager.I.gameData.levelState.delta.objectiveStatus = ObjectiveStatus.complete;
+            GameManager.I.gameData.levelState.delta.missionStatus = ObjectiveStatus.complete;
             GameManager.I.HandleAllObjectivesComplete();
         }
 

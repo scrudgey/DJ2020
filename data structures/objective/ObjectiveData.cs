@@ -8,15 +8,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/Objectives/ObjectiveData")]
 public class ObjectiveData : Objective {
     public PayData targetPaydata;
-    protected override ObjectiveStatus EvaluateStatus(GameData data) {
-        if (data.levelState.delta.levelAcquiredPaydata.Contains(targetPaydata)) {
-            return ObjectiveStatus.complete;
-        } else {
-            return ObjectiveStatus.inProgress;
-        }
-    }
-    public override float Progress(GameData data) => 0f;
-
     public override ObjectiveDelta ToDelta(LevelState state) {
         List<CyberNode> dataNodes = state.delta.cyberGraph.nodes.Values.Where(node => node.type == CyberNodeType.datanode).ToList();
         if (dataNodes.Count == 0) {
@@ -31,6 +22,12 @@ public class ObjectiveData : Objective {
         target.OnDataStolen += () => delta.status = ObjectiveStatus.complete;
 
         Debug.Log($"[objective data] applying objective data {name}:{targetPaydata} -> {target.nodeTitle}:{target.idn}");
+
+        if (visibility == Visibility.known) {
+            if (target.visibility < NodeVisibility.known) {
+                target.visibility = NodeVisibility.known;
+            }
+        }
 
         return delta;
     }

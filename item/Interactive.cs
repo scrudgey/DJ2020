@@ -17,7 +17,7 @@ public abstract class Interactive : Highlightable {
     }
     public ItemUseResult DoActionAndUpdateState(Interactor interactor) {
         // GameManager.I.gameData.levelState.delta.levelInteractedObjects.Add(interactiveId);
-        GameManager.I.CheckObjectives();
+        // GameManager.I.CheckObjectives();
         OnUsed?.Invoke();
         return DoAction(interactor);
     }

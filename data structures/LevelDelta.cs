@@ -15,11 +15,8 @@ public record LevelDelta {
     public float npcSpawnTimer = 0f;
     public float strikeTeamSpawnTimer = 0f;
     public float strikeTeamResponseTimer = 0f;
-    public ObjectiveStatus objectiveStatus;
+    public ObjectiveStatus missionStatus;
     public bool disguise;
-    [JsonIgnore]
-    public Dictionary<Objective, ObjectiveStatus> objectivesState;
-    public HashSet<Objective> failedObjectives;
     public List<PayData> levelAcquiredPaydata;
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> levelAcquiredLoot;
@@ -36,8 +33,6 @@ public record LevelDelta {
     public int stallsAvailable = 1;
     public int easesAvailable = 1;
     public static LevelDelta Empty() => new LevelDelta {
-        objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
-        failedObjectives = new HashSet<Objective>(),
         levelAcquiredPaydata = new List<PayData>(),
         levelAcquiredLoot = new List<LootData>(),
         dialogueCards = new List<DialogueCard>(),
