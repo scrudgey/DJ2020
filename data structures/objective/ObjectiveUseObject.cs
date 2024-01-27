@@ -14,7 +14,7 @@ public class ObjectiveUseObject : Objective {
 
         ObjectiveLootSpawnpoint spawnpoint = state.spawnPoints[targetIdn];
 
-        ObjectiveDelta delta = new ObjectiveDelta(this, () => spawnpoint.transform.position);
+        ObjectiveDelta delta = new ObjectiveDelta(this, () => spawnpoint.transform.position, targetIdn);
         if (state.plan.objectiveLocations.ContainsKey(name)) {
             delta.visibility = Visibility.known;
         }

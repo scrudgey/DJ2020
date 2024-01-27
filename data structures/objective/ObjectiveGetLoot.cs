@@ -15,7 +15,7 @@ public class ObjectiveGetLoot : Objective {
         GameObject lootObj = GameObject.Instantiate(targetLootPrefab, spawnpoint.transform.position, Quaternion.identity);
         LootObject loot = lootObj.GetComponent<LootObject>();
 
-        ObjectiveDelta delta = new ObjectiveDelta(this, () => lootObj.transform.position);
+        ObjectiveDelta delta = new ObjectiveDelta(this, () => lootObj.transform.position, targetIdn);
         if (state.plan.objectiveLocations.ContainsKey(name)) {
             delta.visibility = Visibility.known;
         }

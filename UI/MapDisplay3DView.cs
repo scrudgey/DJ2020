@@ -186,7 +186,8 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         } else if (mode == Mode.mission) {
             foreach (ObjectiveDelta delta in state.delta.objectiveDeltas) {
                 if (delta.visibility == Objective.Visibility.unknown || delta.status != ObjectiveStatus.inProgress) {
-                    objectiveIndicators[delta.template].gameObject.SetActive(false);
+                    if (objectiveIndicators.ContainsKey(delta.template))
+                        objectiveIndicators[delta.template].gameObject.SetActive(false);
                     continue;
                 }
                 if (!objectiveIndicators.ContainsKey(delta.template)) {

@@ -116,7 +116,6 @@ public class CyberdeckUIController : MonoBehaviour {
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
             NetworkAction networkAction = button.GetNetworkAction(indicator.node, graph);
-            Debug.Log(networkAction);
             graph.AddNetworkAction(networkAction);
             GameManager.I.RefreshCyberGraph();
             handler.NodeSelectCallback(indicator);

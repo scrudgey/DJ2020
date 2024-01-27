@@ -168,7 +168,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         yield return new WaitForSeconds(1f);
 
         List<ObjectiveDelta> requiredObjectives = data.levelState.delta.objectiveDeltas;
-        List<Objective> optionalObjectives = data.levelState.template.bonusObjectives;
+        List<ObjectiveDelta> optionalObjectives = data.levelState.delta.optionalObjectiveDeltas;
 
         objectivesContainer.gameObject.SetActive(true);
         foreach (ObjectiveDelta objective in requiredObjectives) {
@@ -186,12 +186,12 @@ public class NeoAfterActionReport : MonoBehaviour {
             StartCoroutine(EaseInTextColor(optionalObjectivesTitle));
             StartCoroutine(EaseInImageColor(optionalObjectivesUnderline, baseColor));
             yield return new WaitForSeconds(1f);
-            // foreach (Objective objective in optionalObjectives) {
-            //     AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(optionalObjectivesContainer, objective, data);
-            //     StartCoroutine(TypeText(handler.objectiveText));
-            //     StartCoroutine(EaseInTextColor(handler.objectiveText));
-            //     yield return new WaitForSeconds(0.5f);
-            // }
+            foreach (ObjectiveDelta objective in optionalObjectives) {
+                AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(optionalObjectivesContainer, objective, data);
+                StartCoroutine(TypeText(handler.objectiveText));
+                StartCoroutine(EaseInTextColor(handler.objectiveText));
+                yield return new WaitForSeconds(0.5f);
+            }
         }
         yield return new WaitForSeconds(1f);
         spacer2.SetActive(true);
@@ -219,7 +219,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         objectivesUnderline.enabled = true;
         objectivesUnderline.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
         List<ObjectiveDelta> requiredObjectives = data.levelState.delta.objectiveDeltas;
-        List<Objective> optionalObjectives = data.levelState.template.bonusObjectives;
+        List<ObjectiveDelta> optionalObjectives = data.levelState.delta.optionalObjectiveDeltas;
         objectivesContainer.gameObject.SetActive(true);
         foreach (ObjectiveDelta objective in requiredObjectives) {
             AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(objectivesContainer, objective, data);
@@ -232,10 +232,10 @@ public class NeoAfterActionReport : MonoBehaviour {
             optionalObjectivesUnderline.enabled = true;
             optionalObjectivesTitle.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
             optionalObjectivesUnderline.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
-            // foreach (Objective objective in optionalObjectives) {
-            //     AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(optionalObjectivesContainer, objective, data);
-            //     handler.objectiveText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
-            // }
+            foreach (ObjectiveDelta objective in optionalObjectives) {
+                AfterActionReportObjectiveHandler handler = CreateObjectiveHandler(optionalObjectivesContainer, objective, data);
+                handler.objectiveText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+            }
         }
         spacer2.SetActive(true);
         missionStatusText.enabled = true;

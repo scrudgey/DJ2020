@@ -26,6 +26,7 @@ public record LevelDelta {
     public float strikeTeamMissionTimer;
     public LevelTemplate.StrikeTeamResponseBehavior strikeTeamBehavior;
     public List<ObjectiveDelta> objectiveDeltas;
+    public List<ObjectiveDelta> optionalObjectiveDeltas;
     // dialogue
     public List<DialogueCard> dialogueCards;
     public int bullshitLevel;
@@ -37,6 +38,7 @@ public record LevelDelta {
         levelAcquiredLoot = new List<LootData>(),
         dialogueCards = new List<DialogueCard>(),
         lastTactics = new Stack<DialogueTacticType>(),
-        objectiveDeltas = new List<ObjectiveDelta>()
+        objectiveDeltas = new List<ObjectiveDelta>(),
+        optionalObjectiveDeltas = new List<ObjectiveDelta>()
     };
 }

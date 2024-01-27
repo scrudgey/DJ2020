@@ -10,6 +10,13 @@ public class ObjectiveData : Objective {
     public PayData targetPaydata;
 
     // public override string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
+    //     if (plan.objectiveLocations.ContainsKey(name)) {
+    //         return plan.objectiveLocations[name];
+    //     }
+    //     return Toolbox.RandomFromList(potentialSpawnPoints);
+    // }
+
+    // public override string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
     //     if (plan.objectiveLocations.ContainsKey(template.name)) {
     //         return plan.objectiveLocations[template.name];
     //     }
@@ -29,7 +36,7 @@ public class ObjectiveData : Objective {
 
         // dataNodes.Remove(target); // TODO: fix this so that multiple objectives can't select the same target node!
 
-        ObjectiveDelta delta = new ObjectiveDelta(this, () => target.position);
+        ObjectiveDelta delta = new ObjectiveDelta(this, () => target.position, targetIdn);
         target.OnDataStolen += () => delta.status = ObjectiveStatus.complete;
 
         Debug.Log($"[objective data] applying objective data {name}:{targetPaydata} -> {target.nodeTitle}:{target.idn}");
@@ -39,6 +46,12 @@ public class ObjectiveData : Objective {
         if (delta.visibility == Visibility.known) {
             if (target.visibility < NodeVisibility.known) {
                 target.visibility = NodeVisibility.known;
+            }
+        }
+
+        foreach (CyberComponent cyberComponent in GameObject.FindObjectsOfType<CyberComponent>()) {
+            if (cyberComponent.idn == targetIdn) {
+                cyberComponent.OnDestroyCallback += () => delta.status = ObjectiveStatus.failed;
             }
         }
 

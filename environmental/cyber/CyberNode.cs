@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -21,6 +22,11 @@ public class CyberNode : Node<CyberNode> {
     public bool BeDiscovered() {
         if (visibility == NodeVisibility.unknown || visibility == NodeVisibility.mystery) {
             visibility = NodeVisibility.known;
+            foreach (ObjectiveDelta objective in GameManager.I.gameData.levelState.delta.objectiveDeltas.Concat(GameManager.I.gameData.levelState.delta.optionalObjectiveDeltas)) {
+                if (objective.targetIdn == idn) {
+                    objective.visibility = Objective.Visibility.known;
+                }
+            }
             return true;
         } else {
             return false;

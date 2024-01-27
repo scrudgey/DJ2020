@@ -143,7 +143,6 @@ public class LevelDataUtilEditor : Editor {
         foreach (Objective objective in template.objectives) {
             objective.spawnPointLocations = new List<Vector3>();
             objective.potentialSpawnPoints = new List<string>();
-            break;
         }
 
         foreach (ObjectiveLootSpawnpoint lootSpawnpoint in GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>()) {

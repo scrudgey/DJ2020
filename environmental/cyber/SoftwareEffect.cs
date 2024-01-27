@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,8 +16,8 @@ public class SoftwareEffect {
                 node.visibility = NodeVisibility.known;
                 foreach (string neighborId in graph.edges[node.idn]) {
                     graph.SetEdgeVisibility(node.idn, neighborId, EdgeVisibility.known);
-
                 }
+                node.BeDiscovered();
                 break;
             case Type.download:
                 if (node.type == CyberNodeType.datanode) {

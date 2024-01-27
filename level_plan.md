@@ -262,44 +262,24 @@ how does the solution work for different objective types?
 * extend this model to all other objective types.
 * load graphs during mission planning with applied visibility
 * use deltas in gameplay to determine objective status
-
-"spawn points" is actually more generic than that- but not sure what to call it
+* implement:
+    * tactic can select and place idn in mission plan per objective
+    * when creating delta for objective loot, data, use mission plan information
+    * set visibility
+    * map view should take plan visibility into account
+    * can't we use cyber node  locations for spawnpointlocations on objective data type? cleaner
+* handle mission failed for objective data
+* optional objectives - after action report
+* discover objective data node -> discover objective
+? "spawn points" is actually more generic than that- but not sure what to call it?
 
 decide on escape menu: does it have selectable markers like planning mode? 
     might as well redesign plan mode tools
 
-
-
-
 ## bugs
-handle mission failed for objective data
 data objectives can select the same target node
+    the solution has to work at the template + plan level
 partial visibility cyber graph doesn't work in mission plan mode
-optional objectives - after action report
-discover objective data node - discover objective
 
+flying loot indicator is a lock icon?
 
-
-
-allow plan mode to modify objective deltas, visibility, etc
-    the basic idea here: 
-    objectives may have one or more potential locations to spawn from
-    objective may have a single location but be unknown
-        objective loot: potentialSpawnPoints
-        objective data: cyber data nodes
-    in the plan, we will purchase a tactic. this state will be reflected in plan.
-    the plan will have to store information per objective.
-        the information specifics will depend on objective type
-            objective data: idn of a specific data node
-            objective loot: idn of a specific potentialSpawnPoints idn
-                (potentialSpawnPoints is also used by objective use item to identify the interactive )
-    if information is set for the objective, its visibility is known as well.
-        template visibility might be unknown, plan visibility is known -> objective delta visibility is known.
-
-implement:
-    * tactic can select and place idn in mission plan per objective
-    * when creating delta for objective loot, data, use mission plan information
-    * set visibility
-    3. map view should take plan visibility into account
-
-can't we use cyber node  locations for spawnpointlocations on objective data type? cleaner

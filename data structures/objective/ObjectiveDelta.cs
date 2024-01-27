@@ -13,11 +13,13 @@ public class ObjectiveDelta {
     public Objective.Visibility visibility;
     public Objective template;
     public Func<Vector3> GetPosition;
+    public string targetIdn;
 
-    public ObjectiveDelta(Objective objective, Func<Vector3> GetPosition) {
+    public ObjectiveDelta(Objective objective, Func<Vector3> GetPosition, string targetIdn) {
         this.template = objective;
         this.GetPosition = GetPosition;
         this.visibility = objective.visibility; // TODO: ??
+        this.targetIdn = targetIdn;
         status = ObjectiveStatus.inProgress;
     }
 }

@@ -130,6 +130,10 @@ public partial class GameManager : Singleton<GameManager> {
             ObjectiveDelta delta = objective.ToDelta(state);
             state.delta.objectiveDeltas.Add(delta);
         }
+        foreach (Objective objective in state.template.bonusObjectives) {
+            ObjectiveDelta delta = objective.ToDelta(state);
+            state.delta.optionalObjectiveDeltas.Add(delta);
+        }
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
