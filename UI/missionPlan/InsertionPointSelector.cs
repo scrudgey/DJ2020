@@ -7,7 +7,9 @@ using UnityEngine.UI;
 public class InsertionPointSelector : MonoBehaviour {
     // public MissionPlanMapController controller;
     public MapMarkerData data;
+    public Objective objective;
     public GameObject checkboxObject;
+    public GameObject questionMarkObject;
     public Image dotImage;
     public Image checkImage;
     public TextMeshProUGUI text;
@@ -18,9 +20,8 @@ public class InsertionPointSelector : MonoBehaviour {
         // this.controller = controller;
         this.data = data;
         this.callback = callback;
-
         text.text = data.markerName;
-
+        questionMarkObject.SetActive(false);
         switch (data.markerType) {
             case MapMarkerData.MapMarkerType.decor:
             case MapMarkerData.MapMarkerType.objective:
@@ -33,6 +34,21 @@ public class InsertionPointSelector : MonoBehaviour {
                 dotImage.gameObject.SetActive(false);
                 checkImage.enabled = false;
                 break;
+        }
+    }
+    public void Configure(Objective objective, Action<InsertionPointSelector> callback, bool visibile) {
+        text.text = objective.title;
+        this.callback = callback;
+        this.objective = objective;
+        checkImage.enabled = false;
+        checkboxObject.SetActive(false);
+
+        if (visibile) {
+            dotImage.gameObject.SetActive(true);
+            questionMarkObject.SetActive(false);
+        } else {
+            dotImage.gameObject.SetActive(false);
+            questionMarkObject.SetActive(true);
         }
 
     }

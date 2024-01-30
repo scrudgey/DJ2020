@@ -276,12 +276,26 @@ how does the solution work for different objective types?
 * partial visibility cyber graph doesn't work in mission plan mode
 * zero visibility cyber graph represents a bunch of nodes as ? in mission mode
 * test that knowing the data objective reveals the node
+* pulse not working right
+* too many POI on elevator
+* jump to laboratory not working right
+* insert/extract not working quite right
+* label insertion point "insertion point"
+* insertion point not working
+* start with markers visible
+* not loading objective markers
+* don't jump to objective if location unknown
 
-decide on escape menu: does it have selectable markers like planning mode? 
-    might as well redesign plan mode tools
+display number of known / unknown nodes in node view
 
 ## bugs
 data objectives can select the same target node
     the solution has to work at the template + plan level
 
+level data util "write all" function
+
+fix floor 4 of elevator image
+reprocess all existing maps
+
 ## tactics can reveal graph information
+

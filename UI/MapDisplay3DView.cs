@@ -29,7 +29,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public Color legendInactiveColor;
     Dictionary<MapMarkerData, MapMarkerIndicator> indicators;
     Dictionary<string, MiniMapNodeMarker> nodeMarkers;
-    Dictionary<Objective, MapMarkerIndicator> objectiveIndicators;
+    public Dictionary<Objective, MapMarkerIndicator> objectiveIndicators;
     Dictionary<string, ObjectiveLootSpawnpoint> objectiveLocations;
     MapMarkerIndicator playerMarker;
     List<Image> floorPips;
@@ -37,6 +37,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     LevelTemplate template;
     LevelPlan plan;
     LevelState state;
+    MapMarkerIndicator selectedIndicator;
 
     public void Initialize(LevelState state) {
         this.state = state;
@@ -68,7 +69,8 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         mapDisplay3Dgenerator.Initialize(template, plan); // TODO: broken network graphs
         Bind(mapDisplay3Dgenerator.gameObject);
 
-        mapDisplayController.Initialize();
+        mapDisplayController.Initialize(template, plan, this);
+
     }
     MapMarkerIndicator SpawnNewMapMarker() {
         GameObject objM = GameObject.Instantiate(mapMarkerPrefab);
@@ -119,14 +121,19 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         }
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
-            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint) continue;
-            if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) continue;
-
+            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && mode == Mode.mission) continue;
+            if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) {
+                if (indicators.ContainsKey(data))
+                    indicators[data].gameObject.SetActive(false);
+                continue;
+            }
             if (!indicators.ContainsKey(data)) {
                 MapMarkerIndicator indicator = SpawnNewMapMarker();
-
-                string indicatorText = data.markerType == MapMarkerData.MapMarkerType.extractionPoint ? "extraction point" : data.markerName;
-
+                string indicatorText = data.markerType switch {
+                    MapMarkerData.MapMarkerType.extractionPoint => "extraction point",
+                    MapMarkerData.MapMarkerType.insertionPoint => "insertion point",
+                    _ => data.markerName
+                };
                 indicator.Configure(indicatorText, data.markerType, data.markerIcon);
                 indicators[data] = indicator;
             }
@@ -210,6 +217,35 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         }
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
+
+        if (generator.clickedObjective != null) {
+            if (objectiveIndicators.ContainsKey(generator.clickedObjective)) {
+                MapMarkerIndicator indicator = objectiveIndicators[generator.clickedObjective];
+                indicator.ShowClickPulse();
+            }
+        } else if (generator.clickedMapMarker != null) {
+            MapMarkerIndicator indicator = indicators[generator.clickedMapMarker];
+            indicator.ShowClickPulse();
+            // Toolbox.RandomizeOneShot(audioSource, columnButtonSound);
+        }
+
+        if (generator.clickedObjective != null) {
+            if (selectedIndicator != null) {
+                selectedIndicator.ShowSelection(false);
+            }
+            if (objectiveIndicators.ContainsKey(generator.clickedObjective)) {
+                MapMarkerIndicator indicator = objectiveIndicators[generator.clickedObjective];
+                indicator.ShowSelection(true);
+                selectedIndicator = indicator;
+            }
+        } else if (generator.selectedMapMarker != null) {
+            if (selectedIndicator != null) {
+                selectedIndicator.ShowSelection(false);
+            }
+            MapMarkerIndicator indicator = indicators[generator.selectedMapMarker];
+            indicator.ShowSelection(true);
+            selectedIndicator = indicator;
+        }
 
         HandleLegendMarkers();
     }

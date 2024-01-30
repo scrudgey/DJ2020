@@ -81,16 +81,6 @@ public class MapMarkerIndicator : MonoBehaviour {
         } else if (markerIcon == MapMarkerData.MapMarkerIcon.arrowRight) {
             icon.transform.rotation = Quaternion.Euler(0f, 0f, 270f);
         }
-
-        // if (ignoreInsertion) {
-        //     if (markerType == MapMarkerData.MapMarkerType.insertionPoint) {
-        //         gameObject.SetActive(false);
-        //     }
-        //     if (markerType == MapMarkerData.MapMarkerType.extractionPoint) {
-        //         text.text = "extraction point";
-        //     }
-        // }
-
     }
 
     public void SetPosition(MapMarkerData data, RectTransform parentRect) {

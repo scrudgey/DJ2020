@@ -15,6 +15,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     public Material materialFloorHighlight;
     List<Texture2D> mapImages;
     public List<MapMarkerData> mapData;
+    public List<MapMarkerData> allMapData;
+    public MapMarkerData selectedMapMarker;
+    public MapMarkerData clickedMapMarker;
     public Dictionary<string, MarkerConfiguration> nodeData;
     public GraphIconReference graphIconReference;
     [Header("camera")]
@@ -49,6 +52,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     PowerGraph currentPowerGraph;
     AlarmGraph currentAlarmGraph;
 
+    public Objective selectedObjective;
+    public Objective clickedObjective;
+
     public void Initialize(LevelState state) {
         Initialize(state.template, state.plan);
         cyberGraph = state.delta.cyberGraph;
@@ -59,6 +65,8 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     }
     public void Initialize(LevelTemplate template, LevelPlan plan) {
         this.template = template;
+
+        allMapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
 
         cyberGraph = CyberGraph.LoadAll(template.levelName);
         powerGraph = PowerGraph.LoadAll(template.levelName);
@@ -72,12 +80,10 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
         foreach (ObjectiveData objectiveData in template.objectives.Concat(template.bonusObjectives).Where(objective => objective is ObjectiveData)) {
             if (objectiveData.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objectiveData.name)) {
-
                 string idn = objectiveData.potentialSpawnPoints[0];
                 if (plan.objectiveLocations.ContainsKey(objectiveData.name)) {
                     idn = plan.objectiveLocations[objectiveData.name];
                 }
-
                 cyberGraph.InfillDummyObjective(objectiveData);
                 cyberGraph.nodes[idn].visibility = NodeVisibility.known;
             }
@@ -119,9 +125,22 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             theta -= 6.28f;
         }
 
-        float y = 1.375f + (0.125f * currentFloor);
-        float x = 1.412f * Mathf.Cos(theta);
-        float z = 1.412f * Mathf.Sin(theta);
+
+        //  |\
+        //  |θ\
+        //  |  \
+        //1 |   \
+        //  |    \
+        //  |_____\ 
+        //      1
+        //  
+        //  tan θ = 1 / 1  
+        //  θ = 45
+
+
+        float y = 1f + (0.125f * currentFloor);
+        float x = 1f * Mathf.Cos(theta);
+        float z = 1f * Mathf.Sin(theta);
 
         float rotX = 45;
         float rotY = 270 - (45 * (theta / 0.785f));
@@ -133,11 +152,15 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
         Quaternion targetRotation = Quaternion.Euler(rotX, rotY, rotZ);
 
+        origin.y = 0;
         Vector3 targetPosition = new Vector3(x, y, z) + origin;
         Vector3 updatedPosition = targetPosition;
 
         cameraTransform.localPosition = updatedPosition;
         cameraTransform.localRotation = targetRotation;
+
+        // Debug.DrawLine(cameraTransform.position, cameraTransform.localToWorldMatrix * origin, Color.green);
+        Debug.DrawLine(cameraTransform.position, cameraTransform.position + 3f * cameraTransform.forward, Color.green);
     }
 
     void ChangeMode(Mode newMode) {
@@ -145,7 +168,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         switch (mode) {
             case Mode.playerfocus:
                 int floor = template.GetFloorForPosition(GameManager.I.playerPosition);
-                origin = WorldToGeneratorPosition(GameManager.I.playerPosition) - transform.position;
+                origin = WorldToGeneratorLocalPosition(GameManager.I.playerPosition) - transform.position;
                 int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
                 SelectFloor(playerFloor);
                 thetaVelocity = 0f;
@@ -218,21 +241,21 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         return $"{zoomFloatAmount:F2}\n{theta:F2}\n({origin.x:F2}, {origin.z:F2})";
     }
 
-    public Vector3 WorldToGeneratorPosition(Vector3 worldPosition, bool debug = false) {
+    public Vector3 WorldToGeneratorLocalPosition(Vector3 worldPosition, bool debug = false) {
 
         int floorNumber = template.GetFloorForPosition(worldPosition);
 
+        // coordinates in map image
         Vector2 quadPosition = WorldToQuadPosition(worldPosition);
 
         // transform to map generator position
         MeshRenderer quad = quads[0];
 
+        // rescale map image coordinates to world coordinates local to generator
         Vector3 generatorPosition = new Vector3(
                 quad.bounds.extents.x * quadPosition.x * 2,
-                0f,
+                floorNumber * 0.125f,
                 quad.bounds.extents.z * quadPosition.y * 2) + quad.transform.position - quad.bounds.extents;
-
-        generatorPosition.y += floorNumber * 0.125f;
 
         if (debug) {
             Debug.Log(worldPosition);
@@ -245,11 +268,15 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         return generatorPosition;
     }
     public Vector2 WorldToViewportPoint(Vector3 worldPosition) {
-        Vector3 generatorPosition = WorldToGeneratorPosition(worldPosition);
+        Vector3 generatorPosition = WorldToGeneratorLocalPosition(worldPosition);
         return mapCamera.WorldToViewportPoint(generatorPosition);
     }
 
     public Vector2 WorldToQuadPosition(Vector3 worldPosition) {
+        // world position 0 -> template.mapOrigin
+        // scale world position -> map cam scale
+        // this turns world position into (x,y) coordinates in the map images- but not justified to any origin?
+        // (0,0) in world coordinates becomes something else in map coordinates but corresponds to the same point.
         return new Vector2(
             template.mapUnitNorth.x * worldPosition.x,
             template.mapUnitEast.y * worldPosition.z) + new Vector2(template.mapOrigin.x, template.mapOrigin.y);
@@ -279,6 +306,22 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         if (input.modeChange != Mode.none) {
             ChangeMode(input.modeChange);
         }
+
+        if (input.jumpToFloor != -1) {
+            SelectFloor(input.jumpToFloor);
+        }
+        if (input.jumpToPoint != Vector3.zero) {
+            origin = WorldToGeneratorLocalPosition(input.jumpToPoint) - transform.position;// - quads[0].bounds.extents;
+        }
+        if (input.selectedMapMarker != null && legendType != MapDisplayController.MapDisplayLegendType.markers) {
+            ClearGraph();
+            LoadMarkers();
+        }
+        selectedMapMarker = input.selectedMapMarker;
+        clickedMapMarker = input.clickedMapMarker;
+
+        selectedObjective = input.selectedObjective;
+        clickedObjective = input.clickedObjective;
 
         OnValueChanged?.Invoke(this);
     }
@@ -360,7 +403,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         points.Add(new Vector3(position2.x, position2.y, position2.z));
         points.Add(position2);
 
-        points = points.Select(point => WorldToGeneratorPosition(point)).ToList();
+        points = points.Select(point => WorldToGeneratorLocalPosition(point)).ToList();
 
         renderer.positionCount = points.Count;
         renderer.SetPositions(points.ToArray());

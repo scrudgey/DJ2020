@@ -37,7 +37,7 @@ public class LevelDataUtilEditor : Editor {
         if (template != null) {
             string levelName = template.levelName;
             // Debug.Log(levelName);
-            if (GUILayout.Button("Write Level Data")) {
+            if (GUILayout.Button("Write Graph Data")) {
                 LevelDataUtil networkUtil = (LevelDataUtil)target;
                 string sceneName = SceneManager.GetActiveScene().name;
 

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MapInput {
     public int floorIncrement;
@@ -9,6 +11,13 @@ public class MapInput {
     public MapDisplay3DGenerator.Mode modeChange;
     public float thetaDelta;
     public Vector2 translationInput;
+    public Vector3 jumpToPoint;
+    public int jumpToFloor;
+    public MapMarkerData selectedMapMarker;
+    public MapMarkerData clickedMapMarker;
+
+    public Objective selectedObjective;
+    public Objective clickedObjective;
 }
 
 public class MapDisplayController : MonoBehaviour {
@@ -22,11 +31,12 @@ public class MapDisplayController : MonoBehaviour {
     public Transform objectivePointContainer;
     public Transform interestPointContainer;
     public GameObject insertionPointButtonPrefab;
+    public ScrollRect scrollRect;
+    public RectTransform scrollRectTransform;
+
 
     InsertionPointSelector extractionSelector;
     InsertionPointSelector insertionSelector;
-    MapMarkerIndicator extractionIndicator;
-    MapMarkerIndicator insertionIndicator;
 
     bool mouseOverMap;
     bool mapEngaged;
@@ -38,6 +48,19 @@ public class MapDisplayController : MonoBehaviour {
     MapDisplay3DGenerator.Mode modeChangeThisFrame;
     float thetaDeltaThisFrame;
     Vector2 translationInput;
+
+    Vector3 jumpToPoint;
+    int jumpToFloor = -1;
+    MapMarkerData selectedMarkerData;
+    MapMarkerData clickedMarkerData;
+
+    Objective selectedObjective;
+    Objective clickedObjective;
+
+    LevelPlan plan;
+    LevelTemplate template;
+
+    MapDisplay3DView view;
 
     void Start() {
         GameManager.OnPlayerInput += UpdateWithInput;
@@ -52,9 +75,14 @@ public class MapDisplayController : MonoBehaviour {
         mouseOverMap = false;
     }
 
-    public void Initialize() {
+    public void Initialize(LevelTemplate template, LevelPlan plan, MapDisplay3DView view) {
+        this.plan = plan;
+        this.view = view;
+        this.template = template;
         if (doPopulateColumns)
-            PopulateColumns();
+            PopulateColumns(template);
+        SwitchLegend(MapDisplayLegendType.markers);
+
     }
 
     // control
@@ -91,13 +119,20 @@ public class MapDisplayController : MonoBehaviour {
     }
 
     void Update() {
+
         MapInput input = new MapInput() {
             floorIncrement = flootIncrementThisFrame,
             zoomIncrement = zoomIncrementThisFrame,
             zoomFloatIncrement = zoomFloatIncrementThisFrame,
             modeChange = modeChangeThisFrame,
             thetaDelta = thetaDeltaThisFrame,
-            translationInput = translationInput
+            translationInput = translationInput,
+            jumpToFloor = jumpToFloor,
+            jumpToPoint = jumpToPoint,
+            selectedMapMarker = selectedMarkerData,
+            clickedMapMarker = clickedMarkerData,
+            selectedObjective = selectedObjective,
+            clickedObjective = clickedObjective
         };
         mapDisplay3DGenerator.UpdateWithInput(input);
 
@@ -107,6 +142,10 @@ public class MapDisplayController : MonoBehaviour {
         modeChangeThisFrame = MapDisplay3DGenerator.Mode.none;
         thetaDeltaThisFrame = 0;
         translationInput = Vector2.zero;
+        jumpToFloor = -1;
+        jumpToPoint = Vector3.zero;
+        clickedObjective = null;
+        clickedMarkerData = null;
     }
 
     public void LegendTypeCallback(string type) {
@@ -125,6 +164,12 @@ public class MapDisplayController : MonoBehaviour {
             newType = MapDisplayLegendType.none;
         }
         mapDisplay3DGenerator.legendType = newType;
+
+        selectedMarkerData = null;
+        clickedMarkerData = null;
+        selectedObjective = null;
+        clickedObjective = null;
+
         switch (newType) {
             case MapDisplayLegendType.none:
                 mapDisplay3DGenerator.ClearGraph();
@@ -149,7 +194,7 @@ public class MapDisplayController : MonoBehaviour {
         }
     }
 
-    public void PopulateColumns() {
+    public void PopulateColumns(LevelTemplate template) {
         List<Transform> columns = new List<Transform>{
             insertionPointContainer,
             extractionPointContainer,
@@ -161,7 +206,7 @@ public class MapDisplayController : MonoBehaviour {
                 Destroy(child.gameObject);
             }
         }
-        foreach (MapMarkerData data in mapDisplay3DGenerator.mapData) {
+        foreach (MapMarkerData data in mapDisplay3DGenerator.allMapData) {
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint ||
                 data.markerType == MapMarkerData.MapMarkerType.extractionPoint ||
                 data.markerType == MapMarkerData.MapMarkerType.objective ||
@@ -175,64 +220,77 @@ public class MapDisplayController : MonoBehaviour {
                     MapMarkerData.MapMarkerType.pointOfInterest => interestPointContainer
                 };
                 obj.transform.SetParent(column, false);
+
                 selector.Configure(data, ColumnItemCallback);
 
-                // if (data.idn == plan.insertionPointIdn) {
-                //     SelectInsertionPoint(selector, indicators[data]);
-                // }
-                // if (data.idn == plan.extractionPointIdn) {
-                //     SelectExtractionPoint(selector, indicators[data]);
-                // }
+                if (data.idn == plan.insertionPointIdn) {
+                    SelectInsertionPoint(selector);
+                }
+                if (data.idn == plan.extractionPointIdn) {
+                    SelectExtractionPoint(selector);
+                }
 
-                // if (plan.insertionPointIdn == "" && insertionIndicator == null && data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
-                //     SelectInsertionPoint(selector, indicators[data]);
-                // }
-                // if (plan.extractionPointIdn == "" && extractionIndicator == null && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
-                //     SelectExtractionPoint(selector, indicators[data]);
-                // }
+                if (plan.insertionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+                    SelectInsertionPoint(selector);
+                }
+                if (plan.extractionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
+                    SelectExtractionPoint(selector);
+                }
             }
+        }
+
+        // TODO: bonus objectives?
+        foreach (Objective objective in template.objectives) {
+            GameObject obj = GameObject.Instantiate(insertionPointButtonPrefab);
+            InsertionPointSelector selector = obj.GetComponent<InsertionPointSelector>();
+            obj.transform.SetParent(objectivePointContainer, false);
+            bool visibile = objective.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objective.name);
+            selector.Configure(objective, ObjectiveSelectorCallback, visibile);
         }
     }
     public void ColumnItemCallback(InsertionPointSelector selector) {
-        // Toolbox.RandomizeOneShot(audioSource, columnButtonSound);
-        // if (selector.data.floorNumber != selectedFloor) {
-        //     ChangeFloorView(selector.data.floorNumber);
-        // }
-        // MapMarkerIndicator indicator = indicators[selector.data];
-        // indicator.ShowClickPulse();
-        // ScrollTo(indicator.transform);
-        // if (selector.data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
-        //     SelectInsertionPoint(selector, indicator);
-        // } else if (selector.data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
-        //     SelectExtractionPoint(selector, indicator);
-        // }
+        jumpToFloor = selector.data.floorNumber;
+        jumpToPoint = selector.data.worldPosition;
+
+        selectedMarkerData = selector.data;
+        clickedMarkerData = selector.data;
+
+        if (selector.data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+            SelectInsertionPoint(selector);
+        } else if (selector.data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
+            SelectExtractionPoint(selector);
+        }
+    }
+    public void ObjectiveSelectorCallback(InsertionPointSelector selector) {
+        Objective objective = selector.objective;
+        if (objective.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objective.name)) {
+            string idn = plan.objectiveLocations.ContainsKey(objective.title) ? plan.objectiveLocations[objective.name] : objective.potentialSpawnPoints[0];
+            jumpToPoint = objective.SpawnPointLocation(idn);
+            jumpToFloor = template.GetFloorForPosition(jumpToPoint);
+
+            selectedObjective = objective;
+            clickedObjective = objective;
+        }
+        // MapMarkerIndicator indicator = view.objectiveIndicators[objective];
+
+        // a different method is needed for selecting objectives- no map marker data exists for them.
+        // some are not selectable: their position is unknown
     }
 
-    void SelectInsertionPoint(InsertionPointSelector selector, MapMarkerIndicator indicator) {
-        if (insertionIndicator != null) {
-            insertionIndicator.ShowSelection(false);
-        }
+    void SelectInsertionPoint(InsertionPointSelector selector) {
         if (insertionSelector != null) {
             insertionSelector.Check(false);
         }
-        insertionIndicator = indicator;
         insertionSelector = selector;
-        indicator.ShowSelection(true);
         selector.Check(true);
-        // plan.insertionPointIdn = selector.data.idn;
+        plan.insertionPointIdn = selector.data.idn;
     }
-    void SelectExtractionPoint(InsertionPointSelector selector, MapMarkerIndicator indicator) {
-        if (extractionIndicator != null) {
-            extractionIndicator.ShowSelection(false);
-        }
+    void SelectExtractionPoint(InsertionPointSelector selector) {
         if (extractionSelector != null) {
             extractionSelector.Check(false);
         }
-        extractionIndicator = indicator;
         extractionSelector = selector;
-        indicator.ShowSelection(true);
         selector.Check(true);
-
-        // plan.extractionPointIdn = selector.data.idn;
+        plan.extractionPointIdn = selector.data.idn;
     }
 }
