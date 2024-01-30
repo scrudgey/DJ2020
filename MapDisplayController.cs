@@ -209,7 +209,7 @@ public class MapDisplayController : MonoBehaviour {
         foreach (MapMarkerData data in mapDisplay3DGenerator.allMapData) {
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint ||
                 data.markerType == MapMarkerData.MapMarkerType.extractionPoint ||
-                data.markerType == MapMarkerData.MapMarkerType.objective ||
+                // data.markerType == MapMarkerData.MapMarkerType.objective ||
                 data.markerType == MapMarkerData.MapMarkerType.pointOfInterest) {
                 GameObject obj = GameObject.Instantiate(insertionPointButtonPrefab);
                 InsertionPointSelector selector = obj.GetComponent<InsertionPointSelector>();

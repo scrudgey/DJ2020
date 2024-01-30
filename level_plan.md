@@ -285,17 +285,24 @@ how does the solution work for different objective types?
 * start with markers visible
 * not loading objective markers
 * don't jump to objective if location unknown
+* level data util "write all" function
+* fix floor 4 of elevator image
+* reprocess all existing maps
+* remove objective markers
+* don't show all insertion points
 
-display number of known / unknown nodes in node view
 
 ## bugs
 data objectives can select the same target node
     the solution has to work at the template + plan level
 
-level data util "write all" function
-
-fix floor 4 of elevator image
-reprocess all existing maps
+display number of known / unknown nodes in node view
+allow for a default origin:
+    office map starts way off
+    yamachi starts way off 
+office floor 4 
+set objective visibilities
+add more insertion points
 
 ## tactics can reveal graph information
 

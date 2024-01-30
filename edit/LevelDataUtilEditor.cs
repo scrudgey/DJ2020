@@ -36,36 +36,34 @@ public class LevelDataUtilEditor : Editor {
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         if (template != null) {
             string levelName = template.levelName;
-            // Debug.Log(levelName);
-            if (GUILayout.Button("Write Graph Data")) {
-                LevelDataUtil networkUtil = (LevelDataUtil)target;
-                string sceneName = SceneManager.GetActiveScene().name;
-
-                PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
-                CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
-                AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
-
-                powerGraph.Write(levelName, sceneName);
-                cyberGraph.Write(levelName, sceneName);
-                alarmGraph.Write(levelName, sceneName);
-
-                AssetDatabase.Refresh();
-            }
-            EditorGUILayout.Space();
-            EditorGUILayout.Separator();
             EditorGUILayout.PropertyField(floorNumberProperty);
-            if (GUILayout.Button("Set floor level")) {
-                // SaveMapData();
-                int floorNumber = floorNumberProperty.intValue;
-                SetFloorHeight(template, floorNumber);
-            }
-            EditorGUILayout.PropertyField(mapCameraProperty);
-            EditorGUILayout.PropertyField(mapTextureProperty);
             if (GUILayout.Button("Write map image")) {
                 SaveMapData();
             }
+            if (GUILayout.Button("Set floor level")) {
+                int floorNumber = floorNumberProperty.intValue;
+                SetFloorHeight(template, floorNumber);
+            }
+            GUILayout.Space(10);
+            EditorGUILayout.Separator();
+            GUILayout.Space(10);
+            if (GUILayout.Button("Write all data")) {
+                WriteGraphDataButtonEffect(levelName);
+                SaveMapMetaData(template);
+                SetObjectiveData(template);
+            }
+            GUILayout.Space(10);
+            EditorGUILayout.Separator();
+            GUILayout.Space(10);
+
+            EditorGUILayout.PropertyField(mapCameraProperty);
+            EditorGUILayout.PropertyField(mapTextureProperty);
+
+            if (GUILayout.Button("Write Graph Data")) {
+                WriteGraphDataButtonEffect(levelName);
+            }
             if (GUILayout.Button("Write map marker data")) {
-                SaveMapData();
+                SaveMapMetaData(template);
             }
             if (GUILayout.Button("Write objective data")) {
                 SetObjectiveData(template);
@@ -77,6 +75,22 @@ public class LevelDataUtilEditor : Editor {
         GetTarget.ApplyModifiedProperties();
     }
 
+    void WriteGraphDataButtonEffect(string levelName) {
+        LevelDataUtil networkUtil = (LevelDataUtil)target;
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
+        CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
+        AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
+
+        powerGraph.Write(levelName, sceneName);
+        cyberGraph.Write(levelName, sceneName);
+        alarmGraph.Write(levelName, sceneName);
+
+        Debug.Log("wrote all graph data.");
+
+        AssetDatabase.Refresh();
+    }
 
     public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node<U>, new() where V : GraphNodeComponent<V, U> {
         T graph = new T();
@@ -126,8 +140,8 @@ public class LevelDataUtilEditor : Editor {
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         int floorNumber = floorNumberProperty.intValue;
 
-        SaveMapSnapshot(mapCam, renderTexture, template, floorNumber);
-        SaveMapMetaData(mapCam, template);
+        SaveMapSnapshot(renderTexture, template, floorNumber);
+        // SaveMapMetaData(template);
 
         AssetDatabase.Refresh();
     }
@@ -135,7 +149,7 @@ public class LevelDataUtilEditor : Editor {
         // map
         Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
-        SaveMapMetaData(mapCam, template);
+        SaveMapMetaData(template);
         AssetDatabase.Refresh();
     }
 
@@ -167,10 +181,14 @@ public class LevelDataUtilEditor : Editor {
             EditorUtility.SetDirty(objective);
         }
 
+        Debug.Log($"wrote {template.objectives.Count} objective data");
+
         EditorUtility.SetDirty(template);
     }
 
-    void SaveMapSnapshot(Camera mapCam, RenderTexture renderTexture, LevelTemplate template, int floorNumber) {
+    void SaveMapSnapshot(RenderTexture renderTexture, LevelTemplate template, int floorNumber) {
+        Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
+
         string levelName = template.levelName;
         string sceneName = SceneManager.GetActiveScene().name;
 
@@ -181,7 +199,9 @@ public class LevelDataUtilEditor : Editor {
         MapMarker.WriteMapImage(levelName, sceneName, tex, floorNumber);
 
     }
-    void SaveMapMetaData(Camera mapCam, LevelTemplate template) {
+    void SaveMapMetaData(LevelTemplate template) {
+        Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
+
         string levelName = template.levelName;
         string sceneName = SceneManager.GetActiveScene().name;
         List<MapMarkerData> datas = new List<MapMarkerData>();

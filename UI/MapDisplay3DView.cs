@@ -121,12 +121,19 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         }
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
+            if (data.markerType == MapMarkerData.MapMarkerType.objective) continue;
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && mode == Mode.mission) continue;
             if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) {
                 if (indicators.ContainsKey(data))
                     indicators[data].gameObject.SetActive(false);
                 continue;
             }
+            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && data.idn != plan.insertionPointIdn) {
+                if (indicators.ContainsKey(data))
+                    indicators[data].gameObject.SetActive(false);
+                continue;
+            }
+
             if (!indicators.ContainsKey(data)) {
                 MapMarkerIndicator indicator = SpawnNewMapMarker();
                 string indicatorText = data.markerType switch {
@@ -180,7 +187,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 // if objective is visible at template level, it must have only one position I guess (??)
                 if (!objectiveIndicators.ContainsKey(objective)) {
                     MapMarkerIndicator objectiveIndicator = SpawnNewMapMarker();
-                    objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.extractionPoint, MapMarkerData.MapMarkerIcon.circle);
+                    objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.objective, MapMarkerData.MapMarkerIcon.circle);
                     objectiveIndicators[objective] = objectiveIndicator;
                 }
 
@@ -199,7 +206,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 }
                 if (!objectiveIndicators.ContainsKey(delta.template)) {
                     MapMarkerIndicator objectiveIndicator = SpawnNewMapMarker();
-                    objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.extractionPoint, MapMarkerData.MapMarkerIcon.circle);
+                    objectiveIndicator.Configure("objective", MapMarkerData.MapMarkerType.objective, MapMarkerData.MapMarkerIcon.circle);
                     objectiveIndicators[delta.template] = objectiveIndicator;
                 }
                 Vector3 position = delta.GetPosition();
@@ -224,8 +231,10 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 indicator.ShowClickPulse();
             }
         } else if (generator.clickedMapMarker != null) {
-            MapMarkerIndicator indicator = indicators[generator.clickedMapMarker];
-            indicator.ShowClickPulse();
+            if (indicators.ContainsKey(generator.clickedMapMarker)) {
+                MapMarkerIndicator indicator = indicators[generator.clickedMapMarker];
+                indicator.ShowClickPulse();
+            }
             // Toolbox.RandomizeOneShot(audioSource, columnButtonSound);
         }
 
