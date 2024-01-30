@@ -59,7 +59,7 @@ public class MapMarker : MonoBehaviour {
 
 [System.Serializable]
 public record MapMarkerData {
-    public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard, camera }
+    public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard, camera, anchor }
     public enum MapMarkerIcon { circle, arrowUp, arrowRight, arrowDown, arrowLeft, lightningBolt, door, camera }
     public string idn;
     public MapMarkerType markerType;

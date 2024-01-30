@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenerator> {
     public enum Mode { none, playerfocus, rotate }
+    public enum GamePhase { plan, mission }
+    public GamePhase gamePhase;
     public Action<MapDisplay3DGenerator> OnValueChanged { get; set; }
     public MapDisplayController.MapDisplayLegendType legendType;
     public Mode mode;
@@ -55,16 +57,27 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     public Objective selectedObjective;
     public Objective clickedObjective;
 
+    public int numberTotalNodes;
+    public int numberDiscoveredNodes;
+    public string currentGraphTitle;
+
     public void Initialize(LevelState state) {
+        selectedMapMarker = null;
+        clickedMapMarker = null;
+        selectedObjective = null;
+        clickedObjective = null;
+
         Initialize(state.template, state.plan);
         cyberGraph = state.delta.cyberGraph;
         powerGraph = state.delta.powerGraph;
         alarmGraph = state.delta.alarmGraph;
         // TODO: set theta based on character camera rotation offset
-
+        gamePhase = GamePhase.mission;
+        ChangeMode(Mode.playerfocus);
     }
     public void Initialize(LevelTemplate template, LevelPlan plan) {
         this.template = template;
+        gamePhase = GamePhase.plan;
 
         allMapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
 
@@ -167,10 +180,23 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         mode = newMode;
         switch (mode) {
             case Mode.playerfocus:
-                int floor = template.GetFloorForPosition(GameManager.I.playerPosition);
-                origin = WorldToGeneratorLocalPosition(GameManager.I.playerPosition) - transform.position;
-                int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
-                SelectFloor(playerFloor);
+                Vector3 position = Vector3.zero;
+
+                if (gamePhase == GamePhase.mission) {
+                    position = GameManager.I.playerPosition;
+                } else {
+                    foreach (MapMarkerData data in allMapData) {
+                        if (data.markerType == MapMarkerData.MapMarkerType.anchor) {
+                            Debug.Log($"found marker anchor: {data}");
+                            position = data.worldPosition;
+                            break;
+                        }
+                    }
+                }
+                // Debug.Log(position); 
+                int floor = template.GetFloorForPosition(position);
+                origin = WorldToGeneratorLocalPosition(position) - transform.position;
+                SelectFloor(floor);
                 thetaVelocity = 0f;
                 break;
             case Mode.rotate:
@@ -374,14 +400,21 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             }
         }
 
+
+        numberDiscoveredNodes = graph.nodes.Values.Where(node => node.visibility >= NodeVisibility.mystery).Count();
+        numberTotalNodes = graph.nodes.Count();
+
         switch (graph) {
             case CyberGraph cyberGraph:
+                currentGraphTitle = "cyber";
                 currentCyberGraph = cyberGraph;
                 break;
             case PowerGraph powerGraph:
+                currentGraphTitle = "power";
                 currentPowerGraph = powerGraph;
                 break;
             case AlarmGraph alarmGraph:
+                currentGraphTitle = "alarm";
                 currentAlarmGraph = alarmGraph;
                 break;
         }
@@ -420,9 +453,11 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     }
     public void ClearMarkers() {
         mapData = new List<MapMarkerData>();
+        currentGraphTitle = "";
     }
     public void LoadMarkers() {
         mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+
     }
     public void DisplayCyberGraph() {
         DisplayGraph(cyberGraph);

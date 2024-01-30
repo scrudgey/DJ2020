@@ -290,19 +290,22 @@ how does the solution work for different objective types?
 * reprocess all existing maps
 * remove objective markers
 * don't show all insertion points
-
+* allow for a default origin:
+    * office map starts way off
+    * yamachi starts way off 
+* set objective visibilities
+    * yamachi
+    * jack that data
+* relevant objective spawn points
+* office floor 4 
+* add more insertion points
+* number of pips on floor indicator
+* display number of known / unknown nodes in node view
+* visibility of other floors
 
 ## bugs
 data objectives can select the same target node
     the solution has to work at the template + plan level
-
-display number of known / unknown nodes in node view
-allow for a default origin:
-    office map starts way off
-    yamachi starts way off 
-office floor 4 
-set objective visibilities
-add more insertion points
 
 ## tactics can reveal graph information
 

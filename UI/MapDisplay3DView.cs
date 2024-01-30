@@ -27,6 +27,11 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public Image legendAlarmIndicator;
     public Color legendActiveColor;
     public Color legendInactiveColor;
+    [Header("map info")]
+    public GraphIconReference graphIconReference;
+    public TextMeshProUGUI nodeNumberText;
+    public Image nodeNumberBox;
+    public GameObject nodeNumberBoxObject;
     Dictionary<MapMarkerData, MapMarkerIndicator> indicators;
     Dictionary<string, MiniMapNodeMarker> nodeMarkers;
     public Dictionary<Objective, MapMarkerIndicator> objectiveIndicators;
@@ -102,7 +107,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     override public void HandleValueChanged(MapDisplay3DGenerator generator) {
         for (int i = floorPipContainer.childCount - 1; i >= 0; i--) {
             Image floorPip = floorPips[i];
-            if (i > generator.numberFloors) {
+            if (i >= generator.numberFloors) {
                 floorPip.enabled = false;
             }
             if (i == generator.currentFloor) {
@@ -121,7 +126,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         }
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
-            if (data.markerType == MapMarkerData.MapMarkerType.objective) continue;
+            if (data.markerType == MapMarkerData.MapMarkerType.objective || data.markerType == MapMarkerData.MapMarkerType.anchor) continue;
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && mode == Mode.mission) continue;
             if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) {
                 if (indicators.ContainsKey(data))
@@ -220,7 +225,6 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             }
             playerMarker.SetPosition(GameManager.I.playerPosition, mapDisplay3Dgenerator, markerContainer);
             playerMarker.gameObject.SetActive(template.GetFloorForPosition(GameManager.I.playerPosition) == generator.currentFloor);
-
         }
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
@@ -254,6 +258,21 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             MapMarkerIndicator indicator = indicators[generator.selectedMapMarker];
             indicator.ShowSelection(true);
             selectedIndicator = indicator;
+        }
+
+        if (generator.currentGraphTitle != "") {
+            nodeNumberBoxObject.SetActive(true);
+            nodeNumberText.text = $"{generator.currentGraphTitle}: {generator.numberDiscoveredNodes}/{generator.numberTotalNodes}";
+            Color color = generator.currentGraphTitle switch {
+                "cyber" => graphIconReference.minimapCyberColor,
+                "power" => graphIconReference.minimapPowerColor,
+                "alarm" => graphIconReference.minimapAlarmColor,
+                _ => graphIconReference.minimapCyberColor
+            };
+            nodeNumberText.color = color;
+            nodeNumberBox.color = color;
+        } else {
+            nodeNumberBoxObject.SetActive(false);
         }
 
         HandleLegendMarkers();
