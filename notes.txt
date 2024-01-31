@@ -3619,42 +3619,18 @@ we should display floor number.
     helps with readability when jumping around in network
     helps with orientation re: map
 
-
-
 # pause/status menu
-    information to show:
+    * information to show:
+        * network info in map in planning mode
+        * map
+
         data
         keys
         loots
-        credots
-        map
+        credits
         objectives
         player status / inventory / health / etc. ?
-            hook for skil tree
-        * network info in map in planning mode
-
-
-flavor
-? markers have visibility?
-
-
-two separate ideas:
-    1. show objectives on the map: important
-    2. connect the map information with objective information
-        this implies buttons that click jump to map
-        this is similar to map planning mode
-        we are replacing map planning mode with 3d map: we can replace jumps as well.
-        the only different functionality is in choosing the insert / extract points. we can move this out!
-
-
-
- readibility
-    colors for network
-    fade current flo0r?
-
+            hook for skill tree
 
 show objective makers: see level_plan.md
 
-
-translation: (-0.55, 0.00, 0.22)  inputDirection:(0.05, 0.00, 0.02) ortho:0.5
-translation: (0.07, 0.00, -0.06)  inputDirection:(-0.01, 0.00, 0.00) ortho:0.5

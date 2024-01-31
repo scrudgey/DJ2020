@@ -255,6 +255,9 @@ public class MapDisplayController : MonoBehaviour {
         selectedMarkerData = selector.data;
         clickedMarkerData = selector.data;
 
+        selectedObjective = null;
+        clickedObjective = null;
+
         if (selector.data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
             SelectInsertionPoint(selector);
         } else if (selector.data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
@@ -267,6 +270,9 @@ public class MapDisplayController : MonoBehaviour {
             string idn = plan.objectiveLocations.ContainsKey(objective.title) ? plan.objectiveLocations[objective.name] : objective.potentialSpawnPoints[0];
             jumpToPoint = objective.SpawnPointLocation(idn);
             jumpToFloor = template.GetFloorForPosition(jumpToPoint);
+
+            selectedMarkerData = null;
+            clickedMarkerData = null;
 
             selectedObjective = objective;
             clickedObjective = objective;

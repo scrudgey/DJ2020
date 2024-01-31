@@ -125,8 +125,8 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         }
         zoomFloatAmount = 1.5f;
         SetZoomLevel(1);
-        int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
-        SelectFloor(playerFloor);
+        // int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
+        // SelectFloor(playerFloor);
         ChangeMode(Mode.playerfocus);
     }
 
@@ -223,7 +223,6 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             }
         }
         currentFloor = toFloor;
-        // DisplayGraph(state.delta.cyberGraph);
         if (currentAlarmGraph != null) {
             DisplayGraph(currentAlarmGraph);
         } else if (currentCyberGraph != null) {
@@ -457,7 +456,6 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     }
     public void LoadMarkers() {
         mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
-
     }
     public void DisplayCyberGraph() {
         DisplayGraph(cyberGraph);

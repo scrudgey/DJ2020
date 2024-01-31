@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     Mode mode;
     public MapDisplay3DGenerator mapDisplay3Dgenerator;
     public MapDisplayController mapDisplayController;
+    public AudioSource audioSource;
     [Header("floor indicators")]
     public Transform floorPipContainer;
     public TextMeshProUGUI floorNumberCaption;
@@ -32,9 +34,25 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public TextMeshProUGUI nodeNumberText;
     public Image nodeNumberBox;
     public GameObject nodeNumberBoxObject;
+    public Dictionary<Objective, MapMarkerIndicator> objectiveIndicators;
+
+    [Header("flavor")]
+    public RectTransform selectionBox;
+    public Image selectionBoxImage;
+    public TextMeshProUGUI flavorText;
+    public RawImage mapRawImage;
+    [Header("sfx")]
+    public AudioClip[] floorChangeSound;
+
+    Coroutine selectionBoxCorotuine;
+    Coroutine floorBlitCoroutine;
+    Coroutine mapShakeCoroutine;
+    Coroutine flavorTextBlitCoroutine;
+
     Dictionary<MapMarkerData, MapMarkerIndicator> indicators;
     Dictionary<string, MiniMapNodeMarker> nodeMarkers;
-    public Dictionary<Objective, MapMarkerIndicator> objectiveIndicators;
+
+    int selectedFloor;
     Dictionary<string, ObjectiveLootSpawnpoint> objectiveLocations;
     MapMarkerIndicator playerMarker;
     List<Image> floorPips;
@@ -55,6 +73,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         this.template = template;
         this.plan = plan;
         floorPips = new List<Image>();
+        selectionBoxImage.enabled = false;
 
         foreach (Transform child in markerContainer) {
             if (child.name == "mapview") continue;
@@ -75,7 +94,10 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         Bind(mapDisplay3Dgenerator.gameObject);
 
         mapDisplayController.Initialize(template, plan, this);
-
+        selectedFloor = mapDisplay3Dgenerator.currentFloor;
+        floorNumberCaption.text = $"{template.sceneDescriptor}: floor {mapDisplay3Dgenerator.currentFloor}";
+        flavorText.text = "";
+        mapRawImage.uvRect = new Rect(0, 0, 1, 1);
     }
     MapMarkerIndicator SpawnNewMapMarker() {
         GameObject objM = GameObject.Instantiate(mapMarkerPrefab);
@@ -116,7 +138,13 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 floorPip.color = deselectedColor;
             }
         }
-        floorNumberCaption.text = $"{template.sceneDescriptor}: floor {generator.currentFloor}";
+        if (selectedFloor != generator.currentFloor) {
+            float amount = generator.currentFloor > selectedFloor ? -1f : 1f;
+            selectedFloor = generator.currentFloor;
+            BlitFloorText($"{template.sceneDescriptor}: floor {generator.currentFloor}");
+            ShakeMp(amount);
+            Toolbox.RandomizeOneShot(audioSource, floorChangeSound);
+        }
 
         foreach (KeyValuePair<MapMarkerData, MapMarkerIndicator> kvp in indicators) {
             kvp.Value.gameObject.SetActive(kvp.Key.floorNumber == generator.currentFloor);
@@ -229,35 +257,39 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();
 
+
         if (generator.clickedObjective != null) {
             if (objectiveIndicators.ContainsKey(generator.clickedObjective)) {
                 MapMarkerIndicator indicator = objectiveIndicators[generator.clickedObjective];
-                indicator.ShowClickPulse();
+                ShowSelectionBox(indicator);
+                BlitFlavorText(generator.clickedObjective.ToString());
             }
         } else if (generator.clickedMapMarker != null) {
             if (indicators.ContainsKey(generator.clickedMapMarker)) {
                 MapMarkerIndicator indicator = indicators[generator.clickedMapMarker];
-                indicator.ShowClickPulse();
+                ShowSelectionBox(indicator);
+                BlitFlavorText(generator.clickedMapMarker.ToFlavorText());
             }
-            // Toolbox.RandomizeOneShot(audioSource, columnButtonSound);
         }
 
-        if (generator.clickedObjective != null) {
+        if (generator.selectedObjective != null) {
             if (selectedIndicator != null) {
                 selectedIndicator.ShowSelection(false);
             }
-            if (objectiveIndicators.ContainsKey(generator.clickedObjective)) {
-                MapMarkerIndicator indicator = objectiveIndicators[generator.clickedObjective];
+            if (objectiveIndicators.ContainsKey(generator.selectedObjective)) {
+                MapMarkerIndicator indicator = objectiveIndicators[generator.selectedObjective];
                 indicator.ShowSelection(true);
                 selectedIndicator = indicator;
+                selectionBox.position = indicator.rectTransform.position;
             }
-        } else if (generator.selectedMapMarker != null) {
+        } else if (generator.selectedMapMarker != null && generator.selectedMapMarker.idn != "") {
             if (selectedIndicator != null) {
                 selectedIndicator.ShowSelection(false);
             }
             MapMarkerIndicator indicator = indicators[generator.selectedMapMarker];
             indicator.ShowSelection(true);
             selectedIndicator = indicator;
+            selectionBox.position = indicator.rectTransform.position;
         }
 
         if (generator.currentGraphTitle != "") {
@@ -298,5 +330,72 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 legendPowerIndicator.color = legendActiveColor;
                 break;
         }
+    }
+
+    void ShowSelectionBox(MapMarkerIndicator indicator) {
+        if (selectionBoxCorotuine != null) {
+            StopCoroutine(selectionBoxCorotuine);
+        }
+        selectionBoxCorotuine = StartCoroutine(ActivateSelectionBox(indicator));
+    }
+    void BlitFloorText(string text) {
+        if (floorBlitCoroutine != null) {
+            StopCoroutine(floorBlitCoroutine);
+        }
+        floorBlitCoroutine = StartCoroutine(Toolbox.BlitText(floorNumberCaption, text, interval: 0.01f));
+    }
+    void BlitFlavorText(string text) {
+        if (flavorTextBlitCoroutine != null) {
+            StopCoroutine(flavorTextBlitCoroutine);
+        }
+        flavorTextBlitCoroutine = StartCoroutine(Toolbox.BlitText(flavorText, text));
+    }
+    void ShakeMp(float amount) {
+        if (mapShakeCoroutine != null) {
+            StopCoroutine(mapShakeCoroutine);
+        }
+        mapShakeCoroutine = StartCoroutine(ActivateMapShake(amount));
+    }
+    IEnumerator ActivateSelectionBox(MapMarkerIndicator indicator) {
+        WaitForSecondsRealtime briefPause = new WaitForSecondsRealtime(0.025f);
+        WaitForSecondsRealtime longerPause = new WaitForSecondsRealtime(0.1f);
+        selectionBoxImage.enabled = true;
+
+
+        selectionBox.sizeDelta = new Vector2(200f, 200f);
+        selectionBoxImage.color = Color.white;
+        yield return briefPause;
+        selectionBoxImage.color = graphIconReference.minimapCyberColor;
+        yield return longerPause;
+
+        yield return Toolbox.BlinkVis(selectionBoxImage, () => {
+            selectionBox.sizeDelta = new Vector2(150f, 150f);
+            selectionBoxImage.color = Color.white;
+        });
+        yield return briefPause;
+        selectionBoxImage.color = graphIconReference.minimapCyberColor;
+        yield return longerPause;
+
+        yield return Toolbox.BlinkVis(selectionBoxImage, () => {
+            selectionBox.sizeDelta = new Vector2(100f, 100f);
+            selectionBoxImage.color = Color.white;
+        });
+        yield return briefPause;
+        selectionBoxImage.color = graphIconReference.minimapCyberColor;
+        yield return longerPause;
+
+
+        yield return Toolbox.BlinkEmphasis(selectionBoxImage);
+        yield return new WaitForSecondsRealtime(2.5f);
+        selectionBoxImage.enabled = false;
+
+        // selectionBox.gameObject.SetActive(false);
+    }
+
+    IEnumerator ActivateMapShake(float amount) {
+        Rect rect = mapRawImage.uvRect;
+        yield return Toolbox.Ease(null, 0.1f, amount * -1, 0, PennerDoubleAnimation.BackEaseOut, (amount) => {
+            mapRawImage.uvRect = new Rect(0, amount, 1, 1);
+        }, unscaledTime: true);
     }
 }

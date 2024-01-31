@@ -311,7 +311,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         // TODO: better system here
-        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "cityskybox") // targetScene != "EscapeMenu"
+        if (targetScene != "UI" && targetScene != "NeoDialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "cityskybox") // targetScene != "EscapeMenu"
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
 
         foreach (string sceneToUnload in scenesToUnload) {

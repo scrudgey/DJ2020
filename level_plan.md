@@ -302,10 +302,20 @@ how does the solution work for different objective types?
 * number of pips on floor indicator
 * display number of known / unknown nodes in node view
 * visibility of other floors
+    * blit some text in the corner?
+    * shake the render texture vertical track
+* initialize with proper floor text
+* initialize with proper floor
+* change all stairs markers
+
 
 ## bugs
 data objectives can select the same target node
     the solution has to work at the template + plan level
+
+flavor
+    slide lines in?
+    what flavor can we apply in mission mode?
 
 ## tactics can reveal graph information
 

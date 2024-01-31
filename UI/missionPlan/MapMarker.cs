@@ -69,6 +69,10 @@ public record MapMarkerData {
     public string description;
     public Vector2 position;
     public Vector3 worldPosition;
+
+    public string ToFlavorText() {
+        return $"{idn}\ntype:{markerType}\npos:{position}";
+    }
 }
 
 
