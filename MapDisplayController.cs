@@ -31,9 +31,11 @@ public class MapDisplayController : MonoBehaviour {
     public Transform objectivePointContainer;
     public Transform interestPointContainer;
     public GameObject insertionPointButtonPrefab;
-    public ScrollRect scrollRect;
-    public RectTransform scrollRectTransform;
 
+    public GameObject insertionBox;
+
+    List<InsertionPointSelector> selectors;
+    // public GameObject extractionBox;
 
     InsertionPointSelector extractionSelector;
     InsertionPointSelector insertionSelector;
@@ -85,6 +87,14 @@ public class MapDisplayController : MonoBehaviour {
 
     }
 
+    public void HideInsertionPoints() {
+        insertionBox.SetActive(false);
+        foreach (InsertionPointSelector selector in selectors) {
+            if (selector.data.markerType != MapMarkerData.MapMarkerType.extractionPoint) continue;
+            if (selector.data.idn == plan.extractionPointIdn) continue;
+            selector.gameObject.SetActive(false);
+        }
+    }
     // control
     public void UpdateWithInput(PlayerInput playerInput) {
         if (mouseOverMap && (playerInput.rightMouseDown || playerInput.mouseDown)) {
@@ -94,10 +104,8 @@ public class MapDisplayController : MonoBehaviour {
         }
 
         if (playerInput.rightMouseDown && mapEngaged) {
-            // thetaDeltaThisFrame += playerInput.mouseDelta.x * Time.unscaledDeltaTime;
             thetaDeltaThisFrame += playerInput.mouseDelta.x * 0.01f;
         } else if (playerInput.mouseDown && mapEngaged) {
-            // translationInput += playerInput.mouseDelta * Time.unscaledDeltaTime;
             translationInput += playerInput.mouseDelta * 0.01f;
         }
 
@@ -195,6 +203,7 @@ public class MapDisplayController : MonoBehaviour {
     }
 
     public void PopulateColumns(LevelTemplate template) {
+        selectors = new List<InsertionPointSelector>();
         List<Transform> columns = new List<Transform>{
             insertionPointContainer,
             extractionPointContainer,
@@ -236,6 +245,8 @@ public class MapDisplayController : MonoBehaviour {
                 if (plan.extractionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
                     SelectExtractionPoint(selector);
                 }
+
+                selectors.Add(selector);
             }
         }
 

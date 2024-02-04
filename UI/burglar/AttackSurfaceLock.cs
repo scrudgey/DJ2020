@@ -43,7 +43,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
             Toolbox.RandomizeOneShot(audioSource, manipulateSounds);
         } else if (activeTool == BurglarToolType.key) {
             bool success = false;
-            foreach (int keyId in GameManager.I.gameData.playerState.physicalKeys) {
+            foreach (int keyId in GameManager.I.gameData.levelState.delta.physicalKeys) {
                 success |= doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
             }
             Toolbox.RandomizeOneShot(audioSource, keySounds);

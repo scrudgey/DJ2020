@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class UIStatusBarHandler : MonoBehaviour {
     public GameObject effectPrefab;
     public Camera UICamera;
@@ -32,7 +32,8 @@ public class UIStatusBarHandler : MonoBehaviour {
         currentCredits = data.playerState.credits + data.levelState.delta.levelAcquiredCredits;
         currentLoots = data.playerState.loots.Count + data.levelState.delta.levelAcquiredLoot.Count;
         currentData = data.playerState.payDatas.Count + data.levelState.delta.levelAcquiredPaydata.Count;
-        currentKeys = data.playerState.physicalKeys.Count + data.playerState.keycards.Count;
+        int numberPasswords = data.playerState.payDatas.Concat(data.levelState.delta.levelAcquiredPaydata).Where(data => data.type == PayData.DataType.password).Count();
+        currentKeys = data.levelState.delta.physicalKeys.Count + data.levelState.delta.keycards.Count + numberPasswords;
         SetTextAmounts();
     }
 
@@ -60,6 +61,7 @@ public class UIStatusBarHandler : MonoBehaviour {
         icon.sprite = data.type switch {
             StatusUpdateData.StatusType.credit => creditSprite,
             StatusUpdateData.StatusType.data => dataSprite,
+            StatusUpdateData.StatusType.passwordData => dataSprite,
             StatusUpdateData.StatusType.key => keySprite,
             StatusUpdateData.StatusType.loot => lootSprite
         };
@@ -69,6 +71,7 @@ public class UIStatusBarHandler : MonoBehaviour {
         Vector3 finalPosition = data.type switch {
             StatusUpdateData.StatusType.credit => creditAmount.transform.position,
             StatusUpdateData.StatusType.data => dataAmount.transform.position,
+            StatusUpdateData.StatusType.passwordData => dataAmount.transform.position,
             StatusUpdateData.StatusType.key => keysAmount.transform.position,
             StatusUpdateData.StatusType.loot => lootAmount.transform.position
         };
@@ -80,6 +83,11 @@ public class UIStatusBarHandler : MonoBehaviour {
             }),
             StatusUpdateData.StatusType.data => Toolbox.CoroutineFunc(() => {
                 currentData += data.increment;
+                SetTextAmounts();
+            }),
+            StatusUpdateData.StatusType.passwordData => Toolbox.CoroutineFunc(() => {
+                currentData += data.increment;
+                currentKeys += data.increment;
                 SetTextAmounts();
             }),
             StatusUpdateData.StatusType.key => Toolbox.CoroutineFunc(() => {
@@ -102,6 +110,7 @@ public class UIStatusBarHandler : MonoBehaviour {
         Transform target = type switch {
             StatusUpdateData.StatusType.credit => creditAmount.transform,
             StatusUpdateData.StatusType.data => dataAmount.transform,
+            StatusUpdateData.StatusType.passwordData => dataAmount.transform,
             StatusUpdateData.StatusType.key => keysAmount.transform,
             StatusUpdateData.StatusType.loot => lootAmount.transform
         };
@@ -118,24 +127,22 @@ public class UIStatusBarHandler : MonoBehaviour {
     }
 
     public void OnClick(string type) {
-        StatusUpdateData.StatusType statusType = type switch {
-            "credits" => StatusUpdateData.StatusType.credit,
-            "loot" => StatusUpdateData.StatusType.loot,
-            "data" => StatusUpdateData.StatusType.data,
-            "keys" => StatusUpdateData.StatusType.key
-        };
         GameManager.I.ShowMenu(MenuType.escapeMenu, () => {
-            Debug.Log(statusType);
-            // TODO: configure pause menu
+            EscapeMenuController escapeMenuController = GameObject.FindObjectOfType<EscapeMenuController>();
+            escapeMenuController.Initialize(GameManager.I.gameData);
+            escapeMenuController.ChangeTabCallback(type switch {
+                "keys" => "key",
+                "credits" => "objective",
+                _ => type
+            });
         });
     }
 
 }
 
 public class StatusUpdateData {
-    public enum StatusType { credit, loot, data, key }
+    public enum StatusType { credit, loot, data, key, passwordData }
     public StatusType type;
     public Vector3 originLocation;
     public int increment;
-
 }

@@ -13,7 +13,7 @@ public class PauseScreenObjectiveIndicator : MonoBehaviour {
     public Color failColor;
     public Color inProgressColor;
 
-    public void Configure(ObjectiveDelta objective, GameData gameData) {
+    public void Configure(ObjectiveDelta objective) {
         ObjectiveStatus status = objective.status;
         statusText.text = status switch {
             ObjectiveStatus.inProgress => "Status: incomplete",

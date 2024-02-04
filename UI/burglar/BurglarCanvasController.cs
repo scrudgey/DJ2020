@@ -99,7 +99,7 @@ public class BurglarCanvasController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         SetTool(BurglarToolType.none);
-        keyringButton.SetActive(GameManager.I.gameData.playerState.physicalKeys.Count > 0);
+        keyringButton.SetActive(GameManager.I.gameData.levelState.delta.physicalKeys.Count > 0);
 
         // configure elements
         data.target.EnableAttackSurface();

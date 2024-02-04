@@ -224,7 +224,7 @@ public class Door : Interactive, IDoor {
         doorLocks.AddRange(universalLocks);
 
         StartCoroutine(TemporarilyDisableCollisions(interactor.transform.root.gameObject));
-        ActivateDoorknob(interactor.transform.position, interactor.transform, doorLocks, withKeySet: GameManager.I.gameData.playerState.physicalKeys);
+        ActivateDoorknob(interactor.transform.position, interactor.transform, doorLocks, withKeySet: GameManager.I.gameData.levelState.delta.physicalKeys);
         return ItemUseResult.Empty() with { waveArm = true };
     }
     public void StartLockTimer() {
@@ -233,8 +233,7 @@ public class Door : Interactive, IDoor {
     public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
         lastInteractorTransform = activator;
 
-        // TODO: apply keys
-        foreach (int keyId in GameManager.I.gameData.playerState.physicalKeys) {
+        foreach (int keyId in GameManager.I.gameData.levelState.delta.physicalKeys) {
             foreach (DoorLock doorLock in doorLocks) {
                 doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
             }

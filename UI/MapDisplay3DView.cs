@@ -67,6 +67,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         Initialize(state.template, state.plan);
         mapDisplay3Dgenerator.Initialize(state);
         mode = Mode.mission;
+        mapDisplayController.HideInsertionPoints();
     }
     public void Initialize(LevelTemplate template, LevelPlan plan) {
         mode = Mode.plan;
@@ -90,10 +91,11 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             floorPips.Add(pip);
         }
 
-        mapDisplay3Dgenerator.Initialize(template, plan); // TODO: broken network graphs
+        mapDisplay3Dgenerator.Initialize(template, plan);
         Bind(mapDisplay3Dgenerator.gameObject);
 
         mapDisplayController.Initialize(template, plan, this);
+
         selectedFloor = mapDisplay3Dgenerator.currentFloor;
         floorNumberCaption.text = $"{template.sceneDescriptor}: floor {mapDisplay3Dgenerator.currentFloor}";
         flavorText.text = "";

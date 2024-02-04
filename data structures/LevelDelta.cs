@@ -33,12 +33,17 @@ public record LevelDelta {
     public Stack<DialogueTacticType> lastTactics;
     public int stallsAvailable = 1;
     public int easesAvailable = 1;
+
+    public HashSet<int> physicalKeys;
+    public HashSet<int> keycards;
     public static LevelDelta Empty() => new LevelDelta {
         levelAcquiredPaydata = new List<PayData>(),
         levelAcquiredLoot = new List<LootData>(),
         dialogueCards = new List<DialogueCard>(),
         lastTactics = new Stack<DialogueTacticType>(),
         objectiveDeltas = new List<ObjectiveDelta>(),
-        optionalObjectiveDeltas = new List<ObjectiveDelta>()
+        optionalObjectiveDeltas = new List<ObjectiveDelta>(),
+        physicalKeys = new HashSet<int>(),
+        keycards = new HashSet<int>()
     };
 }

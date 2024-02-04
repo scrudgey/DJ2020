@@ -13,7 +13,7 @@ public class KeycardReader : Interactive {
     Coroutine coroutine;
     public override ItemUseResult DoAction(Interactor interactor) {
         bool success = false;
-        foreach (int keyId in GameManager.I.gameData.playerState.keycards) {
+        foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
             success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
         }
         AudioClip[] sound;

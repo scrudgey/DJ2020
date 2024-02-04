@@ -3605,6 +3605,29 @@ more equipment to bring on mission?
     * hughlught legend
     * map markers colors
     * camera icon too big
+* pause/status menu
+    * information to show:
+        * network info in map in planning mode
+        * map
+        * show objective makers: see level_plan.md
+        * objectives
+        player status / inventory / health / etc. ?
+            hook for skill tree
+* don't populate insertion points in escape menu map view
+* don't populate unused extraction points in escape menu map view
+* clicking from status bar doesn't work as expected
+* data:
+    * fix button clicking
+* objectives:
+    * layout is kind of ugly
+* start with one thing selected
+* tab buttons should match order of status bar.
+* tab buttons should consistently indicate selected tab
+* inventory can run over
+* objectives when no desc
+* for loot / data / keys, maybe display number in tab?
+* key status bar should include password data
+* network view should hide for pause menu
 
 
 
@@ -3619,18 +3642,12 @@ we should display floor number.
     helps with readability when jumping around in network
     helps with orientation re: map
 
-# pause/status menu
-    * information to show:
-        * network info in map in planning mode
-        * map
 
-        data
-        keys
-        loots
-        credits
-        objectives
-        player status / inventory / health / etc. ?
-            hook for skill tree
 
-show objective makers: see level_plan.md
+status bar should hide for menus
+flying loot widget should be easier to see
+? when pause menu changes sizes, relevant buttons should stay in place.- how?
 
+key:
+    switch game system over to using keydata
+    password data doesn't look right in key view

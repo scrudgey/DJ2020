@@ -232,6 +232,7 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.escapeMenu:
                 // TODO: change this?
+                SetOverlay(OverlayType.none);
                 if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
                     LoadScene("EscapeMenu", callback, unloadAll: false);
                 }
@@ -445,13 +446,15 @@ public partial class GameManager : Singleton<GameManager> {
             }
             escapePressedThisFrame = false;
         } else if (gameData.phase == GamePhase.levelPlay || gameData.phase == GamePhase.vrMission) {
-
             if (inputMode == InputMode.burglar) {
 
             } else {
                 if (activeMenuType == MenuType.none) {
                     MenuType escapeMenuType = gameData.phase == GamePhase.levelPlay ? MenuType.escapeMenu : MenuType.VREscapeMenu;
-                    ShowMenu(escapeMenuType);
+                    ShowMenu(escapeMenuType, () => {
+                        EscapeMenuController controller = GameObject.FindObjectOfType<EscapeMenuController>();
+                        controller.Initialize(gameData);
+                    });
                 } else {
                     DoEscapeMenus();
                 }

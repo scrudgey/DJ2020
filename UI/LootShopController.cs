@@ -73,7 +73,7 @@ public class LootShopController : MonoBehaviour {
             LootData data = grouping.First();
             GameObject button = CreateLootButton(data);
             LootInventoryButton script = button.GetComponent<LootInventoryButton>();
-            script.Initialize(this, grouping.ToList(), count);
+            script.Initialize(LootButtonCallback, grouping.ToList(), count);
             Debug.Log($"group: {data.name} {count}");
             button.transform.SetParent(inventoryContainer, false);
             numberOfitems += 1;

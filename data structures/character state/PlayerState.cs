@@ -46,8 +46,6 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite portrait;
 
-    public HashSet<int> physicalKeys;
-    public HashSet<int> keycards;
 
     public List<string> activePerks;
     public int skillpoints;
@@ -172,8 +170,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
             portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
 
-            physicalKeys = new HashSet<int>(),
-            keycards = new HashSet<int>(),
+            // physicalKeys = new HashSet<int>(),
+            // keycards = new HashSet<int>(),
 
             payDatas = new List<PayData>(),
 

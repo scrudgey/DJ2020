@@ -29,6 +29,10 @@ public class GraphIconReference : ScriptableObject {
     public Color minimapCyberColor;
     public Color minimapAlarmColor;
     public Color minimapPowerColor;
+    [Header("keyImages")]
+    public Sprite physicalKey;
+    public Sprite keyCard;
+    public Sprite password;
 
     public Sprite CyberNodeSprite(CyberNode node) {
         // if (node.lockLevel > 0) {

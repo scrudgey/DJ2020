@@ -21,7 +21,7 @@ public class MissionFailMenuController : MonoBehaviour {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
             obj.transform.SetParent(objectivesContainer, false);
             PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();
-            controller.Configure(objective, data);
+            controller.Configure(objective);
         }
     }
     public void ReplanButtonCallback() {

@@ -15,8 +15,10 @@ public partial class GameManager : Singleton<GameManager> {
     public void AddPayDatas(PayData data, Vector3 position) {
         gameData.levelState.delta.levelAcquiredPaydata.Add(data);
         OnPayDataChange?.Invoke(data, gameData);
+
+        StatusUpdateData.StatusType statusType = data.type == PayData.DataType.password ? StatusUpdateData.StatusType.passwordData : StatusUpdateData.StatusType.data;
         OnGameStateChange?.Invoke(new StatusUpdateData() {
-            type = StatusUpdateData.StatusType.data,
+            type = statusType,
             increment = 1,
             originLocation = position
         });
@@ -56,11 +58,11 @@ public partial class GameManager : Singleton<GameManager> {
         });
     }
     public void AddPhysicalKey(int keyId) {
-        gameData.playerState.physicalKeys.Add(keyId);
+        gameData.levelState.delta.physicalKeys.Add(keyId);
         OnItemPickup?.Invoke(0, $"{keyId}");
     }
     public void AddKeyCard(int keyId) {
-        gameData.playerState.keycards.Add(keyId);
+        gameData.levelState.delta.keycards.Add(keyId);
         OnItemPickup?.Invoke(0, $"{keyId}");
     }
     public void CompleteAllObjectives() {
