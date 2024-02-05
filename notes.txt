@@ -3038,12 +3038,87 @@ x ladders
     * office
     * tower
     * yamachi
+    * redo networks:
+        * remove transferState. instead, every cyber component should bind to the state of the cyber node.
+        * enable progress 
+* no icons in power view
+* yamachi level started w/o/ objective data
+* keys & status bar
+* status bar on top shows:
+    * credits
+    * loot
+    * data
+    * keys
+* thing when when loot is collected
+* clicking opens pause / status screen to appropriate tab
+    * some sort of pseudo-3d offset map in the escape menu
+* dynamically load map display per level
+    update a few more map images
+* allow player to change floors
+* display other locations
+* display player location
+* allow player to 
+    * rotate
+    * move
+    * zoom
+* visibility of floors
+* time to separate model, view, and control.
+* zoom buttons
+* mode buttons
+    * click two: reset to (0, 0) with rotation
+* click one: center on player
+* don't show insertion point
+* show only selected extraction point
+* label extraction point "extraction point"
+* only show selected extraction point
+* properly handle floor level for player
+    * define floor level per scene: part of level template
+* show network stuff
+* refresh graph edges when floor changes
+* toggle markers / network on and off
+* clear ou empty markers
+    * line thickness / 
+* show legend
+    * click again- hide
+    * hughlught legend
+    * map markers colors
+    * camera icon too big
+* pause/status menu
+    * information to show:
+        * network info in map in planning mode
+        * map
+        * show objective makers: see level_plan.md
+        * objectives
+        player status / inventory / health / etc. ?
+            hook for skill tree
+* don't populate insertion points in escape menu map view
+* don't populate unused extraction points in escape menu map view
+* clicking from status bar doesn't work as expected
+* data:
+    * fix button clicking
+* objectives:
+    * layout is kind of ugly
+* start with one thing selected
+* tab buttons should match order of status bar.
+* tab buttons should consistently indicate selected tab
+* inventory can run over
+* objectives when no desc
+* for loot / data / keys, maybe display number in tab?
+* key status bar should include password data
+* network view should hide for pause menu
+    * password data doesn't look right in key view
+* status bar should hide for menus
+* flying loot widget should be easier to see
+* better map  
+    * higher res
+    * better scroll
+        * minimap
+    * pause screen
+    * data and hacking
 
 
 
-places randomizer could break down:
-    we have the wrong objective on it
-    we have overlapping datastore sets
+
 
 more shooting range?
     buttons for bringing target in to inspect?
@@ -3075,10 +3150,8 @@ uncertain:
     shooting the objects
         shoot laser tripwire to disable?
         shoot alarm box to disable?
-    redo networks:
-        remove transferState. instead, every cyber component should bind to the state of the cyber node.
-        enable progress 
     adjust rate of fire for pistols?
+    ? when pause menu changes sizes, relevant buttons should stay in place.- how?
 
 
 nice to have / future goals:
@@ -3471,24 +3544,14 @@ generic spritesheet template is not complete:
     separate arm and torso?
 clickable loot in burglar?
 loot has portrait view in burglar?
-door randomizer should specify key id ?
 jazz up elevator controller
     sound effects
     click effect
-armor
-    an armor rating that is % probability of deflecting a shot
-animate gun holster / unholster
 some suspicion records could be sticky when noticed
     anything related to player behavior and appearance
     a different kind of surveillance camera stickies suspicion records?
-worker dialogue tree
-better map  
-    higher res
-    better scroll
+
 guard stood facing wall in tower
-
-
-
 
 unresolved mechanics / gameplay questions:
     hacking
@@ -3503,9 +3566,6 @@ unresolved mechanics / gameplay questions:
 
 major initiatives:
     anime effects
-    ?minimap
-    pause screen
-    data and hacking
     cyberware
     destructible walls
     vehicles
@@ -3563,91 +3623,40 @@ more equipment to bring on mission?
     ninja vanish
 
 
-* no icons in power view
-* yamachi level started w/o/ objective data
-* keys & status bar
-* status bar on top shows:
-    * credits
-    * loot
-    * data
-    * keys
-* thing when when loot is collected
-* clicking opens pause / status screen to appropriate tab
-    * some sort of pseudo-3d offset map in the escape menu
-* dynamically load map display per level
-    update a few more map images
-* allow player to change floors
-* display other locations
-* display player location
-* allow player to 
-    * rotate
-    * move
-    * zoom
-* visibility of floors
-* time to separate model, view, and control.
-* zoom buttons
-* mode buttons
-    * click two: reset to (0, 0) with rotation
-* click one: center on player
-* don't show insertion point
-* show only selected extraction point
-* label extraction point "extraction point"
-* only show selected extraction point
-* properly handle floor level for player
-    * define floor level per scene: part of level template
-* show network stuff
-* refresh graph edges when floor changes
-* toggle markers / network on and off
-* clear ou empty markers
-    * line thickness / 
-* show legend
-    * click again- hide
-    * hughlught legend
-    * map markers colors
-    * camera icon too big
-* pause/status menu
-    * information to show:
-        * network info in map in planning mode
-        * map
-        * show objective makers: see level_plan.md
-        * objectives
-        player status / inventory / health / etc. ?
-            hook for skill tree
-* don't populate insertion points in escape menu map view
-* don't populate unused extraction points in escape menu map view
-* clicking from status bar doesn't work as expected
-* data:
-    * fix button clicking
-* objectives:
-    * layout is kind of ugly
-* start with one thing selected
-* tab buttons should match order of status bar.
-* tab buttons should consistently indicate selected tab
-* inventory can run over
-* objectives when no desc
-* for loot / data / keys, maybe display number in tab?
-* key status bar should include password data
-* network view should hide for pause menu
-
-
+graphical glitch when entering / exiting aim mode in yamachi
 
 publish trailer on twitter
 update the steam page graphic
-
 multiple guards chose the same clearpoint to navigate to- more global coordination
 better investigative ability when player does something weird like superjump / land
 highlight NPCs that are shooting me
+worker dialogue tree
 
 we should display floor number.
     helps with readability when jumping around in network
     helps with orientation re: map
+music
+    * ducking and side chaining sfx channel
+    * import all current music files
+    * crossfade trackes enable / disable
+    dynamic normalizing as tracks enable / disable?
+    set up music for all missions
 
+animate gun holster / unholster
 
+key system:
+    more detailed key usage enabling keyed alike attacks 
+better combat:
+    armor?
+        an armor rating that is % probability of deflecting a shot?
+    melee combat?   
+    gunshots / impacts / impact sounds / impact effects
+graphic effects
+    80s electricity 
+    anime glow
 
-status bar should hide for menus
-flying loot widget should be easier to see
-? when pause menu changes sizes, relevant buttons should stay in place.- how?
+circuitry hacking
 
-key:
-    switch game system over to using keydata
-    password data doesn't look right in key view
+v2 of selling data / upgrading hack ability
+
+in-between montage

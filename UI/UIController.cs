@@ -12,6 +12,7 @@ public class UIController : MonoBehaviour {
     public Canvas burglarCanvas;
     public Canvas missionSelectorCanvas;
     public Canvas interactiveHighlightCanvas;
+    public Canvas statusBarCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public ItemUIHandler itemUIHandler;
@@ -176,11 +177,15 @@ public class UIController : MonoBehaviour {
             interactiveHighlightCanvas.enabled = false;
         if (burglarCanvas != null)
             burglarCanvas.enabled = false;
+        if (statusBarCanvas != null)
+            statusBarCanvas.enabled = false;
     }
     public void ShowUI() {
         canvas.enabled = true;
         gunDisplayCanvas.enabled = true;
         interactiveHighlightCanvas.enabled = true;
+        if (statusBarCanvas != null)
+            statusBarCanvas.enabled = true;
         if (burglarMode)
             burglarCanvas.enabled = true;
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {

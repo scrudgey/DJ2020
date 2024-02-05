@@ -2,5 +2,8 @@ public enum MusicTrack {
     none,
     lethalGlee,
     obligateArsonist,
-    antiAnecdote
+    antiAnecdote,
+    autoeroticDefenestration,
+    hyperLysisCypher,
+    whereIHidTheBodies
 }

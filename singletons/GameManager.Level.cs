@@ -399,7 +399,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     private void InitializePlayerAndController(LevelPlan plan) {
         ClearSceneData();
-        // inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
         if (characterCamera == null) {
             Debug.Break();
@@ -435,8 +434,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     private void InitializeLevel(LevelPlan plan) {
         InitializePlayerAndController(plan);
-
-
 
         // connect up power grids
         Debug.Log("connecting power grid...");
