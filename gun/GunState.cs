@@ -12,7 +12,8 @@ public class GunState : IGunStatProvider {
         if (!CanShoot()) {
             return;
         }
-        delta.cooldownTimer = getShootInterval();
+        if (template.cycle == CycleType.manual || template.cycle == CycleType.semiautomatic)
+            delta.cooldownTimer = getShootInterval();
         delta.chamber = 0;
         if (ShouldRack()) {
             Rack();

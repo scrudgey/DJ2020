@@ -83,63 +83,32 @@ public class MusicController : Singleton<MusicController> {
     public void HandleSuspicionChange() {
         Suspiciousness sus = GameManager.I.GetTotalSuspicion();
         Reaction reaction = GameManager.I.GetSuspicionReaction(sus);
+        bool alarmActive = GameManager.I.gameData.levelState.delta.alarmGraph.anyAlarmTerminalActivated();
         // Debug.Log($"[music] handle suspicious change {sus}");
-        // TODO: ease in the volumes
         switch (reaction) {
             case Reaction.ignore:
                 SetTrackVolume(0, 1);
                 SetTrackVolume(1, 0);
                 SetTrackVolume(2, 0);
                 SetTrackVolume(3, 0);
-                // audioSources[0].volume = 1;
-                // audioSources[1].volume = 0;
-                // audioSources[2].volume = 0;
-                // audioSources[3].volume = 0;
                 break;
             case Reaction.investigate:
-                // audioSources[0].volume = 1f;
-                // audioSources[1].volume = 1f;
-                // audioSources[2].volume = 0;
-                // audioSources[3].volume = 0;
-
                 SetTrackVolume(0, 1);
                 SetTrackVolume(1, 1);
                 SetTrackVolume(2, 0);
                 SetTrackVolume(3, 0);
                 break;
             case Reaction.attack:
-                // audioSources[0].volume = 1f;
-                // audioSources[1].volume = 1f;
-                // audioSources[2].volume = 1f;
-                // audioSources[3].volume = 1f;
-
                 SetTrackVolume(0, 1);
                 SetTrackVolume(1, 1);
                 SetTrackVolume(2, 1);
-                SetTrackVolume(3, 1);
+                if (alarmActive) {
+                    SetTrackVolume(3, 1);
+                } else {
+                    SetTrackVolume(3, 0);
+                }
                 break;
         }
-
-        // switch (sus) {
-        //     case Suspiciousness.normal:
-        //         audioSources[0].volume = 1;
-        //         audioSources[1].volume = 1;
-        //         audioSources[2].volume = 0;
-        //         audioSources[3].volume = 0;
-        //         break;
-        //     case Suspiciousness.suspicious:
-        //         audioSources[0].volume = 1;
-        //         audioSources[1].volume = 1;
-        //         audioSources[2].volume = 1;
-        //         audioSources[3].volume = 0;
-        //         break;
-        //     case Suspiciousness.aggressive:
-        //         audioSources[0].volume = 1;
-        //         audioSources[1].volume = 1;
-        //         audioSources[2].volume = 1;
-        //         audioSources[3].volume = 1;
-        //         break;
-        // }
     }
 
     void SetTrackVolume(int index, float target) {
@@ -158,7 +127,4 @@ public class MusicController : Singleton<MusicController> {
             source.volume = amount;
         }, unscaledTime: true);
     }
-
-
-
 }

@@ -35,7 +35,7 @@ public class EscapeMenuLootController : MonoBehaviour {
             GameObject button = CreateLootButton(data);
             LootInventoryButton script = button.GetComponent<LootInventoryButton>();
             script.Initialize(LootButtonCallback, grouping.ToList(), count);
-            Debug.Log($"group: {data.name} {count}");
+            // Debug.Log($"group: {data.name} {count}");
             button.transform.SetParent(inventoryContainer, false);
             numberOfitems += 1;
 

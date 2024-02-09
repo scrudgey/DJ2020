@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
 public class CustomAnimator : MonoBehaviour {
     private AnimationClip _legacyClip;
     public float playbackSpeed = 1f;
@@ -18,53 +18,52 @@ public class CustomAnimator : MonoBehaviour {
     private CustomAnimationClip _clip;
     bool isPlaying;
     float timer;
-    AnimationEvent nextEvent;
-    int eventIndex;
+    Stack<AnimationEvent> nextEvents;
+    float referenceTime;
     public void Stop() {
         isPlaying = false;
     }
     public void Play() {
+        if (!isPlaying) {
+            referenceTime = Time.time;
+        }
         isPlaying = true;
+    }
+    void Start() {
+    }
+    void OnClipChange() {
+        timer = 0f;
+        nextEvents = new Stack<AnimationEvent>();
+        ResetStack();
     }
 
     void Update() {
         if (isPlaying) {
-            timer += Time.deltaTime * playbackSpeed;
-            int j = 0;
-            while (nextEvent != null && timer > nextEvent.time && j < 100) {
-                FireEvent(nextEvent);
-                eventIndex += 1;
-                if (eventIndex > _clip.events.Length - 1) {
-                    nextEvent = null;
-                    eventIndex = 0;
-                } else {
-                    nextEvent = _clip.events[eventIndex];
-                }
-                j++;
+            timer = (Time.time - referenceTime) * playbackSpeed;
+            // Debug.Log(timer);
+            while (nextEvents.Count > 0 && timer > nextEvents.Peek().time && isPlaying) {
+                FireEvent(nextEvents.Pop());
             }
-            // i think part of the problem is this being outside the other while loop?
-            while (timer > _clip.length) {
-                timer -= _clip.length;
-                eventIndex = 0;
-                nextEvent = _clip.events[0];
+            if (timer > _clip.length && _clip.length > 0) {
                 if (_clip.wrapMode == WrapMode.Default || _clip.wrapMode == WrapMode.Once) {
                     Stop();
                 } else {
-
+                    ResetStack();
                 }
-                if (_clip.length <= 0) break;
             }
+            // while (nextEvents.Count > 0 && timer  > nextEvents.Peek().time) {
+            //     FireEvent(nextEvents.Pop());
+            // }
         }
     }
-    void FireEvent(AnimationEvent animationEvent) {
-        // Debug.Log($"Fire event: {animationEvent.functionName} {animationEvent.intParameter}");
-        BroadcastMessage(animationEvent.functionName, animationEvent.intParameter, SendMessageOptions.DontRequireReceiver);
-        // BroadcastMessage(animationEvent.functionName, animationEvent., SendMessageOptions.DontRequireReceiver);
+    void ResetStack() {
+        foreach (AnimationEvent e in _clip.events.Reverse()) {
+            nextEvents.Push(e);
+        }
+        // TODO: handle overflow time on looping clips
+        referenceTime = Time.time;
     }
-    void OnClipChange() {
-        // AnimationUtility.
-        timer = 0f;
-        eventIndex = 0;
-        nextEvent = _clip.events[0];
+    void FireEvent(AnimationEvent animationEvent) {
+        BroadcastMessage(animationEvent.functionName, animationEvent.intParameter, SendMessageOptions.DontRequireReceiver);
     }
 }

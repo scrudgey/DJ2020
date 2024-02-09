@@ -24,7 +24,7 @@ public class TargetPractice : MonoBehaviour, IDamageReceiver {
                 points = outerPoints;
             }
             float distance = Vector3.Distance(centerPoint.position, impactPoint);
-            Debug.Log($"{points} : {distance}");
+            // Debug.Log($"{points} : {distance}");
             TargetHitData data = new TargetHitData {
                 points = points,
                 distance = distance

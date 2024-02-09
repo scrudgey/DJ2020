@@ -3547,9 +3547,6 @@ loot has portrait view in burglar?
 jazz up elevator controller
     sound effects
     click effect
-some suspicion records could be sticky when noticed
-    anything related to player behavior and appearance
-    a different kind of surveillance camera stickies suspicion records?
 
 guard stood facing wall in tower
 
@@ -3623,29 +3620,21 @@ more equipment to bring on mission?
     ninja vanish
 
 
-graphical glitch when entering / exiting aim mode in yamachi
+* fix custom animator stutteriness - ???
+* ducking and side chaining sfx channel
+* import all current music files
+* crossfade trackes enable / disable
+* better solution for 4 channels.
+    * set up music for all missions
+        tower- lethal glee
+        jack that data - obligate arsonist
+        elevator - anti anecdote
+        yamachi - hyper lysis
+        711 - bodies
 
-publish trailer on twitter
-update the steam page graphic
-multiple guards chose the same clearpoint to navigate to- more global coordination
-better investigative ability when player does something weird like superjump / land
-highlight NPCs that are shooting me
-worker dialogue tree
-
-we should display floor number.
-    helps with readability when jumping around in network
-    helps with orientation re: map
-music
-    * ducking and side chaining sfx channel
-    * import all current music files
-    * crossfade trackes enable / disable
-    dynamic normalizing as tracks enable / disable?
-    set up music for all missions
 
 animate gun holster / unholster
-
-key system:
-    more detailed key usage enabling keyed alike attacks 
+in-between montage
 better combat:
     armor?
         an armor rating that is % probability of deflecting a shot?
@@ -3655,8 +3644,34 @@ graphic effects
     80s electricity 
     anime glow
 
+
+
+
+ease in elements of perk menu
+
+
+graphical glitch when entering / exiting aim mode in yamachi
+
+publish trailer on twitter
+update the steam page graphic
+multiple guards chose the same clearpoint to navigate to- more global coordination
+better investigative ability when player does something weird like superjump / land
+highlight NPCs that are shooting me
+worker dialogue tree
+
+
+
+some suspicion records could be sticky when noticed
+    anything related to player behavior and appearance
+    the basic problem here is: robbing the register makes you suspicious for a long time even if nobody sees it.
+        opposite problem: you do something quick suspicious and by the time the guard investigates you, it's over.
+    solution: some suspicion records are quick lived, unless they are observed, then they are stickied.
+        can be stickied by guard,
+        can be stickied by minor security camera
+key system:
+    more detailed key usage enabling keyed alike attacks 
+music
+    dynamic normalizing as tracks enable / disable?
 circuitry hacking
 
 v2 of selling data / upgrading hack ability
-
-in-between montage

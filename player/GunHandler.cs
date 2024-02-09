@@ -41,8 +41,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
     public GameObject tamperEvidenceObject;
-    // public TamperEvidence tamperEvidence;
-    // float tamperEvidenceTimer;
     int numberOfShellsPerReload;
     void Awake() {
         lockOnColliders = new Collider[32];
@@ -64,6 +62,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     }
     // used by animator
     public void EndShoot() {
+        Debug.Log("end shoot");
         state = GunStateEnum.idle;
         lastShootInput = null;
         shootRequestedThisFrame = false;
@@ -116,21 +115,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (shootingInaccuracy > 0) {
             shootingInaccuracy = CalculateInaccuracyRecovery(gunInstance, shootingInaccuracy);
         }
-        // if (tamperEvidenceTimer > 0) {
-        //     tamperEvidenceTimer -= Time.deltaTime;
-
-        //     if (tamperEvidenceTimer <= 0) {
-
-        //     }
-        // }
     }
-    // void EnableTamperEvidence(SuspicionRecord suspicionRecord) {
-    //     tamperEvidenceObject.SetActive(true);
-    //     // tamperEvidence.
-    // }
-    // void DisableTamperEvidence() {
-    //     tamperEvidenceObject.SetActive(false);
-    // }
+
     float CalculateInaccuracyRecovery(GunState gunState, float value) {
         if (gunState == null)
             return 0f;
@@ -350,9 +336,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         // shoot bullet
         int numberBullets = gunInstance.template.type == GunType.shotgun ? 5 : 1;
         Bullet bullet = null;
-        // for (int i = 0; i < numberBullets; i++) {
         bullet = EmitBullet(input, numberBullets);
-        // }
 
         // play sound
         NoiseData noiseData = gunInstance.GetShootNoise() with {
@@ -362,6 +346,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.GetShootSounds()));
         Toolbox.Noise(gunPosition(), noiseData, transform.root.gameObject);
+
         // flash
         if (!gunInstance.getSilencer()) {
             muzzleFlashLight.enabled = true;

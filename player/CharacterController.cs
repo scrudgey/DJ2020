@@ -369,8 +369,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     private void HandleHurtableChanged(Destructible hurtable) {
         ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);
-        if (hurtable.lastDamage != null && deadMoveVelocity == Vector3.zero)
-            deadMoveVelocity = hurtable.lastDamage.direction;
+        if (hurtable.lastDamage != null && deadMoveVelocity == Vector3.zero) {
+            // deadMoveVelocity = hurtable.lastDamage.direction; // todo project onto plane
+            deadMoveVelocity = new Vector3(hurtable.lastDamage.direction.x, 0, hurtable.lastDamage.direction.z).normalized;
+        }
+
     }
     private void HandleTakeDamage(Damageable damageable, Damage damage) {
         hitstunTimer = 0.15f;

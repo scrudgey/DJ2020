@@ -101,6 +101,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
                         CycleType.automatic => 0.1f / input.gunInput.baseGun.GetGunStats().shootInterval,
                         _ => 1f
                     };
+                    // Debug.Log($"speed: {animator.playbackSpeed}");
                     break;
                 case GunHandler.GunStateEnum.reloading:
                     SetAnimation(input.gunInput.baseGun.reloadAnimation);
