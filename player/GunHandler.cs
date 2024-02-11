@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver, IPoolable {
     public enum GunStateEnum {
+        holstering,
         idle,
         shooting,
         racking,
@@ -34,14 +35,18 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool shootRequestedThisFrame;
     public CursorData currentTargetData;
     public bool isShooting;
-    public bool isSwitchingWeapon;
+
     public Action<GunHandler> OnShoot;
+    public Action<GunHandler> OnHolsterFinish;
     public bool isAimingWeapon;
     public bool isPlayerCharacter;
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
     public GameObject tamperEvidenceObject;
     int numberOfShellsPerReload;
+    public bool isSwitchingWeapon;
+    GunType fromGunType;
+    GunType toGunType;
     void Awake() {
         lockOnColliders = new Collider[32];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -76,28 +81,30 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     // used by animator
     public void ShellIn() {
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipIn);
-
-
-
         gunInstance.ShellIn(numberOfShellsPerReload);
         OnValueChanged?.Invoke(this);
     }
     // used by animator
     public void StopReload() {
-        // TODO: change state
         if (gunInstance.ShouldRack()) {
             state = GunStateEnum.racking;
         } else state = GunStateEnum.idle;
     }
+    // used by animator
+    public void StopHolster() {
+        state = GunStateEnum.idle;
+        OnValueChanged?.Invoke(this);
+        OnHolsterFinish?.Invoke(this);
+    }
 
 
-    public bool HasGun() => gunInstance != null && gunInstance.template != null;
+    public bool HasGun() => (gunInstance != null && gunInstance.template != null);
 
     public bool CanShoot() => gunInstance.CanShoot() && (state != GunStateEnum.reloading && state != GunStateEnum.racking);
 
     public void Update() {
         if (gunInstance == null || gunInstance.template == null) {
-            state = GunStateEnum.idle;
+            // state = GunStateEnum.idle;
             return;
         } else {
             gunInstance.Update();
@@ -480,12 +487,17 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     private void SwitchGun(GunState instance) {
         if (instance == null || instance == gunInstance)
             return;
+        fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
+        toGunType = instance == null ? GunType.unarmed : instance.template.type;
         isSwitchingWeapon = true;
+        state = GunStateEnum.holstering;
 
         gunInstance = instance;
 
         SetGunAppearanceSuspicion();
         OnValueChanged?.Invoke(this);
+        OnHolsterFinish?.Invoke(this);
+        // Debug.Break();
     }
     public void SetGunAppearanceSuspicion() {
         if (gunInstance != null && gunInstance.template != null) {
@@ -498,12 +510,18 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void Holster() {
+        if (gunInstance == null) return;
+        fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
+        toGunType = GunType.unarmed;
         isSwitchingWeapon = true;
+        state = GunStateEnum.holstering;
+
         gunInstance = null;
         OnValueChanged?.Invoke(this);
         if (isPlayerCharacter) {
             GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
         }
+        // Debug.Break();
     }
     public void SwitchToGun(int idn) {
         switch (idn) {
@@ -543,10 +561,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void SetInputs(PlayerInput input) {
-        // inputMode = input.inputMode;
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
         isAimingWeapon = input.aimWeapon;
+
+        if (state == GunStateEnum.holstering) {
+            return;
+        }
 
         if (HasGun()) {
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
@@ -637,11 +658,13 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         return new AnimationInput.GunAnimationInput {
             gunType = gunType,
             gunState = state,
-            hasGun = gunInstance != null && HasGun(),
+            hasGun = HasGun() || state == GunStateEnum.holstering,
             holstered = gunInstance == null,
             baseGun = baseGun,
             shootRequestedThisFrame = shootRequestedThisFrame,
-            aimWeapon = isAimingWeapon
+            aimWeapon = isAimingWeapon,
+            fromGunType = fromGunType,
+            toGunType = toGunType,
         };
     }
 

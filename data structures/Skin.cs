@@ -43,6 +43,7 @@ public class Skin {
     public Octet<Sprite[]> pistolRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> pistolReload = new Octet<Sprite[]>();
     public Octet<Sprite[]> pistolRun = new Octet<Sprite[]>();
+    public Octet<Sprite[]> pistolHolster = new Octet<Sprite[]>();
 
     // smg
     public Octet<Sprite[]> smgIdle = new Octet<Sprite[]>();
@@ -50,18 +51,24 @@ public class Skin {
     public Octet<Sprite[]> smgRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> smgReload = new Octet<Sprite[]>();
     public Octet<Sprite[]> smgRun = new Octet<Sprite[]>();
+    public Octet<Sprite[]> smgHolster = new Octet<Sprite[]>();
+
 
     // shotgun
     public Octet<Sprite[]> shotgunIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> shotgunShoot = new Octet<Sprite[]>();
     public Octet<Sprite[]> shotgunRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> shotgunReload = new Octet<Sprite[]>();
+    public Octet<Sprite[]> shotgunHolster = new Octet<Sprite[]>();
+
 
     // rifle
     public Octet<Sprite[]> rifleIdle = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleShoot = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleRack = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
+    public Octet<Sprite[]> rifleHolster = new Octet<Sprite[]>();
+
     // skeleton
     public Octet<Sprite[]> skeletonSprites = new Octet<Sprite[]>();
 
@@ -71,7 +78,7 @@ public class Skin {
     public SpriteData[] smgSpriteData;
     public SpriteData[] rifleSpriteData;
     public SpriteData[] shotgunSpriteData;
-
+    public Dictionary<string, SpriteData> allSpriteData;
 
 
     public Octet<Sprite[]> gunIdleSprites(GunType type) {
@@ -163,6 +170,35 @@ public class Skin {
             case GunType.pistol:
                 return pistolReload;
         }
+    }
+    public Octet<Sprite[]> holsterSprites(AnimationInput.GunAnimationInput input) {
+        // |TODO: this doesn't work when guntype -> null
+        if (input.gunType == GunType.unarmed) { // holstering
+            switch (input.fromGunType) {
+                default:
+                case GunType.smg:
+                    return smgHolster;
+                case GunType.rifle:
+                    return rifleHolster;
+                case GunType.shotgun:
+                    return shotgunHolster;
+                case GunType.pistol:
+                    return pistolHolster;
+            }
+        } else {
+            switch (input.toGunType) {
+                default:
+                case GunType.smg:
+                    return smgHolster;
+                case GunType.rifle:
+                    return rifleHolster;
+                case GunType.shotgun:
+                    return shotgunHolster;
+                case GunType.pistol:
+                    return pistolHolster;
+            }
+        }
+
     }
     private static Sprite[] loadSprites(string name, string sheet) {
         Sprite[] output = Resources.LoadAll<Sprite>(PathToSkinSpritesheet(name, sheet)) as Sprite[];
@@ -356,6 +392,20 @@ public class Skin {
         skin.pistolRun[Direction.rightUp] = new Sprite[] { pistolSprites[66], pistolSprites[67], pistolSprites[68], pistolSprites[69] };
         skin.pistolRun[Direction.up] = new Sprite[] { pistolSprites[70], pistolSprites[71], pistolSprites[72], pistolSprites[73] };
 
+        skin.pistolHolster[Direction.down] = skin.pistolIdle[Direction.down];
+        skin.pistolHolster[Direction.rightDown] = skin.pistolIdle[Direction.rightDown];
+        skin.pistolHolster[Direction.right] = skin.pistolIdle[Direction.right];
+        skin.pistolHolster[Direction.rightUp] = skin.pistolIdle[Direction.rightUp];
+        skin.pistolHolster[Direction.up] = skin.pistolIdle[Direction.up];
+
+        if (name == "Jack") {
+            skin.pistolHolster[Direction.down] = new Sprite[] { pistolSprites[0], pistolSprites[74], pistolSprites[75], pistolSprites[76], torsoSprites[0] };
+            skin.pistolHolster[Direction.rightDown] = new Sprite[] { pistolSprites[3], pistolSprites[77], pistolSprites[78], pistolSprites[79], torsoSprites[1] };
+            skin.pistolHolster[Direction.right] = new Sprite[] { pistolSprites[6], pistolSprites[80], pistolSprites[81], pistolSprites[82], torsoSprites[2] };
+            skin.pistolHolster[Direction.rightUp] = new Sprite[] { pistolSprites[9], pistolSprites[83], pistolSprites[84], pistolSprites[85], torsoSprites[3] };
+            skin.pistolHolster[Direction.up] = new Sprite[] { pistolSprites[12], pistolSprites[86], pistolSprites[87], pistolSprites[88], torsoSprites[4] };
+        }
+
 
         // smg
 
@@ -389,6 +439,20 @@ public class Skin {
         skin.smgRun[Direction.rightUp] = new Sprite[] { smgSprites[62], smgSprites[63], smgSprites[64], smgSprites[65] };
         skin.smgRun[Direction.up] = new Sprite[] { smgSprites[66], smgSprites[67], smgSprites[68], smgSprites[69] };
 
+        skin.smgHolster[Direction.down] = skin.smgIdle[Direction.down];
+        skin.smgHolster[Direction.rightDown] = skin.smgIdle[Direction.rightDown];
+        skin.smgHolster[Direction.right] = skin.smgIdle[Direction.right];
+        skin.smgHolster[Direction.rightUp] = skin.smgIdle[Direction.rightUp];
+        skin.smgHolster[Direction.up] = skin.smgIdle[Direction.up];
+
+        if (name == "Jack") {
+            skin.smgHolster[Direction.down] = new Sprite[] { smgSprites[1], pistolSprites[74], pistolSprites[75], smgSprites[70], pistolSprites[74] };
+            skin.smgHolster[Direction.rightDown] = new Sprite[] { smgSprites[4], pistolSprites[77], pistolSprites[78], smgSprites[71], pistolSprites[77] };
+            skin.smgHolster[Direction.right] = new Sprite[] { smgSprites[7], pistolSprites[80], pistolSprites[81], smgSprites[72], pistolSprites[80] };
+            skin.smgHolster[Direction.rightUp] = new Sprite[] { smgSprites[10], pistolSprites[83], pistolSprites[84], smgSprites[73], pistolSprites[83] };
+            skin.smgHolster[Direction.up] = new Sprite[] { smgSprites[13], pistolSprites[86], pistolSprites[87], smgSprites[74], pistolSprites[86] };
+        }
+
         // shotgun
 
         skin.shotgunIdle[Direction.down] = new Sprite[] { shotgunSprites[0] };
@@ -414,6 +478,27 @@ public class Skin {
         skin.shotgunReload[Direction.right] = new Sprite[] { shotgunSprites[32], shotgunSprites[33], shotgunSprites[34], shotgunSprites[35], shotgunSprites[36], shotgunSprites[37] };
         skin.shotgunReload[Direction.rightUp] = new Sprite[] { shotgunSprites[38], shotgunSprites[39], shotgunSprites[40], shotgunSprites[41], shotgunSprites[42], shotgunSprites[43] };
         skin.shotgunReload[Direction.up] = new Sprite[] { shotgunSprites[44], shotgunSprites[45], shotgunSprites[46], shotgunSprites[47], shotgunSprites[48], shotgunSprites[49] };
+
+        skin.shotgunHolster[Direction.down] = skin.shotgunIdle[Direction.down];
+        skin.shotgunHolster[Direction.rightDown] = skin.shotgunIdle[Direction.rightDown];
+        skin.shotgunHolster[Direction.right] = skin.shotgunIdle[Direction.right];
+        skin.shotgunHolster[Direction.rightUp] = skin.shotgunIdle[Direction.rightUp];
+        skin.shotgunHolster[Direction.up] = skin.shotgunIdle[Direction.up];
+
+        if (name == "Jack") {
+            //    skin.smgHolster[Direction.down] = new Sprite[] { smgSprites[1], pistolSprites[74], pistolSprites[75], smgSprites[70], pistolSprites[74] };
+            //     skin.smgHolster[Direction.rightDown] = new Sprite[] { smgSprites[4], pistolSprites[77], pistolSprites[78], smgSprites[71], pistolSprites[77] };
+            //     skin.smgHolster[Direction.right] = new Sprite[] { smgSprites[7], pistolSprites[80], pistolSprites[81], smgSprites[72], pistolSprites[80] };
+            //     skin.smgHolster[Direction.rightUp] = new Sprite[] { smgSprites[10], pistolSprites[83], pistolSprites[84], smgSprites[73], pistolSprites[83] };
+            //     skin.smgHolster[Direction.up] = new Sprite[] { smgSprites[13], pistolSprites[86], pistolSprites[87], smgSprites[74], pistolSprites[86] };
+
+            skin.shotgunHolster[Direction.down] = new Sprite[] { shotgunSprites[1], pistolSprites[74], pistolSprites[75], shotgunSprites[50], pistolSprites[74] };
+            skin.shotgunHolster[Direction.rightDown] = new Sprite[] { shotgunSprites[6], pistolSprites[74], pistolSprites[78], shotgunSprites[51], pistolSprites[74] };
+            skin.shotgunHolster[Direction.right] = new Sprite[] { shotgunSprites[11], pistolSprites[80], pistolSprites[81], shotgunSprites[52], pistolSprites[80] };
+            skin.shotgunHolster[Direction.rightUp] = new Sprite[] { shotgunSprites[15], pistolSprites[83], pistolSprites[84], shotgunSprites[53], pistolSprites[83] };
+            skin.shotgunHolster[Direction.up] = new Sprite[] { shotgunSprites[19], pistolSprites[86], pistolSprites[87], shotgunSprites[54], pistolSprites[86] };
+        }
+
 
         // rifle
 
@@ -441,6 +526,27 @@ public class Skin {
         skin.rifleRack[Direction.rightUp] = new Sprite[] { rifleSprites[43], rifleSprites[44], rifleSprites[45], rifleSprites[44] };
         skin.rifleRack[Direction.up] = new Sprite[] { rifleSprites[49] };
 
+        skin.rifleHolster[Direction.down] = skin.rifleIdle[Direction.down];
+        skin.rifleHolster[Direction.rightDown] = skin.rifleIdle[Direction.rightDown];
+        skin.rifleHolster[Direction.right] = skin.rifleIdle[Direction.right];
+        skin.rifleHolster[Direction.rightUp] = skin.rifleIdle[Direction.rightUp];
+        skin.rifleHolster[Direction.up] = skin.rifleIdle[Direction.up];
+
+        if (name == "Jack") {
+            //    skin.smgHolster[Direction.down] = new Sprite[] { smgSprites[1], pistolSprites[74], pistolSprites[75], smgSprites[70], pistolSprites[74] };
+            //     skin.smgHolster[Direction.rightDown] = new Sprite[] { smgSprites[4], pistolSprites[77], pistolSprites[78], smgSprites[71], pistolSprites[77] };
+            //     skin.smgHolster[Direction.right] = new Sprite[] { smgSprites[7], pistolSprites[80], pistolSprites[81], smgSprites[72], pistolSprites[80] };
+            //     skin.smgHolster[Direction.rightUp] = new Sprite[] { smgSprites[10], pistolSprites[83], pistolSprites[84], smgSprites[73], pistolSprites[83] };
+            //     skin.smgHolster[Direction.up] = new Sprite[] { smgSprites[13], pistolSprites[86], pistolSprites[87], smgSprites[74], pistolSprites[86] };
+
+
+            skin.rifleHolster[Direction.down] = new Sprite[] { rifleSprites[1], pistolSprites[74], pistolSprites[75], rifleSprites[50], pistolSprites[74] };
+            skin.rifleHolster[Direction.rightDown] = new Sprite[] { rifleSprites[4], pistolSprites[77], pistolSprites[78], rifleSprites[51], pistolSprites[77] };
+            skin.rifleHolster[Direction.right] = new Sprite[] { rifleSprites[7], pistolSprites[80], pistolSprites[81], rifleSprites[52], pistolSprites[80] };
+            skin.rifleHolster[Direction.rightUp] = new Sprite[] { rifleSprites[10], pistolSprites[83], pistolSprites[84], rifleSprites[53], pistolSprites[83] };
+            skin.rifleHolster[Direction.up] = new Sprite[] { rifleSprites[13], pistolSprites[86], pistolSprites[87], rifleSprites[54], pistolSprites[86] };
+        }
+
         // data
         skin.unarmedSpriteData = torsoSpriteData.ToArray();
         skin.pistolSpriteData = pistolSpriteData.ToArray();
@@ -448,12 +554,26 @@ public class Skin {
         skin.rifleSpriteData = rifleSpriteData.ToArray();
         skin.shotgunSpriteData = shotgunSpriteData.ToArray();
 
+        skin.allSpriteData = new Dictionary<string, SpriteData>();
+        AddSpriteDataToDictionary(skin, torsoSpriteData, "Torso");
+        AddSpriteDataToDictionary(skin, pistolSpriteData, "pistol");
+        AddSpriteDataToDictionary(skin, smgSpriteData, "smg");
+        AddSpriteDataToDictionary(skin, shotgunSpriteData, "shotgun");
+        AddSpriteDataToDictionary(skin, rifleSpriteData, "rifle");
+
         return skin;
     }
 
+    static void AddSpriteDataToDictionary(Skin skin, List<SpriteData> list, string prefix) {
+        int i = 0;
+        foreach (SpriteData data in list) {
+            string spritename = $"{prefix}_{i}";
+            skin.allSpriteData[spritename] = data;
+            i++;
+        }
+    }
+
     public Octet<Sprite[]> GetCurrentLegsOctet(LegsAnimation.State state, AnimationInput input) {
-
-
         if (input.state == CharacterState.keelOver) {
             return legsKeelOver;
         } else if (input.hitState == HitState.dead) {
@@ -509,6 +629,8 @@ public class Skin {
         }
         // gun states
         switch (input.gunInput.gunState) {
+            case GunHandler.GunStateEnum.holstering:
+                return holsterSprites(input.gunInput);
             case GunHandler.GunStateEnum.reloading:
                 return reloadSprites(input.gunInput.gunType);
             case GunHandler.GunStateEnum.racking:

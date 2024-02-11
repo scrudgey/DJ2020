@@ -348,6 +348,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         gunHandler.characterCamera = OrbitCamera;
         gunHandler.OnShoot += HandleOnShoot;
+        gunHandler.OnHolsterFinish += HandleHolsterFinish;
         // Assign to motor
         Motor.CharacterController = this;
         characterHurtable.OnHitStateChanged += HandleHurtableChanged;
@@ -360,12 +361,16 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         characterHurtable.OnHitStateChanged -= HandleHurtableChanged;
         characterHurtable.OnTakeDamage -= HandleTakeDamage;
         gunHandler.OnShoot -= HandleOnShoot;
+        gunHandler.OnHolsterFinish -= HandleHolsterFinish;
     }
     void HandleOnShoot(GunHandler target) {
         // TODO: handle skill levels
         float recoilMagnitudeY = target.gunInstance.getRecoil().GetRandomInsideBound();
         float recoilMagnitudeX = target.gunInstance.getRecoil().GetRandomInsideBound() * UnityEngine.Random.Range(-0.5f, 0.5f);
         recoil = new Vector3(recoilMagnitudeX, recoilMagnitudeY, 0f);
+    }
+    void HandleHolsterFinish(GunHandler target) {
+        OnValueChanged?.Invoke(this);
     }
     private void HandleHurtableChanged(Destructible hurtable) {
         ((IHitstateSubscriber)this).TransitionToHitState(hurtable.hitState);

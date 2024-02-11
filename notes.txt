@@ -3115,6 +3115,24 @@ x ladders
         * minimap
     * pause screen
     * data and hacking
+* fix custom animator stutteriness - ???
+* ducking and side chaining sfx channel
+* import all current music files
+* crossfade trackes enable / disable
+* better solution for 4 channels.
+    * set up music for all missions
+        tower- lethal glee
+        jack that data - obligate arsonist
+        elevator - anti anecdote
+        yamachi - hyper lysis
+        711 - bodies
+* animate gun holster / unholster
+    * double holstering
+    * handle repeated requests
+    * we switch state, switch animation, everything is good, but the frame is 0
+* smg, rifle, shotgun:
+* automatic weapons broken
+* various other spritesheets broken?
 
 
 
@@ -3620,36 +3638,23 @@ more equipment to bring on mission?
     ninja vanish
 
 
-* fix custom animator stutteriness - ???
-* ducking and side chaining sfx channel
-* import all current music files
-* crossfade trackes enable / disable
-* better solution for 4 channels.
-    * set up music for all missions
-        tower- lethal glee
-        jack that data - obligate arsonist
-        elevator - anti anecdote
-        yamachi - hyper lysis
-        711 - bodies
+switching guns: put one away, take the other out 
 
-
-animate gun holster / unholster
 in-between montage
 better combat:
     armor?
-        an armor rating that is % probability of deflecting a shot?
-    melee combat?   
+        an armor rating that is % probability of deflecting a shot
+        indicator indicates when a shot deflects
+            splat / deflect sfx
+        armor piercing ammo to be indicated somewhere in the gun info display
+    melee combat
     gunshots / impacts / impact sounds / impact effects
 graphic effects
     80s electricity 
     anime glow
-
-
-
-
+711 broken
+shotgun reload broken
 ease in elements of perk menu
-
-
 graphical glitch when entering / exiting aim mode in yamachi
 
 publish trailer on twitter

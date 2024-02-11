@@ -18,7 +18,7 @@ public class CustomAnimator : MonoBehaviour {
     private CustomAnimationClip _clip;
     bool isPlaying;
     float timer;
-    Stack<AnimationEvent> nextEvents;
+    Stack<AnimationEvent> nextEvents = new Stack<AnimationEvent>();
     float referenceTime;
     public void Stop() {
         isPlaying = false;
@@ -38,9 +38,8 @@ public class CustomAnimator : MonoBehaviour {
     }
 
     void Update() {
-        if (isPlaying) {
+        if (isPlaying && _clip != null) {
             timer = (Time.time - referenceTime) * playbackSpeed;
-            // Debug.Log(timer);
             while (nextEvents.Count > 0 && timer > nextEvents.Peek().time && isPlaying) {
                 FireEvent(nextEvents.Pop());
             }
@@ -48,17 +47,19 @@ public class CustomAnimator : MonoBehaviour {
                 if (_clip.wrapMode == WrapMode.Default || _clip.wrapMode == WrapMode.Once) {
                     Stop();
                 } else {
+                    // Debug.Log($"reset:\t{playbackSpeed}\t{timer} ");
                     ResetStack();
                 }
             }
-            // while (nextEvents.Count > 0 && timer  > nextEvents.Peek().time) {
-            //     FireEvent(nextEvents.Pop());
-            // }
         }
     }
     void ResetStack() {
         foreach (AnimationEvent e in _clip.events.Reverse()) {
-            nextEvents.Push(e);
+            if (e.time == 0) {
+                FireEvent(e);
+            } else {
+                nextEvents.Push(e);
+            }
         }
         // TODO: handle overflow time on looping clips
         referenceTime = Time.time;

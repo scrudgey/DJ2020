@@ -9,7 +9,8 @@ public struct AnimationInput {
         public GunTemplate baseGun;
         public bool shootRequestedThisFrame;
         public bool aimWeapon;
-
+        public GunType fromGunType;
+        public GunType toGunType;
         public static GunAnimationInput None() => new GunAnimationInput {
             gunType = GunType.unarmed,
             gunState = GunHandler.GunStateEnum.idle,
