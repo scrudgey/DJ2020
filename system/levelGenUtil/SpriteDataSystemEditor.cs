@@ -10,7 +10,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(SpriteDataSystem))]
 public class SpriteDataSystemEditor : Editor {
-    static string[] spriteSheetTypes = new string[] { "Torso", "pistol", "smg", "rifle", "shotgun" };
+    static string[] spriteSheetTypes = new string[] { "Torso", "pistol", "smg", "rifle", "shotgun", "Sword" };
     SpriteDataSystem spriteDataSystem;
     bool firstSprite;
     SpriteRenderer torsoSpriteRenderer;

@@ -43,7 +43,7 @@ public class Toolbox {
         return default(T);
     }
     static public void RandomizeOneShot(AudioSource audioSource, AudioClip audioClip, float randomPitchWidth = 0.1f, float volume = 1f) {
-        if (!audioSource.isActiveAndEnabled)
+        if (audioSource == null || !audioSource.isActiveAndEnabled)
             return;
         if (randomPitchWidth > 0) {
             audioSource.pitch = UnityEngine.Random.Range(1 - (randomPitchWidth / 2f), 1 + (randomPitchWidth / 2f));

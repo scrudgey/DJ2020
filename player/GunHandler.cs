@@ -16,8 +16,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public ItemHandler itemHandler;
     public CharacterCamera characterCamera;
     public GunStateEnum state;
-    // public InputMode inputMode;
-    // public CharacterState characterState;
     public Action<GunHandler> OnValueChanged { get; set; }
     public float height = 0.5f;
     public AudioSource audioSource;

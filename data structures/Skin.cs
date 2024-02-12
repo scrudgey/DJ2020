@@ -69,6 +69,11 @@ public class Skin {
     public Octet<Sprite[]> rifleReload = new Octet<Sprite[]>();
     public Octet<Sprite[]> rifleHolster = new Octet<Sprite[]>();
 
+    // sword
+    public Octet<Sprite[]> swordIdle = new Octet<Sprite[]>();
+    public Octet<Sprite[]> swordHolster = new Octet<Sprite[]>();
+    public Octet<Sprite[]> swordSwing = new Octet<Sprite[]>();
+
     // skeleton
     public Octet<Sprite[]> skeletonSprites = new Octet<Sprite[]>();
 
@@ -78,6 +83,7 @@ public class Skin {
     public SpriteData[] smgSpriteData;
     public SpriteData[] rifleSpriteData;
     public SpriteData[] shotgunSpriteData;
+    public SpriteData[] swordSpriteData;
     public Dictionary<string, SpriteData> allSpriteData;
 
 
@@ -202,9 +208,10 @@ public class Skin {
     }
     private static Sprite[] loadSprites(string name, string sheet) {
         Sprite[] output = Resources.LoadAll<Sprite>(PathToSkinSpritesheet(name, sheet)) as Sprite[];
-        if (output.Length == 0) {
-            return Resources.LoadAll<Sprite>(PathToSkinSpritesheet("generic", sheet)) as Sprite[];
-        } else return output;
+        // if (output.Length == 0) {
+        //     return Resources.LoadAll<Sprite>(PathToSkinSpritesheet("generic", sheet)) as Sprite[];
+        // } else return output;
+        return output;
     }
     public static string PathToSkinDirectory(string name) {
         return $"sprites/spritesheets/{name}";
@@ -225,15 +232,19 @@ public class Skin {
 
         Sprite[] rifleSprites = loadSprites(name, "rifle");
 
+        Sprite[] swordSprites = loadSprites(name, "Sword");
+
         Sprite[] headSprites = loadSprites(name, "head");
 
         Sprite[] skeletonSprites = Resources.LoadAll<Sprite>("sprites/spritesheets/Skeleton") as Sprite[];
+
 
         List<SpriteData> torsoSpriteData = LoadTorsoSpriteData(name, "Torso");
         List<SpriteData> pistolSpriteData = LoadTorsoSpriteData(name, "pistol");
         List<SpriteData> smgSpriteData = LoadTorsoSpriteData(name, "smg");
         List<SpriteData> rifleSpriteData = LoadTorsoSpriteData(name, "rifle");
         List<SpriteData> shotgunSpriteData = LoadTorsoSpriteData(name, "shotgun");
+
 
         Skin skin = new Skin();
 
@@ -539,12 +550,31 @@ public class Skin {
             //     skin.smgHolster[Direction.rightUp] = new Sprite[] { smgSprites[10], pistolSprites[83], pistolSprites[84], smgSprites[73], pistolSprites[83] };
             //     skin.smgHolster[Direction.up] = new Sprite[] { smgSprites[13], pistolSprites[86], pistolSprites[87], smgSprites[74], pistolSprites[86] };
 
-
             skin.rifleHolster[Direction.down] = new Sprite[] { rifleSprites[1], pistolSprites[74], pistolSprites[75], rifleSprites[50], pistolSprites[74] };
             skin.rifleHolster[Direction.rightDown] = new Sprite[] { rifleSprites[4], pistolSprites[77], pistolSprites[78], rifleSprites[51], pistolSprites[77] };
             skin.rifleHolster[Direction.right] = new Sprite[] { rifleSprites[7], pistolSprites[80], pistolSprites[81], rifleSprites[52], pistolSprites[80] };
             skin.rifleHolster[Direction.rightUp] = new Sprite[] { rifleSprites[10], pistolSprites[83], pistolSprites[84], rifleSprites[53], pistolSprites[83] };
             skin.rifleHolster[Direction.up] = new Sprite[] { rifleSprites[13], pistolSprites[86], pistolSprites[87], rifleSprites[54], pistolSprites[86] };
+        }
+
+        if (name == "Jack") {
+            skin.swordIdle[Direction.down] = new Sprite[] { swordSprites[5] };
+            skin.swordIdle[Direction.rightDown] = new Sprite[] { swordSprites[11] };
+            skin.swordIdle[Direction.right] = new Sprite[] { swordSprites[17] };
+            skin.swordIdle[Direction.rightUp] = new Sprite[] { swordSprites[23] };
+            skin.swordIdle[Direction.up] = new Sprite[] { swordSprites[29] };
+
+            skin.swordHolster[Direction.down] = new Sprite[] { swordSprites[0], swordSprites[1], swordSprites[2], swordSprites[3], swordSprites[4] };
+            skin.swordHolster[Direction.rightDown] = new Sprite[] { swordSprites[6], swordSprites[7], swordSprites[8], swordSprites[9], swordSprites[10] };
+            skin.swordHolster[Direction.right] = new Sprite[] { swordSprites[12], swordSprites[13], swordSprites[14], swordSprites[15], swordSprites[16] };
+            skin.swordHolster[Direction.rightUp] = new Sprite[] { swordSprites[18], swordSprites[19], swordSprites[20], swordSprites[21], swordSprites[22] };
+            skin.swordHolster[Direction.up] = new Sprite[] { swordSprites[24], swordSprites[25], swordSprites[26], swordSprites[27], swordSprites[28] };
+
+            skin.swordSwing[Direction.down] = new Sprite[] { swordSprites[30], swordSprites[31], swordSprites[5] };
+            skin.swordSwing[Direction.rightDown] = new Sprite[] { swordSprites[32], swordSprites[33], swordSprites[11] };
+            skin.swordSwing[Direction.right] = new Sprite[] { swordSprites[34], swordSprites[35], swordSprites[17] };
+            skin.swordSwing[Direction.rightUp] = new Sprite[] { swordSprites[36], swordSprites[37], swordSprites[23] };
+            skin.swordSwing[Direction.up] = new Sprite[] { swordSprites[38], swordSprites[39], swordSprites[29] };
         }
 
         // data
@@ -560,6 +590,12 @@ public class Skin {
         AddSpriteDataToDictionary(skin, smgSpriteData, "smg");
         AddSpriteDataToDictionary(skin, shotgunSpriteData, "shotgun");
         AddSpriteDataToDictionary(skin, rifleSpriteData, "rifle");
+        if (name == "Jack") {
+            List<SpriteData> swordSpriteData = LoadTorsoSpriteData(name, "Sprite");
+            skin.shotgunSpriteData = shotgunSpriteData.ToArray();
+            skin.swordSpriteData = swordSpriteData.ToArray();
+            AddSpriteDataToDictionary(skin, swordSpriteData, "Sword");
+        }
 
         return skin;
     }
