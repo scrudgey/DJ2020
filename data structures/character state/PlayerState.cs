@@ -3,7 +3,7 @@ using Items;
 using Newtonsoft.Json;
 using UnityEngine;
 [System.Serializable]
-public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState, PerkIdConstants {
+public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants { //IGunHandlerState
     public int credits;
 
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
@@ -19,9 +19,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public List<GunState> allGuns;
     [JsonConverter(typeof(ObjectListJsonConverter<ItemTemplate>))]
     public List<ItemTemplate> allItems;
-    public GunState primaryGun { get; set; }
-    public GunState secondaryGun { get; set; }
-    public GunState tertiaryGun { get; set; }
+    public WeaponState primaryGun { get; set; }
+    public WeaponState secondaryGun { get; set; }
+    public WeaponState tertiaryGun { get; set; }
     public int activeGun { get; set; }
     public int numberOfShellsPerReload() {
         return PerkNumberOfShellsPerReload();
@@ -87,6 +87,10 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             gunState8
         };
 
+        WeaponState sword = new WeaponState() {
+            type = WeaponType.melee
+        };
+
         List<ItemTemplate> allItems = new List<ItemTemplate> {
             // ItemTemplate.LoadItem("C4"),
             // ItemTemplate.LoadItem("rocket"),
@@ -147,11 +151,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // headSkin = "security",
             allGuns = allGuns,
             allItems = allItems,
-            primaryGun = gunState1,
+            primaryGun = sword,
+            // primaryGun = new WeaponState(gunState1),
             // secondaryGun = null,
-            secondaryGun = gunState2,
+            secondaryGun = new WeaponState(gunState2),
             // tertiaryGun = null,
-            tertiaryGun = gunState3,
+            tertiaryGun = new WeaponState(gunState3),
             activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
@@ -186,7 +191,7 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     }
 
     public void ApplyState(GameObject playerObject) {
-        ((IGunHandlerState)this).ApplyGunState(playerObject);
+        // ((IGunHandlerState)this).ApplyGunState(playerObject);
         ((ISkinState)this).ApplySkinState(playerObject);
         // ((IItemHandlerState)this).ApplyItemState(playerObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(playerObject);
@@ -199,9 +204,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     }
 
     public static PlayerState Instantiate(PlayerTemplate template) => DefaultState() with {
-        primaryGun = GunState.Instantiate(template.primaryGun),
-        secondaryGun = GunState.Instantiate(template.secondaryGun),
-        tertiaryGun = GunState.Instantiate(template.tertiaryGun),
+        primaryGun = new WeaponState(GunState.Instantiate(template.primaryGun)),
+        secondaryGun = new WeaponState(GunState.Instantiate(template.secondaryGun)),
+        tertiaryGun = new WeaponState(GunState.Instantiate(template.tertiaryGun)),
         health = template.fullHealthAmount,
         cyberEyesThermal = template.cyberEyesThermal,
         cyberlegsLevel = template.cyberlegsLevel,
@@ -213,18 +218,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     };
 
     public void ResetTemporaryState() {
-        if (primaryGun != null) {
-            primaryGun.delta.chamber = 0;
-            primaryGun.ClipIn();
-        }
-        if (secondaryGun != null) {
-            secondaryGun.delta.chamber = 0;
-            secondaryGun.ClipIn();
-        }
-        if (tertiaryGun != null) {
-            tertiaryGun.delta.chamber = 0;
-            tertiaryGun.ClipIn();
-        }
+        primaryGun?.ResetTemporaryState();
+        secondaryGun?.ResetTemporaryState();
+        tertiaryGun?.ResetTemporaryState();
     }
     public int PlayerLevel() {
         return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;

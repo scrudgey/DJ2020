@@ -21,6 +21,10 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     public AnimationClip crawlAnimation;
     public AnimationClip unholsterAnimation;
     public AnimationClip holsterAnimation;
+    [Header("sword")]
+    public AnimationClip swordSwingAnimation;
+    public AnimationClip swordUnholsterAnimation;
+    public AnimationClip swordHolsterAnimation;
     public Skin skin;
     public float trailInterval = 0.05f;
     private bool bob;
@@ -94,10 +98,26 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         gunType = input.gunInput.gunType;
         if (input.hitState == HitState.dead) {
             animator.Stop();
+        } else if (input.gunInput.gunType == GunType.sword) {
+            switch (state) {
+                case GunHandler.GunStateEnum.holstering:
+                    if (input.gunInput.toGunType == GunType.unarmed) {
+                        SetAnimation(swordHolsterAnimation);
+                    } else {
+                        SetAnimation(swordUnholsterAnimation);
+                    }
+                    break;
+                case GunHandler.GunStateEnum.shooting:
+                    SetAnimation(swordSwingAnimation);
+                    break;
+                default:
+                    _frame = 0;
+                    SetAnimation(idleAnimation);
+                    break;
+            }
         } else if (input.gunInput.hasGun) {
             switch (state) {
                 case GunHandler.GunStateEnum.holstering:
-                    //      TODO: change animation depending on types of from, to
                     if (input.gunInput.toGunType == GunType.unarmed) {
                         SetAnimation(holsterAnimation);
                     } else {

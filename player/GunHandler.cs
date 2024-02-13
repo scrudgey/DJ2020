@@ -5,7 +5,7 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver, IPoolable {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, IPoolable { // IGunHandlerStateLoader,
     public enum GunStateEnum {
         holstering,
         idle,
@@ -22,9 +22,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
     public GunState gunInstance;
-    public GunState secondary;
-    public GunState primary;
-    public GunState third;
     public bool emitShell;
     private float movementInaccuracy;
     private float crouchingInaccuracy;
@@ -470,7 +467,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (nonAnimatedReload) {
             ClipIn();
             StopReload();
-            // state = GunStateEnum.idle;
             Rack();
             EndRack();
         }
@@ -482,7 +478,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             return;
         state = GunStateEnum.reloading;
     }
-    private void SwitchGun(GunState instance) {
+    public void SwitchGun(GunState instance) {
         if (instance == null || instance == gunInstance)
             return;
         fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
@@ -495,7 +491,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         SetGunAppearanceSuspicion();
         OnValueChanged?.Invoke(this);
         OnHolsterFinish?.Invoke(this);
-        // Debug.Break();
     }
     public void SetGunAppearanceSuspicion() {
         if (gunInstance != null && gunInstance.template != null) {
@@ -519,36 +514,16 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (isPlayerCharacter) {
             GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
         }
-        // Debug.Break();
     }
-    public void SwitchToGun(int idn) {
-        switch (idn) {
-            case 0:
-                break;
-            case -1:
-                Holster();
-                break;
-            case 1:
-                itemHandler?.EvictSubweapon();
-                SwitchGun(primary);
-                break;
-            case 2:
-                itemHandler?.EvictSubweapon();
-                SwitchGun(secondary);
-                break;
-            case 3:
-                itemHandler?.EvictSubweapon();
-                SwitchGun(third);
-                break;
+    public void SwitchToGun(GunState gunInstance) {
+        if (gunInstance == null) {
+            Holster();
+        } else {
+            itemHandler?.EvictSubweapon();
+            SwitchGun(gunInstance);
         }
     }
 
-    public void ProcessGunSwitch(PlayerInput input) {
-        SwitchToGun(input.selectgun);
-        if (input.reload) {
-            DoReload();
-        }
-    }
     public void DoReload() {
         if (gunInstance == null || gunInstance.template == null)
             return;
@@ -559,6 +534,10 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void SetInputs(PlayerInput input) {
+        if (input.reload) {
+            DoReload();
+        }
+
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
         isAimingWeapon = input.aimWeapon;
@@ -665,16 +644,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             toGunType = toGunType,
         };
     }
-
-    public void LoadGunHandlerState(IGunHandlerState state) {
-        // TODO: here, we would instantiate from template with mutable state applied
-        primary = state.primaryGun;
-        secondary = state.secondaryGun;
-        third = state.tertiaryGun;
-        // numberOfShellsPerReload = state.numberOfShellsPerReload;
-        SwitchToGun(state.activeGun);
-    }
-
     public void OnPoolActivate() {
 
     }

@@ -113,19 +113,20 @@ namespace UI {
             GunState gunState = GunState.Instantiate(gun1);
             switch (args[0]) {
                 case "1":
-                    GameManager.I.gameData.playerState.primaryGun = gunState;
+                    GameManager.I.gameData.playerState.primaryGun = new WeaponState(gunState);
                     break;
                 case "2":
-                    GameManager.I.gameData.playerState.secondaryGun = gunState;
+                    GameManager.I.gameData.playerState.secondaryGun = new WeaponState(gunState);
                     break;
                 case "3":
-                    GameManager.I.gameData.playerState.tertiaryGun = gunState;
+                    GameManager.I.gameData.playerState.tertiaryGun = new WeaponState(gunState);
                     break;
                 default:
                     Debug.LogError("bad gun slot");
                     break;
             }
-            GameManager.I.playerGunHandler.LoadGunHandlerState(GameManager.I.gameData.playerState);
+            GameManager.I.playerCharacterController.LoadState(GameManager.I.gameData.playerState);
+            // GameManager.I.playerGunHandler.LoadGunHandlerState(GameManager.I.gameData.playerState);
         }
         public void ResetPerks(string[] args) {
             GameManager.I.gameData.playerState.activePerks = new List<string>();

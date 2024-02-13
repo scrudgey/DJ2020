@@ -3638,24 +3638,25 @@ more equipment to bring on mission?
     ninja vanish
 
 
-switching guns: put one away, take the other out 
 melee combat
-    sword has to be a selectable weapon
-        fills a gun slot
-        one possibility: it's a flag on gunstate.
-    separate gunhandler / meleehandler
-        this is pretty good
-            inventory selection is a number of weaponstates
-            switching is handled at charactercontroller level
-            depending on weapon type we hand off to different component
-            depending on weapon type we hand off animation input
-            unify this with itemhandler logic as well
+    * new holster animations for sword
+    * swing animation for sword
+    * swing effector
+    * impact sounds
+    * impact on wall
+    impact on soft target
+
+problem with NPCs loading gun state
+sound for reaching holster
+switching guns: put one away, take the other out 
+sword swing down needs to end with blade on other side of character
 
 
 in-between montage
+    unlock contacts
+    favor system
 better combat:
-    armor?
-        an armor rating that is % probability of deflecting a shot
+    an armor rating that is % probability of deflecting a shot
         indicator indicates when a shot deflects
             splat / deflect sfx
         armor piercing ammo to be indicated somewhere in the gun info display

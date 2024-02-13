@@ -97,6 +97,8 @@ public class Skin {
                 return pistolIdle;
             case GunType.rifle:
                 return rifleIdle;
+            case GunType.sword:
+                return swordIdle;
             default:
             case GunType.unarmed:
                 return unarmedIdle;
@@ -125,6 +127,8 @@ public class Skin {
                 return shotgunShoot;
             case GunType.rifle:
                 return rifleShoot;
+            case GunType.sword:
+                return swordSwing;
             default:
             case GunType.pistol:
                 return pistolShoot;
@@ -202,6 +206,8 @@ public class Skin {
                     return shotgunHolster;
                 case GunType.pistol:
                     return pistolHolster;
+                case GunType.sword:
+                    return swordHolster;
             }
         }
 
@@ -497,12 +503,6 @@ public class Skin {
         skin.shotgunHolster[Direction.up] = skin.shotgunIdle[Direction.up];
 
         if (name == "Jack") {
-            //    skin.smgHolster[Direction.down] = new Sprite[] { smgSprites[1], pistolSprites[74], pistolSprites[75], smgSprites[70], pistolSprites[74] };
-            //     skin.smgHolster[Direction.rightDown] = new Sprite[] { smgSprites[4], pistolSprites[77], pistolSprites[78], smgSprites[71], pistolSprites[77] };
-            //     skin.smgHolster[Direction.right] = new Sprite[] { smgSprites[7], pistolSprites[80], pistolSprites[81], smgSprites[72], pistolSprites[80] };
-            //     skin.smgHolster[Direction.rightUp] = new Sprite[] { smgSprites[10], pistolSprites[83], pistolSprites[84], smgSprites[73], pistolSprites[83] };
-            //     skin.smgHolster[Direction.up] = new Sprite[] { smgSprites[13], pistolSprites[86], pistolSprites[87], smgSprites[74], pistolSprites[86] };
-
             skin.shotgunHolster[Direction.down] = new Sprite[] { shotgunSprites[1], pistolSprites[74], pistolSprites[75], shotgunSprites[50], pistolSprites[74] };
             skin.shotgunHolster[Direction.rightDown] = new Sprite[] { shotgunSprites[6], pistolSprites[74], pistolSprites[78], shotgunSprites[51], pistolSprites[74] };
             skin.shotgunHolster[Direction.right] = new Sprite[] { shotgunSprites[11], pistolSprites[80], pistolSprites[81], shotgunSprites[52], pistolSprites[80] };
@@ -544,12 +544,6 @@ public class Skin {
         skin.rifleHolster[Direction.up] = skin.rifleIdle[Direction.up];
 
         if (name == "Jack") {
-            //    skin.smgHolster[Direction.down] = new Sprite[] { smgSprites[1], pistolSprites[74], pistolSprites[75], smgSprites[70], pistolSprites[74] };
-            //     skin.smgHolster[Direction.rightDown] = new Sprite[] { smgSprites[4], pistolSprites[77], pistolSprites[78], smgSprites[71], pistolSprites[77] };
-            //     skin.smgHolster[Direction.right] = new Sprite[] { smgSprites[7], pistolSprites[80], pistolSprites[81], smgSprites[72], pistolSprites[80] };
-            //     skin.smgHolster[Direction.rightUp] = new Sprite[] { smgSprites[10], pistolSprites[83], pistolSprites[84], smgSprites[73], pistolSprites[83] };
-            //     skin.smgHolster[Direction.up] = new Sprite[] { smgSprites[13], pistolSprites[86], pistolSprites[87], smgSprites[74], pistolSprites[86] };
-
             skin.rifleHolster[Direction.down] = new Sprite[] { rifleSprites[1], pistolSprites[74], pistolSprites[75], rifleSprites[50], pistolSprites[74] };
             skin.rifleHolster[Direction.rightDown] = new Sprite[] { rifleSprites[4], pistolSprites[77], pistolSprites[78], rifleSprites[51], pistolSprites[77] };
             skin.rifleHolster[Direction.right] = new Sprite[] { rifleSprites[7], pistolSprites[80], pistolSprites[81], rifleSprites[52], pistolSprites[80] };
@@ -591,7 +585,7 @@ public class Skin {
         AddSpriteDataToDictionary(skin, shotgunSpriteData, "shotgun");
         AddSpriteDataToDictionary(skin, rifleSpriteData, "rifle");
         if (name == "Jack") {
-            List<SpriteData> swordSpriteData = LoadTorsoSpriteData(name, "Sprite");
+            List<SpriteData> swordSpriteData = LoadTorsoSpriteData(name, "Sword");
             skin.shotgunSpriteData = shotgunSpriteData.ToArray();
             skin.swordSpriteData = swordSpriteData.ToArray();
             AddSpriteDataToDictionary(skin, swordSpriteData, "Sword");
@@ -664,36 +658,47 @@ public class Skin {
             return unarmedUse;
         }
         // gun states
-        switch (input.gunInput.gunState) {
-            case GunHandler.GunStateEnum.holstering:
-                return holsterSprites(input.gunInput);
-            case GunHandler.GunStateEnum.reloading:
-                return reloadSprites(input.gunInput.gunType);
-            case GunHandler.GunStateEnum.racking:
-                return gunRackSprites(input.gunInput.gunType);
-            case GunHandler.GunStateEnum.shooting:
-                return shootSprites(input.gunInput.gunType);
-            default:
-                if (input.gunInput.aimWeapon) {
+        if (input.gunInput.gunType == GunType.sword) {
+            switch (input.gunInput.gunState) {
+                case GunHandler.GunStateEnum.holstering:
+                    return swordHolster;
+                case GunHandler.GunStateEnum.shooting:
+                    return swordSwing;
+                default:
+                case GunHandler.GunStateEnum.idle:
+                    return swordIdle;
+            }
+        } else {
+            switch (input.gunInput.gunState) {
+                case GunHandler.GunStateEnum.holstering:
+                    return holsterSprites(input.gunInput);
+                case GunHandler.GunStateEnum.reloading:
+                    return reloadSprites(input.gunInput.gunType);
+                case GunHandler.GunStateEnum.racking:
+                    return gunRackSprites(input.gunInput.gunType);
+                case GunHandler.GunStateEnum.shooting:
                     return shootSprites(input.gunInput.gunType);
-                } else if (input.isMoving) {
-                    if (input.isCrouching) {
-                        // crawl
-                        return unarmedCrawl;
-                    } else if (input.isRunning) {
-                        // running
-                        return gunRunSprites(input.gunInput.gunType);
-                    } else {
-                        // walk
-                        return gunWalkSprites(input.gunInput.gunType);
+                default:
+                    if (input.gunInput.aimWeapon) {
+                        return shootSprites(input.gunInput.gunType);
+                    } else if (input.isMoving) {
+                        if (input.isCrouching) {
+                            // crawl
+                            return unarmedCrawl;
+                        } else if (input.isRunning) {
+                            // running
+                            return gunRunSprites(input.gunInput.gunType);
+                        } else {
+                            // walk
+                            return gunWalkSprites(input.gunInput.gunType);
+                        }
+                    } else { // not moving
+                        if (input.isCrouching) {
+                            return gunCrouchSprites(input.gunInput.gunType);
+                        } else return gunIdleSprites(input.gunInput.gunType);
                     }
-                } else { // not moving
-                    if (input.isCrouching) {
-                        return gunCrouchSprites(input.gunInput.gunType);
-                    } else return gunIdleSprites(input.gunInput.gunType);
-                }
+            }
         }
-
     }
 
 

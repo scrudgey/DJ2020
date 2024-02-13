@@ -28,7 +28,7 @@ public class WeaponWheelController : MonoBehaviour {
         foreach (Transform child in optionContainer) {
             Destroy(child.gameObject);
         }
-        List<GunState> guns = new List<GunState>();
+        List<WeaponState> guns = new List<WeaponState>();
         if (GameManager.I.gameData.playerState.primaryGun != null) {
             guns.Add(GameManager.I.gameData.playerState.primaryGun);
         }
@@ -40,7 +40,7 @@ public class WeaponWheelController : MonoBehaviour {
         }
         thetaDelta = 2f * Mathf.PI / (guns.Count + GameManager.I.gameData.levelState.plan.items.Where(item => item != null).Count() + 1);
         float theta = 0f;
-        foreach (GunState gun in guns) {
+        foreach (WeaponState gun in guns) {
             WeaponWheelOption option = CreateSelectorOption(theta, gun);
             theta += thetaDelta;
         }
@@ -51,7 +51,7 @@ public class WeaponWheelController : MonoBehaviour {
         }
         CreateHolsterOption(theta);
     }
-    WeaponWheelOption CreateSelectorOption(float theta, GunState gun) {
+    WeaponWheelOption CreateSelectorOption(float theta, WeaponState gun) {
         WeaponWheelOption weaponWheelOption = SpawnOption(theta);
         weaponWheelOption.Initialize(gun);
         return weaponWheelOption;
@@ -118,11 +118,11 @@ public class WeaponWheelController : MonoBehaviour {
         // Debug.Log($"closing menu with theta {selectedOption}");
         if (selectedOption == null) {
             return;
-        } else if (selectedOption.gun == GameManager.I.gameData.playerState.primaryGun) {
+        } else if (selectedOption.weapon == GameManager.I.gameData.playerState.primaryGun) {
             input.selectgun = 1;
-        } else if (selectedOption.gun == GameManager.I.gameData.playerState.secondaryGun) {
+        } else if (selectedOption.weapon == GameManager.I.gameData.playerState.secondaryGun) {
             input.selectgun = 2;
-        } else if (selectedOption.gun == GameManager.I.gameData.playerState.tertiaryGun) {
+        } else if (selectedOption.weapon == GameManager.I.gameData.playerState.tertiaryGun) {
             input.selectgun = 3;
         } else if (selectedOption.item != null) {
             input.selectItem = selectedOption.item;

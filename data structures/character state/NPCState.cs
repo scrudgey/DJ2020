@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class NPCState : ICharacterHurtableState, IGunHandlerState {
+public class NPCState : ICharacterHurtableState { //IGunHandlerState
     public NPCTemplate template;
     // gun
     public GunState primaryGun { get; set; }
@@ -29,7 +29,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
 
     public void ApplyState(GameObject npcObject) {
         // this.health = fullHealthAmount;
-        ((IGunHandlerState)this).ApplyGunState(npcObject);
+        // ((IGunHandlerState)this).ApplyGunState(npcObject);
         ((ISkinState)template).ApplySkinState(npcObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
 

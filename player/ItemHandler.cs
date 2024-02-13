@@ -29,7 +29,6 @@ public record ItemUseResult {
     };
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
-    public GunHandler gunHandler;
     public Action<ItemHandler> OnValueChanged { get; set; }
     public List<ItemInstance> items = new List<ItemInstance>();
     public int index;
@@ -118,9 +117,10 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     void OnItemEnter(ItemInstance item) {
         if (item == null)
             return;
-        if (item.subweapon) {
-            gunHandler?.SwitchToGun(-1);
-        }
+        // TODO
+        // if (item.subweapon) { 
+        //     gunHandler?.SwitchToGun(-1);
+        // }
         switch (item) {
             case RocketLauncherItem rocketItem:
                 Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);

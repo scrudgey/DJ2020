@@ -1,18 +1,18 @@
-using UnityEngine;
+// using UnityEngine;
 
-public interface IGunHandlerState {
+// public interface IGunHandlerState {
 
-    // gun
-    public GunState primaryGun { get; set; }
-    public GunState secondaryGun { get; set; }
-    public GunState tertiaryGun { get; set; }
-    public int activeGun { get; set; }
+//     // gun
+//     public GunState primaryGun { get; set; }
+//     public GunState secondaryGun { get; set; }
+//     public GunState tertiaryGun { get; set; }
+//     public int activeGun { get; set; }
 
-    // public int numberOfShellsPerReload { get; }
+//     // public int numberOfShellsPerReload { get; }
 
-    public void ApplyGunState(GameObject playerObject) {
-        foreach (IGunHandlerStateLoader gunLoader in playerObject.GetComponentsInChildren<IGunHandlerStateLoader>()) {
-            gunLoader.LoadGunHandlerState(this);
-        }
-    }
-}
+//     public void ApplyGunState(GameObject playerObject) {
+//         foreach (IGunHandlerStateLoader gunLoader in playerObject.GetComponentsInChildren<IGunHandlerStateLoader>()) {
+//             gunLoader.LoadGunHandlerState(this);
+//         }
+//     }
+// }

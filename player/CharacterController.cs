@@ -40,6 +40,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public Transform targetPoint;
     public JumpIndicatorController jumpIndicatorController;
     public GunHandler gunHandler;
+    public MeleeHandler meleeHandler;
     public ItemHandler itemHandler;
     public Interactor interactor;
     public ManualHacker manualHacker;
@@ -142,6 +143,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     }
     public HitState hitState { get; set; }
 
+    public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
+    public bool isStrikeTeamMember;
+
     // Ladder vars
     private float _ladderUpDownInput;
     private Ladder _activeLadder { get; set; }
@@ -201,20 +205,21 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float gunHitStunTimer;
     private Quaternion aimCameraRotation;
     private Vector3 recoil;
-    private float aimSwayTimer;
-    private float aimSwayFrequencyConstant = 0.5f;
-    private float aimSwayMagnitude = 0.01f;
+    float aimSwayTimer;
+    float aimSwayFrequencyConstant = 0.5f;
+    float aimSwayMagnitude = 0.01f;
     Transform cameraFollowTransform;
     RaycastHit[] rayCastHits;
     float fallTime;
     float fallVelocity;
-    public HashSet<Collider> ignoredColliders = new HashSet<Collider>();
     bool armsRaised;
-
     float inBushesTimer;
-    public bool isStrikeTeamMember;
+    AttackSurface currentAttackSurface;
+    WeaponState primaryWeapon;
+    WeaponState secondaryWeapon;
+    WeaponState tertiaryWeapon;
+    // weapons
 
-    private AttackSurface currentAttackSurface;
 
     // static readonly SuspicionRecord crawlSuspicion = SuspicionRecord.crawlingSuspicion();
 
@@ -511,8 +516,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
         inputCrouchDown = input.CrouchDown;
         CursorData cursorData = input.Fire.cursorData;
-        if (input.selectgun == 3 && !thirdGunSlotEnabled)
-            input.selectgun = 0;
+
         switch (state) {
             case CharacterState.hitstun:
             case CharacterState.dead:
@@ -549,9 +553,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
 
                 // Fire
-
-                gunHandler.ProcessGunSwitch(input);
-                gunHandler.SetInputs(input);
+                HandleSwitchWeapon(input.selectgun);
+                gunHandler?.SetInputs(input);
+                meleeHandler?.SetInputs(input, direction);
 
                 if (!input.revealWeaponWheel) {
                     _inputTorque = input.mouseDelta;
@@ -605,9 +609,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     input.Fire = PlayerInput.FireInputs.none;
                 }
 
-                // Fire
-                gunHandler.ProcessGunSwitch(input);
-                gunHandler.SetInputs(input);
 
                 // Turn to face cursor or movement direction
                 // TODO: exclude when crawling
@@ -636,6 +637,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 slewLookVector.y = 0;
 
+                // Fire
+                HandleSwitchWeapon(input.selectgun);
+                gunHandler?.SetInputs(input);
+                meleeHandler?.SetInputs(input, snapToDirection);
+
                 if (input.snapToLook) {
                     if (input.lookAtPosition != Vector3.zero) {
                         snapToDirection = input.lookAtPosition - transform.position;
@@ -662,8 +668,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 break;
             case CharacterState.popout:
-                gunHandler.ProcessGunSwitch(input);
-                gunHandler.SetInputs(input);
+                HandleSwitchWeapon(input.selectgun);
+                gunHandler?.SetInputs(input);
+
                 if (input.lookAtDirection != Vector3.zero) {
                     lookAtDirection = input.lookAtDirection;
                 }
@@ -703,8 +710,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 // allow gun switch
                 input.Fire.FireHeld = false;
                 input.Fire.FirePressed = false;
-                gunHandler.ProcessGunSwitch(input);
-                gunHandler.SetInputs(input);
+                HandleSwitchWeapon(input.selectgun);
+                gunHandler?.SetInputs(input);
 
                 break;
             case CharacterState.climbing:
@@ -791,6 +798,49 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             if (_currentHVACNode == result.hvacUseResult.dismountElement) {
                 DismountHVAC(_currentHVACNode);
             }
+        }
+    }
+
+    void HandleSwitchWeapon(int index) {
+        switch (index) {
+            case 0:
+                break;
+            case -1:
+                gunHandler.Holster();
+                itemHandler?.EvictSubweapon();
+                meleeHandler?.Holster();
+                break;
+            case 1:
+                itemHandler?.EvictSubweapon();
+                if (primaryWeapon.type == WeaponType.gun) {
+                    gunHandler.SwitchGun(primaryWeapon.gunInstance);
+                    meleeHandler?.Holster();
+                } else {
+                    meleeHandler?.SwitchWeapon(primaryWeapon);
+                    gunHandler?.Holster();
+                }
+                break;
+            case 2:
+                itemHandler?.EvictSubweapon();
+                if (secondaryWeapon.type == WeaponType.gun) {
+                    gunHandler.SwitchGun(secondaryWeapon.gunInstance);
+                    meleeHandler?.Holster();
+                } else {
+                    meleeHandler?.SwitchWeapon(secondaryWeapon);
+                    gunHandler?.Holster();
+                }
+                break;
+            case 3:
+                if (!thirdGunSlotEnabled) break;
+                itemHandler?.EvictSubweapon();
+                if (tertiaryWeapon.type == WeaponType.gun) {
+                    gunHandler.SwitchGun(tertiaryWeapon.gunInstance);
+                    meleeHandler?.Holster();
+                } else {
+                    meleeHandler?.SwitchWeapon(tertiaryWeapon);
+                    gunHandler?.Holster();
+                }
+                break;
         }
     }
 
@@ -1613,6 +1663,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public void LoadState(PlayerState data) {
         superJumpEnabled = data.cyberlegsLevel > 0;
         thirdGunSlotEnabled = data.PerkThirdWeaponSlot();
+
+        primaryWeapon = data.primaryGun;
+        secondaryWeapon = data.secondaryGun;
+        tertiaryWeapon = data.tertiaryGun;
     }
 
     public CameraInput BuildCameraInput() {
@@ -1650,6 +1704,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         // if (GameManager.I.showDebugRays)
         //     Debug.DrawRay(OrbitCamera.Transform.position, OrbitCamera.Transform.forward, Color.blue, 1f);
 
+        AnimationInput.GunAnimationInput gunAnimationInput = AnimationInput.GunAnimationInput.None();
+        if (gunHandler != null && (gunHandler.gunInstance != null || gunHandler.state == GunHandler.GunStateEnum.holstering)) {
+            gunAnimationInput = gunHandler.BuildAnimationInput();
+        } else if (meleeHandler != null && (meleeHandler.weaponState != null || meleeHandler.state == GunHandler.GunStateEnum.holstering)) {
+            gunAnimationInput = meleeHandler.BuildAnimationInput();
+        }
+
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
             isMoving = isMoving(),
@@ -1661,7 +1722,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             wallPressTimer = wallPressTimer,
             state = state,
             playerInputs = _lastInput,
-            gunInput = gunHandler?.BuildAnimationInput() ?? AnimationInput.GunAnimationInput.None(),
+            gunInput = gunAnimationInput,
             camDir = camDir,
             cameraRotation = OrbitCamera.transform.rotation,
             lookAtDirection = lookAtDirection,
