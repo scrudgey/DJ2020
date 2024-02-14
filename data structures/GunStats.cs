@@ -22,11 +22,11 @@ public class GunStats {
     };
 
     public float getAccuracy() {
-        Debug.Log($"accuracy: {spread} -> {1f / spread}");
+        // Debug.Log($"accuracy: {spread} -> {1f / spread}");
         return 1f / spread;
     }
     public float getFireRate() {
-        Debug.Log($"fire rate: {shootInterval} -> {1f / shootInterval}");
+        // Debug.Log($"fire rate: {shootInterval} -> {1f / shootInterval}");
         return 1f / shootInterval;
     }
 }

@@ -16,7 +16,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     public string headSkin { get; set; }
 
     // gun
-    public List<GunState> allGuns;
+    public List<WeaponState> allGuns;
     [JsonConverter(typeof(ObjectListJsonConverter<ItemTemplate>))]
     public List<ItemTemplate> allItems;
     public WeaponState primaryGun { get; set; }
@@ -64,6 +64,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         GunTemplate gun7 = GunTemplate.Load("p4");
         GunTemplate gun8 = GunTemplate.Load("r2");
 
+        MeleeWeaponTemplate swordTemplate = MeleeWeaponTemplate.Load("sword");
+
         GunState gunState1 = GunState.Instantiate(gun1);
         GunState gunState2 = GunState.Instantiate(gun2);
         GunState gunState3 = GunState.Instantiate(gun3);
@@ -76,20 +78,20 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
         gunState1.delta.activeMods.Add(silencer);
 
-        List<GunState> allGuns = new List<GunState> {
-            gunState1,
-            gunState2,
-            gunState3,
-            gunState4,
-            gunState5,
-            gunState6,
-            gunState7,
-            gunState8
+        WeaponState sword = new WeaponState(swordTemplate);
+
+        List<WeaponState> allGuns = new List<WeaponState> {
+            new WeaponState( gunState1),
+            new WeaponState( gunState2),
+            new WeaponState( gunState3),
+            new WeaponState( gunState4),
+            new WeaponState( gunState5),
+            new WeaponState( gunState6),
+            new WeaponState( gunState7),
+            new WeaponState( gunState8),
+            sword
         };
 
-        WeaponState sword = new WeaponState() {
-            type = WeaponType.melee
-        };
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
             // ItemTemplate.LoadItem("C4"),

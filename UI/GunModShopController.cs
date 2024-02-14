@@ -152,9 +152,9 @@ public class GunModShopController : MonoBehaviour {
 
 
     void PopulatePlayerInventory() {
-        foreach (GunState gun in GameManager.I.gameData.playerState.allGuns) {
-            if (gun == null) continue;
-            CreatePlayerGunButton(gun);
+        foreach (WeaponState weapon in GameManager.I.gameData.playerState.allGuns) {
+            if (weapon == null || weapon.type == WeaponType.melee) continue;
+            CreatePlayerGunButton(weapon.gunInstance);
         }
     }
 

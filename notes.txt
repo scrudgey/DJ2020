@@ -3647,12 +3647,14 @@ more equipment to bring on mission?
     * impact on soft target
 * problem with NPCs loading gun state
 * sounds for bullet impact
+* make sword available in shops / loadout
+* graphics for sword picker / sword in weapon wheel
+* weapon UI for sword
+* sword swing down needs to end with blade on other side of character
+* sword collider starts active
 
-make sword available in shops / loadout
-weapon UI for sword
 sound for reaching holster
 switching guns: put one away, take the other out 
-sword swing down needs to end with blade on other side of character
 
 in-between montage
     unlock contacts

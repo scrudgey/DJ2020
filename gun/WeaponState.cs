@@ -3,26 +3,27 @@ public enum WeaponType { none, gun, melee }
 public class WeaponState {
     public WeaponType type;
     public GunState gunInstance;
+    public MeleeWeaponTemplate meleeWeapon;
 
     public Sprite GetSprite() {
         if (type == WeaponType.gun) {
             return gunInstance.GetSprite();
         } else {
-            return null; // TODO:
+            return meleeWeapon.sprite;
         }
     }
     public string GetName() {
         if (type == WeaponType.gun) {
             return gunInstance.getName();
         } else {
-            return "sword"; // TODO:
+            return meleeWeapon.name;
         }
     }
     public string GetShortName() {
         if (type == WeaponType.gun) {
             return gunInstance.getShortName();
         } else {
-            return "sword"; // TODO:
+            return meleeWeapon.name;
         }
     }
     public void ResetTemporaryState() {
@@ -31,9 +32,13 @@ public class WeaponState {
             gunInstance.ClipIn();
         }
     }
-    public WeaponState() { }
+    // public WeaponState() { }
     public WeaponState(GunState gunInstance) {
         this.gunInstance = gunInstance;
         type = WeaponType.gun;
+    }
+    public WeaponState(MeleeWeaponTemplate meleeWeapon) {
+        this.meleeWeapon = meleeWeapon;
+        type = WeaponType.melee;
     }
 }

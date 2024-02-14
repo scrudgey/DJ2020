@@ -29,7 +29,7 @@ public class LevelBootstrapper : MonoBehaviour {
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData();
 
-        GameManager.I.gameData.playerState.allGuns[0].delta.activeMods.Add(Resources.Load("data/guns/mods/silencer") as GunMod);
+        // GameManager.I.gameData.playerState.allGuns[0].delta.activeMods.Add(Resources.Load("data/guns/mods/silencer") as GunMod);
 
         // set up VR mission template
         VRMissionTemplate vrTemplate = VRMissionTemplate.Default();

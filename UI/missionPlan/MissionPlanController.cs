@@ -46,10 +46,10 @@ public class MissionPlanController : MonoBehaviour {
             GunState gunState3 = GunState.Instantiate(gun3);
             GunState gunState4 = GunState.Instantiate(gun4);
 
-            GameManager.I.gameData.playerState.allGuns.Add(gunState1);
-            GameManager.I.gameData.playerState.allGuns.Add(gunState2);
-            GameManager.I.gameData.playerState.allGuns.Add(gunState3);
-            GameManager.I.gameData.playerState.allGuns.Add(gunState4);
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState1));
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState2));
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState3));
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState4));
 
             ItemTemplate item1 = ItemTemplate.LoadItem("C4");
             ItemTemplate item2 = ItemTemplate.LoadItem("rocket");

@@ -5,16 +5,10 @@ using UnityEngine;
 
 public class MeleeHandler : MonoBehaviour {
     public AudioSource audioSource;
-    public WeaponState weaponState;
-    public AudioClip[] swordUnholsterSound;
-    public AudioClip[] swordHolsterSound;
-    public AudioClip[] swordSwingSound;
-    public AudioClip[] swordImpactNormalSound;
-    public AudioClip[] swordImpactHurtableSound;
+    // public WeaponState weaponState;
+    public MeleeWeaponTemplate meleeWeapon;
     public GameObject swordImpactPrefab;
-    public GameObject swordImpactHurtablePrefab;
     PrefabPool swordImpactPool;
-    PrefabPool swordImpactHurtablePool;
     public GunHandler.GunStateEnum state;
     public Transform swordLine;
     public ParticleSystem swordParticles;
@@ -26,20 +20,22 @@ public class MeleeHandler : MonoBehaviour {
     Coroutine swingRoutine;
     void Start() {
         swordImpactPool = PoolManager.I.GetPool(swordImpactPrefab);
-        swordImpactHurtablePool = PoolManager.I.GetPool(swordImpactHurtablePrefab);
-        // swordLine.gameObject.SetActive(false);
         ShowSwordLine(false);
     }
     public void Holster() {
-        if (weaponState == null) return;
-
-        weaponState = null;
+        if (meleeWeapon == null) return;
+        if (swingRoutine != null) {
+            StopCoroutine(swingRoutine);
+            ShowSwordLine(false);
+        }
         state = GunHandler.GunStateEnum.holstering;
 
         fromGunType = GunType.sword;
         toGunType = GunType.unarmed;
 
-        Toolbox.RandomizeOneShot(audioSource, swordHolsterSound);
+        Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordHolsterSound);
+
+        meleeWeapon = null;
         // fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
         // toGunType = GunType.unarmed;
         // isSwitchingWeapon = true;
@@ -62,28 +58,29 @@ public class MeleeHandler : MonoBehaviour {
     }
 
     public void SetInputs(PlayerInput input, Vector3 direction) {
-        if (weaponState == null) return;
+        if (meleeWeapon == null) return;
         if (input.Fire.FirePressed) {
-            Toolbox.RandomizeOneShot(audioSource, swordSwingSound);
+            Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordSwingSound);
             state = GunHandler.GunStateEnum.shooting;
             DoSwingLine(direction);
         }
         // Debug.DrawRay(transform.position, direction, Color.white);
     }
     public void SwitchWeapon(WeaponState weaponState) {
-
-        if (weaponState == null || weaponState == this.weaponState)
+        if (weaponState.type == WeaponType.gun)
             return;
-
+        if (weaponState == null || weaponState.meleeWeapon == this.meleeWeapon)
+            return;
         // fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
         // toGunType = instance == null ? GunType.unarmed : instance.template.type;
         // isSwitchingWeapon = true;
         state = GunHandler.GunStateEnum.holstering;
-        this.weaponState = weaponState;
+        // this.weaponState = weaponState;
+        meleeWeapon = weaponState.meleeWeapon;
 
         fromGunType = GunType.unarmed;
         toGunType = GunType.sword;
-        Toolbox.RandomizeOneShot(audioSource, swordUnholsterSound);
+        Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordUnholsterSound);
 
         // gunInstance = instance;
 
@@ -94,14 +91,14 @@ public class MeleeHandler : MonoBehaviour {
 
     public AnimationInput.GunAnimationInput BuildAnimationInput() {
         GunType gunType = GunType.unarmed;
-        if (weaponState != null) {
+        if (meleeWeapon != null) {
             gunType = GunType.sword;
         }
         return new AnimationInput.GunAnimationInput {
             gunType = gunType,
             gunState = state,
-            hasGun = weaponState != null || state == GunHandler.GunStateEnum.holstering,
-            holstered = weaponState == null,
+            hasGun = meleeWeapon != null || state == GunHandler.GunStateEnum.holstering,
+            holstered = meleeWeapon == null,
             baseGun = null,
             shootRequestedThisFrame = swingRequestedThisFrame,
             aimWeapon = false,
@@ -117,7 +114,6 @@ public class MeleeHandler : MonoBehaviour {
     }
     IEnumerator SwingSword(Vector3 direction) {
         ShowSwordLine(true);
-        swordTrigger.enabled = true;
         Quaternion forward = Quaternion.LookRotation(direction, Vector3.up);
         // Debug.Log($"swinging at {direction}");
         float parity = Random.Range(0f, 1f) < 0.5f ? 1f : -1f;
@@ -129,7 +125,6 @@ public class MeleeHandler : MonoBehaviour {
             }),
             Toolbox.CoroutineFunc(() => {
                 ShowSwordLine(false);
-                swordTrigger.enabled = false;
             })
         );
     }
@@ -141,6 +136,7 @@ public class MeleeHandler : MonoBehaviour {
         } else {
             swordParticles.Stop();
         }
+        swordTrigger.enabled = value;
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -168,12 +164,11 @@ public class MeleeHandler : MonoBehaviour {
         }
 
         if (other.CompareTag("actor")) {
-            Toolbox.RandomizeOneShot(audioSource, swordImpactHurtableSound);
+            Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordImpactHurtableSound);
         } else {
-            Toolbox.RandomizeOneShot(audioSource, swordImpactNormalSound);
+            Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordImpactNormalSound);
             swordImpactPool.GetObject(collisionPoint);
         }
         ShowSwordLine(false);
-        swordTrigger.enabled = false;
     }
 }

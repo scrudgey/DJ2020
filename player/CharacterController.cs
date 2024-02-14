@@ -1707,7 +1707,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         AnimationInput.GunAnimationInput gunAnimationInput = AnimationInput.GunAnimationInput.None();
         if (gunHandler != null && (gunHandler.gunInstance != null || gunHandler.state == GunHandler.GunStateEnum.holstering)) {
             gunAnimationInput = gunHandler.BuildAnimationInput();
-        } else if (meleeHandler != null && (meleeHandler.weaponState != null || meleeHandler.state == GunHandler.GunStateEnum.holstering)) {
+        } else if (meleeHandler != null && (meleeHandler.meleeWeapon != null || meleeHandler.state == GunHandler.GunStateEnum.holstering)) {
             gunAnimationInput = meleeHandler.BuildAnimationInput();
         }
 
