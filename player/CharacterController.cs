@@ -215,9 +215,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     bool armsRaised;
     float inBushesTimer;
     AttackSurface currentAttackSurface;
-    WeaponState primaryWeapon;
-    WeaponState secondaryWeapon;
-    WeaponState tertiaryWeapon;
+    public WeaponState primaryWeapon;
+    public WeaponState secondaryWeapon;
+    public WeaponState tertiaryWeapon;
     // weapons
 
 
@@ -801,7 +801,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
     }
 
-    void HandleSwitchWeapon(int index) {
+    public void HandleSwitchWeapon(int index) {
         switch (index) {
             case 0:
                 break;

@@ -209,6 +209,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     }
 
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
+        // Debug.Log($"{transform.root.gameObject} setting animation: {clip}");
         animator.playbackSpeed = 1f;
         if (forcePlay) {
             animator.Stop();

@@ -3638,19 +3638,21 @@ more equipment to bring on mission?
     ninja vanish
 
 
-melee combat
+* melee combat
     * new holster animations for sword
     * swing animation for sword
     * swing effector
     * impact sounds
     * impact on wall
-    impact on soft target
+    * impact on soft target
+* problem with NPCs loading gun state
+* sounds for bullet impact
 
-problem with NPCs loading gun state
+make sword available in shops / loadout
+weapon UI for sword
 sound for reaching holster
 switching guns: put one away, take the other out 
 sword swing down needs to end with blade on other side of character
-
 
 in-between montage
     unlock contacts
@@ -3663,12 +3665,12 @@ better combat:
     gunshots / impacts / impact sounds / impact effects
 graphic effects
     80s electricity 
-    anime glow
+    anime glow 
+
 711 broken
 shotgun reload broken
 ease in elements of perk menu
 graphical glitch when entering / exiting aim mode in yamachi
-
 publish trailer on twitter
 update the steam page graphic
 multiple guards chose the same clearpoint to navigate to- more global coordination

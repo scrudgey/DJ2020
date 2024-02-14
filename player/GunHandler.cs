@@ -62,7 +62,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     }
     // used by animator
     public void EndShoot() {
-        Debug.Log("end shoot");
         state = GunStateEnum.idle;
         lastShootInput = null;
         shootRequestedThisFrame = false;
@@ -87,6 +86,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     }
     // used by animator
     public void StopHolster() {
+        // Debug.Log($"{transform.root.gameObject} stop holster");
         state = GunStateEnum.idle;
         OnValueChanged?.Invoke(this);
         OnHolsterFinish?.Invoke(this);
@@ -485,6 +485,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
         toGunType = instance == null ? GunType.unarmed : instance.template.type;
         isSwitchingWeapon = true;
         state = GunStateEnum.holstering;
+        // Debug.Log($"{transform.root.gameObject} start holster");
 
         gunInstance = instance;
 
@@ -508,6 +509,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
         toGunType = GunType.unarmed;
         isSwitchingWeapon = true;
         state = GunStateEnum.holstering;
+        // Debug.Log("start holster");
 
         gunInstance = null;
         OnValueChanged?.Invoke(this);

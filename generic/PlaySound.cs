@@ -10,6 +10,7 @@ public class PlaySound : MonoBehaviour {
     public AudioClip[] sounds;
     public AudioSource audioSource;
     public ParticleSystem particles;
+    public float volume = 1f;
     public float probability = 1f;
     public float velocityThreshold = 0f;
     public float cooldownInterval = 1f;
@@ -22,7 +23,7 @@ public class PlaySound : MonoBehaviour {
             return;
         if (Random.Range(0, 1f) < probability) {
             if (jukebox) {
-                Toolbox.AudioSpeaker(transform.position, sounds);
+                Toolbox.AudioSpeaker(transform.position, sounds, volume: volume);
             } else {
                 Toolbox.RandomizeOneShot(audioSource, sounds, randomPitchWidth: randomPitchWidth);
 

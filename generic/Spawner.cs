@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour {
     public GameObject prefab;
+    PrefabPool prefabPool;
+    public float probability = 1;
     private float timer;
     public float delay;
     public bool repeating;
@@ -11,6 +13,8 @@ public class Spawner : MonoBehaviour {
     public bool stopOnGround;
     Rigidbody myRigidBody;
     void Start() {
+        if (useObjectPool)
+            prefabPool = PoolManager.I.GetPool(prefab);
         myRigidBody = GetComponent<Rigidbody>();
     }
 
@@ -20,11 +24,14 @@ public class Spawner : MonoBehaviour {
             return;
         }
         if (timer > delay) {
-            if (useObjectPool) {
-                PoolManager.I.GetPool(prefab).GetObject(transform.position);
-            } else {
-                GameObject.Instantiate(prefab, transform.position, Quaternion.identity);
+            if (Random.Range(0f, 1f) < probability) {
+                if (useObjectPool) {
+                    prefabPool.GetObject(transform.position);
+                } else {
+                    GameObject.Instantiate(prefab, transform.position, Quaternion.identity);
+                }
             }
+
             if (repeating) {
                 timer -= delay;
             } else {

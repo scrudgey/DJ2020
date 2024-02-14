@@ -33,7 +33,23 @@ public class NPCState : ICharacterHurtableState { //IGunHandlerState
         ((ISkinState)template).ApplySkinState(npcObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
 
-        // TODO: abstract this out with an interface
+        CharacterController controller = npcObject.GetComponent<CharacterController>();
+        if (controller != null) {
+            WeaponState weapon1 = template.primaryGun != null ? new WeaponState(GunState.Instantiate(template.primaryGun)) : null;
+            WeaponState weapon2 = template.secondaryGun != null ? new WeaponState(GunState.Instantiate(template.secondaryGun)) : null;
+            WeaponState weapon3 = template.tertiaryGun != null ? new WeaponState(GunState.Instantiate(template.tertiaryGun)) : null;
+
+            controller.primaryWeapon = weapon1;
+            controller.secondaryWeapon = weapon2;
+            controller.tertiaryWeapon = weapon3;
+
+            if (weapon1 != null) {
+                controller.HandleSwitchWeapon(1);
+            } else {
+                controller.HandleSwitchWeapon(0);
+            }
+        }
+
         SphereRobotAI ai = npcObject.GetComponent<SphereRobotAI>();
         if (ai != null) {
             ai.physicalKeys = new HashSet<int>(template.physicalKeys);

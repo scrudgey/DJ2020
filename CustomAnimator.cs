@@ -65,6 +65,7 @@ public class CustomAnimator : MonoBehaviour {
         referenceTime = Time.time;
     }
     void FireEvent(AnimationEvent animationEvent) {
+        // Debug.Log($"{transform.root.gameObject} sending event: {animationEvent.functionName}({animationEvent.intParameter})");
         BroadcastMessage(animationEvent.functionName, animationEvent.intParameter, SendMessageOptions.DontRequireReceiver);
     }
 }

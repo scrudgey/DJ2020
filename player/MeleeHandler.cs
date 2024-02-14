@@ -10,8 +10,11 @@ public class MeleeHandler : MonoBehaviour {
     public AudioClip[] swordHolsterSound;
     public AudioClip[] swordSwingSound;
     public AudioClip[] swordImpactNormalSound;
+    public AudioClip[] swordImpactHurtableSound;
     public GameObject swordImpactPrefab;
+    public GameObject swordImpactHurtablePrefab;
     PrefabPool swordImpactPool;
+    PrefabPool swordImpactHurtablePool;
     public GunHandler.GunStateEnum state;
     public Transform swordLine;
     public ParticleSystem swordParticles;
@@ -23,6 +26,7 @@ public class MeleeHandler : MonoBehaviour {
     Coroutine swingRoutine;
     void Start() {
         swordImpactPool = PoolManager.I.GetPool(swordImpactPrefab);
+        swordImpactHurtablePool = PoolManager.I.GetPool(swordImpactHurtablePrefab);
         // swordLine.gameObject.SetActive(false);
         ShowSwordLine(false);
     }
@@ -116,9 +120,10 @@ public class MeleeHandler : MonoBehaviour {
         swordTrigger.enabled = true;
         Quaternion forward = Quaternion.LookRotation(direction, Vector3.up);
         // Debug.Log($"swinging at {direction}");
+        float parity = Random.Range(0f, 1f) < 0.5f ? 1f : -1f;
 
         return Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 0.08f, -90, 45, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 0.08f, parity * -90, parity * 45, PennerDoubleAnimation.Linear, (amount) => {
                 Quaternion rotation = Quaternion.Euler(0, amount, 0);
                 swordLine.rotation = forward * rotation;
             }),
@@ -141,16 +146,33 @@ public class MeleeHandler : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (other.transform.IsChildOf(transform)) return;
         if (other.isTrigger) return;
-        Vector3 collisionPoint = other.ClosestPoint(transform.position);
-        Impact(collisionPoint);
+        Impact(other);
     }
 
-    void Impact(Vector3 collisionPoint) {
+    void Impact(Collider other) {
         if (swingRoutine != null) {
             StopCoroutine(swingRoutine);
         }
-        Toolbox.RandomizeOneShot(audioSource, swordImpactNormalSound);
-        swordImpactPool.GetObject(collisionPoint);
+        Vector3 collisionPoint = other.ClosestPoint(transform.position);
+        Debug.Log($"sword impact: {other.tag}");
+
+        MeleeDamage damage = new MeleeDamage(15f, transform.position, collisionPoint);
+
+        DamageResult result = DamageResult.NONE;
+        foreach (IDamageReceiver receiver in other.transform.GetComponentsInChildren<IDamageReceiver>()) {
+            if (receiver is Damageable damageable) {
+                result = result.Add(damageable.TakeDamage(damage));
+            } else {
+                receiver.TakeDamage(damage);
+            }
+        }
+
+        if (other.CompareTag("actor")) {
+            Toolbox.RandomizeOneShot(audioSource, swordImpactHurtableSound);
+        } else {
+            Toolbox.RandomizeOneShot(audioSource, swordImpactNormalSound);
+            swordImpactPool.GetObject(collisionPoint);
+        }
         ShowSwordLine(false);
         swordTrigger.enabled = false;
     }

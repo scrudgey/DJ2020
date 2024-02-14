@@ -24,6 +24,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
         RegisterDamageCallback<ExplosionDamage>(TakeExplosionDamage);
         RegisterDamageCallback<ElectricalDamage>(TakeElectricalDamage);
+        RegisterDamageCallback<MeleeDamage>(TakeMeleeDamage);
     }
     public override DamageResult TakeDamage(Damage damage) {
         DamageResult result = DamageResult.NONE;
@@ -33,6 +34,19 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         OnValueChanged?.Invoke(this);
         OnDamageTaken?.Invoke(damage);
         return result;
+    }
+    public DamageResult TakeMeleeDamage(MeleeDamage damage) {
+        if (hitstunType == HitStunType.timer) {
+            hitstunCountdown = hitstunAmount / 2f;
+            hitState = Toolbox.Max(hitState, HitState.hitstun);
+        } else if (hitstunType == HitStunType.invulnerable) {
+            hitstunCountdown = hitstunAmount;
+            hitState = Toolbox.Max(hitState, HitState.invulnerable);
+        }
+        return new DamageResult {
+            damageAmount = damage.amount,
+            damage = damage
+        };
     }
     public DamageResult TakeElectricalDamage(ElectricalDamage damage) {
         hitstunCountdown = hitstunAmount * 2f;
