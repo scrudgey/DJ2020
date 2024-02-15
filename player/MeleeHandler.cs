@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
 using UnityEngine;
-
-public class MeleeHandler : MonoBehaviour {
+public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
     public AudioSource audioSource;
     // public WeaponState weaponState;
     public MeleeWeaponTemplate meleeWeapon;
@@ -14,6 +14,8 @@ public class MeleeHandler : MonoBehaviour {
     public ParticleSystem swordParticles;
     public LineRenderer swordLineRenderer;
     public Collider swordTrigger;
+
+    public Action<MeleeHandler> OnValueChanged { get; set; }
     GunType fromGunType;
     GunType toGunType;
     bool swingRequestedThisFrame;
@@ -29,29 +31,20 @@ public class MeleeHandler : MonoBehaviour {
             ShowSwordLine(false);
         }
         state = GunHandler.GunStateEnum.holstering;
-
         fromGunType = GunType.sword;
         toGunType = GunType.unarmed;
-
         Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordHolsterSound);
-
         meleeWeapon = null;
-        // fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
-        // toGunType = GunType.unarmed;
-        // isSwitchingWeapon = true;
-        // state = GunStateEnum.holstering;
 
         // gunInstance = null;
-        // OnValueChanged?.Invoke(this);
+        OnValueChanged?.Invoke(this);
         // if (isPlayerCharacter) {
         //     GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
         // }
-        // Debug.Break();
     }
     public void StopHolster() {
         state = GunHandler.GunStateEnum.idle;
-        // OnValueChanged?.Invoke(this);
-        // OnHolsterFinish?.Invoke(this);
+        OnValueChanged?.Invoke(this);
     }
     public void EndSwing() {
         state = GunHandler.GunStateEnum.idle;
@@ -64,28 +57,21 @@ public class MeleeHandler : MonoBehaviour {
             state = GunHandler.GunStateEnum.shooting;
             DoSwingLine(direction);
         }
-        // Debug.DrawRay(transform.position, direction, Color.white);
     }
     public void SwitchWeapon(WeaponState weaponState) {
         if (weaponState.type == WeaponType.gun)
             return;
         if (weaponState == null || weaponState.meleeWeapon == this.meleeWeapon)
             return;
-        // fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
-        // toGunType = instance == null ? GunType.unarmed : instance.template.type;
-        // isSwitchingWeapon = true;
         state = GunHandler.GunStateEnum.holstering;
-        // this.weaponState = weaponState;
         meleeWeapon = weaponState.meleeWeapon;
 
         fromGunType = GunType.unarmed;
         toGunType = GunType.sword;
         Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordUnholsterSound);
 
-        // gunInstance = instance;
-
         // SetGunAppearanceSuspicion();
-        // OnValueChanged?.Invoke(this);
+        OnValueChanged?.Invoke(this);
         // OnHolsterFinish?.Invoke(this);
     }
 
@@ -116,7 +102,7 @@ public class MeleeHandler : MonoBehaviour {
         ShowSwordLine(true);
         Quaternion forward = Quaternion.LookRotation(direction, Vector3.up);
         // Debug.Log($"swinging at {direction}");
-        float parity = Random.Range(0f, 1f) < 0.5f ? 1f : -1f;
+        float parity = UnityEngine.Random.Range(0f, 1f) < 0.5f ? 1f : -1f;
 
         return Toolbox.ChainCoroutines(
             Toolbox.Ease(null, 0.08f, parity * -90, parity * 45, PennerDoubleAnimation.Linear, (amount) => {

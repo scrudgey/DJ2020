@@ -15,6 +15,7 @@ public class UIController : MonoBehaviour {
     public Canvas statusBarCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
+    public MeleeWeaponUIHandler meleeWeaponUIHandler;
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
     public LockRadiusIndicatorHandler lockRadiusIndicatorHandler;
@@ -73,6 +74,7 @@ public class UIController : MonoBehaviour {
         objectiveCanvasController.Initialize();
         objectivesCompleteController.Initialize();
         weaponUIHandler.Initialize();
+        meleeWeaponUIHandler.Initialize();
         weaponWheelController.HideWheel();
         weaponWheelController.Initialize();
         targetPracticeUIHandler.canvas.enabled = false;
@@ -102,6 +104,7 @@ public class UIController : MonoBehaviour {
     void BindToNewTarget(GameObject target) {
         // Debug.Log($"ui controller binding to new target {target}");
         weaponUIHandler.Bind(target);
+        meleeWeaponUIHandler.Bind(target);
 
         itemUIHandler.Bind(target);
 

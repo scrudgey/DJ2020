@@ -42,4 +42,24 @@ then they will encounter something during the mission that they are missing the 
 bringing equipment:
     you can bring more if you bring a backpack, duffel bag- makes you a little more suspicious (a neutral suspicion record)
 
+## a possible bridge
 
+there are burglar tools, and inventory items. 
+burglar tools:
+    acquired through non-monetary means
+        the number of tools is limited and unlocking is perhaps arduous in some way but doesn't require money?
+        at worst, a special mission that focuses on using the tool. 
+    explained on-site via phone call:
+        what the tool is used to attack
+        how to use the tool to attack
+        unlocks the tool, possibly
+    you always bring every burglar tool
+
+inventory equipment:
+    purchased with money at a shop
+    tools equiped during gameplay to make your life easier
+    sub-weapons
+
+special purpose gear:
+    diamond tipped drill bit
+    nuclear material container

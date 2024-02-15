@@ -3652,6 +3652,7 @@ more equipment to bring on mission?
 * weapon UI for sword
 * sword swing down needs to end with blade on other side of character
 * sword collider starts active
+* publish trailer on twitter
 
 sound for reaching holster
 switching guns: put one away, take the other out 
@@ -3671,9 +3672,10 @@ graphic effects
 
 711 broken
 shotgun reload broken
+
 ease in elements of perk menu
+    color disabled elements differently
 graphical glitch when entering / exiting aim mode in yamachi
-publish trailer on twitter
 update the steam page graphic
 multiple guards chose the same clearpoint to navigate to- more global coordination
 better investigative ability when player does something weird like superjump / land
