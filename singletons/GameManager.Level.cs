@@ -333,11 +333,13 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"setting focus: {focus}");
         if (playerGunHandler != null) {
             playerGunHandler.isPlayerCharacter = false;
+            playerMeleeHandler.isPlayerCharacter = false;
         }
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
         this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
+        this.playerMeleeHandler = focus.GetComponentInChildren<MeleeHandler>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
         this.playerManualHacker = focus.GetComponentInChildren<ManualHacker>();
         this.playerItemHandler = focus.GetComponentInChildren<ItemHandler>();
@@ -347,6 +349,7 @@ public partial class GameManager : Singleton<GameManager> {
         this.clearSighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
 
         playerGunHandler.isPlayerCharacter = true;
+        playerMeleeHandler.isPlayerCharacter = true;
 
         ElevatorOccluder elevatorOccluder = GameObject.FindObjectOfType<ElevatorOccluder>();
 

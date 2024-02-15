@@ -59,6 +59,7 @@ inventory equipment:
     purchased with money at a shop
     tools equiped during gameplay to make your life easier
     sub-weapons
+    can apply backpack or duffel bag for larger equipment?
 
 special purpose gear:
     diamond tipped drill bit

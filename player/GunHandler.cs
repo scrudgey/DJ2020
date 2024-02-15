@@ -38,6 +38,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
     public GameObject tamperEvidenceObject;
+    public AudioClip[] reachForHolsterSound;
     int numberOfShellsPerReload;
     public bool isSwitchingWeapon;
     GunType fromGunType;
@@ -486,7 +487,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
         isSwitchingWeapon = true;
         state = GunStateEnum.holstering;
         // Debug.Log($"{transform.root.gameObject} start holster");
-
+        if (gunInstance == null) {
+            Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
+        }
         gunInstance = instance;
 
         SetGunAppearanceSuspicion();
@@ -510,7 +513,9 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
         isSwitchingWeapon = true;
         state = GunStateEnum.holstering;
         // Debug.Log("start holster");
-
+        if (gunInstance != null) {
+            Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
+        }
         gunInstance = null;
         OnValueChanged?.Invoke(this);
         if (isPlayerCharacter) {

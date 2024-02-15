@@ -9,3 +9,7 @@ balance concerns:
     a. tools / equipment
     b. weapons
     c. player stats
+
+
+for missions, having to search for objective location is great-
+rewards being quiet, rewards being prepared, draws out mission length

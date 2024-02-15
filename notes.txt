@@ -3653,19 +3653,29 @@ more equipment to bring on mission?
 * sword swing down needs to end with blade on other side of character
 * sword collider starts active
 * publish trailer on twitter
+* sound for reaching holster
+* tighter swing arc
+* having a sword out looks suspicious
+* murdering people with a sword should cause more havoc
+    * swinging a sword should mark me as aggressive
+? switching guns: put one away, take the other out 
 
-sound for reaching holster
-switching guns: put one away, take the other out 
 
-in-between montage
-    unlock contacts
-    favor system
 better combat:
     an armor rating that is % probability of deflecting a shot
         indicator indicates when a shot deflects
             splat / deflect sfx
         armor piercing ammo to be indicated somewhere in the gun info display
     gunshots / impacts / impact sounds / impact effects
+    better NPC reaction to being hurt
+        cries from those hit should alert others
+        hide alert icon
+        hide text
+
+in-between montage
+    unlock contacts
+    favor system
+
 graphic effects
     80s electricity 
     anime glow 

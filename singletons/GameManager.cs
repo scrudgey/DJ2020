@@ -75,6 +75,7 @@ public partial class GameManager : Singleton<GameManager> {
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
     public GunHandler playerGunHandler;
+    public MeleeHandler playerMeleeHandler;
     public ManualHacker playerManualHacker;
     public ItemHandler playerItemHandler;
     public void Start() {

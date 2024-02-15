@@ -14,6 +14,8 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
     public ParticleSystem swordParticles;
     public LineRenderer swordLineRenderer;
     public Collider swordTrigger;
+    public AudioClip[] reachForHolsterSound;
+    public bool isPlayerCharacter;
 
     public Action<MeleeHandler> OnValueChanged { get; set; }
     GunType fromGunType;
@@ -30,12 +32,18 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
             StopCoroutine(swingRoutine);
             ShowSwordLine(false);
         }
+
         state = GunHandler.GunStateEnum.holstering;
         fromGunType = GunType.sword;
         toGunType = GunType.unarmed;
         Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordHolsterSound);
+        if (meleeWeapon != null) {
+            Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
+        }
         meleeWeapon = null;
-
+        if (isPlayerCharacter) {
+            GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
+        }
         // gunInstance = null;
         OnValueChanged?.Invoke(this);
         // if (isPlayerCharacter) {
@@ -56,6 +64,10 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
             Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordSwingSound);
             state = GunHandler.GunStateEnum.shooting;
             DoSwingLine(direction);
+            if (isPlayerCharacter) {
+                SuspicionRecord record = SuspicionRecord.shotsFiredSuspicion();
+                GameManager.I.AddSuspicionRecord(record);
+            }
         }
     }
     public void SwitchWeapon(WeaponState weaponState) {
@@ -63,13 +75,16 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
             return;
         if (weaponState == null || weaponState.meleeWeapon == this.meleeWeapon)
             return;
+        if (meleeWeapon == null) {
+            Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
+        }
         state = GunHandler.GunStateEnum.holstering;
         meleeWeapon = weaponState.meleeWeapon;
 
         fromGunType = GunType.unarmed;
         toGunType = GunType.sword;
         Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordUnholsterSound);
-
+        SetGunAppearanceSuspicion();
         // SetGunAppearanceSuspicion();
         OnValueChanged?.Invoke(this);
         // OnHolsterFinish?.Invoke(this);
@@ -105,7 +120,7 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
         float parity = UnityEngine.Random.Range(0f, 1f) < 0.5f ? 1f : -1f;
 
         return Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 0.08f, parity * -90, parity * 45, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 0.08f, parity * -65, parity * 45, PennerDoubleAnimation.Linear, (amount) => {
                 Quaternion rotation = Quaternion.Euler(0, amount, 0);
                 swordLine.rotation = forward * rotation;
             }),
@@ -154,7 +169,23 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
         } else {
             Toolbox.RandomizeOneShot(audioSource, meleeWeapon.swordImpactNormalSound);
             swordImpactPool.GetObject(collisionPoint);
+            CharacterCamera.Shake(10f, 0.1f);
+            NoiseData noise = new NoiseData() {
+                volume = 10f,
+                suspiciousness = Suspiciousness.suspicious,
+                player = isPlayerCharacter,
+                source = gameObject
+            };
+            Toolbox.Noise(collisionPoint, noise, gameObject);
         }
         ShowSwordLine(false);
+    }
+
+    public void SetGunAppearanceSuspicion() {
+        if (meleeWeapon != null) {
+            if (isPlayerCharacter) {
+                GameManager.I.AddSuspicionRecord(SuspicionRecord.brandishingSuspicion());
+            }
+        }
     }
 }
