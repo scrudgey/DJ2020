@@ -151,7 +151,6 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
             StopCoroutine(swingRoutine);
         }
         Vector3 collisionPoint = other.ClosestPoint(transform.position);
-        Debug.Log($"sword impact: {other.tag}");
 
         MeleeDamage damage = new MeleeDamage(15f, transform.position, collisionPoint);
 
@@ -174,7 +173,8 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
                 volume = 10f,
                 suspiciousness = Suspiciousness.suspicious,
                 player = isPlayerCharacter,
-                source = gameObject
+                source = gameObject,
+                relevantParties = new HashSet<Transform>() { transform.root, other.transform.root }
             };
             Toolbox.Noise(collisionPoint, noise, gameObject);
         }

@@ -275,7 +275,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     player = gameObject == GameManager.I.playerObject,
                     suspiciousness = Suspiciousness.normal,
                     volume = 4,
-                    isFootsteps = true
+                    isFootsteps = true,
+                    relevantParties = new HashSet<Transform>() { transform.root }
                 };
                 Toolbox.Noise(transform.position, noise, transform.root.gameObject);
 

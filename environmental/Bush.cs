@@ -55,7 +55,8 @@ public class Bush : MonoBehaviour {
         Toolbox.Noise(transform.position, new NoiseData() {
             volume = 4,
             suspiciousness = Suspiciousness.suspicious,
-            player = other.transform.IsChildOf(GameManager.I.playerObject.transform)
+            player = other.transform.IsChildOf(GameManager.I.playerObject.transform),
+            relevantParties = new HashSet<Transform>() { other.transform.root }
         }, other.transform.root.gameObject);
         ClearCoroutines();
         Coroutine newRoutine = StartCoroutine(Toolbox.ShakeTree(transform.parent, initialRotation));

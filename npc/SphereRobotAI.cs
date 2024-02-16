@@ -101,6 +101,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     void HandleHitStateChange(Destructible destructible) {
+        // Debug.Log($"hit state change: {destructible.hitState}");
         if (destructible.hitState == HitState.dead) {
             alertHandler.enabled = false;
             speechTextController.enabled = false;
@@ -395,7 +396,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
+                if (bulletImpact.impacted.IsChildOf(transform)) {
 
                 } else {
                     switch (stateMachine.currentState) {
@@ -623,6 +624,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
         } else {
             // not player
+            // Debug.Break();
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
                 if (noise.data.suspiciousness == Suspiciousness.suspicious) {
@@ -732,6 +734,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void OnPoolActivate() {
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
+        alertHandler.gameObject.SetActive(true);// = true;
+
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;
@@ -746,7 +750,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         recentlyInCombat = false;
         recentHeardSuspicious = Suspiciousness.normal;
         lastSuspicionLevel = Suspiciousness.normal;
-        alertHandler.enabled = true;
+        // alertHandler.enabled = true;
+        alertHandler.gameObject.SetActive(false);// = true;
+
         speechTextController.enabled = true;
         highlight.navMeshPath = null;
         stateMachine = new SphereRobotBrain();

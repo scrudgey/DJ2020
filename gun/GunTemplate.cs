@@ -31,6 +31,7 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public float weight;
     public LoHi recoil;
     public List<GunMod> availableMods;
+    public int piercing;
 
     [Header("Resources")]
     public AudioClip[] shootSounds;

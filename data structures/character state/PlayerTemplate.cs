@@ -33,6 +33,8 @@ public record PlayerTemplate : ISkinState, IGunHandlerTemplate, ICharacterHurtab
     public float fullHealthAmount { get; set; }
     [field: SerializeField]
     public HitState hitState { get; set; }
+    public int armorLevel { get; set; }
+
 
     // items
     // public List<string> items { get; set; }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class DamageConditional {
-    public enum DamageType { any, none, bullet, explosion, electric, melee }
+    public enum DamageType { any, none, bullet, explosion, electric, melee, blocked }
     public DamageType type;
 
     public bool ConditionIsMet(Damage damage) {

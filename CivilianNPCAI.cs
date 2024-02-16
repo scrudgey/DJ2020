@@ -265,7 +265,7 @@ public class CivilianNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber,
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
+                if (bulletImpact.impacted.IsChildOf(transform)) {
 
                 } else {
                     alertHandler.ShowAlert(useWarnMaterial: true);

@@ -19,8 +19,13 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
     public Action<CharacterHurtable> OnValueChanged { get; set; }
     public Action<Damage> OnDamageTaken;
     public AudioClip[] zapSound;
+    public int armorLevel;
+
+    PrefabPool impactorPool;
     public override void Awake() {
         base.Awake();
+        GameObject impactPrefab = Resources.Load("prefabs/bulletImpact") as GameObject;
+        impactorPool = PoolManager.I.GetPool(impactPrefab);
         RegisterDamageCallback<BulletDamage>(TakeBulletDamage);
         RegisterDamageCallback<ExplosionDamage>(TakeExplosionDamage);
         RegisterDamageCallback<ElectricalDamage>(TakeElectricalDamage);
@@ -36,13 +41,10 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         return result;
     }
     public DamageResult TakeMeleeDamage(MeleeDamage damage) {
-        if (hitstunType == HitStunType.timer) {
-            hitstunCountdown = hitstunAmount / 2f;
-            hitState = Toolbox.Max(hitState, HitState.hitstun);
-        } else if (hitstunType == HitStunType.invulnerable) {
-            hitstunCountdown = hitstunAmount;
-            hitState = Toolbox.Max(hitState, HitState.invulnerable);
-        }
+        ApplyHitStun();
+        SnapLookAtOrigin(damage);
+        CreateNoiseAndImpact(damage);
+
         return new DamageResult {
             damageAmount = damage.amount,
             damage = damage
@@ -58,15 +60,78 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         };
     }
     public DamageResult TakeBulletDamage(BulletDamage damage) {
+        SnapLookAtOrigin(damage);
+
+        CheckWallDecal(damage);
+
+        ApplyHitStun();
+
+        CreateNoiseAndImpact(damage);
+
+        bool armorBlocked = checkArmorBlock(damage);
+
+        if (headCollider != null) {
+            RaycastHit raycastHit = new RaycastHit();
+            if (headCollider.Raycast(damage.bullet.ray, out raycastHit, 100f)) {
+                // Debug.LogError("Headshot!");
+                damage.amount *= 10f;
+
+                // TODO: support head armor!
+                armorBlocked = false;
+            }
+        }
+
+        if (armorBlocked) {
+            return new DamageResult {
+                damageAmount = damage.amount / 10f,
+                damage = damage,
+                type = DamageResult.Type.blocked
+            };
+        } else {
+            return new DamageResult {
+                damageAmount = damage.amount,
+                damage = damage
+            };
+        }
+
+
+    }
+
+    bool checkArmorBlock(BulletDamage damage) {
+        float threshold = armorLevel * 0.1f - (damage.bullet.piercing * 0.1f);
+        float roll = UnityEngine.Random.Range(0f, 1f);
+        // Debug.Log($"{roll} < {threshold}");
+        if (roll < threshold) {
+            // Debug.Log("blocked!");
+            return true;
+        } else return false;
+    }
+
+    void CreateNoiseAndImpact(Damage damage) {
+        if (!transform.IsChildOf(GameManager.I.playerObject.transform)) {
+            GameObject obj = impactorPool.GetObject(damage.position);
+            BulletImpact impact = obj.GetComponent<BulletImpact>();
+            impact.damage = damage;
+            impact.DestroyInTime(0.1f, impactorPool);
+            NoiseData noise = new NoiseData {
+                player = false,
+                suspiciousness = Suspiciousness.suspicious,
+                volume = 5,
+                isFootsteps = false,
+                relevantParties = new HashSet<Transform>() { transform.root }
+            };
+            Toolbox.Noise(transform.position, noise, transform.root.gameObject);
+        }
+    }
+    void SnapLookAtOrigin(Damage damage) {
         PlayerInput snapInput = new PlayerInput {
-            lookAtPosition = damage.bullet.ray.origin,
+            lookAtPosition = damage.source,
             snapToLook = true,
             Fire = PlayerInput.FireInputs.none
         };
         controller.SetInputs(snapInput);
-
-        CheckWallDecal(damage);
-
+    }
+    void ApplyHitStun() {
         if (hitstunType == HitStunType.timer) {
             hitstunCountdown = hitstunAmount;
             hitState = Toolbox.Max(hitState, HitState.hitstun);
@@ -74,35 +139,6 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
             hitstunCountdown = hitstunAmount * 2f;
             hitState = Toolbox.Max(hitState, HitState.invulnerable);
         }
-
-        if (!transform.IsChildOf(GameManager.I.playerObject.transform)) {
-            GameObject impactPrefab = Resources.Load("prefabs/bulletImpact") as GameObject;
-            GameObject obj = GameObject.Instantiate(impactPrefab, damage.position, Quaternion.identity);
-            BulletImpact impact = obj.GetComponent<BulletImpact>();
-            impact.damage = damage;
-            Destroy(obj, 0.1f);
-
-            NoiseData noise = new NoiseData {
-                player = false,
-                suspiciousness = Suspiciousness.suspicious,
-                volume = 5,
-                isFootsteps = false
-            };
-            Toolbox.Noise(transform.position, noise, transform.root.gameObject);
-        }
-
-        if (headCollider != null) {
-            RaycastHit raycastHit = new RaycastHit();
-            if (headCollider.Raycast(damage.bullet.ray, out raycastHit, 100f)) {
-                // Debug.LogError("Headshot!");
-                damage.amount *= 10f;
-            }
-        }
-
-        return new DamageResult {
-            damageAmount = damage.amount,
-            damage = damage
-        };
     }
     public DamageResult TakeExplosionDamage(ExplosionDamage explosion) {
         return new DamageResult {
@@ -159,5 +195,7 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         this.health = state.health;
         // this.fullHealthAmount = state.fullHealthAmount();
         this.hitState = state.hitState;
+        this.armorLevel = state.armorLevel;
+        Debug.Log($"{transform.root.gameObject} loading character hurtable {state.armorLevel}");
     }
 }

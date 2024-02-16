@@ -33,6 +33,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         return PerkFullHealthAmount();
     }
     public HitState hitState { get; set; }
+    public int armorLevel { get; set; }
+
 
     // stats
     public int cyberlegsLevel;
@@ -153,10 +155,11 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             // headSkin = "security",
             allGuns = allGuns,
             allItems = allItems,
-            primaryGun = sword,
-            // primaryGun = new WeaponState(gunState1),
+            // primaryGun = sword,
+            primaryGun = new WeaponState(gunState1),
             // secondaryGun = null,
-            secondaryGun = new WeaponState(gunState2),
+            // secondaryGun = new WeaponState(gunState2),
+            secondaryGun = sword,
             // tertiaryGun = null,
             tertiaryGun = new WeaponState(gunState3),
             activeGun = -1,
@@ -216,7 +219,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         bodySkin = template.bodySkin,
         headSkin = template.headSkin,
         etiquettes = template.etiquettes,
-        portrait = template.portrait
+        portrait = template.portrait,
+        armorLevel = template.armorLevel
     };
 
     public void ResetTemporaryState() {

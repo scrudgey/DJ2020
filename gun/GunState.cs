@@ -120,6 +120,9 @@ public class GunState : IGunStatProvider {
     public float getRange() {
         return template.range;
     }
+    public int getPiercing() {
+        return template.piercing;
+    }
 
     public float getLockOnSize() {
         return template.lockOnSize;

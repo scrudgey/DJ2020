@@ -286,7 +286,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
                 damage = gunInstance.getBaseDamage(),
                 range = gunInstance.getRange(),
                 gunPosition = gunPosition,
-                source = transform.position
+                source = transform.position,
+                piercing = gunInstance.getPiercing()
             };
             bullet.DoImpacts(transform.root);
             // Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
@@ -343,7 +344,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
 
         // play sound
         NoiseData noiseData = gunInstance.GetShootNoise() with {
-            ray = bullet.ray
+            ray = bullet.ray,
+            relevantParties = new HashSet<Transform>() { transform.root }
         };
         noiseData.player = isPlayerCharacter;
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);

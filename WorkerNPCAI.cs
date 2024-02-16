@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using KinematicCharacterController;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -103,6 +104,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public void OnPoolActivate() {
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
+        alertHandler.gameObject.SetActive(true);
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;
@@ -111,7 +113,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         lastHeardPlayerPosition = null;
 
         lastSuspicionLevel = Suspiciousness.normal;
-        alertHandler.enabled = true;
+        alertHandler.gameObject.SetActive(false);// = true;
         speechTextController.enabled = true;
         stateMachine = new WorkerNPCBrain();
 
@@ -206,6 +208,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 guardNotified = true;
                 EnterDefaultState();
                 break;
+            case WorkerSearchDirectionState:
             case WorkerLoiterState:
                 EnterDefaultState();
                 break;
@@ -290,12 +293,19 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                     ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                     break;
             }
-        } else { // not player
+        } else {
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
                 if (noise.data.suspiciousness == Suspiciousness.suspicious) {
                     SuspicionRecord record = SuspicionRecord.noiseSuspicion();
                     GameManager.I.AddSuspicionRecord(record);
+                    switch (stateMachine.currentState) {
+                        case WorkerGuardState:
+                        case WorkerLoiterState:
+                            alertHandler.ShowWarn();
+                            ChangeState(new WorkerSearchDirectionState(this, noise, characterController));
+                            break;
+                    }
                 } else if (noise.data.suspiciousness == Suspiciousness.aggressive) {
                     SuspicionRecord record = SuspicionRecord.explosionSuspicion();
                     GameManager.I.AddSuspicionRecord(record);
@@ -307,6 +317,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                         case WorkerHeldAtGunpointState:
                         case WorkerLoiterState:
                             alertHandler.ShowAlert(useWarnMaterial: true);
+                            Debug.Log($"worker react to attack state");
                             ChangeState(new WorkerReactToAttackState(this, speechTextController, noise, characterController));
                             break;
                     }
@@ -360,7 +371,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
+                if (bulletImpact.impacted.IsChildOf(transform)) {
 
                 } else {
                     alertHandler.ShowAlert(useWarnMaterial: true);
@@ -457,9 +468,22 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
 
     public DamageResult TakeDamage(Damage damage) {
-        alertHandler.ShowAlert(useWarnMaterial: true);
+        // alertHandler.ShowAlert(useWarnMaterial: true);
         // TODO: change state
         // ChangeState(new CivilianReactToAttackState(this, speechTextController, damage, characterController));
         return DamageResult.NONE;
     }
+
+
+#if UNITY_EDITOR
+    void OnDrawGizmos() {
+        if (stateMachine != null) {
+            string labelText = $"state: {stateMachine.currentStateName}";
+            Handles.Label(transform.position, labelText);
+
+            // string customName = "Relic\\MaskedSpider.png";
+            // Gizmos.DrawIcon(getLocationOfInterest(), customName, true);
+        }
+    }
+#endif
 }

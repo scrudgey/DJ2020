@@ -14,6 +14,7 @@ public class NPCState : ICharacterHurtableState { //IGunHandlerState
     // health
     public float health { get; set; }
     public float fullHealthAmount { get; set; }
+    public int armorLevel { get; set; }
     public HitState hitState { get; set; }
 
     public static NPCState Instantiate(NPCTemplate template) => new NPCState {
@@ -24,7 +25,8 @@ public class NPCState : ICharacterHurtableState { //IGunHandlerState
         activeGun = 0,
         health = template.fullHealthAmount,
         fullHealthAmount = template.fullHealthAmount,
-        hitState = template.hitState
+        hitState = template.hitState,
+        armorLevel = template.armorLevel
     };
 
     public void ApplyState(GameObject npcObject) {
