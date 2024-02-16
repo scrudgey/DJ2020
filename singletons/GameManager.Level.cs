@@ -90,10 +90,12 @@ public partial class GameManager : Singleton<GameManager> {
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
+        NPCSpawnPoint[] nPCSpawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>();
+
         // spawn NPC
         if (spawnNpcs) {
-            while (state.delta.npcCount < state.template.maxInitialNPC) {
-                foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).OrderBy(a => Guid.NewGuid()).ToList()) {
+            while (nPCSpawnPoints.Length > 0 && state.delta.npcCount < state.template.maxInitialNPC) {
+                foreach (NPCSpawnPoint spawnPoint in nPCSpawnPoints.Where(spawn => !spawn.isStrikeTeamSpawn).OrderBy(a => Guid.NewGuid()).ToList()) {
                     if (state.delta.npcCount >= state.template.maxInitialNPC) continue;
                     GameObject npc = spawnPoint.SpawnTemplated();
                     CharacterController controller = npc.GetComponentInChildren<CharacterController>();

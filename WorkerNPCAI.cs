@@ -22,6 +22,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public AlertHandler alertHandler;
     public SightCone sightCone;
     public CharacterController characterController;
+    public CharacterHurtable characterHurtable;
     public GunHandler gunHandler;
     public KinematicCharacterMotor motor;
     public SpeechTextController speechTextController;
@@ -100,11 +101,26 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     void Start() {
         gunHandler.Holster();
         StartCoroutine(Toolbox.RunJobRepeatedly(findNearby));
+        characterHurtable.OnHitStateChanged += HandleHitStateChange;
+    }
+    override public void OnDestroy() {
+        base.OnDestroy();
+        characterHurtable.OnHitStateChanged -= HandleHitStateChange;
+    }
+    void HandleHitStateChange(Destructible destructible) {
+        // Debug.Log($"hit state change: {destructible.hitState}");
+        if (destructible.hitState == HitState.dead) {
+            // alertHandler.enabled = false;
+            // speechTextController.enabled = false;
+            alertHandler.gameObject.SetActive(false);
+            speechTextController.gameObject.SetActive(false);
+        }
     }
     public void OnPoolActivate() {
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
         alertHandler.gameObject.SetActive(true);
+        speechTextController.gameObject.SetActive(true);
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;
@@ -418,6 +434,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             stateMachine.currentState.OnPlayerPerceived();
             if (playerHasGunOut) {
                 switch (stateMachine.currentState) {
+                    case WorkerSearchDirectionState:
                     case WorkerGuardState:
                     case WorkerLoiterState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
@@ -426,6 +443,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 }
             } else if (playerTotalSuspicion == Suspiciousness.aggressive) {
                 switch (stateMachine.currentState) {
+                    case WorkerSearchDirectionState:
                     case WorkerGuardState:
                     case WorkerLoiterState:
                         alertHandler.ShowAlert(useWarnMaterial: true);
@@ -439,6 +457,7 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                 }
             } else if (playerTotalSuspicion == Suspiciousness.suspicious) {
                 switch (stateMachine.currentState) {
+                    case WorkerSearchDirectionState:
                     case WorkerGuardState:
                     case WorkerLoiterState:
                         alertHandler.ShowAlert(useWarnMaterial: true);

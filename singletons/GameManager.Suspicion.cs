@@ -53,7 +53,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public bool PlayerHasGunOut() {
-        return playerGunHandler.gunInstance != null;
+        return playerGunHandler.gunInstance != null || playerMeleeHandler.meleeWeapon != null;
     }
 
     public SensitivityLevel GetCurrentSensitivity() =>

@@ -103,8 +103,10 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void HandleHitStateChange(Destructible destructible) {
         // Debug.Log($"hit state change: {destructible.hitState}");
         if (destructible.hitState == HitState.dead) {
-            alertHandler.enabled = false;
-            speechTextController.enabled = false;
+            // alertHandler.enabled = false;
+            // speechTextController.enabled = false;
+            alertHandler.gameObject.SetActive(false);
+            speechTextController.gameObject.SetActive(false);
         }
     }
 
@@ -735,7 +737,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
         alertHandler.gameObject.SetActive(true);// = true;
-
+        speechTextController.gameObject.SetActive(true);
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;

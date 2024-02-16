@@ -3665,12 +3665,14 @@ more equipment to bring on mission?
 
 
 
-better NPC reaction to being hurt
+* better NPC reaction to being hurt
     * cries from those hit should alert others
-    hide text
-    *? alert icon is visible during death sequence
-    guard behavior is weird
-    scientists don't react to others dying
+    * hide text
+    * alert icon is visible during death sequence
+    * guard behavior is weird
+    * scientists don't react to others dying
+
+
 
 
 armor piercing ammo to be indicated somewhere in the gun info display
