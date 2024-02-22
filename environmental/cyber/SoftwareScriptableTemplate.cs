@@ -8,13 +8,15 @@ public class SoftwareScriptableTemplate : ScriptableObject {
     public List<SoftwareEffect> effects;
     public int maxCharges;
     public Sprite icon;
+    public List<SoftwareCondition> conditions;
     public SoftwareTemplate ToTemplate() {
         return new SoftwareTemplate() {
             name = name,
             effects = effects,
             maxCharges = maxCharges,
             icon = icon,
-            principalType = principalType
+            principalType = principalType,
+            conditions = conditions
         };
     }
 

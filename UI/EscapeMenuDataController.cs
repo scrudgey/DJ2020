@@ -55,7 +55,7 @@ public class EscapeMenuDataController : MonoBehaviour {
 
     void PopulateView(PayData data) {
         viewIcon.enabled = true;
-        viewIcon.sprite = graphIconReference.DataSprite(data.type);
+        viewIcon.sprite = graphIconReference.DataSprite(data.type, true);
 
         viewTitle.text = $"{data.filename}";
         viewDescription.text = $"{data.type}";

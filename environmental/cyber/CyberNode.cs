@@ -15,6 +15,7 @@ public class CyberNode : Node<CyberNode> {
     public bool dataStolen;
     public bool utilityActive;
     public bool isManualHackerTarget;
+    public bool datafileVisibility;
     public CyberNodeStatus status;
     [System.NonSerialized]
     [XmlIgnore]

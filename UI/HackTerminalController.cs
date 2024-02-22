@@ -103,6 +103,7 @@ public class HackTerminalController : MonoBehaviour {
     }
     public void DeploySoftware(SoftwareState state) {
         Debug.Log($"deploying software {state.template.name}");
+        state.charges -= 1;
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
     }

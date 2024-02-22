@@ -15,7 +15,7 @@ public class DataEntryButton : MonoBehaviour {
     public void Configure(Action<PayData> callback, PayData data) {
         this.callback = callback;
         this.data = data;
-        icon.sprite = graphIconReference.DataSprite(data.type);
+        icon.sprite = graphIconReference.DataSprite(data.type, true);
         nameText.text = $"{data.filename}";
     }
     public void Clicked() {

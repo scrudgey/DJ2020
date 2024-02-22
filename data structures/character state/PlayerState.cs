@@ -149,6 +149,9 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             SoftwareScriptableTemplate.Load("scan"),
             SoftwareScriptableTemplate.Load("crack"),
             SoftwareScriptableTemplate.Load("exploit"),
+            SoftwareScriptableTemplate.Load("scanData"),
+            SoftwareScriptableTemplate.Load("scanEdges"),
+            SoftwareScriptableTemplate.Load("scanNode"),
         };
         List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
 

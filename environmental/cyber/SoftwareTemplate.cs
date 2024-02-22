@@ -7,6 +7,8 @@ public class SoftwareTemplate {
     public List<SoftwareEffect> effects;
     public int maxCharges;
     public Sprite icon;
+    public List<SoftwareCondition> conditions;
+
     public SoftwareTemplate() { }
     public static SoftwareTemplate Download() {
         return new SoftwareTemplate() {

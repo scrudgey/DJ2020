@@ -7,6 +7,25 @@ make entire cyberdeck pane fill right side of screen
 configure cyberdeck before mission
 
 
+what parameters of software?
+    type: targeted, virus
+    charges: number, max, unlimited
+    upload time
+    effects:
+        reveal node type
+        reveal node edges
+        reveal datafile
+        crack password
+        exploit
+        disable utility
+        "cover trakcs"
+    conditions:
+        limit on node type          (likely for exploits?)
+        limit on node encryption    (likely for crack?)
+        limit on hops
+    timed vs. permanent
+
+
 
 ## the terminal paradigm
 
@@ -467,10 +486,8 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 # todo
 
 * when a node is compromised, show hack button
-
 * when hack button is clicked, set hack origin
-
-when hack origin is set: 
+* when hack origin is set: 
     * show indicator
     * show terminal
     * show terminal conditionally
@@ -514,39 +531,27 @@ when hack origin is set:
 * handle downloads
 * display max hops in terminal
 * hack button should hide when selected target is too far away
+* apply conditions
+* apply charges
+* explain effects
+* explain conditions
+* explain charges
+* explain disabled/non
+* show status bar in overlay
+* separate scan from scan edges from scan datafile
+* software selector mouseover too close to disabled
+
+
+
+effect when revealing nodes
+effect when revealing edges
+shouldn't have to hack a compromised node to download file
+
+
 
 terminal effect
     player input is typed slowly with sound effects
     responses are blitted rapidly with small pause between newlines
     blinking cursor
 
-what parameters of software?
-    type: targeted, virus
-    charges: number, max, unlimited
-    upload time
-    effects:
-        reveal node type
-        reveal node edges
-        reveal datafile
-        crack password
-        exploit
-        disable utility
-        "cover trakcs"
-    conditions:
-        limit on node type          (likely for exploits?)
-        limit on node encryption    (likely for crack?)
-        limit on hops
-    timed vs. permanent
-
-
-
-apply conditions
-explain effects
-explain conditions
-
-effect when revealing nodes
-effect when revealing edges
-
-separate scan from scan edges from scan datafile
-
-show status bar in overlay
+    

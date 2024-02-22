@@ -44,7 +44,7 @@ public class NodeDataInfoDisplay : MonoBehaviour {
         creditIndicator.SetActive(data.type == PayData.DataType.pay);
         valueamount.gameObject.SetActive(data.type == PayData.DataType.pay);
         icon.enabled = true;
-        icon.sprite = iconReference.DataSprite(data.type);
+        icon.sprite = iconReference.DataSprite(data.type, true);
         // icon.sprite = data.type switch {
         //     PayData.DataType.location => iconLocation,
         //     PayData.DataType.objective => iconObjective,

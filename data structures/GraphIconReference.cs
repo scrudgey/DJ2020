@@ -52,7 +52,7 @@ public class GraphIconReference : ScriptableObject {
             case CyberNodeType.normal:
                 return normalIcon;
             case CyberNodeType.datanode:
-                return DataSprite(node.payData.type);
+                return DataSprite(node.payData.type, node.datafileVisibility);
             case CyberNodeType.utility:
                 return utilityIcon;
             case CyberNodeType.WAN:
@@ -87,15 +87,20 @@ public class GraphIconReference : ScriptableObject {
         }
     }
 
-    public Sprite DataSprite(PayData.DataType dataType) {
-        return dataType switch {
-            PayData.DataType.location => iconLocation,
-            PayData.DataType.objective => iconObjective,
-            PayData.DataType.password => iconPassword,
-            PayData.DataType.pay => iconPay,
-            PayData.DataType.personnel => iconPersonnel,
-            PayData.DataType.unknown => iconGenericData,
-            _ => iconPay
-        };
+    public Sprite DataSprite(PayData.DataType dataType, bool dataVisible) {
+        if (dataVisible) {
+            return dataType switch {
+                PayData.DataType.location => iconLocation,
+                PayData.DataType.objective => iconObjective,
+                PayData.DataType.password => iconPassword,
+                PayData.DataType.pay => iconPay,
+                PayData.DataType.personnel => iconPersonnel,
+                PayData.DataType.unknown => iconGenericData,
+                _ => iconGenericData
+            };
+        } else {
+            return iconGenericData;
+        }
+
     }
 }

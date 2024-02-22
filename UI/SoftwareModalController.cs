@@ -22,14 +22,15 @@ public class SoftwareModalController : MonoBehaviour {
     void HandleSelectedChange(SoftwareSelector newSelector) {
         activeSelector = newSelector;
         if (activeSelector != null) {
-            deployButton.interactable = true;
+            deployButton.interactable = activeSelector.softwareEnabled;
         } else {
             deployButton.interactable = false; ;
         }
     }
     public void Initialize(HackTerminalController terminalController) {
         this.terminalController = terminalController;
-        modalView.Initialize(GameManager.I.gameData.playerState);
+        CyberNode target = terminalController.hackTarget != null ? terminalController.hackTarget.node : null;
+        modalView.Initialize(GameManager.I.gameData.playerState, target);
     }
     public void CancelCalback() {
         GameManager.I.CloseMenu();

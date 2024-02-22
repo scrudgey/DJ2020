@@ -12,12 +12,15 @@ public class SoftwareView : MonoBehaviour {
     public Image titleIcon;
     public TextMeshProUGUI viewTitle;
     public TextMeshProUGUI viewDescription;
+    public TextMeshProUGUI viewRequirements;
     public TextMeshProUGUI viewCharges;
     public Action<SoftwareSelector> onSelectorChange;
     PlayerState playerState;
     public SoftwareSelector activeSelector;
-    public void Initialize(PlayerState playerState) {
+    CyberNode target;
+    public void Initialize(PlayerState playerState, CyberNode target) {
         this.playerState = playerState;
+        this.target = target;
         PopulateSoftwareList();
     }
     void PopulateSoftwareList() {
@@ -35,7 +38,7 @@ public class SoftwareView : MonoBehaviour {
     SoftwareSelector CreateSoftwareSelector(SoftwareState softwareState) {
         GameObject obj = GameObject.Instantiate(softwareSelectorPrefab);
         SoftwareSelector selector = obj.GetComponent<SoftwareSelector>();
-        selector.Initialize(softwareState, SelectorClickCallback);
+        selector.Initialize(softwareState, SelectorClickCallback, target);
         selector.transform.SetParent(selectorList, false);
         return selector;
     }
@@ -45,8 +48,27 @@ public class SoftwareView : MonoBehaviour {
         // set view 
         titleIcon.sprite = state.template.icon;
         viewTitle.text = state.template.name;
-        viewDescription.text = "description goes here";
-        viewCharges.text = "1/1";
+
+        string description = "";
+        foreach (SoftwareEffect effect in state.template.effects) {
+            description += effect.DescriptionString() + "\n";
+        }
+        viewDescription.text = description;
+
+        string requirements = "requirements:\n";
+        if (target != null) {
+            if (state.template.conditions.Count == 0) {
+                requirements += "none";
+            } else {
+                foreach (SoftwareCondition condition in state.template.conditions) {
+                    requirements += condition.DescriptionString(target) + "\n";
+                }
+            }
+
+        }
+        viewRequirements.text = requirements;
+
+        viewCharges.text = $"charges: {state.charges}/{state.template.maxCharges}";
         onSelectorChange?.Invoke(selector);
     }
 

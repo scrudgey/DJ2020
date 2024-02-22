@@ -302,6 +302,7 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.ShowMissionSelector(gameData);
                 break;
             case MenuType.softwareModal:
+                uiController.ShowUI();
                 uiController.ShowSoftwareDeployModal();
                 Time.timeScale = 0f;
                 break;

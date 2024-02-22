@@ -35,7 +35,7 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
 
         if (indicator.node.lockLevel > 0) {
 
-        } else if (indicator.node.type == CyberNodeType.datanode && indicator.node.payData != null) {
+        } else if (node.datafileVisibility && indicator.node.type == CyberNodeType.datanode && indicator.node.payData != null) {
             dataInfoDisplay.Configure(indicator.node.payData, indicator.node.dataStolen);
             dataInfoDisplay.gameObject.SetActive(true);
             utilityInterfaceDisplay.gameObject.SetActive(false);
