@@ -11,6 +11,7 @@ public class GraphIconReference : ScriptableObject {
     public Sprite utilityIcon;
     public Sprite mysteryIcon;
     public Sprite lockIcon;
+    public Sprite skullAndBonesIcon;
     [Header("power sprites")]
     public Sprite normalPowerIcon;
     public Sprite powerSourceIcon;
@@ -33,6 +34,11 @@ public class GraphIconReference : ScriptableObject {
     public Sprite physicalKey;
     public Sprite keyCard;
     public Sprite password;
+    [Header("UI")]
+    public Sprite scanIcon;
+    public Sprite downloadIcon;
+    public Sprite unlockIcon;
+    public Sprite compromiseIcon;
 
     public Sprite CyberNodeSprite(CyberNode node) {
         // if (node.lockLevel > 0) {

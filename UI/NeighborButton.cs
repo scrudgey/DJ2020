@@ -14,7 +14,7 @@ public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public TextMeshProUGUI text;
     string idn;
     EdgeVisibility edgeVisibility;
-    public void Configure<T, U, V>(NodeInfoPaneDisplay<T, U, V> display, Node<U> neighbor, EdgeVisibility visibility) where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
+    public void Configure<T, U, V>(NodeInfoPaneDisplay<T, U, V> display, Node<U> neighbor, EdgeVisibility visibility, NodeVisibility nodeVisibility) where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
         // this.display = display;
         neighborClick = display.NeighborButtonClick;
         neighborMouseover = display.NeighborButtonMouseOver;
@@ -22,7 +22,7 @@ public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         this.idn = neighbor.idn;
         this.edgeVisibility = visibility;
         text.text = neighbor.idn.Substring(0, 10);
-        if (visibility == EdgeVisibility.unknown) {
+        if (visibility == EdgeVisibility.unknown || nodeVisibility < NodeVisibility.known) {
             MakeInactive();
         }
     }

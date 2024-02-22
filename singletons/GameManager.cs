@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
-public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop, perkMenu }
+public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop, perkMenu, softwareModal }
 public enum OverlayType { none, power, cyber, alarm, limitedCyber }
 public enum CursorType { none, gun, pointer, hand }
 public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
@@ -301,6 +301,10 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.HideUI();
                 uiController.ShowMissionSelector(gameData);
                 break;
+            case MenuType.softwareModal:
+                uiController.ShowSoftwareDeployModal();
+                Time.timeScale = 0f;
+                break;
         }
     }
     public void CloseMenu() {
@@ -357,6 +361,9 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.missionSelect:
                 uiController.HideMissionSelector();
+                break;
+            case MenuType.softwareModal:
+                uiController.HideSoftwareDeployModal();
                 break;
         }
         Time.timeScale = 1f;

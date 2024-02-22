@@ -9,6 +9,7 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
     public GameObject neighborContainer;
     public Transform neighborbuttonContainer;
     public GameObject neighborButtonPrefab;
+    public ColorBlock neighborButtonColorBlock;
     [HideInInspector]
     public U node;
     [HideInInspector]
@@ -32,8 +33,9 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
             }
         } else {
             ConfigureNode();
-            ConfigureNeighbors(graph);
         }
+        ConfigureNeighbors(graph);
+
     }
     public abstract void ConfigureNode();
     public abstract void ConfigureMysteryNode();
@@ -45,9 +47,13 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
             foreach (string neighborId in graph.edges[node.idn]) {
                 U neighborNode = graph.nodes[neighborId];
                 GameObject obj = GameObject.Instantiate(neighborButtonPrefab) as GameObject;
+
+                Button uiButton = obj.GetComponent<Button>();
+                uiButton.colors = neighborButtonColorBlock;
+
                 obj.transform.SetParent(neighborbuttonContainer, false);
                 NeighborButton button = obj.GetComponent<NeighborButton>();
-                button.Configure(this, neighborNode, graph.edgeVisibility[(node.idn, neighborId)]);
+                button.Configure(this, neighborNode, graph.edgeVisibility[(node.idn, neighborId)], node.visibility);
             }
             neighborContainer.SetActive(true);
         } else {

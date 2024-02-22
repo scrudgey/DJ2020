@@ -22,11 +22,11 @@ public class CyberdeckHackProgressBar : MonoBehaviour {
 
     public void Initialize(NetworkAction action) {
         this.networkAction = action;
-        if (action.effect.type == SoftwareEffect.Type.download) {
-            progressBar.gameObject.SetActive(false);
-        } else {
-            progressBarOpposite.gameObject.SetActive(false);
-        }
+        // if (action.effect.type == SoftwareEffect.Type.download) {
+        // progressBar.gameObject.SetActive(false);
+        // } else {
+        progressBarOpposite.gameObject.SetActive(false);
+        // }
 
         targetIcon.sprite = icons.CyberNodeSprite(action.toNode);
         targetNameCaption.text = action.toNode.nodeTitle;

@@ -13,9 +13,8 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     HashSet<string> neighborEdge;
     Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<(string, string), LineRenderer> soloLineRenders = new Dictionary<(string, string), LineRenderer>();
-    // Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     Dictionary<HashSet<string>, LineRenderer> marchingAntsRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
-    // Dictionary<string[], LineRenderer> lineRendererArrays = new Dictionary<string[], LineRenderer>();
+    Dictionary<HashSet<string>, LineRenderer> partialLineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
     protected V mousedOverIndicator;
     public OverlayHandler overlayHandler;
@@ -213,6 +212,19 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             string[] edges = edge.ToArray();
             renderer.name = $"marchingants_{edges[0]}_{edges[1]}";
             marchingAntsRenderers[edge] = renderer;
+            return renderer;
+        }
+    }
+    protected LineRenderer GetPartialLineRenderer(HashSet<string> edge) {
+        if (partialLineRenderers.ContainsKey(edge)) {
+            return partialLineRenderers[edge];
+        } else {
+            LineRenderer renderer = InitializeLineRenderer();
+            renderer.textureMode = LineTextureMode.Stretch;
+            renderer.material = Resources.Load("materials/partialLine") as Material;
+            string[] edges = edge.ToArray();
+            renderer.name = $"partial_{edges[0]}_{edges[1]}";
+            partialLineRenderers[edge] = renderer;
             return renderer;
         }
     }

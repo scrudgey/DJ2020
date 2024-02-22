@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Items;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -55,6 +56,9 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     public int gunSkillPoints;
     public int hackSkillPoints;
     public int speechSkillPoints;
+
+    public List<SoftwareTemplate> softwareTemplates;
+    public List<SoftwareState> softwareStates;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
@@ -141,6 +145,15 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         // };
         List<string> perks = new List<string>();
 
+        List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
+            SoftwareScriptableTemplate.Load("scan"),
+            SoftwareScriptableTemplate.Load("crack"),
+            SoftwareScriptableTemplate.Load("exploit"),
+        };
+        List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
+
+        List<SoftwareState> softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
+
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
@@ -191,7 +204,10 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
             // activePerks = new List<string>(),
             activePerks = perks,
-            skillpoints = 0
+            skillpoints = 0,
+
+            softwareTemplates = softwareTemplates,
+            softwareStates = softwareStates
         };
     }
 
@@ -227,6 +243,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         primaryGun?.ResetTemporaryState();
         secondaryGun?.ResetTemporaryState();
         tertiaryGun?.ResetTemporaryState();
+
+        softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
     }
     public int PlayerLevel() {
         return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;

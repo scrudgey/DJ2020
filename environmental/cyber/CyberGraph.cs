@@ -151,7 +151,6 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         foreach (string idn in pathids) {
             output.Add(nodes[idn]);
         }
-        // Debug.Log($"DFS output: {pathids.Count}");
         return output;
     }
     public List<CyberNode> GetPathToNearestCompromised(CyberNode origin) {
@@ -161,7 +160,15 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         foreach (string idn in pathids) {
             output.Add(nodes[idn]);
         }
-        // Debug.Log($"DFS output: {pathids.Count}");
+        return output;
+    }
+    public List<CyberNode> GetPath(CyberNode origin, CyberNode destination) {
+        HashSet<string> pathids = DFS(origin, new HashSet<string>(), new HashSet<string>(),
+            (CyberNode node) => node == destination);
+        List<CyberNode> output = new List<CyberNode>();
+        foreach (string idn in pathids) {
+            output.Add(nodes[idn]);
+        }
         return output;
     }
 

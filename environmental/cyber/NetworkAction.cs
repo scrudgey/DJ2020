@@ -9,7 +9,7 @@ using UnityEngine;
 [System.Serializable]
 public class NetworkAction {
     public string title;
-    public SoftwareEffect effect;
+    public SoftwareTemplate softwareTemplate;
     public float timer;
     public float lifetime;
     public CyberNode toNode;
@@ -27,6 +27,8 @@ public class NetworkAction {
 
     void DoComplete(CyberGraph graph) {
         complete = true;
-        effect.ApplyToNode(toNode, graph);
+        foreach (SoftwareEffect effect in softwareTemplate.effects) {
+            effect.ApplyToNode(toNode, graph);
+        }
     }
 }

@@ -46,9 +46,9 @@ public class CyberdeckUIController : MonoBehaviour {
     public void Refresh(NeoCyberNodeIndicator indicator) {
         this.indicator = indicator;
         if (indicator == null) return;
-        foreach (SoftwareButton button in buttons.Concat(builtInButtons)) {
-            button.Configure(indicator.node, graph);
-        }
+        // foreach (SoftwareButton button in buttons.Concat(builtInButtons)) {
+        //     button.Configure(indicator.node, graph);
+        // }
     }
 
     public void Show() {
@@ -85,8 +85,8 @@ public class CyberdeckUIController : MonoBehaviour {
         GameObject obj = GameObject.Instantiate(softwareButtonPrefab);
         obj.transform.SetParent(softwareContainer, false);
         SoftwareButton button = obj.GetComponent<SoftwareButton>();
-        button.effect = effect;
-        button.Initialize(this);
+        // button.effect = effect;
+        // button.Initialize(effect);
         buttons.Add(button);
     }
 
@@ -115,8 +115,8 @@ public class CyberdeckUIController : MonoBehaviour {
         if (indicator == null) { return; }
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
         if (!graph.networkActions.ContainsKey(indicator.node) || graph.networkActions[indicator.node].Count() < 1) {
-            NetworkAction networkAction = button.GetNetworkAction(indicator.node, graph);
-            graph.AddNetworkAction(networkAction);
+            // NetworkAction networkAction = button.GetNetworkAction(indicator.node, graph);
+            // graph.AddNetworkAction(networkAction);
             GameManager.I.RefreshCyberGraph();
             handler.NodeSelectCallback(indicator);
             Toolbox.RandomizeOneShot(overlayHandler.audioSource, startDownloadSound);
@@ -155,11 +155,11 @@ public class CyberdeckUIController : MonoBehaviour {
         // cyberOverlay.
         CyberNode node = overlayHandler.selectedCyberNodeIndicator.node;
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
-        cyberOverlay.DrawThreat(button.GetNetworkAction(node, graph));
+        // cyberOverlay.DrawThreat(button.GetNetworkAction(node, graph));
     }
     public void SoftwareButtonMouseExit(SoftwareButton button) {
         CyberNode node = overlayHandler.selectedCyberNodeIndicator.node;
         CyberGraph graph = GameManager.I.gameData.levelState.delta.cyberGraph;
-        cyberOverlay.EraseThreat(button.GetNetworkAction(node, graph));
+        // cyberOverlay.EraseThreat(button.GetNetworkAction(node, graph));
     }
 }

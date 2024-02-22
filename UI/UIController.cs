@@ -41,6 +41,7 @@ public class UIController : MonoBehaviour {
     public WeaponWheelController weaponWheelController;
     public TargetPracticeUIHandler targetPracticeUIHandler;
     public UIStatusBarHandler statusBarHandler;
+    public SoftwareModalController softwareModalController;
     public bool mouseOverScrollBox;
     bool burglarMode;
     void Awake() {
@@ -79,6 +80,7 @@ public class UIController : MonoBehaviour {
         weaponWheelController.Initialize();
         targetPracticeUIHandler.canvas.enabled = false;
         statusBarHandler.Initialize();
+        HideSoftwareDeployModal();
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
@@ -169,6 +171,12 @@ public class UIController : MonoBehaviour {
     public void HideVRStats() {
         if (vRStatHandler == null) return;
         vRStatHandler?.gameObject.SetActive(false);
+    }
+    public void ShowSoftwareDeployModal() {
+        softwareModalController.gameObject.SetActive(true);
+    }
+    public void HideSoftwareDeployModal() {
+        softwareModalController.gameObject.SetActive(false);
     }
     public void HideUI() {
         HideVRStats();

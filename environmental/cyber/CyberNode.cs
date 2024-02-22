@@ -40,11 +40,17 @@ public class CyberNode : Node<CyberNode> {
         }
     }
     public CyberNodeStatus getStatus() {
+        // if (compromised) {
+        //     return CyberNodeStatus.compromised;
+        // } else if (isManualHackerTarget && status < CyberNodeStatus.vulnerable) {
+        //     return CyberNodeStatus.vulnerable;
+        // } else return status;
+
         if (compromised) {
             return CyberNodeStatus.compromised;
-        } else if (isManualHackerTarget && status < CyberNodeStatus.vulnerable) {
+        } else if (lockLevel <= 0) {
             return CyberNodeStatus.vulnerable;
-        } else return status;
+        } else return CyberNodeStatus.invulnerable;
     }
     public CyberNode() { }
 

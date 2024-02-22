@@ -33,7 +33,7 @@ public class MeleeWeaponUIHandler : IBinder<MeleeHandler> {
         }
     }
     public void Initialize() {
-        // displayIsOpen = true;
+        displayIsOpen = true;
     }
 
     IEnumerator openDisplay() {

@@ -39,6 +39,10 @@ public class OverlayHandler : MonoBehaviour {
     public CyberNodeInfoPaneDisplay cyberInfoPaneDisplay;
     public PowerNodeInfoDisplay powerInfoPaneDisplay;
     public AlarmNodeInfoDisplay alarmInfoPaneDisplay;
+    [Header("info pane rects")]
+    public RectTransform cyberNodeInfoRect;
+    public RectTransform powerNodeInfoRect;
+    public RectTransform alarmNodeInfoRect;
     public NodeSelectionIndicator selectionIndicator;
     public NodeMouseOverIndicator mouseOverIndicator;
     public UIController uIController;
@@ -52,8 +56,9 @@ public class OverlayHandler : MonoBehaviour {
     public AudioClip[] nodeSelectSound;
     [Header("cyberdeck")]
     public CyberdeckUIController cyberdeckController;
-
-    GameObject activeInfoPane;
+    public NeoCyberNodeIndicator selectedHackOrigin;
+    public List<CyberNode> hackOriginToPathTarget;
+    RectTransform activeInfoPane;
     Coroutine showInfoRoutine;
     public Camera cam {
         get { return _cam; }
@@ -100,12 +105,18 @@ public class OverlayHandler : MonoBehaviour {
         SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
     }
     public void RefreshCyberGraph(CyberGraph graph) {
+        Debug.Log("overlay refresh cyber graph");
+
         cyberOverlay.cam = cam;
+        UpdateHackPath();
         cyberOverlay.Refresh(graph);
+        cyberOverlay.RefreshHackTerminal();
+        // cyberOverlay.ConfigureHackTerminal(selectedHackOrigin, selectedCyberNodeIndicator);
         if (selectedCyberNodeIndicator != null) {
             cyberdeckController.Refresh(selectedCyberNodeIndicator);
             cyberInfoPaneDisplay.Configure(selectedCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
         }
+        // cyberInfoPaneDisplay.ConfigureHackTerminal(selectedHackOrigin, selectedCyberNodeIndicator);
         HandleCyberDeckChange(selectedCyberNodeIndicator);
         SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
@@ -250,24 +261,24 @@ public class OverlayHandler : MonoBehaviour {
         cyberOverlay.NeighborButtonMouseExit();
         powerOverlay.NeighborButtonMouseExit();
         alarmOverlay.NeighborButtonMouseExit();
-        GameObject infoPane = null;
+        RectTransform infoPane = null;
         switch (indicator) {
             case NeoCyberNodeIndicator cybernode:
                 selectedCyberNodeIndicator = cybernode;
                 if (GameManager.I.playerManualHacker.deployed) {
                     GameManager.I.playerManualHacker.Connect(cybernode.node);
                 }
-                infoPane = cyberInfoPaneDisplay.gameObject;
+                infoPane = cyberNodeInfoRect;
                 RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
                 break;
             case PowerNodeIndicator powernode:
                 selectedPowerNodeIndicator = powernode;
-                infoPane = powerInfoPaneDisplay.gameObject;
+                infoPane = powerNodeInfoRect;
                 RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
                 break;
             case AlarmNodeIndicator alarmnode:
                 selectedAlarmNodeIndicator = alarmnode;
-                infoPane = alarmInfoPaneDisplay.gameObject;
+                infoPane = alarmNodeInfoRect;
                 RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
                 break;
         }
@@ -276,23 +287,39 @@ public class OverlayHandler : MonoBehaviour {
             activeInfoPane = infoPane;
         }
     }
+    public void HackOriginSelectCallback(NeoCyberNodeIndicator newOrigin) {
+        if (newOrigin == selectedHackOrigin) return;
+        if (selectedHackOrigin != null) {
+            selectedHackOrigin.SetHackOrigin(false);
+        }
+        selectedHackOrigin = newOrigin;
+        if (selectedHackOrigin != null) {
+            selectedHackOrigin.SetHackOrigin(true);
+        }
+        RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
+    }
+
+    void UpdateHackPath() {
+        // TODO: shortest path
+        if (selectedHackOrigin == null || selectedCyberNodeIndicator == null) {
+            hackOriginToPathTarget = new List<CyberNode>();
+        } else {
+            hackOriginToPathTarget = GameManager.I.gameData.levelState.delta.cyberGraph.GetPath(selectedHackOrigin.node, selectedCyberNodeIndicator.node);
+            if (hackOriginToPathTarget.Count > 3) {
+                hackOriginToPathTarget = new List<CyberNode>();
+                // selectedHackOrigin = null;
+                HackOriginSelectCallback(null);
+            }
+        }
+    }
 
     void HandleCyberDeckChange(NeoCyberNodeIndicator cyberIndicator) {
         if (cyberIndicator == null) {
             MaybeHideCyberdeck();
         } else {
             CyberNode node = cyberIndicator.node;
-
-            // check if node is not discovered and there is a path from node to any compromised node or manual hacker target
-            if (node.visibility < NodeVisibility.known && GameManager.I.gameData.levelState.delta.cyberGraph.GetPathToNearestCompromised(node).Count > 0) {
-                cyberdeckController.Show();
-            } else if (node.getStatus() >= CyberNodeStatus.vulnerable) {
-                cyberdeckController.Show();
-            } else {
-                MaybeHideCyberdeck();
-            }
+            MaybeHideCyberdeck();
         }
-
     }
     void MaybeHideCyberdeck() {
         if (GameManager.I.gameData.levelState.delta.cyberGraph.ActiveNetworkActions().Count > 0) {
@@ -302,7 +329,7 @@ public class OverlayHandler : MonoBehaviour {
         }
     }
     public void NodeMouseOverCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
-        if (indicator != selectedNode) {
+        if (indicator != selectedNode && indicator != selectedHackOrigin) {
             mouseOverIndicator.ActivateSelection(indicator);
             Toolbox.RandomizeOneShot(audioSource, mouseOverSound);
         }
@@ -336,7 +363,7 @@ public class OverlayHandler : MonoBehaviour {
         mouseOverIndicator.HideSelection();
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
-    public void ShowInfoPane(GameObject infoPane) {
+    public void ShowInfoPane(RectTransform infoPane) {
         if (showInfoRoutine != null) {
             StopCoroutine(showInfoRoutine);
         }
@@ -356,12 +383,10 @@ public class OverlayHandler : MonoBehaviour {
         }
     }
 
-    IEnumerator EaseInInfoPane(bool value, GameObject pane) {
-        RectTransform infoPaneRect = pane.GetComponent<RectTransform>();
-
+    IEnumerator EaseInInfoPane(bool value, RectTransform infoPaneRect) {
         float y = infoPaneRect.anchoredPosition.y;
         float startX = infoPaneRect.anchoredPosition.x;
-        float finishX = value ? -550 : -14;
+        float finishX = value ? -575 : -14;
         yield return Toolbox.Ease(null, 0.5f, startX, finishX, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             infoPaneRect.anchoredPosition = new Vector2(amount, y);
         }, unscaledTime: true);

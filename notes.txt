@@ -3677,11 +3677,7 @@ more equipment to bring on mission?
 
 armor piercing ammo to be indicated somewhere in the gun info display
 
-hack v1.1
-    fixed number of slots in cyberdeck for consumable software
-    software has a number of charges, but default is 1
-    make entire cyberdeck pane fill right side of screen
-    configure cyberdeck before mission
+
 
 in-between montage
     unlock contacts
@@ -3721,3 +3717,6 @@ music
 circuitry hacking
 
 v2 of selling data / upgrading hack ability
+
+
+

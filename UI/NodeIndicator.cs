@@ -15,7 +15,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     protected U graph;
     Action<NodeIndicator<T, U>> onMouseOver;
     Action<NodeIndicator<T, U>> onMouseExit;
-    OverlayHandler overlayHandler;
+    protected OverlayHandler overlayHandler;
     public void Configure(T node, U graph, OverlayHandler overlayHandler, Action<NodeIndicator<T, U>> onMouseOver, Action<NodeIndicator<T, U>> onMouseExit) {
         this.node = node;
         this.overlayHandler = overlayHandler;

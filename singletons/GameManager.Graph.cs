@@ -25,6 +25,10 @@ public partial class GameManager : Singleton<GameManager> {
 
         gameData?.levelState?.delta.cyberGraph?.UpdateNetworkActions(Time.deltaTime);
     }
+    public void AddNetworkAction(NetworkAction networkAction) {
+        gameData.levelState.delta.cyberGraph.AddNetworkAction(networkAction);
+        RefreshCyberGraph();
+    }
     public void SetNodeEnabled<U>(Node<U> node, bool value) where U : Node<U> {
         if (applicationIsQuitting) return;
         node.setEnabled(value);
