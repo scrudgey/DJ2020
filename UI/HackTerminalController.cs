@@ -6,9 +6,11 @@ using UnityEngine;
 using UnityEngine.UI;
 public class HackTerminalController : MonoBehaviour {
     public RectTransform rectTransform;
-    public TextMeshProUGUI terminalContent;
+    // public TextMeshProUGUI terminalContent;
+    public TerminalAnimation terminalAnimation;
     public NeoCyberNodeIndicator hackOrigin;
     public NeoCyberNodeIndicator hackTarget;
+    public TerminalAnimation terminal;
     [Header("title")]
     public TextMeshProUGUI attackerTitle;
     public Image attackerIcon;
@@ -26,39 +28,45 @@ public class HackTerminalController : MonoBehaviour {
     Coroutine showRectRoutine;
     bool isHidden;
     List<CyberNode> path;
+    CyberNodeStatus currentCyberNodeStatus;
+    NodeVisibility currentNodeVisibility;
+    int currentLockLevel;
     public void ConfigureHackTerminal(NeoCyberNodeIndicator hackOrigin, NeoCyberNodeIndicator hackTarget, List<CyberNode> path) {
+        bool changeDetected = this.hackOrigin != hackOrigin || this.hackTarget != hackTarget;
+        if (changeDetected) {
+            terminalAnimation.Clear();
+        }
         this.hackOrigin = hackOrigin;
         this.hackTarget = hackTarget;
         this.path = path;
         modalController.Initialize(this);
 
-        // if (hackOrigin == null || hackOrigin == hackTarget) {
-        //     Hide();
-        // } else {
-        //     Show();
-        // }
+        if (hackTarget != null) {
+            CyberNodeStatus nodeStatus = hackTarget.node.getStatus();
+            changeDetected |= nodeStatus != currentCyberNodeStatus;
+            currentCyberNodeStatus = hackTarget.node.getStatus();
+
+            int lockLevel = hackTarget.node.lockLevel;
+            changeDetected |= lockLevel != currentLockLevel;
+            currentLockLevel = lockLevel;
+
+            NodeVisibility visibility = hackTarget.node.visibility;
+            changeDetected |= visibility != currentNodeVisibility;
+            currentNodeVisibility = visibility;
+        }
+
         if (hackOrigin == null || hackTarget == null) {
-            terminalContent.text = "";
+            // terminalContent.text = "";
+            terminalAnimation.Clear();
             HideButtons();
         } else {
             attackerTitle.text = hackOrigin.node.nodeTitle;
             attackerIcon.sprite = hackOrigin.iconImage.sprite;
             numberHops.text = $"distance: {path.Count - 1}/{2}";
-            if (hackTarget.node.visibility == NodeVisibility.unknown || hackTarget.node.visibility == NodeVisibility.mystery) {
-                terminalContent.text = "> ping 127.0.5.10\nPING 127.0.5.10: 56 data bytes\n64 bytes from 127.0.5.10: icmp_seq=0 ttl=64 time=0.118 ms";
-            } else {
-                // target is visible / mapped
-                if (hackTarget.node.getStatus() == CyberNodeStatus.compromised) {
-                    terminalContent.text = "root @ 127.0.05.10 > command? █";
-                } else {
-                    if (hackTarget.node.lockLevel > 0) {
-                        terminalContent.text = "> ssh 127.0.5.10\n* welcome to city sense/net! *\nnew users must register with sysadmin.\n\n    enter password:█";
-                    } else {
-                        terminalContent.text = "> ssh 127.0.5.10\n* welcome to city sense/net! *\nnew users must register with sysadmin.\n\n    enter password:*****\nACCESS GRANTED\n\nbash>█";
-                    }
-                }
-            }
             ShowButtons();
+            if (changeDetected) {
+                terminalAnimation.DrawBasicNodePrompt(hackTarget.node, null);
+            }
         }
     }
     void ShowButtons() {
@@ -71,23 +79,27 @@ public class HackTerminalController : MonoBehaviour {
         downloadButton.SetActive(false);
         utilityButton.SetActive(false);
     }
-    public void Show() {
-        // if (!isHidden) return;
-        Debug.Log("show terminal");
-        DoShowRoutine(true);
+    public void Show(CyberNode target) {
+        DoShowRoutine(true, target);
         isHidden = false;
     }
     public void Hide() {
-        // if (isHidden) return;
-        Debug.Log("hiding terminal");
-        DoShowRoutine(false);
+        DoShowRoutine(false, null);
         isHidden = true;
     }
-    void DoShowRoutine(bool value) {
-        if (showRectRoutine != null) {
-            StopCoroutine(showRectRoutine);
+    void DoShowRoutine(bool value, CyberNode target) {
+        // if (showRectRoutine != null) {
+        //     StopCoroutine(showRectRoutine);
+        // }
+        if (value) {
+            terminalAnimation.DrawBasicNodePrompt(target, ShowRect(true));
+            // showRectRoutine = StartCoroutine(Toolbox.ChainCoroutines(
+            //             ShowRect(value),
+            //             terminalAnimation.DrawBasicNodePrompt(target)
+            //             ));
+        } else {
+            showRectRoutine = StartCoroutine(ShowRect(false));
         }
-        showRectRoutine = StartCoroutine(ShowRect(value));
     }
 
     IEnumerator ShowRect(bool value) {
@@ -102,10 +114,10 @@ public class HackTerminalController : MonoBehaviour {
         GameManager.I.ShowMenu(MenuType.softwareModal);
     }
     public void DeploySoftware(SoftwareState state) {
-        Debug.Log($"deploying software {state.template.name}");
         state.charges -= 1;
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
+        terminalAnimation.HandleSoftwareCallback(state);
     }
 
 
@@ -126,6 +138,7 @@ public class HackTerminalController : MonoBehaviour {
             fromPlayerNode = hackTarget.node.isManualHackerTarget
         };
         GameManager.I.AddNetworkAction(networkAction);
+        terminalAnimation.HandleDownload(payData);
         // else if (effect.type == SoftwareEffect.Type.download) {
         //     networkAction.title = $"downloading {node.payData.filename}...";
         //     if (node.isManualHackerTarget) {
@@ -135,5 +148,6 @@ public class HackTerminalController : MonoBehaviour {
     }
     public void UtilityButtonCallback() {
         GameManager.I.SetCyberNodeUtilityState(hackTarget.node, false);
+        terminalAnimation.HandleUtility();
     }
 }

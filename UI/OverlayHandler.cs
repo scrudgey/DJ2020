@@ -105,8 +105,6 @@ public class OverlayHandler : MonoBehaviour {
         SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
     }
     public void RefreshCyberGraph(CyberGraph graph) {
-        Debug.Log("overlay refresh cyber graph");
-
         cyberOverlay.cam = cam;
         UpdateHackPath();
         cyberOverlay.Refresh(graph);

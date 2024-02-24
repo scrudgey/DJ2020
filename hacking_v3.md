@@ -547,11 +547,10 @@ effect when revealing nodes
 effect when revealing edges
 shouldn't have to hack a compromised node to download file
 
-
-
-terminal effect
-    player input is typed slowly with sound effects
-    responses are blitted rapidly with small pause between newlines
-    blinking cursor
-
-    
+sound effects for typing, enter
+sound effects for software in progress
+delay after enter -> output
+even when node edges are known, cyber info shows edges as unknowns unless node is known
+ 
+hacking from cyberdeck
+smaller terminal window

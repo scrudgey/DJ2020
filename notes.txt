@@ -3717,6 +3717,7 @@ music
 circuitry hacking
 
 v2 of selling data / upgrading hack ability
+even when node edges are known, cyber info shows edges as unknowns unless node is known
 
 
 

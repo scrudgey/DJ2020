@@ -275,7 +275,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             render.enabled = false;
         }
         threatPathRoutine = null;
-        hackTerminalController.Show();
+        hackTerminalController.Show(path.Last());
         RefreshEdgeGraphicState();
     }
 

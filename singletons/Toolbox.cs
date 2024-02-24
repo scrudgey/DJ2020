@@ -627,6 +627,62 @@ public class Toolbox {
             yield return null;
         }
     }
+    public static IEnumerator TypeText(TextMeshProUGUI text, string prefix, string totalText, bool typedInput = false) {
+
+        // TODO: audio
+        // TODO: random timing
+        // TODO: looping cursor
+        // TODO: with delay
+
+        // float characterDuration = 0.04f;
+        // float duration = characterDuration * totalText.Length;
+        int index = 0;
+        // "ab" + "cde"
+        //  01     234 = 5-1
+        int finalIndex = totalText.Length;
+        float duration = 0.04f;
+        float cursorDuration = 0.2f;
+
+        float cursortimer = 0;
+        float timer = 0f;
+        bool cursorvisible = true;
+        text.text = "";
+        while (index < finalIndex) {
+            timer += Time.deltaTime;
+            cursortimer += Time.deltaTime;
+            if (timer > duration) {
+                timer -= duration;
+                if (typedInput) {
+                    duration = UnityEngine.Random.Range(0.05f, 0.1f);
+                    index++;
+                } else {
+                    index += finalIndex / 2;
+                }
+            }
+            if (cursortimer > cursorDuration) {
+                cursorvisible = !cursorvisible;
+                cursortimer -= cursorDuration;
+            }
+            // int numberCharacters = (int)(totalText.Length * (timer / duration));
+            try {
+                string currentText = prefix + totalText.Substring(0, Math.Min(finalIndex, index));
+                if (cursorvisible) {
+                    currentText += "█";
+                }
+
+                text.text = currentText;
+            }
+            catch (Exception e) {
+                Debug.Log($"{totalText} {index} {finalIndex}");
+                //ping 127.0.5.10 17 18
+                //012345678901234
+            }
+
+
+            yield return null;
+        }
+        text.text = prefix + totalText;
+    }
 
     public static IEnumerator Ease(Coroutine routine,
                                     float duration,
