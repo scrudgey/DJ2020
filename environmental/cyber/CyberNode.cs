@@ -72,6 +72,6 @@ public class CyberNode : Node<CyberNode> {
 }
 
 
-public enum CyberNodeType { normal, datanode, utility, WAN }
+public enum CyberNodeType { normal, datanode, utility, WAN, player }
 
 public enum CyberNodeStatus { invulnerable, vulnerable, compromised }

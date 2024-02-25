@@ -104,7 +104,7 @@ public class HackTerminalController : MonoBehaviour {
 
     IEnumerator ShowRect(bool value) {
         float startValue = rectTransform.rect.height;
-        float finalValue = value ? 440f : 0f;
+        float finalValue = value ? 365f : 0f;
         return Toolbox.Ease(null, 0.25f, startValue, finalValue, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             rectTransform.sizeDelta = new Vector2(505f, amount);
         }, unscaledTime: true);

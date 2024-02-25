@@ -470,6 +470,26 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        gameData.levelState.delta.cyberGraph.nodes["player"] = new CyberNode() {
+            compromised = true,
+            payData = null,
+            type = CyberNodeType.player,
+            lockLevel = 0,
+            dataSink = true,
+            dataStolen = false,
+            utilityActive = false,
+            isManualHackerTarget = false,
+            datafileVisibility = false,
+            status = CyberNodeStatus.compromised,
+            visibility = NodeVisibility.known,
+            sceneName = SceneManager.GetActiveScene().name,
+            idn = "player",
+            nodeTitle = "player",
+            enabled = true,
+            fixedVisibility = true,
+            alwaysOnScreen = true
+        };
+
         RefreshPowerGraph();
         RefreshCyberGraph();
         RefreshAlarmGraph();

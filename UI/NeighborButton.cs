@@ -22,7 +22,7 @@ public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         this.idn = neighbor.idn;
         this.edgeVisibility = visibility;
         text.text = neighbor.idn.Substring(0, 10);
-        if (visibility == EdgeVisibility.unknown || nodeVisibility < NodeVisibility.known) {
+        if (visibility == EdgeVisibility.unknown) {
             MakeInactive();
         }
     }

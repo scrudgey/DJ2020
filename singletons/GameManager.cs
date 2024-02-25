@@ -444,6 +444,10 @@ public partial class GameManager : Singleton<GameManager> {
         escapePressedThisFrame = false;
         if (playerObject != null)
             playerPosition = playerObject.transform.position;
+
+        // set player cybernode
+        CyberNode node = GetCyberNode("player");
+        node.position = playerPosition;
     }
     public void HandleEscapePressed() {
         if (gameData.phase == GamePhase.world) {

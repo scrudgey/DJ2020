@@ -630,7 +630,6 @@ public class Toolbox {
     public static IEnumerator TypeText(TextMeshProUGUI text, string prefix, string totalText, bool typedInput = false) {
 
         // TODO: audio
-        // TODO: random timing
         // TODO: looping cursor
         // TODO: with delay
 

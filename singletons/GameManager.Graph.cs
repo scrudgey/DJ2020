@@ -173,6 +173,9 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public GameObject GetNodeComponent(string idn) {
+        if (idn == "player") {
+            return playerObject;
+        }
         PoweredComponent[] poweredComponents = FindObjectsOfType<PoweredComponent>();
         PoweredComponent poweredComponent = poweredComponents.Where(component => component.idn == idn).FirstOrDefault();
         if (poweredComponent != null) {

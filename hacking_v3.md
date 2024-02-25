@@ -540,17 +540,36 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 * show status bar in overlay
 * separate scan from scan edges from scan datafile
 * software selector mouseover too close to disabled
+* even when node edges are known, cyber info shows edges as unknowns unless node is known
+* even when data file is known, data indicator not shown unless node is known
+* smaller terminal window
+
+
+
+do something about terminal jumping when indicator revealed
+shouldn't have to hack a compromised node to download file
 
 
 
 effect when revealing nodes
 effect when revealing edges
-shouldn't have to hack a compromised node to download file
-
 sound effects for typing, enter
 sound effects for software in progress
-delay after enter -> output
-even when node edges are known, cyber info shows edges as unknowns unless node is known
+? delay after enter -> output
  
+
+
 hacking from cyberdeck
-smaller terminal window
+    everything in the existing flow assumes it is a cybernodeindicator and it uses the associated node
+    two possibilities:
+        1. turn player indicator into a cyber node, unifying this and other codebases
+            cyberdeck becomes a node- this is interesting
+            nodes can be dynamic
+            this is an unknown
+            i think this is the solution
+    cybergraph update - set player node position
+
+
+# load up cyberdeck during mission planning
+
+# craft software between missions
