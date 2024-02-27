@@ -72,13 +72,20 @@ public class ManualHacker : MonoBehaviour {
         if (Vector3.Distance(target.position, transform.position) > 3f) return;
         Disconnect(dontRefreshCyberGraph: true);
         targetNode = target;
-        target.isManualHackerTarget = true;
+        // target.isManualHackerTarget = true;
+        CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
+        GameManager.I.gameData.levelState.delta.cyberGraph.AddEdge(playerNode, target);
         GameManager.I.RefreshCyberGraph();
     }
     public void Disconnect(bool dontRefreshCyberGraph = false) {
         if (targetNode != null) {
-            targetNode.isManualHackerTarget = false;
+            // targetNode.isManualHackerTarget = false;
+            // target.isManualHackerTarget = true;
+            CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
+            GameManager.I.gameData.levelState.delta.cyberGraph.RemoveEdge(playerNode, targetNode);
         }
+
+
         targetNode = null;
         if (!dontRefreshCyberGraph) {
             GameManager.I.RefreshCyberGraph();

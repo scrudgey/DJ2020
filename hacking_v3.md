@@ -543,31 +543,36 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 * even when node edges are known, cyber info shows edges as unknowns unless node is known
 * even when data file is known, data indicator not shown unless node is known
 * smaller terminal window
+* hacking from cyberdeck
+* color of text in cybernode info panel
+* "player" should be "localhost"
+* remove edge line render when edge is removed
+* cybernodeinfo overlaps item view
+* player -> node edge should not have elbowing
+* should not mouseover cyberdeck indicator
+* red lines don't hide / don't go away
+* do something about terminal jumping when indicator revealed
+* player node position
+* only show player node if cyber deck is out
+* overlay box should have fixed sizes
+* button colors
+* shouldn't have to hack a compromised node to download file...??/
 
+disconnecting / closing: how? when? 
+    escape key
 
-
-do something about terminal jumping when indicator revealed
-shouldn't have to hack a compromised node to download file
-
-
+sfx
+    network action in progress
+    typing command in terminal
+    laughter when exploit starts
 
 effect when revealing nodes
 effect when revealing edges
 sound effects for typing, enter
 sound effects for software in progress
 ? delay after enter -> output
- 
 
-
-hacking from cyberdeck
-    everything in the existing flow assumes it is a cybernodeindicator and it uses the associated node
-    two possibilities:
-        1. turn player indicator into a cyber node, unifying this and other codebases
-            cyberdeck becomes a node- this is interesting
-            nodes can be dynamic
-            this is an unknown
-            i think this is the solution
-    cybergraph update - set player node position
+adjust other info panes to match cyber
 
 
 # load up cyberdeck during mission planning

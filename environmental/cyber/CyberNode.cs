@@ -14,7 +14,7 @@ public class CyberNode : Node<CyberNode> {
     public bool dataSink;
     public bool dataStolen;
     public bool utilityActive;
-    public bool isManualHackerTarget;
+    // public bool isManualHackerTarget;
     public bool datafileVisibility;
     public CyberNodeStatus status;
     [System.NonSerialized]
@@ -34,11 +34,11 @@ public class CyberNode : Node<CyberNode> {
         }
     }
     public override NodeVisibility GetVisibility() {
-        if (isManualHackerTarget && visibility == NodeVisibility.unknown) {
-            return NodeVisibility.mystery;
-        } else {
-            return base.GetVisibility();
-        }
+        // if (isManualHackerTarget && visibility == NodeVisibility.unknown) {
+        //     return NodeVisibility.mystery;
+        // } else {
+        return base.GetVisibility();
+        // }
     }
     public CyberNodeStatus getStatus() {
         // if (compromised) {

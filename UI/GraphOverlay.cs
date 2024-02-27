@@ -10,11 +10,11 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     protected T graph;
     public Material lineRendererMaterial;
     public Material marchingAntsMaterial;
-    HashSet<string> neighborEdge;
-    Dictionary<HashSet<string>, LineRenderer> lineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
+    (string, string) neighborEdge;
+    Dictionary<(string, string), LineRenderer> lineRenderers = new Dictionary<(string, string), LineRenderer>();
     Dictionary<(string, string), LineRenderer> soloLineRenders = new Dictionary<(string, string), LineRenderer>();
-    Dictionary<HashSet<string>, LineRenderer> marchingAntsRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
-    Dictionary<HashSet<string>, LineRenderer> partialLineRenderers = new Dictionary<HashSet<string>, LineRenderer>(HashSet<string>.CreateSetComparer());
+    Dictionary<(string, string), LineRenderer> marchingAntsRenderers = new Dictionary<(string, string), LineRenderer>();
+    Dictionary<(string, string), LineRenderer> partialLineRenderers = new Dictionary<(string, string), LineRenderer>();
     protected Dictionary<U, V> indicators = new Dictionary<U, V>();
     protected V mousedOverIndicator;
     public OverlayHandler overlayHandler;
@@ -47,7 +47,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public virtual void UpdateNodes() {
         foreach (KeyValuePair<U, V> kvp in indicators) {
             Vector3 screenPoint = cam.WorldToScreenPoint(kvp.Key.position);
-            if (kvp.Key.GetVisibility() == NodeVisibility.unknown) {
+            if (kvp.Key.GetVisibility() == NodeVisibility.unknown || (kvp.Key.onlyShowIfHackDeployed && !GameManager.I.playerManualHacker.deployed)) {
                 kvp.Value.gameObject.SetActive(false);
             } else {
                 kvp.Value.gameObject.SetActive(true);
@@ -76,15 +76,15 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         if (graph.nodes.Count() == 0 || indicators.Count == 0) {
             return;
         }
-        foreach (HashSet<string> edge in graph.edgePairs) {
+        foreach ((string, string) edge in graph.edgePairs) {
             SetEdgeGraphicState(edge, sceneName);
         }
     }
 
-    protected void SetEdgeGraphicState(HashSet<string> edge, string sceneName) {
-        string[] nodes = edge.ToArray();
-        U node1 = graph.nodes[nodes[0]];
-        U node2 = graph.nodes[nodes[1]];
+    protected void SetEdgeGraphicState((string, string) edge, string sceneName) {
+        // string[] nodes = edge.ToArray();
+        U node1 = graph.nodes[edge.Item1];
+        U node2 = graph.nodes[edge.Item2];
         if (node1.sceneName != sceneName || node2.sceneName != sceneName)
             return;
         // bool bothNodesVisible = node1.visibility >= NodeVisibility.mystery && node2.visibility >= NodeVisibility.mystery;
@@ -112,10 +112,10 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             }
         }
     }
-    public void SetEdgeState(HashSet<string> edge) {
-        string[] nodes = edge.ToArray();
-        U node1 = graph.nodes[nodes[0]];
-        U node2 = graph.nodes[nodes[1]];
+    public void SetEdgeState((string, string) edge) {
+        // string[] nodes = edge.ToArray();
+        U node1 = graph.nodes[edge.Item1];
+        U node2 = graph.nodes[edge.Item2];
         LineRenderer renderer = GetLineRenderer(edge);
         SetEdgeState(renderer, node1, node2);
     }
@@ -123,7 +123,15 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public abstract void SetEdgeState(LineRenderer renderer, U node1, U node2);
 
     protected void SetLinePositions(LineRenderer renderer, U node1, U node2) {
-        List<Vector3> points = pointsBetweenNodes(node1, node2);
+        List<Vector3> points;
+        if (node1.straightLine || node2.straightLine) {
+            points = new List<Vector3>() {
+                node1.position,
+                node2.position
+            };
+        } else {
+            points = pointsBetweenNodes(node1, node2);
+        }
 
         renderer.positionCount = points.Count;
         renderer.SetPositions(points.ToArray());
@@ -183,14 +191,15 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         }
     }
 
-    protected LineRenderer GetLineRenderer(HashSet<string> edge) {
+    protected LineRenderer GetLineRenderer((string, string) edge) {
         if (lineRenderers.ContainsKey(edge)) {
             return lineRenderers[edge];
         } else {
             LineRenderer renderer = InitializeLineRenderer();
-            string[] edges = edge.ToArray();
-            renderer.name = $"edge_{edges[0]}_{edges[1]}";
+            renderer.name = $"edge_{edge.Item1}_{edge.Item2}";
+            (string, string) edge2 = (edge.Item2, edge.Item1);
             lineRenderers[edge] = renderer;
+            lineRenderers[edge2] = renderer;
             return renderer;
         }
     }
@@ -204,27 +213,31 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             return renderer;
         }
     }
-    protected LineRenderer GetMarchingAntsLineRenderer(HashSet<string> edge) {
+    protected LineRenderer GetMarchingAntsLineRenderer((string, string) edge) {
         if (marchingAntsRenderers.ContainsKey(edge)) {
             return marchingAntsRenderers[edge];
         } else {
             LineRenderer renderer = InitializeLineRenderer();
-            string[] edges = edge.ToArray();
-            renderer.name = $"marchingants_{edges[0]}_{edges[1]}";
+            // string[] edges = edge.ToArray();
+            (string, string) edge2 = (edge.Item2, edge.Item1);
+            renderer.name = $"marchingants_{edge.Item1}_{edge.Item2}";
             marchingAntsRenderers[edge] = renderer;
+            marchingAntsRenderers[edge2] = renderer;
             return renderer;
         }
     }
-    protected LineRenderer GetPartialLineRenderer(HashSet<string> edge) {
+    protected LineRenderer GetPartialLineRenderer((string, string) edge) {
         if (partialLineRenderers.ContainsKey(edge)) {
             return partialLineRenderers[edge];
         } else {
             LineRenderer renderer = InitializeLineRenderer();
             renderer.textureMode = LineTextureMode.Stretch;
             renderer.material = Resources.Load("materials/partialLine") as Material;
-            string[] edges = edge.ToArray();
-            renderer.name = $"partial_{edges[0]}_{edges[1]}";
+            // string[] edges = edge.ToArray();
+            (string, string) edge2 = (edge.Item2, edge.Item1);
+            renderer.name = $"partial_{edge.Item1}_{edge.Item2}";
             partialLineRenderers[edge] = renderer;
+            marchingAntsRenderers[edge2] = renderer;
             return renderer;
         }
     }
@@ -280,13 +293,13 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         overlayHandler.NodeSelectCallback(indicator);
     }
     public void NeighborButtonMouseOver(string sourceidn, string neighboridn) {
-        HashSet<string> edge = new HashSet<string> { sourceidn, neighboridn };
+        (string, string) edge = (sourceidn, neighboridn);
         LineRenderer renderer = GetLineRenderer(edge);
         renderer.material.color = Color.white;
         neighborEdge = edge;
     }
     public void NeighborButtonMouseExit() {
-        if (neighborEdge != null) {
+        if (neighborEdge != default) {
             SetEdgeState(neighborEdge);
         }
     }

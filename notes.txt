@@ -3717,7 +3717,11 @@ music
 circuitry hacking
 
 v2 of selling data / upgrading hack ability
-even when node edges are known, cyber info shows edges as unknowns unless node is known
+* even when node edges are known, cyber info shows edges as unknowns unless node is known
+
+
+CyberGraph: (e83a78bf-501b-45b2-ad50-1cc87de93bf5, cac2b52f-aea4-4542-87c4-e99b8e7989fb) ->? 
+            (e83a78bf-501b-45b2-ad50-1cc87de93bf5, cac2b52f-aea4-4542-87c4-e99b8e7989fb)
 
 
 

@@ -367,10 +367,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
     public void DisplayGraph<T, W>(Graph<T, W> graph) where T : Node<T> where W : Graph<T, W> {
         ClearGraph();
-        foreach (HashSet<string> edge in graph.edgePairs) {
-            string[] nodes = edge.ToArray();
-            T node1 = graph.nodes[nodes[0]];
-            T node2 = graph.nodes[nodes[1]];
+        foreach ((string, string) edge in graph.edgePairs) {
+            T node1 = graph.nodes[edge.Item1];
+            T node2 = graph.nodes[edge.Item2];
 
             int floor1 = template.GetFloorForPosition(node1.position);
             int floor2 = template.GetFloorForPosition(node2.position);

@@ -446,8 +446,8 @@ public partial class GameManager : Singleton<GameManager> {
             playerPosition = playerObject.transform.position;
 
         // set player cybernode
-        CyberNode node = GetCyberNode("player");
-        node.position = playerPosition;
+        CyberNode node = GetCyberNode("localhost");
+        node.position = playerPosition + Vector3.up;
     }
     public void HandleEscapePressed() {
         if (gameData.phase == GamePhase.world) {

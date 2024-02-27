@@ -155,27 +155,32 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     }
 
     public override void OnPointerClick(PointerEventData pointerEventData) {
-        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
-            GameManager.I.SetOverlay(OverlayType.cyber);
-            // handle node connections
+        if (!node.notClickable) {
+            if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+                GameManager.I.SetOverlay(OverlayType.cyber);
+            }
+            base.OnPointerClick(pointerEventData);
         }
-        base.OnPointerClick(pointerEventData);
     }
 
     public override void OnPointerEnter(PointerEventData eventData) {
-        base.OnPointerEnter(eventData);
-        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
-            GameManager.I.playerManualHacker.Connect(node);
-        } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.playerManualHacker.targetNode == null) {
-            GameManager.I.playerManualHacker.Connect(node);
+        if (!node.notClickable) {
+            base.OnPointerEnter(eventData);
+            if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+                GameManager.I.playerManualHacker.Connect(node);
+            } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.playerManualHacker.targetNode == null) {
+                GameManager.I.playerManualHacker.Connect(node);
+            }
         }
     }
     public override void OnPointerExit(PointerEventData eventData) {
-        base.OnPointerExit(eventData);
-        if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
-            GameManager.I.playerManualHacker.Disconnect();
-        } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.uiController.overlayHandler.selectedNode == null) {
-            GameManager.I.playerManualHacker.Disconnect();
+        if (!node.notClickable) {
+            base.OnPointerExit(eventData);
+            if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+                GameManager.I.playerManualHacker.Disconnect();
+            } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.uiController.overlayHandler.selectedNode == null) {
+                GameManager.I.playerManualHacker.Disconnect();
+            }
         }
     }
 

@@ -11,13 +11,11 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     public string levelName;
     public SerializableDictionary<string, T> nodes;
     public SerializableDictionary<string, HashSet<string>> edges;
-    public HashSet<HashSet<string>> edgePairs;
+    public HashSet<(string, string)> edgePairs;
     public SerializableDictionary<(string, string), EdgeVisibility> edgeVisibility;
-    public HashSet<string[]> edgeArrays;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
-        edgePairs = new HashSet<HashSet<string>>(HashSet<string>.CreateSetComparer());
-        edgeArrays = new HashSet<string[]>();
+        edgePairs = new HashSet<(string, string)>();
         edges = new SerializableDictionary<string, HashSet<string>>();
         edgeVisibility = new SerializableDictionary<(string, string), EdgeVisibility>();
     }
@@ -28,11 +26,27 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         if (from == to) return;
         AddLink(from, to);
         AddLink(to, from);
-        edgePairs.Add(new HashSet<string> { from.idn, to.idn });
-        edgeArrays.Add(new string[2] { from.idn, to.idn });
+        edgePairs.Add((from.idn, to.idn));
+        edgePairs.Add((to.idn, from.idn));
+    }
+    public void RemoveEdge(Node<T> from, Node<T> to) {
+        if (from == to) return;
+        RemoveLink(from, to);
+        RemoveLink(to, from);
+        edgePairs.Remove((from.idn, to.idn));
+        edgePairs.Remove((to.idn, from.idn));
+        // edgeArrays.Remove(new string[2] { from.idn, to.idn });
     }
 
     void AddLink(Node<T> from, Node<T> to) {
+        if (from == to) return;
+        if (!edges.ContainsKey(from.idn)) {
+            edges[from.idn] = new HashSet<string>();
+        }
+        edges[from.idn].Add(to.idn);
+        SetEdgeVisibility(from.idn, to.idn, EdgeVisibility.known);
+    }
+    void RemoveLink(Node<T> from, Node<T> to) {
         if (from == to) return;
         if (!edges.ContainsKey(from.idn)) {
             edges[from.idn] = new HashSet<string>();
@@ -119,9 +133,8 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         foreach (KeyValuePair<string, HashSet<string>> edge in rhs.edges) {
             lhs.edges[edge.Key] = edge.Value;
         }
-        foreach (HashSet<string> edgePair in rhs.edgePairs) {
+        foreach ((string, string) edgePair in rhs.edgePairs) {
             lhs.edgePairs.Add(edgePair);
-            lhs.edgeArrays.Add(edgePair.ToArray());
         }
         return lhs;
     }
@@ -146,18 +159,16 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
 
         switch (visibilityDefault) {
             case LevelTemplate.GraphVisibilityDefault.all:
-                foreach (HashSet<string> edge in edgePairs) {
-                    string[] ids = edge.ToArray();
-                    SetEdgeVisibility(ids[0], ids[1], EdgeVisibility.known);
+                foreach ((string, string) edge in edgePairs) {
+                    SetEdgeVisibility(edge.Item1, edge.Item2, EdgeVisibility.known);
                 }
                 break;
             case LevelTemplate.GraphVisibilityDefault.none:
                 foreach (KeyValuePair<string, T> kvp in nodes) {
                     kvp.Value.visibility = NodeVisibility.unknown;
                 }
-                foreach (HashSet<string> edge in edgePairs) {
-                    string[] ids = edge.ToArray();
-                    SetEdgeVisibility(ids[0], ids[1], EdgeVisibility.unknown);
+                foreach ((string, string) edge in edgePairs) {
+                    SetEdgeVisibility(edge.Item1, edge.Item2, EdgeVisibility.unknown);
                 }
                 break;
             case LevelTemplate.GraphVisibilityDefault.partial:
@@ -167,13 +178,12 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                         _ => NodeVisibility.known,
                     };
                 }
-                foreach (HashSet<string> edge in edgePairs) {
-                    string[] ids = edge.ToArray();
+                foreach ((string, string) edge in edgePairs) {
                     EdgeVisibility vis = UnityEngine.Random.Range(0f, 1f) switch {
                         < 0.3f => EdgeVisibility.unknown,
                         _ => EdgeVisibility.known,
                     };
-                    SetEdgeVisibility(ids[0], ids[1], vis);
+                    SetEdgeVisibility(edge.Item1, edge.Item2, vis);
                 }
                 break;
         }
@@ -200,7 +210,6 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     public void SetEdgeVisibility(string id1, string id2, EdgeVisibility visibility) {
         edgeVisibility[(id1, id2)] = visibility;
         edgeVisibility[(id2, id1)] = visibility;
-        // nodes[id1].visibility = (NodeVisibility)Mathf.Max((in))
         if (visibility == EdgeVisibility.known) {
             if (nodes[id1].visibility < NodeVisibility.mystery) {
                 nodes[id1].visibility = NodeVisibility.mystery;

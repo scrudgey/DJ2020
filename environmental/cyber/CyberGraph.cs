@@ -103,11 +103,11 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
                     anyComplete = true;
                 }
 
-                if (action.fromPlayerNode && !action.toNode.isManualHackerTarget) {
-                    // broken path
-                    anyComplete = true;
-                    completedActions.Add(action);
-                }
+                // if (action.fromPlayerNode) {//&& !action.toNode.isManualHackerTarget) {
+                //     // broken path
+                //     anyComplete = true;
+                //     completedActions.Add(action);
+                // }
 
                 NetworkActionUpdate?.Invoke(action);
             }
@@ -146,7 +146,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
 
     public List<CyberNode> GetPathToNearestDownloadPoint(CyberNode origin) {
         HashSet<string> pathids = DFS(origin, new HashSet<string>(), new HashSet<string>(),
-            (CyberNode node) => node.dataSink || node.isManualHackerTarget);
+            (CyberNode node) => node.dataSink);
         List<CyberNode> output = new List<CyberNode>();
         foreach (string idn in pathids) {
             output.Add(nodes[idn]);
@@ -155,7 +155,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
     }
     public List<CyberNode> GetPathToNearestCompromised(CyberNode origin) {
         HashSet<string> pathids = DFS(origin, new HashSet<string>(), new HashSet<string>(),
-            (CyberNode node) => node.getStatus() == CyberNodeStatus.compromised || node.isManualHackerTarget);
+            (CyberNode node) => node.getStatus() == CyberNodeStatus.compromised);
         List<CyberNode> output = new List<CyberNode>();
         foreach (string idn in pathids) {
             output.Add(nodes[idn]);

@@ -44,7 +44,7 @@ public class SoftwareTemplate {
             timerRate = 1f,
             payData = target.payData,
             path = path,
-            fromPlayerNode = target.isManualHackerTarget
+            // fromPlayerNode = target.isManualHackerTarget
         };
         // else if (effect.type == SoftwareEffect.Type.download) {
         //     networkAction.title = $"downloading {node.payData.filename}...";

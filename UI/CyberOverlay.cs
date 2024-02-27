@@ -4,8 +4,8 @@ using System.Linq;
 using Easings;
 using UnityEngine;
 public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndicator> {
-    public RectTransform cyberdeckIndicator;
-    public LineRenderer cyberdeckLineRenderer;
+    // public RectTransform cyberdeckIndicator;
+    // public LineRenderer cyberdeckLineRenderer;
     public Material normalCyberdeckLineMaterial;
     public Material marchingAntsCyberdeckLineMaterial;
     public Color marchingAntsColor;
@@ -22,6 +22,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public HackTerminalController hackTerminalController;
 
     Coroutine threatPathRoutine;
+    List<CyberNode> currentThreatPath;
     float marchingAntsTimer;
     int hackPathHash;
 
@@ -45,50 +46,13 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         } else if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
             LimitedUpdate();
         }
-
-        SetPlayerNodeIndicator();
-
         DrawMarchingAntsForAllActiveActions();
     }
-    void SetPlayerNodeIndicator() {
-        if (GameManager.I.playerManualHacker.deployed && GameManager.I.activeOverlayType == OverlayType.cyber) {
-            Vector3 playerPosition = GameManager.I.playerManualHacker.transform.position;
-            Vector3 screenPoint = cam.WorldToScreenPoint(playerPosition);
 
-            cyberdeckIndicator.gameObject.SetActive(true);
-            cyberdeckIndicator.position = screenPoint;
-            cyberdeckLineRenderer.material.SetTextureOffset("_MainTex", new Vector2(-1f * marchingAntsTimer, 0));
-        } else {
-            cyberdeckIndicator.gameObject.SetActive(false);
-        }
-    }
     public override void RefreshEdgeGraphicState() {
         base.RefreshEdgeGraphicState();
-
-
-        if (GameManager.I.playerManualHacker.targetNode != null) {
-            List<Vector3> points = new List<Vector3>();
-            points.Add(GameManager.I.playerManualHacker.transform.position);
-            points.Add(GameManager.I.playerManualHacker.targetNode.position);
-
-            cyberdeckLineRenderer.enabled = true;
-            cyberdeckLineRenderer.positionCount = points.Count;
-            cyberdeckLineRenderer.SetPositions(points.ToArray());
-            if (graph.ActiveNetworkActions().Any(networkAction => networkAction.fromPlayerNode)) {
-                cyberdeckLineRenderer.material = marchingAntsCyberdeckLineMaterial;
-                cyberdeckLineRenderer.material.color = marchingAntsColor;
-            } else {
-                cyberdeckLineRenderer.material = normalCyberdeckLineMaterial;
-                if (GameManager.I.playerManualHacker.targetNode.getStatus() == CyberNodeStatus.compromised) {
-                    cyberdeckLineRenderer.material.color = compromisedColor;
-                } else {
-                    cyberdeckLineRenderer.material.color = vulnerableColor;
-                }
-            }
-        } else {
-            cyberdeckLineRenderer.enabled = false;
-        }
     }
+
     override public void SetEdgeState(LineRenderer renderer, CyberNode node1, CyberNode node2) {
         if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
             renderer.enabled = false;
@@ -176,7 +140,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         for (int i = 0; i < networkAction.path.Count; i++) {
             CyberNode nextNode = networkAction.path[i];
             if (nextNode == currentnode) continue;
-            HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
+            (string, string) edge = (currentnode.idn, nextNode.idn);
             LineRenderer renderer = GetLineRenderer(edge);
             renderer.material = lineRendererMaterial;
             currentnode = nextNode;
@@ -188,7 +152,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             CyberNode nextNode = action.path[i];
             if (nextNode == currentnode) continue;
             NeoCyberNodeIndicator indicator = indicators[nextNode];
-            HashSet<string> edge = new HashSet<string> { currentnode.idn, nextNode.idn };
+            (string, string) edge = (currentnode.idn, nextNode.idn);
             LineRenderer renderer = GetLineRenderer(edge);
             renderer.material = marchingAntsMaterial;
             indicator.lineMaterial.SetTextureOffset("_MainTex", new Vector2(-2f * action.timer, 0));
@@ -210,7 +174,11 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         }
 
         int newHashCode = string.Join("", overlayHandler.hackOriginToPathTarget.Select(node => node.idn)).GetHashCode();
-        if (newHashCode != hackPathHash) {
+        if (overlayHandler.selectedHackOrigin == null &&
+             overlayHandler.selectedCyberNodeIndicator != null &&
+             overlayHandler.selectedCyberNodeIndicator.node.getStatus() == CyberNodeStatus.compromised) {
+            hackTerminalController.Show(overlayHandler.selectedCyberNodeIndicator.node);
+        } else if (newHashCode != hackPathHash) {
             DoDrawPathRoutine(overlayHandler.hackOriginToPathTarget);
         }
         hackPathHash = newHashCode;
@@ -219,19 +187,28 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         hackTerminalController.Hide();
         if (threatPathRoutine != null) {
             StopCoroutine(threatPathRoutine);
+            ResetCurrentPath(currentThreatPath);
         }
         if (path.Count > 1) {
             threatPathRoutine = StartCoroutine(DrawPathRoutine(path));
+            currentThreatPath = path;
         }
     }
-
+    void ResetCurrentPath(List<CyberNode> path) {
+        for (int i = 0; i < path.Count - 1; i++) {
+            CyberNode node1 = path[i];
+            CyberNode node2 = path[i + 1];
+            (string, string) edge = (node1.idn, node2.idn);
+            LineRenderer render = GetPartialLineRenderer(edge);
+            render.enabled = false;
+        }
+    }
     IEnumerator DrawPathRoutine(List<CyberNode> path) {
         List<IEnumerator> partialLineEasings = new List<IEnumerator>();
         for (int i = 0; i < path.Count - 1; i++) {
             CyberNode node1 = path[i];
             CyberNode node2 = path[i + 1];
-
-            HashSet<string> edge = new HashSet<string>() { node1.idn, node2.idn };
+            (string, string) edge = (node1.idn, node2.idn);
             LineRenderer render = GetPartialLineRenderer(edge);
             LineRenderer edgeRenderer = GetLineRenderer(edge);
             render.positionCount = edgeRenderer.positionCount;
@@ -270,7 +247,8 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         for (int i = 0; i < path.Count - 1; i++) {
             CyberNode node1 = path[i];
             CyberNode node2 = path[i + 1];
-            HashSet<string> edge = new HashSet<string>() { node1.idn, node2.idn };
+            // HashSet<string> edge = new HashSet<string>() { node1.idn, node2.idn };
+            (string, string) edge = (node1.idn, node2.idn);
             LineRenderer render = GetPartialLineRenderer(edge);
             render.enabled = false;
         }

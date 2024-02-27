@@ -21,7 +21,7 @@ public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         neighborMouseExit = display.NeighborButtonMouseExit;
         this.idn = neighbor.idn;
         this.edgeVisibility = visibility;
-        text.text = neighbor.idn.Substring(0, 10);
+        text.text = neighbor.idn.Substring(0, Math.Min(10, neighbor.idn.Length));
         if (visibility == EdgeVisibility.unknown) {
             MakeInactive();
         }

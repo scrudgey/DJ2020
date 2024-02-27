@@ -10,7 +10,6 @@ public class HackTerminalController : MonoBehaviour {
     public TerminalAnimation terminalAnimation;
     public NeoCyberNodeIndicator hackOrigin;
     public NeoCyberNodeIndicator hackTarget;
-    public TerminalAnimation terminal;
     [Header("title")]
     public TextMeshProUGUI attackerTitle;
     public Image attackerIcon;
@@ -55,18 +54,20 @@ public class HackTerminalController : MonoBehaviour {
             currentNodeVisibility = visibility;
         }
 
-        if (hackOrigin == null || hackTarget == null) {
-            // terminalContent.text = "";
-            terminalAnimation.Clear();
-            HideButtons();
-        } else {
+        if (hackOrigin != null) {
             attackerTitle.text = hackOrigin.node.nodeTitle;
             attackerIcon.sprite = hackOrigin.iconImage.sprite;
             numberHops.text = $"distance: {path.Count - 1}/{2}";
+        }
+        if (hackTarget != null) {
             ShowButtons();
             if (changeDetected) {
-                terminalAnimation.DrawBasicNodePrompt(hackTarget.node, null);
+                terminalAnimation.DrawBasicNodePrompt(hackTarget.node);
             }
+        }
+        if (hackOrigin == null && hackTarget == null) {
+            terminalAnimation.Clear();
+            HideButtons();
         }
     }
     void ShowButtons() {
@@ -88,15 +89,8 @@ public class HackTerminalController : MonoBehaviour {
         isHidden = true;
     }
     void DoShowRoutine(bool value, CyberNode target) {
-        // if (showRectRoutine != null) {
-        //     StopCoroutine(showRectRoutine);
-        // }
         if (value) {
-            terminalAnimation.DrawBasicNodePrompt(target, ShowRect(true));
-            // showRectRoutine = StartCoroutine(Toolbox.ChainCoroutines(
-            //             ShowRect(value),
-            //             terminalAnimation.DrawBasicNodePrompt(target)
-            //             ));
+            terminalAnimation.ShowThenPrompt(ShowRect(true), target);
         } else {
             showRectRoutine = StartCoroutine(ShowRect(false));
         }
@@ -131,11 +125,10 @@ public class HackTerminalController : MonoBehaviour {
             title = $"downloading {payData.filename}...",
             softwareTemplate = SoftwareTemplate.Download(),
             lifetime = 2f,
-            toNode = path[path.Count - 1],
+            toNode = hackTarget.node,
             timerRate = 1f,
             payData = payData,
             path = downloadPath,
-            fromPlayerNode = hackTarget.node.isManualHackerTarget
         };
         GameManager.I.AddNetworkAction(networkAction);
         terminalAnimation.HandleDownload(payData);

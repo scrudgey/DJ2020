@@ -15,6 +15,9 @@ public class Node<U> : IMarkerProvider where U : Node<U> {
     public NodeVisibility visibility;
     public bool fixedVisibility;
     public bool alwaysOnScreen;
+    public bool straightLine;
+    public bool notClickable;
+    public bool onlyShowIfHackDeployed;
     public virtual MarkerConfiguration GetConfiguration(GraphIconReference graphIconReference) {
         return new MarkerConfiguration();
     }

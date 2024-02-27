@@ -11,12 +11,8 @@ public class TerminalAnimation : MonoBehaviour {
         Clear();
     }
     public IEnumerator WriteMany(params Writeln[] inputs) {
-        // if (currentCoroutine != null) {
-        //     StopCoroutine(currentCoroutine);
-        // }
         IEnumerator[] routines = inputs.Select((Writeln input) => CreateEntry(input)).ToArray();
         return Toolbox.ChainCoroutines(routines);
-        // currentCoroutine = StartCoroutine(Toolbox.ChainCoroutines(routines));
     }
 
     IEnumerator CreateEntry(Writeln input) {
@@ -25,7 +21,6 @@ public class TerminalAnimation : MonoBehaviour {
         obj.transform.SetParent(container, false);
         lastEntry = obj.GetComponent<TerminalEntry>();
         yield return lastEntry.Write(input);
-        // return entry;
     }
     public void Clear() {
         foreach (Transform child in container) {
@@ -33,8 +28,13 @@ public class TerminalAnimation : MonoBehaviour {
         }
     }
 
-
-    public void DrawBasicNodePrompt(CyberNode node, IEnumerator after) {
+    public void ShowThenPrompt(IEnumerator show, CyberNode target) {
+        if (currentCoroutine != null) {
+            StopCoroutine(currentCoroutine);
+        }
+        currentCoroutine = StartCoroutine(Toolbox.ChainCoroutines(show, DrawBasicNodePrompt(target)));
+    }
+    public IEnumerator DrawBasicNodePrompt(CyberNode node) {
         IEnumerator write = null;
         if (node.visibility == NodeVisibility.unknown || node.visibility == NodeVisibility.mystery) {
             // terminalContent.text = "> ping 127.0.5.10\nPING 127.0.5.10: 56 data bytes\n64 bytes from 127.0.5.10: icmp_seq=0 ttl=64 time=0.118 ms";
@@ -72,14 +72,7 @@ public class TerminalAnimation : MonoBehaviour {
                 }
             }
         }
-        if (currentCoroutine != null) {
-            StopCoroutine(currentCoroutine);
-        }
-        if (after != null) {
-            currentCoroutine = StartCoroutine(Toolbox.ChainCoroutines(after, write));
-        } else {
-            currentCoroutine = StartCoroutine(write);
-        }
+        return write;
     }
 
     public void HandleSoftwareCallback(SoftwareState state) {

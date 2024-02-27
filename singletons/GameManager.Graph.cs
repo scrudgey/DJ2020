@@ -173,7 +173,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public GameObject GetNodeComponent(string idn) {
-        if (idn == "player") {
+        if (idn == "localhost") {
             return playerObject;
         }
         PoweredComponent[] poweredComponents = FindObjectsOfType<PoweredComponent>();
