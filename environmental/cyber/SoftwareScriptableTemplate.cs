@@ -9,6 +9,7 @@ public class SoftwareScriptableTemplate : ScriptableObject {
     public int maxCharges;
     public Sprite icon;
     public List<SoftwareCondition> conditions;
+    public AudioClip[] deploySounds;
     public SoftwareTemplate ToTemplate() {
         return new SoftwareTemplate() {
             name = name,
@@ -16,7 +17,8 @@ public class SoftwareScriptableTemplate : ScriptableObject {
             maxCharges = maxCharges,
             icon = icon,
             principalType = principalType,
-            conditions = conditions
+            conditions = conditions,
+            deploySounds = deploySounds
         };
     }
 

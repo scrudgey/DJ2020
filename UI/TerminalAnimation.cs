@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 public class TerminalAnimation : MonoBehaviour {
+    public AudioSource audioSource;
     public GameObject terminalEntryPrefab;
     public Transform container;
+    [Header("sounds")]
+    public AudioClip[] typingSounds;
     TerminalEntry lastEntry;
     Coroutine currentCoroutine;
     void Start() {
@@ -20,7 +23,8 @@ public class TerminalAnimation : MonoBehaviour {
         GameObject obj = GameObject.Instantiate(terminalEntryPrefab);
         obj.transform.SetParent(container, false);
         lastEntry = obj.GetComponent<TerminalEntry>();
-        yield return lastEntry.Write(input);
+        lastEntry.audioSource = audioSource;
+        yield return lastEntry.Write(input, typingSounds);
     }
     public void Clear() {
         foreach (Transform child in container) {

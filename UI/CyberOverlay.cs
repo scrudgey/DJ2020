@@ -9,8 +9,11 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Material normalCyberdeckLineMaterial;
     public Material marchingAntsCyberdeckLineMaterial;
     public Color marchingAntsColor;
+    public AudioSource audioSourceNetworkActions;
     [Header("sound effects")]
     public AudioClip[] finishDownloadSound;
+    public AudioClip[] startHackPathSound;
+    public AudioClip[] networkActionSound;
     [Header("colors")]
     public Color invulnerableColor;
     public Color vulnerableColor;
@@ -121,9 +124,17 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         }
     }
     void DrawMarchingAntsForAllActiveActions() {
+
         foreach (NetworkAction action in graph.ActiveNetworkActions()) {
-            if (action.path.ToHashSet().Count < 2) continue; // no path / path to player cyberdeck
+            // if (action.path.ToHashSet().Count < 2) continue; // no path / path to player cyberdeck
             DrawMatchingAntsOnPath(action);
+        }
+        if (audioSourceNetworkActions.isPlaying && graph.ActiveNetworkActions().Count == 0) {
+            audioSourceNetworkActions.Stop();
+        } else if (!audioSourceNetworkActions.isPlaying && graph.ActiveNetworkActions().Count > 0) {
+            Debug.Log("play process sound");
+            audioSourceNetworkActions.clip = networkActionSound[0];
+            audioSourceNetworkActions.Play();
         }
     }
     void HandleNetworkActionsChange(Dictionary<CyberNode, List<NetworkAction>> actions) {
@@ -204,6 +215,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         }
     }
     IEnumerator DrawPathRoutine(List<CyberNode> path) {
+        Toolbox.RandomizeOneShot(overlayHandler.audioSource, startHackPathSound);
         List<IEnumerator> partialLineEasings = new List<IEnumerator>();
         for (int i = 0; i < path.Count - 1; i++) {
             CyberNode node1 = path[i];

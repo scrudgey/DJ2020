@@ -8,6 +8,7 @@ public class SoftwareTemplate {
     public int maxCharges;
     public Sprite icon;
     public List<SoftwareCondition> conditions;
+    public AudioClip[] deploySounds;
 
     public SoftwareTemplate() { }
     public static SoftwareTemplate Download() {

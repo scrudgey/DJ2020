@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class HackTerminalController : MonoBehaviour {
+    public AudioSource audioSource;
     public RectTransform rectTransform;
     // public TextMeshProUGUI terminalContent;
     public TerminalAnimation terminalAnimation;
@@ -23,6 +24,8 @@ public class HackTerminalController : MonoBehaviour {
     public GameObject passwordButton;
     public GameObject utilityButton;
     public TextMeshProUGUI utilityButtonText;
+    [Header("sounds")]
+    public AudioClip[] showTerminalSounds;
 
     Coroutine showRectRoutine;
     bool isHidden;
@@ -83,6 +86,7 @@ public class HackTerminalController : MonoBehaviour {
     public void Show(CyberNode target) {
         DoShowRoutine(true, target);
         isHidden = false;
+        Toolbox.RandomizeOneShot(audioSource, showTerminalSounds);
     }
     public void Hide() {
         DoShowRoutine(false, null);
@@ -112,6 +116,8 @@ public class HackTerminalController : MonoBehaviour {
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
         terminalAnimation.HandleSoftwareCallback(state);
+        Debug.Log("play deploy sound");
+        Toolbox.RandomizeOneShot(audioSource, state.template.deploySounds);
     }
 
 

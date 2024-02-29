@@ -54,6 +54,7 @@ public class OverlayHandler : MonoBehaviour {
     [Header("sound effects")]
     public AudioClip[] mouseOverSound;
     public AudioClip[] nodeSelectSound;
+    public AudioClip[] selectHackOriginSound;
     [Header("cyberdeck")]
     public CyberdeckUIController cyberdeckController;
     public NeoCyberNodeIndicator selectedHackOrigin;
@@ -109,12 +110,10 @@ public class OverlayHandler : MonoBehaviour {
         UpdateHackPath();
         cyberOverlay.Refresh(graph);
         cyberOverlay.RefreshHackTerminal();
-        // cyberOverlay.ConfigureHackTerminal(selectedHackOrigin, selectedCyberNodeIndicator);
         if (selectedCyberNodeIndicator != null) {
             cyberdeckController.Refresh(selectedCyberNodeIndicator);
             cyberInfoPaneDisplay.Configure(selectedCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
         }
-        // cyberInfoPaneDisplay.ConfigureHackTerminal(selectedHackOrigin, selectedCyberNodeIndicator);
         HandleCyberDeckChange(selectedCyberNodeIndicator);
         SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
@@ -292,6 +291,7 @@ public class OverlayHandler : MonoBehaviour {
         }
         selectedHackOrigin = newOrigin;
         if (selectedHackOrigin != null) {
+            Toolbox.RandomizeOneShot(audioSource, selectHackOriginSound);
             selectedHackOrigin.SetHackOrigin(true);
         }
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);

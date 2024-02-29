@@ -6,9 +6,22 @@ using UnityEngine;
 using UnityEngine.UI;
 public class TerminalEntry : MonoBehaviour {
     public TextMeshProUGUI text;
-    public IEnumerator Write(Writeln input) {
+    public AudioSource audioSource;
+    public IEnumerator Write(Writeln input, AudioClip[] audioClips) {
         // text.text = input;
         text.text = "";
-        return Toolbox.TypeText(text, input.prefix, input.content, typedInput: input.playerType);
+        return Toolbox.ChainCoroutines(
+            Toolbox.CoroutineFunc(() => {
+                if (input.playerType) {
+                    Toolbox.RandomizeOneShot(audioSource, audioClips);
+                }
+            }),
+            Toolbox.TypeText(text, input.prefix, input.content, typedInput: input.playerType),
+            Toolbox.CoroutineFunc(() => {
+                if (input.playerType) {
+                    audioSource.Stop();
+                }
+            })
+        );
     }
 }

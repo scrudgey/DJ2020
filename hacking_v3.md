@@ -557,22 +557,31 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 * overlay box should have fixed sizes
 * button colors
 * shouldn't have to hack a compromised node to download file...??/
+* sfx
+    * network action in progress
+    replacement for the thing that sounds too like stickykeys
+    * deploy sounds
+    * start hack path
+    * click node
+    * mouseover node
+    * typing command in terminal
+    * show terminal
+    * select hack origin
+* adjust other info panes to match cyber
+? delay after enter -> output
+* download button colors
+* network action sound is still old?
 
-disconnecting / closing: how? when? 
-    escape key
 
-sfx
-    network action in progress
-    typing command in terminal
-    laughter when exploit starts
+
+disconnecting / closing: how? when? escape key?
 
 effect when revealing nodes
 effect when revealing edges
-sound effects for typing, enter
-sound effects for software in progress
-? delay after enter -> output
 
-adjust other info panes to match cyber
+
+
+firewalls
 
 
 # load up cyberdeck during mission planning
