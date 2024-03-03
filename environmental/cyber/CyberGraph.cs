@@ -211,4 +211,16 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         return new HashSet<string>();
     }
 
+
+    public override bool DiscoverNode(CyberNode node,
+                                NodeVisibility newNodeVisibility = NodeVisibility.unknown,
+                                bool discoverEdges = false,
+                                bool discoverFile = false) {
+        bool value = base.DiscoverNode(node, newNodeVisibility, discoverEdges, discoverFile);
+        if (discoverFile && !node.datafileVisibility) {
+            value = true;
+            node.datafileVisibility = true;
+        }
+        return value;
+    }
 }

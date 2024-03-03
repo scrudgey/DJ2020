@@ -28,7 +28,7 @@ public record GameData {
             filename = "test",
             phase = GamePhase.none,
             playerState = playerState,
-            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState.allItems), playerState),
+            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState), playerState),
             completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
                 "Jack That Data",
@@ -46,7 +46,7 @@ public record GameData {
         if (levelPlans.ContainsKey(template.levelName)) {
             return levelPlans[template.levelName];
         } else {
-            LevelPlan plan = LevelPlan.Default(playerState.allItems);
+            LevelPlan plan = LevelPlan.Default(playerState);
             levelPlans[template.levelName] = plan;
             return plan;
         }

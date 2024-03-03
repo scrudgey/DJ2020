@@ -1,14 +1,21 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
+[System.Serializable]
 public class SoftwareTemplate {
     public string name;
     public SoftwareEffect.Type principalType;
     public List<SoftwareEffect> effects;
     public int maxCharges;
+
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite icon;
+
     public List<SoftwareCondition> conditions;
-    public AudioClip[] deploySounds;
+
+    [JsonConverter(typeof(ObjectListJsonConverter<AudioClip>))]
+    public List<AudioClip> deploySounds;
 
     public SoftwareTemplate() { }
     public static SoftwareTemplate Download() {

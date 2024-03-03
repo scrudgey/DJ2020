@@ -33,24 +33,16 @@ public class SoftwareEffect {
     public void ApplyToNode(CyberNode node, CyberGraph graph) {
         switch (type) {
             case Type.scan:
-                node.visibility = NodeVisibility.known;
-                foreach (string neighborId in graph.edges[node.idn]) {
-                    graph.SetEdgeVisibility(node.idn, neighborId, EdgeVisibility.known);
-                }
-                node.BeDiscovered();
-                node.datafileVisibility = true;
+                GameManager.I.DiscoverNode(node, NodeVisibility.known, discoverEdges: true, discoverFile: true);
                 break;
             case Type.scanNode:
-                node.visibility = NodeVisibility.known;
-                node.BeDiscovered();
+                GameManager.I.DiscoverNode(node, NodeVisibility.known);
                 break;
             case Type.scanEdges:
-                foreach (string neighborId in graph.edges[node.idn]) {
-                    graph.SetEdgeVisibility(node.idn, neighborId, EdgeVisibility.known);
-                }
+                GameManager.I.DiscoverNode(node, discoverEdges: true);
                 break;
             case Type.scanFile:
-                node.datafileVisibility = true;
+                GameManager.I.DiscoverNode(node, discoverFile: true);
                 break;
             case Type.download:
                 if (node.type == CyberNodeType.datanode) {

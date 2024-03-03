@@ -242,12 +242,13 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         armorLevel = template.armorLevel
     };
 
-    public void ResetTemporaryState() {
+    public void ResetTemporaryState(LevelPlan plan) {
         primaryGun?.ResetTemporaryState();
         secondaryGun?.ResetTemporaryState();
         tertiaryGun?.ResetTemporaryState();
 
-        softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
+        // softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
+        softwareStates = plan.softwareTemplates.Select(template => new SoftwareState(template)).ToList();
     }
     public int PlayerLevel() {
         return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;

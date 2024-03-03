@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
 [CreateAssetMenu(menuName = "ScriptableObjects/SoftwareScriptableTemplate")]
 public class SoftwareScriptableTemplate : ScriptableObject {
     public new string name;
@@ -18,7 +18,7 @@ public class SoftwareScriptableTemplate : ScriptableObject {
             icon = icon,
             principalType = principalType,
             conditions = conditions,
-            deploySounds = deploySounds
+            deploySounds = deploySounds.ToList()
         };
     }
 

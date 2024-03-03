@@ -3595,10 +3595,10 @@ jazz up elevator controller
 guard stood facing wall in tower
 
 unresolved mechanics / gameplay questions:
-    hacking
+    * progression in burglar tools?
+    * hacking
+    * do we buy / unlock more burglar tools?
     circuits
-    do we buy / unlock more burglar tools?
-    progression in burglar tools?
     progression in shops? 
         items, guns
     progression in world?
@@ -3607,13 +3607,10 @@ unresolved mechanics / gameplay questions:
 
 major initiatives:
     anime effects
-    cyberware
     destructible walls
     vehicles
     finalize street 
     robots
-    music
-        auto leveling, balance, ducking
     missions
         1 way shootout
         productionize office
@@ -3621,8 +3618,8 @@ major initiatives:
     system:
         title
         controls, settings
-        pause screen status report
-            loot, data
+        * pause screen status report
+            * loot, data
             weapons, loadout, 
             character stats, skills
 shops:
@@ -3671,13 +3668,13 @@ more equipment to bring on mission?
     * alert icon is visible during death sequence
     * guard behavior is weird
     * scientists don't react to others dying
-
+    * cyberware
+    * music
+        * auto leveling, balance, ducking
 
 
 
 armor piercing ammo to be indicated somewhere in the gun info display
-
-
 
 in-between montage
     unlock contacts
@@ -3686,8 +3683,6 @@ in-between montage
 graphic effects
     80s electricity 
     anime glow 
-
-
 
 711 broken
 shotgun reload broken
@@ -3700,8 +3695,6 @@ multiple guards chose the same clearpoint to navigate to- more global coordinati
 better investigative ability when player does something weird like superjump / land
 highlight NPCs that are shooting me
 worker dialogue tree
-
-
 
 some suspicion records could be sticky when noticed
     anything related to player behavior and appearance
@@ -3718,10 +3711,6 @@ circuitry hacking
 
 v2 of selling data / upgrading hack ability
 * even when node edges are known, cyber info shows edges as unknowns unless node is known
-
-
-CyberGraph: (e83a78bf-501b-45b2-ad50-1cc87de93bf5, cac2b52f-aea4-4542-87c4-e99b8e7989fb) ->? 
-            (e83a78bf-501b-45b2-ad50-1cc87de93bf5, cac2b52f-aea4-4542-87c4-e99b8e7989fb)
-
+sword holster has smg sprite?
 
 

@@ -18,8 +18,8 @@ public class ManualHacker : MonoBehaviour {
     Transform myTransform;
     public CyberNode targetNode;
     public GameObject visualEffect;
-    public GameObject discoveryParticleEffect;
-    PrefabPool discoveryParticlePool;
+    // public GameObject discoveryParticleEffect;
+    // PrefabPool discoveryParticlePool;
     [Header("configure")]
     public LineRenderer lineRenderer;
     public Material wireUnfurlMaterial;
@@ -31,14 +31,13 @@ public class ManualHacker : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip wireDeploy;
     public AudioClip wireAttach;
-    public AudioClip discoverySound;
     bool deploySoundPlayed;
     bool attachSoundPlayed;
     void Start() {
         myTransform = transform;
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         targetNode = null;
-        discoveryParticlePool = PoolManager.I.GetPool(discoveryParticleEffect);
+        // discoveryParticlePool = PoolManager.I.GetPool(discoveryParticleEffect);
     }
     void Update() {
         if (targetNode != null) {
@@ -57,11 +56,12 @@ public class ManualHacker : MonoBehaviour {
             foreach (CyberNode node in GameManager.I.gameData.levelState.delta.cyberGraph.nodes.Values) {
                 float distance = Vector3.Distance(node.position, playerPosition);
                 if (distance < 3) {
-                    bool wasDiscovered = node.BeDiscovered();
-                    if (wasDiscovered) {
-                        Toolbox.RandomizeOneShot(audioSource, discoverySound);
-                        discoveryParticlePool.GetObject(node.position);
-                    }
+                    GameManager.I.DiscoverNode(node, NodeVisibility.known);
+                    // bool wasDiscovered = node.BeDiscovered();
+                    // if (wasDiscovered) {
+                    //     Toolbox.RandomizeOneShot(audioSource, discoverySound);
+                    //     discoveryParticlePool.GetObject(node.position);
+                    // }
                 }
             }
         }

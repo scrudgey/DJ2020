@@ -32,7 +32,10 @@ public partial class GameManager : Singleton<GameManager> {
     // UI input
     public InputActionReference showConsole;
     public InputActionReference escapeAction;
-
+    [Header("particle effect")]
+    public GameObject discoveryParticleEffect;
+    PrefabPool discoveryParticlePool;
+    public AudioClip discoverySound;
 
     // UI callbacks
     public static Action<GameObject> OnFocusChanged;
@@ -81,6 +84,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void Start() {
         cursorType = CursorType.pointer;
         showDebugRays = true;
+        discoveryParticlePool = PoolManager.I.GetPool(discoveryParticleEffect);
         showConsole.action.performed += HandleShowConsleAction;
         escapeAction.action.performed += HandleEscapeAction;
     }
@@ -442,12 +446,15 @@ public partial class GameManager : Singleton<GameManager> {
         }
         toggleConsoleThisFrame = false;
         escapePressedThisFrame = false;
-        if (playerObject != null)
+        if (playerObject != null) {
             playerPosition = playerObject.transform.position;
 
-        // set player cybernode
-        CyberNode node = GetCyberNode("localhost");
-        node.position = playerPosition + Vector3.up;
+            // set player cybernode
+            CyberNode node = GetCyberNode("localhost");
+            if (node != null)
+                node.position = playerPosition + Vector3.up;
+        }
+
     }
     public void HandleEscapePressed() {
         if (gameData.phase == GamePhase.world) {

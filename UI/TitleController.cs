@@ -178,7 +178,7 @@ public class TitleController : MonoBehaviour {
             };
             GameManager.I.gameData = GameData.TestInitialData();
 
-            LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems), GameManager.I.gameData.playerState);
+            LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(GameManager.I.gameData.playerState), GameManager.I.gameData.playerState);
 
             GameManager.I.gameData.levelState = level;
             Debug.Log("start mission");

@@ -218,6 +218,28 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                 nodes[id2].visibility = NodeVisibility.mystery;
             }
         }
+    }
 
+    public virtual bool DiscoverNode(T node,
+                            NodeVisibility newNodeVisibility = NodeVisibility.unknown,
+                            bool discoverEdges = false,
+                            bool discoverFile = false) {
+        bool doSfx = false;
+        if (newNodeVisibility > node.visibility) {
+            node.visibility = newNodeVisibility;
+            doSfx = true;
+            foreach (ObjectiveDelta objective in GameManager.I.gameData.levelState.delta.objectiveDeltas.Concat(GameManager.I.gameData.levelState.delta.optionalObjectiveDeltas)) {
+                if (objective.targetIdn == node.idn) {
+                    objective.visibility = Objective.Visibility.known;
+                }
+            }
+        }
+        if (discoverEdges) {
+            doSfx = true;
+            foreach (string neighborId in edges[node.idn]) {
+                SetEdgeVisibility(node.idn, neighborId, EdgeVisibility.known);
+            }
+        }
+        return doSfx;
     }
 }

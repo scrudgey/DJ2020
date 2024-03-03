@@ -36,7 +36,7 @@ public partial class GameManager : Singleton<GameManager> {
         levelTemplate.maxNPC = 3;
 
         PlayerState playerState = PlayerState.Instantiate(template.playerState);
-        LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<ItemTemplate>()), playerState);
+        LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState), playerState);
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
             playerState = playerState,
@@ -51,7 +51,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
-        gameData.playerState.ResetTemporaryState();
+        gameData.playerState.ResetTemporaryState(plan);
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }
 
@@ -64,7 +64,7 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
-        InitializeLevel(LevelPlan.Default(new List<ItemTemplate>()));
+        // InitializeLevel(LevelPlan.Default(new List<ItemTemplate>()));
         LoadSkyboxForScene(state.template.sceneName);
 
         TransitionToPhase(GamePhase.vrMission);
@@ -160,7 +160,7 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
             zone.SpawnNPCs();
         }
-        InitializePlayerAndController(LevelPlan.Default(new List<ItemTemplate>()));
+        InitializePlayerAndController(LevelPlan.Default(gameData.playerState));
         LoadSkyboxForScene(sceneName);
         // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
 

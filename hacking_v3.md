@@ -571,19 +571,43 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 ? delay after enter -> output
 * download button colors
 * network action sound is still old?
-
-
-
-disconnecting / closing: how? when? escape key?
-
-effect when revealing nodes
-effect when revealing edges
+* effect when revealing nodes
+* iconography
+* modular view
+    * display template mode
+* populate slots from inventory
+* configures level plan
+* slotcolor = green or something
+* level plan should take effect
+    * plan templates -> player state analogous to items
+* deploy buttons during gameplay
+* populate slots with default
 
 
 
 firewalls
+password entry
+check all instances when node visibility changes
+
+
+disconnecting / closing: how? when? escape key?
+effect when revealing edges
 
 
 # load up cyberdeck during mission planning
+
+cyberdeck stats
+    software slots, or size?
+    slots: immediately intuitive, cleverly limiting
+    sizes: 
+        idiomatic
+        more complicated
+        more possibilities
+        more customization to software
+start with slots
+
+come up with overall design:
+    clear slots
+    draw image of sorts
 
 # craft software between missions

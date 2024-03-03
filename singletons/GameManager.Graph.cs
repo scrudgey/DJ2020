@@ -193,4 +193,20 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return null;
     }
+
+    public void DiscoverNode<U>(U node,
+                                NodeVisibility newNodeVisibility = NodeVisibility.unknown,
+                                bool discoverEdges = false,
+                                bool discoverFile = false) where U : Node<U> {
+        bool doSfx = node switch {
+            CyberNode cyberNode => gameData.levelState.delta.cyberGraph.DiscoverNode(cyberNode, newNodeVisibility, discoverEdges, discoverFile),
+            PowerNode powerNode => gameData.levelState.delta.powerGraph.DiscoverNode(powerNode, newNodeVisibility, discoverEdges, discoverFile),
+            AlarmNode alarmNode => gameData.levelState.delta.alarmGraph.DiscoverNode(alarmNode, newNodeVisibility, discoverEdges, discoverFile)
+        };
+
+        if (doSfx) {
+            Toolbox.RandomizeOneShot(audioSource, discoverySound);
+            discoveryParticlePool.GetObject(node.position);
+        }
+    }
 }

@@ -10,6 +10,7 @@ public class SoftwareSelector : MonoBehaviour {
     Action<SoftwareSelector> callback;
     public TextMeshProUGUI title;
     public SoftwareState softwareState;
+    public SoftwareTemplate softwareTemplate;
     public Button myButton;
     [Header("default colorblock")]
     public ColorBlock defaultColorblock;
@@ -30,6 +31,13 @@ public class SoftwareSelector : MonoBehaviour {
         }
 
         myButton.colors = softwareEnabled ? defaultColorblock : disabledColorblock;
+    }
+    public void Initialize(SoftwareTemplate template, Action<SoftwareSelector> callback) {
+        this.callback = callback;
+        this.softwareTemplate = template;
+        title.text = template.name;
+        softwareButton.Initialize(template);
+        myButton.colors = defaultColorblock;
     }
     public void ClickCallback() {
         callback?.Invoke(this);

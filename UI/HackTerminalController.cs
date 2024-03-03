@@ -41,7 +41,7 @@ public class HackTerminalController : MonoBehaviour {
         this.hackOrigin = hackOrigin;
         this.hackTarget = hackTarget;
         this.path = path;
-        modalController.Initialize(this);
+        modalController.Initialize(this, GameManager.I.gameData.playerState);
 
         if (hackTarget != null) {
             CyberNodeStatus nodeStatus = hackTarget.node.getStatus();
@@ -116,10 +116,8 @@ public class HackTerminalController : MonoBehaviour {
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
         terminalAnimation.HandleSoftwareCallback(state);
-        Debug.Log("play deploy sound");
-        Toolbox.RandomizeOneShot(audioSource, state.template.deploySounds);
+        Toolbox.RandomizeOneShot(audioSource, state.template.deploySounds.ToArray());
     }
-
 
     public void PasswordButtonCallback() {
         Debug.Log("password");

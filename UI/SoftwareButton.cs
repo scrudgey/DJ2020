@@ -14,6 +14,10 @@ public class SoftwareButton : MonoBehaviour {
         icon.sprite = state.template.icon;
         levelCaption.text = $"{state.charges}";
     }
+    public void Initialize(SoftwareTemplate template) {
+        icon.sprite = template.icon;
+        levelCaption.text = $"{template.maxCharges}";
+    }
     // public void Configure(CyberNode node, CyberGraph graph) {
     //     bool targetIsDatastore = node.type == CyberNodeType.datanode;
     //     bool targetIsLocked = node.lockLevel > 0;
