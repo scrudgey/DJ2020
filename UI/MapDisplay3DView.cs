@@ -212,7 +212,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
 
         if (mode == Mode.plan) {
-            foreach (Objective objective in template.objectives) {
+            foreach (Objective objective in template.AllObjectives()) {
                 if (objective.visibility == Objective.Visibility.unknown && !plan.objectiveLocations.ContainsKey(objective.name)) {
                     if (objectiveIndicators.ContainsKey(objective))
                         objectiveIndicators[objective].gameObject.SetActive(false);
@@ -233,7 +233,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 objectiveIndicators[objective].gameObject.SetActive(template.GetFloorForPosition(position) == generator.currentFloor);
             }
         } else if (mode == Mode.mission) {
-            foreach (ObjectiveDelta delta in state.delta.objectiveDeltas) {
+            foreach (ObjectiveDelta delta in state.delta.AllObjectives()) {
                 if (delta.visibility == Objective.Visibility.unknown || delta.status != ObjectiveStatus.inProgress) {
                     if (objectiveIndicators.ContainsKey(delta.template))
                         objectiveIndicators[delta.template].gameObject.SetActive(false);

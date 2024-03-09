@@ -91,7 +91,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
         cyberGraph.InfillDummyData();
 
-        foreach (ObjectiveData objectiveData in template.objectives.Concat(template.bonusObjectives).Where(objective => objective is ObjectiveData)) {
+        foreach (ObjectiveData objectiveData in template.AllObjectives().Where(objective => objective is ObjectiveData)) {
             if (objectiveData.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objectiveData.name)) {
                 string idn = objectiveData.potentialSpawnPoints[0];
                 if (plan.objectiveLocations.ContainsKey(objectiveData.name)) {

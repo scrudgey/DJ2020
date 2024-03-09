@@ -196,6 +196,5 @@ public class CharacterHurtable : Destructible, IBindable<CharacterHurtable>, IPo
         // this.fullHealthAmount = state.fullHealthAmount();
         this.hitState = state.hitState;
         this.armorLevel = state.armorLevel;
-        Debug.Log($"{transform.root.gameObject} loading character hurtable {state.armorLevel}");
     }
 }

@@ -81,7 +81,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
 
         transform.localPosition = Vector3.zero;
         if (bob && !input.isProne) {
-            transform.localPosition -= new Vector3(0f, 0.01f, 0f);
+            transform.localPosition -= new Vector3(0f, 0.02f, 0f); // TODO: ?
         }
 
         SetState(input.gunInput.gunState);
@@ -98,12 +98,14 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         gunType = input.gunInput.gunType;
         if (input.hitState == HitState.dead) {
             animator.Stop();
-        } else if (input.gunInput.gunType == GunType.sword) {
+        } else if (input.gunInput.gunType == GunType.sword || input.gunInput.fromGunType == GunType.sword) {
             switch (state) {
                 case GunHandler.GunStateEnum.holstering:
                     if (input.gunInput.toGunType == GunType.unarmed) {
+                        Debug.Log("set animation sword holster");
                         SetAnimation(swordHolsterAnimation);
                     } else {
+                        Debug.Log("set animation sword unholster");
                         SetAnimation(swordUnholsterAnimation);
                     }
                     break;

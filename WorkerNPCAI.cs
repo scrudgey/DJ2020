@@ -347,14 +347,27 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         Collider player = GameManager.I.playerCollider;
         if (Vector3.Dot(target.transform.up, player.bounds.center - transform.position) < 0) {
             Toolbox.AsyncClearLineOfSight(target.transform.position, player, (RaycastHit hit) => {
-                if (hit.collider == player) Perceive(player, byPassVisibilityCheck: true);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == player.transform.root) {
+                    Perceive(player, byPassVisibilityCheck: true);
+                }
+                // else {
+                //     // Debug.DrawLine(target.transform.position, hit.point, Color.cyan);
+                // }
             });
         }
     }
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
             Toolbox.AsyncClearLineOfSight(target.transform.position, t.newestAddition, (RaycastHit hit) => {
-                if (hit.collider == t.newestAddition) Perceive(t.newestAddition);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == t.newestAddition.transform.root) {
+                    // Debug.DrawLine(target.transform.position, hit.point, Color.red);
+                    Perceive(t.newestAddition);
+                }
+                // else {
+                //     // Debug.DrawLine(target.transform.position, hit.point, Color.cyan);
+                // }
             });
         }
     }
@@ -364,7 +377,13 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             if (collider == null)
                 continue;
             Toolbox.AsyncClearLineOfSight(target.transform.position, collider, (RaycastHit hit) => {
-                if (hit.collider == collider) Perceive(collider);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == collider.transform.root) {
+                    Perceive(collider);
+                }
+                // else {
+                //     Debug.DrawLine(target.transform.position, hit.point, Color.cyan);
+                // }
             });
         }
     }

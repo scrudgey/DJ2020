@@ -141,7 +141,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         TransitionToPhase(GamePhase.levelPlay);
 
-        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.objectiveDeltas
+        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.AllObjectives()
             .Select(objective => objective.status).ToList());
 
         if (doCutscene)
@@ -218,13 +218,20 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot.Where(loot => loot.isCollectible));
         gameData.playerState.skillpoints += 1;
 
-        // TODO: broken
         CharacterHurtable playerHurtable = playerObject.GetComponentInChildren<CharacterHurtable>();
         gameData.playerState.health = playerHurtable.health;
+
         foreach (LevelTemplate unlock in gameData.levelState.template.unlockLevels) {
             if (gameData.unlockedLevels.Contains(unlock.levelName)) continue;
             gameData.unlockedLevels.Add(unlock.levelName);
         }
+
+        foreach (ObjectiveDelta delta in gameData.levelState.delta.optionalObjectiveDeltas) {
+            if (delta.status == ObjectiveStatus.complete) {
+                delta.template.ApplyReward(gameData);
+            }
+        }
+
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {

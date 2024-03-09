@@ -5,12 +5,13 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 public partial class GameManager : Singleton<GameManager> {
-    public static Action<ObjectiveDelta> OnObjectivesChange;
+    public static Action<List<ObjectiveDelta>, ObjectiveDelta, bool> OnObjectivesChange;
     public static Action<LootData, GameData> OnLootChange;
     public static Action<PayData, GameData> OnPayDataChange;
     public static Action<int, String> OnItemPickup;
     public static Action<StatusUpdateData> OnGameStateChange;
     int lastObjectivesStatusHashCode;
+    int lastOptionalObjectiveStatusHashCode;
 
     public void AddPayDatas(PayData data, Vector3 position) {
         gameData.levelState.delta.levelAcquiredPaydata.Add(data);
@@ -71,11 +72,23 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void CheckObjectives(ObjectiveDelta changedDelta) {
         if (gameData.phase != GamePhase.levelPlay) return;
-
+        CheckOptionalObjectives(changedDelta);
+        CheckRequiredObjectives(changedDelta);
+    }
+    void CheckOptionalObjectives(ObjectiveDelta changedDelta) {
+        List<ObjectiveStatus> statuses = gameData.levelState.delta.optionalObjectiveDeltas
+                    .Select(objective => objective.status).ToList();
+        int newHashCode = Toolbox.ListHashCode<ObjectiveStatus>(statuses);
+        if (lastOptionalObjectiveStatusHashCode != newHashCode) {
+            OnObjectivesChange?.Invoke(gameData.levelState.delta.optionalObjectiveDeltas, changedDelta, true);
+        }
+        lastOptionalObjectiveStatusHashCode = newHashCode;
+    }
+    void CheckRequiredObjectives(ObjectiveDelta changedDelta) {
         List<ObjectiveStatus> statuses = gameData.levelState.delta.objectiveDeltas
             .Select(objective => objective.status).ToList();
-
         ObjectiveStatus newTotalStatus;
+
         if (statuses.Any(status => status == ObjectiveStatus.failed)) {
             newTotalStatus = ObjectiveStatus.failed;
         } else if (statuses.All(status => status == ObjectiveStatus.complete)) {
@@ -95,7 +108,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         int newHashCode = Toolbox.ListHashCode<ObjectiveStatus>(statuses);
         if (lastObjectivesStatusHashCode != newHashCode) {
-            OnObjectivesChange?.Invoke(changedDelta);
+            OnObjectivesChange?.Invoke(gameData.levelState.delta.objectiveDeltas, changedDelta, false);
         }
         lastObjectivesStatusHashCode = newHashCode;
     }

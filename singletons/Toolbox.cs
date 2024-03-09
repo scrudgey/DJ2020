@@ -821,7 +821,22 @@ public class Toolbox {
         }
         component.enabled = true;
     }
-
+    public static IEnumerator BlinkColor(TextMeshProUGUI textmesh, Color color, int pulses = 7, bool unlimited = false) {
+        float timer = 0f;
+        int cycles = 0;
+        bool enable = false;
+        while (cycles < pulses && !unlimited) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > 0.2f) {
+                enable = !enable;
+                timer -= 0.2f;
+                cycles += 1;
+                textmesh.color = enable ? color : Color.white;
+            }
+            yield return null;
+        }
+        textmesh.color = color;
+    }
     public static IEnumerator BlinkVis(Image image, Action inbetweener, float blinkInterval = 0.05f) {
         WaitForSecondsRealtime waiter = new WaitForSecondsRealtime(blinkInterval / 2f);
         image.enabled = false;

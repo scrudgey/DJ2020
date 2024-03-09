@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class SuspicionDialogueParameters {
     public string challenge;
+    public string pastTenseChallenge;
     public List<DialogueTactic> tactics;
 }
 
@@ -31,6 +32,7 @@ public enum DialogueTacticType { none, lie, deny, bluff, redirect, challenge, it
 
 public class SuspicionRecord {
     public string content;
+    public string stickyContent;
     public float lifetime;
     public float maxLifetime;
     public Suspiciousness suspiciousness;
@@ -40,11 +42,23 @@ public class SuspicionRecord {
     public List<string> grammarFiles = new List<string>();
     public int challengeValue = (int)Toolbox.RandomGaussian(30, 80);
 
+    public bool stickyable;
+    public bool stickied;
+    public bool stickiedThisFrame;
+
     public void Update(float deltaTime) {
         lifetime -= deltaTime;
     }
     public bool IsTimed() {
         return maxLifetime > 0;
+    }
+    public void MakeSticky() {
+        if (!stickied)
+            stickiedThisFrame = true;
+        maxLifetime = -1f;
+        lifetime = 1f;
+        stickied = true;
+        Debug.Log("making sticky suspicion record: " + content);
     }
     public DialogueTactic getResponse(DialogueTacticType tacticType) {
         DialogueTactic tactic;
@@ -213,6 +227,7 @@ public class SuspicionRecord {
         lifetime = 1f,
         maxLifetime = 1f,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = "What was that object you just placed?",
             tactics = new List<DialogueTactic>{
@@ -256,6 +271,7 @@ public class SuspicionRecord {
         lifetime = 160f,
         maxLifetime = 160f,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = "Why did you rob the cash register?",
             tactics = new List<DialogueTactic>{
@@ -342,6 +358,7 @@ public class SuspicionRecord {
         lifetime = 60f,
         maxLifetime = 60f,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = "Why did you run away?",
             tactics = new List<DialogueTactic>{
@@ -512,6 +529,7 @@ public class SuspicionRecord {
         content = "brandishing weapon",
         suspiciousness = Suspiciousness.suspicious,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = "Why are you waving that gun around?",
             tactics = new List<DialogueTactic>{
@@ -554,6 +572,7 @@ public class SuspicionRecord {
         lifetime = 3f,
         maxLifetime = 3f,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = $"Do you realize you triggered a {sensorName} sensor?",
             tactics = new List<DialogueTactic>{
@@ -595,6 +614,7 @@ public class SuspicionRecord {
         suspiciousness = Suspiciousness.aggressive,
         maxLifetime = 1f,
         lifetime = 1f,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = "Stand down! Why are you shooting!?",
             tactics = new List<DialogueTactic>{
@@ -631,6 +651,7 @@ public class SuspicionRecord {
         lifetime = 3f,
         maxLifetime = 3f,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = $"What are you doing with that {data.target.niceName}?",
             tactics = new List<DialogueTactic>{
@@ -716,6 +737,7 @@ public class SuspicionRecord {
         lifetime = 2f,
         maxLifetime = 2f,
         allowDataResponse = true,
+        stickyable = true,
         dialogue = new SuspicionDialogueParameters {
             challenge = $"What are you doing with that {lootName}?",
             tactics = new List<DialogueTactic>{
@@ -753,40 +775,41 @@ public class SuspicionRecord {
         }
     };
 
-    public static SuspicionRecord tamperingSuspicion() => new SuspicionRecord {
-        content = "tampering with equipment",
-        suspiciousness = Suspiciousness.suspicious,
-        lifetime = 3f,
-        maxLifetime = 3f,
-        dialogue = new SuspicionDialogueParameters {
-            challenge = $"",
-            tactics = new List<DialogueTactic>{
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.lie,
-                            content = $"",
-                            successResponse = "",
-                            failResponse = ""
-                        },
-                         new DialogueTactic{
-                            tacticType = DialogueTacticType.deny,
-                            content = "",
-                            successResponse = "",
-                            failResponse = ""
-                        },
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.challenge,
-                            content = "",
-                            successResponse = "",
-                            failResponse = ""
-                        },
-                        new DialogueTactic{
-                            tacticType = DialogueTacticType.redirect,
-                            content = "",
-                            successResponse = "",
-                            failResponse = ""
-                        }
-                    }
-        }
-    };
+    // public static SuspicionRecord tamperingSuspicion() => new SuspicionRecord {
+    //     content = "tampering with equipment",
+    //     suspiciousness = Suspiciousness.suspicious,
+    //     lifetime = 3f,
+    //     maxLifetime = 3f,
+    //     stickyable = true,
+    //     dialogue = new SuspicionDialogueParameters {
+    //         challenge = $"",
+    //         tactics = new List<DialogueTactic>{
+    //                     new DialogueTactic{
+    //                         tacticType = DialogueTacticType.lie,
+    //                         content = $"",
+    //                         successResponse = "",
+    //                         failResponse = ""
+    //                     },
+    //                      new DialogueTactic{
+    //                         tacticType = DialogueTacticType.deny,
+    //                         content = "",
+    //                         successResponse = "",
+    //                         failResponse = ""
+    //                     },
+    //                     new DialogueTactic{
+    //                         tacticType = DialogueTacticType.challenge,
+    //                         content = "",
+    //                         successResponse = "",
+    //                         failResponse = ""
+    //                     },
+    //                     new DialogueTactic{
+    //                         tacticType = DialogueTacticType.redirect,
+    //                         content = "",
+    //                         successResponse = "",
+    //                         failResponse = ""
+    //                     }
+    //                 }
+    //     }
+    // };
 }
 

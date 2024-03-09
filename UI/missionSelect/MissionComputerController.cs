@@ -29,6 +29,7 @@ public class MissionComputerController : MonoBehaviour {
     public TextMeshProUGUI missionNameText;
     public TextMeshProUGUI taglineText;
     public Transform objectivesContainer;
+    public GameObject bonusObjectiveDivider;
 
     [Header("faction")]
     bool factionIsShowing;
@@ -216,22 +217,32 @@ public class MissionComputerController : MonoBehaviour {
         InitializeObjectives(template);
     }
     void InitializeObjectives(LevelTemplate template) {
+        bonusObjectiveDivider.SetActive(false);
+
         foreach (Transform child in objectivesContainer) {
-            if (child.name == "title") continue;
+            if (child.name == "title" || child.gameObject == bonusObjectiveDivider) continue;
             Destroy(child.gameObject);
         }
         foreach (Objective objective in template.objectives) {
-            GameObject obj = GameObject.Instantiate(objectivePrefab);
-            obj.transform.SetParent(objectivesContainer, false);
-            MissionSelectorObjective handler = obj.GetComponent<MissionSelectorObjective>();
+            MissionSelectorObjective handler = spawnObjective();
             handler.Initialize(objective);
-            AddSpacer();
-            // TextMeshProUGUI objText = obj.GetComponentInChildren<TextMeshProUGUI>();
-            // objText.text = objective.title;
+            // AddSpacer();
         }
-        // AddSpacer();
-        // AddDivider();
-        // AddSpacer();
+        if (template.bonusObjectives.Count > 0) {
+            // AddDivider();
+            bonusObjectiveDivider.SetActive(true);
+            bonusObjectiveDivider.transform.SetAsLastSibling();
+            foreach (Objective objective in template.bonusObjectives) {
+                MissionSelectorObjective handler = spawnObjective();
+                handler.Initialize(objective, isBonus: true);
+                // AddSpacer();
+            }
+        }
+    }
+    MissionSelectorObjective spawnObjective() {
+        GameObject obj = GameObject.Instantiate(objectivePrefab);
+        obj.transform.SetParent(objectivesContainer, false);
+        return obj.GetComponent<MissionSelectorObjective>();
     }
     public void AddSpacer() {
         GameObject spacerObj = GameObject.Instantiate(spacerPrefab);

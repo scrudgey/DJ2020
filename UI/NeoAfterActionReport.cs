@@ -59,6 +59,7 @@ public class NeoAfterActionReport : MonoBehaviour {
     public RectTransform skillPointCounterRect;
     RectTransform adjustMaskToRect;
     int mutableBalance;
+    int bonusAmount;
     int counterBalance;
     Coroutine currentCoroutine;
     float skipTimer = 0f;
@@ -70,8 +71,13 @@ public class NeoAfterActionReport : MonoBehaviour {
         continueButton.SetActive(false);
         perkMenuButton.SetActive(false);
 
+        bonusAmount = gameData.levelState.delta.optionalObjectiveDeltas
+            .Where(delta => delta.status == ObjectiveStatus.complete)
+            .Select(delta => delta.template.bonusRewardCredits)
+            .Sum();
+        counterBalance = data.levelState.template.creditReward + bonusAmount;
+
         mutableBalance = data.playerState.credits - data.levelState.template.creditReward;
-        counterBalance = data.levelState.template.creditReward;
 
         state = State.title;
 
@@ -275,7 +281,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         yield return new WaitForSeconds(1.5f);
 
         bonusObject.SetActive(true);
-        bonusAmountText.text = "0";
+        bonusAmountText.text = bonusAmount.ToString("#,#");
         StartCoroutine(TypeText(bonyusCaptionText));
 
         StartCoroutine(TypeText(bonusAmountText));

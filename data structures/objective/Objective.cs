@@ -13,6 +13,10 @@ public abstract class Objective : ScriptableObject {
     public Sprite objectiveImage;
     public List<string> potentialSpawnPoints;
     public List<Vector3> spawnPointLocations;
+    [Header("bonus reward")]
+    public int bonusRewardCredits;
+    public int bonusRewardFavors;
+    public int bonusRewardSkillpoints;
 
     public static string ReadableFinalStatus(ObjectiveStatus status) => status switch {
         ObjectiveStatus.canceled => "CANCELED",
@@ -35,5 +39,12 @@ public abstract class Objective : ScriptableObject {
             return plan.objectiveLocations[name];
         }
         return Toolbox.RandomFromList(potentialSpawnPoints);
+    }
+
+    public void ApplyReward(GameData gameData) {
+        Debug.Log($"bonus objective {title} applying reward");
+        gameData.playerState.credits += bonusRewardCredits;
+        gameData.playerState.favors += bonusRewardFavors;
+        gameData.playerState.skillpoints += bonusRewardSkillpoints;
     }
 }

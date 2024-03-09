@@ -343,7 +343,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // Collider player = ;
         ClearLineOfSight(playerCollider, (RaycastHit hit) => {
             // Debug.Log($"sight check player raycast hit: {hit.collider}");
-            if (hit.collider == playerCollider) Perceive(playerCollider, byPassVisibilityCheck: true);
+            if (hit.collider == null) return;
+            if (hit.collider.transform.root == playerCollider.transform.root) Perceive(playerCollider, byPassVisibilityCheck: true);
         });
     }
     void SetInputs(PlayerInput input) {
@@ -352,7 +353,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
             ClearLineOfSight(t.newestAddition, (RaycastHit hit) => {
-                if (hit.collider == t.newestAddition) Perceive(t.newestAddition);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == t.newestAddition.transform.root) Perceive(t.newestAddition);
             });
         }
     }
@@ -361,7 +363,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (collider == null)
                 continue;
             ClearLineOfSight(collider, (RaycastHit hit) => {
-                if (hit.collider == collider) Perceive(collider);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == collider.transform.root) Perceive(collider);
             });
         }
     }
@@ -456,6 +459,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             seenPlayerCollider = other;
             Reaction reaction = ReactToPlayerSuspicion();
             if (reaction == Reaction.attack) { // TODO: investigate routine
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
                     case SphereMoveState:
@@ -470,6 +475,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             } else if (reaction == Reaction.investigate) {
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
                     case SphereMoveState:

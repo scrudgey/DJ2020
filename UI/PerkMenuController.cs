@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class PerkMenuController : MonoBehaviour {
     public AudioSource audioSource;
     public PerkCategory currentPane;
@@ -66,13 +66,22 @@ public class PerkMenuController : MonoBehaviour {
         ChangePane(PerkCategory.gun);
         RefreshDisplay(state);
         HidePerkView();
+        // EaseInButtons();
     }
     void HidePerkView() {
         perkViewActive = false;
         perkviewContainer.SetActive(false);
         perkviewRect.sizeDelta = new Vector2(450, 50f);
     }
-
+    void EaseInButtons() {
+        float delay = 0f;
+        foreach (PerkButton button in GameObject.FindObjectsOfType(typeof(PerkButton), true).OrderBy(perkbutton => ((PerkButton)perkbutton).transform.position.x)) {
+            // button.Initialize(this, state);
+            // button.SetSelected(false);
+            button.EaseIn(delay);
+            delay += 0.005f;
+        }
+    }
     void RefreshDisplay(PlayerState state) {
         playerHealth.text = $"HP: {(int)state.health} / {state.fullHealthAmount()}";
         playerLevel.text = $"{state.PlayerLevel()}";
@@ -143,6 +152,8 @@ public class PerkMenuController : MonoBehaviour {
         outlineImage.color = c;
         headerOutlineImage.color = c;
         headerBackgroundImage.color = c;
+
+        EaseInButtons();
     }
 
     public void PerkButtonCallback(PerkButton button) {

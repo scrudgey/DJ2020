@@ -107,6 +107,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
             GameManager.I.SetLocationOfDisturbance(other.bounds.center);
             GameManager.I.DispatchGuard(other.bounds.center);
             GameManager.I.AddSuspicionRecord(SuspicionRecord.trippedSensor("security camera"));
+            GameManager.I.StickifySuspicion();
         }
     }
 

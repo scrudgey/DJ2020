@@ -10,6 +10,8 @@ public class TerminalEntry : MonoBehaviour {
     public IEnumerator Write(Writeln input, AudioClip[] audioClips) {
         // text.text = input;
         text.text = "";
+        text.color = input.color;
+        IEnumerator blinker = input.flash ? Toolbox.CoroutineFunc(() => { StartCoroutine(Toolbox.BlinkColor(text, input.color)); }) : Toolbox.CoroutineFunc(() => { });
         return Toolbox.ChainCoroutines(
             Toolbox.CoroutineFunc(() => {
                 if (input.playerType) {
@@ -21,7 +23,8 @@ public class TerminalEntry : MonoBehaviour {
                 if (input.playerType) {
                     audioSource.Stop();
                 }
-            })
+            }),
+            blinker
         );
     }
 }

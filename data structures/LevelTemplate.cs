@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -81,4 +82,6 @@ public class LevelTemplate : ScriptableObject {
         }
         return index;
     }
+
+    public List<Objective> AllObjectives() => objectives.Concat(bonusObjectives).ToList();
 }

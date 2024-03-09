@@ -6,6 +6,7 @@ using UnityEngine;
 [System.Serializable]
 public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants { //IGunHandlerState
     public int credits;
+    public int favors;
 
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> loots;

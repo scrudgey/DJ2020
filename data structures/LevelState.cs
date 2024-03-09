@@ -95,4 +95,5 @@ public class LevelState : PerkIdConstants {
     public int NumberPreviousTacticType(DialogueTacticType type) {
         return delta.lastTactics.Where(tactic => tactic == type).Count();
     }
+
 }

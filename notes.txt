@@ -3159,6 +3159,38 @@ x ladders
         * indicator indicates when a shot deflects
             * splat / deflect sfx
     * gunshots / impacts / impact sounds / impact effects
+* better NPC reaction to being hurt
+    * cries from those hit should alert others
+    * hide text
+    * alert icon is visible during death sequence
+    * guard behavior is weird
+    * scientists don't react to others dying
+    * cyberware
+    * music
+        * auto leveling, balance, ducking
+* even when node edges are known, cyber info shows edges as unknowns unless node is known
+* sword holster has smg sprite?
+* 711 broken
+    * guard doesnt care about me waving a gun or robbing the register
+* shotgun reload broken
+* graphical glitch when entering / exiting aim mode in yamachi
+* ease in elements of perk menu
+* regenerate graphs and objectives for all missions   
+* optional objectives
+    * find all places where we objectiveDeltas.Concat optional objectives
+    * replace with general method
+    * then ensure that we use this in every place
+    * test that objective completion works as expected
+    * apply reward from completed optional objectives
+    * delineate optional / not in all places
+        * mission overview
+        * mission planning
+        * pause screen
+        * mission fail
+        * after action report
+* optional objective change text
+
+
 
 
 
@@ -3181,7 +3213,7 @@ uncertain:
         slow walk?
     apply skin graphics to corpse?
     "v" and "^" buttons on scrollbars?
-    show objectives as blit-in text on lower left?  
+    * show objectives as blit-in text on lower left?  
         show days
     maybe fall damage from rooftop should be greater
     larger / more clear crosshairs cursor
@@ -3189,7 +3221,7 @@ uncertain:
         newtonsoft json is broken??
         bolt cutter?
     router panel conceals a second port?
-    way to hack camera without opening panel?
+    * way to hack camera without opening panel?
     electrical zap effect around broken wires?
     shooting the objects
         shoot laser tripwire to disable?
@@ -3197,8 +3229,8 @@ uncertain:
     adjust rate of fire for pistols?
     ? when pause menu changes sizes, relevant buttons should stay in place.- how?
 
-
 nice to have / future goals:
+    one way to make an effective callout camera movement is linear
     * after action report should be fragmentary, show reward, over a transit cutscene
     first level should set the tone
     aim: swing into position, then subtly zoom in to focus on reticle
@@ -3574,8 +3606,17 @@ holster to put away rocket launcher
 hide elements in inspector that are set by template
 cutting wire on security camera did not work
 hacking seccurity camera did not work
-npc heads can turn to face other npcs in the area
-npc can ask "can i help you?" to player who intrudes on their space?
+
+AI
+    npc heads can turn to face other npcs in the area
+    npc can ask "can i help you?" to player who intrudes on their space?
+    multiple guards chose the same clearpoint to navigate to- more global coordination
+    better investigative ability when player does something weird like superjump / land
+    711 worker? interrogated me 
+    guard stood facing wall in tower
+    maybe sight check a little higher
+
+
 reselect rocket launcher to put away
 attack surface card reader attack
 attack surface for keycard reader
@@ -3592,8 +3633,6 @@ jazz up elevator controller
     sound effects
     click effect
 
-guard stood facing wall in tower
-
 unresolved mechanics / gameplay questions:
     * progression in burglar tools?
     * hacking
@@ -3606,7 +3645,6 @@ unresolved mechanics / gameplay questions:
     backpack and duffel bag
 
 major initiatives:
-    anime effects
     destructible walls
     vehicles
     finalize street 
@@ -3628,6 +3666,11 @@ shops:
         software, hardware
     sell guns
     mystery man in bar
+
+burglar system
+    outline all burglar tools
+    burglar tool mentor
+    intelligence gathering
 
 more equipment to bring on mission?
     shuriken
@@ -3660,57 +3703,43 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-
-
-* better NPC reaction to being hurt
-    * cries from those hit should alert others
-    * hide text
-    * alert icon is visible during death sequence
-    * guard behavior is weird
-    * scientists don't react to others dying
-    * cyberware
-    * music
-        * auto leveling, balance, ducking
-
-
-
-armor piercing ammo to be indicated somewhere in the gun info display
-
-in-between montage
-    unlock contacts
-    favor system
-
+circuitry hacking
+alarm sensors
+v2 of selling data / upgrading hack ability
+highlight NPCs that are shooting me
 graphic effects
     80s electricity 
     anime glow 
 
-711 broken
-shotgun reload broken
+medium-effort mini systems work:
+    update the steam page graphic
+    in-between montage
+        unlock contacts
+    armor piercing ammo to be indicated somewhere in the gun info display
+        first: gun shop progression
 
-ease in elements of perk menu
-    color disabled elements differently
-graphical glitch when entering / exiting aim mode in yamachi
-update the steam page graphic
-multiple guards chose the same clearpoint to navigate to- more global coordination
-better investigative ability when player does something weird like superjump / land
-highlight NPCs that are shooting me
-worker dialogue tree
 
-some suspicion records could be sticky when noticed
-    anything related to player behavior and appearance
-    the basic problem here is: robbing the register makes you suspicious for a long time even if nobody sees it.
-        opposite problem: you do something quick suspicious and by the time the guard investigates you, it's over.
-    solution: some suspicion records are quick lived, unless they are observed, then they are stickied.
-        can be stickied by guard,
-        can be stickied by minor security camera
+
+
+
+favor system
+worker npc dialogue tree
 key system:
     more detailed key usage enabling keyed alike attacks 
-music
-    dynamic normalizing as tracks enable / disable?
-circuitry hacking
+    use passwords in analogous way
+    password data unlocks passwords
+display different title when stickied: past tense
+    when adding record, if sticky record already exists, switch content...?
+        record stays stickied
+    different caption
+    different challenge
+security cameras should be visible from floor!
 
-v2 of selling data / upgrading hack ability
-* even when node edges are known, cyber info shows edges as unknowns unless node is known
-sword holster has smg sprite?
 
 
+define new objective types:
+    don't kill anyone, etc
+    steal x amount loot
+    extra data file
+
+multiple offers

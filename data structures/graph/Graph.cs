@@ -228,7 +228,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         if (newNodeVisibility > node.visibility) {
             node.visibility = newNodeVisibility;
             doSfx = true;
-            foreach (ObjectiveDelta objective in GameManager.I.gameData.levelState.delta.objectiveDeltas.Concat(GameManager.I.gameData.levelState.delta.optionalObjectiveDeltas)) {
+            foreach (ObjectiveDelta objective in GameManager.I.gameData.levelState.delta.AllObjectives()) {
                 if (objective.targetIdn == node.idn) {
                     objective.visibility = Objective.Visibility.known;
                 }

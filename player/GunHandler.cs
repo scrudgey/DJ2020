@@ -39,7 +39,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     public bool nonAnimatedReload;
     public GameObject tamperEvidenceObject;
     public AudioClip[] reachForHolsterSound;
-    int numberOfShellsPerReload;
+    // int numberOfShellsPerReload;
     public bool isSwitchingWeapon;
     GunType fromGunType;
     GunType toGunType;
@@ -75,6 +75,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     }
     // used by animator
     public void ShellIn() {
+        int numberOfShellsPerReload = isPlayerCharacter ? GameManager.I.gameData.playerState.numberOfShellsPerReload() : 1;
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipIn);
         gunInstance.ShellIn(numberOfShellsPerReload);
         OnValueChanged?.Invoke(this);

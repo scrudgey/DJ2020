@@ -22,7 +22,7 @@ public class SightCone : MonoBehaviour, IBindable<SightCone> {
         // Debug.Log($"adding to field of view: {other}");
         newestAddition = other;
         fieldOfView.Add(other);
-        PruneFieldOfView();
+        // PruneFieldOfView();
         OnValueChanged?.Invoke(this);
     }
     private void OnTriggerExit(Collider other) {

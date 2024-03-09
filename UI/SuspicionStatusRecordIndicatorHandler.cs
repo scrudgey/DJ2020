@@ -13,9 +13,13 @@ public class SuspicionStatusRecordIndicatorHandler : MonoBehaviour {
     public Color green;
     public Color yellow;
     public Color red;
+    public Color defaultBarColor;
+    public Color alertBarColor;
+    public Image barImage;
     float timer;
     bool easeIn;
     float easeInDuration = 0.1f;
+    Coroutine flashRoutine;
     public void Configure(SuspicionRecord record, bool newRecord = false) {
         this.suspicionRecord = record;
         dotText.color = record.suspiciousness switch {
@@ -26,6 +30,15 @@ public class SuspicionStatusRecordIndicatorHandler : MonoBehaviour {
         };
         contentText.text = record.content;
         if (newRecord) StartEaseIn();
+        if (record.stickiedThisFrame) {
+            record.stickiedThisFrame = false;
+            flashRoutine = StartCoroutine(FlashSticky());
+        }
+        if (flashRoutine != null) {
+            barImage.color = alertBarColor;
+        } else {
+            barImage.color = defaultBarColor;
+        }
     }
     void StartEaseIn() {
         timer = 0f;
@@ -51,5 +64,12 @@ public class SuspicionStatusRecordIndicatorHandler : MonoBehaviour {
         } else {
             lifetimeFillBarTransform.sizeDelta = new Vector2(0f, 0f);
         }
+    }
+
+    IEnumerator FlashSticky() {
+        yield return Toolbox.Ease(null, 0.2f, 0f, rectTransform.rect.width, PennerDoubleAnimation.Linear, (amount) => {
+            lifetimeFillBarTransform.sizeDelta = new Vector2(amount, 1f);
+        });
+        lifetimeFillBarTransform.sizeDelta = new Vector2(0f, 0f);
     }
 }

@@ -18,9 +18,8 @@ public class MissionPlanOverviewController : MonoBehaviour {
     public TextMeshProUGUI securityDescText;
     [Header("objectives")]
     public Transform objectivesContainer;
+    public Transform bonusObjectivesContainer;
     public GameObject objectivePrefab;
-    public Transform bonusContainer;
-    public GameObject bonusPrefab;
     public GameObject bonusTitle;
 
     GameData data;
@@ -38,7 +37,7 @@ public class MissionPlanOverviewController : MonoBehaviour {
         foreach (Transform child in objectivesContainer) {
             Destroy(child.gameObject);
         }
-        foreach (Transform child in bonusContainer) {
+        foreach (Transform child in bonusObjectivesContainer) {
             Destroy(child.gameObject);
         }
         bonusTitle.SetActive(false);
@@ -53,6 +52,12 @@ public class MissionPlanOverviewController : MonoBehaviour {
         if (template.bonusObjectives.Count > 0) {
             bonusTitle.SetActive(true);
             // populate list
+            foreach (Objective objective in template.bonusObjectives) {
+                GameObject obj = GameObject.Instantiate(objectivePrefab);
+                obj.transform.SetParent(bonusObjectivesContainer, false);
+                MissionSelectorObjective handler = obj.GetComponent<MissionSelectorObjective>();
+                handler.Initialize(objective, isBonus: true);
+            }
         }
 
     }

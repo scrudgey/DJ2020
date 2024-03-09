@@ -154,7 +154,7 @@ public class LevelDataUtilEditor : Editor {
     }
 
     public void SetObjectiveData(LevelTemplate template) {
-        foreach (Objective objective in template.objectives) {
+        foreach (Objective objective in template.AllObjectives()) {
             objective.spawnPointLocations = new List<Vector3>();
             objective.potentialSpawnPoints = new List<string>();
         }
@@ -170,18 +170,19 @@ public class LevelDataUtilEditor : Editor {
             objective.spawnPointLocations.Add(lootSpawnpoint.transform.position);
 
             EditorUtility.SetDirty(objective);
+            EditorUtility.SetDirty(lootSpawnpoint);
         }
 
         List<CyberComponent> cyberDataStores = GameObject.FindObjectsOfType<CyberComponent>()
             .Where(component => component.nodeType == CyberNodeType.datanode).ToList();
 
-        foreach (ObjectiveData objective in template.objectives.Where(objective => objective is ObjectiveData)) {
+        foreach (ObjectiveData objective in template.AllObjectives().Where(objective => objective is ObjectiveData)) {
             objective.spawnPointLocations = cyberDataStores.Select(component => component.transform.position).ToList();
             objective.potentialSpawnPoints = cyberDataStores.Select(component => component.idn).ToList();
             EditorUtility.SetDirty(objective);
         }
 
-        Debug.Log($"wrote {template.objectives.Count} objective data");
+        Debug.Log($"wrote {template.AllObjectives().Count} objective data");
 
         EditorUtility.SetDirty(template);
     }

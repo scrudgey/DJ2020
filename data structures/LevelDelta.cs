@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
+
 [System.Serializable]
 public record LevelDelta {
     public enum MissionPhase { action, extractionSuccess, extractionFail, playerDead }
@@ -46,4 +48,6 @@ public record LevelDelta {
         physicalKeys = new HashSet<int>(),
         keycards = new HashSet<int>()
     };
+    public List<ObjectiveDelta> AllObjectives() => objectiveDeltas.Concat(optionalObjectiveDeltas).ToList();
+
 }

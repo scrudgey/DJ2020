@@ -72,7 +72,6 @@ public class UIController : MonoBehaviour {
         HideBurglar();
         HideMissionSelector();
         saveIndicatorController.HideIndicator();
-        objectiveCanvasController.Initialize();
         objectivesCompleteController.Initialize();
         weaponUIHandler.Initialize();
         meleeWeaponUIHandler.Initialize();

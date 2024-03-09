@@ -194,6 +194,8 @@ public class Skin {
                     return shotgunHolster;
                 case GunType.pistol:
                     return pistolHolster;
+                case GunType.sword:
+                    return swordHolster;
             }
         } else {
             switch (input.toGunType) {
@@ -658,9 +660,10 @@ public class Skin {
             return unarmedUse;
         }
         // gun states
-        if (input.gunInput.gunType == GunType.sword) {
+        if (input.gunInput.gunType == GunType.sword || input.gunInput.fromGunType == GunType.sword) {
             switch (input.gunInput.gunState) {
                 case GunHandler.GunStateEnum.holstering:
+                    Debug.Log("setting sprites: swordholster");
                     return swordHolster;
                 case GunHandler.GunStateEnum.shooting:
                     return swordSwing;

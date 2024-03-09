@@ -251,7 +251,7 @@ public class MapDisplayController : MonoBehaviour {
         }
 
         // TODO: bonus objectives?
-        foreach (Objective objective in template.objectives) {
+        foreach (Objective objective in template.AllObjectives()) {
             GameObject obj = GameObject.Instantiate(insertionPointButtonPrefab);
             InsertionPointSelector selector = obj.GetComponent<InsertionPointSelector>();
             obj.transform.SetParent(objectivePointContainer, false);

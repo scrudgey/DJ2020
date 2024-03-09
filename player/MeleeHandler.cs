@@ -32,6 +32,7 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
             StopCoroutine(swingRoutine);
             ShowSwordLine(false);
         }
+        // Debug.Break();
 
         state = GunHandler.GunStateEnum.holstering;
         fromGunType = GunType.sword;
@@ -78,6 +79,8 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
         if (meleeWeapon == null) {
             Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
         }
+
+        // Debug.Break();
         state = GunHandler.GunStateEnum.holstering;
         meleeWeapon = weaponState.meleeWeapon;
 
