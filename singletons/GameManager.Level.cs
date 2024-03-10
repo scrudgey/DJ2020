@@ -19,6 +19,7 @@ public partial class GameManager : Singleton<GameManager> {
     public float timePlayed;
     List<AsyncOperation> scenesLoading;
     public bool isLoadingLevel;
+    public Action<CharacterController> OnHumanDied;
     void Awake() {
         InputController.InitializeInstance();
     }
@@ -100,11 +101,14 @@ public partial class GameManager : Singleton<GameManager> {
                     GameObject npc = spawnPoint.SpawnTemplated();
                     CharacterController controller = npc.GetComponentInChildren<CharacterController>();
                     controller.OnCharacterDead += HandleNPCDead;
+                    controller.OnCharacterDead += HandleHumanDead;
                     state.delta.npcCount += 1;
                 }
             }
             foreach (WorkerSpawnPoint spawnPoint in GameObject.FindObjectsOfType<WorkerSpawnPoint>()) {
                 GameObject npc = spawnPoint.SpawnTemplated();
+                CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+                controller.OnCharacterDead += HandleHumanDead;
             }
 
             foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
@@ -112,7 +116,11 @@ public partial class GameManager : Singleton<GameManager> {
             }
 
             foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
-                zone.SpawnNPCs();
+                List<GameObject> npcs = zone.SpawnNPCs();
+                foreach (GameObject npc in npcs) {
+                    CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+                    controller.OnCharacterDead += HandleHumanDead;
+                }
             }
         }
 
@@ -141,8 +149,8 @@ public partial class GameManager : Singleton<GameManager> {
 
         TransitionToPhase(GamePhase.levelPlay);
 
-        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.AllObjectives()
-            .Select(objective => objective.status).ToList());
+        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.objectiveDeltas.Select(objective => objective.status).ToList());
+        lastOptionalObjectiveStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.optionalObjectiveDeltas.Select(objective => objective.status).ToList());
 
         if (doCutscene)
             StartCutsceneCoroutine(StartMissionCutscene());
@@ -173,6 +181,11 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void HandleNPCDead(CharacterController npc) {
         RemoveNPC(npc);
+    }
+    void HandleHumanDead(CharacterController npc) {
+        npc.OnCharacterDead -= HandleHumanDead;
+        OnHumanDied?.Invoke(npc);
+        gameData.levelState.delta.humansKilled += 1;
     }
 
     public void RemoveNPC(CharacterController npc) {

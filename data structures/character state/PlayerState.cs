@@ -203,6 +203,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             payDatas = new List<PayData>(),
 
             credits = 9650,
+            favors = 7,
             // credits = 600,
             loots = loots,
 

@@ -3190,6 +3190,14 @@ x ladders
         * after action report
 * optional objective change text
 
+* define new objective types:
+    * don't kill anyone, etc
+    * don't raise the alarm
+* favor system
+    * favor iconography
+    * use favor to purchase tactic
+
+
 
 
 
@@ -3617,6 +3625,9 @@ AI
     maybe sight check a little higher
 
 
+security cameras should be visible from floor!
+are anonymous delegates memory leaks? i.e. objective deltas
+711 HQ said dispatching strike team; no strike team arrived and guards were silent- they're supposed to search the building
 reselect rocket launcher to put away
 attack surface card reader attack
 attack surface for keycard reader
@@ -3632,6 +3643,9 @@ loot has portrait view in burglar?
 jazz up elevator controller
     sound effects
     click effect
+show bonus reward favors
+
+
 
 unresolved mechanics / gameplay questions:
     * progression in burglar tools?
@@ -3654,7 +3668,7 @@ major initiatives:
         productionize office
             redo apartment after office
     system:
-        title
+        * title
         controls, settings
         * pause screen status report
             * loot, data
@@ -3666,6 +3680,11 @@ shops:
         software, hardware
     sell guns
     mystery man in bar
+
+tactics
+    tactic dialogue is jumpy
+    replace credit symbol when price is favor, not credits
+    faster text blit
 
 burglar system
     outline all burglar tools
@@ -3717,13 +3736,13 @@ medium-effort mini systems work:
         unlock contacts
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
+        gun perks
 
 
 
-
-
-favor system
 worker npc dialogue tree
+    scientist
+    7-11 worker
 key system:
     more detailed key usage enabling keyed alike attacks 
     use passwords in analogous way
@@ -3733,13 +3752,5 @@ display different title when stickied: past tense
         record stays stickied
     different caption
     different challenge
-security cameras should be visible from floor!
 
 
-
-define new objective types:
-    don't kill anyone, etc
-    steal x amount loot
-    extra data file
-
-multiple offers

@@ -14,6 +14,7 @@ public class ObjectiveDelta {
     public Objective template;
     public Func<Vector3> GetPosition;
     public string targetIdn;
+    public bool hasLocation = true;
 
     public ObjectiveDelta(Objective objective, Func<Vector3> GetPosition, string targetIdn) {
         this.template = objective;
@@ -22,4 +23,5 @@ public class ObjectiveDelta {
         this.targetIdn = targetIdn;
         status = ObjectiveStatus.inProgress;
     }
+
 }

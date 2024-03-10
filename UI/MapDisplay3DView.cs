@@ -234,6 +234,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             }
         } else if (mode == Mode.mission) {
             foreach (ObjectiveDelta delta in state.delta.AllObjectives()) {
+                if (!delta.hasLocation) continue;
                 if (delta.visibility == Objective.Visibility.unknown || delta.status != ObjectiveStatus.inProgress) {
                     if (objectiveIndicators.ContainsKey(delta.template))
                         objectiveIndicators[delta.template].gameObject.SetActive(false);

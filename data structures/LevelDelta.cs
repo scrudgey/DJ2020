@@ -38,6 +38,7 @@ public record LevelDelta {
 
     public HashSet<int> physicalKeys;
     public HashSet<int> keycards;
+    public int humansKilled;
     public static LevelDelta Empty() => new LevelDelta {
         levelAcquiredPaydata = new List<PayData>(),
         levelAcquiredLoot = new List<LootData>(),

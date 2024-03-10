@@ -16,6 +16,7 @@ public partial class GameManager : Singleton<GameManager> {
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
     public Action<GameObject> OnNPCSpawn;
+    public Action OnAlarmActivate;
 
     List<CharacterController> strikeTeamMembers;
 
@@ -34,6 +35,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void ActivateLevelAlarm() {
         gameData.levelState.delta.strikeTeamMissionTimer = 0f;
+
         if (!gameData.levelState.delta.alarmTerminalActive) {
             if (gameData.levelState.delta.hqPhase == HQPhase.normal)
                 ChangeHQPhase(HQPhase.dispatchStrikeTeam);
@@ -46,11 +48,13 @@ public partial class GameManager : Singleton<GameManager> {
                 point.cleared = false;
             }
             if (allClearPoints.Length > 0) {
+                // TODO: this could be handled with event
                 foreach (SphereRobotAI ai in FindObjectsOfType<SphereRobotAI>()) {
                     ai.OnAlarmActivate(allClearPoints);
                 }
             }
             OnSuspicionChange?.Invoke();
+            OnAlarmActivate?.Invoke();
         }
     }
     public void DeactivateAlarm() {
