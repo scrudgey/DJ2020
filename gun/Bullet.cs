@@ -10,6 +10,7 @@ public class Bullet {
     public Vector3 gunPosition;
     public Ray ray;
     public Vector3 source;
+    public int piercing;
     public Bullet(Ray ray) {
         this.ray = ray;
     }

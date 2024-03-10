@@ -1,27 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class MissionFailMenuController : MonoBehaviour {
     public GameObject UIEditorCamera;
     public Transform objectivesContainer;
     public GameObject objectiveIndicatorPrefab;
+    public GameObject bonusObjectiveHeader;
+    public TextMeshProUGUI missionname;
     private GameData gameData;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
     }
     public void Start() {
         foreach (Transform child in objectivesContainer) {
+            if (child.gameObject == bonusObjectiveHeader) continue;
             Destroy(child.gameObject);
         }
     }
     public void Initialize(GameData data) {
         this.gameData = data;
-        foreach (Objective objective in data.levelState.template.objectives) {
+        missionname.text = data.levelState.template.readableMissionName;
+        foreach (ObjectiveDelta objective in data.levelState.delta.objectiveDeltas) {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
             obj.transform.SetParent(objectivesContainer, false);
-            PauseScreenObjectiveIndicator controller = obj.GetComponent<PauseScreenObjectiveIndicator>();
-            controller.Configure(objective, data);
+            MissionSelectorObjective controller = obj.GetComponent<MissionSelectorObjective>();
+            controller.Initialize(objective);
+        }
+        if (data.levelState.delta.optionalObjectiveDeltas.Count > 0) {
+            bonusObjectiveHeader.SetActive(true);
+            bonusObjectiveHeader.transform.SetAsLastSibling();
+            foreach (ObjectiveDelta objective in data.levelState.delta.optionalObjectiveDeltas) {
+                GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
+                obj.transform.SetParent(objectivesContainer, false);
+                MissionSelectorObjective controller = obj.GetComponent<MissionSelectorObjective>();
+                controller.Initialize(objective, isBonus: true);
+            }
+        } else {
+            bonusObjectiveHeader.SetActive(false);
         }
     }
     public void ReplanButtonCallback() {

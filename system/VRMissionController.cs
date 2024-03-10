@@ -32,7 +32,7 @@ public class VRMissionController : MonoBehaviour {
         PoolManager.I.RegisterPool("prefabs/NPC", poolSize: NPCPoolSize);
         spawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToArray();
         if (!state.template.alarmHQEnabled) {
-            AlarmRadio levelHQTerminal = GameManager.I.levelRadioTerminal();
+            AlarmNode levelHQTerminal = GameManager.I.levelRadioTerminal();
             if (levelHQTerminal != null) {
                 GameManager.I.RemoveAlarmNode(levelHQTerminal.idn);
             }

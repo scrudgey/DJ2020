@@ -101,9 +101,12 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     }
 
     void HandleHitStateChange(Destructible destructible) {
+        // Debug.Log($"hit state change: {destructible.hitState}");
         if (destructible.hitState == HitState.dead) {
-            alertHandler.enabled = false;
-            speechTextController.enabled = false;
+            // alertHandler.enabled = false;
+            // speechTextController.enabled = false;
+            alertHandler.gameObject.SetActive(false);
+            speechTextController.gameObject.SetActive(false);
         }
     }
 
@@ -340,7 +343,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         // Collider player = ;
         ClearLineOfSight(playerCollider, (RaycastHit hit) => {
             // Debug.Log($"sight check player raycast hit: {hit.collider}");
-            if (hit.collider == playerCollider) Perceive(playerCollider, byPassVisibilityCheck: true);
+            if (hit.collider == null) return;
+            if (hit.collider.transform.root == playerCollider.transform.root) Perceive(playerCollider, byPassVisibilityCheck: true);
         });
     }
     void SetInputs(PlayerInput input) {
@@ -349,7 +353,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public override void HandleValueChanged(SightCone t) {
         if (t.newestAddition != null) {
             ClearLineOfSight(t.newestAddition, (RaycastHit hit) => {
-                if (hit.collider == t.newestAddition) Perceive(t.newestAddition);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == t.newestAddition.transform.root) Perceive(t.newestAddition);
             });
         }
     }
@@ -358,7 +363,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             if (collider == null)
                 continue;
             ClearLineOfSight(collider, (RaycastHit hit) => {
-                if (hit.collider == collider) Perceive(collider);
+                if (hit.collider == null) return;
+                if (hit.collider.transform.root == collider.transform.root) Perceive(collider);
             });
         }
     }
@@ -395,7 +401,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
             if (other.CompareTag("bulletImpact")) {
                 BulletImpact bulletImpact = other.GetComponent<BulletImpact>();
-                if (bulletImpact.damage.hit.collider.transform.IsChildOf(transform)) {
+                if (bulletImpact.impacted.IsChildOf(transform)) {
 
                 } else {
                     switch (stateMachine.currentState) {
@@ -453,6 +459,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             seenPlayerCollider = other;
             Reaction reaction = ReactToPlayerSuspicion();
             if (reaction == Reaction.attack) { // TODO: investigate routine
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
                     case SphereMoveState:
@@ -467,6 +475,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                         break;
                 }
             } else if (reaction == Reaction.investigate) {
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case SearchDirectionState:
                     case SphereMoveState:
@@ -623,6 +633,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             }
         } else {
             // not player
+            // Debug.Break();
             if (noise.data.suspiciousness > Suspiciousness.normal) {
                 lastHeardDisturbancePosition = new SpaceTimePoint(noise.transform.position);
                 if (noise.data.suspiciousness == Suspiciousness.suspicious) {
@@ -732,6 +743,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public void OnPoolActivate() {
         Awake();
         listener = gameObject.GetComponentInChildren<Listener>();
+        alertHandler.gameObject.SetActive(true);// = true;
+        speechTextController.gameObject.SetActive(true);
     }
     public void OnPoolDectivate() {
         perceptionCountdown = 0f;
@@ -746,7 +759,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         recentlyInCombat = false;
         recentHeardSuspicious = Suspiciousness.normal;
         lastSuspicionLevel = Suspiciousness.normal;
-        alertHandler.enabled = true;
+        // alertHandler.enabled = true;
+        alertHandler.gameObject.SetActive(false);// = true;
+
         speechTextController.enabled = true;
         highlight.navMeshPath = null;
         stateMachine = new SphereRobotBrain();

@@ -4,16 +4,16 @@ using Items;
 using TMPro;
 using UnityEngine;
 public class LoadoutStashPickerButton : MonoBehaviour {
-    public enum PickerType { gun, item }
+    public enum PickerType { gun, item, melee }
     public PickerType type;
     public MissionPlanLoadoutController loadoutController;
     public TextMeshProUGUI text;
-    public GunState gunstate;
+    public WeaponState gunstate;
     public ItemTemplate item;
-    public void Initialize(MissionPlanLoadoutController controller, GunState state) {
+    public void Initialize(MissionPlanLoadoutController controller, WeaponState state) {
         this.gunstate = state;
         this.loadoutController = controller;
-        text.text = state.getShortName();
+        text.text = state.GetShortName();
         type = PickerType.gun;
     }
     public void Initialize(MissionPlanLoadoutController controller, ItemTemplate item) {

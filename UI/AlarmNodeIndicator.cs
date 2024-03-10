@@ -10,16 +10,19 @@ public class AlarmNodeIndicator : NodeIndicator<AlarmNode, AlarmGraph> {
     public GameObject timerObject;
     public RectTransform timerRect;
     public RectTransform bkgRect;
-
-    protected override void SetGraphicalState(AlarmNode node) {
+    public GraphIconReference iconReference;
+    public override void SetGraphicalState(AlarmNode node) {
+        // iconImage.sprite = normalIcon;
+        iconImage.sprite = iconReference.AlarmNodeSprite(node);
         if (!node.getEnabled()) {
-            image.color = deadColor;
+            iconImage.color = deadColor;
         } else if (node.alarmTriggered) {
-            image.color = enabledColor;
+            iconImage.color = enabledColor;
             timerRect.sizeDelta = new Vector2(node.countdownTimer / 30f * bkgRect.rect.width, 1f);
         } else {
-            image.color = disabledColor;
+            iconImage.color = disabledColor;
         }
+
         if (node.countdownTimer > 0f) {
             timerObject.SetActive(true);
         } else {

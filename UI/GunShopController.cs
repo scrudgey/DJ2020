@@ -140,9 +140,9 @@ public class GunShopController : MonoBehaviour {
             Destroy(child.gameObject);
         }
         emptyInventoryIndicator.SetActive(GameManager.I.gameData.playerState.allGuns.Count == 0);
-        foreach (GunState gun in GameManager.I.gameData.playerState.allGuns) {
-            if (gun == null) continue;
-            GameObject button = CreatePlayerGunButton(gun);
+        foreach (WeaponState weapon in GameManager.I.gameData.playerState.allGuns) {
+            if (weapon == null || weapon.type == WeaponType.melee) continue;
+            GameObject button = CreatePlayerGunButton(weapon.gunInstance);
             if (button == null) continue;
             button.transform.SetParent(rightGunScrollContainer, false);
         }
@@ -238,7 +238,7 @@ public class GunShopController : MonoBehaviour {
 
         // add instance to player arsenal
         GunState newGun = GunState.Instantiate(data.template);
-        GameManager.I.gameData.playerState.allGuns.Add(newGun);
+        GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(newGun));
 
         // clear stat view
         ClearGunForSale();

@@ -4,8 +4,8 @@ using TMPro;
 using UnityEngine;
 public class AfterActionReportObjectiveHandler : MonoBehaviour {
     public TextMeshProUGUI objectiveText;
-    public void Initialize(Objective objective, ObjectiveStatus status, GameData data) {
+    public void Initialize(ObjectiveDelta objective, ObjectiveStatus status, GameData data) {
         string statusString = Objective.ReadableFinalStatus(status);
-        objectiveText.text = $"{objective.title} - {statusString}";
+        objectiveText.text = $"{objective.template.title} - {statusString}";
     }
 }

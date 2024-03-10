@@ -8,14 +8,53 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/Objectives/ObjectiveData")]
 public class ObjectiveData : Objective {
     public PayData targetPaydata;
-    protected override ObjectiveStatus EvaluateStatus(GameData data) {
-        // if (targetPaydata.All(payData => data.playerState.payDatas.Select(dat => dat.filename).Contains(payData.filename))) {
-        // if (targetPaydata.All(payData => data.levelState.delta.levelAcquiredPaydata.Select(dat => dat.filename).Contains(payData.filename))) {
-        if (data.levelState.delta.levelAcquiredPaydata.Contains(targetPaydata)) {
-            return ObjectiveStatus.complete;
-        } else {
-            return ObjectiveStatus.inProgress;
+
+    // public override string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
+    //     if (plan.objectiveLocations.ContainsKey(name)) {
+    //         return plan.objectiveLocations[name];
+    //     }
+    //     return Toolbox.RandomFromList(potentialSpawnPoints);
+    // }
+
+    // public override string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
+    //     if (plan.objectiveLocations.ContainsKey(template.name)) {
+    //         return plan.objectiveLocations[template.name];
+    //     }
+
+    //     CyberGraph cyberGraph = CyberGraph.LoadAll(template.levelName);
+    //     List<CyberNode> dataNodes = cyberGraph.nodes.Values.Where(node => node.type == CyberNodeType.datanode).ToList();
+    //     if (dataNodes.Count == 0) {
+    //         Debug.LogError("Not enough data nodes to support level objectives! Mission is not possible.");
+    //     }
+    //     return Toolbox.RandomFromList(dataNodes).idn;
+    // }
+    public override ObjectiveDelta ToDelta(LevelState state) {
+        string targetIdn = SelectSpawnPointIdn(state.template, state.plan);
+
+        CyberNode target = state.delta.cyberGraph.nodes[targetIdn];
+        target.payData = targetPaydata;
+
+        // dataNodes.Remove(target); // TODO: fix this so that multiple objectives can't select the same target node!
+
+        ObjectiveDelta delta = new ObjectiveDelta(this, () => target.position, targetIdn);
+        target.OnDataStolen += () => delta.status = ObjectiveStatus.complete;
+
+        Debug.Log($"[objective data] applying objective data {name}:{targetPaydata} -> {target.nodeTitle}:{target.idn}");
+        if (state.plan.objectiveLocations.ContainsKey(name)) {
+            delta.visibility = Visibility.known;
         }
+        if (delta.visibility == Visibility.known) {
+            if (target.visibility < NodeVisibility.known) {
+                target.visibility = NodeVisibility.known;
+            }
+        }
+
+        foreach (CyberComponent cyberComponent in GameObject.FindObjectsOfType<CyberComponent>()) {
+            if (cyberComponent.idn == targetIdn) {
+                cyberComponent.OnDestroyCallback += () => delta.status = ObjectiveStatus.failed;
+            }
+        }
+
+        return delta;
     }
-    public override float Progress(GameData data) => 0f;
 }

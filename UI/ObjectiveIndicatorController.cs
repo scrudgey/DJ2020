@@ -13,8 +13,8 @@ public class ObjectiveIndicatorController : MonoBehaviour {
     public Image[] images;
     Coroutine indicateNewRoutine;
     public Image outlineImage;
-    public void Configure(Objective objective, GameData gameData, int index) {
-        ObjectiveStatus status = objective.Status(gameData);
+    public void Configure(ObjectiveDelta objective, int index) {
+        ObjectiveStatus status = objective.status;
         checkBoxText.text = status switch {
             ObjectiveStatus.inProgress => "",
             ObjectiveStatus.complete => "+",
@@ -33,7 +33,7 @@ public class ObjectiveIndicatorController : MonoBehaviour {
             _ => "X"
         };
         titleText.text = $"Objective {letterIndex}";
-        descriptionText.text = objective.title;
+        descriptionText.text = objective.template.title;
 
 
         Color color = status switch {

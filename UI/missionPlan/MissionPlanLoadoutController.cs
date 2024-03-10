@@ -131,7 +131,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
 
-    void ApplyGunTemplate(LoadoutWeaponButton button, GunState gunstate) {
+    void ApplyGunTemplate(LoadoutWeaponButton button, WeaponState gunstate) {
         if (gunstate != null) {
             button.ApplyGunTemplate(gunstate);
         } else {
@@ -177,11 +177,15 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     }
 
 
-    public void WeaponSlotClicked(int slotIndex, GunState gunState, bool clear = false) {
+    public void WeaponSlotClicked(int slotIndex, WeaponState weaponState, bool clear = false) {
         if (!clear)
             ShowStatsView();
-        gunStatHandler.DisplayGunTemplate(gunState);
-        gunStatHandler.SetCompareGun(gunState);
+        if (weaponState.type == WeaponType.gun) {
+            gunStatHandler.DisplayGunTemplate(weaponState.gunInstance);
+            gunStatHandler.SetCompareGun(weaponState.gunInstance);
+        } else {
+            gunStatHandler.ClearGunTemplate();
+        }
 
         selectedWeaponSlot = slotIndex;
         switch (slotIndex) {
@@ -202,7 +206,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 break;
         }
         InitializeWeaponPicker();
-        if (gunState == null) {
+        if (weaponState == null) {
             torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
         }
         if (clear) {
@@ -248,7 +252,9 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public void StashPickerCallback(LoadoutStashPickerButton picker) {
         // Toolbox.RandomizeOneShot(audioSource, pickerCallbackSounds, randomPitchWidth: 0.05f);
         switch (picker.type) {
-            case LoadoutStashPickerButton.PickerType.gun: WeaponPickerCallback(picker); break;
+            case LoadoutStashPickerButton.PickerType.gun:
+                WeaponPickerCallback(picker.gunstate);
+                break;
             case LoadoutStashPickerButton.PickerType.item: ItemPickerCallback(picker); break;
         }
         StartPickerCoroutine(ClosePicker());
@@ -259,7 +265,12 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         switch (picker.type) {
             case LoadoutStashPickerButton.PickerType.gun:
                 // gunStatHandler.SetCompareGun(picker.gunstate.template);
-                gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
+                // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
+                if (picker.gunstate.type == WeaponType.gun) {
+                    gunStatHandler.DisplayGunTemplate(picker.gunstate.gunInstance);
+                } else {
+                    gunStatHandler.ClearGunTemplate();
+                }
                 break;
         }
     }
@@ -272,13 +283,18 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                     2 => secondaryWeaponButton,
                     3 => tertiaryWeaponButton
                 };
-                gunStatHandler.DisplayGunTemplate(button.gunState);
+                if (button.gunState.type == WeaponType.gun) {
+                    gunStatHandler.DisplayGunTemplate(button.gunState.gunInstance);
+                } else {
+                    gunStatHandler.ClearGunTemplate();
+                }
                 break;
         }
     }
 
-    void WeaponPickerCallback(LoadoutStashPickerButton picker) {
-        Toolbox.RandomizeOneShot(audioSource, picker.gunstate.template.unholster, randomPitchWidth: 0.05f);
+    void WeaponPickerCallback(WeaponState weaponState) {
+        if (weaponState.type == WeaponType.gun)
+            Toolbox.RandomizeOneShot(audioSource, weaponState.gunInstance.template.unholster, randomPitchWidth: 0.05f);
 
         primaryHighlight.SetActive(false);
         secondaryHighlight.SetActive(false);
@@ -289,28 +305,34 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             2 => secondaryWeaponButton,
             3 => tertiaryWeaponButton
         };
-        button.ApplyGunTemplate(picker.gunstate);
+
+        // WeaponState weaponState = new WeaponState(gunstate);
+        button.ApplyGunTemplate(weaponState);
         // TODO: apply total state, not just template
         // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
         // TODO: change plan, not player state (requires change to VR mission designer too?)
         switch (selectedWeaponSlot) {
             case 1:
-                data.playerState.primaryGun = picker.gunstate;
+                data.playerState.primaryGun = weaponState;
                 break;
             case 2:
-                data.playerState.secondaryGun = picker.gunstate;
+                data.playerState.secondaryGun = weaponState;
                 break;
             case 3:
-                data.playerState.tertiaryGun = picker.gunstate;
+                data.playerState.tertiaryGun = weaponState;
                 break;
         }
-
-        Octet<Sprite[]> octet = picker.gunstate.template.type switch {
-            GunType.pistol => bodySkin.pistolIdle,
-            GunType.smg => bodySkin.smgIdle,
-            GunType.rifle => bodySkin.rifleIdle,
-            GunType.shotgun => bodySkin.shotgunIdle,
-        };
+        Octet<Sprite[]> octet;
+        if (weaponState.type == WeaponType.melee) {
+            octet = bodySkin.swordIdle;
+        } else {
+            octet = weaponState.gunInstance.template.type switch {
+                GunType.pistol => bodySkin.pistolIdle,
+                GunType.smg => bodySkin.smgIdle,
+                GunType.rifle => bodySkin.rifleIdle,
+                GunType.shotgun => bodySkin.shotgunIdle,
+            };
+        }
         torsoImage.sprite = octet[Direction.rightDown][0];
     }
     void ItemPickerCallback(LoadoutStashPickerButton picker) {
@@ -337,19 +359,21 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         foreach (Transform child in pickerContainer) {
             Destroy(child.gameObject);
         }
-        // GunTemplate[] allGuns = Resources.LoadAll<GunTemplate>("data/guns");
-        List<GunState> allGuns = GameManager.I.gameData.playerState.allGuns;
+        List<WeaponState> allGuns = GameManager.I.gameData.playerState.allGuns
+            .Where(weapon => weapon.type == WeaponType.gun)
+            .ToList();
+        List<WeaponState> melees = GameManager.I.gameData.playerState.allGuns.Where(weapon => weapon.type == WeaponType.melee).ToList();
 
-        List<GunState> pistols = allGuns.Where(gun => gun.template.type == GunType.pistol)
+        List<WeaponState> pistols = allGuns.Where(gun => gun.gunInstance.template.type == GunType.pistol)
             .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
             .ToList();
-        List<GunState> smgs = allGuns.Where(gun => gun.template.type == GunType.smg)
+        List<WeaponState> smgs = allGuns.Where(gun => gun.gunInstance.template.type == GunType.smg)
             .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
             .ToList();
-        List<GunState> rifles = allGuns.Where(gun => gun.template.type == GunType.rifle)
+        List<WeaponState> rifles = allGuns.Where(gun => gun.gunInstance.template.type == GunType.rifle)
             .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
             .ToList();
-        List<GunState> shotguns = allGuns.Where(gun => gun.template.type == GunType.shotgun)
+        List<WeaponState> shotguns = allGuns.Where(gun => gun.gunInstance.template.type == GunType.shotgun)
             .Where(gun => gun != data.playerState.primaryGun && gun != data.playerState.secondaryGun && gun != data.playerState.tertiaryGun)
             .ToList();
 
@@ -383,6 +407,14 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             // create shotgun divider
             instantiateDivider("Shotgun");
             shotguns.ForEach(gun => {
+                LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
+                pickerHandler.Initialize(this, gun);
+            });
+        }
+        if (melees.Count > 0) {
+            // create shotgun divider
+            instantiateDivider("Melee");
+            melees.ForEach(gun => {
                 LoadoutStashPickerButton pickerHandler = instantiateWeaponPicker();
                 pickerHandler.Initialize(this, gun);
             });
@@ -440,7 +472,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public void OnWeaponSlotMouseOver(LoadoutWeaponButton button) {
         if (button.gunState != null) {
             ShowStatsView();
-            gunStatHandler.DisplayGunTemplate(button.gunState);
+            if (button.gunState.type == WeaponType.gun) {
+                gunStatHandler.DisplayGunTemplate(button.gunState.gunInstance);
+            } else {
+                gunStatHandler.ClearGunTemplate();
+            }
         }
     }
     public void OnWeaponSlotMouseExit(LoadoutWeaponButton button) {

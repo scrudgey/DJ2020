@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.PostProcessing;
 
 // TODO: eliminate this enum
-public enum CameraState { normal, wallPress, attractor, aim, burgle, free, firstPerson }
+public enum CameraState { normal, wallPress, attractor, aim, burgle, free, firstPerson, overlayView }
 
 public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
     public static bool ORTHOGRAPHIC_MODE = true;
@@ -31,6 +31,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public Material wallPressSkybox;
     public Transform maskCylinder;
     public Camera[] skyBoxCameras = new Camera[0];
+    public Camera[] subCameras;
     [Header("Framing")]
     public Camera Camera;
     public Vector2 FollowPointFraming = new Vector2(0f, 0f);
@@ -106,7 +107,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         zoomCoefficientTarget -= input.zoomInput.y * Time.unscaledDeltaTime * 0.1f;
         zoomCoefficientTarget = Math.Clamp(zoomCoefficientTarget, 0.25f, 1.0f);
         zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f);
-        // Debug.Log($"zoom coefficients: {zoomCoefficientTarget} {zoomCoefficient} {zoomVelocity}");
     }
     void Awake() {
         Transform = this.transform;
@@ -255,7 +255,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
-        if (input.state == CharacterState.hvacAim) {
+        if (input.state == CharacterState.overlayView) {
+            camState = CameraState.overlayView;
+        } else if (input.state == CharacterState.hvacAim) {
             camState = CameraState.firstPerson;
         } else if (input.state == CharacterState.aim) {
             camState = CameraState.aim;
@@ -287,6 +289,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 SetSkyBoxCamerasEnabled(false);
                 break;
             default:
+            case CameraState.overlayView:
             case CameraState.normal:
                 if (ORTHOGRAPHIC_MODE) {
                     RenderSettings.skybox = isometricSkybox;
@@ -330,6 +333,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         }
         if (thermalGogglesActive) {
             volume.profile = thermalProfile;
+        }
+        foreach (Camera subCamera in subCameras) {
+            subCamera.orthographicSize = Camera.orthographicSize;
+            subCamera.orthographic = Camera.orthographic;
+            subCamera.fieldOfView = Camera.fieldOfView;
         }
     }
     public void SetSkyBoxCamerasEnabled(bool enabled) {
@@ -382,7 +390,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = Vector3.zero;
-            if (state == CameraState.burgle) {
+            if (state == CameraState.overlayView) {
+                screenOffset = new Vector2(currentOrthographicSize / 3f, 0f);
+            } else if (state == CameraState.burgle) {
                 // orthographic size is half-size in world units
                 screenOffset = new Vector2(currentOrthographicSize, 0f);
             } else {

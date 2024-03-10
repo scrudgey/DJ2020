@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ public class LootInventoryButton : MonoBehaviour {
     public LootTypeIcon[] typeIcons;
     List<LootData> lootData;
     int count;
-    LootShopController lootShopController;
-    public void Initialize(LootShopController lootShopController, List<LootData> datas, int count) {
-        this.lootShopController = lootShopController;
+    Action<List<LootData>> callback;
+    public void Initialize(Action<List<LootData>> callback, List<LootData> datas, int count) {
+        this.callback = callback;
         this.lootData = datas;
         this.count = count;
         LootData data = datas.First();
@@ -26,6 +27,6 @@ public class LootInventoryButton : MonoBehaviour {
         typeIcons[3].Hide();
     }
     public void Clicked() {
-        lootShopController.LootButtonCallback(lootData);
+        callback?.Invoke(lootData);
     }
 }

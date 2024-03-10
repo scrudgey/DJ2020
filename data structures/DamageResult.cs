@@ -7,10 +7,15 @@ public struct DamageResult : IEquatable<DamageResult> {
     public Damage damage;
 
     public DamageResult Add(DamageResult other) {
+        Type finalType = type;
+        if (type == Type.blocked || other.type == Type.blocked) {
+            finalType = Type.blocked;
+        }
         return new DamageResult {
             damageAmount = damageAmount + other.damageAmount,
             // damage = other.damage
-            damage = damage
+            damage = damage,
+            type = finalType
         };
     }
 

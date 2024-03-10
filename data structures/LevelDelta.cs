@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
+
 [System.Serializable]
 public record LevelDelta {
     public enum MissionPhase { action, extractionSuccess, extractionFail, playerDead }
@@ -15,14 +17,9 @@ public record LevelDelta {
     public float npcSpawnTimer = 0f;
     public float strikeTeamSpawnTimer = 0f;
     public float strikeTeamResponseTimer = 0f;
-    public ObjectiveStatus objectiveStatus;
+    public ObjectiveStatus missionStatus;
     public bool disguise;
-    [JsonIgnore]
-    public Dictionary<Objective, ObjectiveStatus> objectivesState;
-    public HashSet<Objective> failedObjectives;
-    [JsonConverter(typeof(ObjectListJsonConverter<PayData>))]
     public List<PayData> levelAcquiredPaydata;
-    public HashSet<string> levelInteractedObjects;
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> levelAcquiredLoot;
     public int levelAcquiredCredits;
@@ -30,21 +27,28 @@ public record LevelDelta {
     public bool alarmTerminalActive;
     public float strikeTeamMissionTimer;
     public LevelTemplate.StrikeTeamResponseBehavior strikeTeamBehavior;
-
+    public List<ObjectiveDelta> objectiveDeltas;
+    public List<ObjectiveDelta> optionalObjectiveDeltas;
     // dialogue
-
     public List<DialogueCard> dialogueCards;
     public int bullshitLevel;
     public Stack<DialogueTacticType> lastTactics;
     public int stallsAvailable = 1;
     public int easesAvailable = 1;
+
+    public HashSet<int> physicalKeys;
+    public HashSet<int> keycards;
+    public int humansKilled;
     public static LevelDelta Empty() => new LevelDelta {
-        objectivesState = new Dictionary<Objective, ObjectiveStatus>(),
-        failedObjectives = new HashSet<Objective>(),
         levelAcquiredPaydata = new List<PayData>(),
-        levelInteractedObjects = new HashSet<string>(),
         levelAcquiredLoot = new List<LootData>(),
         dialogueCards = new List<DialogueCard>(),
-        lastTactics = new Stack<DialogueTacticType>()
+        lastTactics = new Stack<DialogueTacticType>(),
+        objectiveDeltas = new List<ObjectiveDelta>(),
+        optionalObjectiveDeltas = new List<ObjectiveDelta>(),
+        physicalKeys = new HashSet<int>(),
+        keycards = new HashSet<int>()
     };
+    public List<ObjectiveDelta> AllObjectives() => objectiveDeltas.Concat(optionalObjectiveDeltas).ToList();
+
 }

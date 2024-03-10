@@ -78,6 +78,7 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
                 Debug.LogError($"callback failed: {i} {results[i]} {previousCallbacks[i]}");
                 Debug.LogError($"previous index: {previousIndex}, index: {index}");
                 Debug.LogError(e.Message);
+                Debug.LogError(e.StackTrace);
             }
         }
 

@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MapMarkerIndicator : MonoBehaviour {
-    public RectTransform parentRect;
     public RectTransform rectTransform;
     public TextMeshProUGUI text;
     public Image icon;
@@ -23,18 +22,20 @@ public class MapMarkerIndicator : MonoBehaviour {
     public Color red;
     public Color blue;
     public Color yellow;
-
     Coroutine pulseCoroutine;
     Coroutine selectionCoroutine;
     void Start() {
         clickPulseIndicator.enabled = false;
         selectedIndicator.enabled = false;
     }
-    public void Configure(MapMarkerData data, RectTransform parentRect) {
-        text.text = data.markerName;
-        rectTransform.anchoredPosition = data.position * parentRect.rect.width;
 
-        switch (data.markerType) {
+    public void Configure(MapMarkerData data) {
+        Configure(data.markerName, data.markerType, data.markerIcon);
+    }
+    public void Configure(string markerName, MapMarkerData.MapMarkerType markerType, MapMarkerData.MapMarkerIcon markerIcon) {
+        text.text = markerName;
+
+        switch (markerType) {
             case MapMarkerData.MapMarkerType.decor:
                 text.color = blue;
                 icon.color = blue;
@@ -61,7 +62,7 @@ public class MapMarkerIndicator : MonoBehaviour {
                 break;
         }
 
-        icon.sprite = data.markerIcon switch {
+        icon.sprite = markerIcon switch {
             MapMarkerData.MapMarkerIcon.arrowDown => arrowSprite,
             MapMarkerData.MapMarkerIcon.arrowLeft => arrowSprite,
             MapMarkerData.MapMarkerIcon.arrowRight => arrowSprite,
@@ -73,13 +74,21 @@ public class MapMarkerIndicator : MonoBehaviour {
             _ => circleSprite
         };
 
-        if (data.markerIcon == MapMarkerData.MapMarkerIcon.arrowLeft) {
+        if (markerIcon == MapMarkerData.MapMarkerIcon.arrowLeft) {
             icon.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
-        } else if (data.markerIcon == MapMarkerData.MapMarkerIcon.arrowDown) {
+        } else if (markerIcon == MapMarkerData.MapMarkerIcon.arrowDown) {
             icon.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-        } else if (data.markerIcon == MapMarkerData.MapMarkerIcon.arrowRight) {
+        } else if (markerIcon == MapMarkerData.MapMarkerIcon.arrowRight) {
             icon.transform.rotation = Quaternion.Euler(0f, 0f, 270f);
         }
+    }
+
+    public void SetPosition(MapMarkerData data, RectTransform parentRect) {
+        rectTransform.anchoredPosition = data.position * parentRect.rect.width;
+    }
+    public void SetPosition(Vector3 worldPosition, MapDisplay3DGenerator mapDisplay3Dgenerator, RectTransform parentRect) {
+        Vector3 viewPosition = mapDisplay3Dgenerator.WorldToViewportPoint(worldPosition);
+        rectTransform.anchoredPosition = viewPosition * parentRect.rect.width;
     }
 
     public void ShowClickPulse() {

@@ -6,16 +6,18 @@ using UnityEngine.UI;
 
 public class PowerNodeIndicator : NodeIndicator<PowerNode, PowerGraph> {
     public Color unpoweredColor;
-    protected override void SetGraphicalState(PowerNode node) {
+    public GraphIconReference icons;
+    public override void SetGraphicalState(PowerNode node) {
+        iconImage.sprite = icons.PowerNodeSprite(node);
+
         if (node.getEnabled()) {
             if (node.powered) {
-                image.color = enabledColor;
+                iconImage.color = enabledColor;
             } else {
-                image.color = unpoweredColor;
+                iconImage.color = unpoweredColor;
             }
         } else {
-            image.color = disabledColor;
+            iconImage.color = disabledColor;
         }
     }
-
 }

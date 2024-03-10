@@ -5,8 +5,9 @@ using System.Linq;
 using KinematicCharacterController;
 using UnityEngine;
 
-public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerStateLoader, IInputReceiver, IPoolable {
+public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, IPoolable { // IGunHandlerStateLoader,
     public enum GunStateEnum {
+        holstering,
         idle,
         shooting,
         racking,
@@ -15,17 +16,12 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public ItemHandler itemHandler;
     public CharacterCamera characterCamera;
     public GunStateEnum state;
-    // public InputMode inputMode;
-    // public CharacterState characterState;
     public Action<GunHandler> OnValueChanged { get; set; }
     public float height = 0.5f;
     public AudioSource audioSource;
     public Light muzzleFlashLight;
     public KinematicCharacterMotor motor;
     public GunState gunInstance;
-    public GunState secondary;
-    public GunState primary;
-    public GunState third;
     public bool emitShell;
     private float movementInaccuracy;
     private float crouchingInaccuracy;
@@ -34,16 +30,19 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     public bool shootRequestedThisFrame;
     public CursorData currentTargetData;
     public bool isShooting;
-    public bool isSwitchingWeapon;
+
     public Action<GunHandler> OnShoot;
+    public Action<GunHandler> OnHolsterFinish;
     public bool isAimingWeapon;
     public bool isPlayerCharacter;
     Collider[] lockOnColliders;
     public bool nonAnimatedReload;
     public GameObject tamperEvidenceObject;
-    // public TamperEvidence tamperEvidence;
-    // float tamperEvidenceTimer;
-    int numberOfShellsPerReload;
+    public AudioClip[] reachForHolsterSound;
+    // int numberOfShellsPerReload;
+    public bool isSwitchingWeapon;
+    GunType fromGunType;
+    GunType toGunType;
     void Awake() {
         lockOnColliders = new Collider[32];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -76,29 +75,33 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
     }
     // used by animator
     public void ShellIn() {
+        int numberOfShellsPerReload = isPlayerCharacter ? GameManager.I.gameData.playerState.numberOfShellsPerReload() : 1;
         Toolbox.RandomizeOneShot(audioSource, gunInstance.template.clipIn);
-
-
-
         gunInstance.ShellIn(numberOfShellsPerReload);
         OnValueChanged?.Invoke(this);
     }
     // used by animator
     public void StopReload() {
-        // TODO: change state
         if (gunInstance.ShouldRack()) {
             state = GunStateEnum.racking;
         } else state = GunStateEnum.idle;
     }
+    // used by animator
+    public void StopHolster() {
+        // Debug.Log($"{transform.root.gameObject} stop holster");
+        state = GunStateEnum.idle;
+        OnValueChanged?.Invoke(this);
+        OnHolsterFinish?.Invoke(this);
+    }
 
 
-    public bool HasGun() => gunInstance != null && gunInstance.template != null;
+    public bool HasGun() => (gunInstance != null && gunInstance.template != null);
 
     public bool CanShoot() => gunInstance.CanShoot() && (state != GunStateEnum.reloading && state != GunStateEnum.racking);
 
     public void Update() {
         if (gunInstance == null || gunInstance.template == null) {
-            state = GunStateEnum.idle;
+            // state = GunStateEnum.idle;
             return;
         } else {
             gunInstance.Update();
@@ -116,21 +119,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (shootingInaccuracy > 0) {
             shootingInaccuracy = CalculateInaccuracyRecovery(gunInstance, shootingInaccuracy);
         }
-        // if (tamperEvidenceTimer > 0) {
-        //     tamperEvidenceTimer -= Time.deltaTime;
-
-        //     if (tamperEvidenceTimer <= 0) {
-
-        //     }
-        // }
     }
-    // void EnableTamperEvidence(SuspicionRecord suspicionRecord) {
-    //     tamperEvidenceObject.SetActive(true);
-    //     // tamperEvidence.
-    // }
-    // void DisableTamperEvidence() {
-    //     tamperEvidenceObject.SetActive(false);
-    // }
+
     float CalculateInaccuracyRecovery(GunState gunState, float value) {
         if (gunState == null)
             return 0f;
@@ -297,7 +287,8 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
                 damage = gunInstance.getBaseDamage(),
                 range = gunInstance.getRange(),
                 gunPosition = gunPosition,
-                source = transform.position
+                source = transform.position,
+                piercing = gunInstance.getPiercing()
             };
             bullet.DoImpacts(transform.root);
             // Debug.DrawLine(gunPosition, endPosition, Color.green, 10f);
@@ -350,18 +341,18 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         // shoot bullet
         int numberBullets = gunInstance.template.type == GunType.shotgun ? 5 : 1;
         Bullet bullet = null;
-        // for (int i = 0; i < numberBullets; i++) {
         bullet = EmitBullet(input, numberBullets);
-        // }
 
         // play sound
         NoiseData noiseData = gunInstance.GetShootNoise() with {
-            ray = bullet.ray
+            ray = bullet.ray,
+            relevantParties = new HashSet<Transform>() { transform.root }
         };
         noiseData.player = isPlayerCharacter;
         audioSource.pitch = UnityEngine.Random.Range(noiseData.pitch - 0.1f, noiseData.pitch + 0.1f);
         audioSource.PlayOneShot(Toolbox.RandomFromList(gunInstance.GetShootSounds()));
         Toolbox.Noise(gunPosition(), noiseData, transform.root.gameObject);
+
         // flash
         if (!gunInstance.getSilencer()) {
             muzzleFlashLight.enabled = true;
@@ -480,7 +471,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         if (nonAnimatedReload) {
             ClipIn();
             StopReload();
-            // state = GunStateEnum.idle;
             Rack();
             EndRack();
         }
@@ -492,15 +482,22 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
             return;
         state = GunStateEnum.reloading;
     }
-    private void SwitchGun(GunState instance) {
+    public void SwitchGun(GunState instance) {
         if (instance == null || instance == gunInstance)
             return;
+        fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
+        toGunType = instance == null ? GunType.unarmed : instance.template.type;
         isSwitchingWeapon = true;
-
+        state = GunStateEnum.holstering;
+        // Debug.Log($"{transform.root.gameObject} start holster");
+        if (gunInstance == null) {
+            Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
+        }
         gunInstance = instance;
 
         SetGunAppearanceSuspicion();
         OnValueChanged?.Invoke(this);
+        OnHolsterFinish?.Invoke(this);
     }
     public void SetGunAppearanceSuspicion() {
         if (gunInstance != null && gunInstance.template != null) {
@@ -513,41 +510,30 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void Holster() {
+        if (gunInstance == null) return;
+        fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
+        toGunType = GunType.unarmed;
         isSwitchingWeapon = true;
+        state = GunStateEnum.holstering;
+        // Debug.Log("start holster");
+        if (gunInstance != null) {
+            Toolbox.RandomizeOneShot(audioSource, reachForHolsterSound);
+        }
         gunInstance = null;
         OnValueChanged?.Invoke(this);
         if (isPlayerCharacter) {
             GameManager.I.RemoveSuspicionRecord(SuspicionRecord.brandishingSuspicion());
         }
     }
-    public void SwitchToGun(int idn) {
-        switch (idn) {
-            case 0:
-                break;
-            case -1:
-                Holster();
-                break;
-            case 1:
-                itemHandler?.EvictSubweapon();
-                SwitchGun(primary);
-                break;
-            case 2:
-                itemHandler?.EvictSubweapon();
-                SwitchGun(secondary);
-                break;
-            case 3:
-                itemHandler?.EvictSubweapon();
-                SwitchGun(third);
-                break;
+    public void SwitchToGun(GunState gunInstance) {
+        if (gunInstance == null) {
+            Holster();
+        } else {
+            itemHandler?.EvictSubweapon();
+            SwitchGun(gunInstance);
         }
     }
 
-    public void ProcessGunSwitch(PlayerInput input) {
-        SwitchToGun(input.selectgun);
-        if (input.reload) {
-            DoReload();
-        }
-    }
     public void DoReload() {
         if (gunInstance == null || gunInstance.template == null)
             return;
@@ -558,10 +544,17 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         }
     }
     public void SetInputs(PlayerInput input) {
-        // inputMode = input.inputMode;
+        if (input.reload) {
+            DoReload();
+        }
+
         currentTargetData = input.Fire.cursorData;
         shootRequestedThisFrame = false;
         isAimingWeapon = input.aimWeapon;
+
+        if (state == GunStateEnum.holstering) {
+            return;
+        }
 
         if (HasGun()) {
             Vector3 targetPoint = input.Fire.cursorData.worldPosition;
@@ -652,23 +645,15 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IGunHandlerState
         return new AnimationInput.GunAnimationInput {
             gunType = gunType,
             gunState = state,
-            hasGun = gunInstance != null && HasGun(),
+            hasGun = HasGun() || state == GunStateEnum.holstering,
             holstered = gunInstance == null,
             baseGun = baseGun,
             shootRequestedThisFrame = shootRequestedThisFrame,
-            aimWeapon = isAimingWeapon
+            aimWeapon = isAimingWeapon,
+            fromGunType = fromGunType,
+            toGunType = toGunType,
         };
     }
-
-    public void LoadGunHandlerState(IGunHandlerState state) {
-        // TODO: here, we would instantiate from template with mutable state applied
-        primary = state.primaryGun;
-        secondary = state.secondaryGun;
-        third = state.tertiaryGun;
-        // numberOfShellsPerReload = state.numberOfShellsPerReload;
-        SwitchToGun(state.activeGun);
-    }
-
     public void OnPoolActivate() {
 
     }

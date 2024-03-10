@@ -3026,13 +3026,183 @@ x ladders
 * stealing dat001 in tower didn't work
 * main issue with clearsighter right now is sometimes things stay transparent.
 * when reverting to patrol, we can do better
+* put trailer on steam page
+* power grid
+* alarm grid
+* test that these work as expected still
+* stop buzz sound / hide lights when laser grid is disabled
+* disabling utility while alarm in progress should stop alarm
+* compromising a node should permanent set utility off?
+* reconnect all levels
+    * jtd
+    * office
+    * tower
+    * yamachi
+    * redo networks:
+        * remove transferState. instead, every cyber component should bind to the state of the cyber node.
+        * enable progress 
+* no icons in power view
+* yamachi level started w/o/ objective data
+* keys & status bar
+* status bar on top shows:
+    * credits
+    * loot
+    * data
+    * keys
+* thing when when loot is collected
+* clicking opens pause / status screen to appropriate tab
+    * some sort of pseudo-3d offset map in the escape menu
+* dynamically load map display per level
+    update a few more map images
+* allow player to change floors
+* display other locations
+* display player location
+* allow player to 
+    * rotate
+    * move
+    * zoom
+* visibility of floors
+* time to separate model, view, and control.
+* zoom buttons
+* mode buttons
+    * click two: reset to (0, 0) with rotation
+* click one: center on player
+* don't show insertion point
+* show only selected extraction point
+* label extraction point "extraction point"
+* only show selected extraction point
+* properly handle floor level for player
+    * define floor level per scene: part of level template
+* show network stuff
+* refresh graph edges when floor changes
+* toggle markers / network on and off
+* clear ou empty markers
+    * line thickness / 
+* show legend
+    * click again- hide
+    * hughlught legend
+    * map markers colors
+    * camera icon too big
+* pause/status menu
+    * information to show:
+        * network info in map in planning mode
+        * map
+        * show objective makers: see level_plan.md
+        * objectives
+        player status / inventory / health / etc. ?
+            hook for skill tree
+* don't populate insertion points in escape menu map view
+* don't populate unused extraction points in escape menu map view
+* clicking from status bar doesn't work as expected
+* data:
+    * fix button clicking
+* objectives:
+    * layout is kind of ugly
+* start with one thing selected
+* tab buttons should match order of status bar.
+* tab buttons should consistently indicate selected tab
+* inventory can run over
+* objectives when no desc
+* for loot / data / keys, maybe display number in tab?
+* key status bar should include password data
+* network view should hide for pause menu
+    * password data doesn't look right in key view
+* status bar should hide for menus
+* flying loot widget should be easier to see
+* better map  
+    * higher res
+    * better scroll
+        * minimap
+    * pause screen
+    * data and hacking
+* fix custom animator stutteriness - ???
+* ducking and side chaining sfx channel
+* import all current music files
+* crossfade trackes enable / disable
+* better solution for 4 channels.
+    * set up music for all missions
+        tower- lethal glee
+        jack that data - obligate arsonist
+        elevator - anti anecdote
+        yamachi - hyper lysis
+        711 - bodies
+* animate gun holster / unholster
+    * double holstering
+    * handle repeated requests
+    * we switch state, switch animation, everything is good, but the frame is 0
+* smg, rifle, shotgun:
+* automatic weapons broken
+* various other spritesheets broken?
+* melee combat
+    * new holster animations for sword
+    * swing animation for sword
+    * swing effector
+    * impact sounds
+    * impact on wall
+    * impact on soft target
+* problem with NPCs loading gun state
+* sounds for bullet impact
+* make sword available in shops / loadout
+* graphics for sword picker / sword in weapon wheel
+* weapon UI for sword
+* sword swing down needs to end with blade on other side of character
+* sword collider starts active
+* publish trailer on twitter
+* sound for reaching holster
+* tighter swing arc
+* having a sword out looks suspicious
+* murdering people with a sword should cause more havoc
+    * swinging a sword should mark me as aggressive
+? switching guns: put one away, take the other out 
+* better combat:
+    * an armor rating that is % probability of deflecting a shot
+        * indicator indicates when a shot deflects
+            * splat / deflect sfx
+    * gunshots / impacts / impact sounds / impact effects
+* better NPC reaction to being hurt
+    * cries from those hit should alert others
+    * hide text
+    * alert icon is visible during death sequence
+    * guard behavior is weird
+    * scientists don't react to others dying
+    * cyberware
+    * music
+        * auto leveling, balance, ducking
+* even when node edges are known, cyber info shows edges as unknowns unless node is known
+* sword holster has smg sprite?
+* 711 broken
+    * guard doesnt care about me waving a gun or robbing the register
+* shotgun reload broken
+* graphical glitch when entering / exiting aim mode in yamachi
+* ease in elements of perk menu
+* regenerate graphs and objectives for all missions   
+* optional objectives
+    * find all places where we objectiveDeltas.Concat optional objectives
+    * replace with general method
+    * then ensure that we use this in every place
+    * test that objective completion works as expected
+    * apply reward from completed optional objectives
+    * delineate optional / not in all places
+        * mission overview
+        * mission planning
+        * pause screen
+        * mission fail
+        * after action report
+* optional objective change text
+
+* define new objective types:
+    * don't kill anyone, etc
+    * don't raise the alarm
+* favor system
+    * favor iconography
+    * use favor to purchase tactic
 
 
 
 
-places randomizer could break down:
-    we have the wrong objective on it
-    we have overlapping datastore sets
+
+
+
 
 more shooting range?
     buttons for bringing target in to inspect?
@@ -3051,7 +3221,7 @@ uncertain:
         slow walk?
     apply skin graphics to corpse?
     "v" and "^" buttons on scrollbars?
-    show objectives as blit-in text on lower left?  
+    * show objectives as blit-in text on lower left?  
         show days
     maybe fall damage from rooftop should be greater
     larger / more clear crosshairs cursor
@@ -3059,18 +3229,16 @@ uncertain:
         newtonsoft json is broken??
         bolt cutter?
     router panel conceals a second port?
-    way to hack camera without opening panel?
+    * way to hack camera without opening panel?
     electrical zap effect around broken wires?
     shooting the objects
         shoot laser tripwire to disable?
         shoot alarm box to disable?
-    redo networks:
-        remove transferState. instead, every cyber component should bind to the state of the cyber node.
-        enable progress 
     adjust rate of fire for pistols?
-
+    ? when pause menu changes sizes, relevant buttons should stay in place.- how?
 
 nice to have / future goals:
+    one way to make an effective callout camera movement is linear
     * after action report should be fragmentary, show reward, over a transit cutscene
     first level should set the tone
     aim: swing into position, then subtly zoom in to focus on reticle
@@ -3446,8 +3614,20 @@ holster to put away rocket launcher
 hide elements in inspector that are set by template
 cutting wire on security camera did not work
 hacking seccurity camera did not work
-npc heads can turn to face other npcs in the area
-npc can ask "can i help you?" to player who intrudes on their space?
+
+AI
+    npc heads can turn to face other npcs in the area
+    npc can ask "can i help you?" to player who intrudes on their space?
+    multiple guards chose the same clearpoint to navigate to- more global coordination
+    better investigative ability when player does something weird like superjump / land
+    711 worker? interrogated me 
+    guard stood facing wall in tower
+    maybe sight check a little higher
+
+
+security cameras should be visible from floor!
+are anonymous delegates memory leaks? i.e. objective deltas
+711 HQ said dispatching strike team; no strike team arrived and guards were silent- they're supposed to search the building
 reselect rocket launcher to put away
 attack surface card reader attack
 attack surface for keycard reader
@@ -3460,30 +3640,18 @@ generic spritesheet template is not complete:
     separate arm and torso?
 clickable loot in burglar?
 loot has portrait view in burglar?
-door randomizer should specify key id ?
 jazz up elevator controller
     sound effects
     click effect
-armor
-    an armor rating that is % probability of deflecting a shot
-animate gun holster / unholster
-some suspicion records could be sticky when noticed
-    anything related to player behavior and appearance
-    a different kind of surveillance camera stickies suspicion records?
-worker dialogue tree
-better map  
-    higher res
-    better scroll
-guard stood facing wall in tower
-
+show bonus reward favors
 
 
 
 unresolved mechanics / gameplay questions:
-    hacking
+    * progression in burglar tools?
+    * hacking
+    * do we buy / unlock more burglar tools?
     circuits
-    do we buy / unlock more burglar tools?
-    progression in burglar tools?
     progression in shops? 
         items, guns
     progression in world?
@@ -3491,26 +3659,19 @@ unresolved mechanics / gameplay questions:
     backpack and duffel bag
 
 major initiatives:
-    anime effects
-    ?minimap
-    pause screen
-    data and hacking
-    cyberware
     destructible walls
     vehicles
     finalize street 
     robots
-    music
-        auto leveling, balance, ducking
     missions
         1 way shootout
         productionize office
             redo apartment after office
     system:
-        title
+        * title
         controls, settings
-        pause screen status report
-            loot, data
+        * pause screen status report
+            * loot, data
             weapons, loadout, 
             character stats, skills
 shops:
@@ -3519,6 +3680,16 @@ shops:
         software, hardware
     sell guns
     mystery man in bar
+
+tactics
+    tactic dialogue is jumpy
+    replace credit symbol when price is favor, not credits
+    faster text blit
+
+burglar system
+    outline all burglar tools
+    burglar tool mentor
+    intelligence gathering
 
 more equipment to bring on mission?
     shuriken
@@ -3551,21 +3722,35 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-status bar on top shows:
-    credits
-    loots
-    data
-    keys
-    shows when key is used
-    when loot is collected
-
-
-
-multiple guards chose the same clearpoint to navigate to- more global coordination
-better investigative ability when player does something weird like superjump / land
+circuitry hacking
+alarm sensors
+v2 of selling data / upgrading hack ability
 highlight NPCs that are shooting me
+graphic effects
+    80s electricity 
+    anime glow 
+
+medium-effort mini systems work:
+    update the steam page graphic
+    in-between montage
+        unlock contacts
+    armor piercing ammo to be indicated somewhere in the gun info display
+        first: gun shop progression
+        gun perks
 
 
 
+worker npc dialogue tree
+    scientist
+    7-11 worker
+key system:
+    more detailed key usage enabling keyed alike attacks 
+    use passwords in analogous way
+    password data unlocks passwords
+display different title when stickied: past tense
+    when adding record, if sticky record already exists, switch content...?
+        record stays stickied
+    different caption
+    different challenge
 
 

@@ -23,15 +23,17 @@ public class NPCSpawnZone : MonoBehaviour {
         }
         // effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
-    public void SpawnNPCs() {
+    public List<GameObject> SpawnNPCs() {
         // StartCoroutine(SpawnRoutine());
-        SpawnRoutineBlocking();
+        return SpawnRoutineBlocking();
     }
-    void SpawnRoutineBlocking() {
+    List<GameObject> SpawnRoutineBlocking() {
+        List<GameObject> npcs = new List<GameObject>();
         for (int i = 0; i < number.GetRandomInsideBound(); i++) {
             NPCTemplate template = Toolbox.RandomFromList(templates);
-            SpawnNPC(template);
+            npcs.Add(SpawnNPC(template));
         }
+        return npcs;
     }
     IEnumerator SpawnRoutine() {
         for (int i = 0; i < number.GetRandomInsideBound(); i++) {

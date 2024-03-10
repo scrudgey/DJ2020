@@ -20,7 +20,7 @@ public class AttackSurfaceKeycardReader : AttackSurfaceElement {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.keycard) {
             bool success = false;
-            foreach (int keyId in GameManager.I.gameData.playerState.keycards) {
+            foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
                 success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
             }
             if (success) {

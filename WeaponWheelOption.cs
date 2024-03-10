@@ -13,15 +13,15 @@ public class WeaponWheelOption : MonoBehaviour {
     // public Color holsterColor;
     // public Sprite holsterSprite;
     public GameObject holsterIcon;
-    public GunState gun;
+    public WeaponState weapon;
     public ItemTemplate item;
     public bool holster;
 
-    public void Initialize(GunState gun) {
-        this.gun = gun;
-        icon.sprite = gun.GetSprite();
+    public void Initialize(WeaponState weapon) {
+        this.weapon = weapon;
+        icon.sprite = weapon.GetSprite();
         background.color = normalColor;
-        optionName = gun.getName();
+        optionName = weapon.GetName();
         holsterIcon.SetActive(false);
     }
     public void Initialize(ItemTemplate item) {

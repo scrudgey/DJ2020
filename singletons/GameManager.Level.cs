@@ -19,6 +19,7 @@ public partial class GameManager : Singleton<GameManager> {
     public float timePlayed;
     List<AsyncOperation> scenesLoading;
     public bool isLoadingLevel;
+    public Action<CharacterController> OnHumanDied;
     void Awake() {
         InputController.InitializeInstance();
     }
@@ -36,7 +37,7 @@ public partial class GameManager : Singleton<GameManager> {
         levelTemplate.maxNPC = 3;
 
         PlayerState playerState = PlayerState.Instantiate(template.playerState);
-        LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(new List<ItemTemplate>()), playerState);
+        LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState), playerState);
         // instantiate gamedata
         gameData = GameData.TestInitialData() with {
             playerState = playerState,
@@ -51,7 +52,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
-        gameData.playerState.ResetTemporaryState();
+        gameData.playerState.ResetTemporaryState(plan);
         LoadScene(template.sceneName, () => StartMission(gameData.levelState));
     }
 
@@ -64,7 +65,7 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
-        InitializeLevel(LevelPlan.Default(new List<ItemTemplate>()));
+        // InitializeLevel(LevelPlan.Default(new List<ItemTemplate>()));
         LoadSkyboxForScene(state.template.sceneName);
 
         TransitionToPhase(GamePhase.vrMission);
@@ -90,19 +91,24 @@ public partial class GameManager : Singleton<GameManager> {
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
+        NPCSpawnPoint[] nPCSpawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>();
+
         // spawn NPC
         if (spawnNpcs) {
-            while (state.delta.npcCount < state.template.maxInitialNPC) {
-                foreach (NPCSpawnPoint spawnPoint in GameObject.FindObjectsOfType<NPCSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).OrderBy(a => Guid.NewGuid()).ToList()) {
+            while (nPCSpawnPoints.Length > 0 && state.delta.npcCount < state.template.maxInitialNPC) {
+                foreach (NPCSpawnPoint spawnPoint in nPCSpawnPoints.Where(spawn => !spawn.isStrikeTeamSpawn).OrderBy(a => Guid.NewGuid()).ToList()) {
                     if (state.delta.npcCount >= state.template.maxInitialNPC) continue;
                     GameObject npc = spawnPoint.SpawnTemplated();
                     CharacterController controller = npc.GetComponentInChildren<CharacterController>();
                     controller.OnCharacterDead += HandleNPCDead;
+                    controller.OnCharacterDead += HandleHumanDead;
                     state.delta.npcCount += 1;
                 }
             }
             foreach (WorkerSpawnPoint spawnPoint in GameObject.FindObjectsOfType<WorkerSpawnPoint>()) {
                 GameObject npc = spawnPoint.SpawnTemplated();
+                CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+                controller.OnCharacterDead += HandleHumanDead;
             }
 
             foreach (RobotSpawnPoint spawnPoint in GameObject.FindObjectsOfType<RobotSpawnPoint>().Where(spawn => !spawn.isStrikeTeamSpawn).ToList()) {
@@ -110,7 +116,11 @@ public partial class GameManager : Singleton<GameManager> {
             }
 
             foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
-                zone.SpawnNPCs();
+                List<GameObject> npcs = zone.SpawnNPCs();
+                foreach (GameObject npc in npcs) {
+                    CharacterController controller = npc.GetComponentInChildren<CharacterController>();
+                    controller.OnCharacterDead += HandleHumanDead;
+                }
             }
         }
 
@@ -119,22 +129,28 @@ public partial class GameManager : Singleton<GameManager> {
             doorRandomizer.ApplyState(state.template);
         }
 
-        // randomize cyber components
-        foreach (CyberRandomizer cyberRandomizer in GameObject.FindObjectsOfType<CyberRandomizer>()) {
-            cyberRandomizer.ApplyState(state.template);
-        }
+        state.spawnPoints = GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>().ToDictionary(s => s.idn, s => s);
 
-        // apply level initializer(s)
-        foreach (LevelInitializer initializer in GameObject.FindObjectsOfType<LevelInitializer>()) {
-            initializer.ApplyState();
+
+        // randomize cyber state:
+        state.delta.cyberGraph.InfillRandomData();
+
+        // initialize objectives- this will affect graph visibility
+        foreach (Objective objective in state.template.objectives) {
+            ObjectiveDelta delta = objective.ToDelta(state);
+            state.delta.objectiveDeltas.Add(delta);
+        }
+        foreach (Objective objective in state.template.bonusObjectives) {
+            ObjectiveDelta delta = objective.ToDelta(state);
+            state.delta.optionalObjectiveDeltas.Add(delta);
         }
 
         MusicController.I.LoadTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);
 
-        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.template.objectives
-            .Select(objective => objective.Status(gameData)).ToList());
+        lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.objectiveDeltas.Select(objective => objective.status).ToList());
+        lastOptionalObjectiveStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.optionalObjectiveDeltas.Select(objective => objective.status).ToList());
 
         if (doCutscene)
             StartCutsceneCoroutine(StartMissionCutscene());
@@ -152,7 +168,7 @@ public partial class GameManager : Singleton<GameManager> {
         foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
             zone.SpawnNPCs();
         }
-        InitializePlayerAndController(LevelPlan.Default(new List<ItemTemplate>()));
+        InitializePlayerAndController(LevelPlan.Default(gameData.playerState));
         LoadSkyboxForScene(sceneName);
         // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
 
@@ -165,6 +181,11 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void HandleNPCDead(CharacterController npc) {
         RemoveNPC(npc);
+    }
+    void HandleHumanDead(CharacterController npc) {
+        npc.OnCharacterDead -= HandleHumanDead;
+        OnHumanDied?.Invoke(npc);
+        gameData.levelState.delta.humansKilled += 1;
     }
 
     public void RemoveNPC(CharacterController npc) {
@@ -210,13 +231,20 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.playerState.loots.AddRange(gameData.levelState.delta.levelAcquiredLoot.Where(loot => loot.isCollectible));
         gameData.playerState.skillpoints += 1;
 
-        // TODO: broken
         CharacterHurtable playerHurtable = playerObject.GetComponentInChildren<CharacterHurtable>();
         gameData.playerState.health = playerHurtable.health;
+
         foreach (LevelTemplate unlock in gameData.levelState.template.unlockLevels) {
             if (gameData.unlockedLevels.Contains(unlock.levelName)) continue;
             gameData.unlockedLevels.Add(unlock.levelName);
         }
+
+        foreach (ObjectiveDelta delta in gameData.levelState.delta.optionalObjectiveDeltas) {
+            if (delta.status == ObjectiveStatus.complete) {
+                delta.template.ApplyReward(gameData);
+            }
+        }
+
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {
@@ -305,7 +333,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         // TODO: better system here
-        if (targetScene != "UI" && targetScene != "DialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "EscapeMenu" && targetScene != "cityskybox")
+        if (targetScene != "UI" && targetScene != "NeoDialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "cityskybox") // targetScene != "EscapeMenu"
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
 
         foreach (string sceneToUnload in scenesToUnload) {
@@ -327,18 +355,23 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"setting focus: {focus}");
         if (playerGunHandler != null) {
             playerGunHandler.isPlayerCharacter = false;
+            playerMeleeHandler.isPlayerCharacter = false;
         }
         this.playerObject = focus;
         this.playerLightLevelProbe = focus.GetComponentInChildren<LightLevelProbe>();
         this.playerCharacterController = focus.GetComponentInChildren<CharacterController>();
         this.playerGunHandler = focus.GetComponentInChildren<GunHandler>();
+        this.playerMeleeHandler = focus.GetComponentInChildren<MeleeHandler>();
         this.playerCollider = focus.GetComponentInChildren<Collider>();
+        this.playerManualHacker = focus.GetComponentInChildren<ManualHacker>();
+        this.playerItemHandler = focus.GetComponentInChildren<ItemHandler>();
 
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
         this.clearSighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
 
         playerGunHandler.isPlayerCharacter = true;
+        playerMeleeHandler.isPlayerCharacter = true;
 
         ElevatorOccluder elevatorOccluder = GameObject.FindObjectOfType<ElevatorOccluder>();
 
@@ -381,9 +414,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     void ClearSceneData() {
         // this stuff should all belong to level delta
-        poweredComponents = new Dictionary<string, PoweredComponent>();
-        cyberComponents = new Dictionary<string, CyberComponent>();
-        alarmComponents = new Dictionary<string, AlarmComponent>();
         lastStrikeTeamMember = null;
 
         // TODO: this stuff should belong to level state
@@ -394,7 +424,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     private void InitializePlayerAndController(LevelPlan plan) {
         ClearSceneData();
-        // inputController = GameObject.FindObjectOfType<InputController>();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
         if (characterCamera == null) {
             Debug.Break();
@@ -431,24 +460,58 @@ public partial class GameManager : Singleton<GameManager> {
     private void InitializeLevel(LevelPlan plan) {
         InitializePlayerAndController(plan);
 
-
         // connect up power grids
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
-            poweredComponents[component.idn] = component;
+            PowerNode node = GetPowerNode(component.idn);
+            component.node = node;
+            foreach (INodeBinder<PowerNode> binder in component.GetComponentsInChildren<INodeBinder<PowerNode>>()) {
+                binder.Bind(node);
+            }
         }
 
         // connect up cyber grids
         Debug.Log("connecting cyber grid...");
-        foreach (CyberComponent component in GameObject.FindObjectsOfType<CyberComponent>()) {
-            cyberComponents[component.idn] = component;
+        foreach (CyberComponent component in FindObjectsOfType<CyberComponent>()) {
+            CyberNode node = GetCyberNode(component.idn);
+            component.node = node;
+            foreach (INodeBinder<CyberNode> binder in component.GetComponentsInChildren<INodeBinder<CyberNode>>()) {
+                binder.Bind(node);
+            }
         }
 
         // connect up alarm grids
         Debug.Log("connecting alarm grid...");
-        foreach (AlarmComponent component in GameObject.FindObjectsOfType<AlarmComponent>()) {
-            alarmComponents[component.idn] = component;
+        foreach (AlarmComponent component in FindObjectsOfType<AlarmComponent>()) {
+            AlarmNode node = GetAlarmNode(component.idn);
+            component.node = node;
+            foreach (INodeBinder<AlarmNode> binder in component.GetComponentsInChildren<INodeBinder<AlarmNode>>()) {
+                binder.Bind(node);
+            }
         }
+
+        gameData.levelState.delta.cyberGraph.nodes["localhost"] = new CyberNode() {
+            compromised = true,
+            payData = null,
+            type = CyberNodeType.player,
+            lockLevel = 0,
+            dataSink = true,
+            dataStolen = false,
+            utilityActive = false,
+            // isManualHackerTarget = false,
+            datafileVisibility = false,
+            status = CyberNodeStatus.compromised,
+            visibility = NodeVisibility.known,
+            sceneName = SceneManager.GetActiveScene().name,
+            idn = "localhost",
+            nodeTitle = "localhost",
+            enabled = true,
+            fixedVisibility = true,
+            alwaysOnScreen = true,
+            straightLine = true,
+            notClickable = true,
+            onlyShowIfHackDeployed = true
+        };
 
         RefreshPowerGraph();
         RefreshCyberGraph();

@@ -10,7 +10,7 @@ public class Key : Interactive {
     public bool suspicious;
     public override ItemUseResult DoAction(Interactor interactor) {
         Destroy(gameObject);
-        GameManager.I.AddKey(keyId, type);
+        GameManager.I.AddKey(keyId, type, transform.position);
         interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
         if (suspicious) {

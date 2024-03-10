@@ -19,13 +19,18 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     public AnimationClip unarmedWalkAnimation;
     public AnimationClip unarmedWalkSlowAnimation;
     public AnimationClip crawlAnimation;
+    public AnimationClip unholsterAnimation;
+    public AnimationClip holsterAnimation;
+    [Header("sword")]
+    public AnimationClip swordSwingAnimation;
+    public AnimationClip swordUnholsterAnimation;
+    public AnimationClip swordHolsterAnimation;
     public Skin skin;
     public float trailInterval = 0.05f;
     private bool bob;
     private AnimationInput lastInput;
     bool isMoving;
     bool isCrouching;
-    // bool isCrawling;
     GunType gunType;
 
 
@@ -76,7 +81,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
 
         transform.localPosition = Vector3.zero;
         if (bob && !input.isProne) {
-            transform.localPosition -= new Vector3(0f, 0.01f, 0f);
+            transform.localPosition -= new Vector3(0f, 0.02f, 0f); // TODO: ?
         }
 
         SetState(input.gunInput.gunState);
@@ -93,14 +98,42 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         gunType = input.gunInput.gunType;
         if (input.hitState == HitState.dead) {
             animator.Stop();
+        } else if (input.gunInput.gunType == GunType.sword || input.gunInput.fromGunType == GunType.sword) {
+            switch (state) {
+                case GunHandler.GunStateEnum.holstering:
+                    if (input.gunInput.toGunType == GunType.unarmed) {
+                        Debug.Log("set animation sword holster");
+                        SetAnimation(swordHolsterAnimation);
+                    } else {
+                        Debug.Log("set animation sword unholster");
+                        SetAnimation(swordUnholsterAnimation);
+                    }
+                    break;
+                case GunHandler.GunStateEnum.shooting:
+                    SetAnimation(swordSwingAnimation);
+                    break;
+                default:
+                    _frame = 0;
+                    SetAnimation(idleAnimation);
+                    break;
+            }
         } else if (input.gunInput.hasGun) {
             switch (state) {
+                case GunHandler.GunStateEnum.holstering:
+                    if (input.gunInput.toGunType == GunType.unarmed) {
+                        SetAnimation(holsterAnimation);
+                    } else {
+                        SetAnimation(unholsterAnimation);
+                    }
+                    animator.playbackSpeed = 0.8f;
+                    break;
                 case GunHandler.GunStateEnum.shooting:
                     SetAnimation(input.gunInput.baseGun.shootAnimation, forcePlay: input.gunInput.shootRequestedThisFrame);
                     animator.playbackSpeed = input.gunInput.baseGun.cycle switch {
                         CycleType.automatic => 0.1f / input.gunInput.baseGun.GetGunStats().shootInterval,
                         _ => 1f
                     };
+                    // Debug.Log($"speed: {animator.playbackSpeed}");
                     break;
                 case GunHandler.GunStateEnum.reloading:
                     SetAnimation(input.gunInput.baseGun.reloadAnimation);
@@ -137,28 +170,28 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         return ApplyTorsoSpriteData(input);
     }
     SpriteData ApplyTorsoSpriteData(AnimationInput input) {
-        int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
-        SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
-            GunType.unarmed => skin.unarmedSpriteData,
-            GunType.pistol => skin.pistolSpriteData,
-            GunType.smg => skin.smgSpriteData,
-            GunType.rifle => input.isRunning ? skin.smgSpriteData : skin.rifleSpriteData,
-            GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
-            _ => skin.unarmedSpriteData
-        };
-        if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
-            torsoSpriteDatas = skin.unarmedSpriteData;
-        }
+        // int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
+        // SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
+        //     GunType.unarmed => skin.unarmedSpriteData,
+        //     GunType.pistol => skin.pistolSpriteData,
+        //     GunType.smg => skin.smgSpriteData,
+        //     GunType.rifle => input.isRunning ? skin.smgSpriteData : skin.rifleSpriteData,
+        //     GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
+        //     _ => skin.unarmedSpriteData
+        // };
+        // if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
+        //     torsoSpriteDatas = skin.unarmedSpriteData;
+        // }
         try {
-            SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
-
-            Vector3 headOffset = new Vector3(torsoSpriteData.headOffset.x / 100f, torsoSpriteData.headOffset.y / 100f, 0f);
+            // SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
+            SpriteData spriteData = skin.allSpriteData[spriteRenderer.sprite.name];
+            Vector3 headOffset = new Vector3(spriteData.headOffset.x / 100f, spriteData.headOffset.y / 100f, 0f);
             headAnimation.transform.localPosition = headOffset;
-            headAnimation.UpdateView(input, torsoSpriteData);
-            return torsoSpriteData;
+            headAnimation.UpdateView(input, spriteData);
+            return spriteData;
         }
         catch (Exception) {
-            Debug.LogError($"**** index:{sheetIndex} name:{spriteRenderer.sprite.name} prone:{input.isProne} dead:{input.hitState == HitState.dead} guntype:{input.gunInput.gunType}");
+            Debug.LogError($"**** name:{spriteRenderer.sprite.name} prone:{input.isProne} dead:{input.hitState == HitState.dead} guntype:{input.gunInput.gunType}");
             return null;
         }
     }
@@ -178,6 +211,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     }
 
     private void SetAnimation(AnimationClip clip, bool forcePlay = false) {
+        // Debug.Log($"{transform.root.gameObject} setting animation: {clip}");
         animator.playbackSpeed = 1f;
         if (forcePlay) {
             animator.Stop();

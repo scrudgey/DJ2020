@@ -2,20 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PoweredLightSource : MonoBehaviour {
+public class PoweredLightSource : MonoBehaviour, INodeBinder<PowerNode> {
+    public PowerNode node { get; set; }
     public MeshRenderer meshRenderer;
-    public PoweredComponent poweredComponent;
     public Light[] lights;
     float timer;
-    void Start() {
-        poweredComponent.OnStateChange += OnPowerChange;
-    }
-    void OnDestroy() {
-        poweredComponent.OnStateChange -= OnPowerChange;
-    }
-    public void OnPowerChange(PoweredComponent node) {
+    public void HandleNodeChange() {
         if (meshRenderer != null) {
-            if (node.power) {
+            if (node.powered) {
                 meshRenderer.material.EnableKeyword("_EMISSION");
                 meshRenderer.material.SetColor("_EmissionColor", Color.white);
             } else {
@@ -25,7 +19,7 @@ public class PoweredLightSource : MonoBehaviour {
         }
 
         foreach (Light light in lights) {
-            light.enabled = node.power;
+            light.enabled = node.powered;
         }
     }
 }

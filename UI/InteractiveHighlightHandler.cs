@@ -6,11 +6,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class InteractiveHighlightHandler : IBinder<Interactor> {
-    // Interactor IBinder<Interactor>.target { get; set; }
-
     public Camera cam;
     public RectTransform cursor;
-    // public HighlightableTargetData currentInteractorTarget;
     public InteractorTargetData currentInteractorTarget;
     public TextMeshProUGUI cursorText;
     public TextMeshProUGUI dotText;

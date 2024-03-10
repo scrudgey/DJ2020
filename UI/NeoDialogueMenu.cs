@@ -117,6 +117,9 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     }
     IEnumerator StartNextChallenge(SuspicionRecord manualSuspicionRecord = null) {
         yield return null;
+        if (currentChallenge != null && currentChallenge.stickied) {
+            GameManager.I.RemoveSuspicionRecord(currentChallenge, removeSticky: true);
+        }
         currentChallenge = manualSuspicionRecord == null ? unresolvedSuspicionRecords.Pop() : manualSuspicionRecord;
         stallButton.SetActive(false);
         easeButtonObject.SetActive(false);
@@ -168,6 +171,9 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     }
 
     IEnumerator StartConclusion() {
+        if (currentChallenge != null && currentChallenge.stickied) {
+            GameManager.I.RemoveSuspicionRecord(currentChallenge, removeSticky: true);
+        }
         if (GameManager.I.gameData.levelState.delta.bullshitLevel > bullshitMeter.bullshitThreshold) {
             dialogueResult = DialogueResult.fail;
         } else {

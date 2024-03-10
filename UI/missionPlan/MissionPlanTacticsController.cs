@@ -24,6 +24,7 @@ public class MissionPlanTacticsController : MonoBehaviour {
     [Header("references")]
     public Transform availableEntriesContainer;
     public TextMeshProUGUI creditsText;
+    public TextMeshProUGUI favorsText;
     public TextMeshProUGUI dialogueTacticName;
     public TextMeshProUGUI dialogueTacticsCost;
 
@@ -63,28 +64,16 @@ public class MissionPlanTacticsController : MonoBehaviour {
         List<string> activeTacticNames = plan.activeTactics.Select(tactic => tactic.title).ToList();
 
         foreach (Tactic tactic in template.availableTactics) {
-            // if (activeTacticNames.Contains(tactic.title)) continue;
             GameObject obj = Instantiate(availbleEntryPrefab);
             obj.transform.SetParent(availableEntriesContainer, false);
             PurchaseTacticEntry purchaseTacticEntry = obj.GetComponent<PurchaseTacticEntry>();
             PurchaseTacticEntry.Status status = activeTacticNames.Contains(tactic.title) ? PurchaseTacticEntry.Status.purchased : PurchaseTacticEntry.Status.forSale;
             purchaseTacticEntry.Initialize(this, tactic, status);
-            // if (activeEntry == null) {
-            //     AvailableEntryCallback(purchaseTacticEntry);
-            // }
         }
     }
     void SetupActiveTactics(LevelPlan plan) {
-        // foreach (Transform child in activeEntriesContainer) {
-        //     if (child.gameObject.name.ToLower().Contains("title") ||
-        //         child.gameObject.name.ToLower().Contains("divider") ||
-        //         child.gameObject.name.ToLower().Contains("spacer") ||
-        //         child.gameObject.name.ToLower().Contains("credits")) continue;
-        //     Destroy(child.gameObject);
-        // }
         foreach (Tactic tactic in plan.activeTactics) {
             GameObject obj = Instantiate(activeEntryPrefab);
-            // obj.transform.SetParent(activeEntriesContainer, false);
             ActiveTacticView activeTacticView = obj.GetComponent<ActiveTacticView>();
             activeTacticView.Initialize(tactic);
         }
@@ -94,15 +83,31 @@ public class MissionPlanTacticsController : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, openDialogueSound);
         activeEntry = entry;
         ShowDialogue(entry);
-        // ConfigurePurchaseDialogue(entry.tactic);
     }
     void SetCreditsText() {
         creditsText.text = $"{data.playerState.credits}";
+        favorsText.text = $"{data.playerState.favors}";
     }
 
     void HandleBuyResponse(DialogueResponseButton button) {
         PurchaseCallback();
         HideDialogue();
+    }
+    void HandleBargainBuyResponse(DialogueResponseButton button) {
+        PurchaseBargainCallback();
+        HideDialogue();
+    }
+    void HandleFavorResponse(Tactic tactic) {
+        ClearDialogueResponseContainer();
+        StartCoroutine(Toolbox.ChainCoroutines(
+            storeDialogueController.ShopownerCoroutine("I'll cut you a deal this time, for free."),
+            new WaitForSecondsRealtime(0.5f),
+            Toolbox.CoroutineFunc(() => {
+                ShowTacticInformationBargainInDialogue(tactic);
+                CreateDialogueResponse("[BUY]", "deal.", ChainPlayerResponseWithEmptyButton(HandleBargainBuyResponse, "[END]"));
+                CreateDialogueResponse("[CANCEL]", "no deal.", ChainPlayerResponseWithEmptyButton(HandleCancelResponse, "[END]"));
+            })
+        ));
     }
     void HandleCancelResponse(DialogueResponseButton button) {
         HideDialogue();
@@ -123,14 +128,27 @@ public class MissionPlanTacticsController : MonoBehaviour {
         if (activeEntry.tactic.cost > data.playerState.credits) {
             PurchaseFail();
         } else {
+            data.playerState.credits -= activeEntry.tactic.cost;
+            PurchaseSuccess(activeEntry.tactic);
+        }
+    }
+    public void PurchaseBargainCallback() {
+        if (activeEntry == null) {
+            PurchaseFail();
+            return;
+        }
+        if (data.playerState.favors <= 0) {
+            PurchaseFail();
+        } else {
+            data.playerState.favors -= 1;
             PurchaseSuccess(activeEntry.tactic);
         }
     }
 
     void PurchaseSuccess(Tactic tactic) {
         Toolbox.RandomizeOneShot(audioSource, purchaseSound);
-        data.playerState.credits -= tactic.cost;
         plan.activeTactics.Add(tactic);
+        tactic.ApplyPurchaseState(template, plan);
         SetupPurchases(template, plan);
         SetupActiveTactics(plan);
         SetCreditsText();
@@ -190,16 +208,22 @@ public class MissionPlanTacticsController : MonoBehaviour {
         dialogueTacticsCost.text = $"Asking price: {tactic.cost}";
         tacticStatusContainer.SetActive(true);
     }
+    void ShowTacticInformationBargainInDialogue(Tactic tactic) {
+        dialogueTacticName.text = tactic.title;
+        dialogueTacticsCost.text = $"Asking price: 1 favor";
+        tacticStatusContainer.SetActive(true);
+    }
     void ShowPurchaseDialogue(Tactic tactic) {
         StartCoroutine(Toolbox.ChainCoroutines(
-            Toolbox.CoroutineFunc(() => {
-                storeDialogueController.SetShopownerDialogue(tactic.vendorPitch);
-            }),
-            new WaitForSecondsRealtime(1f),
+            storeDialogueController.ShopownerCoroutine(tactic.vendorPitch),
+            // new WaitForSecondsRealtime(0.5f),
             Toolbox.CoroutineFunc(() => {
                 ShowTacticInformationInDialogue(tactic);
-                CreateDialogueResponse("[BUY]", "deal.", DecorateCallback(HandleBuyResponse, prefix: "[END]"));
-                CreateDialogueResponse("[CANCEL]", "no deal.", DecorateCallback(HandleCancelResponse, prefix: "[END]"));
+                CreateDialogueResponse("[BUY]", "deal.", ChainPlayerResponseWithEmptyButton(HandleBuyResponse, "[END]"));
+                if (data.playerState.favors > 0) {
+                    CreateDialogueResponse("[FAVOR]", $"you owe me, {tactic.vendorName}.", ChainPlayerResponseWithEmptyButton((DialogueResponseButton button) => HandleFavorResponse(tactic), "[CONTINUE]"));
+                }
+                CreateDialogueResponse("[CANCEL]", "no deal.", ChainPlayerResponseWithEmptyButton(HandleCancelResponse, "[END]"));
             })
         ));
     }
@@ -210,7 +234,7 @@ public class MissionPlanTacticsController : MonoBehaviour {
             ClearDialogueResponseContainer();
         });
     }
-    Action<DialogueResponseButton> DecorateCallback(Action<DialogueResponseButton> callback, string prefix = "[CONTINUE]") {
+    Action<DialogueResponseButton> ChainPlayerResponseWithEmptyButton(Action<DialogueResponseButton> callback, string prefix) {
         return (DialogueResponseButton button) => {
             storeDialogueController.SetPlayerDialogue(button.response);
             ClearDialogueResponseContainer();

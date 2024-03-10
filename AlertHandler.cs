@@ -38,15 +38,15 @@ public class AlertHandler : MonoBehaviour {
     }
     public void ShowAlert(bool useWarnMaterial = false) {
         // if (!enabled) 
-        Debug.Log("showing alert");
+        // Debug.Log("showing alert");
         ResetCoroutine(ShowAlertIcon(useWarnMaterial: useWarnMaterial));
     }
     public void ShowWarn() {
-        Debug.Log("showing warn");
+        // Debug.Log("showing warn");
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowGiveUp() {
-        Debug.Log("showing give up");
+        // Debug.Log("showing give up");
         ResetCoroutine(ShowQuestionIcon());
     }
     public void ShowRadio() {

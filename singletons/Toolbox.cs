@@ -7,6 +7,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 // random from list
 // play a sound with random pitch from randomized list
 // maybe use loudspeaker object
@@ -42,7 +43,7 @@ public class Toolbox {
         return default(T);
     }
     static public void RandomizeOneShot(AudioSource audioSource, AudioClip audioClip, float randomPitchWidth = 0.1f, float volume = 1f) {
-        if (!audioSource.isActiveAndEnabled)
+        if (audioSource == null || !audioSource.isActiveAndEnabled)
             return;
         if (randomPitchWidth > 0) {
             audioSource.pitch = UnityEngine.Random.Range(1 - (randomPitchWidth / 2f), 1 + (randomPitchWidth / 2f));
@@ -506,10 +507,17 @@ public class Toolbox {
     }
 
     public static Texture2D RenderToTexture2D(RenderTexture rTex) {
-        Texture2D tex = new Texture2D(1024, 1024, TextureFormat.RGB24, false);
+        Texture2D tex = new Texture2D(1024, 1024, TextureFormat.RGBA32, false);
         // ReadPixels looks at the active RenderTexture.
         RenderTexture.active = rTex;
         tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        for (int i = 0, j = tex.width; i < j; i += 1) {
+            for (int k = 0, l = tex.height; k < l; k += 1) {
+                if (tex.GetPixel(i, k) == Color.black) {
+                    tex.SetPixel(i, k, Color.clear);
+                }
+            }
+        }
         tex.Apply();
         return tex;
     }
@@ -618,6 +626,61 @@ public class Toolbox {
             textMesh.text = substring;
             yield return null;
         }
+    }
+    public static IEnumerator TypeText(TextMeshProUGUI text, string prefix, string totalText, bool typedInput = false) {
+
+        // TODO: audio
+        // TODO: looping cursor
+        // TODO: with delay
+
+        // float characterDuration = 0.04f;
+        // float duration = characterDuration * totalText.Length;
+        int index = 0;
+        // "ab" + "cde"
+        //  01     234 = 5-1
+        int finalIndex = totalText.Length;
+        float duration = 0.04f;
+        float cursorDuration = 0.2f;
+
+        float cursortimer = 0;
+        float timer = 0f;
+        bool cursorvisible = true;
+        text.text = "";
+        while (index < finalIndex) {
+            timer += Time.deltaTime;
+            cursortimer += Time.deltaTime;
+            if (timer > duration) {
+                timer -= duration;
+                if (typedInput) {
+                    duration = UnityEngine.Random.Range(0.05f, 0.1f);
+                    index++;
+                } else {
+                    index += finalIndex / 2;
+                }
+            }
+            if (cursortimer > cursorDuration) {
+                cursorvisible = !cursorvisible;
+                cursortimer -= cursorDuration;
+            }
+            // int numberCharacters = (int)(totalText.Length * (timer / duration));
+            try {
+                string currentText = prefix + totalText.Substring(0, Math.Min(finalIndex, index));
+                if (cursorvisible) {
+                    currentText += "█";
+                }
+
+                text.text = currentText;
+            }
+            catch (Exception e) {
+                Debug.Log($"{totalText} {index} {finalIndex}");
+                //ping 127.0.5.10 17 18
+                //012345678901234
+            }
+
+
+            yield return null;
+        }
+        text.text = prefix + totalText;
     }
 
     public static IEnumerator Ease(Coroutine routine,
@@ -744,10 +807,10 @@ public class Toolbox {
         return Mathf.Clamp(std * sigma + mean, minValue, maxValue);
     }
 
-    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7) {
+    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7, bool unlimited = false) {
         float timer = 0f;
         int cycles = 0;
-        while (cycles < pulses) {
+        while (cycles < pulses && !unlimited) {
             timer += Time.unscaledDeltaTime;
             if (timer > 0.1f) {
                 timer -= 0.05f;
@@ -757,6 +820,41 @@ public class Toolbox {
             yield return null;
         }
         component.enabled = true;
+    }
+    public static IEnumerator BlinkColor(TextMeshProUGUI textmesh, Color color, int pulses = 7, bool unlimited = false) {
+        float timer = 0f;
+        int cycles = 0;
+        bool enable = false;
+        while (cycles < pulses && !unlimited) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > 0.2f) {
+                enable = !enable;
+                timer -= 0.2f;
+                cycles += 1;
+                textmesh.color = enable ? color : Color.white;
+            }
+            yield return null;
+        }
+        textmesh.color = color;
+    }
+    public static IEnumerator BlinkVis(Image image, Action inbetweener, float blinkInterval = 0.05f) {
+        WaitForSecondsRealtime waiter = new WaitForSecondsRealtime(blinkInterval / 2f);
+        image.enabled = false;
+        yield return waiter;
+        inbetweener();
+        yield return waiter;
+        image.enabled = true;
+    }
+
+    public static Vector3 Round(Vector3 vector3, int decimalPlaces = 2) {
+        float multiplier = 1;
+        for (int i = 0; i < decimalPlaces; i++) {
+            multiplier *= 10f;
+        }
+        return new Vector3(
+            Mathf.Round(vector3.x * multiplier) / multiplier,
+            Mathf.Round(vector3.y * multiplier) / multiplier,
+            Mathf.Round(vector3.z * multiplier) / multiplier);
     }
 }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -9,6 +10,7 @@ public class LevelTemplate : ScriptableObject {
     public enum StrikeTeamCompletionThreshold { timer, clear }
     public enum StrikeTeamResponseBehavior { clear, investigate }
     public enum StrikeTeamCompletionBehavior { patrol, leave }
+    public enum GraphVisibilityDefault { all, none, partial }
 
     [Header("level and scene")]
     public string levelName;
@@ -16,6 +18,7 @@ public class LevelTemplate : ScriptableObject {
     public string sceneName;
     public string sceneDescriptor;
     public int mapviewInitialFloor = 1;
+    public List<float> floorHeights;
     public string tagline;
     public MusicTrack musicTrack;
     [Header("text")]
@@ -37,7 +40,9 @@ public class LevelTemplate : ScriptableObject {
 
     [Header("gameplay parameters")]
     public SensitivityLevel sensitivityLevel;
-
+    public GraphVisibilityDefault cyberGraphVisibilityDefault;
+    public GraphVisibilityDefault alarmGraphVisibiltyDefault;
+    public GraphVisibilityDefault powerGraphVisibilityDefault;
     public int maxInitialNPC;
     public int minNPC;
     public AudioClip alarmAudioClip;
@@ -52,6 +57,11 @@ public class LevelTemplate : ScriptableObject {
     public StrikeTeamCompletionThreshold strikeCompletionThreshold;
     public StrikeTeamCompletionBehavior strikeTeamCompletion;
 
+    [Header("map")]
+    public Vector3 mapOrigin;
+    public Vector3 mapUnitNorth;
+    public Vector3 mapUnitEast;
+
 
     public static LevelTemplate LoadAsInstance(string name) {
         return ScriptableObject.Instantiate(Resources.Load($"data/missions/{name}/{name}") as LevelTemplate);
@@ -61,4 +71,17 @@ public class LevelTemplate : ScriptableObject {
         Debug.Log($"template path: {path}");
         return Resources.Load<LevelTemplate>(path) as LevelTemplate;
     }
+
+    public int GetFloorForPosition(Vector3 position) {
+        int index = -1;
+        foreach (float floorHeight in floorHeights) {
+            if (floorHeight >= position.y) {
+                return index;
+            }
+            index++;
+        }
+        return index;
+    }
+
+    public List<Objective> AllObjectives() => objectives.Concat(bonusObjectives).ToList();
 }

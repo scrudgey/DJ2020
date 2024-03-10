@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class DestroyOnParticleEnd : MonoBehaviour {
     ParticleSystem[] particles;
+    public GameObject prefab;
+    PrefabPool pool;
     void Awake() {
+        if (prefab == null) {
+            Debug.LogError($"destroy on end: no prefab {gameObject}");
+        }
+        pool = PoolManager.I.GetPool(prefab);
         particles = GetComponentsInChildren<ParticleSystem>();
     }
 
@@ -17,7 +23,8 @@ public class DestroyOnParticleEnd : MonoBehaviour {
             }
         }
         if (!isPlaying) {
-            Destroy(gameObject);
+            // Destroy(gameObject);
+            pool.RecallObject(gameObject);
         }
     }
 }

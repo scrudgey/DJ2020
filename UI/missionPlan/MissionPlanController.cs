@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MissionPlanController : MonoBehaviour {
-    public enum PaneType { loadout, map, tactics, overview }
+    public enum PaneType { loadout, map, tactics, overview, cyberdeck }
 
     public bool debugStart;
     public AudioClip[] buttonSound;
@@ -22,16 +22,22 @@ public class MissionPlanController : MonoBehaviour {
     public GameObject loadOutPane;
     public GameObject mapPane;
     public GameObject tacticPane;
+    public GameObject cyberdeckPane;
     [Header("Controllers")]
     public MissionPlanLoadoutController loadoutController;
-    public MissionPlanMapController mapController;
+    // public MissionPlanMapController mapController;
+    public MapDisplay3DView mapDisplay;
     public MissionPlanTacticsController tacticsController;
     public MissionPlanOverviewController overviewController;
+    public MissionPlanCyberController cyberController;
+
+
     [Header("Highlights")]
     public Image overviewHighlight;
     public Image loadoutHighlight;
     public Image mapHighlight;
     public Image tacticsHighlight;
+    public Image cyberdeckHighlight;
 
     void Start() {
         if (debugStart) {
@@ -45,10 +51,10 @@ public class MissionPlanController : MonoBehaviour {
             GunState gunState3 = GunState.Instantiate(gun3);
             GunState gunState4 = GunState.Instantiate(gun4);
 
-            GameManager.I.gameData.playerState.allGuns.Add(gunState1);
-            GameManager.I.gameData.playerState.allGuns.Add(gunState2);
-            GameManager.I.gameData.playerState.allGuns.Add(gunState3);
-            GameManager.I.gameData.playerState.allGuns.Add(gunState4);
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState1));
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState2));
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState3));
+            GameManager.I.gameData.playerState.allGuns.Add(new WeaponState(gunState4));
 
             ItemTemplate item1 = ItemTemplate.LoadItem("C4");
             ItemTemplate item2 = ItemTemplate.LoadItem("rocket");
@@ -69,29 +75,30 @@ public class MissionPlanController : MonoBehaviour {
         this.template = template;
         plan = gameData.GetLevelPlan(template);
         loadoutController.Initialize(data, template, plan);
-        mapController.Initialize(data, template, plan);
+        // mapController.Initialize(data, template, plan);
+        mapDisplay.Initialize(template, plan);
         tacticsController.Initialize(data, template, plan);
         overviewController.Initialize(data, template, plan);
+        cyberController.Initialize(data, template, plan);
         SwitchPanes(PaneType.overview);
-        Toolbox.RandomizeOneShot(audioSource, startSound, randomPitchWidth: 0.05f);
     }
     public void OverviewButtonCallback() {
-        Toolbox.RandomizeOneShot(audioSource, buttonSound, randomPitchWidth: 0.05f);
         SwitchPanes(PaneType.overview);
     }
     public void LoadOutButtonCallback() {
-        Toolbox.RandomizeOneShot(audioSource, buttonSound, randomPitchWidth: 0.05f);
         SwitchPanes(PaneType.loadout);
     }
     public void MapButtonCallback() {
-        Toolbox.RandomizeOneShot(audioSource, buttonSound, randomPitchWidth: 0.05f);
         SwitchPanes(PaneType.map);
     }
     public void TacticButtonCallback() {
-        Toolbox.RandomizeOneShot(audioSource, buttonSound, randomPitchWidth: 0.05f);
         SwitchPanes(PaneType.tactics);
     }
+    public void CyberButtonCallback() {
+        SwitchPanes(PaneType.cyberdeck);
+    }
     public void SwitchPanes(PaneType toPane) {
+        Toolbox.RandomizeOneShot(audioSource, startSound, randomPitchWidth: 0.05f);
         switch (toPane) {
             case PaneType.loadout:
                 titleText.text = "Mission Planning - Loadout";
@@ -99,11 +106,13 @@ public class MissionPlanController : MonoBehaviour {
                 mapPane.SetActive(false);
                 tacticPane.SetActive(false);
                 overviewPane.SetActive(false);
+                cyberdeckPane.SetActive(false);
 
                 overviewHighlight.enabled = false;
                 loadoutHighlight.enabled = true;
                 mapHighlight.enabled = false;
                 tacticsHighlight.enabled = false;
+                cyberdeckHighlight.enabled = false;
                 break;
             case PaneType.map:
                 titleText.text = "Mission Planning - Map";
@@ -111,11 +120,14 @@ public class MissionPlanController : MonoBehaviour {
                 mapPane.SetActive(true);
                 tacticPane.SetActive(false);
                 overviewPane.SetActive(false);
+                cyberdeckPane.SetActive(false);
 
                 overviewHighlight.enabled = false;
                 loadoutHighlight.enabled = false;
                 mapHighlight.enabled = true;
                 tacticsHighlight.enabled = false;
+                cyberdeckHighlight.enabled = false;
+
                 break;
             case PaneType.tactics:
                 titleText.text = "Mission Planning - Tactics";
@@ -123,11 +135,14 @@ public class MissionPlanController : MonoBehaviour {
                 mapPane.SetActive(false);
                 tacticPane.SetActive(true);
                 overviewPane.SetActive(false);
+                cyberdeckPane.SetActive(false);
 
                 overviewHighlight.enabled = false;
                 loadoutHighlight.enabled = false;
                 mapHighlight.enabled = false;
                 tacticsHighlight.enabled = true;
+                cyberdeckHighlight.enabled = false;
+
                 break;
             case PaneType.overview:
                 titleText.text = "Mission Planning - Overview";
@@ -135,11 +150,28 @@ public class MissionPlanController : MonoBehaviour {
                 mapPane.SetActive(false);
                 tacticPane.SetActive(false);
                 overviewPane.SetActive(true);
+                cyberdeckPane.SetActive(false);
 
                 overviewHighlight.enabled = true;
                 loadoutHighlight.enabled = false;
                 mapHighlight.enabled = false;
                 tacticsHighlight.enabled = false;
+                cyberdeckHighlight.enabled = false;
+
+                break;
+            case PaneType.cyberdeck:
+                titleText.text = "Mission Planning - Cyberdeck";
+                loadOutPane.SetActive(false);
+                mapPane.SetActive(false);
+                tacticPane.SetActive(false);
+                overviewPane.SetActive(false);
+                cyberdeckPane.SetActive(true);
+
+                overviewHighlight.enabled = false;
+                loadoutHighlight.enabled = false;
+                mapHighlight.enabled = false;
+                tacticsHighlight.enabled = false;
+                cyberdeckHighlight.enabled = true;
                 break;
         }
     }

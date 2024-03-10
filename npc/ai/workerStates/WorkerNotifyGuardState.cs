@@ -99,7 +99,8 @@ public class WorkerNotifyGuardState : WorkerNPCControlState {
                 player = false,
                 isGunshot = false,
                 isFootsteps = false,
-                source = owner.gameObject
+                source = owner.gameObject,
+                relevantParties = new HashSet<Transform>() { owner.transform.root }
             };
             Toolbox.Noise(owner.transform.position, data, owner.gameObject);
         }

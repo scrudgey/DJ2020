@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class AttackSurfaceWire : MonoBehaviour {
-    public AlarmComponent[] alarmComponentsToDisable;
-    public AlarmComponent[] alarmComponentsToActivate;
-    public PoweredComponent[] poweredComponentsToDisable;
+public class AttackSurfaceWire : MonoBehaviour, INodeBinder<PowerNode>, INodeBinder<CyberNode>, INodeBinder<AlarmNode> {
+    PowerNode INodeBinder<PowerNode>.node { get; set; }
+    CyberNode INodeBinder<CyberNode>.node { get; set; }
+    AlarmNode INodeBinder<AlarmNode>.node { get; set; }
+
+    // TODO: replace this with some sort of enum / selector
+    public bool disablePowerNode;
+    public bool disableCyberNode;
+    public bool disableAlarmNode;
+    public bool activateAlarmNode;
     public SecurityCamera securityCamera;
     public string resultText;
     public bool electricalDamage;
-    public PoweredComponent electricalDamageSourceComponent;
     public BurglarAttackResult DoCut() {
         BurglarAttackResult result = BurglarAttackResult.None;
-
         if (electricalDamage) {
-            bool doZap = electricalDamageSourceComponent == null || electricalDamageSourceComponent.nodeEnabled;
+            PowerNode powerNode = ((INodeBinder<PowerNode>)this).node;
+            bool doZap = powerNode == null || powerNode.getEnabled();
             if (doZap) {
                 result = result with {
                     success = false,
@@ -31,9 +36,9 @@ public class AttackSurfaceWire : MonoBehaviour {
             return result;
         }
 
-        foreach (AlarmComponent component in alarmComponentsToDisable) {
-            GameManager.I.SetAlarmOverride(component);
-            GameManager.I.SetNodeEnabled<AlarmComponent, AlarmNode>(component, false);
+        if (disableAlarmNode) {
+            AlarmNode alarmNode = ((INodeBinder<AlarmNode>)this).node;
+            GameManager.I.SetNodeEnabled(alarmNode, false);
             result = result with {
                 success = true,
                 feedbackText = resultText,
@@ -41,8 +46,9 @@ public class AttackSurfaceWire : MonoBehaviour {
                 tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
-        foreach (AlarmComponent component in alarmComponentsToActivate) {
-            GameManager.I.SetAlarmNodeTriggered(component, true);
+        if (activateAlarmNode) {
+            AlarmNode alarmNode = ((INodeBinder<AlarmNode>)this).node;
+            GameManager.I.SetAlarmNodeTriggered(alarmNode, true);
             result = result with {
                 success = true,
                 feedbackText = resultText,
@@ -50,9 +56,9 @@ public class AttackSurfaceWire : MonoBehaviour {
                 tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
-        foreach (PoweredComponent component in poweredComponentsToDisable) {
-            GameManager.I.SetNodeEnabled<PoweredComponent, PowerNode>(component, false);
-            GameManager.I.SetPowerNodeState(component, false);
+        if (disablePowerNode) {
+            PowerNode powerNode = ((INodeBinder<PowerNode>)this).node;
+            GameManager.I.SetNodeEnabled(powerNode, false);
             result = result with {
                 success = true,
                 feedbackText = resultText,
@@ -69,8 +75,16 @@ public class AttackSurfaceWire : MonoBehaviour {
                 tamperEvidenceReportString = "HQ respond. Someone has tampered with the electronics."
             };
         }
-
-
         return result;
+    }
+
+    void INodeBinder<CyberNode>.HandleNodeChange() {
+
+    }
+    void INodeBinder<PowerNode>.HandleNodeChange() {
+
+    }
+    void INodeBinder<AlarmNode>.HandleNodeChange() {
+
     }
 }

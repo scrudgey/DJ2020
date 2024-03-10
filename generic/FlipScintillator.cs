@@ -10,18 +10,31 @@ public class FlipScintillator : MonoBehaviour {
     public bool scaleWithVelocity;
     public Rigidbody body;
     public SpriteRenderer spriteRenderer;
+    public Transform flipTransform;
     public void Start() {
         Flip();
     }
     public void Flip() {
         if (flipX) {
-            if (Random.value >= 0.5) {
-                spriteRenderer.flipX = !spriteRenderer.flipX;
+            if (spriteRenderer != null)
+                if (Random.value >= 0.5) {
+                    spriteRenderer.flipX = !spriteRenderer.flipX;
+                }
+            if (flipTransform != null) {
+                Vector3 scale = flipTransform.localScale;
+                scale.x *= -1f;
+                flipTransform.localScale = scale;
             }
         }
         if (flipY) {
-            if (Random.value >= 0.5) {
-                spriteRenderer.flipY = !spriteRenderer.flipY;
+            if (spriteRenderer != null)
+                if (Random.value >= 0.5) {
+                    spriteRenderer.flipY = !spriteRenderer.flipY;
+                }
+            if (flipTransform != null) {
+                Vector3 scale = flipTransform.localScale;
+                scale.y *= -1f;
+                flipTransform.localScale = scale;
             }
         }
     }

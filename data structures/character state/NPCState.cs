@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class NPCState : ICharacterHurtableState, IGunHandlerState {
+public class NPCState : ICharacterHurtableState { //IGunHandlerState
     public NPCTemplate template;
     // gun
     public GunState primaryGun { get; set; }
@@ -14,6 +14,7 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
     // health
     public float health { get; set; }
     public float fullHealthAmount { get; set; }
+    public int armorLevel { get; set; }
     public HitState hitState { get; set; }
 
     public static NPCState Instantiate(NPCTemplate template) => new NPCState {
@@ -24,16 +25,33 @@ public class NPCState : ICharacterHurtableState, IGunHandlerState {
         activeGun = 0,
         health = template.fullHealthAmount,
         fullHealthAmount = template.fullHealthAmount,
-        hitState = template.hitState
+        hitState = template.hitState,
+        armorLevel = template.armorLevel
     };
 
     public void ApplyState(GameObject npcObject) {
         // this.health = fullHealthAmount;
-        ((IGunHandlerState)this).ApplyGunState(npcObject);
+        // ((IGunHandlerState)this).ApplyGunState(npcObject);
         ((ISkinState)template).ApplySkinState(npcObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(npcObject);
 
-        // TODO: abstract this out with an interface
+        CharacterController controller = npcObject.GetComponent<CharacterController>();
+        if (controller != null) {
+            WeaponState weapon1 = template.primaryGun != null ? new WeaponState(GunState.Instantiate(template.primaryGun)) : null;
+            WeaponState weapon2 = template.secondaryGun != null ? new WeaponState(GunState.Instantiate(template.secondaryGun)) : null;
+            WeaponState weapon3 = template.tertiaryGun != null ? new WeaponState(GunState.Instantiate(template.tertiaryGun)) : null;
+
+            controller.primaryWeapon = weapon1;
+            controller.secondaryWeapon = weapon2;
+            controller.tertiaryWeapon = weapon3;
+
+            if (weapon1 != null) {
+                controller.HandleSwitchWeapon(1);
+            } else {
+                controller.HandleSwitchWeapon(0);
+            }
+        }
+
         SphereRobotAI ai = npcObject.GetComponent<SphereRobotAI>();
         if (ai != null) {
             ai.physicalKeys = new HashSet<int>(template.physicalKeys);

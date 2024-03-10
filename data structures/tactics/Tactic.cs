@@ -14,4 +14,8 @@ public abstract class Tactic : ScriptableObject {
     public string vendorPitch;
 
     public Sprite icon;
+
+    public virtual void ApplyPurchaseState(LevelTemplate template, LevelPlan plan) {
+
+    }
 }

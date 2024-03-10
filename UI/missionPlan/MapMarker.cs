@@ -30,6 +30,7 @@ public class MapMarker : MonoBehaviour {
     public static void WriteMapImage(string levelName, string sceneName, Texture2D tex, int floorNumber) {
         byte[] bytes = tex.EncodeToPNG();
         string path = MapMarker.MapPath(levelName, sceneName, floorNumber);
+        Debug.Log($"writing {path}...");
         System.IO.File.WriteAllBytes(path, bytes);
     }
 
@@ -58,7 +59,7 @@ public class MapMarker : MonoBehaviour {
 
 [System.Serializable]
 public record MapMarkerData {
-    public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard, camera }
+    public enum MapMarkerType { decor, insertionPoint, extractionPoint, objective, pointOfInterest, guard, camera, anchor }
     public enum MapMarkerIcon { circle, arrowUp, arrowRight, arrowDown, arrowLeft, lightningBolt, door, camera }
     public string idn;
     public MapMarkerType markerType;
@@ -67,6 +68,11 @@ public record MapMarkerData {
     public string markerName;
     public string description;
     public Vector2 position;
+    public Vector3 worldPosition;
+
+    public string ToFlavorText() {
+        return $"{idn}\ntype:{markerType}\npos:{position}";
+    }
 }
 
 

@@ -21,11 +21,13 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
         Motor.CharacterController = this;
         gunHandler.nonAnimatedReload = true;
         // TODO: remove?
-        gunHandler.primary = GunState.Instantiate(GunTemplate.Load("s1"));
-        gunHandler.SwitchToGun(1);
-        gunHandler.Reload();
-        gunHandler.ClipIn();
-        gunHandler.Rack();
+        // gunHandler.primary = GunState.Instantiate(GunTemplate.Load("s1"));
+        // WeaponState weapon = new WeaponState(GunState.Instantiate(GunTemplate.Load("s1")));
+        // GunState gun = GunState.Instantiate(GunTemplate.Load("s1"));
+        // gunHandler.SwitchToGun(gun);
+        // gunHandler.Reload();
+        // gunHandler.ClipIn();
+        // gunHandler.Rack();
     }
 
     public Action<SphereRobotController> OnValueChanged { get; set; }
@@ -62,7 +64,7 @@ public class SphereRobotController : MonoBehaviour, ICharacterController, IBinda
         }
 
         input.Fire.skipAnimation = true;
-        gunHandler.ProcessGunSwitch(input);
+        // switch gun as necessary
         gunHandler.SetInputs(input);
     }
 

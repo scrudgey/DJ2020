@@ -2,16 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AlarmButton : Interactive {
-    public AlarmComponent alarmComponent;
+public class AlarmButton : Interactive, INodeBinder<AlarmNode> {
+    public AlarmNode node { get; set; }
     public AudioSource audioSource;
     public AudioClip[] useButtonSounds;
-
     bool alarmState;
     public override void Start() {
         base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        alarmComponent.OnStateChange += OnAlarmChange;
     }
     public override ItemUseResult DoAction(Interactor interactor) {
         PressButton();
@@ -20,13 +18,10 @@ public class AlarmButton : Interactive {
         };
     }
     public void PressButton() {
-        GameManager.I.SetAlarmNodeTriggered(alarmComponent, true);
+        GameManager.I.SetAlarmNodeTriggered(node, true);
         Toolbox.RandomizeOneShot(audioSource, useButtonSounds);
     }
-    public void OnAlarmChange(AlarmComponent node) {
-        // Debug.Log($"alarm component {this} on power change powered: {node.power}");
-        // powerPowered = node.power;
-        // ApplyCyberPowerState();
+    public void HandleNodeChange() {
         alarmState = node.alarmTriggered;
     }
 

@@ -14,14 +14,13 @@ using UnityEngine.SceneManagement;
 [CustomEditor(typeof(LevelDataUtil))]
 [CanEditMultipleObjects]
 public class LevelDataUtilEditor : Editor {
-    // public string levelName = "test";
-    // public LevelTemplate levelData;
     LevelDataUtil t;
     SerializedObject GetTarget;
     SerializedProperty levelData;
     SerializedProperty mapCameraProperty;
     SerializedProperty mapTextureProperty;
     SerializedProperty floorNumberProperty;
+    SerializedProperty floorWidgetProperty;
     void OnEnable() {
         t = (LevelDataUtil)target;
         GetTarget = new SerializedObject(t);
@@ -29,45 +28,45 @@ public class LevelDataUtilEditor : Editor {
         mapCameraProperty = GetTarget.FindProperty("mapCamera"); // Find the List in our script and create a refrence of it
         mapTextureProperty = GetTarget.FindProperty("mapTexture"); // Find the List in our script and create a refrence of it
         floorNumberProperty = GetTarget.FindProperty("floorNumber"); // Find the List in our script and create a refrence of it
+        floorWidgetProperty = GetTarget.FindProperty("floorWidget");
     }
     public override void OnInspectorGUI() {
-
         EditorGUILayout.PropertyField(levelData);
-        // levelData = (LevelTemplate)base.serializedObject.FindProperty("levelData").objectReferenceValue;
-
-        // levelName = EditorGUILayout.TextField("level name", levelName);
+        EditorGUILayout.PropertyField(floorWidgetProperty);
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         if (template != null) {
             string levelName = template.levelName;
-            // Debug.Log(levelName);
-            if (GUILayout.Button("Write Level Data")) {
-                LevelDataUtil networkUtil = (LevelDataUtil)target;
-                string sceneName = SceneManager.GetActiveScene().name;
-
-                PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
-                CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
-                AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
-
-                foreach (Node node in powerGraph.nodes.Values) {
-                    Debug.Log($"writing power graph: {node.idn} {levelName}");
-                }
-
-                powerGraph.Write(levelName, sceneName);
-                cyberGraph.Write(levelName, sceneName);
-                alarmGraph.Write(levelName, sceneName);
-
-                AssetDatabase.Refresh();
-            }
-            EditorGUILayout.Space();
-            EditorGUILayout.Separator();
             EditorGUILayout.PropertyField(floorNumberProperty);
-            EditorGUILayout.PropertyField(mapCameraProperty);
-            EditorGUILayout.PropertyField(mapTextureProperty);
             if (GUILayout.Button("Write map image")) {
                 SaveMapData();
             }
+            if (GUILayout.Button("Set floor level")) {
+                int floorNumber = floorNumberProperty.intValue;
+                SetFloorHeight(template, floorNumber);
+            }
+            GUILayout.Space(10);
+            EditorGUILayout.Separator();
+            GUILayout.Space(10);
+            if (GUILayout.Button("Write all data")) {
+                WriteGraphDataButtonEffect(levelName);
+                SaveMapMetaData(template);
+                SetObjectiveData(template);
+            }
+            GUILayout.Space(10);
+            EditorGUILayout.Separator();
+            GUILayout.Space(10);
+
+            EditorGUILayout.PropertyField(mapCameraProperty);
+            EditorGUILayout.PropertyField(mapTextureProperty);
+
+            if (GUILayout.Button("Write Graph Data")) {
+                WriteGraphDataButtonEffect(levelName);
+            }
             if (GUILayout.Button("Write map marker data")) {
-                SaveMapData();
+                SaveMapMetaData(template);
+            }
+            if (GUILayout.Button("Write objective data")) {
+                SetObjectiveData(template);
             }
         } else {
             Debug.LogError("set level template before writing level data");
@@ -76,51 +75,44 @@ public class LevelDataUtilEditor : Editor {
         GetTarget.ApplyModifiedProperties();
     }
 
+    void WriteGraphDataButtonEffect(string levelName) {
+        LevelDataUtil networkUtil = (LevelDataUtil)target;
+        string sceneName = SceneManager.GetActiveScene().name;
 
-    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node, new() where V : GraphNodeComponent<V, U> {
+        PowerGraph powerGraph = BuildGraph<PowerGraph, PowerNode, PoweredComponent>();
+        CyberGraph cyberGraph = BuildGraph<CyberGraph, CyberNode, CyberComponent>();
+        AlarmGraph alarmGraph = BuildGraph<AlarmGraph, AlarmNode, AlarmComponent>();
+
+        powerGraph.Write(levelName, sceneName);
+        cyberGraph.Write(levelName, sceneName);
+        alarmGraph.Write(levelName, sceneName);
+
+        Debug.Log("wrote all graph data.");
+
+        AssetDatabase.Refresh();
+    }
+
+    public T BuildGraph<T, U, V>() where T : Graph<U, T>, new() where U : Node<U>, new() where V : GraphNodeComponent<V, U> {
         T graph = new T();
 
         V[] components = GameObject.FindObjectsOfType<V>();
         string sceneName = SceneManager.GetActiveScene().name;
 
-        foreach (var group in components.GroupBy(component => component.gameObject)) {
+        foreach (V component in components) {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
-
-            Vector3 position = group.First().NodePosition();
-
+            Vector3 position = component.NodePosition();
+            // Debug.Log($"{idn}: {component}");
+            component.idn = idn;
+            component.enabled = true;
             // new node with idn
-            U node = new U {
-                sceneName = sceneName,
-                idn = idn,
-                position = position,
-                // enabled = true,
-                icon = NodeIcon.normal
-            };
-            node.setEnabled(true);
+            U node = component.NewNode();
+            node.sceneName = sceneName;
             graph.nodes[idn] = node;
-
-            foreach (V component in group) {
-                if (component.nodeTitle != "") {
-                    node.nodeTitle = component.nodeTitle;
-                }
-                if (component.icon != NodeIcon.normal)
-                    node.icon = component.icon;
-                Debug.Log($"{idn}: {component}");
-                // set the component's id
-                component.idn = idn;
-                EditorUtility.SetDirty(component);
-
-                node.type = component switch {
-                    PowerSource => NodeType.powerSource,
-                    InternetSource => NodeType.WAN,
-                    _ => NodeType.normal
-                };
-
-                // allow the subclass to add class-specific configuration
-                component.ConfigureNode(node);
-            }
+            EditorUtility.SetDirty(component);
         }
+
+
         foreach (V component in components) {
             if (component == null)
                 continue;
@@ -129,6 +121,10 @@ public class LevelDataUtilEditor : Editor {
                     continue;
                 U source = graph.nodes[component.idn];
                 U neighbor = graph.nodes[link.idn];
+                if (component.idn == link.idn) {
+                    Debug.Log($"adding self-edge disallowed: {component.idn}");
+                    continue;
+                }
                 graph.AddEdge(source, neighbor);
             }
         }
@@ -144,8 +140,8 @@ public class LevelDataUtilEditor : Editor {
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         int floorNumber = floorNumberProperty.intValue;
 
-        SaveMapSnapshot(mapCam, renderTexture, template, floorNumber);
-        SaveMapMetaData(mapCam, template);
+        SaveMapSnapshot(renderTexture, template, floorNumber);
+        // SaveMapMetaData(template);
 
         AssetDatabase.Refresh();
     }
@@ -153,11 +149,47 @@ public class LevelDataUtilEditor : Editor {
         // map
         Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
-        SaveMapMetaData(mapCam, template);
+        SaveMapMetaData(template);
         AssetDatabase.Refresh();
     }
 
-    void SaveMapSnapshot(Camera mapCam, RenderTexture renderTexture, LevelTemplate template, int floorNumber) {
+    public void SetObjectiveData(LevelTemplate template) {
+        foreach (Objective objective in template.AllObjectives()) {
+            objective.spawnPointLocations = new List<Vector3>();
+            objective.potentialSpawnPoints = new List<string>();
+        }
+
+        foreach (ObjectiveLootSpawnpoint lootSpawnpoint in GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>()) {
+            Guid guid = Guid.NewGuid();
+            string idn = guid.ToString();
+            lootSpawnpoint.idn = idn;
+
+            Objective objective = lootSpawnpoint.objective;
+
+            objective.potentialSpawnPoints.Add(idn);
+            objective.spawnPointLocations.Add(lootSpawnpoint.transform.position);
+
+            EditorUtility.SetDirty(objective);
+            EditorUtility.SetDirty(lootSpawnpoint);
+        }
+
+        List<CyberComponent> cyberDataStores = GameObject.FindObjectsOfType<CyberComponent>()
+            .Where(component => component.nodeType == CyberNodeType.datanode).ToList();
+
+        foreach (ObjectiveData objective in template.AllObjectives().Where(objective => objective is ObjectiveData)) {
+            objective.spawnPointLocations = cyberDataStores.Select(component => component.transform.position).ToList();
+            objective.potentialSpawnPoints = cyberDataStores.Select(component => component.idn).ToList();
+            EditorUtility.SetDirty(objective);
+        }
+
+        Debug.Log($"wrote {template.AllObjectives().Count} objective data");
+
+        EditorUtility.SetDirty(template);
+    }
+
+    void SaveMapSnapshot(RenderTexture renderTexture, LevelTemplate template, int floorNumber) {
+        Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
+
         string levelName = template.levelName;
         string sceneName = SceneManager.GetActiveScene().name;
 
@@ -166,8 +198,11 @@ public class LevelDataUtilEditor : Editor {
         mapCam.targetTexture = null;
         Texture2D tex = Toolbox.RenderToTexture2D(renderTexture);
         MapMarker.WriteMapImage(levelName, sceneName, tex, floorNumber);
+
     }
-    void SaveMapMetaData(Camera mapCam, LevelTemplate template) {
+    void SaveMapMetaData(LevelTemplate template) {
+        Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
+
         string levelName = template.levelName;
         string sceneName = SceneManager.GetActiveScene().name;
         List<MapMarkerData> datas = new List<MapMarkerData>();
@@ -176,11 +211,32 @@ public class LevelDataUtilEditor : Editor {
             string idn = guid.ToString();
             marker.data.position = mapCam.WorldToViewportPoint(marker.transform.position);
             marker.data.idn = idn;
+            marker.data.worldPosition = marker.transform.position;
             datas.Add(marker.data);
             EditorUtility.SetDirty(marker);
         }
         Debug.Log($"writing {datas.Count} map marker data...");
         MapMarker.WriteMapMetaData(levelName, sceneName, datas);
+
+
+        Vector3 mapOrigin = mapCam.WorldToViewportPoint(Vector3.zero);
+        Vector3 mapNorthPoint = mapCam.WorldToViewportPoint(new Vector3(1f, 0f, 0f));
+        Vector3 mapEastPoint = mapCam.WorldToViewportPoint(new Vector3(0f, 0f, 1f));
+        template.mapOrigin = mapOrigin;
+        template.mapUnitNorth = mapNorthPoint - mapOrigin;
+        template.mapUnitEast = mapEastPoint - mapOrigin;
+
+        EditorUtility.SetDirty(template);
+    }
+
+    void SetFloorHeight(LevelTemplate template, int floorNumber) {
+        Transform floorWidget = (Transform)floorWidgetProperty.objectReferenceValue;
+        while (template.floorHeights.Count < floorNumber + 1) {
+            template.floorHeights.Add(0);
+        }
+        template.floorHeights[floorNumber] = floorWidget.position.y;
+
+        EditorUtility.SetDirty(template);
     }
 
 }

@@ -64,7 +64,8 @@ public class Footsteps : MonoBehaviour {
                     player = player,
                     suspiciousness = Suspiciousness.normal,
                     volume = volume,
-                    isFootsteps = true
+                    isFootsteps = true,
+                    relevantParties = new HashSet<Transform>() { transform.root }
                 };
                 Toolbox.Noise(transform.position, noise, transform.root.gameObject, spherical: false);
                 // if (player && GameManager.I.timePlayed > 3f) {

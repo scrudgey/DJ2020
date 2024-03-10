@@ -29,7 +29,6 @@ public record ItemUseResult {
     };
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
-    public GunHandler gunHandler;
     public Action<ItemHandler> OnValueChanged { get; set; }
     public List<ItemInstance> items = new List<ItemInstance>();
     public int index;
@@ -118,15 +117,18 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     void OnItemEnter(ItemInstance item) {
         if (item == null)
             return;
-        if (item.subweapon) {
-            gunHandler?.SwitchToGun(-1);
-        }
+        // TODO
+        // if (item.subweapon) { 
+        //     gunHandler?.SwitchToGun(-1);
+        // }
         switch (item) {
             case RocketLauncherItem rocketItem:
                 Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);
                 break;
             case CyberDeck:
-                GameManager.I.SetOverlay(OverlayType.cyber);
+                GameManager.I.playerManualHacker.deployed = true;
+                if (GameManager.I.activeOverlayType == OverlayType.none)
+                    GameManager.I.SetOverlay(OverlayType.limitedCyber);
                 break;
             case IRGoggles goggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = true;
@@ -143,7 +145,10 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             return;
         switch (item) {
             case CyberDeck:
-                GameManager.I.SetOverlay(OverlayType.none);
+                if (GameManager.I.activeOverlayType == OverlayType.limitedCyber)
+                    GameManager.I.SetOverlay(OverlayType.none);
+                GameManager.I.playerManualHacker.deployed = false;
+                GameManager.I.playerManualHacker.Disconnect();
                 break;
             case IRGoggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;

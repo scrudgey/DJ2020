@@ -17,6 +17,7 @@ public class Listener : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         NoiseComponent noiseComponent = other.GetComponent<NoiseComponent>();
         if (noiseComponent != null) {
+            if (noiseComponent.data.relevantParties.Contains(transform.root)) return;
             Vector3 position = transform.position;
             Vector3 otherPosition = other.transform.position;
             float distance = Vector3.Distance(otherPosition, position);

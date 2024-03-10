@@ -29,17 +29,26 @@ public class StoreDialogueController : MonoBehaviour {
         rightDialogueName.text = buyerName.ToLower();
         leftDialogueName.text = storeName.ToLower();
     }
+
     public void SetShopownerDialogue(string dialogue) {
         dialogueLeftSpacer.minWidth = 20f;
         dialogueRightSpacer.minWidth = 150f;
-        // dialogueText.text = dialogue;
         BlitDialogue(dialogue);
+    }
+    public IEnumerator ShopownerCoroutine(string dialogue) {
+        dialogueLeftSpacer.minWidth = 20f;
+        dialogueRightSpacer.minWidth = 150f;
+        return BlitDialogueText(dialogue);
     }
     public void SetPlayerDialogue(string dialogue) {
         dialogueLeftSpacer.minWidth = 150f;
         dialogueRightSpacer.minWidth = 20f;
-        // dialogueText.text = dialogue;
         BlitDialogue(dialogue);
+    }
+    public IEnumerator PlayerCoroutine(string dialogue) {
+        dialogueLeftSpacer.minWidth = 150f;
+        dialogueRightSpacer.minWidth = 20f;
+        return BlitDialogueText(dialogue);
     }
     public void MoveDialogueBox(bool playerSide) {
         if (playerSide) {

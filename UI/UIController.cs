@@ -12,8 +12,10 @@ public class UIController : MonoBehaviour {
     public Canvas burglarCanvas;
     public Canvas missionSelectorCanvas;
     public Canvas interactiveHighlightCanvas;
+    public Canvas statusBarCanvas;
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
+    public MeleeWeaponUIHandler meleeWeaponUIHandler;
     public ItemUIHandler itemUIHandler;
     public AimIndicatorHandler aimIndicatorHandler;
     public LockRadiusIndicatorHandler lockRadiusIndicatorHandler;
@@ -22,7 +24,7 @@ public class UIController : MonoBehaviour {
     public ActionLogHandler actionLogHandler;
     public OverlayHandler overlayHandler;
     public GameObject UIEditorCamera;
-    public HackDisplay hackDisplay;
+    // public HackDisplay hackDisplay;
     public VisibilityUIHandler visibilityUIHandler;
     public SuspicionIndicatorHandler suspicionIndicatorHandler;
     public HealthIndicatorController healthIndicatorController;
@@ -38,6 +40,9 @@ public class UIController : MonoBehaviour {
     public SaveIndicatorController saveIndicatorController;
     public WeaponWheelController weaponWheelController;
     public TargetPracticeUIHandler targetPracticeUIHandler;
+    public UIStatusBarHandler statusBarHandler;
+    public SoftwareModalController softwareModalController;
+    public bool mouseOverScrollBox;
     bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -47,13 +52,15 @@ public class UIController : MonoBehaviour {
         // cameras
         canvas.worldCamera = Camera.main;
         interactiveHighlightHandler.cam = Camera.main;
+        overlayHandler.uIController = this;
         overlayHandler.cam = Camera.main;
         aimIndicatorHandler.UICamera = Camera.main;
         lockRadiusIndicatorHandler.UICamera = Camera.main;
         lockIndicatorHandler.UICamera = Camera.main;
         playerCalloutHandler.UICamera = Camera.main;
         playerArrowCalloutHandler.UICamera = Camera.main;
-        hackDisplay.cam = Camera.main;
+        statusBarHandler.UICamera = Camera.main;
+        // hackDisplay.cam = Camera.main;
         caption.text = "";
 
         GameManager.OnFocusChanged += BindToNewTarget;
@@ -65,12 +72,14 @@ public class UIController : MonoBehaviour {
         HideBurglar();
         HideMissionSelector();
         saveIndicatorController.HideIndicator();
-        objectiveCanvasController.Initialize();
         objectivesCompleteController.Initialize();
         weaponUIHandler.Initialize();
+        meleeWeaponUIHandler.Initialize();
         weaponWheelController.HideWheel();
         weaponWheelController.Initialize();
         targetPracticeUIHandler.canvas.enabled = false;
+        statusBarHandler.Initialize();
+        HideSoftwareDeployModal();
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
@@ -96,6 +105,7 @@ public class UIController : MonoBehaviour {
     void BindToNewTarget(GameObject target) {
         // Debug.Log($"ui controller binding to new target {target}");
         weaponUIHandler.Bind(target);
+        meleeWeaponUIHandler.Bind(target);
 
         itemUIHandler.Bind(target);
 
@@ -161,6 +171,12 @@ public class UIController : MonoBehaviour {
         if (vRStatHandler == null) return;
         vRStatHandler?.gameObject.SetActive(false);
     }
+    public void ShowSoftwareDeployModal() {
+        softwareModalController.gameObject.SetActive(true);
+    }
+    public void HideSoftwareDeployModal() {
+        softwareModalController.gameObject.SetActive(false);
+    }
     public void HideUI() {
         HideVRStats();
         if (canvas != null)
@@ -171,11 +187,15 @@ public class UIController : MonoBehaviour {
             interactiveHighlightCanvas.enabled = false;
         if (burglarCanvas != null)
             burglarCanvas.enabled = false;
+        if (statusBarCanvas != null)
+            statusBarCanvas.enabled = false;
     }
     public void ShowUI() {
         canvas.enabled = true;
         gunDisplayCanvas.enabled = true;
         interactiveHighlightCanvas.enabled = true;
+        if (statusBarCanvas != null)
+            statusBarCanvas.enabled = true;
         if (burglarMode)
             burglarCanvas.enabled = true;
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {
@@ -187,6 +207,14 @@ public class UIController : MonoBehaviour {
     }
     public void ShowSaveIndicator() {
         // saveIndicatorController.ShowSaveIndicator();
+    }
+
+    public bool OverlayNodeIsSelected() {
+        return overlayHandler.selectedNode != null;
+    }
+
+    public CameraInput GetOverlayCameraInput() {
+        return overlayHandler.selectedNode.GetCameraInput();
     }
 
 }

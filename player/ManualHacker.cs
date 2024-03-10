@@ -12,17 +12,15 @@ public class ManualHackTargetData {
     public ManualHackTargetData(CyberComponent target) {
         this.target = target;
     }
-    public HackInput ToManualHackInput() => new HackInput {
-        targetNode = GameManager.I.GetCyberNode(target.idn),
-        type = HackType.manual
-    };
 }
 public class ManualHacker : MonoBehaviour {
-    public SphereCollider sphereCollider;
-    public CapsuleCollider characterCollider;
-    public Action<ManualHackTargetData> OnActionDone;
-    public Dictionary<Collider, CyberComponent> cyberComponents = new Dictionary<Collider, CyberComponent>();
-    bool hackToolDeployed;
+    public bool deployed;
+    Transform myTransform;
+    public CyberNode targetNode;
+    public GameObject visualEffect;
+    // public GameObject discoveryParticleEffect;
+    // PrefabPool discoveryParticlePool;
+    [Header("configure")]
     public LineRenderer lineRenderer;
     public Material wireUnfurlMaterial;
     public Material wireAttachedMaterial;
@@ -36,93 +34,68 @@ public class ManualHacker : MonoBehaviour {
     bool deploySoundPlayed;
     bool attachSoundPlayed;
     void Start() {
+        myTransform = transform;
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        targetNode = null;
+        // discoveryParticlePool = PoolManager.I.GetPool(discoveryParticleEffect);
     }
-    public void AddInteractive(Collider other) {
-        CyberComponent component = other.GetComponent<CyberComponent>();
-        if (component) {
-            cyberComponents[other] = component;
-        }
-        RemoveNullCyberComponents();
-        HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-    }
-    public void RemoveInteractive(Collider other) {
-        if (cyberComponents.ContainsKey(other)) {
-            cyberComponents.Remove(other);
-        }
-        RemoveNullCyberComponents();
-        HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-    }
-
-    public ManualHackTargetData ActiveTarget() {
-        RemoveNullCyberComponents();
-        if (!hackToolDeployed) {
-            return null;
-        }
-        if (cyberComponents.Count == 0) {
-            return null;
-        } else return cyberComponents
-            .ToList()
-            .Where((KeyValuePair<Collider, CyberComponent> kvp) => IsNodeVulnerable(kvp.Value.GetNode()))
-            .Select((KeyValuePair<Collider, CyberComponent> kvp) => new ManualHackTargetData(kvp.Value))
-            .DefaultIfEmpty(null)
-            .First(); // TODO: weigh the targets in some way, return deterministic
-    }
-
-    bool IsNodeVulnerable(CyberNode node) {
-        // TODO: compute various checks to see if node is indeed vulnerable
-        return hackToolDeployed && !node.compromised && Vector3.Distance(node.position, transform.position) < sphereCollider.radius;
-    }
-    void RemoveNullCyberComponents() => cyberComponents =
-        cyberComponents
-            .Where(f => f.Value != null && f.Key != null)
-            .ToDictionary(x => x.Key, x => x.Value);
-
-    void OnTriggerEnter(Collider other) => AddInteractive(other);
-
-    void OnTriggerExit(Collider other) => RemoveInteractive(other);
-
-    public void SetInputs(ManualHackInput inputs) {
-        bool refresh = false;
-        if (inputs.activeItem != null && hackToolDeployed != inputs.activeItem.EnablesManualHack()) {
-            hackToolDeployed = inputs.activeItem.EnablesManualHack();
-            refresh = true;
-        }
-        if (refresh) {
-            HackController.I.HandleVulnerableManualNodes(GetVulnerableNodes());
-        }
-        if (inputs.playerInput.useItem) {
-            ManualHackTargetData data = ActiveTarget();
-            // Debug.Log($"active target: {data}");
-            if (data == null) return;
-            HackController.I.HandleHackInput(data.ToManualHackInput());
-            OnActionDone?.Invoke(data);
-        }
-    }
-
-    public List<CyberNode> GetVulnerableNodes() => cyberComponents
-        .ToList()
-        .Select((KeyValuePair<Collider, CyberComponent> kvp) => kvp.Value.GetNode())
-        .Where(IsNodeVulnerable)
-
-        .ToList();
-
     void Update() {
-        CyberNode node = GetVulnerableNodes().DefaultIfEmpty(null).FirstOrDefault();
-        if (node != null) {
+        if (targetNode != null) {
             timer += Time.deltaTime;
-            UpdateWire(node);
+            UpdateWire(targetNode);
+            if (Vector3.Distance(myTransform.position, targetNode.position) > 3f) {
+                Disconnect();
+            }
         } else {
             timer = 0f;
-            deploySoundPlayed = false;
-            attachSoundPlayed = false;
             lineRenderer.enabled = false;
         }
-        float radius = GameManager.I?.gameData?.playerState?.hackRadius ?? 1.5f;
-        sphereCollider.radius = radius;
+        visualEffect.SetActive(deployed);
+        if (deployed) {
+            Vector3 playerPosition = GameManager.I.playerPosition;
+            foreach (CyberNode node in GameManager.I.gameData.levelState.delta.cyberGraph.nodes.Values) {
+                float distance = Vector3.Distance(node.position, playerPosition);
+                if (distance < 3) {
+                    GameManager.I.DiscoverNode(node, NodeVisibility.known);
+                    // bool wasDiscovered = node.BeDiscovered();
+                    // if (wasDiscovered) {
+                    //     Toolbox.RandomizeOneShot(audioSource, discoverySound);
+                    //     discoveryParticlePool.GetObject(node.position);
+                    // }
+                }
+            }
+        }
     }
+
+    public void Connect(CyberNode target) {
+        if (!deployed) return;
+        if (Vector3.Distance(target.position, transform.position) > 3f) return;
+        Disconnect(dontRefreshCyberGraph: true);
+        targetNode = target;
+        // target.isManualHackerTarget = true;
+        CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
+        GameManager.I.gameData.levelState.delta.cyberGraph.AddEdge(playerNode, target);
+        GameManager.I.RefreshCyberGraph();
+    }
+    public void Disconnect(bool dontRefreshCyberGraph = false) {
+        if (targetNode != null) {
+            // targetNode.isManualHackerTarget = false;
+            // target.isManualHackerTarget = true;
+            CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
+            GameManager.I.gameData.levelState.delta.cyberGraph.RemoveEdge(playerNode, targetNode);
+        }
+
+
+        targetNode = null;
+        if (!dontRefreshCyberGraph) {
+            GameManager.I.RefreshCyberGraph();
+        }
+        deploySoundPlayed = false;
+        attachSoundPlayed = false;
+    }
+
     void UpdateWire(CyberNode node) {
-        Vector3 playerPos = characterCollider.bounds.center;
+        Vector3 playerPos = myTransform.position;
         lineRenderer.enabled = true;
         Vector3[] points = new Vector3[2];
         if (timer < 0.25) {

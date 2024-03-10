@@ -13,6 +13,7 @@ public class InputController : Singleton<InputController> {
     [Header("mouse")]
 
     public Vector2 sensitivity = new Vector2(2f, 2f);
+    // public Vector2 sensitivity = new Vector2(20000f, 20000f);
     public Vector2 smoothing = new Vector2(2f, 2f);
     [Header("Inputs")]
     public InputActionReference MoveAction;
@@ -42,6 +43,7 @@ public class InputController : Singleton<InputController> {
 
     private Vector2 inputVector;
     private bool firePressedHeld;
+    private bool rightClickHeld;
     private bool mouseDown;
     private bool mouseClickedThisFrame;
     private bool firePressedThisFrame;
@@ -126,6 +128,7 @@ public class InputController : Singleton<InputController> {
     public void HandleActionButtonAction(InputAction.CallbackContext ctx) {
         if (ctx.ReadValueAsButton()) {
             actionButtonPressedThisFrame = ctx.ReadValueAsButton();
+            rightClickHeld = ctx.ReadValueAsButton();
         }
     }
     public void HandleNextItemAction(InputAction.CallbackContext ctx) {
@@ -154,6 +157,9 @@ public class InputController : Singleton<InputController> {
     public void HandleFireActionCanceled(InputAction.CallbackContext ctx) {
         firePressedHeld = false;
         mouseDown = false;
+    }
+    public void HandleRightClickActionCanceled(InputAction.CallbackContext ctx) {
+        rightClickHeld = false;
     }
     public void HandleCrouchActionCanceled(InputAction.CallbackContext ctx) {
         crouchHeld = false;
@@ -215,6 +221,7 @@ public class InputController : Singleton<InputController> {
         useItem.action.performed += HandleUseItemAction;
         // Button up
         FireAction.action.canceled += HandleFireActionCanceled;
+        actionButton.action.canceled += HandleRightClickActionCanceled;
         CrouchAction.action.canceled += HandleCrouchActionCanceled;
         RunAction.action.canceled += HandleRunActionCanceled;
         MoveAction.action.canceled += HandleMoveActionCanceled;
@@ -262,6 +269,7 @@ public class InputController : Singleton<InputController> {
         useItem.action.performed -= HandleUseItemAction;
         // Button up
         FireAction.action.canceled -= HandleFireActionCanceled;
+        actionButton.action.canceled -= HandleRightClickActionCanceled;
         CrouchAction.action.canceled -= HandleCrouchActionCanceled;
         RunAction.action.canceled -= HandleRunActionCanceled;
         MoveAction.action.canceled -= HandleMoveActionCanceled;
@@ -284,7 +292,6 @@ public class InputController : Singleton<InputController> {
             firePressedHeld = false;
         }
         Vector2 mousePosition = Mouse.current.position.ReadValue();
-        Vector2 viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
@@ -295,7 +302,16 @@ public class InputController : Singleton<InputController> {
         _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
         _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
 
-        CursorData targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
+        // TODO: this is weird
+        Vector2 viewPortPoint = Vector2.zero;
+        CursorData targetData = CursorData.none;
+        Quaternion cameraRotation = Quaternion.identity;
+        if (OrbitCamera != null) {
+            viewPortPoint = OrbitCamera.Camera.ScreenToViewportPoint(mousePosition);
+            targetData = OrbitCamera.GetTargetData(mousePosition, GameManager.I.inputMode);
+            cameraRotation = OrbitCamera.isometricRotation;
+        }
+
         PlayerInput characterInputs = PlayerInput.none;
         if (GameManager.I.gameData.phase == GamePhase.world) {
             selectGunThisFrame = 0;
@@ -332,6 +348,7 @@ public class InputController : Singleton<InputController> {
             rotateCameraLeftPressedThisFrame = rotateCameraLeftPressedThisFrame,
             zoomInput = zoomInput,
             mouseDown = mouseDown,
+            rightMouseDown = rightClickHeld,
             mouseClicked = mouseClick,
             escapePressed = escapePressedThisFrame,
             mousePosition = mousePosition,

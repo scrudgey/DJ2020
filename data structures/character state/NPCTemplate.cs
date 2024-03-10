@@ -31,6 +31,9 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     [field: SerializeField]
     public float fullHealthAmount { get; set; }
     public HitState hitState { get; set; }
+    [field: SerializeField]
+    public int armorLevel { get; set; }
+
 
     // speech
     [field: SerializeField]

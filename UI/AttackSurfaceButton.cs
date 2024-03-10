@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackSurfaceButton : AttackSurfaceElement {
+public class AttackSurfaceButton : AttackSurfaceElement, INodeBinder<AlarmNode> {
+    public AlarmNode node { get; set; }
     [Header("sprites")]
     public Sprite defaultSprite;
     public Sprite mouseOverSprite;
@@ -14,7 +15,6 @@ public class AttackSurfaceButton : AttackSurfaceElement {
     public AudioSource audioSource;
 
     [Header("effects")]
-    public AlarmComponent alarmComponent;
     public ElevatorController elevatorController;
     public int selectFloor;
 
@@ -38,14 +38,15 @@ public class AttackSurfaceButton : AttackSurfaceElement {
             }
         }
     }
+    public void HandleNodeChange() { }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.none) {
             pressTimer = 0.5f;
             Toolbox.RandomizeOneShot(audioSource, buttonPressedSound);
             string feedbackText = "";
-            if (alarmComponent != null) {
-                GameManager.I.SetAlarmNodeTriggered(alarmComponent, false);
+            if (node != null) {
+                GameManager.I.SetAlarmNodeTriggered(node, false);
                 feedbackText = "alarm reset";
             }
             if (elevatorController != null) {

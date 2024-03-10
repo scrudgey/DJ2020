@@ -29,7 +29,7 @@ public class LevelBootstrapper : MonoBehaviour {
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData();
 
-        GameManager.I.gameData.playerState.allGuns[0].delta.activeMods.Add(Resources.Load("data/guns/mods/silencer") as GunMod);
+        // GameManager.I.gameData.playerState.allGuns[0].delta.activeMods.Add(Resources.Load("data/guns/mods/silencer") as GunMod);
 
         // set up VR mission template
         VRMissionTemplate vrTemplate = VRMissionTemplate.Default();
@@ -44,16 +44,21 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
-            // BaseItem.LoadItem("deck"),
-            // ItemTemplate.LoadItem("C4"),
+            ItemTemplate.LoadItem("deck"),
+            ItemTemplate.LoadItem("C4"),
             ItemTemplate.LoadItem("goggles"),
             ItemTemplate.LoadItem("rocket"),
-            ItemTemplate.LoadItem("grenade"),
+            // ItemTemplate.LoadItem("grenade"),
         };
 
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData();
-        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(allItems), GameManager.I.gameData.playerState);
+        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(GameManager.I.gameData.playerState), GameManager.I.gameData.playerState);
+
+        // select a random extraction point
+        string extractionIdn = Toolbox.RandomFromList(GameObject.FindObjectsOfType<ExtractionZone>().Select(zone => zone.data.idn).ToList());
+        level.plan.extractionPointIdn = extractionIdn;
+
         GameManager.I.gameData.levelState = level;
 
         // start the game state
@@ -63,13 +68,13 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapWorld() {
         Debug.Log($"bootstrapping world ...");
         GameManager.I.gameData = GameData.TestInitialData();
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT001") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT002") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/delta_memo") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/GLOB003") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/hosaka1") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/VBS_log") as PayData);
-        GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/viral13") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT001") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/DAT002") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/delta_memo") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/GLOB003") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/hosaka1") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/VBS_log") as PayData);
+        // GameManager.I.gameData.playerState.payDatas.Add(Resources.Load("data/paydata/viral13") as PayData);
 
         // GameManager.I.gameData.playerState.health = 50f;
         GameManager.I.SetMarketData();

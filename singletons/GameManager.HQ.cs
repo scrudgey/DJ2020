@@ -16,11 +16,12 @@ public partial class GameManager : Singleton<GameManager> {
     public Dictionary<GameObject, HQReport> reports;
     float clearCaptionTimer;
     public Action<GameObject> OnNPCSpawn;
+    public Action OnAlarmActivate;
 
     List<CharacterController> strikeTeamMembers;
 
     public void ActivateHQRadioNode() {
-        AlarmRadio terminal = levelRadioTerminal();
+        AlarmNode terminal = levelRadioTerminal();
         if (terminal != null) {
             SetAlarmNodeTriggered(terminal, true);
         }
@@ -34,6 +35,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void ActivateLevelAlarm() {
         gameData.levelState.delta.strikeTeamMissionTimer = 0f;
+
         if (!gameData.levelState.delta.alarmTerminalActive) {
             if (gameData.levelState.delta.hqPhase == HQPhase.normal)
                 ChangeHQPhase(HQPhase.dispatchStrikeTeam);
@@ -46,11 +48,13 @@ public partial class GameManager : Singleton<GameManager> {
                 point.cleared = false;
             }
             if (allClearPoints.Length > 0) {
+                // TODO: this could be handled with event
                 foreach (SphereRobotAI ai in FindObjectsOfType<SphereRobotAI>()) {
                     ai.OnAlarmActivate(allClearPoints);
                 }
             }
             OnSuspicionChange?.Invoke();
+            OnAlarmActivate?.Invoke();
         }
     }
     public void DeactivateAlarm() {
@@ -80,16 +84,23 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return false;
     }
-    public AlarmRadio levelRadioTerminal() => alarmComponents.Values
-                    .Where(node => node != null & node is AlarmRadio)
-                    .Select(component => (AlarmRadio)component)
+    public AlarmNode levelRadioTerminal() => gameData.levelState.delta.alarmGraph.nodes.Values
+                    .Where(node => node.nodeType == AlarmNode.AlarmNodeType.radio)
                     .FirstOrDefault();
 
     public void RemoveAlarmNode(string idn) {
-        AlarmComponent component = GetAlarmComponent(idn);
-        alarmComponents.Remove(idn);
-        Destroy(component.gameObject);
-        Debug.Log($"removing alarm node {idn}");
+        // TODO: this won't really work!
+        AlarmComponent component = null;
+        foreach (AlarmComponent candidate in GameObject.FindObjectsOfType<AlarmComponent>()) {
+            if (candidate.idn == idn) {
+                component = candidate;
+                break;
+            }
+        }
+        if (component != null) {
+            Destroy(component.gameObject);
+            Debug.Log($"removing alarm node {idn}");
+        }
     }
 
     public void OpenReportTicket(GameObject reporter, HQReport report) {
@@ -190,18 +201,6 @@ public partial class GameManager : Singleton<GameManager> {
             timer = Math.Max(timer, node.countdownTimer);
         }
         return timer;
-    }
-    public void UpdateGraphs() {
-        // method for time-updating graph state
-
-        float alarmTimerOrig = alarmCountdown();
-
-        gameData?.levelState?.delta.alarmGraph?.Update();
-
-        float alarmTimer = alarmCountdown();
-        if (alarmTimer <= 0 && alarmTimerOrig > 0) {
-            InitiateAlarmShutdown();
-        }
     }
     public void UpdateAlarm() {
         if (gameData.levelState.anyAlarmTerminalActivated()) {

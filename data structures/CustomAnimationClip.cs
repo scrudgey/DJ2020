@@ -8,6 +8,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class CustomAnimationClip {
+    public string name;
     public AnimationEvent[] events;
     public float length;
     public WrapMode wrapMode;
@@ -15,9 +16,9 @@ public class CustomAnimationClip {
     // required for serialization
     public CustomAnimationClip() { }
     public CustomAnimationClip(AnimationEvent[] events, AnimationClip clip) {
+        this.name = clip.name;
         this.events = events.OrderBy(e => e.time).ToArray();
         this.length = clip.length;
-        // Debug.Log($"animation clip length: {clip.length} custom length: {this.length}");
         this.wrapMode = clip.wrapMode;
     }
 
@@ -42,7 +43,6 @@ public class CustomAnimationClip {
     public void Write(string animationName) {
         string path = filePath(animationName);
         XmlSerializer serializer = new XmlSerializer(typeof(CustomAnimationClip));
-        // string path = FilePath(levelName, sceneName);
         using (FileStream sceneStream = File.Create(path)) {
             serializer.Serialize(sceneStream, this);
         }
@@ -50,6 +50,5 @@ public class CustomAnimationClip {
 
     static string filePath(string animationName) {
         return Path.Combine(Application.dataPath, "Resources", "data", "animation", $"{animationName}.xml");
-        // return $"data/animation/{animationName}";
     }
 }

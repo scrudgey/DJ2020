@@ -1,99 +1,86 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler where T : Node where U : Graph<T, U> {
-    public Image image;
-    public Image selectionIndicatorImage;
+public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, INodeCameraProvider where T : Node<T> where U : Graph<T, U> {
+    static readonly Vector2 HALFSIES = Vector2.one / 2f;
+    public Image iconImage;
     public RectTransform rectTransform;
     public Color enabledColor;
     public Color disabledColor;
-    protected bool showSelectionIndicator;
-    private float selectionIndicatorTimer;
-    readonly float SELECTION_TIMEOUT = 0.05f;
     public T node;
-    public Action<NodeIndicator<T, U>> onMouseOver;
-    public Action<NodeIndicator<T, U>> onMouseExit;
-    public static Action<NodeIndicator<T, U>> staticOnMouseOver;
-    public static Action<NodeIndicator<T, U>> staticOnMouseExit;
-    public IGraphOverlay<U, T, NodeIndicator<T, U>> overlay;
-    public void Configure(T node, Graph<T, U> graph, IGraphOverlay<U, T, NodeIndicator<T, U>> overlay) {
+    protected U graph;
+    Action<NodeIndicator<T, U>> onMouseOver;
+    Action<NodeIndicator<T, U>> onMouseExit;
+    protected OverlayHandler overlayHandler;
+    public void Configure(T node, U graph, OverlayHandler overlayHandler, Action<NodeIndicator<T, U>> onMouseOver, Action<NodeIndicator<T, U>> onMouseExit) {
         this.node = node;
-        this.overlay = overlay;
-
-        // TODO: dynamically enlarge line renderer cache
-
-        // set icon
-        Sprite[] icons = Resources.LoadAll<Sprite>("sprites/UI/Powericons") as Sprite[];
-        switch (node.icon) {
-            case NodeIcon.normal:
-                image.sprite = icons[0];
-                break;
-            case NodeIcon.power:
-                image.sprite = icons[3];
-                break;
-            case NodeIcon.mains:
-                image.sprite = icons[7];
-                break;
-        }
-
+        this.overlayHandler = overlayHandler;
+        this.onMouseOver = onMouseOver;
+        this.onMouseExit = onMouseExit;
+        this.graph = graph;
         SetGraphicalState(node);
-
-        // set lines
-        List<Vector3> positions = new List<Vector3>();
-        foreach (T neighbor in graph.Neighbors(node)) {
-            positions.Add(node.position);
-            positions.Add(neighbor.position);
-        }
-
     }
-    public void ApplyDistanceEffect(float distance) {
-        // float alpha = Mathf.Clamp(1f - (Mathf.Pow(distance, 2)), 0, 1);
-        float alpha = Mathf.Clamp(1f - (distance * 2f), 0, 1);
-        // float alpha = Mathf.Clamp(1f - distance, 0, 1);
-        HSBColor newHSBColor = HSBColor.FromColor(new Color(image.color.r, image.color.g, image.color.b, alpha));
-        newHSBColor.b -= distance;
-        // Color newColor = new Color(image.color.r, image.color.g, image.color.b, alpha);
-        image.color = newHSBColor.ToColor();
-        transform.localScale = alpha * Vector3.one;
-    }
-    protected virtual void SetGraphicalState(T node) {
-        if (node.getEnabled()) {
-            image.color = enabledColor;
-        } else {
-            image.color = disabledColor;
-        }
+    public virtual void SetGraphicalState(T node) {
+
     }
     public void SetScreenPosition(Vector3 position) {
+        if (graph == null || node == null) return;
+
+        // keep on the screen if:
+        //  one of my edges points to the selected node
+        //  overlay handler selected node is a node indicator.
+        //  i am a node indicator.
+
+        bool keepOnScreen = overlayHandler.selectedNode != null && graph.edges.ContainsKey(node.idn) ?
+           graph.edges[node.idn].Contains(overlayHandler.selectedNode.GetNodeId()) : false;
+
+        keepOnScreen = keepOnScreen || node.alwaysOnScreen;
+
+        if (keepOnScreen) {
+            position.x = Math.Max(position.x, 0);
+            position.x = Math.Min(position.x, 1905);
+            position.y = Math.Max(position.y, 0);
+            position.y = Math.Min(position.y, 1065);
+        }
         rectTransform.position = position;
     }
     public virtual void OnPointerEnter(PointerEventData eventData) {
-        // move this to use callbacks
-        showSelectionIndicator = true;
-        staticOnMouseOver?.Invoke(this);
         onMouseOver?.Invoke(this);
     }
     public virtual void OnPointerExit(PointerEventData eventData) {
-        showSelectionIndicator = false;
-        selectionIndicatorImage.enabled = false;
-        staticOnMouseExit?.Invoke(this);
         onMouseExit?.Invoke(this);
     }
     public virtual void OnPointerClick(PointerEventData pointerEventData) {
-
+        overlayHandler.NodeSelectCallback(this);
     }
 
-    void Update() {
-        if (showSelectionIndicator) {
-            selectionIndicatorTimer += Time.deltaTime;
-            if (selectionIndicatorTimer > SELECTION_TIMEOUT) {
-                selectionIndicatorTimer -= SELECTION_TIMEOUT;
-                selectionIndicatorImage.enabled = !selectionIndicatorImage.enabled;
-            }
-        } else {
-            selectionIndicatorImage.enabled = false;
-        }
+    public CameraInput GetCameraInput() {
+        CursorData data = CursorData.none;
+        data.screenPositionNormalized = HALFSIES;
+        return new CameraInput {
+            deltaTime = Time.deltaTime,
+            wallNormal = Vector3.zero,
+            lastWallInput = Vector2.zero,
+            crouchHeld = false,
+            playerPosition = node.position,
+            state = CharacterState.overlayView,
+            targetData = data,
+            playerDirection = Vector3.zero,
+            popoutParity = PopoutParity.left,
+            aimCameraRotation = Quaternion.identity,
+            targetTransform = null,
+            targetPosition = node.position,
+            atLeftEdge = false,
+            atRightEdge = false,
+            currentAttackSurface = null
+        };
+    }
+
+    public string GetNodeId() {
+        return node.idn;
     }
 }

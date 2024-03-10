@@ -35,10 +35,29 @@ public partial class GameManager : Singleton<GameManager> {
         OnSuspicionChange?.Invoke();
     }
 
-    public void RemoveSuspicionRecord(SuspicionRecord record) {
+    public void RemoveSuspicionRecord(SuspicionRecord record, bool removeSticky = false) {
         if (suspicionRecords.ContainsKey(record.content)) {
-            suspicionRecords.Remove(record.content);
+            SuspicionRecord existingRecord = suspicionRecords[record.content];
+            if (existingRecord.stickied) {
+                Debug.Log("attempting to remove sticky suspicion record: " + record.content);
+                if (removeSticky) {
+                    Debug.Log("removing sticky record " + record.content);
+                    suspicionRecords.Remove(record.content);
+                } else {
+                    // TODO: toggle a flag on the record to indicate past tense
+                }
+            } else {
+                suspicionRecords.Remove(record.content);
+            }
             OnSuspicionChange?.Invoke();
+        }
+    }
+    public void StickifySuspicion() {
+        Debug.Log("** apply sticky! **");
+        foreach (SuspicionRecord record in suspicionRecords.Values) {
+            if (record.stickyable) {
+                record.MakeSticky();
+            }
         }
     }
 
@@ -53,7 +72,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public bool PlayerHasGunOut() {
-        return playerGunHandler.gunInstance != null;
+        return playerGunHandler.gunInstance != null || playerMeleeHandler.meleeWeapon != null;
     }
 
     public SensitivityLevel GetCurrentSensitivity() =>

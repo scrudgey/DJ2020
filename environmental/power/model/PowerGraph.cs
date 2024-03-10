@@ -8,20 +8,14 @@ using UnityEngine;
 [System.Serializable]
 public class PowerGraph : Graph<PowerNode, PowerGraph> {
     public void Refresh() {
-        // Debug.Log($"power graph with {nodes.Count} elements");
         nodes.Values.ToList().ForEach(node => node.powered = false);
 
         // run the algorithm
-        PowerNode[] sources = nodes.Values.Where(node => node.type == NodeType.powerSource && node.getEnabled()).ToArray();
+        PowerNode[] sources = nodes.Values.Where(node => node.type == PowerNode.NodeType.powerSource && node.getEnabled()).ToArray();
 
         foreach (PowerNode source in sources) {
             // Debug.Log($"power source: {source.idn}");
             DFS(source);
-        }
-        foreach (PowerNode node in nodes.Values) {
-            PoweredComponent component = GameManager.I.GetPowerComponent(node.idn);
-            if (component != null)
-                component.nodeEnabled = node.getEnabled();
         }
     }
     void DFS(PowerNode node) {

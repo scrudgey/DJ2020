@@ -1,15 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using Items;
 using Newtonsoft.Json;
 using UnityEngine;
 [System.Serializable]
-public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableState, PerkIdConstants {
+public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants { //IGunHandlerState
     public int credits;
+    public int favors;
 
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> loots;
-
-    [JsonConverter(typeof(ObjectListJsonConverter<PayData>))]
     public List<PayData> payDatas;
 
     // skin
@@ -18,12 +18,12 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public string headSkin { get; set; }
 
     // gun
-    public List<GunState> allGuns;
+    public List<WeaponState> allGuns;
     [JsonConverter(typeof(ObjectListJsonConverter<ItemTemplate>))]
     public List<ItemTemplate> allItems;
-    public GunState primaryGun { get; set; }
-    public GunState secondaryGun { get; set; }
-    public GunState tertiaryGun { get; set; }
+    public WeaponState primaryGun { get; set; }
+    public WeaponState secondaryGun { get; set; }
+    public WeaponState tertiaryGun { get; set; }
     public int activeGun { get; set; }
     public int numberOfShellsPerReload() {
         return PerkNumberOfShellsPerReload();
@@ -35,6 +35,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         return PerkFullHealthAmount();
     }
     public HitState hitState { get; set; }
+    public int armorLevel { get; set; }
+
 
     // stats
     public int cyberlegsLevel;
@@ -48,8 +50,6 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite portrait;
 
-    public HashSet<int> physicalKeys;
-    public HashSet<int> keycards;
 
     public List<string> activePerks;
     public int skillpoints;
@@ -57,6 +57,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     public int gunSkillPoints;
     public int hackSkillPoints;
     public int speechSkillPoints;
+
+    public List<SoftwareTemplate> softwareTemplates;
+    public List<SoftwareState> softwareStates;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
@@ -67,6 +70,8 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         GunTemplate gun6 = GunTemplate.Load("p3");
         GunTemplate gun7 = GunTemplate.Load("p4");
         GunTemplate gun8 = GunTemplate.Load("r2");
+
+        MeleeWeaponTemplate swordTemplate = MeleeWeaponTemplate.Load("sword");
 
         GunState gunState1 = GunState.Instantiate(gun1);
         GunState gunState2 = GunState.Instantiate(gun2);
@@ -80,16 +85,20 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
         gunState1.delta.activeMods.Add(silencer);
 
-        List<GunState> allGuns = new List<GunState> {
-            gunState1,
-            gunState2,
-            gunState3,
-            gunState4,
-            gunState5,
-            gunState6,
-            gunState7,
-            gunState8
+        WeaponState sword = new WeaponState(swordTemplate);
+
+        List<WeaponState> allGuns = new List<WeaponState> {
+            new WeaponState( gunState1),
+            new WeaponState( gunState2),
+            new WeaponState( gunState3),
+            new WeaponState( gunState4),
+            new WeaponState( gunState5),
+            new WeaponState( gunState6),
+            new WeaponState( gunState7),
+            new WeaponState( gunState8),
+            sword
         };
+
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
             // ItemTemplate.LoadItem("C4"),
@@ -137,6 +146,18 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         // };
         List<string> perks = new List<string>();
 
+        List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
+            SoftwareScriptableTemplate.Load("scan"),
+            SoftwareScriptableTemplate.Load("crack"),
+            SoftwareScriptableTemplate.Load("exploit"),
+            SoftwareScriptableTemplate.Load("scanData"),
+            SoftwareScriptableTemplate.Load("scanEdges"),
+            SoftwareScriptableTemplate.Load("scanNode"),
+        };
+        List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
+
+        List<SoftwareState> softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
+
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
@@ -151,11 +172,13 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             // headSkin = "security",
             allGuns = allGuns,
             allItems = allItems,
-            primaryGun = gunState1,
+            // primaryGun = sword,
+            primaryGun = new WeaponState(gunState1),
             // secondaryGun = null,
-            secondaryGun = gunState2,
+            // secondaryGun = new WeaponState(gunState2),
+            secondaryGun = sword,
             // tertiaryGun = null,
-            tertiaryGun = gunState3,
+            tertiaryGun = new WeaponState(gunState3),
             activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
@@ -174,23 +197,27 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
             etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
             portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
 
-            physicalKeys = new HashSet<int>(),
-            keycards = new HashSet<int>(),
+            // physicalKeys = new HashSet<int>(),
+            // keycards = new HashSet<int>(),
 
             payDatas = new List<PayData>(),
 
             credits = 9650,
+            favors = 7,
             // credits = 600,
             loots = loots,
 
             // activePerks = new List<string>(),
             activePerks = perks,
-            skillpoints = 0
+            skillpoints = 0,
+
+            softwareTemplates = softwareTemplates,
+            softwareStates = softwareStates
         };
     }
 
     public void ApplyState(GameObject playerObject) {
-        ((IGunHandlerState)this).ApplyGunState(playerObject);
+        // ((IGunHandlerState)this).ApplyGunState(playerObject);
         ((ISkinState)this).ApplySkinState(playerObject);
         // ((IItemHandlerState)this).ApplyItemState(playerObject);
         ((ICharacterHurtableState)this).ApplyHurtableState(playerObject);
@@ -203,9 +230,9 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
     }
 
     public static PlayerState Instantiate(PlayerTemplate template) => DefaultState() with {
-        primaryGun = GunState.Instantiate(template.primaryGun),
-        secondaryGun = GunState.Instantiate(template.secondaryGun),
-        tertiaryGun = GunState.Instantiate(template.tertiaryGun),
+        primaryGun = new WeaponState(GunState.Instantiate(template.primaryGun)),
+        secondaryGun = new WeaponState(GunState.Instantiate(template.secondaryGun)),
+        tertiaryGun = new WeaponState(GunState.Instantiate(template.tertiaryGun)),
         health = template.fullHealthAmount,
         cyberEyesThermal = template.cyberEyesThermal,
         cyberlegsLevel = template.cyberlegsLevel,
@@ -213,22 +240,17 @@ public record PlayerState : ISkinState, IGunHandlerState, ICharacterHurtableStat
         bodySkin = template.bodySkin,
         headSkin = template.headSkin,
         etiquettes = template.etiquettes,
-        portrait = template.portrait
+        portrait = template.portrait,
+        armorLevel = template.armorLevel
     };
 
-    public void ResetTemporaryState() {
-        if (primaryGun != null) {
-            primaryGun.delta.chamber = 0;
-            primaryGun.ClipIn();
-        }
-        if (secondaryGun != null) {
-            secondaryGun.delta.chamber = 0;
-            secondaryGun.ClipIn();
-        }
-        if (tertiaryGun != null) {
-            tertiaryGun.delta.chamber = 0;
-            tertiaryGun.ClipIn();
-        }
+    public void ResetTemporaryState(LevelPlan plan) {
+        primaryGun?.ResetTemporaryState();
+        secondaryGun?.ResetTemporaryState();
+        tertiaryGun?.ResetTemporaryState();
+
+        // softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
+        softwareStates = plan.softwareTemplates.Select(template => new SoftwareState(template)).ToList();
     }
     public int PlayerLevel() {
         return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;

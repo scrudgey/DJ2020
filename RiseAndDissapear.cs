@@ -11,6 +11,8 @@ public class RiseAndDissapear : MonoBehaviour, IPoolable {
         }
     }
     public SpriteRenderer spriteRenderer;
+    public float riseTime = 1f;
+    public float hangTime = 0.5f;
     Color initialColor;
     void Awake() {
         initialColor = spriteRenderer.color;
@@ -27,18 +29,16 @@ public class RiseAndDissapear : MonoBehaviour, IPoolable {
     IEnumerator DoRiseAndDisappear() {
         float timer = 0f;
         Vector3 initialPosition = myTransform.position;
-        float duration = 1f;
-        while (timer < duration) {
+        while (timer < riseTime) {
             timer += Time.unscaledDeltaTime;
-            float newY = (float)PennerDoubleAnimation.ExpoEaseOut(timer, initialPosition.y, 0.5f, duration);
+            float newY = (float)PennerDoubleAnimation.ExpoEaseOut(timer, initialPosition.y, 0.5f, riseTime);
             myTransform.position = new Vector3(initialPosition.x, newY, initialPosition.z);
             yield return null;
         }
         timer = 0f;
-        duration = 0.5f;
-        while (timer < duration) {
+        while (timer < hangTime) {
             timer += Time.unscaledDeltaTime;
-            float alpha = (float)PennerDoubleAnimation.Linear(timer, 1f, -1f, duration);
+            float alpha = (float)PennerDoubleAnimation.Linear(timer, 1f, -1f, hangTime);
             Color color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
             spriteRenderer.color = color;
             yield return null;
