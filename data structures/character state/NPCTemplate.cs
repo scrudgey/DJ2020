@@ -41,6 +41,7 @@ public class NPCTemplate : ScriptableObject, IGunHandlerTemplate, ISkinState, IC
     [field: SerializeField]
     public Sprite portrait;
     public List<string> grammarFiles;
+    public NPCDialogueParameters dialogueParameters;
 
     public List<int> physicalKeys;
 

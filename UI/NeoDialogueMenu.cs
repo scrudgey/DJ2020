@@ -115,6 +115,19 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         concludeCallback.Invoke(dialogueResult);
         GameManager.I.CloseMenu();
     }
+
+    bool HasNextChallenge() {
+        while (unresolvedSuspicionRecords.Count > 0) {
+            SuspicionRecord nextRecord = unresolvedSuspicionRecords.Peek();
+            SuspicionDialogueParameters suspicionDialogueParameters = nextRecord.getDialogue(input.npcCharacter.parameters);
+            if (suspicionDialogueParameters.enabled) {
+                return true;
+            } else {
+                unresolvedSuspicionRecords.Pop();
+            }
+        }
+        return false;
+    }
     IEnumerator StartNextChallenge(SuspicionRecord manualSuspicionRecord = null) {
         yield return null;
         if (currentChallenge != null && currentChallenge.stickied) {
@@ -127,7 +140,10 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         // rectify item cards
         RectifySpecialCards(currentChallenge);
 
-        IEnumerator blitter = neoDialogueController.SetLeftDialogueText(currentChallenge.dialogue.challenge, "");
+        // input.npcCharacter
+        // string challenge = currentChallenge.getDialogue(input.npcCharacter.parameters).challenge;
+        string challenge = currentChallenge.GetChallenge(input.npcCharacter.parameters);
+        IEnumerator blitter = neoDialogueController.SetLeftDialogueText(challenge, "");
         IEnumerator activateCards = ActivateCards(true);
 
         yield return Toolbox.ChainCoroutines(blitter, activateCards);
@@ -152,7 +168,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         if (escapeCard != null) {
             Destroy(escapeCard.gameObject);
         }
-        if (challenge.allowIDCardResponse) {
+        if (challenge.allowIDCardResponse) { // TODO: ???
             NeoDialogueCardController cardController = InstantiateBlankCard();
             cardController.InitializeIDCard(this, IDCardClick);
             specialCard = cardController;
@@ -219,7 +235,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     }
 
     public void CardClick(NeoDialogueCardController cardController) {
-        DialogueTactic response = currentChallenge.getResponse(cardController.cardData.type);
+
         GameManager.I.gameData.levelState.delta.dialogueCards.Remove(cardController.cardData);
         GameManager.I.gameData.levelState.delta.bullshitLevel += cardController.cardData.derivedValue(input);
         stallButton.SetActive(false);
@@ -232,7 +248,8 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
 
         IEnumerator cardPlay = cardController.PlayCard();
 
-        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{response.tacticType.ToString().ToUpper()}]</color> {response.getContent()}");
+        string tacticContent = currentChallenge.GetTacticContent(input.npcCharacter.parameters, cardController.cardData.type);
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[{cardController.cardData.type.ToString().ToUpper()}]</color> {tacticContent}");
 
         IEnumerator removeCard = cardController.RemoveCard();
 
@@ -245,13 +262,15 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
 
         IEnumerator responseBlit;
         if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
-            responseBlit = neoDialogueController.SetLeftDialogueText(response.getSuccessResponse(), "");
+            string successResponse = currentChallenge.GetTacticSuccessResponse(input.npcCharacter.parameters, cardController.cardData.type);
+            responseBlit = neoDialogueController.SetLeftDialogueText(successResponse, "");
         } else {
-            responseBlit = neoDialogueController.SetLeftDialogueText(response.getFailResponse(), "");
+            string failResponse = currentChallenge.GetTacticFailResponse(input.npcCharacter.parameters, cardController.cardData.type);
+            responseBlit = neoDialogueController.SetLeftDialogueText(failResponse, "");
         }
         IEnumerator nextBit;
         // next challenge
-        if (unresolvedSuspicionRecords.Count > 0) {
+        if (HasNextChallenge()) {
             nextBit = StartNextChallenge();
         } else {
             nextBit = StartConclusion();
@@ -356,7 +375,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
 
         IEnumerator nextBit;
         // next challenge
-        if (unresolvedSuspicionRecords.Count > 0) {
+        if (HasNextChallenge()) {
             nextBit = StartNextChallenge();
         } else {
             nextBit = StartConclusion();
@@ -399,11 +418,12 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         }
         SetPersonnelDataCount();
 
-        DialogueTactic response = currentChallenge.getResponse(DialogueTacticType.item);
+        DialogueTactic response = currentChallenge.getTactic(input.npcCharacter.parameters, DialogueTacticType.item);
 
         IEnumerator cardPlay = cardController.PlayCard();
 
-        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[DATA]</color> {response.getContent()}");
+        string tacticContent = currentChallenge.GetTacticContent(input.npcCharacter.parameters, cardController.cardData.type);
+        IEnumerator blitter = neoDialogueController.SetRightDialogueText($"<color=#2ed573>[DATA]</color> {tacticContent}");
 
         IEnumerator removeCard = cardController.RemoveCard();
 
@@ -412,11 +432,12 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         IEnumerator continuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(true); });
         IEnumerator antiContinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
 
-        IEnumerator responseBlit = neoDialogueController.SetLeftDialogueText(response.getSuccessResponse(), "");
+        string successResponse = currentChallenge.GetTacticSuccessResponse(input.npcCharacter.parameters, cardController.cardData.type);
+        IEnumerator responseBlit = neoDialogueController.SetLeftDialogueText(successResponse, "");
 
         IEnumerator nextBit;
         // next challenge
-        if (unresolvedSuspicionRecords.Count > 0) {
+        if (HasNextChallenge()) {
             nextBit = StartNextChallenge();
         } else {
             nextBit = StartConclusion();

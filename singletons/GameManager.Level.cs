@@ -245,6 +245,8 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        TransitionToPhase(GamePhase.afteraction);
+        SaveGameData();
         LoadAfterActionReport();
     }
     public void FinishMissionFail() {
@@ -268,10 +270,6 @@ public partial class GameManager : Singleton<GameManager> {
         MusicController.I.Stop();
         TransitionToPhase(GamePhase.afteraction);
         LoadScene("AfterAction", () => {
-            // Debug.Log("start afteraction");
-            // activeMenuType = MenuType.none;
-            // AfterActionReportHandler handler = GameObject.FindObjectOfType<AfterActionReportHandler>();
-            // handler.Initialize(gameData);
             NeoAfterActionReport handler = GameObject.FindObjectOfType<NeoAfterActionReport>();
             handler.Initialize(gameData);
         });

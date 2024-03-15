@@ -25,6 +25,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     public SphereRobotBrain stateMachine;
 
     public SpeechTextController speechTextController;
+    public NPCDialogueParameters dialogueParameters;
     public SpottedHighlight highlight;
 
     float perceptionCountdown;
@@ -773,7 +774,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
         portrait = speechTextController.portrait,
         etiquettes = etiquettes,
         alertness = alertness,
-        name = dialogueName
+        name = dialogueName,
+        parameters = dialogueParameters
     };
     public DialogueInput GetDialogueInput() => GameManager.I.GetDialogueInput(gameObject, myCharacterInput());
 

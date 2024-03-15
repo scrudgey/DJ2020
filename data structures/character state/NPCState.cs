@@ -57,23 +57,21 @@ public class NPCState : ICharacterHurtableState { //IGunHandlerState
             ai.physicalKeys = new HashSet<int>(template.physicalKeys);
             ai.alertness = template.alertness;
             ai.etiquettes = template.etiquettes;
-            // ai.portrait = template.portrait;
             ai.dialogueName = template.dialogueName;
 
             ai.speechTextController.portrait = template.portrait;
             ai.speechTextController.grammarFiles = template.grammarFiles;
+            ai.dialogueParameters = template.dialogueParameters;
         }
 
         WorkerNPCAI workerNPCAI = npcObject.GetComponent<WorkerNPCAI>();
         if (workerNPCAI != null) {
-            // workerNPCAI.physicalKeys = new HashSet<int>(template.physicalKeys);
             workerNPCAI.alertness = template.alertness;
             workerNPCAI.etiquettes = template.etiquettes;
-            // workerNPCAI.portrait = template.portrait;
             workerNPCAI.dialogueName = template.dialogueName;
             workerNPCAI.speechTextController.portrait = template.portrait;
             workerNPCAI.speechTextController.grammarFiles = template.grammarFiles;
-
+            workerNPCAI.dialogueParameters = template.dialogueParameters;
         }
 
         LevelRandomSound randomSound = npcObject.GetComponent<LevelRandomSound>();

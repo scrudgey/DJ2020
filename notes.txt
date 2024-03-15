@@ -3189,14 +3189,28 @@ x ladders
         * mission fail
         * after action report
 * optional objective change text
-
 * define new objective types:
     * don't kill anyone, etc
     * don't raise the alarm
 * favor system
     * favor iconography
     * use favor to purchase tactic
-
+* worker npc dialogue tree
+    * guard
+    * worker
+* implement all of npcdialogue parameters
+* transfer information to this scriptable object
+* deprecate list<tactic>
+* implement suspicion record extraction functio
+* some npc types might not care about some suspicions
+* implement scientist dialogue
+* set all tactic types
+* test suspicion enablement
+* hook up personnel data to dialogue menu
+* string substitution
+* someone was shot bluff
+* dialogue parameters should be set by npc template
+* display different title when stickied: past tense
 
 
 
@@ -3507,8 +3521,6 @@ world:
         look in direction
         look at player
         different from SphereRobot, but still uses a state machine.
-    mission guy in the bar
-    create all shops
     linger in bar:
         move to open spot on the bar and get a drink
         move to a seat
@@ -3575,10 +3587,11 @@ performance:
     generating a lot of garbage in sphererobotai
 
 pretty easy to run in guns blazing
-    bonus objectives can dicincentivize this
+    * bonus objectives can dicincentivize this
     when alarm is hit, doors come down and turrets pop out
     player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
 
+footsteps don't seem to matter any more
 doors are blocking people again?
 silencer shows in gameplay
 map pane:
@@ -3627,10 +3640,13 @@ AI
 
 security cameras should be visible from floor!
 are anonymous delegates memory leaks? i.e. objective deltas
+    When you have an event handler attached to an event that delegate contains two things, an instance of an object and a method to run on that object. That referenced object won't be able to be garbage collected until either:
+    The object with the event is no longer "alive".
+    You remove the event handler (i.e. the reference to) your delegate, allowing your object to be freed earlier.
+    https://stackoverflow.com/questions/13635505/anonymous-method-for-event-handler-not-a-leak
 711 HQ said dispatching strike team; no strike team arrived and guards were silent- they're supposed to search the building
 reselect rocket launcher to put away
-attack surface card reader attack
-attack surface for keycard reader
+
 sphere clear points state:
     get closest by nav mesh?
     transitions from this state?
@@ -3644,6 +3660,8 @@ jazz up elevator controller
     sound effects
     click effect
 show bonus reward favors
+implement worker dialogue?
+npcs get confused when they are approaching you to dialogue
 
 
 
@@ -3676,8 +3694,9 @@ major initiatives:
             character stats, skills
 shops:
     more fences
-    hacker
-        software, hardware
+        phone fence
+    hacker?
+        software, hardware?
     sell guns
     mystery man in bar
 
@@ -3690,6 +3709,8 @@ burglar system
     outline all burglar tools
     burglar tool mentor
     intelligence gathering
+    attack surface card reader attack
+    attack surface for keycard reader
 
 more equipment to bring on mission?
     shuriken
@@ -3724,33 +3745,23 @@ more equipment to bring on mission?
 
 circuitry hacking
 alarm sensors
-v2 of selling data / upgrading hack ability
+selling data / upgrading hack ability
 highlight NPCs that are shooting me
 graphic effects
     80s electricity 
     anime glow 
 
+softlock with expendable software
+
 medium-effort mini systems work:
+    key system
     update the steam page graphic
     in-between montage
-        unlock contacts
+        unlock contacts for tactics
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
         gun perks
 
-
-
-worker npc dialogue tree
-    scientist
-    7-11 worker
-key system:
-    more detailed key usage enabling keyed alike attacks 
-    use passwords in analogous way
-    password data unlocks passwords
-display different title when stickied: past tense
-    when adding record, if sticky record already exists, switch content...?
-        record stays stickied
-    different caption
-    different challenge
-
-
+montage leads to tactics, shops unlock
+gun perks leads to gun shop progression
+this whole thing can flesh out the world system

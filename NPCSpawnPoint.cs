@@ -37,6 +37,7 @@ public class NPCSpawnPoint : MonoBehaviour {
         ai.patrolRoute = route;
         ai.prefabPool = NPCPool;
 
+
         LootDropper lootDropper = npc.GetComponentInChildren<LootDropper>();
         if (lootDropper != null) {
             lootDropper.loot.AddRange(lootDrops);
@@ -51,7 +52,6 @@ public class NPCSpawnPoint : MonoBehaviour {
     void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
         NPCState state = NPCState.Instantiate(template);
 
-        // TODO: driven by level data
         state.activeGun = 1;
         state.ApplyState(npcObject);
     }

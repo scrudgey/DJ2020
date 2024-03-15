@@ -37,7 +37,6 @@ public class ManualHacker : MonoBehaviour {
         myTransform = transform;
         audioSource = Toolbox.SetUpAudioSource(gameObject);
         targetNode = null;
-        // discoveryParticlePool = PoolManager.I.GetPool(discoveryParticleEffect);
     }
     void Update() {
         if (targetNode != null) {
@@ -57,11 +56,6 @@ public class ManualHacker : MonoBehaviour {
                 float distance = Vector3.Distance(node.position, playerPosition);
                 if (distance < 3) {
                     GameManager.I.DiscoverNode(node, NodeVisibility.known);
-                    // bool wasDiscovered = node.BeDiscovered();
-                    // if (wasDiscovered) {
-                    //     Toolbox.RandomizeOneShot(audioSource, discoverySound);
-                    //     discoveryParticlePool.GetObject(node.position);
-                    // }
                 }
             }
         }
@@ -72,20 +66,15 @@ public class ManualHacker : MonoBehaviour {
         if (Vector3.Distance(target.position, transform.position) > 3f) return;
         Disconnect(dontRefreshCyberGraph: true);
         targetNode = target;
-        // target.isManualHackerTarget = true;
         CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
         GameManager.I.gameData.levelState.delta.cyberGraph.AddEdge(playerNode, target);
         GameManager.I.RefreshCyberGraph();
     }
     public void Disconnect(bool dontRefreshCyberGraph = false) {
         if (targetNode != null) {
-            // targetNode.isManualHackerTarget = false;
-            // target.isManualHackerTarget = true;
             CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
             GameManager.I.gameData.levelState.delta.cyberGraph.RemoveEdge(playerNode, targetNode);
         }
-
-
         targetNode = null;
         if (!dontRefreshCyberGraph) {
             GameManager.I.RefreshCyberGraph();

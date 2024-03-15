@@ -32,6 +32,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
         suspicionRecords[record.content] = record;
+        record.pastTense = false;
         OnSuspicionChange?.Invoke();
     }
 
@@ -39,12 +40,10 @@ public partial class GameManager : Singleton<GameManager> {
         if (suspicionRecords.ContainsKey(record.content)) {
             SuspicionRecord existingRecord = suspicionRecords[record.content];
             if (existingRecord.stickied) {
-                Debug.Log("attempting to remove sticky suspicion record: " + record.content);
                 if (removeSticky) {
-                    Debug.Log("removing sticky record " + record.content);
                     suspicionRecords.Remove(record.content);
                 } else {
-                    // TODO: toggle a flag on the record to indicate past tense
+                    existingRecord.pastTense = true;
                 }
             } else {
                 suspicionRecords.Remove(record.content);

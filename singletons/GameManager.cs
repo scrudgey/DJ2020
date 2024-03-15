@@ -110,7 +110,16 @@ public partial class GameManager : Singleton<GameManager> {
         timePlayed = 0f;
         GameManager.I.gameData = loadData;
         GameManager.I.CloseMenu();
-        GameManager.I.ReturnToApartment();
+
+        // TODO: change this depending on the state of the game loading
+        Debug.Log($"loading game data at phase: {loadData.phase}");
+        if (loadData.phase == GamePhase.afteraction) {
+            GameManager.I.LoadAfterActionReport();
+
+        } else {
+            GameManager.I.ReturnToApartment();
+
+        }
     }
     public void SaveGameData() {
         gameData.timePlayedInSeconds += timePlayed;

@@ -26,6 +26,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     public GunHandler gunHandler;
     public KinematicCharacterMotor motor;
     public SpeechTextController speechTextController;
+    public NPCDialogueParameters dialogueParameters;
+
 
     [Header("character")]
     public Alertness alertness = Alertness.normal;
@@ -493,7 +495,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
         portrait = speechTextController.portrait,
         etiquettes = etiquettes,
         alertness = alertness,
-        name = dialogueName
+        name = dialogueName,
+        parameters = dialogueParameters
     };
 
     public Reaction ReactToPlayerSuspicion() {

@@ -22,4 +22,5 @@ public struct DialogueCharacterInput {
     public Alertness alertness;
     public SpeechEtiquette[] etiquettes;
     public string name;
+    public NPCDialogueParameters parameters;
 }

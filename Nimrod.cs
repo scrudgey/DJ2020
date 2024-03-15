@@ -30,6 +30,11 @@ namespace Nimrod {
                 }
             }
         }
+        public void AddSymbols(Dictionary<string, List<string>> newSymbols) {
+            foreach (KeyValuePair<string, List<string>> kvp in newSymbols) {
+                symbols.Add(kvp.Key, kvp.Value);
+            }
+        }
         public string Parse(string parseText) {
             string result = "";
             int iterations = 0;

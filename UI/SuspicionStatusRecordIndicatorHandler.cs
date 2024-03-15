@@ -28,7 +28,7 @@ public class SuspicionStatusRecordIndicatorHandler : MonoBehaviour {
             Suspiciousness.aggressive => red,
             _ => green
         };
-        contentText.text = record.content;
+        contentText.text = record.pastTense ? record.pastTenseContent : record.content;
         if (newRecord) StartEaseIn();
         if (record.stickiedThisFrame) {
             record.stickiedThisFrame = false;
