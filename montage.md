@@ -38,10 +38,54 @@ save points currently:
 
 this means that:
     currently, player could lose state after mission complete and before end of after action report.
-    we must save immediately after apply reward.
-        change mode to after-action
-    then save after finishing after-action
-        change mode back to normal
+    * we must save immediately after apply reward.
+        * change mode to after-action
+    * then save after finishing after-action
+        * change mode back to normal
+    save after applying montage
 
 on gamemanager LoadGame
     change what we jump to 
+
+# restaurant
+
+jack walks into a restaurant
+
+options:
+?
+
+outcome:
+
+
+# bar
+
+jack walks into a bar
+
+"you enter the bar"
+
+options:
+tactics contacts
+
+# safehouse
+
+* jack walks into safehouse
+* open dialogue to map select
+* walk cutscene and first text
+* jack arrives and sits
+* prompt text: choose an option
+* selection is made
+* write the bar sequence
+* faster fade down to montage
+* it jumped straight to completion
+* remove some objectives from test level
+* change caption text "Jack visits the bar'
+* no descriptions on characters
+* reaction image and reaction text
+* conclusion button
+* close dialogue
+* blit texts
+* tactic specifies response text
+
+buttons: clicking/mousing over and then confirming?
+stop animation during montage
+reaction image

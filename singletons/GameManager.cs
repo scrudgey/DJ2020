@@ -111,11 +111,10 @@ public partial class GameManager : Singleton<GameManager> {
         GameManager.I.gameData = loadData;
         GameManager.I.CloseMenu();
 
-        // TODO: change this depending on the state of the game loading
         Debug.Log($"loading game data at phase: {loadData.phase}");
         if (loadData.phase == GamePhase.afteraction) {
+            //  TODO: load differently to jump to montage phase of after action
             GameManager.I.LoadAfterActionReport();
-
         } else {
             GameManager.I.ReturnToApartment();
 

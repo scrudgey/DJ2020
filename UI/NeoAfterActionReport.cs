@@ -18,6 +18,8 @@ public class NeoAfterActionReport : MonoBehaviour {
     public GameObject continueButton;
     public GameObject perkMenuButton;
     public Button perkMenuButtonComponent;
+    public MontageViewController montageViewController;
+    public Animator jackAnimation;
 
     [Header("mission name")]
     public ContentSizeFitter missionContentFitter;
@@ -70,6 +72,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         targetHeight = 0f;
         continueButton.SetActive(false);
         perkMenuButton.SetActive(false);
+        montageViewController.Initialize();
 
         bonusAmount = gameData.levelState.delta.optionalObjectiveDeltas
             .Where(delta => delta.status == ObjectiveStatus.complete)
@@ -132,7 +135,7 @@ public class NeoAfterActionReport : MonoBehaviour {
                 state = State.fadeout;
                 continueButton.SetActive(false);
                 perkMenuButton.SetActive(false);
-                currentCoroutine = StartCoroutine(FadeOut());
+                currentCoroutine = StartCoroutine(FadeToMontage());
                 break;
         }
     }
@@ -142,9 +145,23 @@ public class NeoAfterActionReport : MonoBehaviour {
     IEnumerator FadeIn() {
         yield return Toolbox.Ease(null, 2f, 1f, 0f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true);
     }
-    IEnumerator FadeOut() {
-        yield return Toolbox.Ease(null, 2f, 0f, 1f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true);
-        GameManager.I.StartNewDay();
+    IEnumerator FadeToMontage() {
+        yield return Toolbox.ChainCoroutines(
+            Toolbox.Ease(null, 1f, 0f, 0.5f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true),
+            Toolbox.CoroutineFunc(() => {
+                jackAnimation.enabled = false;
+                montageViewController.StartSequence();
+            })
+        );
+    }
+    IEnumerator FadeToNewDay() {
+        yield return Toolbox.ChainCoroutines(
+            Toolbox.Ease(null, 1f, 0.5f, 0f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true),
+            Toolbox.CoroutineFunc(() => GameManager.I.StartNewDay())
+        );
+    }
+    public void MontageFinishedCallback() {
+        StartCoroutine(FadeToNewDay());
     }
 
     IEnumerator ShowTitleAndObjectives(GameData data) {
