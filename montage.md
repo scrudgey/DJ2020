@@ -55,7 +55,7 @@ options:
 ?
 
 outcome:
-
+permanent health boost -> health refill?
 
 # bar
 
@@ -66,7 +66,14 @@ jack walks into a bar
 options:
 tactics contacts
 
-# safehouse
+# club
+
+options:
+unlock a fence
+
+
+
+
 
 * jack walks into safehouse
 * open dialogue to map select
@@ -85,7 +92,32 @@ tactics contacts
 * close dialogue
 * blit texts
 * tactic specifies response text
+* draw map
+* draw chibi walk
+* pause the subway bounce too
+* stop animation during montage
+* apply unlock mechanism
+* determine tactics from state
+* this list is used in every mission planning, but those not available for those missions are greyed out
+* handle unavailable tactic callback
+* draw reaction image
+* faster chibi walk animation
+* pause the swinging handrails
+* skipping reward screws up the balance text
+* restaurant scene
+* randomize restaurant name
+? buttons: clicking/mousing over and then confirming?
 
-buttons: clicking/mousing over and then confirming?
-stop animation during montage
-reaction image
+
+
+map highlights locations
+apply bonus health / health refill
+
+restaurant reaction image
+npcs
+    in bar
+    on street
+
+food options:
+    +10 max HP
+    +1 favor

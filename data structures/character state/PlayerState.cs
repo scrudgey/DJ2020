@@ -11,6 +11,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     [JsonConverter(typeof(ObjectListJsonConverter<LootData>))]
     public List<LootData> loots;
     public List<PayData> payDatas;
+    [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
+    public List<Tactic> unlockedTactics;
 
     // skin
     public string legSkin { get; set; }
@@ -159,6 +161,10 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
         List<SoftwareState> softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
 
+        List<Tactic> tactis = new List<Tactic>{
+            Resources.Load("data/tactics/cyberattack") as Tactic
+        };
+
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
@@ -213,7 +219,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             skillpoints = 0,
 
             softwareTemplates = softwareTemplates,
-            softwareStates = softwareStates
+            softwareStates = softwareStates,
+            unlockedTactics = tactis
         };
     }
 
@@ -402,5 +409,10 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             baseValue = baseValue
         };
         return newCard;
+    }
+
+    public List<Tactic> TacticsAvailableToUnlock() {
+        Tactic[] allTactics = Resources.LoadAll<Tactic>("data/tactics") as Tactic[];
+        return allTactics.Where(tactic => !unlockedTactics.Contains(tactic)).ToList();
     }
 }

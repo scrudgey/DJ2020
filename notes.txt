@@ -3757,7 +3757,7 @@ medium-effort mini systems work:
     key system
     update the steam page graphic
     in-between montage
-        unlock contacts for tactics
+        * unlock contacts for tactics
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
         gun perks

@@ -8,15 +8,24 @@ public class SimpleAnimate : MonoBehaviour {
     public float interval;
     float timer;
     int index;
+    bool isPlaying = true;
+    public void Play() {
+        isPlaying = true;
+    }
+    public void Stop() {
+        isPlaying = false;
+    }
     void Update() {
-        timer += Time.unscaledDeltaTime;
-        if (timer > interval) {
-            timer -= interval;
-            index += 1;
-            if (index > sprites.Length - 1) {
-                index = 0;
+        if (isPlaying) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > interval) {
+                timer -= interval;
+                index += 1;
+                if (index > sprites.Length - 1) {
+                    index = 0;
+                }
+                image.sprite = sprites[index];
             }
-            image.sprite = sprites[index];
         }
     }
 }

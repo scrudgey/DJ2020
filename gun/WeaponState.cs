@@ -1,8 +1,10 @@
+using Newtonsoft.Json;
 using UnityEngine;
 public enum WeaponType { none, gun, melee }
 public class WeaponState {
     public WeaponType type;
     public GunState gunInstance;
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<MeleeWeaponTemplate>))]
     public MeleeWeaponTemplate meleeWeapon;
 
     public Sprite GetSprite() {

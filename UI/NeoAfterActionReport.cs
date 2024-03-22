@@ -20,6 +20,8 @@ public class NeoAfterActionReport : MonoBehaviour {
     public Button perkMenuButtonComponent;
     public MontageViewController montageViewController;
     public Animator jackAnimation;
+    public SubwayAnimator subwayAnimator;
+    public SimpleAnimate[] holdAnimators;
 
     [Header("mission name")]
     public ContentSizeFitter missionContentFitter;
@@ -73,7 +75,7 @@ public class NeoAfterActionReport : MonoBehaviour {
         continueButton.SetActive(false);
         perkMenuButton.SetActive(false);
         montageViewController.Initialize();
-
+        subwayAnimator.Play();
         bonusAmount = gameData.levelState.delta.optionalObjectiveDeltas
             .Where(delta => delta.status == ObjectiveStatus.complete)
             .Select(delta => delta.template.bonusRewardCredits)
@@ -109,15 +111,15 @@ public class NeoAfterActionReport : MonoBehaviour {
         if (currentCoroutine != null) StopCoroutine(currentCoroutine);
         switch (state) {
             case State.title:
-                Debug.Log("skip title ");
+                // Debug.Log("skip title ");
                 SkipTitleAndObjectives(gameData);
                 break;
             case State.missionName:
-                Debug.Log("skip missionName");
+                // Debug.Log("skip missionName");
                 SkipReward(gameData);
                 break;
             case State.reward:
-                Debug.Log("skip reward");
+                // Debug.Log("skip reward");
                 SkipReward(gameData);
                 break;
         }
@@ -125,13 +127,13 @@ public class NeoAfterActionReport : MonoBehaviour {
     public void ContinueButtonCallback() {
         switch (state) {
             case State.missionName:
-                Debug.Log("continue from missionName -> reward");
+                // Debug.Log("continue from missionName -> reward");
                 state = State.reward;
                 continueButton.SetActive(false);
                 currentCoroutine = StartCoroutine(ShowReward(gameData));
                 break;
             case State.reward:
-                Debug.Log("continue from reward -> fadeout");
+                // Debug.Log("continue from reward -> fadeout");
                 state = State.fadeout;
                 continueButton.SetActive(false);
                 perkMenuButton.SetActive(false);
@@ -150,13 +152,22 @@ public class NeoAfterActionReport : MonoBehaviour {
             Toolbox.Ease(null, 1f, 0f, 0.5f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true),
             Toolbox.CoroutineFunc(() => {
                 jackAnimation.enabled = false;
+                foreach (SimpleAnimate animate in holdAnimators) {
+                    animate.Stop();
+                }
+                subwayAnimator.Stop();
                 montageViewController.StartSequence();
             })
         );
     }
     IEnumerator FadeToNewDay() {
+        jackAnimation.enabled = true;
+        foreach (SimpleAnimate animate in holdAnimators) {
+            animate.Play();
+        }
+        subwayAnimator.Play();
         yield return Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 1f, 0.5f, 0f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true),
+            Toolbox.Ease(null, 1f, 0.5f, 1f, PennerDoubleAnimation.Linear, (amount) => fade.color = new Color(0, 0, 0, amount), unscaledTime: true),
             Toolbox.CoroutineFunc(() => GameManager.I.StartNewDay())
         );
     }
@@ -380,7 +391,7 @@ public class NeoAfterActionReport : MonoBehaviour {
             creditParticles.Play();
         }
         mutableBalance = data.levelState.template.creditReward;
-        balanceAmountText.text = mutableBalance.ToString("#,#");
+        balanceAmountText.text = data.playerState.credits.ToString("#,#");
         counterAmountText.gameObject.SetActive(false);
         counterCreditSymbolObject.SetActive(false);
         skillPointsObject.SetActive(true);

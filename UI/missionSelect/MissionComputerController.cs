@@ -45,20 +45,20 @@ public class MissionComputerController : MonoBehaviour {
     public Color mapColor2;
     public float timer;
     public float colorFlipInterval;
-    public TextMeshProUGUI mapDescriptionTitle;
-    public TextMeshProUGUI mapDescriptionBody;
-    public TextMeshProUGUI mapDescriptionTarget;
+    // public TextMeshProUGUI mapDescriptionTitle;
+    // public TextMeshProUGUI mapDescriptionBody;
+    // public TextMeshProUGUI mapDescriptionTarget;
 
     [Header("objects")]
     public GameObject rewardBox;
     [Header("easing")]
     public LayoutElement bottomLayoutElement;
     bool bottomIsShowing;
-    List<Coroutine> blitRoutines;
+    // List<Coroutine> blitRoutines;
 
     public void Initialize(GameData data) {
         // bottomPanel.SetActive(false);
-        blitRoutines = new List<Coroutine>();
+        // blitRoutines = new List<Coroutine>();
         bottomIsShowing = false;
         factionIsShowing = false;
         mapPanel.SetActive(false);
@@ -122,14 +122,14 @@ public class MissionComputerController : MonoBehaviour {
         factionLogo.sprite = button.template.faction.logo;
         factionText.text = button.template.faction.factionName;
 
-        foreach (Coroutine coroutine in blitRoutines) {
-            StopCoroutine(coroutine);
-        }
+        // foreach (Coroutine coroutine in blitRoutines) {
+        //     StopCoroutine(coroutine);
+        // }
 
-        blitRoutines.Clear();
-        blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTitle, "NEO BOSTON")));
-        blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionBody, "Pop: 2,654,776\n42°21′37″N\n71°3′28″W")));
-        blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTarget, $"TARGET: {button.template.sceneDescriptor}")));
+        // blitRoutines.Clear();
+        // blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTitle, "NEO BOSTON")));
+        // blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionBody, "Pop: 2,654,776\n42°21′37″N\n71°3′28″W")));
+        // blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTarget, $"TARGET: {button.template.sceneDescriptor}")));
     }
     void ShowDetailsDialogue() {
         bottomIsShowing = true;
@@ -265,15 +265,15 @@ public class MissionComputerController : MonoBehaviour {
         HideDetailsDialogue();
     }
 
-    void Update() {
-        timer += Time.unscaledDeltaTime;
-        if (timer > colorFlipInterval) {
-            timer -= colorFlipInterval;
-            if (mapImage.color == mapColor1) {
-                mapImage.color = mapColor2;
-            } else {
-                mapImage.color = mapColor1;
-            }
-        }
-    }
+    // void Update() {
+    //     timer += Time.unscaledDeltaTime;
+    //     if (timer > colorFlipInterval) {
+    //         timer -= colorFlipInterval;
+    //         if (mapImage.color == mapColor1) {
+    //             mapImage.color = mapColor2;
+    //         } else {
+    //             mapImage.color = mapColor1;
+    //         }
+    //     }
+    // }
 }

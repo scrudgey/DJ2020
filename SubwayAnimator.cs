@@ -40,6 +40,8 @@ public class SubwayAnimator : MonoBehaviour {
     public GameObject[] parallaxGameObjects;
     public Transform foregroundCar;
     List<ParallaxLayer> parallaxLayers;
+    Coroutine bumpRoutine;
+    bool isplaying;
     void Start() {
         parallaxLayers = new List<ParallaxLayer>();
         foreach (GameObject parallaxObject in parallaxGameObjects) {
@@ -48,13 +50,27 @@ public class SubwayAnimator : MonoBehaviour {
         }
         parallaxLayers[0].xFactor = 180;
         parallaxLayers[1].xFactor = 350;
-
-        StartCoroutine(BumpTheTrain());
-
     }
+
+    public void Play() {
+        if (bumpRoutine != null) {
+            StopCoroutine(bumpRoutine);
+        }
+        isplaying = true;
+        bumpRoutine = StartCoroutine(BumpTheTrain());
+    }
+    public void Stop() {
+        if (bumpRoutine != null) {
+            StopCoroutine(bumpRoutine);
+        }
+        isplaying = false;
+    }
+
     void Update() {
-        foreach (ParallaxLayer layer in parallaxLayers) {
-            layer.Update(Time.deltaTime);
+        if (isplaying) {
+            foreach (ParallaxLayer layer in parallaxLayers) {
+                layer.Update(Time.deltaTime);
+            }
         }
     }
     IEnumerator BumpTheTrain() {

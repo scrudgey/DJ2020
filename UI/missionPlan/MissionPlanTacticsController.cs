@@ -63,11 +63,20 @@ public class MissionPlanTacticsController : MonoBehaviour {
         }
         List<string> activeTacticNames = plan.activeTactics.Select(tactic => tactic.title).ToList();
 
-        foreach (Tactic tactic in template.availableTactics) {
+        // foreach (Tactic tactic in template.availableTactics) {
+        foreach (Tactic tactic in GameManager.I.gameData.playerState.unlockedTactics) {
+            Debug.Log($"unlocked tactic: {tactic.name}");
+
             GameObject obj = Instantiate(availbleEntryPrefab);
             obj.transform.SetParent(availableEntriesContainer, false);
             PurchaseTacticEntry purchaseTacticEntry = obj.GetComponent<PurchaseTacticEntry>();
-            PurchaseTacticEntry.Status status = activeTacticNames.Contains(tactic.title) ? PurchaseTacticEntry.Status.purchased : PurchaseTacticEntry.Status.forSale;
+            PurchaseTacticEntry.Status status;
+            if (template.availableTactics.Contains(tactic)) {
+                status = activeTacticNames.Contains(tactic.title) ? PurchaseTacticEntry.Status.purchased : PurchaseTacticEntry.Status.forSale;
+
+            } else {
+                status = PurchaseTacticEntry.Status.unavailable;
+            }
             purchaseTacticEntry.Initialize(this, tactic, status);
         }
     }
@@ -170,24 +179,43 @@ public class MissionPlanTacticsController : MonoBehaviour {
 
         dialogueRectTransform.sizeDelta = new Vector2(1290f, 35f);
 
-        dialogueCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 0.55f, 35f, 331f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
-                dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
-            }, unscaledTime: true),
-            Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
-            Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
-                leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
-            }, unscaledTime: true),
-            new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => HideStatic(entry.tactic)),
-            new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => ShowIntroDialogue(entry.tactic)),
-            // new WaitForSecondsRealtime(1f),
-            Toolbox.Ease(null, 0.75f, 331f, 680f, PennerDoubleAnimation.ExpoEaseIn, (float height) => {
-                dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
-            }, unscaledTime: true),
-            Toolbox.CoroutineFunc(() => dialogueCoroutine = null)
-        ));
+        if (entry.status == PurchaseTacticEntry.Status.forSale) {
+            dialogueCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
+                Toolbox.Ease(null, 0.55f, 35f, 331f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                    dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
+                }, unscaledTime: true),
+                Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
+                Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                    leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
+                }, unscaledTime: true),
+                new WaitForSecondsRealtime(0.5f),
+                Toolbox.CoroutineFunc(() => HideStatic(entry.tactic)),
+                new WaitForSecondsRealtime(0.5f),
+                Toolbox.CoroutineFunc(() => ShowIntroDialogue(entry.tactic)),
+                // new WaitForSecondsRealtime(1f),
+                Toolbox.Ease(null, 0.75f, 331f, 680f, PennerDoubleAnimation.ExpoEaseIn, (float height) => {
+                    dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
+                }, unscaledTime: true),
+                Toolbox.CoroutineFunc(() => dialogueCoroutine = null)
+            ));
+        } else {
+            dialogueCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
+                Toolbox.Ease(null, 0.55f, 35f, 331f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                    dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
+                }, unscaledTime: true),
+                Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
+                Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                    leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
+                }, unscaledTime: true),
+                new WaitForSecondsRealtime(0.5f),
+                Toolbox.CoroutineFunc(() => ShowUnavailableDialogue(entry.tactic)),
+                Toolbox.Ease(null, 0.75f, 331f, 680f, PennerDoubleAnimation.ExpoEaseIn, (float height) => {
+                    dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
+                }, unscaledTime: true),
+                Toolbox.CoroutineFunc(() => dialogueCoroutine = null)
+            ));
+        }
+
     }
 
     void InitializeDialogue(PurchaseTacticEntry entry) {
@@ -233,6 +261,10 @@ public class MissionPlanTacticsController : MonoBehaviour {
             ShowPurchaseDialogue(tactic);
             ClearDialogueResponseContainer();
         });
+    }
+    void ShowUnavailableDialogue(Tactic tactic) {
+        storeDialogueController.SetShopownerDialogue($"[{tactic.vendorName} does not answer the phone]");
+        CreateDialogueResponse("[END]", "", HandleCancelResponse);
     }
     Action<DialogueResponseButton> ChainPlayerResponseWithEmptyButton(Action<DialogueResponseButton> callback, string prefix) {
         return (DialogueResponseButton button) => {
