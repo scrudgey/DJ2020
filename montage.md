@@ -73,8 +73,6 @@ unlock a fence
 
 
 
-
-
 * jack walks into safehouse
 * open dialogue to map select
 * walk cutscene and first text
@@ -107,17 +105,28 @@ unlock a fence
 * restaurant scene
 * randomize restaurant name
 ? buttons: clicking/mousing over and then confirming?
+* map highlights locations
+* fix chibijack walk cycle
+* restaurant reaction image
+* apply bonus health / health refill
+* npcs
+* response to unlock contact
+    * contact button shows fence 
+    * club button mouseover
+* nightclub
+    * animate lasers
+    * fix up response text
+    * fill in all fence data
+* food react image: noodle bar
+    * make head smaller?
 
-
-
-map highlights locations
-apply bonus health / health refill
-
-restaurant reaction image
-npcs
-    in bar
-    on street
 
 food options:
     +10 max HP
-    +1 favor
+    +1 skill point
+
+fence react image
+
+does it make sense to have separate skill points and bonus hp when skill point can be used for bonus hp?
+    the strategy is to get bonus skill point and buy the bonus hp to level up before you get the bonus hp.
+anything else the player could get?

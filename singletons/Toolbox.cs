@@ -689,11 +689,15 @@ public class Toolbox {
                                     float end,
                                     Func<double, double, double, double, double> easing,
                                     Action<float> update,
-                                    bool unscaledTime = false) {
+                                    bool unscaledTime = false,
+                                    bool looping = false) {
         float timer = 0;
         update(start);
-        while (timer < duration) {
+        while (timer < duration || looping) {
             timer += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            if (looping && timer > duration) {
+                timer -= duration;
+            }
             float value = (float)easing(timer, start, end - start, duration);
             update(value);
             yield return null;

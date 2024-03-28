@@ -5,8 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 public class LootPreferenceController : MonoBehaviour {
     public TextMeshProUGUI lootTypeText;
+    public GameObject spacer;
     public LootTypeIcon[] lootIcons;
-    public void Initialize(LootPreferenceData data) {
+    public void Initialize(LootPreferenceData data, bool hideTypeText = false) {
         lootTypeText.text = data.type.ToString();
         for (int i = 0; i < lootIcons.Length; i++) {
             if (i < data.bonus) {
@@ -15,6 +16,10 @@ public class LootPreferenceController : MonoBehaviour {
             } else {
                 lootIcons[i].gameObject.SetActive(false);
             }
+        }
+        if (hideTypeText) {
+            lootTypeText.gameObject.SetActive(false);
+            spacer.SetActive(false);
         }
     }
 }

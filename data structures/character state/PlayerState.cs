@@ -13,6 +13,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     public List<PayData> payDatas;
     [JsonConverter(typeof(ObjectListJsonConverter<Tactic>))]
     public List<Tactic> unlockedTactics;
+    [JsonConverter(typeof(ObjectListJsonConverter<LootBuyerData>))]
+    public List<LootBuyerData> unlockedFences;
 
     // skin
     public string legSkin { get; set; }
@@ -33,6 +35,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
     // health
     public float health { get; set; }
+    public int bonusHealth;
     public float fullHealthAmount() {
         return PerkFullHealthAmount();
     }
@@ -165,6 +168,10 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             Resources.Load("data/tactics/cyberattack") as Tactic
         };
 
+        List<LootBuyerData> fences = new List<LootBuyerData>{
+            Resources.Load("data/lootbuyers/snakeman") as LootBuyerData
+        };
+
         return new PlayerState() {
             legSkin = "Jack",
             bodySkin = "Jack",
@@ -220,7 +227,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
             softwareTemplates = softwareTemplates,
             softwareStates = softwareStates,
-            unlockedTactics = tactis
+            unlockedTactics = tactis,
+            unlockedFences = fences
         };
     }
 
@@ -352,7 +360,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_1);
         totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_2);
         totalLevel += GetPerkLevel(PerkIdConstants.PERKID_HEALTH_3);
-        return 150f + (totalLevel * 50f);
+        return 150f + bonusHealth + (totalLevel * 50f);
     }
     public int PerkGunAccuracyLevel(GunType gunType) {
         return gunType switch {
@@ -414,5 +422,9 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     public List<Tactic> TacticsAvailableToUnlock() {
         Tactic[] allTactics = Resources.LoadAll<Tactic>("data/tactics") as Tactic[];
         return allTactics.Where(tactic => !unlockedTactics.Contains(tactic)).ToList();
+    }
+    public List<LootBuyerData> FencesAvailableToUnlock() {
+        LootBuyerData[] allFences = Resources.LoadAll<LootBuyerData>("data/lootbuyer") as LootBuyerData[];
+        return allFences.Where(fence => !unlockedFences.Contains(fence)).ToList();
     }
 }

@@ -32,6 +32,7 @@ public class LootShopController : MonoBehaviour {
     public TextMeshProUGUI buyerNameText;
     public TextMeshProUGUI buyerDescriptionText;
     public Transform buyerPreferencesContainer;
+    public Image buyerPortrait;
 
     [Header("sounds")]
     public AudioSource audioSource;
@@ -110,6 +111,10 @@ public class LootShopController : MonoBehaviour {
         }
         buyerNameText.text = data.buyerName.ToLower();
         buyerDescriptionText.text = data.description;
+
+        // set portrait
+        buyerPortrait.sprite = data.portrait;
+
         foreach (LootPreferenceData preference in data.preferences) {
             GameObject gameObject = GameObject.Instantiate(lootPreferencePrefab);
             LootPreferenceController controller = gameObject.GetComponent<LootPreferenceController>();

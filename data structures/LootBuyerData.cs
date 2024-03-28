@@ -3,10 +3,14 @@ using System.Linq;
 using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/LootBuyerData")]
 public class LootBuyerData : ScriptableObject {
+    public Sprite portrait;
     public string buyerName;
     [TextArea(5, 6)]
     public string description;
+    [TextArea(5, 6)]
+    public string introduction;
     public List<LootPreferenceData> preferences;
+    public bool isRemote;
 
     public float CalculateBonusFactor(LootData lootData) {
         float factor = 1f;
