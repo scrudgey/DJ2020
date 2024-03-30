@@ -3701,12 +3701,14 @@ graphic effects
 
 softlock with expendable software
 
-
-
-unresolved mechanics / gameplay questions:
+    * in-between montage
+        * unlock contacts for tactics
     * progression in burglar tools?
     * hacking
     * do we buy / unlock more burglar tools?
+
+
+unresolved mechanics / gameplay questions:
     circuits
     progression in shops? 
         items, guns
@@ -3730,27 +3732,31 @@ major initiatives:
             * loot, data
             weapons, loadout, 
             character stats, skills
+
+
+
+
+
 medium-effort mini systems work:
     key system
     update the steam page graphic
-    * in-between montage
-        * unlock contacts for tactics
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
         gun perks
+    vehicles
+        strike team may arrive by vehicle
+        exfiltration / insertion may be by vehicle
 
-vehicles
-    strike team may arrive by vehicle
-    exfiltration / insertion may be by vehicle
+
+put shop n go, sympathetic detonation into game
+    support plexiglass
+    support shop n go
+    support sympathetic detonation
+
+    apply sympathetic: world
+    apply shop n go: after action, mission plan
 
 unlock fences
 bar tells fence location
 call remote fences
-
-montage leads to tactics, shops unlock
-gun perks leads to gun shop progression
-this whole thing can flesh out the world system
-
-put shop n go, sympathetic detonation into game
-    sympathetic: world
-    shop n go: after action, mission plan
+gun shop progression

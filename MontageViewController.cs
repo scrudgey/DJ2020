@@ -333,10 +333,11 @@ public class MontageViewController : MonoBehaviour {
                 restaurantReactionHolder.SetActive(true);
                 plainTextHolder.SetActive(true);
             }),
-            Toolbox.BlitText(plainText, "Got food!\n+10 max HP"),
+            Toolbox.BlitText(plainText, "Got food!\n+1 skill point"),
             Toolbox.CoroutineFunc(() => {
-                GameManager.I.gameData.playerState.bonusHealth += 10;
-                GameManager.I.gameData.playerState.health = GameManager.I.gameData.playerState.fullHealthAmount();
+                // GameManager.I.gameData.playerState.bonusHealth += 10;
+                // GameManager.I.gameData.playerState.health = GameManager.I.gameData.playerState.fullHealthAmount();
+                GameManager.I.gameData.playerState.skillpoints += 1;
                 continueButton.SetActive(true);
                 continueButtonCallback = ContinueToClose;
             })

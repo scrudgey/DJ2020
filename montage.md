@@ -119,14 +119,7 @@ unlock a fence
     * fill in all fence data
 * food react image: noodle bar
     * make head smaller?
+* fence react image
+* food options:
 
-
-food options:
-    +10 max HP
-    +1 skill point
-
-fence react image
-
-does it make sense to have separate skill points and bonus hp when skill point can be used for bonus hp?
-    the strategy is to get bonus skill point and buy the bonus hp to level up before you get the bonus hp.
-anything else the player could get?
+WS0324
