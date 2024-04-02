@@ -5,5 +5,9 @@ public enum MusicTrack {
     antiAnecdote,
     autoeroticDefenestration,
     hyperLysisCypher,
-    whereIHidTheBodies
+    whereIHidTheBodies,
+    plexiglassParallax,
+    moistPlace,
+    shopNGo,
+    sympatheticDetonation
 }

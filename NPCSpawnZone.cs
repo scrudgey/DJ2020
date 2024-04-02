@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using KinematicCharacterController;
@@ -6,11 +7,13 @@ using UnityEngine.AI;
 
 public class NPCSpawnZone : MonoBehaviour {
     public WalkToStoreState.StoreType storeType;
+    public FenceLocation fenceLocation;
     public LoHi number;
     public NPCTemplate[] templates;
     public Collider zone;
     public bool world;
     PrefabPool NPCPool;
+    GameObject fencePrefab;
     WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.01f);
     void Start() {
         InitializePools();
@@ -21,29 +24,45 @@ public class NPCSpawnZone : MonoBehaviour {
         } else {
             NPCPool = PoolManager.I?.RegisterPool("prefabs/CivilianNPC", poolSize: 100);
         }
+        fencePrefab = Resources.Load("prefabs/lootShop") as GameObject;
         // effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
     public List<GameObject> SpawnNPCs() {
         // StartCoroutine(SpawnRoutine());
         return SpawnRoutineBlocking();
     }
+    public GameObject SpawnFence(LootBuyerData lootData) {
+        GameObject obj = SpawnNPC(lootData.template, (Vector3 pos) => GameObject.Instantiate(fencePrefab, pos, Quaternion.identity));
+        StoreOwner storeOwner = obj.GetComponent<StoreOwner>();
+        storeOwner.storeType = StoreType.loot;
+        storeOwner.lootBuyerData = lootData;
+        return obj;
+    }
     List<GameObject> SpawnRoutineBlocking() {
+        if (NPCPool == null) {
+            InitializePools();
+        }
         List<GameObject> npcs = new List<GameObject>();
         for (int i = 0; i < number.GetRandomInsideBound(); i++) {
             NPCTemplate template = Toolbox.RandomFromList(templates);
-            npcs.Add(SpawnNPC(template));
+            npcs.Add(SpawnNPC(template, NPCPool.GetObject));
         }
         return npcs;
     }
     IEnumerator SpawnRoutine() {
+        if (NPCPool == null) {
+            InitializePools();
+        }
         for (int i = 0; i < number.GetRandomInsideBound(); i++) {
             NPCTemplate template = Toolbox.RandomFromList(templates);
-            SpawnNPC(template);
+            SpawnNPC(template, NPCPool.GetObject);
             yield return wait;
         }
     }
 
-    GameObject SpawnNPC(NPCTemplate template) {
+
+
+    public GameObject SpawnNPC(NPCTemplate template, Func<Vector3, GameObject> spawn) {
         if (NPCPool == null) {
             InitializePools();
         }
@@ -56,7 +75,8 @@ public class NPCSpawnZone : MonoBehaviour {
         if (NavMesh.SamplePosition(point, out hit, 1f, filter)) {
             Vector3 destination = hit.position;
 
-            GameObject npc = NPCPool.GetObject(destination);
+            // GameObject npc = NPCPool.GetObject(destination);
+            GameObject npc = spawn(destination);
 
             CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
 
@@ -68,10 +88,11 @@ public class NPCSpawnZone : MonoBehaviour {
 
             if (world) {
                 WorldNPCAI ai = npc.GetComponent<WorldNPCAI>();
-                ai.Initialize(storeType);
+                // if (ai)
+                ai?.Initialize(storeType);
             } else {
                 CivilianNPCAI ai = npc.GetComponent<CivilianNPCAI>();
-                ai.Initialize();
+                ai?.Initialize();
             }
 
             // should be part of apply state?

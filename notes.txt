@@ -3706,7 +3706,17 @@ softlock with expendable software
     * progression in burglar tools?
     * hacking
     * do we buy / unlock more burglar tools?
-
+* put shop n go, sympathetic detonation into game
+    * support plexiglass
+    * support shop n go
+    * support sympathetic detonation
+    * apply sympathetic: world
+    * apply shop n go: after action, mission plan
+* don't stop music when moving between scens in world
+* civilians in world are all armed
+* indicate value: on deal menu
+* unlock fences
+    * every day, set up the fences
 
 unresolved mechanics / gameplay questions:
     circuits
@@ -3737,26 +3747,43 @@ major initiatives:
 
 
 
+
 medium-effort mini systems work:
     key system
     update the steam page graphic
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
         gun perks
-    vehicles
+
+
+* fix map in mission computer
+finish up world
+    gaps in floor can see subway below
+    edges of map
+    flickery lights
+call remote fences
+bar tells fence location
+
+snake man fence should be handled identically
+    always present
+fences can use the pop up tents
+fences should have outfits set
+
+
+gun shop progression
+
+
+pause screen feels rough
+elevator needs polish in general
+    stealing data was broken in elevator level
+    footstep sounds- loud, weird?
+    clearsighter is clunky, imprecise, laggy, not solid solution
+    cyber jump inside resulted in bizarre behavior
+    scientist said "if you see anything let me know"
+    moving between floors of clearsighter is rough
+don't always change active scene on load
+    world pause screen
+
+ vehicles
         strike team may arrive by vehicle
         exfiltration / insertion may be by vehicle
-
-
-put shop n go, sympathetic detonation into game
-    support plexiglass
-    support shop n go
-    support sympathetic detonation
-
-    apply sympathetic: world
-    apply shop n go: after action, mission plan
-
-unlock fences
-bar tells fence location
-call remote fences
-gun shop progression

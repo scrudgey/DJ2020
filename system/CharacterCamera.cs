@@ -530,7 +530,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         PlanarDirection = closestCardinal * Vector3.forward;
 
         return new CameraTargetParameters() {
-            fieldOfView = 65f,
+            fieldOfView = 75f,
             orthographic = false,
             rotation = cameraRotation,
             snapToRotation = cameraRotation,

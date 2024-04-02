@@ -101,6 +101,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void StartNewDay() {
         SetMarketData();
         SetDealData();
+        SetFenceData();
         SaveGameData();
         ReturnToApartment();
     }
@@ -666,7 +667,7 @@ public partial class GameManager : Singleton<GameManager> {
         LoadScene("MissionPlan", () => {
             MissionPlanController controller = GameObject.FindObjectOfType<MissionPlanController>();
             controller.Initialize(gameData, template);
-            Debug.Log("controller intialized");
+            MusicController.I.PlaySimpleTrack(MusicTrack.shopNGo);
         });
     }
     public void ReturnToMissionSelector() {

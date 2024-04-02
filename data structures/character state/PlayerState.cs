@@ -169,7 +169,10 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         };
 
         List<LootBuyerData> fences = new List<LootBuyerData>{
-            Resources.Load("data/lootbuyers/snakeman") as LootBuyerData
+            Resources.Load("data/lootbuyer/snakeman") as LootBuyerData,
+            Resources.Load("data/lootbuyer/doctor") as LootBuyerData,
+            Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
+            Resources.Load("data/lootbuyer/posh") as LootBuyerData,
         };
 
         return new PlayerState() {

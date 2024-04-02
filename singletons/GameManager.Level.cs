@@ -145,7 +145,8 @@ public partial class GameManager : Singleton<GameManager> {
             state.delta.optionalObjectiveDeltas.Add(delta);
         }
 
-        MusicController.I.LoadTrack(state.template.musicTrack);
+        // MusicController.I.LoadTrack(state.template.musicTrack);
+        MusicController.I.PlayMissionTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);
 
@@ -164,13 +165,22 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.ShowInteractiveHighlight();
             }, unloadAll: false);
         }
+
         // TODO: this should be inside the loading coroutine.
         foreach (NPCSpawnZone zone in GameObject.FindObjectsOfType<NPCSpawnZone>()) {
             zone.SpawnNPCs();
+            if (zone.fenceLocation != FenceLocation.nowhere) {
+                foreach (FenceData data in gameData.fenceData) {
+                    if (data.location == zone.fenceLocation) {
+                        zone.SpawnFence(data.fence);
+                    }
+                }
+            }
         }
         InitializePlayerAndController(LevelPlan.Default(gameData.playerState));
         LoadSkyboxForScene(sceneName);
         // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
+        MusicController.I.PlaySimpleTrack(MusicTrack.sympatheticDetonation);
 
         TransitionToPhase(GamePhase.world);
     }

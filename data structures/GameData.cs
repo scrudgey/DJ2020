@@ -18,10 +18,12 @@ public record GameData {
     public SerializableDictionary<string, LevelPlan> levelPlans;
     public MarketData marketData;
     public List<DealData> dealData;
+    public List<FenceData> fenceData;
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/missions/test/test") as LevelTemplate;
         // DateTime.Now;
         PlayerState playerState = PlayerState.DefaultState();
+
         return new GameData() {
             createdAtTime = DateTime.Now,
             timePlayedInSeconds = 0,
@@ -38,7 +40,9 @@ public record GameData {
                 "elevator",
                 "office"
             },
-            levelPlans = new SerializableDictionary<string, LevelPlan>()
+            levelPlans = new SerializableDictionary<string, LevelPlan>(),
+            fenceData = new List<FenceData>(),
+            dealData = new List<DealData>()
         };
     }
 

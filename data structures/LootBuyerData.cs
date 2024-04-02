@@ -3,8 +3,12 @@ using System.Linq;
 using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/LootBuyerData")]
 public class LootBuyerData : ScriptableObject {
+
     public Sprite portrait;
     public string buyerName;
+    public bool isMale;
+    public NPCTemplate template;
+
     [TextArea(5, 6)]
     public string description;
     [TextArea(5, 6)]

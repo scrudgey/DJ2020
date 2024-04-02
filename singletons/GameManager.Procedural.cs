@@ -36,4 +36,12 @@ public partial class GameManager : Singleton<GameManager> {
         }
         gameData.dealData = dealDatas;
     }
+    public void SetFenceData() {
+        List<FenceData> fenceDatas = new List<FenceData>();
+        foreach (LootBuyerData fence in gameData.playerState.unlockedFences) {
+            FenceData data = new FenceData(fence);
+            fenceDatas.Add(data);
+        }
+        gameData.fenceData = fenceDatas;
+    }
 }

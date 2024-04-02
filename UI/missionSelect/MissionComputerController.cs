@@ -38,6 +38,7 @@ public class MissionComputerController : MonoBehaviour {
     public Image factionLogo;
 
     [Header("map")]
+    public WorldmapView worldmapView;
     public GameObject mapPanel;
     public RectTransform mapRect;
     public Image mapImage;
@@ -149,11 +150,12 @@ public class MissionComputerController : MonoBehaviour {
 
     void ShowMapAndFaction() {
         factionIsShowing = true;
-        mapRect.sizeDelta = new Vector2(530f, 35f);
+        mapRect.sizeDelta = new Vector2(959, 35f);
         factionRect.sizeDelta = new Vector2(330f, 35f);
         mapPanel.SetActive(true);
-        StartCoroutine(Toolbox.Ease(null, 0.5f, 35f, 550f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
-            mapRect.sizeDelta = new Vector2(530f, height);
+        worldmapView.ShowText();
+        StartCoroutine(Toolbox.Ease(null, 0.5f, 35f, 525f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+            mapRect.sizeDelta = new Vector2(959, height);
         }, unscaledTime: true));
         StartCoroutine(Toolbox.ChainCoroutines(
             new WaitForSecondsRealtime(0.2f),
