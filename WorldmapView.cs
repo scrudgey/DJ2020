@@ -33,6 +33,10 @@ public class WorldmapView : MonoBehaviour {
         StartCoroutine(Toolbox.BlitText(mapDescriptionTitle, "NEO BOSTON"));
         StartCoroutine(Toolbox.BlitText(mapDescriptionBody, "Pop: 2,654,776\n42°21′37″N\n71°3′28″W"));
     }
+    public void ShowWorldText() {
+        StartCoroutine(Toolbox.BlitText(mapDescriptionTitle, "WORLD"));
+        StartCoroutine(Toolbox.BlitText(mapDescriptionBody, "Pop: 14,592,331\n03:13:27 AM EST"));
+    }
     void Update() {
         timer += Time.unscaledDeltaTime;
         if (timer > colorFlipInterval) {

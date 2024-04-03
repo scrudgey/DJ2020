@@ -12,13 +12,19 @@ public class NPCSpawnZone : MonoBehaviour {
     public NPCTemplate[] templates;
     public Collider zone;
     public bool world;
+    public bool spawnNPCs = true;
     PrefabPool NPCPool;
     GameObject fencePrefab;
     WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.01f);
+    NavMeshHit hit = new NavMeshHit();
+    static NavMeshQueryFilter filter;
     void Start() {
         InitializePools();
     }
     void InitializePools() {
+        filter = new NavMeshQueryFilter {
+            areaMask = LayerUtil.KeySetToNavLayerMask(new HashSet<int>())
+        };
         if (world) {
             NPCPool = PoolManager.I?.RegisterPool("prefabs/WorldNPC", poolSize: 100);
         } else {
@@ -28,14 +34,22 @@ public class NPCSpawnZone : MonoBehaviour {
         // effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
     public List<GameObject> SpawnNPCs() {
+        if (spawnNPCs) {
+            return SpawnRoutineBlocking();
+        } else {
+            return new List<GameObject>();
+        }
         // StartCoroutine(SpawnRoutine());
-        return SpawnRoutineBlocking();
     }
     public GameObject SpawnFence(LootBuyerData lootData) {
         GameObject obj = SpawnNPC(lootData.template, (Vector3 pos) => GameObject.Instantiate(fencePrefab, pos, Quaternion.identity));
         StoreOwner storeOwner = obj.GetComponent<StoreOwner>();
         storeOwner.storeType = StoreType.loot;
         storeOwner.lootBuyerData = lootData;
+
+        GameObject watch = new GameObject($"{lootData.buyerName} watchpoint");
+        watch.transform.position = samplePosition();
+        storeOwner.lookAtPoint = watch.transform;
         return obj;
     }
     List<GameObject> SpawnRoutineBlocking() {
@@ -61,21 +75,19 @@ public class NPCSpawnZone : MonoBehaviour {
     }
 
 
-
+    Vector3 samplePosition() {
+        Vector3 point = Toolbox.RandomInsideBounds(zone);
+        if (NavMesh.SamplePosition(point, out hit, 1f, filter)) {
+            return hit.position;
+        } else return Vector3.zero;
+    }
     public GameObject SpawnNPC(NPCTemplate template, Func<Vector3, GameObject> spawn) {
         if (NPCPool == null) {
             InitializePools();
         }
-        NavMeshHit hit = new NavMeshHit();
-        Vector3 point = Toolbox.RandomInsideBounds(zone);
-        NavMeshQueryFilter filter = new NavMeshQueryFilter {
-            areaMask = LayerUtil.KeySetToNavLayerMask(new HashSet<int>())
-        };
+        Vector3 destination = samplePosition();
 
-        if (NavMesh.SamplePosition(point, out hit, 1f, filter)) {
-            Vector3 destination = hit.position;
-
-            // GameObject npc = NPCPool.GetObject(destination);
+        if (destination != Vector3.zero) {
             GameObject npc = spawn(destination);
 
             CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();

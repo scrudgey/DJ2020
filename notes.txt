@@ -3755,24 +3755,30 @@ medium-effort mini systems work:
         first: gun shop progression
         gun perks
 
-
+* snake man fence should be handled identically
 * fix map in mission computer
+* fences should have outfits set
+* fences can use the pop up tents
+* fences can be in the bar
+
+* call remote fences
+    * world map
+    * dialing / static
+    closing menu allows calling another
+* initial portrait size
+* initial menu rect size
+
 finish up world
     gaps in floor can see subway below
     edges of map
     flickery lights
-call remote fences
 bar tells fence location
-
-snake man fence should be handled identically
-    always present
-fences can use the pop up tents
-fences should have outfits set
-
-
 gun shop progression
 
 
+faster camera spin?
+faster clearsight fade?
+    above/below no fade
 pause screen feels rough
 elevator needs polish in general
     stealing data was broken in elevator level

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using Items;
 using TMPro;
 using UnityEngine;
@@ -33,12 +34,18 @@ public class LootShopController : MonoBehaviour {
     public TextMeshProUGUI buyerDescriptionText;
     public Transform buyerPreferencesContainer;
     public Image buyerPortrait;
+    public GameObject staticObject;
+    public RectTransform leftPortraitRectTransform;
+
 
     [Header("sounds")]
     public AudioSource audioSource;
     public AudioClip[] sellSound;
     public AudioClip[] selectSound;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] staticSound;
+    public AudioClip[] openDialogueSound;
+
 
 
     List<LootData> currentItemForSale;
@@ -47,7 +54,7 @@ public class LootShopController : MonoBehaviour {
 
     void Awake() {
         DestroyImmediate(UIEditorCamera);
-        bottomRect.sizeDelta = new Vector2(1f, 0f);
+        bottomRect.sizeDelta = new Vector2(1290f, 0f);
     }
 
     public void Initialize(LootBuyerData lootBuyerData) {
@@ -57,10 +64,42 @@ public class LootShopController : MonoBehaviour {
         ClearItemForSale();
         ShowSellerData(lootBuyerData);
         dialogueController.Initialize(GameManager.I.gameData.filename, lootBuyerData.buyerName);
+        bottomRect.sizeDelta = new Vector2(1290f, 0f);
+
         // set portraits
-        dialogueController.SetShopownerDialogue("We have a cash flow problem. Can you front?");
-        StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+        if (lootBuyerData.isRemote) {
+            leftPortraitRectTransform.sizeDelta = new Vector2(220f, 1f);
+
+            Toolbox.RandomizeOneShot(audioSource, openDialogueSound);
+
+            StartCoroutine(Toolbox.ChainCoroutines(
+                    Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
+                    Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                        leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
+                    }, unscaledTime: true),
+                    new WaitForSecondsRealtime(0.5f),
+                    Toolbox.CoroutineFunc(() => HideStatic(lootBuyerData)),
+                    new WaitForSecondsRealtime(0.5f),
+                    Toolbox.CoroutineFunc(() => dialogueController.SetShopownerDialogue("We have a cash flow problem. Can you front?")),
+                    new WaitForSecondsRealtime(1f),
+                    // Toolbox.Ease(null, 0.75f, 331f, 680f, PennerDoubleAnimation.ExpoEaseIn, (float height) => {
+                    //     dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
+                    // }, unscaledTime: true),
+                    Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound)
+                ));
+        } else {
+            staticObject.SetActive(false);
+            dialogueController.SetShopownerDialogue("We have a cash flow problem. Can you front?");
+            StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+        }
     }
+
+    void HideStatic(LootBuyerData data) {
+        // dialogueController.SetImages(tactic.vendorSprite);
+        buyerPortrait.sprite = data.portrait;
+        staticObject.SetActive(false);
+    }
+
     void PopulatePlayerInventory() {
         foreach (Transform child in inventoryContainer) {
             if (child == nothingToSellText.transform) continue;

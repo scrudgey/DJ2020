@@ -511,7 +511,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
         }
     }
     public void Holster() {
-        Debug.Log($"holster: {gunInstance}");
         if (gunInstance == null) return;
         fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;
         toGunType = GunType.unarmed;

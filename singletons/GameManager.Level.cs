@@ -171,6 +171,7 @@ public partial class GameManager : Singleton<GameManager> {
             zone.SpawnNPCs();
             if (zone.fenceLocation != FenceLocation.nowhere) {
                 foreach (FenceData data in gameData.fenceData) {
+                    if (data.fence.isRemote) continue;
                     if (data.location == zone.fenceLocation) {
                         zone.SpawnFence(data.fence);
                     }
