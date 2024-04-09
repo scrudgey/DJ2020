@@ -105,17 +105,17 @@ public class VRMissionDesigner : MonoBehaviour {
     [Header("Save / load")]
     public VRScenarioPicker scenarioPicker;
 
-    void Start() {
-        foreach (Transform child in pickerContainer) {
-            Destroy(child.gameObject);
-        }
-        tabOriginalColor = tab2.colors.normalColor;
-        selectedWeapon = 1;
-        selectedCharacter = 1;
-        template = VRMissionTemplate.LoadVRMissionTemplate(VRMissionTemplate.DEFAULT_FILENAME);
-        gunStatHandler.DisplayGunTemplate(template.playerState.primaryGun);
-        OnDataChange();
-    }
+    // void Start() {
+    //     foreach (Transform child in pickerContainer) {
+    //         Destroy(child.gameObject);
+    //     }
+    //     tabOriginalColor = tab2.colors.normalColor;
+    //     selectedWeapon = 1;
+    //     selectedCharacter = 1;
+    //     template = VRMissionTemplate.LoadVRMissionTemplate(VRMissionTemplate.DEFAULT_FILENAME);
+    //     gunStatHandler.DisplayGunTemplate(template.playerState.primaryGun);
+    //     OnDataChange();
+    // }
 
     void InitializeWeaponPicker() {
         foreach (Transform child in pickerContainer) {

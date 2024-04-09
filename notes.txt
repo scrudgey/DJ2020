@@ -3748,6 +3748,38 @@ major initiatives:
 
 
 
+* snake man fence should be handled identically
+* fix map in mission computer
+* fences should have outfits set
+* fences can use the pop up tents
+* fences can be in the bar
+* call remote fences
+    * world map
+    * dialing / static
+* initial portrait size
+* initial menu rect size
+* loot seller dialogue
+    * introduction
+    * introduction if player has no loot
+* closing phone menu allows calling another
+* don't always change active scene on load
+* regen eagle
+* replace all fonts
+* mission details too big
+* mission plan statsrect is broken
+    * mission details fonts
+    * tactics dialogue
+    * gun mod shop
+    * bar done button
+    * paydatashop done button
+    * action callout
+    * gun mod shop fonts
+    * faction, map in mission select
+* gunshop statsrect?
+
+
+
+
 medium-effort mini systems work:
     key system
     update the steam page graphic
@@ -3755,18 +3787,9 @@ medium-effort mini systems work:
         first: gun shop progression
         gun perks
 
-* snake man fence should be handled identically
-* fix map in mission computer
-* fences should have outfits set
-* fences can use the pop up tents
-* fences can be in the bar
 
-* call remote fences
-    * world map
-    * dialing / static
-    closing menu allows calling another
-* initial portrait size
-* initial menu rect size
+
+phone menu portrait is green
 
 finish up world
     gaps in floor can see subway below
@@ -3776,6 +3799,23 @@ bar tells fence location
 gun shop progression
 
 
+UI polish:
+    faster UI reveal
+    -> thinner UI borders
+    -> font
+        textmeshprougui
+        -> mbyte sparro
+    subtitle: size 28, bar height 35
+    -> dialogue text font size -> 28
+    -> update loot icons
+    ease out menus
+    sounds for menu show, menu close: clicks
+        change reveal from open -> click 5
+    title:
+        eagle, 50point, change padding
+    do not reveal until canvas is initialized
+
+better agreement between wallpress/third person post processing and isometric
 faster camera spin?
 faster clearsight fade?
     above/below no fade
@@ -3787,9 +3827,52 @@ elevator needs polish in general
     cyber jump inside resulted in bizarre behavior
     scientist said "if you see anything let me know"
     moving between floors of clearsighter is rough
-don't always change active scene on load
-    world pause screen
 
  vehicles
         strike team may arrive by vehicle
         exfiltration / insertion may be by vehicle
+
+
+* font: overlay button
+    * phone menu
+    * loot menu
+    * bar
+    * escape
+    * gunmod
+    * gunshop
+    * importershop
+    * itemshop
+    * mainescape
+    * medicalshop
+    * missionplan
+    * paydatashop
+    * perkmenu
+
+
+
+
+
+logos for omni, delta, elf
+title screen
+
+click sound when click done button in many menus
+    - phone menu
+    - loot menu
+    - bar
+    - escape
+    - gunmod
+    - gunshop
+    - importershop
+    - itemshop
+    - mainescape
+    - medicalshop
+    - paydatashop
+    - perkmenu
+    
+hide canvas until initialized
+    dialogue
+    missionfail
+    
+perk details disclose speed/sound
+can activate infinte perks
+speed up + pitch up blitting?

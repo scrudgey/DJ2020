@@ -583,7 +583,7 @@ public class Toolbox {
         yield return new WaitForSecondsRealtime(0.5f);
         RandomizeOneShot(audioSource, discloseBottomSound, randomPitchWidth: 0.02f);
         float timer = 0f;
-        float duration = 0.5f;
+        float duration = 0.1f;
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             float height = (float)PennerDoubleAnimation.Linear(timer, 0f, 610f, duration);

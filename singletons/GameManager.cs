@@ -715,4 +715,8 @@ public partial class GameManager : Singleton<GameManager> {
 
         return isVisible;
     }
+
+    public void PlayUISound(AudioClip[] clips) {
+        Toolbox.RandomizeOneShot(audioSource, clips);
+    }
 }

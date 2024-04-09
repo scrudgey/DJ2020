@@ -7,6 +7,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 public class EscapeMenuController : MonoBehaviour {
+
+    public Canvas myCanvas;
+
     public GameObject UIEditorCamera;
     public RectTransform menuRect;
 
@@ -48,14 +51,20 @@ public class EscapeMenuController : MonoBehaviour {
     [Header("colors")]
     public ColorBlock normalTabColors;
     public ColorBlock selectedTabColors;
+    [Header("sounds")]
+    public AudioClip[] openSounds;
+    public AudioClip[] closeSounds;
     Coroutine menuSizeCoroutine;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
     public void Initialize(GameData data) {
+        GameManager.I.PlayUISound(openSounds);
         foreach (Transform child in objectivesContainer) {
             if (child.gameObject == bonusObjectiveHeader) continue;
+            if (child.name.ToLower().Contains("spacer")) continue;
             Destroy(child.gameObject);
         }
         foreach (ObjectiveDelta objective in data.levelState.delta.objectiveDeltas) {
@@ -92,10 +101,13 @@ public class EscapeMenuController : MonoBehaviour {
         lootCount.text = $"{currentLoots}";
         dataCount.text = $"{currentData}";
         keyCount.text = $"{currentKeys}";
+        ChangeTabCallback("objective");
+        myCanvas.enabled = true;
     }
 
     public void ContinueButtonCallback() {
         GameManager.I.CloseMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
     public void AbortButtonCallback() {
         GameManager.I.CloseMenu();

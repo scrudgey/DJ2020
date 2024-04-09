@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class GunModShopController : MonoBehaviour {
+    public Canvas myCanvas;
     public GameObject UIEditorCamera;
     public StoreDialogueController storeDialogueController;
     public RectTransform bottomRect;
@@ -46,8 +47,10 @@ public class GunModShopController : MonoBehaviour {
     public AudioClip[] modSelectSound;
     public AudioClip[] buySound;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
@@ -67,6 +70,7 @@ public class GunModShopController : MonoBehaviour {
         storeDialogueController.Initialize(GameManager.I.gameData.filename, "Shin");
         storeDialogueController.SetShopownerDialogue("You need something with a little more punch, huh? I got you covered.");
         SetNoGunsIndicator(GameManager.I.gameData.playerState.allGuns.Count == 0);
+        myCanvas.enabled = true;
     }
 
     void SetNoGunsIndicator(bool value) {
@@ -254,5 +258,6 @@ public class GunModShopController : MonoBehaviour {
 
     public void DoneButtonCallback() {
         GameManager.I.CloseMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 }

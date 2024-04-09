@@ -14,6 +14,7 @@ public class LootCanvasCounter {
 public class LootCanvasHandler : MonoBehaviour {
     public RectTransform mainRect;
     public RectTransform detailsRect;
+    public GraphIconReference graphIconReference;
     Coroutine showCoroutine;
     float hangTimer = 0f;
 
@@ -111,7 +112,8 @@ public class LootCanvasHandler : MonoBehaviour {
             //     LootCategory.drug => drugSprite,
             //     _ => dataSprite
             // };
-            lootCategoryIcon.sprite = LootTypeIcon.LootCategoryToSprite(data.category);
+            // lootCategoryIcon.sprite = LootTypeIcon.LootCategoryToSprite(data.category);
+            lootCategoryIcon.sprite = graphIconReference.LootSprite(data.category);
         } else {
             creditsContainer.SetActive(false);
             valueText.enabled = false;

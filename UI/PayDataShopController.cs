@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class PayDataShopController : MonoBehaviour {
+    public Canvas myCanvas;
 
     public GameObject UIEditorCamera;
     public RectTransform bottomRect;
@@ -26,11 +27,13 @@ public class PayDataShopController : MonoBehaviour {
     public AudioClip[] sellSound;
     public AudioClip[] selectDataSound;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
 
 
     DataFileButton selectedButton;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
@@ -43,6 +46,7 @@ public class PayDataShopController : MonoBehaviour {
         ClearSaleData();
         PopulateDataButtons();
         SetPlayerCredits();
+        myCanvas.enabled = true;
     }
 
     void ClearDataButtons() {
@@ -96,5 +100,6 @@ public class PayDataShopController : MonoBehaviour {
     }
     public void DoneButtonCallback() {
         GameManager.I.CloseMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 }

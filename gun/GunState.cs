@@ -8,6 +8,10 @@ public class GunState : IGunStatProvider {
     [JsonConverter(typeof(ScriptableObjectJsonConverter<GunTemplate>))]
     public GunTemplate template;
 
+    public GunState() {
+        // needed for serialization
+    }
+
     public void Shoot() {
         if (!CanShoot()) {
             return;

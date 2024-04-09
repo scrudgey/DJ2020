@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class ItemShopController : MonoBehaviour {
+    public Canvas myCanvas;
     public GameObject UIEditorCamera;
     public GameObject itemButtonPrefab;
     public GameObject bodyContainer;
@@ -33,12 +34,15 @@ public class ItemShopController : MonoBehaviour {
     public AudioClip[] selectGunSound;
     public AudioClip blitSound;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
+
     Coroutine blitTextRoutine;
 
     List<ItemSaleData> itemSaleData = new List<ItemSaleData>();
     ItemSaleData currentItemForSale;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
@@ -46,6 +50,7 @@ public class ItemShopController : MonoBehaviour {
         itemSaleData = LoadItemSaleData();
         ClearInitialize();
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+        myCanvas.enabled = true;
     }
     List<ItemSaleData> LoadItemSaleData() => new List<ItemSaleData>(){
             new ItemSaleData(ItemTemplate.LoadItem("C4"), 600),
@@ -68,6 +73,7 @@ public class ItemShopController : MonoBehaviour {
     }
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 
     void PopulateStoreInventory() {

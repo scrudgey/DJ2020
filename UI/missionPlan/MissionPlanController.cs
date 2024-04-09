@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class MissionPlanController : MonoBehaviour {
     public enum PaneType { loadout, map, tactics, overview, cyberdeck }
+    public Canvas myCanvas;
 
     public bool debugStart;
     public AudioClip[] buttonSound;
@@ -38,6 +39,10 @@ public class MissionPlanController : MonoBehaviour {
     public Image mapHighlight;
     public Image tacticsHighlight;
     public Image cyberdeckHighlight;
+
+    void Awake() {
+        myCanvas.enabled = false;
+    }
 
     void Start() {
         if (debugStart) {
@@ -81,6 +86,7 @@ public class MissionPlanController : MonoBehaviour {
         overviewController.Initialize(data, template, plan);
         cyberController.Initialize(data, template, plan);
         SwitchPanes(PaneType.overview);
+        myCanvas.enabled = true;
     }
     public void OverviewButtonCallback() {
         SwitchPanes(PaneType.overview);

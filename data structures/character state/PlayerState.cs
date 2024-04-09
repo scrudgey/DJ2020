@@ -113,19 +113,19 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             ItemTemplate.LoadItem("deck"),
         };
 
-        // List<LootData> loots = new List<LootData> {
-        //     Resources.Load("data/loot/drug/rush") as LootData,
-        //     Resources.Load("data/loot/drug/rush") as LootData,
-        //     Resources.Load("data/loot/drug/rush") as LootData,
-        //     Resources.Load("data/loot/drug/vial") as LootData,
-        //     Resources.Load("data/loot/drug/vial") as LootData,
-        //     Resources.Load("data/loot/drug/zyme") as LootData,
-        //     Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
-        //     Resources.Load("data/loot/industrial/tungstenRod") as LootData,
-        //     Resources.Load("data/loot/industrial/flask") as LootData,
-        // };
+        List<LootData> loots = new List<LootData> {
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/vial") as LootData,
+            Resources.Load("data/loot/drug/vial") as LootData,
+            Resources.Load("data/loot/drug/zyme") as LootData,
+            Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
+            Resources.Load("data/loot/industrial/tungstenRod") as LootData,
+            Resources.Load("data/loot/industrial/flask") as LootData,
+        };
 
-        List<LootData> loots = new List<LootData>();
+        // List<LootData> loots = new List<LootData>();
         // List<string> perks = new List<string>{
         //     "p1_1",
         //     "p1_2",

@@ -6,6 +6,7 @@ using Easings;
 using TMPro;
 using UnityEngine;
 public class ImporterShopController : MonoBehaviour {
+    public Canvas myCanvas;
     public RectTransform bottomRect;
     public GameObject UIEditorCamera;
     public AudioSource audioSource;
@@ -23,7 +24,10 @@ public class ImporterShopController : MonoBehaviour {
     [Header("sounds")]
     public AudioClip[] showDialogueSounds;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
+
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
 
@@ -39,6 +43,7 @@ public class ImporterShopController : MonoBehaviour {
         } else {
             storeDialogueController.SetShopownerDialogue("Help me out, decker. I've gotta move this shipment from singapore.");
         }
+        myCanvas.enabled = true;
     }
 
     void ClearDealButtons() {
@@ -130,6 +135,7 @@ public class ImporterShopController : MonoBehaviour {
 
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 
     void SetStoreDialogueAccept() {

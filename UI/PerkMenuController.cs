@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class PerkMenuController : MonoBehaviour {
+    public Canvas myCanvas;
     public AudioSource audioSource;
     public PerkCategory currentPane;
     public GameObject UIEditorCamera;
@@ -54,10 +55,13 @@ public class PerkMenuController : MonoBehaviour {
     public AudioClip[] activatePerkSound;
     public AudioClip[] disclosePerkSound;
     public AudioClip[] changePaneSound;
+    public AudioClip[] closeSounds;
+
     bool perkViewActive;
     PlayerState state;
     PerkButton selectedPerkButton;
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
     public void Initialize(GameData data, PlayerState state) {
@@ -67,6 +71,7 @@ public class PerkMenuController : MonoBehaviour {
         RefreshDisplay(state);
         HidePerkView();
         // EaseInButtons();
+        myCanvas.enabled = true;
     }
     void HidePerkView() {
         perkViewActive = false;
@@ -103,6 +108,7 @@ public class PerkMenuController : MonoBehaviour {
     }
     public void CloseButtonCallback() {
         GameManager.I.HidePerkMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 
     public void NextPaneCallback() {

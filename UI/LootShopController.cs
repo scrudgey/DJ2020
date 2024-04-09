@@ -1,13 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using Items;
+using Nimrod;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class LootShopController : MonoBehaviour {
-
+    public Canvas myCanvas;
     public GameObject UIEditorCamera;
     public GameObject lootButtonPrefab;
     // public GameObject bodyContainer;
@@ -45,20 +47,30 @@ public class LootShopController : MonoBehaviour {
     public AudioClip[] discloseBottomSound;
     public AudioClip[] staticSound;
     public AudioClip[] openDialogueSound;
+    public AudioClip[] closeSounds;
+    public GameObject continueButton;
+    Action continueCallback;
 
-
-
+    Grammar grammar;
     List<LootData> currentItemForSale;
     int forSaleTotalPrice;
     LootBuyerData lootBuyerData;
+    bool remoteCall;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1290f, 0f);
     }
 
     public void Initialize(LootBuyerData lootBuyerData) {
         this.lootBuyerData = lootBuyerData;
+        continueButton.SetActive(false);
+        grammar = new Grammar();
+        grammar.Load("loot");
+        grammar.AddSymbol("name", GameManager.I.gameData.filename);
+        dialogueController.Clear();
+
         PopulatePlayerInventory();
         SetPlayerCredits();
         ClearItemForSale();
@@ -66,32 +78,73 @@ public class LootShopController : MonoBehaviour {
         dialogueController.Initialize(GameManager.I.gameData.filename, lootBuyerData.buyerName);
         bottomRect.sizeDelta = new Vector2(1290f, 0f);
 
-        // set portraits
-        if (lootBuyerData.isRemote) {
-            leftPortraitRectTransform.sizeDelta = new Vector2(220f, 1f);
+        remoteCall = lootBuyerData.isRemote;
 
-            Toolbox.RandomizeOneShot(audioSource, openDialogueSound);
-
-            StartCoroutine(Toolbox.ChainCoroutines(
-                    Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
-                    Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
-                        leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
-                    }, unscaledTime: true),
-                    new WaitForSecondsRealtime(0.5f),
-                    Toolbox.CoroutineFunc(() => HideStatic(lootBuyerData)),
-                    new WaitForSecondsRealtime(0.5f),
-                    Toolbox.CoroutineFunc(() => dialogueController.SetShopownerDialogue("We have a cash flow problem. Can you front?")),
+        if (GameManager.I.gameData.playerState.loots.Count == 0) { // player has no loot
+            continueCallback = ContinueFromNoLootPrompt;
+            if (lootBuyerData.isRemote) {
+                leftPortraitRectTransform.sizeDelta = new Vector2(220f, 1f);
+                Toolbox.RandomizeOneShot(audioSource, openDialogueSound);
+                StartCoroutine(Toolbox.ChainCoroutines(
+                        Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
+                        Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                            leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
+                        }, unscaledTime: true),
+                        new WaitForSecondsRealtime(0.5f),
+                        Toolbox.CoroutineFunc(() => HideStatic(lootBuyerData)),
+                        new WaitForSecondsRealtime(0.5f),
+                        Toolbox.CoroutineFunc(() => dialogueController.SetShopownerDialogue(grammar.Parse("{greet-remote-normal}"))),
+                        new WaitForSecondsRealtime(1f),
+                        Toolbox.CoroutineFunc(() => continueButton.SetActive(true))
+                    ));
+            } else {
+                staticObject.SetActive(false);
+                StartCoroutine(Toolbox.ChainCoroutines(
+                    Toolbox.CoroutineFunc(() => dialogueController.SetShopownerDialogue(grammar.Parse("{greet-street-normal}"))),
                     new WaitForSecondsRealtime(1f),
-                    // Toolbox.Ease(null, 0.75f, 331f, 680f, PennerDoubleAnimation.ExpoEaseIn, (float height) => {
-                    //     dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
-                    // }, unscaledTime: true),
-                    Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound)
+                    Toolbox.CoroutineFunc(() => continueButton.SetActive(true))
                 ));
-        } else {
-            staticObject.SetActive(false);
-            dialogueController.SetShopownerDialogue("We have a cash flow problem. Can you front?");
-            StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+            }
+        } else { // player has loot
+            if (lootBuyerData.isRemote) {
+                leftPortraitRectTransform.sizeDelta = new Vector2(220f, 1f);
+                Toolbox.RandomizeOneShot(audioSource, openDialogueSound);
+                StartCoroutine(Toolbox.ChainCoroutines(
+                        Toolbox.CoroutineFunc(() => Toolbox.RandomizeOneShot(audioSource, staticSound)),
+                        Toolbox.Ease(null, 0.75f, 1f, 220f, PennerDoubleAnimation.QuintEaseOut, (float height) => {
+                            leftPortraitRectTransform.sizeDelta = new Vector2(220f, height);
+                        }, unscaledTime: true),
+                        new WaitForSecondsRealtime(0.5f),
+                        Toolbox.CoroutineFunc(() => HideStatic(lootBuyerData)),
+                        new WaitForSecondsRealtime(0.5f),
+                        Toolbox.CoroutineFunc(() => dialogueController.SetShopownerDialogue(grammar.Parse("{greet-remote-normal}"))),
+                        new WaitForSecondsRealtime(1f),
+                        // Toolbox.Ease(null, 0.75f, 331f, 680f, PennerDoubleAnimation.ExpoEaseIn, (float height) => {
+                        //     dialogueRectTransform.sizeDelta = new Vector2(1290f, height);
+                        // }, unscaledTime: true),
+                        Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound)
+                    ));
+            } else {
+                staticObject.SetActive(false);
+                dialogueController.SetShopownerDialogue(grammar.Parse("{greet-street-normal}"));
+                StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+            }
         }
+        myCanvas.enabled = true;
+    }
+
+    void ContinueFromNoLootPrompt() {
+        continueButton.SetActive(false);
+        continueCallback = DoneButtonCallback;
+        StartCoroutine(Toolbox.ChainCoroutines(
+                                Toolbox.CoroutineFunc(() => dialogueController.SetShopownerDialogue(grammar.Parse("{no-loot}"))),
+                                new WaitForSecondsRealtime(1f),
+                                Toolbox.CoroutineFunc(() => continueButton.SetActive(true))
+                            ));
+    }
+
+    public void ContinueClicked() {
+        continueCallback?.Invoke();
     }
 
     void HideStatic(LootBuyerData data) {
@@ -121,6 +174,10 @@ public class LootShopController : MonoBehaviour {
     }
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
+        if (remoteCall) {
+            GameManager.I.ShowMenu(MenuType.phoneMenu);
+        }
+        GameManager.I.PlayUISound(closeSounds);
     }
     void SetPlayerCredits() {
         playerCreditsText.text = GameManager.I.gameData.playerState.credits.ToString();
@@ -213,7 +270,7 @@ public class LootShopController : MonoBehaviour {
         PopulatePlayerInventory();
         ClearItemForSale();
         SetPlayerCredits();
-        dialogueController.SetShopownerDialogue("I'll take it.");
+        dialogueController.SetShopownerDialogue(grammar.Parse("{accept}"));
     }
 
 }

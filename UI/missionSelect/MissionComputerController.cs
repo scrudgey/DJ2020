@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
-using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,19 +40,19 @@ public class MissionComputerController : MonoBehaviour {
     public WorldmapView worldmapView;
     public GameObject mapPanel;
     public RectTransform mapRect;
-    public Image mapImage;
-    public Color mapColor1;
-    public Color mapColor2;
-    public float timer;
-    public float colorFlipInterval;
+    // public Image mapImage;
+    // public Color mapColor1;
+    // public Color mapColor2;
+    // public float timer;
+    // public float colorFlipInterval;
     // public TextMeshProUGUI mapDescriptionTitle;
     // public TextMeshProUGUI mapDescriptionBody;
     // public TextMeshProUGUI mapDescriptionTarget;
 
     [Header("objects")]
     public GameObject rewardBox;
-    [Header("easing")]
-    public LayoutElement bottomLayoutElement;
+    // [Header("easing")]
+    // public LayoutElement bottomLayoutElement;
     bool bottomIsShowing;
     // List<Coroutine> blitRoutines;
 
@@ -135,7 +134,7 @@ public class MissionComputerController : MonoBehaviour {
     void ShowDetailsDialogue() {
         bottomIsShowing = true;
         detailsPanel.SetActive(true);
-        StartCoroutine(EaseInDetailsPanel());
+        EaseInDetailsPanel();
         foreach (MissionSelectorButton selectorButton in selectorButtons) {
             selectorButton.button.interactable = false;
         }
@@ -165,35 +164,41 @@ public class MissionComputerController : MonoBehaviour {
             }, unscaledTime: true))
         );
     }
-    IEnumerator EaseInPanel() {
-        float timer = 0f;
-        float duration = 1f;
-        while (timer < duration) {
-            timer += Time.unscaledDeltaTime;
-            float size = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 200, 425, duration);
-            bottomLayoutElement.minHeight = size;
-            yield return null;
-        }
-        bottomLayoutElement.minHeight = 625f;
-    }
-    IEnumerator EaseInDetailsPanel() {
-        float timer = 0f;
-        float duration = 0.4f;
-        detailsRect.sizeDelta = new Vector2(50f, 50f);
-        while (timer < duration) {
-            timer += Time.unscaledDeltaTime;
-            float width = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 1750, duration);
-            detailsRect.sizeDelta = new Vector2(width, 50f);
-            yield return null;
-        }
-        timer = 0f;
-        while (timer < duration) {
-            timer += Time.unscaledDeltaTime;
-            float height = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 940, duration);
-            detailsRect.sizeDelta = new Vector2(1800f, height);
-            yield return null;
-        }
-        detailsRect.sizeDelta = new Vector2(1800f, 990f);
+    // IEnumerator EaseInPanel() {
+    //     float timer = 0f;
+    //     float duration = 1f;
+    //     while (timer < duration) {
+    //         timer += Time.unscaledDeltaTime;
+    //         float size = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 200, 425, duration);
+    //         bottomLayoutElement.minHeight = size;
+    //         yield return null;
+    //     }
+    //     bottomLayoutElement.minHeight = 625f;
+    // }
+    void EaseInDetailsPanel() {
+        // float timer = 0f;
+        // float duration = 0.4f;
+        // detailsRect.sizeDelta = new Vector2(50f, 50f);
+        // while (timer < duration) {
+        //     timer += Time.unscaledDeltaTime;
+        //     float width = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 1750, duration);
+        //     detailsRect.sizeDelta = new Vector2(width, 50f);
+        //     yield return null;
+        // }
+        // timer = 0f;
+        // while (timer < duration) {
+        //     timer += Time.unscaledDeltaTime;
+        //     float height = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 940, duration);
+        //     detailsRect.sizeDelta = new Vector2(1800f, height);
+        //     yield return null;
+        // }
+        // detailsRect.sizeDelta = new Vector2(1800f, 990f);
+        StartCoroutine(Toolbox.Ease(null, 0.2f, 50, 1700, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+            detailsRect.sizeDelta = new Vector2(amount, detailsRect.rect.height);
+        }, unscaledTime: true));
+        StartCoroutine(Toolbox.Ease(null, 0.1f, 50, 800, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+            detailsRect.sizeDelta = new Vector2(detailsRect.rect.width, amount);
+        }, unscaledTime: true));
     }
 
     public void LoadTemplate(LevelTemplate template) {

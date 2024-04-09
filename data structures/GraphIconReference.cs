@@ -39,6 +39,13 @@ public class GraphIconReference : ScriptableObject {
     public Sprite downloadIcon;
     public Sprite unlockIcon;
     public Sprite compromiseIcon;
+    [Header("loot")]
+    public Sprite drugLootIcon;
+    public Sprite commercialLootIcon;
+    public Sprite medicalLootIcon;
+    public Sprite industrialLootIcon;
+    public Sprite gemLootIcon;
+
 
     public Sprite CyberNodeSprite(CyberNode node) {
         // if (node.lockLevel > 0) {
@@ -102,5 +109,17 @@ public class GraphIconReference : ScriptableObject {
             return iconGenericData;
         }
 
+    }
+
+    public Sprite LootSprite(LootCategory lootCategory) {
+        return lootCategory switch {
+            LootCategory.commercial => commercialLootIcon,
+            LootCategory.drug => drugLootIcon,
+            LootCategory.gem => gemLootIcon,
+            LootCategory.industrial => industrialLootIcon,
+            LootCategory.medical => medicalLootIcon,
+            LootCategory.none => drugLootIcon,
+            _ => drugLootIcon
+        };
     }
 }

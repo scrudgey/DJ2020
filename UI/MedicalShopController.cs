@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class MedicalShopController : MonoBehaviour {
-
+    public Canvas myCanvas;
     public GameObject UIEditorCamera;
     public RectTransform bottomRect;
     public AudioSource audioSource;
@@ -24,18 +24,19 @@ public class MedicalShopController : MonoBehaviour {
     [Header("sounds")]
     public AudioClip[] healSounds;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
     public void Initialize() {
-
         storeDialogueController.Initialize(GameManager.I.gameData.filename, "Dr. Head");
-
         storeDialogueController.SetShopownerDialogue("My work is clean. No questions asked.");
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         SetPlayerStats();
+        myCanvas.enabled = true;
     }
 
     void SetPlayerStats() {
@@ -81,5 +82,6 @@ public class MedicalShopController : MonoBehaviour {
 
     public void DoneButtonCallback() {
         GameManager.I.CloseMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 }

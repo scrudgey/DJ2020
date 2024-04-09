@@ -6,6 +6,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class GunShopController : MonoBehaviour {
+    public Canvas myCanvas;
+
     public GameObject UIEditorCamera;
 
     public GameObject gunButtonPrefab;
@@ -39,12 +41,15 @@ public class GunShopController : MonoBehaviour {
     public AudioClip[] selectGunSound;
     public AudioClip[] mouseOverSound;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
+
     public AudioClip blitSound;
     Coroutine blitTextRoutine;
     List<GunSaleData> gunSaleData = new List<GunSaleData>();
     GunSaleData currentGunForSale;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
@@ -56,6 +61,7 @@ public class GunShopController : MonoBehaviour {
         ClearInitialize();
         SetBuyMode();
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+        myCanvas.enabled = true;
     }
 
 
@@ -192,6 +198,7 @@ public class GunShopController : MonoBehaviour {
 
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
     public void SellModeCallback() {
         SetSellMode();

@@ -4,6 +4,8 @@ using Easings;
 using UnityEngine;
 
 public class BarShopController : MonoBehaviour {
+    public Canvas myCanvas;
+
     public AudioSource audioSource;
     public GameObject UIEditorCamera;
     public RectTransform bottomRect;
@@ -11,10 +13,13 @@ public class BarShopController : MonoBehaviour {
     public Transform marketReportContainer;
     public StoreDialogueController dialogueController;
     public MarketData marketData;
+    [Header("sounds")]
     public AudioClip[] askSound;
     public AudioClip[] discloseBottomSound;
+    public AudioClip[] closeSounds;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
@@ -28,6 +33,7 @@ public class BarShopController : MonoBehaviour {
         dialogueController.SetShopownerDialogue("come in to my underground black market bar.");
         marketData = GameManager.I.gameData.marketData;
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
+        myCanvas.enabled = true;
     }
 
     void PopulateMarketData() {
@@ -65,5 +71,6 @@ public class BarShopController : MonoBehaviour {
 
     public void DoneButtonCallback() {
         GameManager.I.HideShopMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 }

@@ -6,13 +6,17 @@ using UnityEngine.UI;
 
 
 public class PhoneMenuController : MonoBehaviour {
+    public Canvas myCanvas;
     public GameObject UIEditorCamera;
 
     public Transform phoneButtonContainer;
     public GameObject phoneButtonPrefab;
     public WorldmapView worldmapView;
+    [Header("sounds")]
+    public AudioClip[] closeSounds;
 
     void Awake() {
+        myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
     public void Initialize() {
@@ -25,6 +29,7 @@ public class PhoneMenuController : MonoBehaviour {
             }
         }
         worldmapView.ShowWorldText();
+        myCanvas.enabled = true;
     }
 
     PhoneButton CreateButton(FenceData fenceData) {
@@ -46,5 +51,6 @@ public class PhoneMenuController : MonoBehaviour {
     }
     public void DoneMenuClicked() {
         GameManager.I.CloseMenu();
+        GameManager.I.PlayUISound(closeSounds);
     }
 }

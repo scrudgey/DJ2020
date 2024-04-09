@@ -93,10 +93,12 @@ public class HackTerminalController : MonoBehaviour {
         isHidden = true;
     }
     void DoShowRoutine(bool value, CyberNode target) {
-        if (value) {
-            terminalAnimation.ShowThenPrompt(ShowRect(true), target);
-        } else {
-            showRectRoutine = StartCoroutine(ShowRect(false));
+        if (gameObject.activeInHierarchy) {
+            if (value) {
+                terminalAnimation.ShowThenPrompt(ShowRect(true), target);
+            } else {
+                showRectRoutine = StartCoroutine(ShowRect(false));
+            }
         }
     }
 

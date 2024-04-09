@@ -7,6 +7,9 @@ public class WeaponState {
     [JsonConverter(typeof(ScriptableObjectJsonConverter<MeleeWeaponTemplate>))]
     public MeleeWeaponTemplate meleeWeapon;
 
+    public WeaponState() {
+        // needed for serialization
+    }
     public Sprite GetSprite() {
         if (type == WeaponType.gun) {
             return gunInstance.GetSprite();

@@ -315,9 +315,9 @@ public partial class GameManager : Singleton<GameManager> {
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
             isLoadingLevel = false;
-        }));
+        }, unloadAll));
     }
-    public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback) {
+    public IEnumerator GetSceneLoadProgress(string targetScene, List<string> scenesToLoad, List<string> scenesToUnload, Action callback, bool SetActiveScene) {
         scenesLoading = new List<AsyncOperation>();
 
         // if target scene is in scenes to unload, then that means it must be loaded right now, so we want to reload it.
@@ -342,8 +342,11 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         // TODO: better system here
-        if (targetScene != "UI" && targetScene != "NeoDialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "cityskybox") // targetScene != "EscapeMenu"
+        // if (targetScene != "UI" && targetScene != "NeoDialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "cityskybox") {
+        if (SetActiveScene) {
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
+
+        } // targetScene != "EscapeMenu"
 
         foreach (string sceneToUnload in scenesToUnload) {
             Debug.Log($"try unload scene async: {sceneToUnload} {SceneManager.GetSceneByName(sceneToUnload).isLoaded}");

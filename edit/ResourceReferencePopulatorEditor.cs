@@ -68,18 +68,18 @@ public class ResourceReferencePopulatorEditor : Editor {
 
         // EditorGUILayout.Space();
 
-        for (int i = 0; i < keyList.arraySize; i++) {
-            SerializedProperty keyRef = keyList.GetArrayElementAtIndex(i);
-            SerializedProperty valueRef = valueList.GetArrayElementAtIndex(i);
-            // SerializedProperty Key = MyListRef.FindPropertyRelative("key");
-            // SerializedProperty Value = MyListRef.FindPropertyRelative("value");
-            EditorGUILayout.PropertyField(keyRef);
-            EditorGUILayout.PropertyField(valueRef);
-            // if (GUILayout.Button($"remove {i}")) {
-            //     ThisList.DeleteArrayElementAtIndex(i);
-            // }
-            EditorGUILayout.Space();
-        }
+        // for (int i = 0; i < keyList.arraySize; i++) {
+        //     SerializedProperty keyRef = keyList.GetArrayElementAtIndex(i);
+        //     SerializedProperty valueRef = valueList.GetArrayElementAtIndex(i);
+        //     // SerializedProperty Key = MyListRef.FindPropertyRelative("key");
+        //     // SerializedProperty Value = MyListRef.FindPropertyRelative("value");
+        //     EditorGUILayout.PropertyField(keyRef);
+        //     EditorGUILayout.PropertyField(valueRef);
+        //     // if (GUILayout.Button($"remove {i}")) {
+        //     //     ThisList.DeleteArrayElementAtIndex(i);
+        //     // }
+        //     EditorGUILayout.Space();
+        // }
 
         GetTarget.ApplyModifiedProperties();
     }

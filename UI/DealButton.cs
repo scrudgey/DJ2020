@@ -8,6 +8,7 @@ public class DealButton : MonoBehaviour {
     private ImporterShopController importerShopController;
     [HideInInspector]
     public DealData dealData;
+    public GraphIconReference graphIconReference;
 
     [Header("offer")]
     public Image offerIcon;
@@ -45,7 +46,8 @@ public class DealButton : MonoBehaviour {
                 inventoryAmountText.color = notPossibleColor;
             }
         } else {
-            priceIcon.sprite = LootTypeIcon.LootCategoryToSprite(data.priceType);
+            // priceIcon.sprite = LootTypeIcon.LootCategoryToSprite(data.priceType);
+            priceIcon.sprite = graphIconReference.LootSprite(data.priceType);
             priceCreditObject.SetActive(false);
             priceTitle.text = $"{data.priceCount}x {data.priceType}";
 
