@@ -3223,7 +3223,106 @@ x ladders
         * a separate screen?
     * data stealing needs to be more clean and engaging
     * better network readability
-
+    * in-between montage
+        * unlock contacts for tactics
+    * progression in burglar tools?
+    * hacking
+    * do we buy / unlock more burglar tools?
+* put shop n go, sympathetic detonation into game
+    * support plexiglass
+    * support shop n go
+    * support sympathetic detonation
+    * apply sympathetic: world
+    * apply shop n go: after action, mission plan
+* don't stop music when moving between scens in world
+* civilians in world are all armed
+* indicate value: on deal menu
+* unlock fences
+    * every day, set up the fences
+* snake man fence should be handled identically
+* fix map in mission computer
+* fences should have outfits set
+* fences can use the pop up tents
+* fences can be in the bar
+* call remote fences
+    * world map
+    * dialing / static
+* initial portrait size
+* initial menu rect size
+* loot seller dialogue
+    * introduction
+    * introduction if player has no loot
+* closing phone menu allows calling another
+* don't always change active scene on load
+* regen eagle
+* replace all fonts
+* mission details too big
+* mission plan statsrect is broken
+    * mission details fonts
+    * tactics dialogue
+    * gun mod shop
+    * bar done button
+    * paydatashop done button
+    * action callout
+    * gun mod shop fonts
+    * faction, map in mission select
+* gunshop statsrect?
+* font: overlay button
+    * phone menu
+    * loot menu
+    * bar
+    * escape
+    * gunmod
+    * gunshop
+    * importershop
+    * itemshop
+    * mainescape
+    * medicalshop
+    * missionplan
+    * paydatashop
+    * perkmenu
+* click sound when click done button in many menus
+   * phone menu show sound
+    * phone menu
+    * loot menu
+    * medicalshop
+    * itemshop
+    * mainescape
+    - bar
+    - escape
+    - gunmod
+    - gunshop
+    - importershop
+    - paydatashop
+    - perkmenu
+* hide canvas until initialized
+* title screen
+* perk details disclose speed/sound
+* can activate infinite perks
+* UI polish:
+    * faster UI reveal
+    * thinner UI borders
+    * font
+    * subtitle: size 28, bar height 35
+    * dialogue text font size -> 28
+    * update loot icons
+    * sounds for menu show, menu close: clicks
+    * title:
+    * do not reveal until canvas is initialized
+* pause screen feels rough
+    * intel can tell in advance where the target data is. 
+    * optional objectives
+        * mission plan mapview 
+        * disable selectors when necessary
+        * markers gated behind tactical data* loot 
+    * some data is useful in social engineering
+    * some data provides keycodes
+* title
+* pause screen status report
+    * loot, data
+            * buy info
+            * locate key objectives
+        * discoverable networks
 
 
 
@@ -3340,22 +3439,14 @@ weapons
             animator speed can be adjusted
 
 planning mode
-    * intel can tell in advance where the target data is. 
-    * optional objectives
     HP / def indicators
-    * mission plan mapview 
-        * disable selectors when necessary
-        * markers gated behind tactical data
     tactics pane
         disable when no tactoics
         purchase keycard
-        * buy info
-            * locate key objectives
-            locate key items
-            locate traps / sensors / weapon emplacements: intel
-            locate guards / patrols / security operations center: intel
-            learn info to be used in dialogue
-            discoverable networks
+        locate key items
+        locate traps / sensors / weapon emplacements: intel
+        locate guards / patrols / security operations center: intel
+        learn info to be used in dialogue
         when map data is bought, show notification on map tab
 
 minimap?
@@ -3364,15 +3455,9 @@ minimap?
         show sightcone
     indicate player
 
-
-
 networks
     DFS path finding doesn't quite work right for highlighting alarm path
     some computers trip honeypots
-
-* loot 
-    * some data is useful in social engineering
-    * some data provides keycodes
 
 graphics
     show thermal goggles on player head?
@@ -3513,7 +3598,6 @@ world:
         sell guns
         mystery man in bar
 
-
 perks to implement:
     gun_nut
     cyberware_1 ... _4
@@ -3532,7 +3616,6 @@ perks to implement:
         visually identify weaknesses / identify types
         hotwire
 
-
 performance:
     parallelize the pulselight
     raycastall and OverlapSphere
@@ -3543,7 +3626,6 @@ pretty easy to run in guns blazing
     * bonus objectives can dicincentivize this
     when alarm is hit, doors come down and turrets pop out
     player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
-
 
 AI
     npc heads can turn to face other npcs in the area
@@ -3581,9 +3663,6 @@ AI
     sphere clear points state:
         get closest by nav mesh?
         transitions from this state?
-
-
-
 
 footsteps don't seem to matter any more
 doors are blocking people again?
@@ -3640,6 +3719,7 @@ jazz up elevator controller
     click effect
 show bonus reward favors
 implement worker dialogue?
+guard spotted me during mission start
 
 
 
@@ -3693,31 +3773,6 @@ more equipment to bring on mission?
     smoke grenade
     ninja vanish
 
-
-selling data / upgrading hack ability
-graphic effects
-    80s electricity 
-    anime glow 
-
-softlock with expendable software
-
-    * in-between montage
-        * unlock contacts for tactics
-    * progression in burglar tools?
-    * hacking
-    * do we buy / unlock more burglar tools?
-* put shop n go, sympathetic detonation into game
-    * support plexiglass
-    * support shop n go
-    * support sympathetic detonation
-    * apply sympathetic: world
-    * apply shop n go: after action, mission plan
-* don't stop music when moving between scens in world
-* civilians in world are all armed
-* indicate value: on deal menu
-* unlock fences
-    * every day, set up the fences
-
 unresolved mechanics / gameplay questions:
     circuits
     progression in shops? 
@@ -3726,153 +3781,72 @@ unresolved mechanics / gameplay questions:
         other towns connected by subway?
     backpack and duffel bag
 
+
+
+
+
+
+
 major initiatives:
     destructible walls
-    vehicles
-    finalize street 
     robots
     missions
         1 way shootout
         productionize office
             redo apartment after office
     system:
-        * title
         controls, settings
-        * pause screen status report
-            * loot, data
             weapons, loadout, 
             character stats, skills
-
-
-
-
-
-
-* snake man fence should be handled identically
-* fix map in mission computer
-* fences should have outfits set
-* fences can use the pop up tents
-* fences can be in the bar
-* call remote fences
-    * world map
-    * dialing / static
-* initial portrait size
-* initial menu rect size
-* loot seller dialogue
-    * introduction
-    * introduction if player has no loot
-* closing phone menu allows calling another
-* don't always change active scene on load
-* regen eagle
-* replace all fonts
-* mission details too big
-* mission plan statsrect is broken
-    * mission details fonts
-    * tactics dialogue
-    * gun mod shop
-    * bar done button
-    * paydatashop done button
-    * action callout
-    * gun mod shop fonts
-    * faction, map in mission select
-* gunshop statsrect?
-
-
-
+selling data / upgrading hack ability
+graphic effects
+    80s electricity 
+    anime glow 
 
 medium-effort mini systems work:
+    softlock with expendable software
     key system
     update the steam page graphic
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
         gun perks
-
-
-
-phone menu portrait is green
-
 finish up world
     gaps in floor can see subway below
     edges of map
     flickery lights
 bar tells fence location
 gun shop progression
+vehicles
+    strike team may arrive by vehicle
+    exfiltration / insertion may be by vehicle
 
 
-UI polish:
-    faster UI reveal
-    -> thinner UI borders
-    -> font
-        textmeshprougui
-        -> mbyte sparro
-    subtitle: size 28, bar height 35
-    -> dialogue text font size -> 28
-    -> update loot icons
-    ease out menus
-    sounds for menu show, menu close: clicks
-        change reveal from open -> click 5
-    title:
-        eagle, 50point, change padding
-    do not reveal until canvas is initialized
-
-better agreement between wallpress/third person post processing and isometric
-faster camera spin?
-faster clearsight fade?
-    above/below no fade
-pause screen feels rough
-elevator needs polish in general
-    stealing data was broken in elevator level
-    footstep sounds- loud, weird?
-    clearsighter is clunky, imprecise, laggy, not solid solution
-    cyber jump inside resulted in bizarre behavior
-    scientist said "if you see anything let me know"
-    moving between floors of clearsighter is rough
-
- vehicles
-        strike team may arrive by vehicle
-        exfiltration / insertion may be by vehicle
-
-
-* font: overlay button
-    * phone menu
-    * loot menu
-    * bar
-    * escape
-    * gunmod
-    * gunshop
-    * importershop
-    * itemshop
-    * mainescape
-    * medicalshop
-    * missionplan
-    * paydatashop
-    * perkmenu
+polish
+    better agreement between wallpress/third person post processing and isometric
+    faster camera spin?
+    faster clearsight fade?
+        above/below no fade
+    elevator needs polish in general
+        stealing data was broken in elevator level
+        footstep sounds- loud, weird?
+        clearsighter is clunky, imprecise, laggy, not solid solution
+        cyber jump inside resulted in bizarre behavior
+        scientist said "if you see anything let me know"
+        moving between floors of clearsighter is rough
 
 
 
 
+
+phone menu portrait is green
+
+change "scopeback" sound from mission plan
+skill menu "skill points" "player level" text
+ease out menus
 
 logos for omni, delta, elf
-title screen
 
-click sound when click done button in many menus
-    - phone menu
-    - loot menu
-    - bar
-    - escape
-    - gunmod
-    - gunshop
-    - importershop
-    - itemshop
-    - mainescape
-    - medicalshop
-    - paydatashop
-    - perkmenu
-    
-hide canvas until initialized
-    dialogue
-    missionfail
-    
-perk details disclose speed/sound
-can activate infinte perks
+add perks to main escape menu / replace main escape menu
+
+dialogue?
 speed up + pitch up blitting?

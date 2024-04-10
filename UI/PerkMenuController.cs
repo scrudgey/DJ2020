@@ -55,6 +55,7 @@ public class PerkMenuController : MonoBehaviour {
     public AudioClip[] activatePerkSound;
     public AudioClip[] disclosePerkSound;
     public AudioClip[] changePaneSound;
+    public AudioClip[] showSounds;
     public AudioClip[] closeSounds;
 
     bool perkViewActive;
@@ -66,6 +67,7 @@ public class PerkMenuController : MonoBehaviour {
     }
     public void Initialize(GameData data, PlayerState state) {
         this.state = state;
+        GameManager.I.PlayUISound(showSounds);
         playerName.text = data.filename;
         ChangePane(PerkCategory.gun);
         RefreshDisplay(state);
@@ -179,7 +181,8 @@ public class PerkMenuController : MonoBehaviour {
     void ShowPerkView() {
         perkViewActive = true;
         perkviewContainer.SetActive(true);
-        StartCoroutine(Toolbox.Ease(null, 0.5f, 50f, 740f, PennerDoubleAnimation.Linear, (float amount) => {
+        Toolbox.RandomizeOneShot(audioSource, showSounds);
+        StartCoroutine(Toolbox.Ease(null, 0.15f, 50f, 740f, PennerDoubleAnimation.Linear, (float amount) => {
             perkviewRect.sizeDelta = new Vector2(450f, amount);
         }, unscaledTime: true));
     }
@@ -229,7 +232,7 @@ public class PerkMenuController : MonoBehaviour {
             perkViewActiveText.text = "activated";
 
             perkViewActivateButton.interactable = false;
-        } else if (perk.CanBePurchased(state)) {
+        } else if (state.skillpoints > 0 && perk.CanBePurchased(state)) {
             perkViewActiveText.gameObject.SetActive(false);
             perkViewActivateButton.gameObject.SetActive(true);
 

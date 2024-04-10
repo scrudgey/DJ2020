@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 
 public class MissionFailMenuController : MonoBehaviour {
+    public Canvas mycanvas;
     public GameObject UIEditorCamera;
     public Transform objectivesContainer;
     public GameObject objectiveIndicatorPrefab;
@@ -11,6 +12,7 @@ public class MissionFailMenuController : MonoBehaviour {
     public TextMeshProUGUI missionname;
     private GameData gameData;
     void Awake() {
+        mycanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
     public void Start() {
@@ -40,6 +42,7 @@ public class MissionFailMenuController : MonoBehaviour {
         } else {
             bonusObjectiveHeader.SetActive(false);
         }
+        mycanvas.enabled = true;
     }
     public void ReplanButtonCallback() {
         GameManager.I.CloseMenu();

@@ -14,12 +14,14 @@ public class PhoneMenuController : MonoBehaviour {
     public WorldmapView worldmapView;
     [Header("sounds")]
     public AudioClip[] closeSounds;
+    public AudioClip[] openSounds;
 
     void Awake() {
         myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
     public void Initialize() {
+        GameManager.I.PlayUISound(openSounds);
         foreach (Transform child in phoneButtonContainer) {
             Destroy(child.gameObject);
         }
