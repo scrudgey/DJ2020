@@ -3323,6 +3323,12 @@ x ladders
             * buy info
             * locate key objectives
         * discoverable networks
+* ease out menus
+* change "scopeback" sound from mission plan
+* skill menu "skill points" "player level" text
+dialogue?
+speed up + pitch up blitting?
+* phone menu portrait is green
 
 
 
@@ -3460,6 +3466,9 @@ networks
     some computers trip honeypots
 
 graphics
+    graphic effects
+        80s electricity 
+        anime glow 
     show thermal goggles on player head?
     fog of breath
     reflective puddle
@@ -3798,55 +3807,40 @@ major initiatives:
         controls, settings
             weapons, loadout, 
             character stats, skills
-selling data / upgrading hack ability
-graphic effects
-    80s electricity 
-    anime glow 
+
 
 medium-effort mini systems work:
     softlock with expendable software
+    selling data / upgrading hack ability
     key system
     update the steam page graphic
     armor piercing ammo to be indicated somewhere in the gun info display
         first: gun shop progression
         gun perks
-finish up world
-    gaps in floor can see subway below
-    edges of map
-    flickery lights
-bar tells fence location
-gun shop progression
-vehicles
-    strike team may arrive by vehicle
-    exfiltration / insertion may be by vehicle
+    finish up world
+        gaps in floor can see subway below
+        edges of map
+        flickery lights
+    bar tells fence location
+    gun shop progression
+    vehicles
+        strike team may arrive by vehicle
+        exfiltration / insertion may be by vehicle
 
 
 polish
+    fix skybox again
     better agreement between wallpress/third person post processing and isometric
     faster camera spin?
-    faster clearsight fade?
-        above/below no fade
+    overhaul clearsighter
     elevator needs polish in general
         stealing data was broken in elevator level
         footstep sounds- loud, weird?
-        clearsighter is clunky, imprecise, laggy, not solid solution
         cyber jump inside resulted in bizarre behavior
         scientist said "if you see anything let me know"
-        moving between floors of clearsighter is rough
-
-
-
-
-
-phone menu portrait is green
-
-change "scopeback" sound from mission plan
-skill menu "skill points" "player level" text
-ease out menus
-
-logos for omni, delta, elf
 
 add perks to main escape menu / replace main escape menu
+    loot, data, key, map
+    no objective
 
-dialogue?
-speed up + pitch up blitting?
+logos for omni, delta, elf

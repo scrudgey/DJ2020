@@ -5,6 +5,7 @@ using UnityEngine;
 public class LootBuyerData : ScriptableObject {
 
     public Sprite portrait;
+    public Sprite phonePortrait;
     public string buyerName;
     public string phoneNumber;
     public bool isMale;

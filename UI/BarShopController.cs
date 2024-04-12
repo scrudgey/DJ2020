@@ -70,7 +70,7 @@ public class BarShopController : MonoBehaviour {
     }
 
     public void DoneButtonCallback() {
-        GameManager.I.HideShopMenu();
         GameManager.I.PlayUISound(closeSounds);
+        StartCoroutine(Toolbox.CloseMenu(bottomRect));
     }
 }

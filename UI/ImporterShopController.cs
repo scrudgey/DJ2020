@@ -134,8 +134,8 @@ public class ImporterShopController : MonoBehaviour {
     }
 
     public void DoneButtonCallback() {
-        GameManager.I.HideShopMenu();
         GameManager.I.PlayUISound(closeSounds);
+        StartCoroutine(Toolbox.CloseMenu(bottomRect));
     }
 
     void SetStoreDialogueAccept() {

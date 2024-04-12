@@ -593,6 +593,17 @@ public class Toolbox {
         bottomRect.sizeDelta = new Vector2(1f, 610f);
     }
 
+    public static IEnumerator CloseMenu(RectTransform rect) {
+        float initialHeight = rect.rect.height;
+        float width = rect.rect.width;
+        return ChainCoroutines(
+            Ease(null, 0.1f, initialHeight, 10f, PennerDoubleAnimation.Linear, (amount) => {
+                rect.sizeDelta = new Vector2(width, amount);
+            }, unscaledTime: true),
+            CoroutineFunc(() => GameManager.I.CloseMenu())
+        );
+    }
+
     public static int ClampWrap(int value, int min, int max) {
         if (value > max) {
             return 0;

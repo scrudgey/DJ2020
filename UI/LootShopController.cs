@@ -149,7 +149,7 @@ public class LootShopController : MonoBehaviour {
 
     void HideStatic(LootBuyerData data) {
         // dialogueController.SetImages(tactic.vendorSprite);
-        buyerPortrait.sprite = data.portrait;
+        buyerPortrait.sprite = data.isRemote ? data.phonePortrait : data.portrait;
         staticObject.SetActive(false);
     }
 
@@ -173,11 +173,16 @@ public class LootShopController : MonoBehaviour {
         }
     }
     public void DoneButtonCallback() {
-        GameManager.I.HideShopMenu();
-        if (remoteCall) {
-            GameManager.I.ShowMenu(MenuType.phoneMenu);
-        }
         GameManager.I.PlayUISound(closeSounds);
+        StartCoroutine(Toolbox.ChainCoroutines(
+            Toolbox.CloseMenu(bottomRect),
+            Toolbox.CoroutineFunc(() => {
+                if (remoteCall) {
+                    GameManager.I.ShowMenu(MenuType.phoneMenu);
+                }
+            }
+            )
+        ));
     }
     void SetPlayerCredits() {
         playerCreditsText.text = GameManager.I.gameData.playerState.credits.ToString();
@@ -209,7 +214,7 @@ public class LootShopController : MonoBehaviour {
         buyerDescriptionText.text = data.description;
 
         // set portrait
-        buyerPortrait.sprite = data.portrait;
+        buyerPortrait.sprite = data.isRemote ? data.phonePortrait : data.portrait;
 
         foreach (LootPreferenceData preference in data.preferences) {
             GameObject gameObject = GameObject.Instantiate(lootPreferencePrefab);

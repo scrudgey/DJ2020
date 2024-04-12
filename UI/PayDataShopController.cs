@@ -99,7 +99,7 @@ public class PayDataShopController : MonoBehaviour {
         SetPlayerCredits();
     }
     public void DoneButtonCallback() {
-        GameManager.I.CloseMenu();
         GameManager.I.PlayUISound(closeSounds);
+        StartCoroutine(Toolbox.CloseMenu(bottomRect));
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class PhoneMenuController : MonoBehaviour {
     public Canvas myCanvas;
     public GameObject UIEditorCamera;
+    public RectTransform myRect;
 
     public Transform phoneButtonContainer;
     public GameObject phoneButtonPrefab;
@@ -52,7 +53,8 @@ public class PhoneMenuController : MonoBehaviour {
         worldmapView.StopHighlight();
     }
     public void DoneMenuClicked() {
-        GameManager.I.CloseMenu();
+        // GameManager.I.CloseMenu();
         GameManager.I.PlayUISound(closeSounds);
+        StartCoroutine(Toolbox.CloseMenu(myRect));
     }
 }

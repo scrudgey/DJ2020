@@ -330,6 +330,8 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void CloseMenu() {
+        uiController.ShowInteractiveHighlight();
+
         switch (activeMenuType) {
             default:
                 break;
@@ -669,10 +671,6 @@ public partial class GameManager : Singleton<GameManager> {
         _ => null
     });
 
-    public void HideShopMenu() {
-        CloseMenu();
-        uiController.ShowInteractiveHighlight();
-    }
     public void ShowMissionPlanner(LevelTemplate template) {
         TransitionToPhase(GamePhase.plan);
         LoadScene("MissionPlan", () => {
