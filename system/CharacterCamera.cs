@@ -16,6 +16,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     // public static bool ORTHOGRAPHIC_MODE = false;
     public enum IsometricOrientation { NE, SE, SW, NW }
     public IsometricOrientation initialOrientation;
+    public IsometricOrientation currentOrientation;
     private CameraState _state;
     public CameraState state {
         get { return _state; }
@@ -85,7 +86,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public float zoomCoefficientTarget = 1f;
     float zoomVelocity = 0.0f;
     private bool horizontalAimParity;
-    private List<Quaternion> cardinalDirections;
+    private Dictionary<Quaternion, IsometricOrientation> cardinalDirections;
     private static List<CameraAttractorZone> attractors = new List<CameraAttractorZone>();
     CameraInput.RotateInput currentRotationInput;
     CameraAttractorZone currentAttractor = null;
@@ -138,7 +139,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
         Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
         targetRotation = planarRot * verticalRot;
-        cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
+
+        // cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
+        cardinalDirections = new Dictionary<Quaternion, IsometricOrientation>(){
+            {Quaternion.Euler(0f, 45f, 0f) * rotationFromInput, IsometricOrientation.NE},
+            {Quaternion.Euler(0f, 135f, 0f) * rotationFromInput, IsometricOrientation.SE},
+            {Quaternion.Euler(0f, 225, 0f) * rotationFromInput, IsometricOrientation.SW},
+            {Quaternion.Euler(0f, 315, 0f) * rotationFromInput, IsometricOrientation.NW},
+        };
     }
 
     void Start() {
@@ -367,7 +375,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
         Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
 
-
+        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(planarRot, cardinalDirections.Keys.ToList());
+        currentOrientation = cardinalDirections[closestCardinal];
 
         float desiredOrthographicSize = 1f;
         float fieldOfView = 70f;
@@ -525,8 +534,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         }
 
 
-        // update PlanarDirection to snap to nearest of 4 quadrants
-        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
+        // // update PlanarDirection to snap to nearest of 4 quadrants
+        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections.Keys.ToList());
         PlanarDirection = closestCardinal * Vector3.forward;
 
         return new CameraTargetParameters() {
@@ -557,7 +566,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         cameraRotation = input.aimCameraRotation;
 
         // update PlanarDirection to snap to nearest of 4 quadrants
-        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections);
+        Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections.Keys.ToList());
         PlanarDirection = closestCardinal * Vector3.forward;
 
         return new CameraTargetParameters() {
@@ -680,6 +689,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // Apply position
         Transform.position = targetPosition;
         isometricRotation = Transform.rotation;
+
+        Debug.DrawRay(transform.position, 100f * transform.forward, Color.yellow);
     }
 
     public CursorData GetTargetData(Vector2 cursorPosition, InputMode inputMode) {
@@ -785,7 +796,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             }
         }
 
-        Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
+        // Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
         InteractorTargetData interactorData = Interactive.ClosestTarget(targetDatas);
         if (prioritySet && !disableLockOn) {
             Vector2 pointPosition = Camera.WorldToScreenPoint(targetPoint);
@@ -891,7 +902,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             }
             targetPoint = hit.point;
         }
-        Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
+        // Debug.DrawLine(transform.position, targetPoint, Color.yellow, 0.1f);
 
         InteractorTargetData interactorData = Interactive.ClosestTarget(targetDatas);
 

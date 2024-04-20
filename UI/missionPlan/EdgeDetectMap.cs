@@ -5,12 +5,10 @@ public class EdgeDetectMap : MonoBehaviour {
     public Camera myCamera;
     public Material material;
     public bool applyFilter;
-    float storedShadowDistance;
     void Start() {
         myCamera.depthTextureMode = DepthTextureMode.Depth;
     }
     void OnPreRender() {
-        storedShadowDistance = QualitySettings.shadowDistance;
         QualitySettings.shadowDistance = 0;
     }
     void OnPostRender() {

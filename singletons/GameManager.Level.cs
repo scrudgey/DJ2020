@@ -381,6 +381,7 @@ public partial class GameManager : Singleton<GameManager> {
         ClearSighter clearSighter = GameObject.FindObjectOfType<ClearSighter>();
         this.clearSighter2 = GameObject.FindObjectOfType<NeoClearsighter>();
         this.clearSighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
+        this.clearsighterV4 = GameObject.FindObjectOfType<NeoClearsighterV4>();
 
         playerGunHandler.isPlayerCharacter = true;
         playerMeleeHandler.isPlayerCharacter = true;
@@ -398,16 +399,17 @@ public partial class GameManager : Singleton<GameManager> {
             Destroy(clearSighter);
         }
         if (clearSighter2 != null) {
-            // 
-            // Debug.Log("hi");
             // clearSighter2.Initialize(focus.transform, characterCamera, playerCharacterController);
             Destroy(clearSighter2);
         }
         if (clearSighterV3 != null) {
-            // Destroy(clearsighterV3);
-            clearSighterV3.Initialize(focus.transform, characterCamera, playerCharacterController);
+            // clearSighterV3.Initialize(focus.transform, characterCamera, playerCharacterController);
+            Destroy(clearSighterV3);
         }
-
+        if (clearsighterV4 != null) {
+            string sceneName = SceneManager.GetActiveScene().name;
+            clearsighterV4.Initialize(focus.transform, characterCamera, playerCharacterController, gameData.levelState.template, sceneName);
+        }
 
         if (elevatorOccluder != null) {
             elevatorOccluder.Initialize(characterCamera);
@@ -422,6 +424,7 @@ public partial class GameManager : Singleton<GameManager> {
     public bool IsObjectVisible(GameObject obj) {
         // TODO: fix
         // if (clearSighter2 == null) return true;
+        if (clearSighterV3 == null) return true;
         return clearSighterV3?.IsObjectVisible(obj) ?? true;
     }
     void ClearSceneData() {

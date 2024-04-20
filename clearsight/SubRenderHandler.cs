@@ -77,6 +77,7 @@ public class SubRenderHandler {
         renderer.SetPropertyBlock(propBlock);
     }
     public void TotallyInvisible() {
+        if (renderer == null) return;
         if (isCutaway)
             cutawayRenderer.SetActive(false);
         renderer.material = initialMaterial;
@@ -84,6 +85,8 @@ public class SubRenderHandler {
     }
     public void CompleteFadeOut(bool parentHasCutaway) {
         if (renderer == null) return;
+        if (isCutaway)
+            cutawayRenderer.SetActive(true);
         if (!isCutaway && !parentHasCutaway && !data.totallTransparentIsInvisible) {
             myAlpha = 0.7f;
             propBlock.SetFloat("_TargetAlpha", myAlpha);

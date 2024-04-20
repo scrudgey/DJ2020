@@ -636,8 +636,6 @@ public class NeoClearsighterV3 : MonoBehaviour {
             }
             return handler;
         }
-
-
     }
 
     public void RemoveRendererHandler(Renderer renderer) {

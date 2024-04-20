@@ -32,10 +32,18 @@ public class ClearsightRendererHandler {
 
 
     public ClearsightRendererHandler(NeoClearsighterV3 clearsighter, Transform root, Vector3 position, bool isDynamic = false) {
+        this.clearsighter = clearsighter;
+        Initialize(root, position, isDynamic);
+    }
+
+    public ClearsightRendererHandler(Transform root, Vector3 position, bool isDynamic = false) {
+        Initialize(root, position, isDynamic);
+    }
+
+    void Initialize(Transform root, Vector3 position, bool isDynamic = false) {
         name = root.name;
         Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
         this.isDynamic = isDynamic;
-        this.clearsighter = clearsighter;
         alpha = 1;
 
         Bounds tmpBounds = renderers[0].bounds;
@@ -104,7 +112,8 @@ public class ClearsightRendererHandler {
     void SubscribeToTimeUpdate() {
         if (!isSubscribedToTimeUpdate) {
             isSubscribedToTimeUpdate = true;
-            clearsighter.OnTime += HandleTimeTick;
+            if (clearsighter != null)
+                clearsighter.OnTime += HandleTimeTick;
         }
     }
 
@@ -198,7 +207,8 @@ public class ClearsightRendererHandler {
             }
         } else { //if (currentRendererState == desiredRendererState) 
             isSubscribedToTimeUpdate = false;
-            clearsighter.OnTime -= HandleTimeTick;
+            if (clearsighter != null)
+                clearsighter.OnTime -= HandleTimeTick;
         }
     }
 

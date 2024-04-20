@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,6 +22,9 @@ public class LevelDataUtilEditor : Editor {
     SerializedProperty mapTextureProperty;
     SerializedProperty floorNumberProperty;
     SerializedProperty floorWidgetProperty;
+    SerializedProperty gridSpacingProperty;
+    SerializedProperty boundingBoxProperty;
+    SerializedProperty selectedFloorPointsProperty;
     void OnEnable() {
         t = (LevelDataUtil)target;
         GetTarget = new SerializedObject(t);
@@ -29,6 +33,9 @@ public class LevelDataUtilEditor : Editor {
         mapTextureProperty = GetTarget.FindProperty("mapTexture"); // Find the List in our script and create a refrence of it
         floorNumberProperty = GetTarget.FindProperty("floorNumber"); // Find the List in our script and create a refrence of it
         floorWidgetProperty = GetTarget.FindProperty("floorWidget");
+        gridSpacingProperty = GetTarget.FindProperty("gridSpacing");
+        boundingBoxProperty = GetTarget.FindProperty("boundingBox");
+        selectedFloorPointsProperty = GetTarget.FindProperty("selectedFloorPoints");
     }
     public override void OnInspectorGUI() {
         EditorGUILayout.PropertyField(levelData);
@@ -67,6 +74,15 @@ public class LevelDataUtilEditor : Editor {
             }
             if (GUILayout.Button("Write objective data")) {
                 SetObjectiveData(template);
+            }
+
+            GUILayout.Space(10);
+            EditorGUILayout.Separator();
+            GUILayout.Space(10);
+            EditorGUILayout.PropertyField(gridSpacingProperty);
+            EditorGUILayout.PropertyField(boundingBoxProperty);
+            if (GUILayout.Button("Write culling data")) {
+                WriteCullingData(template);
             }
         } else {
             Debug.LogError("set level template before writing level data");
@@ -238,6 +254,57 @@ public class LevelDataUtilEditor : Editor {
 
         EditorUtility.SetDirty(template);
     }
+
+    void WriteCullingData(LevelTemplate template) {
+        RooftopZone[] rooftopZones = GameObject.FindObjectsOfType<RooftopZone>();
+        foreach (RooftopZone zone in rooftopZones) {
+            zone.idn = System.Guid.NewGuid().ToString();
+        }
+
+        List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
+                    .Where(renderer => renderer.gameObject.isStatic)
+                    .Concat(
+                        GameObject.FindObjectsOfType<SpriteRenderer>()
+                            .Where(obj => obj.CompareTag("decor"))
+                            .Select(obj => obj.GetComponent<Renderer>())
+                    )
+                    .Concat(
+                        GameObject.FindObjectsOfType<TextMeshPro>()
+                            .Where(tmp => tmp.gameObject.isStatic)
+                            .Select(obj => obj.GetComponent<Renderer>())
+                    )
+                    .ToList();
+
+        foreach (Renderer renderer in staticRenderers) {
+            CullingComponent cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.transform.GetRoot(skipHierarchyFolders: true).gameObject);
+            cullingComponent.idn = System.Guid.NewGuid().ToString();
+            cullingComponent.Initialize();
+            cullingComponent.floor = template.GetFloorForPosition(cullingComponent.bounds.center);
+            cullingComponent.rooftopZoneIdn = "-1";
+            EditorUtility.SetDirty(cullingComponent);
+            foreach (RooftopZone zone in rooftopZones) {
+                if (zone.ContainsPoint(cullingComponent.bounds.center)) {
+                    cullingComponent.rooftopZoneIdn = zone.idn;
+                    break;
+                }
+            }
+        }
+
+        BoxCollider boxCollider = (BoxCollider)boundingBoxProperty.objectReferenceValue;
+        float gridSpacing = gridSpacingProperty.floatValue;
+
+
+        Debug.Log("instantiating culling volume...");
+        CullingVolume volume = new CullingVolume(boxCollider.bounds, gridSpacing, template);
+
+        string sceneName = SceneManager.GetActiveScene().name;
+        volume.Write(template.levelName, sceneName);
+
+        AssetDatabase.Refresh();
+        // t = (LevelDataUtil)target;
+        // t.selectedFloorPoints = points;
+    }
+
 
 }
 #endif

@@ -25,6 +25,7 @@ public partial class GameManager : Singleton<GameManager> {
     public LightLevelProbe playerLightLevelProbe;
     public NeoClearsighter clearSighter2;
     public NeoClearsighterV3 clearSighterV3;
+    public NeoClearsighterV4 clearsighterV4;
     List<IInputReceiver> inputReceivers = new List<IInputReceiver>();
 
 

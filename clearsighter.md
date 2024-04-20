@@ -127,13 +127,6 @@ handle multiple floors
 
 
 
-
-
-
-
-
-
-
                 // how to handle easing between states?
                 // we tally transparent requests- if we just went transparent we don't go back to opaque right away
                 // we also need to integrate a few transparent requests before we start fading.
@@ -166,3 +159,122 @@ handle multiple floors
                 // update: alpha
                 // update: alpha
                 // current state == transparent, ubsubscribe
+
+
+
+# clearsighter v4
+
+the emphasis here will be on total accuracy, polish, precision
+nothing slow
+
+the idea i had is to pre-compute culling of static geometry on a grid
+then line-of-sight to each grid point and cull geometry accordingly.
+
+1. placement of grid
+    fixed points vs. points attached to geometry
+    what if geometry overlaps points? inaccuracy?
+2. efficient sampling of grid
+    a. only test those points immediately around the player. 
+        do not test distance to every single point on every single update.
+    b. only recompute those points affected when the player moves.
+        this means recomputing only points at the edge of the effective grid.
+    c. raycast in a way that is blocked only by occluding geometry
+        raycast from top of player to top of ceiling
+3. precomputed data structure
+    every static geometry gets a unique ID
+    every point on the grid lists IDs occluding for each cardinal camera direction
+4. define floor heights
+5. handlers manage hiding/showing meshes
+
+edge cases:
+    1. decals on walls
+    2. floors like jackthatdata
+    3. moving between floors
+    4. non-static geometry
+
+
+suppose player is at (45, 60, 1). grid extends from [0, 100], [0, 100]. clearsight radius is 20
+1. identify floor player is on, or if player is between floors
+2. now we need to sample points from (25, 40, 1) to (65, 80, 1)
+3. grid is a 2d array. suppose first index is x.
+    we want to sample points grid[25] -> grid[65]
+    within each grid entry are y entries
+    grid[25] = grid[25][0]...grid[25][100]
+        we can easily sample this to be between 40 and 80
+    
+    grid[25][40] ... grid[25][80]
+    grid[26][40] ... grid[26][80]
+    ...
+    grid[65][40] ... grid[65][80]
+
+
+
+
+* in editor mode, create grid of points, one grid Aper floor, bounded by the bounding box
+* find all static geometry roots. create a new component on them that will manage culling.
+    * give each culling component a UIID
+* for each point, find all intersecting static geometry along each cardinal direction, store the UUIDs
+* write the information to file.
+* during gameplay:
+    * on start:
+        * load the data
+        * find all culling components and store them by UUID key in a dictionary.
+    * on update:
+        * raycast efficiently from the player to every grid point on this floor within the culling radius
+        * for every visible grid point, get the list of culled UUIDs along the cardinal direction
+        * cull the geometry accordingly- let culling component handle it
+* problem: all of the async raycast batch stuff is assuming a fixed buffer size
+* handle aboves
+    * load all culling components into an octree
+* skinny objects: pad out with extra collider
+* handle stuff in folders!
+* build test level
+* culling volume
+    * better handling above/below etc
+    * implement floor-based culling
+        * dictionary maintains status of each floor (visible, invisible)
+        * methods to detect when player leaves floor
+        * coroutine for managing disabling floors
+        * collections of culling components per floor
+* handle different camera modes
+    * revert floor visibility back when re-entering state
+* exterior roof zones
+* make rooftop zones
+    * multiple colliders
+    * colliders have a noninteracting layer that hits the raycast and a tag
+* tag culling components with rooftop zone when computing
+    * allow id -1
+* track if grid raycasts hit rooftop zones
+* track which zone the player is in
+* track interloper state of rooftop zones
+* floorstates must be nested under roof zones
+* handle dynamic sprites
+* separate the time updates between dynamic and static
+
+
+handle floor transitions
+    clearly we must detect when the player is in a buffer zone between floors and then change visibility accordingly
+    interloper logic will have to change: don't handle things as above in interloper.
+        only handle those things on the grid floor, and as interloper only.
+
+handle world levels
+    culling data should be tied to scene perhaps
+
+optimization: somehow remove points with no culling data?
+    do not return these from the grid search
+    set a flag during volume creation for easy check
+
+if we need to fine tune dynamic culling, code can interact with culling component
+    have a flag for allow culling
+    when flag is turned on or off, reapply culling status
+
+player shadow!
+    duplicate sprites in shadows-only mode
+
+
+
+fade?
+scale test
+    number of points (grid spacing)
+    size of grid search
+

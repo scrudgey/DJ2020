@@ -137,7 +137,7 @@ public class Toolbox {
             return component;
         }
     }
-    public static void DrawPlane(Vector3 position, Plane plane) {
+    public static void DrawPlane(Vector3 position, Plane plane, float time = 0.75f) {
         // Debug.Log($"draw plane: {position} {plane}");
         // Debug.DrawLine(position, position + plane.normal * 10f, Color.cyan, 10f);
         Vector3 normal = plane.normal;
@@ -156,13 +156,13 @@ public class Toolbox {
         var corner1 = position + v3;
         var corner3 = position - v3;
 
-        Debug.DrawLine(corner0, corner2, Color.cyan, 0.75f);
-        Debug.DrawLine(corner1, corner3, Color.cyan, 0.75f);
-        Debug.DrawLine(corner0, corner1, Color.cyan, 0.75f);
-        Debug.DrawLine(corner1, corner2, Color.cyan, 0.75f);
-        Debug.DrawLine(corner2, corner3, Color.cyan, 0.75f);
-        Debug.DrawLine(corner3, corner0, Color.cyan, 0.75f);
-        Debug.DrawRay(position, normal, Color.red, 0.75f);
+        Debug.DrawLine(corner0, corner2, Color.cyan, time);
+        Debug.DrawLine(corner1, corner3, Color.cyan, time);
+        Debug.DrawLine(corner0, corner1, Color.cyan, time);
+        Debug.DrawLine(corner1, corner2, Color.cyan, time);
+        Debug.DrawLine(corner2, corner3, Color.cyan, time);
+        Debug.DrawLine(corner3, corner0, Color.cyan, time);
+        Debug.DrawRay(position, normal, Color.red, time);
     }
     static public TagSystemData GetTagData(GameObject target) {
         TagSystem system = target.transform.root.GetComponentInChildren<TagSystem>();
