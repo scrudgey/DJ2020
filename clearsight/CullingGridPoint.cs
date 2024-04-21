@@ -6,6 +6,8 @@ using UnityEngine;
 [System.Serializable]
 public class CullingGridPoint {
     public Vector3 position;
+    public int floor;
+    // todo: floor
     public List<string> NEInterlopers;
     public List<string> NWInterlopers;
     public List<string> SEInterlopers;
@@ -17,8 +19,9 @@ public class CullingGridPoint {
     public List<string> SWRoofZones;
 
     public CullingGridPoint() { } // needed for serialization
-    public CullingGridPoint(Vector3 position) {
+    public CullingGridPoint(Vector3 position, int floor) {
         this.position = position;
+        this.floor = floor;
 
         LayerMask mask = LayerUtil.GetLayerMask(Layer.def, Layer.bulletPassThrough, Layer.clearsighterBlock);
 
@@ -93,10 +96,12 @@ public class CullingGridPoint {
         CharacterCamera.IsometricOrientation.SW => SWRoofZones,
         _ => NERoofZones
     };
-    public Vector3 rayCastDirection(Vector3 playerPosition) {
+    public (Vector3, Vector3) rayCastOriginAndDirection(Vector3 playerPosition) {
         Vector3 pointPosition = position + (2f * Vector3.up);
         Vector3 displacement = pointPosition - playerPosition;
+        Vector3 origin = playerPosition;
+        origin.y = pointPosition.y;
         displacement.y = 0;
-        return displacement;
+        return (origin, displacement);
     }
 }

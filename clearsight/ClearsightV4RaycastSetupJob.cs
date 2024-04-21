@@ -8,11 +8,12 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
 struct ClearsightV4RaycastSetupJob : IJobParallelFor {
-    public Vector3 EyePos;
     public LayerMask layerMask;
 
     [ReadOnly]
     public NativeArray<Vector3> directions;
+    [ReadOnly]
+    public NativeArray<Vector3> origins;
     [ReadOnly]
     public NativeArray<float> distances;
 
@@ -22,7 +23,8 @@ struct ClearsightV4RaycastSetupJob : IJobParallelFor {
     public void Execute(int index) {
         Vector3 vec = directions[index];
         float distance = distances[index];
-        Commands[index] = new RaycastCommand(EyePos, vec.normalized, distance, layerMask: layerMask);
+        Vector3 origin = origins[index];
+        Commands[index] = new RaycastCommand(origin, vec.normalized, distance, layerMask: layerMask);
     }
 }
 

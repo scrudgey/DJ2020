@@ -15,7 +15,7 @@ public class CullingVolume {
         this.floorHeights = template.floorHeights;
         for (int i = 0; i < template.floorHeights.Count; i++) {
             float floorHeight = template.floorHeights[i];
-            grids[i] = new CullingGrid(boundingBox, gridSpacing, floorHeight);
+            grids[i] = new CullingGrid(boundingBox, gridSpacing, floorHeight, i);
         }
     }
     public List<CullingGridPoint> SubgridAroundWorldPoint(Vector3 position, float radius) {

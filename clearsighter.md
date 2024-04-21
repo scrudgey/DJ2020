@@ -254,12 +254,10 @@ suppose player is at (45, 60, 1). grid extends from [0, 100], [0, 100]. clearsig
     * clearly we must detect when the player is in a buffer zone between floors and then change visibility accordingly
     * interloper logic will have to change: don't handle things as above in interloper.
         * only handle those things on the grid floor, and as interloper only.
+* figure out why the floor has that final invisible region
+* somehow, state is sticky when moving between floors
 
 
-
-
-
-figure out why the floor has that final invisible region
 
 handle world levels
     culling data should be tied to scene perhaps
@@ -268,7 +266,7 @@ handle world levels
 
 
 
-    
+
 
 optimization: somehow remove points with no culling data?
     do not return these from the grid search

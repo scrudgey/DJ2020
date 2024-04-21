@@ -44,6 +44,8 @@ public class NeoClearsighterV4 : MonoBehaviour {
     // async raycast components
     JobHandle gatherJobHandle;
     NativeArray<Vector3> radarDirections;
+    NativeArray<Vector3> raycastOrigins;
+
     NativeArray<float> distances;
     NativeArray<RaycastHit> raycastResults;
     NativeArray<RaycastHit> raycastResultsBackBuffer;
@@ -129,6 +131,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     void InitializeNativeArrays(int NUMBER_DIRECTIONS) {
         var allocator = Allocator.Persistent;
         radarDirections = new NativeArray<Vector3>(NUMBER_DIRECTIONS, allocator);
+        raycastOrigins = new NativeArray<Vector3>(NUMBER_DIRECTIONS, allocator);
         distances = new NativeArray<float>(NUMBER_DIRECTIONS, allocator);
         raycastResults = new NativeArray<RaycastHit>(NUMBER_DIRECTIONS, allocator);
         raycastResultsBackBuffer = new NativeArray<RaycastHit>(NUMBER_DIRECTIONS, allocator);
@@ -344,17 +347,20 @@ public class NeoClearsighterV4 : MonoBehaviour {
         commands = new NativeArray<RaycastCommand>(numberOfPoints, allocator);
         results = new NativeArray<RaycastHit>(numberOfPoints, allocator);
 
+
         Vector3 followPosition = followTransform.position;
         for (int i = 0; i < numberOfPoints; i++) {
             CullingGridPoint point = previousFramePoints[i];
-            Vector3 displacement = point.rayCastDirection(followPosition);
+            (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPosition);
             radarDirections[i] = displacement;
+            raycastOrigins[i] = origin;
             distances[i] = displacement.magnitude;
         }
 
         // create setup job
         var setupJob = new ClearsightV4RaycastSetupJob();
-        setupJob.EyePos = followTransform.position + Vector3.up; // TODO: this probably must change?
+        // previously followtransform.position + up
+        setupJob.origins = raycastOrigins;
         setupJob.directions = radarDirections;
         setupJob.distances = distances;
         setupJob.layerMask = defaultLayerMask;
@@ -394,17 +400,19 @@ public class NeoClearsighterV4 : MonoBehaviour {
     IEnumerator EnqueueInterloperCulling(int j, Vector3 playerPosition, int playerFloor) {
         Vector3 followPoint = followTransform.position + Vector3.up;
         int numberPoints = points.Count;
-        HashSet<string> hits = new HashSet<string>();
+        HashSet<(int, string)> hits = new HashSet<(int, string)>();
         HashSet<string> roofZoneHits = new HashSet<string>();
         for (int i = 0; i < numberPoints; i++) {
             RaycastHit result = raycastResults[i];
             CullingGridPoint point = points[i];
             if (result.collider == null) {
-                Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
+                (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPoint);
+
+                Debug.DrawLine(origin, origin + displacement, Color.green);
                 // point.DrawRay(orientation);
                 CharacterCamera.IsometricOrientation orientation = (CharacterCamera.IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
                 foreach (string idn in point.GetInterlopers(orientation)) {
-                    hits.Add(idn);
+                    hits.Add((point.floor, idn));
                 }
                 foreach (string zoneIdn in point.GetRooftopZones(orientation)) {
                     if (zoneIdn != "-1") {
@@ -413,14 +421,16 @@ public class NeoClearsighterV4 : MonoBehaviour {
                     }
                 }
             } else {
-                // Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.red);
+                (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPoint);
+                // Debug.DrawLine(origin, origin + displacement, Color.red);
             }
         }
 
         // enqueue culling commands
-        foreach (string idn in hits) {
+        foreach ((int pointFloor, string idn) in hits) {
             CullingComponent cullingComponent = cullingComponents[idn];
             if (cullingComponent.floor != playerFloor && cullingComponent.floor != playerBetweenFloorHigh - 1) continue;
+            if (pointFloor > cullingComponent.floor) continue; // don't allow things above to call this an interloper
             commandQueue.Add(new CullingCommand(cullingComponent, CullingCommand.Command.interloper));
         }
         bool updateBecauseRoofZone = false;

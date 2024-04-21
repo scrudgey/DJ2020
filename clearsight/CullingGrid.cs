@@ -17,7 +17,7 @@ public class CullingGrid {
     public CullingGrid() { }//required for serialization
 
 
-    public CullingGrid(Bounds boundingBox, float gridSpacing, float floorHeight) {
+    public CullingGrid(Bounds boundingBox, float gridSpacing, float floorHeight, int floor) {
         this.origin = boundingBox.center - boundingBox.extents;
         this.gridSpacing = gridSpacing;
         this.xRows = (int)(boundingBox.extents.x / gridSpacing) * 2;
@@ -29,7 +29,7 @@ public class CullingGrid {
             CullingGridPoint[] row = new CullingGridPoint[zRows];
             for (int z = 0; z < zRows; z++) {
                 Vector3 position = new Vector3(origin.x + (x * gridSpacing), floorHeight, origin.z + (z * gridSpacing));
-                CullingGridPoint point = new CullingGridPoint(position);
+                CullingGridPoint point = new CullingGridPoint(position, floor);
                 row[z] = point;
             }
             points[x] = row;
