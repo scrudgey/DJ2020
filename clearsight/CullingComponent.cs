@@ -56,11 +56,11 @@ public class CullingComponent : MonoBehaviour {
         handlers.Remove(renderer);
     }
     public void ApplyCulling(Vector3 playerPosition) {
-        if (IsAbove(playerPosition)) {
-            ChangeState(CullingComponent.CullingState.above);
-        } else {
-            ChangeState(CullingComponent.CullingState.interloper);
-        }
+        // if (IsAbove(playerPosition)) {
+        //     ChangeState(CullingComponent.CullingState.above);
+        // } else {
+        ChangeState(CullingComponent.CullingState.interloper);
+        // }
     }
     public void StopCulling() {
         ChangeState(CullingComponent.CullingState.normal);

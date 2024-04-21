@@ -20,12 +20,16 @@ public class CullingVolume {
     }
     public List<CullingGridPoint> SubgridAroundWorldPoint(Vector3 position, float radius) {
         int floorIndex = GetFloorIndexPosition(position);
+        return SubgridAroundWorldPoint(floorIndex, position, radius);
+    }
+    public List<CullingGridPoint> SubgridAroundWorldPoint(int floorIndex, Vector3 position, float radius) {
         if (floorIndex < 0 || floorIndex >= floorHeights.Count) {
             return new List<CullingGridPoint>();
         } else {
             return grids[floorIndex].SubgridAroundWorldPoint(position, radius);
         }
     }
+
 
     public int GetFloorIndexPosition(Vector3 position) {
         int index = -1;

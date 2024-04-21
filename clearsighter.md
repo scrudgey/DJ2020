@@ -250,15 +250,25 @@ suppose player is at (45, 60, 1). grid extends from [0, 100], [0, 100]. clearsig
 * floorstates must be nested under roof zones
 * handle dynamic sprites
 * separate the time updates between dynamic and static
+* handle floor transitions
+    * clearly we must detect when the player is in a buffer zone between floors and then change visibility accordingly
+    * interloper logic will have to change: don't handle things as above in interloper.
+        * only handle those things on the grid floor, and as interloper only.
 
 
-handle floor transitions
-    clearly we must detect when the player is in a buffer zone between floors and then change visibility accordingly
-    interloper logic will have to change: don't handle things as above in interloper.
-        only handle those things on the grid floor, and as interloper only.
+
+
+
+figure out why the floor has that final invisible region
 
 handle world levels
     culling data should be tied to scene perhaps
+
+
+
+
+
+    
 
 optimization: somehow remove points with no culling data?
     do not return these from the grid search
@@ -270,7 +280,6 @@ if we need to fine tune dynamic culling, code can interact with culling componen
 
 player shadow!
     duplicate sprites in shadows-only mode
-
 
 
 fade?

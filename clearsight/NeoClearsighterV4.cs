@@ -16,7 +16,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     public Transform followTransform;
     public CharacterCamera characterCamera;
     public CharacterController characterController;
-    public float betweenFloorBuffer = 0.5f;
+    float betweenFloorBuffer = 1f;
 
     Vector3 playerPosition;
     int playerFloor;
@@ -121,7 +121,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
 
         RectifyPlayerFloor();
 
-        InitializeNativeArrays(1000);
+        InitializeNativeArrays(2000);
         initialized = true;
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleGeometry));
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleDynamicAbove));
@@ -187,7 +187,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         } else if (state == State.showAll) {
 
             for (int i = cullingVolume.floorHeights.Count - 1; i > 0; i--) {
-                yield return ChangeFloorState(i, playerFloor, 0);
+                yield return ChangeFloorState(i, 0);
             }
 
         }
@@ -220,7 +220,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         if (transitionFloor != -99) {
             playerBetweenFloorHigh = transitionFloor + 1;
             playerBetweenFloorLow = transitionFloor;
-            Debug.Log($"between floors {playerBetweenFloorLow}-{playerBetweenFloorHigh}");
+            // Debug.Log($"between floors {playerBetweenFloorLow}-{playerBetweenFloorHigh}");
         } else {
             playerBetweenFloorHigh = -99;
             playerBetweenFloorLow = -99;
@@ -257,21 +257,23 @@ public class NeoClearsighterV4 : MonoBehaviour {
         floorRoutine = StartCoroutine(HideAllAboveFloors());
     }
     IEnumerator HideAllAboveFloors() {
-        int floor = playerFloor;
+        // int floor = playerFloor;
         int k = 0;
-        for (int i = cullingVolume.floorHeights.Count - 1; i > floor; i--) {
-            yield return ChangeFloorState(i, floor, k);
+        for (int i = cullingVolume.floorHeights.Count - 1; i > playerFloor; i--) {
+            yield return ChangeFloorState(i, k);
         }
-        yield return ChangeFloorState(floor, floor, k);
+        yield return ChangeFloorState(playerFloor, k);
     }
-    IEnumerator ChangeFloorState(int floorIndex, int playerFloorIndex, int k) {
+    IEnumerator ChangeFloorState(int floorIndex, int k) {
         foreach (KeyValuePair<string, Dictionary<int, FloorState>> kvp in floorStatesPerRoofZone) {
             string zoneId = kvp.Key;
             Dictionary<int, FloorState> floorStates = kvp.Value;
 
             // if playerfloor >= floorIndex or (the player is not in the roof zone and the roof zone is not an interloper), the desired state is visible
+            // if there is a between floor
             FloorState desiredState;
-            if (playerFloorIndex >= floorIndex || (playerRoofZone != zoneId && !activeRoofZoneInterlopers.ContainsKey(zoneId))) {
+            int maxFloor = Mathf.Max(playerBetweenFloorHigh - 1, playerFloor);
+            if (maxFloor >= floorIndex || (playerRoofZone != zoneId && !activeRoofZoneInterlopers.ContainsKey(zoneId))) {
                 desiredState = FloorState.visible;
             } else {
                 desiredState = FloorState.invisible;
@@ -332,6 +334,10 @@ public class NeoClearsighterV4 : MonoBehaviour {
 
         var allocator = Allocator.TempJob;
         previousFramePoints = cullingVolume.SubgridAroundWorldPoint(followTransform.position, 15f);
+        if (playerBetweenFloorHigh != -99) {
+            List<CullingGridPoint> additionalPoints = cullingVolume.SubgridAroundWorldPoint(playerBetweenFloorHigh - 1, followTransform.position, 15f);
+            previousFramePoints.AddRange(additionalPoints);
+        }
         int numberOfPoints = previousFramePoints.Count;
 
         // allocate data shared across jobs
@@ -348,7 +354,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
 
         // create setup job
         var setupJob = new ClearsightV4RaycastSetupJob();
-        setupJob.EyePos = followTransform.position + Vector3.up;
+        setupJob.EyePos = followTransform.position + Vector3.up; // TODO: this probably must change?
         setupJob.directions = radarDirections;
         setupJob.distances = distances;
         setupJob.layerMask = defaultLayerMask;
@@ -394,7 +400,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
             RaycastHit result = raycastResults[i];
             CullingGridPoint point = points[i];
             if (result.collider == null) {
-                // Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
+                Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
                 // point.DrawRay(orientation);
                 CharacterCamera.IsometricOrientation orientation = (CharacterCamera.IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
                 foreach (string idn in point.GetInterlopers(orientation)) {
@@ -414,7 +420,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         // enqueue culling commands
         foreach (string idn in hits) {
             CullingComponent cullingComponent = cullingComponents[idn];
-            if (cullingComponent.floor != playerFloor) continue;
+            if (cullingComponent.floor != playerFloor && cullingComponent.floor != playerBetweenFloorHigh - 1) continue;
             commandQueue.Add(new CullingCommand(cullingComponent, CullingCommand.Command.interloper));
         }
         bool updateBecauseRoofZone = false;
