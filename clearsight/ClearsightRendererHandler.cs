@@ -68,7 +68,7 @@ public class ClearsightRendererHandler {
     }
 
     public void AddSubRenderHandler(Renderer renderer) {
-        SubRenderHandler handler = new SubRenderHandler(renderer);
+        SubRenderHandler handler = new SubRenderHandler(renderer, null);
         handlers[renderer] = handler;
         hasCutaway |= handler.isCutaway;
     }
@@ -119,7 +119,7 @@ public class ClearsightRendererHandler {
 
     void MakeInvisible() {
         foreach (SubRenderHandler handler in handlers.Values) {
-            handler.TotallyInvisible();
+            handler.TotallyInvisible(false);
         }
     }
     void FadeOut() {
@@ -181,7 +181,7 @@ public class ClearsightRendererHandler {
                     if (alpha <= 0.1) {
                         foreach (SubRenderHandler handler in handlers.Values) {
                             if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
-                                handler.CompleteFadeOut(hasCutaway);
+                                handler.CutawayInvisible(hasCutaway);
                         }
                         currentRendererState = RendererState.transparent;
                     }
@@ -189,7 +189,7 @@ public class ClearsightRendererHandler {
                 case RendererState.opaque:
                     if (alpha >= 1) {
                         foreach (SubRenderHandler handler in handlers.Values) {
-                            handler.CompleteFadeIn();
+                            handler.Visible(false);
                         }
                         currentRendererState = RendererState.opaque;
                     }
@@ -199,7 +199,7 @@ public class ClearsightRendererHandler {
                         MakeInvisible();
                         foreach (SubRenderHandler handler in handlers.Values) {
                             if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
-                                handler.CompleteFadeOut(hasCutaway);
+                                handler.CutawayInvisible(hasCutaway);
                         }
                         currentRendererState = RendererState.invisible;
                     }

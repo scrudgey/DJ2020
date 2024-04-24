@@ -4,9 +4,13 @@ using System.Linq;
 using UnityEngine;
 public class RooftopZone : MonoBehaviour {
     public string idn;
-    public List<Collider> colliders;
+    public List<Collider> playerDetectionColliders;
+    public List<Collider> geometryInclusionColliders;
 
-    public bool ContainsPoint(Vector3 point) {
-        return colliders.Any(collider => collider.bounds.Contains(point));
+    public bool ContainsPlayerPoint(Vector3 point) {
+        return playerDetectionColliders.Any(collider => collider.bounds.Contains(point));
+    }
+    public bool ContainsGeometry(Vector3 point) {
+        return geometryInclusionColliders.Any(collider => collider.bounds.Contains(point));
     }
 }

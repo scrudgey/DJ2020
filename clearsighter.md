@@ -256,13 +256,44 @@ suppose player is at (45, 60, 1). grid extends from [0, 100], [0, 100]. clearsig
         * only handle those things on the grid floor, and as interloper only.
 * figure out why the floor has that final invisible region
 * somehow, state is sticky when moving between floors
+* elevator level is straight broken?
+    * this is related to hierarchy folder issues
+        * lintels
+        * signage
+    * distant buildings
+* handle world levels
+    * culling data should be tied to scene perhaps
+    * roof zone:
+        * one volume for defining membership
+        * one volume for defining player driven culling
+        * one volume for defining interlope
+        * this will allow jackthatdata to work
+    * dynamic culling not resetting 
+    * aboves not resetting when view changes
+* use roof zone info when culling dynamic
+* other interlopers become visible when in roof zone: particularly distant buildings
+* hvac non-static grate
 
 
+create culling data for all scenes  
+    floating high pieces    
+        elevator floor signs
+        elevator doors
+    raycasts are blocked by windows
+    hvac non-static grate
+    add one more floor (4) in elevator for top roofs
 
-handle world levels
-    culling data should be tied to scene perhaps
 
+HVAC ducts / ceiling lights - needs a new solution
+    these things aren't necessarily interlopers at all.
+    they should just be hidden when the player is on that floor.
+        handle these when we rectify the floor states
+        turn them invisible on the player floor.
+        don't let them un-invisible when culling stops
+        complicated logic here
 
+    don't include them in culling grid point
+    make a special dictionary of them and use it when rectifying floors
 
 
 
@@ -276,12 +307,17 @@ if we need to fine tune dynamic culling, code can interact with culling componen
     have a flag for allow culling
     when flag is turned on or off, reapply culling status
 
-player shadow!
-    duplicate sprites in shadows-only mode
-
 
 fade?
-scale test
+scale test?
     number of points (grid spacing)
     size of grid search
 
+
+
+
+player shadow!
+    duplicate sprites in shadows-only mode
+mapview is broken reference to scenedata
+lootcanvashandler missing graph icon reference
+hack was broken in jtd

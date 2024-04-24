@@ -20,9 +20,11 @@ public class SubRenderHandler {
 
     public Renderer renderer;
     float myAlpha;
+    CullingComponent parent;
 
-    public SubRenderHandler(Renderer renderer) {
+    public SubRenderHandler(Renderer renderer, CullingComponent parent) {
         this.renderer = renderer;
+        this.parent = parent;
         propBlock = new MaterialPropertyBlock();
         renderer.GetPropertyBlock(propBlock);
         initialMaterial = renderer.sharedMaterial;
@@ -76,14 +78,17 @@ public class SubRenderHandler {
         propBlock.SetFloat("_TargetAlpha", myAlpha);
         renderer.SetPropertyBlock(propBlock);
     }
-    public void TotallyInvisible() {
+    public void TotallyInvisible(bool debug) {
         if (renderer == null) return;
         if (isCutaway)
             cutawayRenderer.SetActive(false);
+        if (debug) {
+            Debug.Log($"invisible: renderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
+        }
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
-    public void CompleteFadeOut(bool parentHasCutaway) {
+    public void CutawayInvisible(bool parentHasCutaway) {
         if (renderer == null) return;
         if (isCutaway)
             cutawayRenderer.SetActive(true);
@@ -96,12 +101,17 @@ public class SubRenderHandler {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         }
     }
-    public void CompleteFadeIn() {
+    public void Visible(bool debug) {
         if (renderer == null) return;
         if (isCutaway)
             cutawayRenderer.SetActive(false);
+
+        if (debug) {
+            Debug.Log($"visibile: renderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
+        }
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = initialShadowCastingMode;
+
     }
 
 }

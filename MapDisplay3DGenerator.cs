@@ -45,6 +45,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     float zoomFloatAmount;
     int zoomLevel;
     LevelTemplate template;
+    SceneData sceneData;
 
     CyberGraph cyberGraph;
     PowerGraph powerGraph;
@@ -61,13 +62,13 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     public int numberDiscoveredNodes;
     public string currentGraphTitle;
 
-    public void Initialize(LevelState state) {
+    public void Initialize(LevelState state, SceneData sceneData) {
         selectedMapMarker = null;
         clickedMapMarker = null;
         selectedObjective = null;
         clickedObjective = null;
 
-        Initialize(state.template, state.plan);
+        Initialize(state.template, sceneData, state.plan);
         cyberGraph = state.delta.cyberGraph;
         powerGraph = state.delta.powerGraph;
         alarmGraph = state.delta.alarmGraph;
@@ -75,8 +76,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         gamePhase = GamePhase.mission;
         ChangeMode(Mode.playerfocus);
     }
-    public void Initialize(LevelTemplate template, LevelPlan plan) {
+    public void Initialize(LevelTemplate template, SceneData sceneData, LevelPlan plan) {
         this.template = template;
+        this.sceneData = sceneData;
         gamePhase = GamePhase.plan;
 
         allMapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
@@ -194,7 +196,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
                     }
                 }
                 // Debug.Log(position); 
-                int floor = template.GetFloorForPosition(position);
+                int floor = sceneData.GetFloorForPosition(position);
                 origin = WorldToGeneratorLocalPosition(position) - transform.position;
                 SelectFloor(floor);
                 thetaVelocity = 0f;
@@ -268,7 +270,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
     public Vector3 WorldToGeneratorLocalPosition(Vector3 worldPosition, bool debug = false) {
 
-        int floorNumber = template.GetFloorForPosition(worldPosition);
+        int floorNumber = sceneData.GetFloorForPosition(worldPosition);
 
         // coordinates in map image
         Vector2 quadPosition = WorldToQuadPosition(worldPosition);
@@ -371,8 +373,8 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             T node1 = graph.nodes[edge.Item1];
             T node2 = graph.nodes[edge.Item2];
 
-            int floor1 = template.GetFloorForPosition(node1.position);
-            int floor2 = template.GetFloorForPosition(node2.position);
+            int floor1 = sceneData.GetFloorForPosition(node1.position);
+            int floor2 = sceneData.GetFloorForPosition(node2.position);
 
             if (floor1 != currentFloor || floor2 != currentFloor) continue;
 

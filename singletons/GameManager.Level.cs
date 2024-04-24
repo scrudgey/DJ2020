@@ -46,17 +46,18 @@ public partial class GameManager : Singleton<GameManager> {
 
         // instantiate mission state from template
         VRMissionState state = VRMissionState.Instantiate(template);
-
-        LoadScene(template.sceneName, () => StartVRMission(state));
+        SceneData sceneData = SceneData.loadSceneData(template.sceneName);
+        LoadScene(template.sceneName, () => StartVRMission(state, sceneData));
     }
     public void LoadMission(LevelTemplate template, LevelPlan plan) {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
         gameData.playerState.ResetTemporaryState(plan);
-        LoadScene(template.sceneName, () => StartMission(gameData.levelState));
+        SceneData sceneData = SceneData.loadSceneData(template.sceneName);
+        LoadScene(template.sceneName, () => StartMission(gameData.levelState, sceneData));
     }
 
-    public void StartVRMission(VRMissionState state) {
+    public void StartVRMission(VRMissionState state, SceneData sceneData) {
         Debug.Log("GameMananger: start VR mission");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
@@ -65,19 +66,16 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
+
         // InitializeLevel(LevelPlan.Default(new List<ItemTemplate>()));
-        LoadSkyboxForScene(state.template.sceneName);
+        LoadSkyboxForScene(sceneData);
 
         TransitionToPhase(GamePhase.vrMission);
         GameObject controller = GameObject.Instantiate(Resources.Load("prefabs/VRMissionController")) as GameObject;
         VRMissionController missionController = controller.GetComponent<VRMissionController>();
         missionController.StartVRMission(state);
     }
-    void LoadSkyboxForScene(String sceneName) {
-        SceneData sceneData = SceneData.loadSceneData(sceneName);
-        LoadSkyBox(sceneData);
-    }
-    public void StartMission(LevelState state, bool spawnNpcs = true, bool doCutscene = true) {
+    public void StartMission(LevelState state, SceneData sceneData, bool spawnNpcs = true, bool doCutscene = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
         if (!SceneManager.GetSceneByName("UI").isLoaded) {
             LoadScene("UI", () => {
@@ -86,8 +84,8 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
-        InitializeLevel(state.plan);
-        LoadSkyboxForScene(state.template.sceneName);
+        InitializeLevel(state.plan, sceneData);
+        LoadSkyboxForScene(sceneData);
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
@@ -178,12 +176,18 @@ public partial class GameManager : Singleton<GameManager> {
                 }
             }
         }
-        InitializePlayerAndController(LevelPlan.Default(gameData.playerState));
-        LoadSkyboxForScene(sceneName);
+        SceneData sceneData = SceneData.loadSceneData(sceneName);
+        InitializePlayerAndController(LevelPlan.Default(gameData.playerState), sceneData);
+        LoadSkyboxForScene(sceneData);
         // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
         MusicController.I.PlaySimpleTrack(MusicTrack.sympatheticDetonation);
 
         TransitionToPhase(GamePhase.world);
+    }
+
+
+    void LoadSkyboxForScene(SceneData sceneData) {
+        LoadSkyBox(sceneData);
     }
     void HandlePlayerDead(CharacterController npc) {
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.playerDead;
@@ -363,7 +367,7 @@ public partial class GameManager : Singleton<GameManager> {
         yield return new WaitForEndOfFrame();
     }
 
-    public void SetFocus(GameObject focus) {
+    public void SetFocus(GameObject focus, SceneData sceneData) {
         Debug.Log($"setting focus: {focus}");
         if (playerGunHandler != null) {
             playerGunHandler.isPlayerCharacter = false;
@@ -408,7 +412,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         if (clearsighterV4 != null) {
             string sceneName = SceneManager.GetActiveScene().name;
-            clearsighterV4.Initialize(focus.transform, characterCamera, playerCharacterController, gameData.levelState.template, sceneName);
+            clearsighterV4.Initialize(focus.transform, characterCamera, playerCharacterController, sceneData, sceneName);
         }
 
         if (elevatorOccluder != null) {
@@ -437,7 +441,7 @@ public partial class GameManager : Singleton<GameManager> {
         suspicionRecords = new Dictionary<string, SuspicionRecord>();
         lastObjectivesStatusHashCode = -1;
     }
-    private void InitializePlayerAndController(LevelPlan plan) {
+    private void InitializePlayerAndController(LevelPlan plan, SceneData sceneData) {
         ClearSceneData();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
         if (characterCamera == null) {
@@ -454,7 +458,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
         // spawn player object  
         GameObject playerObj = SpawnPlayer(gameData.playerState, plan);
-        SetFocus(playerObj);
+        SetFocus(playerObj, sceneData);
 
         // connect player object to input controller
         SetInputReceivers(playerObj);
@@ -472,8 +476,8 @@ public partial class GameManager : Singleton<GameManager> {
             characterCamera.skyBoxCameras = skycams.ToArray();
         }, unloadAll: false);
     }
-    private void InitializeLevel(LevelPlan plan) {
-        InitializePlayerAndController(plan);
+    private void InitializeLevel(LevelPlan plan, SceneData sceneData) {
+        InitializePlayerAndController(plan, sceneData);
 
         // connect up power grids
         Debug.Log("connecting power grid...");

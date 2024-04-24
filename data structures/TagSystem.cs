@@ -27,6 +27,9 @@ public class TagSystemData {
     public bool totallTransparentIsInvisible;
     public bool partialTransparentIsInvisible;
 
+    // if true, don't wait for interloper- go invisible like an above floor when player on my floor
+    public bool invisibleOnPlayerFloor;
+
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;
 

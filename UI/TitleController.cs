@@ -184,7 +184,8 @@ public class TitleController : MonoBehaviour {
             Debug.Log("start mission");
 
             // start the game state
-            GameManager.I.StartMission(level, spawnNpcs: false, doCutscene: false);
+            SceneData sceneData = SceneData.loadSceneData("interactionTestbed");
+            GameManager.I.StartMission(level, sceneData, spawnNpcs: false, doCutscene: false);
         });
     }
 

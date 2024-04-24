@@ -58,6 +58,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     List<Image> floorPips;
     int numberFloors;
     LevelTemplate template;
+    SceneData sceneData;
     LevelPlan plan;
     LevelState state;
     MapMarkerIndicator selectedIndicator;
@@ -65,7 +66,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public void Initialize(LevelState state) {
         this.state = state;
         Initialize(state.template, state.plan);
-        mapDisplay3Dgenerator.Initialize(state);
+        mapDisplay3Dgenerator.Initialize(state, sceneData);
         mode = Mode.mission;
         mapDisplayController.HideInsertionPoints();
     }
@@ -91,10 +92,10 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             floorPips.Add(pip);
         }
 
-        mapDisplay3Dgenerator.Initialize(template, plan);
+        mapDisplay3Dgenerator.Initialize(template, sceneData, plan);
         Bind(mapDisplay3Dgenerator.gameObject);
 
-        mapDisplayController.Initialize(template, plan, this);
+        mapDisplayController.Initialize(template, sceneData, plan, this);
 
         selectedFloor = mapDisplay3Dgenerator.currentFloor;
         floorNumberCaption.text = $"{template.sceneDescriptor}: floor {mapDisplay3Dgenerator.currentFloor}";
@@ -194,7 +195,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         foreach (KeyValuePair<string, MarkerConfiguration> kvp in mapDisplay3Dgenerator.nodeData) {
             if (!nodeMarkers.ContainsKey(kvp.Key)) {
                 MiniMapNodeMarker marker = SpawnNodeMarker();
-                int floor = template.GetFloorForPosition(kvp.Value.worldPosition);
+                int floor = sceneData.GetFloorForPosition(kvp.Value.worldPosition);
                 marker.Configure(kvp.Value, generator, floor);
                 nodeMarkers[kvp.Key] = marker;
             }
@@ -230,7 +231,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 Vector3 position = objective.SpawnPointLocation(idn);
 
                 objectiveIndicators[objective].SetPosition(position, mapDisplay3Dgenerator, markerContainer);
-                objectiveIndicators[objective].gameObject.SetActive(template.GetFloorForPosition(position) == generator.currentFloor);
+                objectiveIndicators[objective].gameObject.SetActive(sceneData.GetFloorForPosition(position) == generator.currentFloor);
             }
         } else if (mode == Mode.mission) {
             foreach (ObjectiveDelta delta in state.delta.AllObjectives()) {
@@ -247,7 +248,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 }
                 Vector3 position = delta.GetPosition();
                 objectiveIndicators[delta.template].SetPosition(position, mapDisplay3Dgenerator, markerContainer);
-                objectiveIndicators[delta.template].gameObject.SetActive(template.GetFloorForPosition(position) == generator.currentFloor);
+                objectiveIndicators[delta.template].gameObject.SetActive(sceneData.GetFloorForPosition(position) == generator.currentFloor);
             }
 
             if (playerMarker == null) {
@@ -255,7 +256,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 playerMarker.Configure("", MapMarkerData.MapMarkerType.guard, MapMarkerData.MapMarkerIcon.circle);
             }
             playerMarker.SetPosition(GameManager.I.playerPosition, mapDisplay3Dgenerator, markerContainer);
-            playerMarker.gameObject.SetActive(template.GetFloorForPosition(GameManager.I.playerPosition) == generator.currentFloor);
+            playerMarker.gameObject.SetActive(sceneData.GetFloorForPosition(GameManager.I.playerPosition) == generator.currentFloor);
         }
 
         statsView.text = mapDisplay3Dgenerator.GetStatsString();

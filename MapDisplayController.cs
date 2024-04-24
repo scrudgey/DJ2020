@@ -61,6 +61,7 @@ public class MapDisplayController : MonoBehaviour {
 
     LevelPlan plan;
     LevelTemplate template;
+    SceneData sceneData;
 
     MapDisplay3DView view;
 
@@ -77,12 +78,13 @@ public class MapDisplayController : MonoBehaviour {
         mouseOverMap = false;
     }
 
-    public void Initialize(LevelTemplate template, LevelPlan plan, MapDisplay3DView view) {
+    public void Initialize(LevelTemplate levelTemplate, SceneData sceneData, LevelPlan plan, MapDisplay3DView view) {
         this.plan = plan;
         this.view = view;
-        this.template = template;
+        this.template = levelTemplate;
+        this.sceneData = sceneData;
         if (doPopulateColumns)
-            PopulateColumns(template);
+            PopulateColumns(levelTemplate);
         SwitchLegend(MapDisplayLegendType.markers);
 
     }
@@ -280,7 +282,7 @@ public class MapDisplayController : MonoBehaviour {
         if (objective.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objective.name)) {
             string idn = plan.objectiveLocations.ContainsKey(objective.title) ? plan.objectiveLocations[objective.name] : objective.potentialSpawnPoints[0];
             jumpToPoint = objective.SpawnPointLocation(idn);
-            jumpToFloor = template.GetFloorForPosition(jumpToPoint);
+            jumpToFloor = sceneData.GetFloorForPosition(jumpToPoint);
 
             selectedMarkerData = null;
             clickedMarkerData = null;

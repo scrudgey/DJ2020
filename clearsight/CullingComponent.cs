@@ -1,27 +1,46 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class CullingComponent : MonoBehaviour {
-
+    public bool debug;
+    public TagSystemData data;
+    public SceneData sceneData;
     public enum CullingState { normal, interloper, above }
     public enum RendererState { opaque, transparent, invisible }
     public string idn;
     public int floor;
     public Bounds bounds;
-    public string myName;
     public string rooftopZoneIdn;
-    CullingState state;
+    public CullingState state;
     Dictionary<Renderer, SubRenderHandler> handlers;
     public Vector3 adjustedPosition;
-    bool isDynamic;
-    bool hasCutaway;
+    public bool isDynamic;
+    public bool hasCutaway;
+    bool initialized;
+    WaitForSeconds waiter = new WaitForSeconds(0.1f);
 
+    RooftopZone[] rooftopZones;
 
-    public void Initialize(bool isDynamic = false) {
-        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+    public void Initialize(SceneData sceneData, bool isDynamic = false) {
+        if (initialized) return;
+        this.sceneData = sceneData;
         this.isDynamic = isDynamic;
+
+        TagSystem system = GetComponent<TagSystem>();
+        if (system != null) {
+            this.data = system.data;
+        } else {
+            this.data = new TagSystemData();
+        }
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
         if (renderers.Length > 0) {
             Bounds tmpBounds = renderers[0].bounds;
 
@@ -45,22 +64,35 @@ public class CullingComponent : MonoBehaviour {
         } else {
             this.handlers = new Dictionary<Renderer, SubRenderHandler>();
         }
+        if (isDynamic) {
+            rooftopZoneIdn = "-1";
+            rooftopZones = GameObject.FindObjectsOfType<RooftopZone>();
+            StartCoroutine(Toolbox.RunJobRepeatedly(() => UpdateRoofZone()));
+        }
+        initialized = true;
     }
 
+    IEnumerator UpdateRoofZone() {
+        Vector3 position = transform.position;
+        floor = sceneData.GetFloorForPosition(position);
+        foreach (RooftopZone zone in rooftopZones) {
+            if (zone.ContainsGeometry(position)) {
+                rooftopZoneIdn = zone.idn;
+                break;
+            }
+        }
+        yield return waiter;
+    }
     public void AddSubRenderHandler(Renderer renderer) {
-        SubRenderHandler handler = new SubRenderHandler(renderer);
+        SubRenderHandler handler = new SubRenderHandler(renderer, this);
         handlers[renderer] = handler;
         hasCutaway |= handler.isCutaway;
     }
     public void RemoveSubRenderHandler(Renderer renderer) {
         handlers.Remove(renderer);
     }
-    public void ApplyCulling(Vector3 playerPosition) {
-        // if (IsAbove(playerPosition)) {
-        //     ChangeState(CullingComponent.CullingState.above);
-        // } else {
+    public void ApplyInterloper(Vector3 playerPosition) {
         ChangeState(CullingComponent.CullingState.interloper);
-        // }
     }
     public void StopCulling() {
         ChangeState(CullingComponent.CullingState.normal);
@@ -68,37 +100,37 @@ public class CullingComponent : MonoBehaviour {
     public void ChangeState(CullingState toState) {
         switch (toState) {
             case CullingState.normal:
-                FadeIn();
+                Visible();
                 break;
             case CullingState.interloper:
-                FadeOut();
+                Cutaway();
                 break;
             case CullingState.above:
-                MakeInvisible();
+                Invisible();
                 break;
         }
         state = toState;
     }
-    public bool IsAbove(Vector3 playerPosition) {
-        return adjustedPosition.y > playerPosition.y;
-    }
     public bool IsAbove(int playerFloor) {
         return floor > playerFloor;
     }
-    void MakeInvisible() {
+    void Invisible() {
         foreach (SubRenderHandler handler in handlers.Values) {
-            handler.TotallyInvisible();
+            handler.TotallyInvisible(debug);
         }
     }
-    void FadeOut() {
+    void Cutaway() {
         foreach (SubRenderHandler handler in handlers.Values) {
-            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
-                handler.CompleteFadeOut(hasCutaway);
+            if (handler.data.partialTransparentIsInvisible) {
+                handler.TotallyInvisible(debug);
+            } else if (!handler.data.dontHideInterloper) {
+                handler.CutawayInvisible(hasCutaway);
+            }
         }
     }
-    void FadeIn() {
+    void Visible() {
         foreach (SubRenderHandler handler in handlers.Values) {
-            handler.CompleteFadeIn();
+            handler.Visible(debug);
         }
     }
 

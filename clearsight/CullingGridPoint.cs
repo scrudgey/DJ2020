@@ -65,12 +65,22 @@ public class CullingGridPoint {
         // Debug.DrawRay(position, 10f * ray.direction, Color.white);
 
         foreach (RaycastHit hit in hits) {
-            Transform root = hit.collider.transform.GetRoot(skipHierarchyFolders: true);
-
-            CullingComponent component = root.GetComponent<CullingComponent>();
-            if (component != null) { cullingComponents.Add(component); }
-
-            RooftopZone zone = root.GetComponent<RooftopZone>();
+            CullingComponent cullingComponent = null;
+            RooftopZone zone = null;
+            Transform rootWithoutHierarchyFolder = hit.collider.transform.GetRoot(skipHierarchyFolders: true);
+            if (rootWithoutHierarchyFolder != null) {
+                cullingComponent = rootWithoutHierarchyFolder.GetComponent<CullingComponent>();
+                zone = rootWithoutHierarchyFolder.GetComponent<RooftopZone>();
+            } else {
+                if (hit.collider.transform.root.gameObject.IsHierarchyFolder()) {
+                    cullingComponent = hit.collider.GetComponent<CullingComponent>();
+                    zone = hit.collider.GetComponent<RooftopZone>();
+                } else {
+                    cullingComponent = hit.collider.transform.root.GetComponent<CullingComponent>();
+                    zone = hit.collider.transform.root.GetComponent<RooftopZone>();
+                }
+            }
+            if (cullingComponent != null) { cullingComponents.Add(cullingComponent); }
             if (zone != null) { roofZones.Add(zone); }
         }
         List<string> cullingIds = cullingComponents.Select(component => component.idn).ToHashSet().ToList();

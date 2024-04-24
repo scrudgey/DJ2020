@@ -35,7 +35,7 @@ public class CullingGrid {
             points[x] = row;
         }
 
-        Debug.Log($"x rows: {xRows}\tz rows: {zRows}\tpoints: {xRows * zRows}");
+        Debug.Log($"floor:{floor}\tx rows: {xRows}\tz rows: {zRows}\tpoints: {xRows * zRows}");
     }
     public int GetBufferSize(float radius) {
         int radiusPoints = (int)(radius / gridSpacing);

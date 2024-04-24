@@ -37,7 +37,9 @@ public class LevelBootstrapper : MonoBehaviour {
         VRMissionState state = VRMissionState.Instantiate(vrTemplate);
 
         // start the game state
-        GameManager.I.StartVRMission(state);
+        string sceneName = SceneManager.GetActiveScene().name;
+        SceneData sceneData = SceneData.loadSceneData(sceneName);
+        GameManager.I.StartVRMission(state, sceneData);
     }
 
     void BootStrapMission() {
@@ -61,8 +63,10 @@ public class LevelBootstrapper : MonoBehaviour {
 
         GameManager.I.gameData.levelState = level;
 
+        string sceneName = SceneManager.GetActiveScene().name;
+        SceneData sceneData = SceneData.loadSceneData(sceneName);
         // start the game state
-        GameManager.I.StartMission(level, spawnNpcs: spawnNPCs, doCutscene: false);
+        GameManager.I.StartMission(level, sceneData, spawnNpcs: spawnNPCs, doCutscene: false);
     }
 
     void BootStrapWorld() {

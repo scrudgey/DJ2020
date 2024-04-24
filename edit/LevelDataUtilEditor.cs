@@ -18,6 +18,7 @@ public class LevelDataUtilEditor : Editor {
     LevelDataUtil t;
     SerializedObject GetTarget;
     SerializedProperty levelData;
+    SerializedProperty sceneDataProperty;
     SerializedProperty mapCameraProperty;
     SerializedProperty mapTextureProperty;
     SerializedProperty floorNumberProperty;
@@ -25,16 +26,20 @@ public class LevelDataUtilEditor : Editor {
     SerializedProperty gridSpacingProperty;
     SerializedProperty boundingBoxProperty;
     SerializedProperty selectedFloorPointsProperty;
+    SerializedProperty findCullingIdnProperty;
     void OnEnable() {
         t = (LevelDataUtil)target;
         GetTarget = new SerializedObject(t);
         levelData = GetTarget.FindProperty("levelData"); // Find the List in our script and create a refrence of it
+        sceneDataProperty = GetTarget.FindProperty("sceneData");
+
         mapCameraProperty = GetTarget.FindProperty("mapCamera"); // Find the List in our script and create a refrence of it
         mapTextureProperty = GetTarget.FindProperty("mapTexture"); // Find the List in our script and create a refrence of it
         floorNumberProperty = GetTarget.FindProperty("floorNumber"); // Find the List in our script and create a refrence of it
         floorWidgetProperty = GetTarget.FindProperty("floorWidget");
         gridSpacingProperty = GetTarget.FindProperty("gridSpacing");
         boundingBoxProperty = GetTarget.FindProperty("boundingBox");
+        findCullingIdnProperty = GetTarget.FindProperty("findCullingIdn");
         selectedFloorPointsProperty = GetTarget.FindProperty("selectedFloorPoints");
     }
     public override void OnInspectorGUI() {
@@ -43,13 +48,8 @@ public class LevelDataUtilEditor : Editor {
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         if (template != null) {
             string levelName = template.levelName;
-            EditorGUILayout.PropertyField(floorNumberProperty);
             if (GUILayout.Button("Write map image")) {
                 SaveMapData();
-            }
-            if (GUILayout.Button("Set floor level")) {
-                int floorNumber = floorNumberProperty.intValue;
-                SetFloorHeight(template, floorNumber);
             }
             GUILayout.Space(10);
             EditorGUILayout.Separator();
@@ -79,13 +79,39 @@ public class LevelDataUtilEditor : Editor {
             GUILayout.Space(10);
             EditorGUILayout.Separator();
             GUILayout.Space(10);
+
+        } else {
+            // Debug.LogError("set level template before writing level data");
+        }
+
+        GUILayout.Space(20);
+        EditorGUILayout.Separator();
+        EditorGUILayout.PropertyField(sceneDataProperty);
+        GUILayout.Space(10);
+        SceneData sceneData = (SceneData)sceneDataProperty.objectReferenceValue;
+        if (sceneData != null) {
+            EditorGUILayout.PropertyField(floorNumberProperty);
+            if (GUILayout.Button("Set floor level")) {
+                int floorNumber = floorNumberProperty.intValue;
+                SetFloorHeight(sceneData, floorNumber);
+            }
             EditorGUILayout.PropertyField(gridSpacingProperty);
             EditorGUILayout.PropertyField(boundingBoxProperty);
             if (GUILayout.Button("Write culling data")) {
-                WriteCullingData(template);
+                WriteCullingData(sceneData);
             }
-        } else {
-            Debug.LogError("set level template before writing level data");
+            GUILayout.Space(10);
+            EditorGUILayout.PropertyField(findCullingIdnProperty);
+            if (GUILayout.Button("Find culling component by idn")) {
+                string idn = findCullingIdnProperty.stringValue;
+                foreach (CullingComponent component in GameObject.FindObjectsOfType<CullingComponent>()) {
+                    if (component.idn == idn) {
+                        Selection.activeGameObject = component.gameObject;
+                        Debug.Log($"{component.gameObject} {component}");
+                        break;
+                    }
+                }
+            }
         }
 
         GetTarget.ApplyModifiedProperties();
@@ -245,17 +271,17 @@ public class LevelDataUtilEditor : Editor {
         EditorUtility.SetDirty(template);
     }
 
-    void SetFloorHeight(LevelTemplate template, int floorNumber) {
+    void SetFloorHeight(SceneData sceneData, int floorNumber) {
         Transform floorWidget = (Transform)floorWidgetProperty.objectReferenceValue;
-        while (template.floorHeights.Count < floorNumber + 1) {
-            template.floorHeights.Add(0);
+        while (sceneData.floorHeights.Count < floorNumber + 1) {
+            sceneData.floorHeights.Add(0);
         }
-        template.floorHeights[floorNumber] = floorWidget.position.y;
+        sceneData.floorHeights[floorNumber] = floorWidget.position.y;
 
-        EditorUtility.SetDirty(template);
+        EditorUtility.SetDirty(sceneData);
     }
 
-    void WriteCullingData(LevelTemplate template) {
+    void WriteCullingData(SceneData sceneData) {
         RooftopZone[] rooftopZones = GameObject.FindObjectsOfType<RooftopZone>();
         foreach (RooftopZone zone in rooftopZones) {
             zone.idn = System.Guid.NewGuid().ToString();
@@ -263,6 +289,7 @@ public class LevelDataUtilEditor : Editor {
 
         List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
                     .Where(renderer => renderer.gameObject.isStatic)
+                    .Where(renderer => !renderer.CompareTag("noCulling"))
                     .Concat(
                         GameObject.FindObjectsOfType<SpriteRenderer>()
                             .Where(obj => obj.CompareTag("decor"))
@@ -276,14 +303,26 @@ public class LevelDataUtilEditor : Editor {
                     .ToList();
 
         foreach (Renderer renderer in staticRenderers) {
-            CullingComponent cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.transform.GetRoot(skipHierarchyFolders: true).gameObject);
+            if (renderer == null) continue;
+            CullingComponent cullingComponent;
+
+            if (renderer.transform.GetRoot(skipHierarchyFolders: true) != null) {
+                cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.transform.GetRoot(skipHierarchyFolders: true).gameObject);
+            } else {
+                if (renderer.transform.root.gameObject.IsHierarchyFolder()) {
+                    cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.gameObject);
+                } else {
+                    cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.transform.root.gameObject);
+                }
+            }
+
             cullingComponent.idn = System.Guid.NewGuid().ToString();
-            cullingComponent.Initialize();
-            cullingComponent.floor = template.GetFloorForPosition(cullingComponent.bounds.center);
+            cullingComponent.Initialize(sceneData);
+            cullingComponent.floor = sceneData.GetFloorForPosition(cullingComponent.bounds.center);
             cullingComponent.rooftopZoneIdn = "-1";
             EditorUtility.SetDirty(cullingComponent);
             foreach (RooftopZone zone in rooftopZones) {
-                if (zone.ContainsPoint(cullingComponent.bounds.center)) {
+                if (zone.ContainsGeometry(cullingComponent.bounds.center)) {
                     cullingComponent.rooftopZoneIdn = zone.idn;
                     break;
                 }
@@ -295,14 +334,14 @@ public class LevelDataUtilEditor : Editor {
 
 
         Debug.Log("instantiating culling volume...");
-        CullingVolume volume = new CullingVolume(boxCollider.bounds, gridSpacing, template);
+        CullingVolume volume = new CullingVolume(boxCollider.bounds, gridSpacing, sceneData);
 
         string sceneName = SceneManager.GetActiveScene().name;
-        volume.Write(template.levelName, sceneName);
+        volume.Write(sceneData, sceneName);
 
         AssetDatabase.Refresh();
-        // t = (LevelDataUtil)target;
-        // t.selectedFloorPoints = points;
+        t = (LevelDataUtil)target;
+        t.selectedGrid = volume.grids[0];
     }
 
 

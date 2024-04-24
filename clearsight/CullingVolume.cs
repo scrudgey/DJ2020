@@ -10,11 +10,11 @@ public class CullingVolume {
     public CullingGrid[] grids;
     public List<float> floorHeights;
     public CullingVolume() { } // required for serialization
-    public CullingVolume(Bounds boundingBox, float gridSpacing, LevelTemplate template) {
-        grids = new CullingGrid[template.floorHeights.Count];
-        this.floorHeights = template.floorHeights;
-        for (int i = 0; i < template.floorHeights.Count; i++) {
-            float floorHeight = template.floorHeights[i];
+    public CullingVolume(Bounds boundingBox, float gridSpacing, SceneData sceneData) {
+        grids = new CullingGrid[sceneData.floorHeights.Count];
+        this.floorHeights = sceneData.floorHeights;
+        for (int i = 0; i < sceneData.floorHeights.Count; i++) {
+            float floorHeight = sceneData.floorHeights[i];
             grids[i] = new CullingGrid(boundingBox, gridSpacing, floorHeight, i);
         }
     }
@@ -76,22 +76,22 @@ public class CullingVolume {
     | floor -1
      */
 
-    public void Write(string levelName, string sceneName) {
+    public void Write(SceneData sceneData, string sceneName) {
         XmlSerializer serializer = new XmlSerializer(typeof(CullingVolume));
-        string path = CullingFilePath(levelName, sceneName);
+        string path = CullingFileWritePath(sceneData, sceneName);
         Debug.Log($"writing culling data to {path}...");
         using (FileStream sceneStream = File.Create(path)) {
             serializer.Serialize(sceneStream, this);
         }
     }
 
-    public static string CullingFilePath(string levelName, string sceneName) {
-        string scenePath = LevelState.LevelDataPath(levelName);
+    public static string CullingFileWritePath(SceneData sceneData, string sceneName) {
+        string scenePath = SceneData.SceneDataPath();
         return Path.Combine(scenePath, $"cullingvolume_{sceneName}.xml");
     }
 
-    public static CullingVolume Load(string levelName, string sceneName) {
-        string path = $"data/missions/{levelName}/cullingvolume_{sceneName}";
+    public static CullingVolume Load(string sceneName) {
+        string path = $"data/sceneData/cullingvolume_{sceneName}";
         TextAsset textAsset = Resources.Load<TextAsset>(path) as TextAsset;
         XmlSerializer serializer = new XmlSerializer(typeof(CullingVolume));
         Debug.Log($"loading culling volume at {path}...");
