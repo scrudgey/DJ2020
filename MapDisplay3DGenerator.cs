@@ -109,8 +109,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         // powerGraph.Apply(plan);
         // alarmGraph.Apply(plan);
 
-        mapImages = MapMarker.LoadMapImages(template.levelName, template.sceneName);
-        // mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+        mapImages = LoadMapImages(template.levelName, template.sceneName);
         nodeData = new Dictionary<string, MarkerConfiguration>();
         numberFloors = mapImages.Count;
         theta = 3.925f;
@@ -127,9 +126,16 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         }
         zoomFloatAmount = 1.5f;
         SetZoomLevel(1);
-        // int playerFloor = template.GetFloorForPosition(GameManager.I.playerPosition);
-        // SelectFloor(playerFloor);
         ChangeMode(Mode.playerfocus);
+    }
+
+    List<Texture2D> LoadMapImages(string levelName, string sceneName) {
+        List<Texture2D> maps = new List<Texture2D>();
+        for (int i = 0; i < 10; i++) {
+            Texture2D map = Resources.Load<Texture2D>(MapMarker.MapPath(levelName, sceneName, i, includeDataPath: false, withExtension: false)) as Texture2D;
+            if (map != null) maps.Add(map);
+        }
+        return maps;
     }
 
     void Update() {
@@ -196,7 +202,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
                     }
                 }
                 // Debug.Log(position); 
-                int floor = sceneData.GetFloorForPosition(position);
+                int floor = sceneData.GetMapFloorForPosition(position);
                 origin = WorldToGeneratorLocalPosition(position) - transform.position;
                 SelectFloor(floor);
                 thetaVelocity = 0f;
@@ -270,7 +276,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
 
     public Vector3 WorldToGeneratorLocalPosition(Vector3 worldPosition, bool debug = false) {
 
-        int floorNumber = sceneData.GetFloorForPosition(worldPosition);
+        int floorNumber = sceneData.GetMapFloorForPosition(worldPosition);
 
         // coordinates in map image
         Vector2 quadPosition = WorldToQuadPosition(worldPosition);
@@ -373,8 +379,8 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
             T node1 = graph.nodes[edge.Item1];
             T node2 = graph.nodes[edge.Item2];
 
-            int floor1 = sceneData.GetFloorForPosition(node1.position);
-            int floor2 = sceneData.GetFloorForPosition(node2.position);
+            int floor1 = sceneData.GetMapFloorForPosition(node1.position);
+            int floor2 = sceneData.GetMapFloorForPosition(node2.position);
 
             if (floor1 != currentFloor || floor2 != currentFloor) continue;
 

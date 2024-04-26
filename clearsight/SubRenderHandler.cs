@@ -8,19 +8,20 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+[System.Serializable]
 public class SubRenderHandler {
     public TagSystemData data;
-    MaterialPropertyBlock propBlock;
-    GameObject cutawayRenderer;
-    Material interloperMaterial;
+    public MaterialPropertyBlock propBlock;
+    public GameObject cutawayRenderer;
+    public Material interloperMaterial;
     public Material initialMaterial;
     public ShadowCastingMode initialShadowCastingMode;
-    Bounds bounds;
+    public Bounds bounds;
     public bool isCutaway;
 
     public Renderer renderer;
-    float myAlpha;
-    CullingComponent parent;
+    public float myAlpha;
+    public CullingComponent parent;
 
     public SubRenderHandler(Renderer renderer, CullingComponent parent) {
         this.renderer = renderer;
@@ -60,7 +61,7 @@ public class SubRenderHandler {
 
     public void Fade() {
         if (renderer == null) return;
-        if (data.dontHideInterloper) return;
+        // if (data.dontHideInterloper) return;
         if (data.partialTransparentIsInvisible) {
             renderer.material = initialMaterial;
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
@@ -78,18 +79,23 @@ public class SubRenderHandler {
         propBlock.SetFloat("_TargetAlpha", myAlpha);
         renderer.SetPropertyBlock(propBlock);
     }
+
     public void TotallyInvisible(bool debug) {
         if (renderer == null) return;
+        if (debug) {
+            Debug.Log($"{parent.idn} invisible:\trenderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
+        }
         if (isCutaway)
             cutawayRenderer.SetActive(false);
-        if (debug) {
-            Debug.Log($"invisible: renderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
-        }
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
-    public void CutawayInvisible(bool parentHasCutaway) {
+
+    public void CutawayInvisible(bool parentHasCutaway, bool debug) {
         if (renderer == null) return;
+        if (debug) {
+            Debug.Log($"{parent.idn} cutaway:\trenderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
+        }
         if (isCutaway)
             cutawayRenderer.SetActive(true);
         if (!isCutaway && !parentHasCutaway && !data.totallTransparentIsInvisible) {
@@ -101,17 +107,15 @@ public class SubRenderHandler {
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         }
     }
+
     public void Visible(bool debug) {
         if (renderer == null) return;
+        if (debug) {
+            Debug.Log($"{parent.idn} visibile:\trenderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
+        }
         if (isCutaway)
             cutawayRenderer.SetActive(false);
-
-        if (debug) {
-            Debug.Log($"visibile: renderer: {renderer}\tmaterial:{renderer.material}->{initialMaterial}\tshadowmode:{renderer.shadowCastingMode}->{initialShadowCastingMode}");
-        }
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = initialShadowCastingMode;
-
     }
-
 }

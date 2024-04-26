@@ -28,7 +28,7 @@ public class ElevatorDoors : MonoBehaviour {
     public AudioClip[] doorCloseStart;
 
     void Awake() {
-        indicatorTransform.SetParent(null, true);
+        // indicatorTransform.SetParent(null, true);
         callbuttonTransform.SetParent(null, true);
         foreach (ElevatorDoorData data in doorDatas) {
             data.door.SetParent(null, true);

@@ -47,14 +47,6 @@ public class MapMarker : MonoBehaviour {
             return null;
         }
     }
-    public static List<Texture2D> LoadMapImages(string levelName, string sceneName) {
-        List<Texture2D> maps = new List<Texture2D>();
-        for (int i = 0; i < 10; i++) {
-            Texture2D map = Resources.Load<Texture2D>(MapPath(levelName, sceneName, i, includeDataPath: false, withExtension: false)) as Texture2D;
-            if (map != null) maps.Add(map);
-        }
-        return maps;
-    }
 }
 
 [System.Serializable]

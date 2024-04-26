@@ -10,12 +10,7 @@ public class HVACElement : MonoBehaviour {
     public AudioSource audioSource;
     public AudioClip[] impactGrateSound;
     public AudioClip[] ejectGrateSound;
-    void Awake() {
-        if (grate != null) {
-            grate.transform.SetParent(null);
-            grate.isKinematic = true;
-        }
-    }
+
     public bool DismountOnEnter() {
         return dismountOnEnter;
     }

@@ -433,7 +433,7 @@ public class NeoClearsighter : MonoBehaviour {
             if (renderer.name == "cutaway") continue;
 
             TagSystemData tagSystemData = rendererTagData[renderer];
-            if (tagSystemData.dontHideInterloper) continue;
+            // if (tagSystemData.dontHideInterloper) continue;
             Vector3 rendererPosition = rendererBounds[renderer].center;
             Vector3 directionToInterloper = rendererPosition - followTransform.position;
 

@@ -6,7 +6,7 @@ public class DestroyOnParticleEnd : MonoBehaviour {
     ParticleSystem[] particles;
     public GameObject prefab;
     PrefabPool pool;
-    void Awake() {
+    void Start() {
         if (prefab == null) {
             Debug.LogError($"destroy on end: no prefab {gameObject}");
         }

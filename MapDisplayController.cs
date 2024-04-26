@@ -86,7 +86,6 @@ public class MapDisplayController : MonoBehaviour {
         if (doPopulateColumns)
             PopulateColumns(levelTemplate);
         SwitchLegend(MapDisplayLegendType.markers);
-
     }
 
     public void HideInsertionPoints() {
@@ -282,7 +281,7 @@ public class MapDisplayController : MonoBehaviour {
         if (objective.visibility == Objective.Visibility.known || plan.objectiveLocations.ContainsKey(objective.name)) {
             string idn = plan.objectiveLocations.ContainsKey(objective.title) ? plan.objectiveLocations[objective.name] : objective.potentialSpawnPoints[0];
             jumpToPoint = objective.SpawnPointLocation(idn);
-            jumpToFloor = sceneData.GetFloorForPosition(jumpToPoint);
+            jumpToFloor = sceneData.GetMapFloorForPosition(jumpToPoint);
 
             selectedMarkerData = null;
             clickedMarkerData = null;

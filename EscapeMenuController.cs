@@ -62,6 +62,7 @@ public class EscapeMenuController : MonoBehaviour {
     }
     public void Initialize(GameData data) {
         GameManager.I.PlayUISound(openSounds);
+
         foreach (Transform child in objectivesContainer) {
             if (child.gameObject == bonusObjectiveHeader) continue;
             if (child.name.ToLower().Contains("spacer")) continue;
@@ -88,7 +89,9 @@ public class EscapeMenuController : MonoBehaviour {
         missionTitle.text = data.levelState.template.readableMissionName;
         missionTagline.text = data.levelState.template.tagline;
         missionStatusText.text = "status: active";
-        mapDisplayView.Initialize(data.levelState);
+
+        SceneData sceneData = SceneData.loadSceneData(data.levelState.template.sceneName);
+        mapDisplayView.Initialize(data.levelState, sceneData);
         lootController.Initialize(data.levelState.delta.levelAcquiredLoot.Concat(data.playerState.loots).ToList());
         keyController.Initialize(data.levelState);
         dataController.Initialize(data);

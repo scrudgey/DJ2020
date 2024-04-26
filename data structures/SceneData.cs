@@ -11,6 +11,8 @@ public class SceneData : ScriptableObject {
     public SkyBoxType skyBoxType;
     public Vector3 skyboxOffset;
     public List<float> floorHeights;
+    public List<float> mapFloorHeights;
+
 
     public static SceneData loadSceneData(string sceneName) {
         Debug.Log($"load scenedata data/sceneData/{sceneName}");
@@ -22,7 +24,17 @@ public class SceneData : ScriptableObject {
         return path;
     }
 
-    public int GetFloorForPosition(Vector3 position) {
+    public int GetCullingFloorForPosition(Vector3 position) {
+        int index = -1;
+        foreach (float floorHeight in floorHeights) {
+            if (floorHeight >= position.y) {
+                return index;
+            }
+            index++;
+        }
+        return index;
+    }
+    public int GetMapFloorForPosition(Vector3 position) {
         int index = -1;
         foreach (float floorHeight in floorHeights) {
             if (floorHeight >= position.y) {

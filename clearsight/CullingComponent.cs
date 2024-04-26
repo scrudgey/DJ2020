@@ -10,7 +10,6 @@ using UnityEngine.Rendering;
 
 public class CullingComponent : MonoBehaviour {
     public bool debug;
-    public TagSystemData data;
     public SceneData sceneData;
     public enum CullingState { normal, interloper, above }
     public enum RendererState { opaque, transparent, invisible }
@@ -20,9 +19,11 @@ public class CullingComponent : MonoBehaviour {
     public string rooftopZoneIdn;
     public CullingState state;
     Dictionary<Renderer, SubRenderHandler> handlers;
+    public List<SubRenderHandler> handlerList;
     public Vector3 adjustedPosition;
     public bool isDynamic;
     public bool hasCutaway;
+    public TagSystemData data;
     bool initialized;
     WaitForSeconds waiter = new WaitForSeconds(0.1f);
 
@@ -35,9 +36,9 @@ public class CullingComponent : MonoBehaviour {
 
         TagSystem system = GetComponent<TagSystem>();
         if (system != null) {
-            this.data = system.data;
+            data = system.data;
         } else {
-            this.data = new TagSystemData();
+            data = new TagSystemData();
         }
 
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
@@ -45,6 +46,7 @@ public class CullingComponent : MonoBehaviour {
             Bounds tmpBounds = renderers[0].bounds;
 
             this.handlers = new Dictionary<Renderer, SubRenderHandler>();
+            this.handlerList = new List<SubRenderHandler>();
             foreach (Renderer renderer in renderers) {
                 if (renderer is ParticleSystemRenderer) continue;
                 if (renderer is TrailRenderer) continue;
@@ -53,16 +55,17 @@ public class CullingComponent : MonoBehaviour {
                 tmpBounds.Encapsulate(renderer.bounds);
             }
             this.bounds = tmpBounds;
-            Transform findAnchor = transform.Find("clearSighterAnchor");
+            Transform findAnchor = transform.Find("anchor");
             if (findAnchor != null) {
-                // Debug.Log($"found clear sighter anchor: {root.gameObject} {findAnchor}");
+                Debug.Log($"found clear sighter anchor: {gameObject} {findAnchor}");
                 this.adjustedPosition = findAnchor.position;
             } else {
                 this.adjustedPosition = tmpBounds.center;
-                this.adjustedPosition.y -= tmpBounds.extents.y;
+                // this.adjustedPosition.y -= tmpBounds.extents.y;
             }
         } else {
             this.handlers = new Dictionary<Renderer, SubRenderHandler>();
+            this.handlerList = new List<SubRenderHandler>();
         }
         if (isDynamic) {
             rooftopZoneIdn = "-1";
@@ -74,7 +77,7 @@ public class CullingComponent : MonoBehaviour {
 
     IEnumerator UpdateRoofZone() {
         Vector3 position = transform.position;
-        floor = sceneData.GetFloorForPosition(position);
+        floor = sceneData.GetCullingFloorForPosition(position);
         foreach (RooftopZone zone in rooftopZones) {
             if (zone.ContainsGeometry(position)) {
                 rooftopZoneIdn = zone.idn;
@@ -87,10 +90,11 @@ public class CullingComponent : MonoBehaviour {
         SubRenderHandler handler = new SubRenderHandler(renderer, this);
         handlers[renderer] = handler;
         hasCutaway |= handler.isCutaway;
+        handlerList.Add(handler);
     }
-    public void RemoveSubRenderHandler(Renderer renderer) {
-        handlers.Remove(renderer);
-    }
+    // public void RemoveSubRenderHandler(Renderer renderer) {
+    //     handlers.Remove(renderer);
+    // }
     public void ApplyInterloper(Vector3 playerPosition) {
         ChangeState(CullingComponent.CullingState.interloper);
     }
@@ -123,8 +127,8 @@ public class CullingComponent : MonoBehaviour {
         foreach (SubRenderHandler handler in handlers.Values) {
             if (handler.data.partialTransparentIsInvisible) {
                 handler.TotallyInvisible(debug);
-            } else if (!handler.data.dontHideInterloper) {
-                handler.CutawayInvisible(hasCutaway);
+            } else {
+                handler.CutawayInvisible(hasCutaway, debug);
             }
         }
     }

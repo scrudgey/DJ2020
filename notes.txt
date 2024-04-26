@@ -3844,3 +3844,14 @@ add perks to main escape menu / replace main escape menu
     no objective
 
 logos for omni, delta, elf
+
+missing headers for map markers in mission plan
+hacking is broken
+
+player shadow!
+    duplicate sprites in shadows-only mode
+mapview is broken reference to scenedata
+lootcanvashandler missing graph icon reference
+hack was broken in jtd
+police sirens
+city ambience

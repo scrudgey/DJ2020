@@ -210,6 +210,15 @@ suppose player is at (45, 60, 1). grid extends from [0, 100], [0, 100]. clearsig
 
 
 
+if we need to fine tune dynamic culling, code can interact with culling component
+    have a flag for allow culling
+    when flag is turned on or off, reapply culling status
+
+fade?
+scale test?
+    number of points (grid spacing)
+    size of grid search
+
 * in editor mode, create grid of points, one grid Aper floor, bounded by the bounding box
 * find all static geometry roots. create a new component on them that will manage culling.
     * give each culling component a UIID
@@ -273,51 +282,37 @@ suppose player is at (45, 60, 1). grid extends from [0, 100], [0, 100]. clearsig
 * use roof zone info when culling dynamic
 * other interlopers become visible when in roof zone: particularly distant buildings
 * hvac non-static grate
+* HVAC ducts / ceiling lights - needs a new solution
+        * elevator floor signs
+* second level stairs
+* ceiling lights
+* elevator track
+* floating high pieces    
+* decals:
+    * wallpipes
+    * wall meter
+    * pillar tower
+    * pillar 
+    * wall monitor
+    * all graffiti
+* create culling data for all scenes  
+* hvac non-static grate
+* separate floor height definition for scene map data
+* elevator doors
+* HVAC entrypoint
+* raycasts are blocked by windows
+* more lintels in yamachi
+* more roof zones for street
+* add one more floor (4) in elevator for top roofs
+* there are two floors in tower underground?
+* rooftop interloper does not disappear
+* street culling breaks down
 
 
-create culling data for all scenes  
-    floating high pieces    
-        elevator floor signs
-        elevator doors
-    raycasts are blocked by windows
-    hvac non-static grate
-    add one more floor (4) in elevator for top roofs
-
-
-HVAC ducts / ceiling lights - needs a new solution
-    these things aren't necessarily interlopers at all.
-    they should just be hidden when the player is on that floor.
-        handle these when we rectify the floor states
-        turn them invisible on the player floor.
-        don't let them un-invisible when culling stops
-        complicated logic here
-
-    don't include them in culling grid point
-    make a special dictionary of them and use it when rectifying floors
-
-
-
-
+office-type geometry needs to support cutaway
 
 optimization: somehow remove points with no culling data?
     do not return these from the grid search
     set a flag during volume creation for easy check
 
-if we need to fine tune dynamic culling, code can interact with culling component
-    have a flag for allow culling
-    when flag is turned on or off, reapply culling status
 
-
-fade?
-scale test?
-    number of points (grid spacing)
-    size of grid search
-
-
-
-
-player shadow!
-    duplicate sprites in shadows-only mode
-mapview is broken reference to scenedata
-lootcanvashandler missing graph icon reference
-hack was broken in jtd

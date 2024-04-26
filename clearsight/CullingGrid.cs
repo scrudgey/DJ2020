@@ -59,7 +59,8 @@ public class CullingGrid {
         for (int i = minX; i < maxX; i++) {
             CullingGridPoint[] row = points[i];
             for (int j = minZ; j < maxZ; j++) {
-                output.Add(row[j]);
+                if (!row[j].isEmpty)
+                    output.Add(row[j]);
             }
         }
         return output;

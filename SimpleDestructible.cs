@@ -32,7 +32,7 @@ public class SimpleDestructible : Destructible {
             rigidbody.AddForce(force, ForceMode.Impulse);
         }
         TagSystemData data = Toolbox.GetTagData(gameObject);
-        data.dontHideAbove = true;
+        // data.dontHideAbove = true;
         Destroy(this);
     }
 }

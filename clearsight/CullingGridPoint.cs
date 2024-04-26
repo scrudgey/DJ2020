@@ -6,6 +6,7 @@ using UnityEngine;
 [System.Serializable]
 public class CullingGridPoint {
     public Vector3 position;
+    public bool isEmpty;
     public int floor;
     // todo: floor
     public List<string> NEInterlopers;
@@ -32,6 +33,9 @@ public class CullingGridPoint {
         (SEInterlopers, SERoofZones) = DoRaycast(CharacterCamera.IsometricOrientation.SE, mask);
 
         (SWInterlopers, SWRoofZones) = DoRaycast(CharacterCamera.IsometricOrientation.SW, mask);
+
+        isEmpty = NEInterlopers.Count + NERoofZones.Count + NWInterlopers.Count + NWRoofZones.Count +
+                  SEInterlopers.Count + SERoofZones.Count + SWInterlopers.Count + SWRoofZones.Count == 0;
     }
     Ray OrientationToRay(CharacterCamera.IsometricOrientation orientation) {
         float initialPlanarAngle = orientation switch {
@@ -65,6 +69,7 @@ public class CullingGridPoint {
         // Debug.DrawRay(position, 10f * ray.direction, Color.white);
 
         foreach (RaycastHit hit in hits) {
+            if (hit.collider.bounds.Contains(position)) continue;
             CullingComponent cullingComponent = null;
             RooftopZone zone = null;
             Transform rootWithoutHierarchyFolder = hit.collider.transform.GetRoot(skipHierarchyFolders: true);
@@ -80,7 +85,14 @@ public class CullingGridPoint {
                     zone = hit.collider.transform.root.GetComponent<RooftopZone>();
                 }
             }
-            if (cullingComponent != null) { cullingComponents.Add(cullingComponent); }
+            if (cullingComponent != null) {
+                TagSystem tagSystem = cullingComponent.GetComponent<TagSystem>();
+                if (tagSystem != null && tagSystem.data.invisibleOnPlayerFloor) {
+
+                } else {
+                    cullingComponents.Add(cullingComponent);
+                }
+            }
             if (zone != null) { roofZones.Add(zone); }
         }
         List<string> cullingIds = cullingComponents.Select(component => component.idn).ToHashSet().ToList();

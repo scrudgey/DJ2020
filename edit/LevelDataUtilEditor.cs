@@ -47,6 +47,8 @@ public class LevelDataUtilEditor : Editor {
         EditorGUILayout.PropertyField(floorWidgetProperty);
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         if (template != null) {
+            GUILayout.Label("Level Template");
+
             string levelName = template.levelName;
             if (GUILayout.Button("Write map image")) {
                 SaveMapData();
@@ -84,17 +86,31 @@ public class LevelDataUtilEditor : Editor {
             // Debug.LogError("set level template before writing level data");
         }
 
+
         GUILayout.Space(20);
         EditorGUILayout.Separator();
         EditorGUILayout.PropertyField(sceneDataProperty);
         GUILayout.Space(10);
         SceneData sceneData = (SceneData)sceneDataProperty.objectReferenceValue;
         if (sceneData != null) {
+            GUILayout.Label("Scene Data");
+            Editor.CreateEditor(sceneData).OnInspectorGUI();
+
+            SerializedObject serializedObject = new UnityEditor.SerializedObject(sceneData);
+            SerializedProperty floorHeightsProperty = serializedObject.FindProperty("floorHeights");
+
             EditorGUILayout.PropertyField(floorNumberProperty);
-            if (GUILayout.Button("Set floor level")) {
+            if (GUILayout.Button("Set culling floor level")) {
                 int floorNumber = floorNumberProperty.intValue;
                 SetFloorHeight(sceneData, floorNumber);
+                // EditorGUILayout.PropertyField(floorHeightsProperty);
             }
+            if (GUILayout.Button("Set map floor level")) {
+                int floorNumber = floorNumberProperty.intValue;
+                SetMapFloorHeight(sceneData, floorNumber);
+                // EditorGUILayout.PropertyField(floorHeightsProperty);
+            }
+            GUILayout.Space(20);
             EditorGUILayout.PropertyField(gridSpacingProperty);
             EditorGUILayout.PropertyField(boundingBoxProperty);
             if (GUILayout.Button("Write culling data")) {
@@ -277,7 +293,14 @@ public class LevelDataUtilEditor : Editor {
             sceneData.floorHeights.Add(0);
         }
         sceneData.floorHeights[floorNumber] = floorWidget.position.y;
-
+        EditorUtility.SetDirty(sceneData);
+    }
+    void SetMapFloorHeight(SceneData sceneData, int floorNumber) {
+        Transform floorWidget = (Transform)floorWidgetProperty.objectReferenceValue;
+        while (sceneData.mapFloorHeights.Count < floorNumber + 1) {
+            sceneData.mapFloorHeights.Add(0);
+        }
+        sceneData.mapFloorHeights[floorNumber] = floorWidget.position.y;
         EditorUtility.SetDirty(sceneData);
     }
 
@@ -316,13 +339,20 @@ public class LevelDataUtilEditor : Editor {
                 }
             }
 
+            TagSystem tagSystem = cullingComponent.GetComponent<TagSystem>();
+
             cullingComponent.idn = System.Guid.NewGuid().ToString();
             cullingComponent.Initialize(sceneData);
-            cullingComponent.floor = sceneData.GetFloorForPosition(cullingComponent.bounds.center);
+            cullingComponent.floor = sceneData.GetCullingFloorForPosition(cullingComponent.adjustedPosition);
             cullingComponent.rooftopZoneIdn = "-1";
+            if (tagSystem != null && tagSystem.data.invisibleOnPlayerFloor) {
+                cullingComponent.floor += 1;
+            }
+
             EditorUtility.SetDirty(cullingComponent);
+
             foreach (RooftopZone zone in rooftopZones) {
-                if (zone.ContainsGeometry(cullingComponent.bounds.center)) {
+                if (zone.ContainsGeometry(cullingComponent.adjustedPosition)) {
                     cullingComponent.rooftopZoneIdn = zone.idn;
                     break;
                 }

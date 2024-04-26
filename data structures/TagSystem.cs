@@ -20,15 +20,10 @@ public class TagSystemData {
     // currently used by: transparent objects
 
     // if true, I do not hide when above the player
-    public bool dontHideAbove;  // TODO: use layers instead
+    // public bool dontHideAbove;  // TODO: use layers instead
 
     // if true, I do not hide when above the player
-    public bool dontHideInterloper;  // TODO: use layers instead
-    public bool totallTransparentIsInvisible;
-    public bool partialTransparentIsInvisible;
-
-    // if true, don't wait for interloper- go invisible like an above floor when player on my floor
-    public bool invisibleOnPlayerFloor;
+    // public bool dontHideInterloper;  // TODO: use layers instead
 
     // if greater than 0, the player will target this object when mouse over
     public int targetPriority = -1;
@@ -40,7 +35,14 @@ public class TagSystemData {
     public Transform targetPoint;
     public Transform headTargetPoint;
 
-    public bool debugClearSighter;
+    [Header("culling")]
+    public bool totallTransparentIsInvisible;
+    public bool partialTransparentIsInvisible;
+    // if true, culling grid points above my floor can't mark me interloper.
+    public bool dontCullFromAbove;
+    // if true, don't wait for interloper- go invisible like an above floor when player on my floor
+    public bool invisibleOnPlayerFloor;
+
 }
 public class TagSystem : MonoBehaviour {
     public TagSystemData data;

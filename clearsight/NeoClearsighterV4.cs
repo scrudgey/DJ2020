@@ -70,12 +70,13 @@ public class NeoClearsighterV4 : MonoBehaviour {
         this.sceneData = sceneData;
         this.characterCamera = characterCamera;
         this.characterController = characterController;
-        defaultLayerMask = LayerUtil.GetLayerMask(Layer.def, Layer.bulletPassThrough, Layer.clearsighterBlock);
+        defaultLayerMask = LayerUtil.GetLayerMask(Layer.def, Layer.clearsighterBlock); // Layer.bulletPassThrough, 
 
         commandQueue = new List<CullingCommand>();
         cullingComponents = new Dictionary<string, CullingComponent>();
-        cullingComponentsByZoneAndFloors = new Dictionary<string, Dictionary<int, List<CullingComponent>>>();//  Dictionary<int, List<CullingComponent>>();
-        floorStatesPerRoofZone = new Dictionary<string, Dictionary<int, FloorState>>();// Dictionary<int, FloorState>();
+        cullingComponentsByZoneAndFloors = new Dictionary<string, Dictionary<int, List<CullingComponent>>>();
+
+        floorStatesPerRoofZone = new Dictionary<string, Dictionary<int, FloorState>>();
         roofZones = new Dictionary<string, RooftopZone>();
         dynamicCullingComponents = new Dictionary<Collider, CullingComponent>();
         colliderHits = new Collider[5000];
@@ -101,6 +102,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
             roofZones[zone.idn] = zone;
             floorStatesPerRoofZone[zone.idn] = new Dictionary<int, FloorState>();
             cullingComponentsByZoneAndFloors[zone.idn] = new Dictionary<int, List<CullingComponent>>();
+
             for (int i = -1; i < sceneData.floorHeights.Count + 1; i++) {
                 floorStatesPerRoofZone[zone.idn][i] = FloorState.visible;
                 cullingComponentsByZoneAndFloors[zone.idn][i] = new List<CullingComponent>();
@@ -226,6 +228,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
             playerBetweenFloorLow = transitionFloor;
             // Debug.Log($"between floors\t({playerBetweenFloorLow}, {playerBetweenFloorHigh})");
         } else {
+            resetFloorCulling |= playerBetweenFloorHigh != -99;
             playerBetweenFloorHigh = -99;
             playerBetweenFloorLow = -99;
         }
@@ -294,13 +297,16 @@ public class NeoClearsighterV4 : MonoBehaviour {
                     CullingComponent cullingComponent = floorComponents[j];
 
                     if (desiredState == FloorState.visible) {
-                        cullingComponent.ChangeState(CullingComponent.CullingState.normal);
+                        if (!activeInterlopers.ContainsKey(cullingComponent)) {
+                            // activeInterlopers.Remove(cullingComponent);
+                            cullingComponent.ChangeState(CullingComponent.CullingState.normal);
+                        }
+                        // cullingComponent.ChangeState(CullingComponent.CullingState.normal);
                     } else if (desiredState == FloorState.invisible) {
+                        if (activeInterlopers.ContainsKey(cullingComponent)) {
+                            activeInterlopers.Remove(cullingComponent);
+                        }
                         cullingComponent.ChangeState(CullingComponent.CullingState.above);
-                    }
-
-                    if (activeInterlopers.ContainsKey(cullingComponent)) {
-                        activeInterlopers.Remove(cullingComponent);
                     }
 
                     k++;
@@ -433,8 +439,9 @@ public class NeoClearsighterV4 : MonoBehaviour {
         // enqueue culling commands
         foreach ((int pointFloor, string idn) in hits) {
             CullingComponent cullingComponent = cullingComponents[idn];
-            if (cullingComponent.floor != playerFloor && cullingComponent.floor != playerBetweenFloorHigh - 1) continue;
-            if (pointFloor > cullingComponent.floor) continue; // don't allow things above to call this an interloper
+            if (floorStatesPerRoofZone[cullingComponent.rooftopZoneIdn][cullingComponent.floor] != FloorState.visible) continue;
+            // if (cullingComponent.floor != playerFloor && cullingComponent.floor != playerBetweenFloorHigh - 1) continue;
+            if (cullingComponent.data.dontCullFromAbove && pointFloor > cullingComponent.floor) continue; // don't allow things above to call this an interloper
             commandQueue.Add(new CullingCommand(cullingComponent, CullingCommand.Command.interloper));
         }
         bool updateBecauseRoofZone = false;
@@ -453,6 +460,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     IEnumerator ApplyCommands(Vector3 playerPosition) {
         foreach (CullingCommand command in commandQueue) {
             if (command.command == CullingCommand.Command.interloper) {
+                if (floorStatesPerRoofZone[command.component.rooftopZoneIdn][command.component.floor] != FloorState.visible) continue;
                 command.component.ApplyInterloper(playerPosition);
             } else if (command.command == CullingCommand.Command.above) {
                 command.component.ChangeState(CullingComponent.CullingState.above);
@@ -485,7 +493,8 @@ public class NeoClearsighterV4 : MonoBehaviour {
         foreach (CullingComponent key in keys) {
             activeInterlopers[key] -= 1;
             if (activeInterlopers[key] <= 0) {
-                key.StopCulling();
+                if (floorStatesPerRoofZone[key.rooftopZoneIdn][key.floor] == FloorState.visible)
+                    key.StopCulling();
                 keysToRemove.Add(key);
             }
         }

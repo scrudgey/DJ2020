@@ -124,7 +124,7 @@ public class ClearsightRendererHandler {
     }
     void FadeOut() {
         foreach (SubRenderHandler handler in handlers.Values) {
-            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
+            if (!(state == CullingState.interloper))
                 handler.FadeTransparent();
         }
     }
@@ -180,8 +180,8 @@ public class ClearsightRendererHandler {
                 case RendererState.transparent:
                     if (alpha <= 0.1) {
                         foreach (SubRenderHandler handler in handlers.Values) {
-                            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
-                                handler.CutawayInvisible(hasCutaway);
+                            if (!(state == CullingState.interloper))
+                                handler.CutawayInvisible(hasCutaway, false);
                         }
                         currentRendererState = RendererState.transparent;
                     }
@@ -198,8 +198,8 @@ public class ClearsightRendererHandler {
                     if (alpha <= 0) {
                         MakeInvisible();
                         foreach (SubRenderHandler handler in handlers.Values) {
-                            if (!(state == CullingState.interloper && handler.data.dontHideInterloper))
-                                handler.CutawayInvisible(hasCutaway);
+                            if (!(state == CullingState.interloper))
+                                handler.CutawayInvisible(hasCutaway, false);
                         }
                         currentRendererState = RendererState.invisible;
                     }

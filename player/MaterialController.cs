@@ -207,6 +207,6 @@ public class MaterialController {
         }
     }
 
-    public bool active() => (disableBecauseInterloper && !tagSystemData.bulletPassthrough && !tagSystemData.dontHideInterloper) ||
-                (disableRender && !tagSystemData.dontHideAbove);
+    public bool active() => (disableBecauseInterloper && !tagSystemData.bulletPassthrough) ||
+                (disableRender);
 }
