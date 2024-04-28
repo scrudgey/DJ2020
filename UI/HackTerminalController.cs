@@ -75,7 +75,11 @@ public class HackTerminalController : MonoBehaviour {
     }
     void ShowButtons() {
         passwordButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery && hackTarget.node.lockLevel > 0);
-        downloadButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery && hackTarget.node.lockLevel == 0 && hackTarget.node.payData != null && !hackTarget.node.dataStolen && hackTarget.node.type == CyberNodeType.datanode);
+        downloadButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery &&
+                                    hackTarget.node.lockLevel == 0 &&
+                                    hackTarget.node.payData != null &&
+                                    !hackTarget.node.dataStolen &&
+                                    hackTarget.node.type == CyberNodeType.datanode);
         utilityButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery && hackTarget.node.lockLevel == 0 && hackTarget.node.type == CyberNodeType.utility);
     }
     void HideButtons() {

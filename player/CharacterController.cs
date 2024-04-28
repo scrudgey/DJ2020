@@ -800,6 +800,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 DismountHVAC(_currentHVACNode);
             }
         }
+
+        if (result.changeScene) {
+            GameManager.I.SaveGameData();
+            GameManager.I.LoadScene(result.toSceneName, () => {
+                GameManager.I.StartWorld(result.toSceneName);
+                Debug.Log("start world finished");
+            });
+        }
+
     }
 
     public void HandleSwitchWeapon(int index) {

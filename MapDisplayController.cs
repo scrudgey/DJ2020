@@ -213,6 +213,7 @@ public class MapDisplayController : MonoBehaviour {
         };
         foreach (Transform column in columns) {
             foreach (Transform child in column) {
+                if (child.name.Contains("header")) continue;
                 Destroy(child.gameObject);
             }
         }

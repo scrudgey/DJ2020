@@ -24,6 +24,8 @@ public record ItemUseResult {
     public AttackSurface attackSurface;
     public bool emptyUse;
     public HvacUseResult hvacUseResult;
+    public bool changeScene;
+    public string toSceneName;
     public static ItemUseResult Empty() => new ItemUseResult {
         hvacUseResult = HvacUseResult.Empty()
     };

@@ -12,11 +12,11 @@ public class SceneExit : Interactive {
         }
     }
     public override ItemUseResult DoAction(Interactor interactor) {
-        GameManager.I.SaveGameData();
-        GameManager.I.LoadScene(toSceneName, () => {
-            GameManager.I.StartWorld(toSceneName);
-        });
-        return ItemUseResult.Empty();
+
+        return ItemUseResult.Empty() with {
+            changeScene = true,
+            toSceneName = toSceneName
+        };
     }
     public override string ResponseString() {
         return $"used exit";

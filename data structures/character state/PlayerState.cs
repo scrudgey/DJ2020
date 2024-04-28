@@ -87,21 +87,25 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         GunState gunState7 = GunState.Instantiate(gun7);
         GunState gunState8 = GunState.Instantiate(gun8);
 
-        GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
-        gunState1.delta.activeMods.Add(silencer);
+        // GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
+        // gunState1.delta.activeMods.Add(silencer);
 
         WeaponState sword = new WeaponState(swordTemplate);
 
+        // List<WeaponState> allGuns = new List<WeaponState> {
+        //     new WeaponState( gunState1),
+        //     new WeaponState( gunState2),
+        //     new WeaponState( gunState3),
+        //     new WeaponState( gunState4),
+        //     new WeaponState( gunState5),
+        //     new WeaponState( gunState6),
+        //     new WeaponState( gunState7),
+        //     new WeaponState( gunState8),
+        //     sword
+        // };
+
         List<WeaponState> allGuns = new List<WeaponState> {
-            new WeaponState( gunState1),
-            new WeaponState( gunState2),
-            new WeaponState( gunState3),
-            new WeaponState( gunState4),
-            new WeaponState( gunState5),
-            new WeaponState( gunState6),
-            new WeaponState( gunState7),
-            new WeaponState( gunState8),
-            sword
+            new WeaponState( gunState1)
         };
 
 
@@ -109,23 +113,23 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             // ItemTemplate.LoadItem("C4"),
             // ItemTemplate.LoadItem("rocket"),
             // ItemTemplate.LoadItem("goggles"),
-            ItemTemplate.LoadItem("grenade"),
+            // ItemTemplate.LoadItem("grenade"),
             ItemTemplate.LoadItem("deck"),
         };
 
-        List<LootData> loots = new List<LootData> {
-            Resources.Load("data/loot/drug/rush") as LootData,
-            Resources.Load("data/loot/drug/rush") as LootData,
-            Resources.Load("data/loot/drug/rush") as LootData,
-            Resources.Load("data/loot/drug/vial") as LootData,
-            Resources.Load("data/loot/drug/vial") as LootData,
-            Resources.Load("data/loot/drug/zyme") as LootData,
-            Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
-            Resources.Load("data/loot/industrial/tungstenRod") as LootData,
-            Resources.Load("data/loot/industrial/flask") as LootData,
-        };
+        // List<LootData> loots = new List<LootData> {
+        //     Resources.Load("data/loot/drug/rush") as LootData,
+        //     Resources.Load("data/loot/drug/rush") as LootData,
+        //     Resources.Load("data/loot/drug/rush") as LootData,
+        //     Resources.Load("data/loot/drug/vial") as LootData,
+        //     Resources.Load("data/loot/drug/vial") as LootData,
+        //     Resources.Load("data/loot/drug/zyme") as LootData,
+        //     Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
+        //     Resources.Load("data/loot/industrial/tungstenRod") as LootData,
+        //     Resources.Load("data/loot/industrial/flask") as LootData,
+        // };
 
-        // List<LootData> loots = new List<LootData>();
+        List<LootData> loots = new List<LootData>();
         // List<string> perks = new List<string>{
         //     "p1_1",
         //     "p1_2",
@@ -170,9 +174,9 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
         List<LootBuyerData> fences = new List<LootBuyerData>{
             Resources.Load("data/lootbuyer/snakeman") as LootBuyerData,
-            Resources.Load("data/lootbuyer/doctor") as LootBuyerData,
-            Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
-            Resources.Load("data/lootbuyer/posh") as LootBuyerData,
+            // Resources.Load("data/lootbuyer/doctor") as LootBuyerData,
+            // Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
+            // Resources.Load("data/lootbuyer/posh") as LootBuyerData,
         };
 
         return new PlayerState() {
@@ -191,11 +195,11 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             allItems = allItems,
             // primaryGun = sword,
             primaryGun = new WeaponState(gunState1),
-            // secondaryGun = null,
+            secondaryGun = null,
             // secondaryGun = new WeaponState(gunState2),
-            secondaryGun = sword,
-            // tertiaryGun = null,
-            tertiaryGun = new WeaponState(gunState3),
+            // secondaryGun = sword,
+            tertiaryGun = null,
+            // tertiaryGun = new WeaponState(gunState3),
             activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
@@ -219,8 +223,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
             payDatas = new List<PayData>(),
 
-            credits = 9650,
-            favors = 7,
+            credits = 1250,
+            favors = 0,
             // credits = 600,
             loots = loots,
 

@@ -45,6 +45,8 @@ public class MontageViewController : MonoBehaviour {
     [Header("nightclub")]
     public Transform clubJackHolder;
     public GameObject clubImageHolder;
+    public GameObject clubReactionHolder;
+
     public ClubMontageButton[] clubMontageButtons;
     public RectTransform laserBundle1;
     public RectTransform laserBundle2;
@@ -70,6 +72,7 @@ public class MontageViewController : MonoBehaviour {
         continueButton.SetActive(false);
         clubButtonsHolder.SetActive(false);
         restaurantReactionHolder.SetActive(false);
+        clubReactionHolder.SetActive(false);
         worldmapView.Initialize();
 
         chibiJackAnimation.enabled = false;
@@ -176,11 +179,13 @@ public class MontageViewController : MonoBehaviour {
         }
         int i = 0;
         foreach (LootBuyerData tactic in targetTactics) {
+            // Debug.Log($"configuring club montage button {i} {tactic}");
             clubMontageButtons[i].Initialize(this, tactic);
             i++;
         }
         while (i < 3) {
-            barButtons[i].gameObject.SetActive(false);
+            // Debug.Log($"disabling club montage button {i}");
+            clubMontageButtons[i].gameObject.SetActive(false);
             i++;
         }
     }
@@ -240,7 +245,7 @@ public class MontageViewController : MonoBehaviour {
         barImageHolder.SetActive(false);
         reactionTextHolder.SetActive(false);
 
-        reactionImageHolder.SetActive(true);
+        clubReactionHolder.SetActive(true);
         plainTextHolder.SetActive(true);
 
         StartCoroutine(Toolbox.ChainCoroutines(

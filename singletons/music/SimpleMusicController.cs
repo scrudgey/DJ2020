@@ -33,7 +33,7 @@ public class SimpleMusicController : MusicMixController {
     public override void Stop() {
         foreach (Coroutine routine in fadeRoutines) {
             if (routine == null) continue;
-            GameManager.I.StopCoroutine(routine);
+            GameManager.I?.StopCoroutine(routine);
         }
         audioSources.ToList().ForEach(audiosource => {
             audiosource.volume = 0f;

@@ -57,7 +57,6 @@ public class CullingComponent : MonoBehaviour {
             this.bounds = tmpBounds;
             Transform findAnchor = transform.Find("anchor");
             if (findAnchor != null) {
-                Debug.Log($"found clear sighter anchor: {gameObject} {findAnchor}");
                 this.adjustedPosition = findAnchor.position;
             } else {
                 this.adjustedPosition = tmpBounds.center;

@@ -58,7 +58,10 @@ public class MusicController : Singleton<MusicController> {
             "Shop N Go Mart LOOP - VER 2.0 - DJ3 2024"
         }},
         {MusicTrack.sympatheticDetonation, new string[]{
-            "Sympathetic Detonation LOOP - Ver 1.0 - DJ3 2024"
+            "Sympathetic Detonation LOOP - VER 6.5 - DJ3 2024"
+        }},
+        {MusicTrack.bestLaidPlans, new string[]{
+            "The Best Laid Plans Get Knocked Up LOOP - VER 2.0 - DJ3 2024"
         }}
     };
     public AudioSource[] audioSources;
