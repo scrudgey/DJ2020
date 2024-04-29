@@ -10,7 +10,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     enum State { normal, showAll, aboveOnly }
     enum FloorState { visible, invisible }
     State state;
-    static readonly int BATCHSIZE = 500;
+    static readonly int BATCHSIZE = 50000;
     readonly static int jobBatchSize = 18;
 
     public Transform followTransform;
@@ -570,12 +570,15 @@ public class NeoClearsighterV4 : MonoBehaviour {
         DisposeOfNativeArrays();
     }
     void DisposeOfNativeArrays() {
-        // if (!gatherJobHandle.IsCompleted) {
         gatherJobHandle.Complete();
-        // }
+
         if (radarDirections.IsCreated) {
             radarDirections.Dispose();
             radarDirections = default;
+        }
+        if (raycastOrigins.IsCreated) {
+            raycastOrigins.Dispose();
+            raycastOrigins = default;
         }
         if (raycastResults.IsCreated) {
             raycastResults.Dispose();
@@ -584,6 +587,10 @@ public class NeoClearsighterV4 : MonoBehaviour {
         if (raycastResultsBackBuffer.IsCreated) {
             raycastResultsBackBuffer.Dispose();
             raycastResultsBackBuffer = default;
+        }
+        if (distances.IsCreated) {
+            distances.Dispose();
+            distances = default;
         }
         if (commands.IsCreated) {
             commands.Dispose();

@@ -525,23 +525,21 @@ public partial class GameManager : Singleton<GameManager> {
 
             if (gameData.levelState != null)
                 uiController?.UpdateWithPlayerInput(ref playerInput);
-            // }
 
             UpdateCursor(uiclick, playerInput);
 
             CameraInput input = default;
             if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
                 input = uiController.GetOverlayCameraInput();
-                // clearSighterV3.temporaryFollowTransform = 
                 if (uiController.mouseOverScrollBox) {
                     playerInput.zoomInput = Vector2.zero;
                 }
                 foreach (IInputReceiver i in inputReceivers) {
-                    // Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
-                    // playerInput.lookAtDirection = directionToCursor;
-                    i.SetInputs(PlayerInput.none);
+                    if (i != null)
+                        i.SetInputs(PlayerInput.none);
                 }
-                characterCamera.SetInputs(playerInput);
+                if (characterCamera != null)
+                    characterCamera.SetInputs(playerInput);
 
             } else {
                 input = playerCharacterController.BuildCameraInput();

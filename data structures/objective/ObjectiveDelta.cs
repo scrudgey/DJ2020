@@ -1,6 +1,8 @@
 using System;
+using Newtonsoft.Json;
 using UnityEngine;
 
+[System.Serializable]
 public class ObjectiveDelta {
     ObjectiveStatus _status;
     public ObjectiveStatus status {
@@ -11,8 +13,12 @@ public class ObjectiveDelta {
         }
     }
     public Objective.Visibility visibility;
+
+    [JsonConverter(typeof(Objective))]
     public Objective template;
+
     public Func<Vector3> GetPosition;
+
     public string targetIdn;
     public bool hasLocation = true;
 

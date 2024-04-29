@@ -35,7 +35,7 @@ public class SpeechTextController : MonoBehaviour {
         cam = Camera.main;
         HideText();
         visibilityTimer = 0f;
-        SetRectPositions();
+        // SetRectPositions();
     }
     void OnDisable() {
         HideText();
@@ -76,7 +76,15 @@ public class SpeechTextController : MonoBehaviour {
         ShowText();
     }
     void SetRectPositions() {
-        childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position + offset));
+        // childRects.ForEach((rect) => rect.position = cam.WorldToScreenPoint(followTransform.position + offset));
+        try {
+            foreach (RectTransform childRect in childRects) {
+                childRect.position = cam.WorldToScreenPoint(followTransform.position + offset);
+            }
+        }
+        catch (Exception e) {
+            Debug.LogError($"exception while setting rect positions: {e}");
+        }
     }
 
     void ShowText() {

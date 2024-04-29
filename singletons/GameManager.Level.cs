@@ -59,7 +59,10 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void StartVRMission(VRMissionState state, SceneData sceneData) {
         Debug.Log("GameMananger: start VR mission");
-        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+        if (SceneManager.GetSceneByName("UI").isLoaded) {
+            uiController.Initialize();
+            uiController.InitializeObjectivesController(gameData);
+        } else {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
                 uiController.Initialize();
@@ -77,13 +80,17 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void StartMission(LevelState state, SceneData sceneData, bool spawnNpcs = true, bool doCutscene = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
-        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+        if (SceneManager.GetSceneByName("UI").isLoaded) {
+            uiController.Initialize();
+            uiController.InitializeObjectivesController(gameData);
+        } else {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
                 uiController.Initialize();
                 uiController.InitializeObjectivesController(gameData);
             }, unloadAll: false);
         }
+
         InitializeLevel(state.plan, sceneData);
         LoadSkyboxForScene(sceneData);
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
@@ -155,7 +162,11 @@ public partial class GameManager : Singleton<GameManager> {
             StartCutsceneCoroutine(StartMissionCutscene());
     }
     public void StartWorld(string sceneName) {
-        if (!SceneManager.GetSceneByName("UI").isLoaded) {
+        if (SceneManager.GetSceneByName("UI").isLoaded) {
+            uiController.Initialize();
+            uiController.HideUI();
+            uiController.ShowInteractiveHighlight();
+        } else {
             LoadScene("UI", () => {
                 uiController = GameObject.FindObjectOfType<UIController>();
                 uiController.Initialize();
@@ -181,7 +192,6 @@ public partial class GameManager : Singleton<GameManager> {
         LoadSkyboxForScene(sceneData);
         // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
         MusicController.I.PlaySimpleTrack(MusicTrack.sympatheticDetonation);
-
         TransitionToPhase(GamePhase.world);
     }
 
@@ -283,6 +293,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void LoadAfterActionReport() {
         MusicController.I.Stop();
+        MusicController.I.PlaySimpleTrack(MusicTrack.bestLaidPlans);
         TransitionToPhase(GamePhase.afteraction);
         LoadScene("AfterAction", () => {
             NeoAfterActionReport handler = GameObject.FindObjectOfType<NeoAfterActionReport>();
@@ -300,7 +311,8 @@ public partial class GameManager : Singleton<GameManager> {
             int sceneCount = SceneManager.sceneCount;
             for (int i = 0; i < sceneCount; i++) {
                 string activeSceneName = SceneManager.GetSceneAt(i).name;
-                scenesToUnload.Add(activeSceneName);
+                if (activeSceneName != "UI")
+                    scenesToUnload.Add(activeSceneName);
             }
 
             // Debug.Log("show loading screen");
@@ -315,7 +327,6 @@ public partial class GameManager : Singleton<GameManager> {
                 callback();
 
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
-                // Debug.Log("remove loading screen");
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
             isLoadingLevel = false;

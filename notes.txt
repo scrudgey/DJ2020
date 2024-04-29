@@ -3329,6 +3329,14 @@ x ladders
 dialogue?
 speed up + pitch up blitting?
 * phone menu portrait is green
+* neighborbutton not working
+* hacking is broken
+    * download is broken
+* importer bad font
+* mapview is broken reference to scenedata
+* lootcanvashandler missing graph icon reference
+* missing headers for map markers in mission plan
+
 
 
 
@@ -3818,7 +3826,7 @@ medium-effort mini systems work:
         first: gun shop progression
         gun perks
     finish up world
-        gaps in floor can see subway below
+        * gaps in floor can see subway below
         edges of map
         flickery lights
     bar tells fence location
@@ -3832,12 +3840,11 @@ polish
     fix skybox again
     better agreement between wallpress/third person post processing and isometric
     faster camera spin?
-    overhaul clearsighter
     elevator needs polish in general
-        stealing data was broken in elevator level
         footstep sounds- loud, weird?
         cyber jump inside resulted in bizarre behavior
         scientist said "if you see anything let me know"
+
 
 add perks to main escape menu / replace main escape menu
     loot, data, key, map
@@ -3845,13 +3852,37 @@ add perks to main escape menu / replace main escape menu
 
 logos for omni, delta, elf
 
-missing headers for map markers in mission plan
-hacking is broken
-
 player shadow!
     duplicate sprites in shadows-only mode
-mapview is broken reference to scenedata
-lootcanvashandler missing graph icon reference
-hack was broken in jtd
-police sirens
-city ambience
+
+ambience system
+    a separate channel in mixer
+    non-spatial audio- let code control volume
+    collider regions tied to audio clips
+        police sirens
+        city ambience
+        room tone
+
+
+
+
+
+fix save data serialization
+    error writing to file: /Users/rfoltz/Library/Application Support/DefaultCompany/wetworks/saveGames/test Newtonsoft.Json.JsonSerializationException: Self referencing loop detected for property 'normalized' with type 'UnityEngine.Vector3'. Path 'levelState.delta.objectiveDeltas[0].template.spawnPointLocations[0].normalized'.
+prevent objectives from choosing the same target
+
+fix UI on title screen
+fix UI in world scene
+
+fix up the cyberdeck loadout screen
+
+
+* fix crash to desktop
+* make UI don't destroy on load, never unload UI scene
+* fix starting gear
+* clean teardown of jobs/native collections on scene change
+* fix speechtextcontroller
+* stealing data was broken in elevator level
+* overhaul clearsighterx
+* connect new musics
+* broken after action cutscene
