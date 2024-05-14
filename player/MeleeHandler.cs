@@ -150,6 +150,7 @@ public class MeleeHandler : MonoBehaviour, IBindable<MeleeHandler> {
     }
 
     void Impact(Collider other) {
+        if (meleeWeapon == null) return;
         if (swingRoutine != null) {
             StopCoroutine(swingRoutine);
         }

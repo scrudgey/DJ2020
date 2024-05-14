@@ -3428,7 +3428,14 @@ speed up + pitch up blitting?
 * doors are blocking people again?
 * softlock with expendable software
     * cyberdeck always comes with infinte-use cracker that requires being connected
-    
+* armor piercing ammo to be indicated somewhere in the gun info display
+    * gun perks
+* gun shop I.
+    * make guns for sale handled by gamestate and procedural generation
+    * allow gun perks
+        * gun perk icons in ui
+        * tooltip mouseover
+
 
 
 
@@ -3867,9 +3874,16 @@ unresolved mechanics / gameplay questions:
 
 
 
+missions
+    1 way shootout
+    productionize office
+        redo apartment after office
 
-armor piercing ammo to be indicated somewhere in the gun info display
-    gun perks
+
+make hack selection automatic
+    prefer shorter paths, prefer cyberdeck
+    highlight edges from compromised nodes
+    x
 key system
 ambience system
     a separate channel in mixer
@@ -3882,37 +3896,10 @@ ambience system
     determine distance to collider region and fade out?
         two regions? one for activation and one for distance?
 
-
 destructible walls
     gibs
     re-bake navmesh
 
-missions
-    1 way shootout
-    productionize office
-        redo apartment after office
 fix up the cyberdeck loadout screen
-update the steam page graphic
-
-
-cyberdeck:
     MB total? or slots?
-
-
-gun shop I.
-    * make guns for sale handled by gamestate and procedural generation
-    * allow gun perks
-        * gun perk icons in ui
-        tooltip mouseover
-    how do we make sure the end-game player has access to good guns?
-        1. new gun shop(s) in later game that have more good stuff
-        2. algorithm changes to favor more rare stuff as player progresses
-        3. shop in market with smaller selection but more random
-        4. a contact can get you anything you need at a premium
-        5. ask shop to hold a gun for you
-
-
-make hack selection automatic
-    prefer shorter paths, prefer cyberdeck
-    highlight edges from compromised nodes
-    x
+update the steam page graphic

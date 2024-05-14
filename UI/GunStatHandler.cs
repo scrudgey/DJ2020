@@ -64,6 +64,9 @@ public class GunStatHandler : MonoBehaviour {
     [Header("perks")]
     public Transform perkIconHolder;
     public GameObject perkIconPrefab;
+    public RectTransform toolTipTransform;
+    public TextMeshProUGUI toolTipTitle;
+    public TextMeshProUGUI toolTipDescription;
 
     GunStats compareGun;
     GunStats currentGun;
@@ -82,6 +85,7 @@ public class GunStatHandler : MonoBehaviour {
         }
     }
     void Start() {
+        HideToolTip();
         statBarRects = new Dictionary<GunStat, RectTransform>{
             {GunStat.shootInterval, shootIntervalBar},
             {GunStat.noise, noiseBar},
@@ -157,14 +161,21 @@ public class GunStatHandler : MonoBehaviour {
             GameObject obj = GameObject.Instantiate(perkIconPrefab);
             obj.transform.SetParent(perkIconHolder, false);
             GunPerkIcon icon = obj.GetComponent<GunPerkIcon>();
-            icon.Initialize(perk, graphIconReference);
+            icon.Initialize(perk, graphIconReference, ShowToolTip, HideToolTip);
         }
     }
+    void HideToolTip() {
+        toolTipTransform.gameObject.SetActive(false);
+    }
+    void ShowToolTip(GunPerkIcon gunPerkIcon) {
+        toolTipTransform.gameObject.SetActive(true);
+        toolTipTransform.transform.position = gunPerkIcon.transform.position;
+        toolTipTitle.text = gunPerkIcon.perk.type.ToString();
+        toolTipDescription.text = gunPerkIcon.perk.Description();
+    }
     void SetTemplateTexts(GunTemplate template) {
-        // nameText.text = template.name;
         typeText.text = template.type.ToString();
         cycleText.text = template.cycle.ToString();
-        // gunImage.sprite = template.image;
     }
     public void PopulateStats(GunStats template) {
         shootIntervalText.text = (template.getFireRate()).ToString("f1");
