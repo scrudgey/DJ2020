@@ -5,6 +5,8 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/NPCDialogueParameters")]
 public class NPCDialogueParameters : ScriptableObject {
+    public string conclusionSucces;
+    public string conclusionFail;
     public SuspicionDialogueParameters IdentitySuspicionParams;
     public SuspicionDialogueParameters GunshotHeardParams;
     public SuspicionDialogueParameters CrawlingParams;

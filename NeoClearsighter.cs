@@ -296,10 +296,10 @@ public class NeoClearsighter : MonoBehaviour {
                 cutawayRenderers[renderer].SetActive(false);
             }
             if (renderer.CompareTag("occlusionSpecial")) continue;
-            if (renderer.name == "elevator_car") {
-                Debug.Log("weird");
-                Debug.Break();
-            }
+            // if (renderer.name == "elevator_car") {
+            //     Debug.Log("weird");
+            //     Debug.Break();
+            // }
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
             renderer.material = initialMaterials[renderer];
             hiddenTransforms.Remove(renderer.transform.root);
@@ -325,10 +325,10 @@ public class NeoClearsighter : MonoBehaviour {
                 renderer.SetPropertyBlock(propBlock);
                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];
             } else {
-                if (renderer.name == "elevator_car") {
-                    Debug.Log("weird");
-                    Debug.Break();
-                }
+                // if (renderer.name == "elevator_car") {
+                //     Debug.Log("weird");
+                //     Debug.Break();
+                // }
 
                 renderer.material = initialMaterials[renderer];
                 renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;

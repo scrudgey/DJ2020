@@ -24,30 +24,32 @@ public class SoftwareModalController : MonoBehaviour {
     }
     public void Initialize(HackTerminalController terminalController, PlayerState playerState) {
         this.terminalController = terminalController;
-        CyberNode target = terminalController.hackTarget != null ? terminalController.hackTarget.node : null;
-        modalView.Initialize(GameManager.I.gameData.playerState, target);
-        PopulateSoftwareList(playerState, target);
+        CyberNode target = terminalController?.hackTarget?.node ?? null;
+        CyberNode origin = terminalController?.hackOrigin?.node ?? null;
+        List<CyberNode> path = terminalController.path;
+        modalView.Initialize(GameManager.I.gameData.playerState, target, origin, path);
+        PopulateSoftwareList(playerState, target, origin, path);
     }
-    void PopulateSoftwareList(PlayerState playerState, CyberNode target) {
+    void PopulateSoftwareList(PlayerState playerState, CyberNode target, CyberNode origin, List<CyberNode> path) {
         foreach (Transform child in selectorList) {
             Destroy(child.gameObject);
         }
         foreach (SoftwareState state in playerState.softwareStates) {
-            SoftwareSelector newselector = CreateSoftwareSelector(state, target);
+            SoftwareSelector newselector = CreateSoftwareSelector(state, target, origin, path);
             if (activeSelector == null) {
                 SelectorClickCallback(newselector);
             }
         }
     }
-    SoftwareSelector CreateSoftwareSelector(SoftwareState softwareState, CyberNode target) {
+    SoftwareSelector CreateSoftwareSelector(SoftwareState softwareState, CyberNode target, CyberNode origin, List<CyberNode> path) {
         GameObject obj = GameObject.Instantiate(softwareSelectorPrefab);
         SoftwareSelector selector = obj.GetComponent<SoftwareSelector>();
-        selector.Initialize(softwareState, SelectorClickCallback, target);
+        selector.Initialize(softwareState, SelectorClickCallback, target, origin, path);
         selector.transform.SetParent(selectorList, false);
         return selector;
     }
     public void SelectorClickCallback(SoftwareSelector selector) {
-        modalView.Display(selector.softwareState);
+        modalView.DisplayState(selector.softwareState, selector.path);
         activeSelector = selector;
     }
 

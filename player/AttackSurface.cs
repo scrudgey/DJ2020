@@ -61,7 +61,8 @@ public class AttackSurface : MonoBehaviour {
         attackCam.enabled = true;
     }
     public void DisableAttackSurface() {
-        attackCam.enabled = false;
+        if (attackCam != null)
+            attackCam.enabled = false;
     }
 
     public void EnableOutline() {
@@ -88,6 +89,7 @@ public class AttackSurface : MonoBehaviour {
         RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.attackSurface, Layer.bulletOnly));
         foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
             ObiRope rope = hit.collider.gameObject.GetComponent<ObiRope>();
+            Debug.Log($"{hit.collider.gameObject} {rope}");
             if (rope != null) {
                 MeshRenderer meshRenderer = rope.GetComponent<MeshRenderer>();
                 if (!meshRenderer.enabled) continue;
@@ -110,6 +112,7 @@ public class AttackSurface : MonoBehaviour {
                 AttackSurfaceWire wireElement = rope.GetComponent<AttackSurfaceWire>();
                 if (wireElement != null) {
                     result = wireElement?.DoCut();
+                    Debug.Log($"{wireElement} {result}");
                     if (result.success) {
                         rope.Tear(rope.elements[index]);
                         rope.RebuildConstraintsFromElements();
@@ -119,7 +122,7 @@ public class AttackSurface : MonoBehaviour {
                     rope.RebuildConstraintsFromElements();
                 }
             }
-            // Debug.Log($"break on: {hit.collider.gameObject}");
+            Debug.Log($"break on: {hit.collider.gameObject}");
             break;
         }
         return result;

@@ -14,13 +14,14 @@ public class ObjectiveDelta {
     }
     public Objective.Visibility visibility;
 
-    [JsonConverter(typeof(Objective))]
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<Objective>))]
     public Objective template;
 
     public Func<Vector3> GetPosition;
 
     public string targetIdn;
     public bool hasLocation = true;
+    public int progressInt;
 
     public ObjectiveDelta(Objective objective, Func<Vector3> GetPosition, string targetIdn) {
         this.template = objective;

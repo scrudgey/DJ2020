@@ -7,6 +7,7 @@ public class SoftwareTemplate {
     public string name;
     public SoftwareEffect.Type principalType;
     public List<SoftwareEffect> effects;
+    public bool infiniteCharges;
     public int maxCharges;
 
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
@@ -52,25 +53,7 @@ public class SoftwareTemplate {
             timerRate = 1f,
             payData = target.payData,
             path = path,
-            // fromPlayerNode = target.isManualHackerTarget
         };
-        // else if (effect.type == SoftwareEffect.Type.download) {
-        //     networkAction.title = $"downloading {node.payData.filename}...";
-        //     networkAction.path = graph.GetPathToNearestDownloadPoint(node);
-        //     if (node.isManualHackerTarget) {
-        //         networkAction.fromPlayerNode = true;
-        //     }
-        // } 
-        // else if (node.isManualHackerTarget) {
-        //     networkAction.fromPlayerNode = true;
-        // } else {
-        //     networkAction.path.Add(node);
-        //     networkAction.path.Add(graph.GetNearestCompromisedNode(node));
-        // }
-
-        // if (networkAction.path.Count > 1 && networkAction.path[networkAction.path.Count - 1].isManualHackerTarget) {
-        //     networkAction.fromPlayerNode = true;
-        // }
 
         return networkAction;
     }

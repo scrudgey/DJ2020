@@ -96,4 +96,19 @@ public class LevelState : PerkIdConstants {
         return delta.lastTactics.Where(tactic => tactic == type).Count();
     }
 
+    public string SetLocationOfObjective(Objective objective) {
+        if (delta.objectiveLocations.ContainsKey(objective.name)) {
+            return delta.objectiveLocations[objective.name];
+        } else if (plan.objectiveLocations.ContainsKey(objective.name)) {
+            string target = plan.objectiveLocations[objective.name];
+            delta.objectiveLocations[objective.name] = target;
+            return target;
+        } else {
+            List<string> occupiedTargets = new List<string>(new HashSet<string>(delta.objectiveLocations.Values).Union(new HashSet<string>(plan.objectiveLocations.Values)));
+            string target = Toolbox.RandomFromListExcept(objective.potentialSpawnPoints, occupiedTargets);
+            delta.objectiveLocations[objective.name] = target;
+            return target;
+        }
+    }
+
 }

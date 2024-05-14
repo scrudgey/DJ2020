@@ -14,6 +14,7 @@ public class GunStatHandler : MonoBehaviour {
     public RectTransform mainContainer;
     public Color positiveOffsetColor;
     public Color negativeOffsetColor;
+    public GraphIconReference graphIconReference;
 
     [Header("shootInterval")]
     public TextMeshProUGUI shootIntervalText;
@@ -59,6 +60,10 @@ public class GunStatHandler : MonoBehaviour {
     public RectTransform weightOffsetBar;
 
     public Image gunImage;
+
+    [Header("perks")]
+    public Transform perkIconHolder;
+    public GameObject perkIconPrefab;
 
     GunStats compareGun;
     GunStats currentGun;
@@ -118,9 +123,10 @@ public class GunStatHandler : MonoBehaviour {
             nameText.text = template.name;
             gunImage.sprite = template.images[0];
             DisplayStats(template.GetGunStats());
+            DisplayPerks(template.intrinsicPerks);
         }
     }
-    public void DisplayGunTemplate(GunState gunState) {
+    public void DisplayGunState(GunState gunState) {
         if (gunState == null) {
             ClearGunTemplate();
         } else {
@@ -128,16 +134,31 @@ public class GunStatHandler : MonoBehaviour {
             nameText.text = gunState.getName();
             gunImage.sprite = gunState.GetSprite();
             DisplayStats(gunState.GetGunStats());
+            DisplayPerks(gunState.template.intrinsicPerks.Concat(gunState.delta.perks).ToList());
         }
     }
     public void ClearGunTemplate() {
         currentGun = null;
         ClearStats();
+        foreach (Transform child in perkIconHolder) {
+            Destroy(child.gameObject);
+        }
     }
     public void DisplayStats(GunStats newStats) {
         currentGun = newStats;
         PopulateStats(currentGun);
         LerpBars(currentGun);
+    }
+    public void DisplayPerks(List<GunPerk> perks) {
+        foreach (Transform child in perkIconHolder) {
+            Destroy(child.gameObject);
+        }
+        foreach (GunPerk perk in perks) {
+            GameObject obj = GameObject.Instantiate(perkIconPrefab);
+            obj.transform.SetParent(perkIconHolder, false);
+            GunPerkIcon icon = obj.GetComponent<GunPerkIcon>();
+            icon.Initialize(perk, graphIconReference);
+        }
     }
     void SetTemplateTexts(GunTemplate template) {
         // nameText.text = template.name;

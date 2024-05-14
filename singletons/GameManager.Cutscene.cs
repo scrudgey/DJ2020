@@ -126,11 +126,13 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public IEnumerator ExtractionZoneCutscene(ExtractionZone zone) {
+        Debug.Log($"starting extraction zone cutscene {zone}");
         float timer = 0f;
         float duration = 4f;
         characterCamera.followCursorCoefficient = 1f;
         // clearSighter2.followTransform = zone.transform;
-        clearSighterV3.followTransform = zone.transform;
+        // clearSighterV3.followTransform = zone.transform;
+        clearsighterV4.followTransform = zone.transform;
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             Time.timeScale = Mathf.Lerp(Time.timeScale, 0f, 0.01f);
@@ -158,7 +160,8 @@ public partial class GameManager : Singleton<GameManager> {
         characterCamera.followCursorCoefficient = 5f;
 
         // clearSighter2.followTransform = playerObject.transform;
-        clearSighterV3.followTransform = playerObject.transform;
+        // clearSighterV3.followTransform = playerObject.transform;
+        clearsighterV4.followTransform = playerObject.transform;
 
         yield return null;
     }

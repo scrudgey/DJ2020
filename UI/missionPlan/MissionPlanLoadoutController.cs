@@ -178,13 +178,15 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
 
     public void WeaponSlotClicked(int slotIndex, WeaponState weaponState, bool clear = false) {
-        if (!clear)
-            ShowStatsView();
-        if (weaponState.type == WeaponType.gun) {
-            gunStatHandler.DisplayGunTemplate(weaponState.gunInstance);
-            gunStatHandler.SetCompareGun(weaponState.gunInstance);
-        } else {
+        if (clear) {
             gunStatHandler.ClearGunTemplate();
+
+        } else {
+            ShowStatsView();
+            if (weaponState.type == WeaponType.gun) {
+                gunStatHandler.DisplayGunState(weaponState.gunInstance);
+                gunStatHandler.SetCompareGun(weaponState.gunInstance);
+            }
         }
 
         selectedWeaponSlot = slotIndex;
@@ -267,7 +269,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 // gunStatHandler.SetCompareGun(picker.gunstate.template);
                 // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
                 if (picker.gunstate.type == WeaponType.gun) {
-                    gunStatHandler.DisplayGunTemplate(picker.gunstate.gunInstance);
+                    gunStatHandler.DisplayGunState(picker.gunstate.gunInstance);
                 } else {
                     gunStatHandler.ClearGunTemplate();
                 }
@@ -284,7 +286,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                     3 => tertiaryWeaponButton
                 };
                 if (button.gunState.type == WeaponType.gun) {
-                    gunStatHandler.DisplayGunTemplate(button.gunState.gunInstance);
+                    gunStatHandler.DisplayGunState(button.gunState.gunInstance);
                 } else {
                     gunStatHandler.ClearGunTemplate();
                 }
@@ -473,7 +475,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         if (button.gunState != null) {
             ShowStatsView();
             if (button.gunState.type == WeaponType.gun) {
-                gunStatHandler.DisplayGunTemplate(button.gunState.gunInstance);
+                gunStatHandler.DisplayGunState(button.gunState.gunInstance);
             } else {
                 gunStatHandler.ClearGunTemplate();
             }

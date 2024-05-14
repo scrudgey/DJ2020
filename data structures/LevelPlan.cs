@@ -21,11 +21,11 @@ public record LevelPlan {
 
     public SerializableDictionary<string, string> objectiveLocations;
 
-    public static LevelPlan Default(PlayerState playerState) { // TODO: replace argument with playerstate?
-
-        // TODO: initialize software templates from player default as well
+    public static LevelPlan Default(PlayerState playerState) {
         List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
-        List<SoftwareTemplate> softwares = new List<SoftwareTemplate>() { null, null, null };
+        List<SoftwareTemplate> softwares = new List<SoftwareTemplate>() { SoftwareScriptableTemplate.Load("crack_inf").ToTemplate(), null, null, null };
+
+        // initialize item loadout
         if (playerState.allItems.Count >= 1) {
             itemList[0] = playerState.allItems[0];
         }
@@ -38,14 +38,17 @@ public record LevelPlan {
         if (playerState.allItems.Count >= 4) {
             itemList[3] = playerState.allItems[3];
         }
+
+        // initialize software loadout
         if (playerState.softwareTemplates.Count > 0) {
             int j = 0;
-            for (int i = 0; i < softwares.Count; i++) {
+            for (int i = 1; i < softwares.Count; i++) {
                 softwares[i] = playerState.softwareTemplates[j];
                 j++;
                 if (j >= playerState.softwareTemplates.Count) j = 0;
             }
         }
+
         return new LevelPlan {
             insertionPointIdn = "",
             extractionPointIdn = "",
@@ -68,6 +71,17 @@ public record LevelPlan {
             // if (startWithFakeID()) {
             //     itemHandler.items.Add(ItemInstance.LoadItem("ID"));
             // }
+        }
+    }
+
+    public void SetObjectiveLocation(Objective objective) {
+        if (objectiveLocations.ContainsKey(objective.name)) {
+            Debug.Log($"set objective location: skipping already set {objective.name}");
+            return;
+        } else {
+            string target = Toolbox.RandomFromListExcept(objective.potentialSpawnPoints, objectiveLocations.Values.ToArray());
+            Debug.Log($"tactic intel is setting objective {objective.name} spawn point: {target}");
+            objectiveLocations[objective.name] = target;
         }
     }
 

@@ -23,6 +23,7 @@ public class GunState : IGunStatProvider {
             Rack();
         }
     }
+    public int GetCost() => template.baseCost + delta.perks.Select(perk => perk.cost).Sum();
     public int MaxAmmo() => getClipSize();
 
     public bool CanShoot() => delta.CanShoot();
@@ -51,15 +52,15 @@ public class GunState : IGunStatProvider {
     }
     public NoiseData GetShootNoise() => shootNoise();
 
-    public static GunState Instantiate(GunTemplate template) => new GunState {
+    public static GunState Instantiate(GunTemplate template, bool applyRandomPerks = false) => new GunState {
         template = template,
-        delta = GunDelta.From(template)
+        delta = GunDelta.From(template, applyRandomPerks)
     };
-    public static GunState Instantiate(GunTemplate template, GunDelta delta) {
-        GunState state = Instantiate(template);
-        state.ApplyDelta(delta);
-        return state;
-    }
+    // public static GunState Instantiate(GunTemplate template, GunDelta delta) {
+    //     GunState state = Instantiate(template);
+    //     state.ApplyDelta(delta);
+    //     return state;
+    // }
     public void ApplyDelta(GunDelta newDelta) {
         this.delta = newDelta;
     }
@@ -67,6 +68,9 @@ public class GunState : IGunStatProvider {
         GunStats templateStats = template.GetGunStats();
         foreach (GunMod mod in delta.activeMods) {
             templateStats += mod.GetGunStats();
+        }
+        foreach (GunPerk perk in delta.perks.Concat(template.intrinsicPerks)) {
+            templateStats += perk.GetGunStats();
         }
         return templateStats;
     }
@@ -94,42 +98,40 @@ public class GunState : IGunStatProvider {
         }
     }
 
-    public float getBaseDamage() =>
-        delta.activeMods
-            .Select(mod => mod.baseDamage).Aggregate(template.baseDamage, (current, next) => current + next)
-            .GetRandomInsideBound();
-
+    public float getBaseDamage() => (delta.activeMods.Select(mod => mod.baseDamage))
+                    .Concat(delta.perks.Select(perk => perk.baseDamage))
+                    .Aggregate(template.baseDamage, (current, next) => current + next)
+                    .GetRandomInsideBound();
 
     public bool getSilencer() =>
         (template.silencer || delta.activeMods.Any(mod => mod.type == GunModType.silencer));
 
-    public float getNoise() => template.noise + delta.activeMods.Select(mod => mod.noise).Sum();
+    public float getNoise() => template.noise + delta.activeMods.Select(mod => mod.noise).Sum() + delta.perks.Select(perk => perk.noise).Sum();
 
-    public int getClipSize() => template.clipSize + delta.activeMods.Select(mod => mod.clipSize).Sum();
+    public int getClipSize() => template.clipSize + delta.activeMods.Select(mod => mod.clipSize).Sum() + delta.perks.Select(perk => perk.clipSize).Sum();
 
     public float getPitch() {
         // TODO:: apply mods
         return template.pitch;
     }
-    public float getShootInterval() => template.shootInterval + delta.activeMods.Select(mod => mod.shootInterval).Sum();
+    public float getShootInterval() => template.shootInterval + delta.activeMods.Select(mod => mod.shootInterval).Sum() + delta.perks.Select(perk => perk.shootInterval).Sum();
 
     public float getMuzzleFlashSize() {
         return template.muzzleflashSize;
     }
     public float getWeight() {
-        return template.weight;
+        return template.weight + delta.activeMods.Select(mod => mod.weight).Sum() + delta.perks.Select(perk => perk.weight).Sum();
     }
-    public float getSpread() => template.spread + delta.activeMods.Select(mod => mod.spread).Sum();
+    public float getSpread() => template.spread + delta.activeMods.Select(mod => mod.spread).Sum() + delta.perks.Select(perk => perk.spread).Sum();
 
     public float getRange() {
         return template.range;
     }
     public int getPiercing() {
-        return template.piercing;
+        return template.piercing + delta.activeMods.Select(mod => mod.armorPiercing).Sum() + delta.perks.Select(perk => perk.armorPiercing).Sum();
     }
-
     public float getLockOnSize() {
-        return template.lockOnSize;
+        return template.lockOnSize + delta.activeMods.Select(mod => mod.lockOnSize).Sum() + delta.perks.Select(perk => perk.lockOnSize).Sum();
     }
     public LoHi getRecoil() {
         return template.recoil;

@@ -13,9 +13,9 @@ public class EscapeMenuDataController : MonoBehaviour {
     public TextMeshProUGUI viewTitle;
     public Image viewIcon;
     public TextMeshProUGUI viewDescription;
-    public void Initialize(GameData data) {
+    public void Initialize(List<PayData> datas) {
         ClearView();
-        List<PayData> datas = data.playerState.payDatas.Concat(data.levelState.delta.levelAcquiredPaydata).ToList();
+        // List<PayData> datas = data.playerState.payDatas.Concat(data.levelState.delta.levelAcquiredPaydata).ToList();
         PopulateKeyColumn(datas);
     }
 

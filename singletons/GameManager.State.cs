@@ -138,9 +138,12 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     void ActivateExtractionPoint() {
+        Debug.Log($"activate extraction point plan: {gameData.levelState.plan.extractionPointIdn}");
         if (gameData.levelState.plan.extractionPointIdn != "") { // default
             foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
+                Debug.Log($"activate extraction point check zone {zone.data.idn}");
                 if (zone.data.idn == gameData.levelState.plan.extractionPointIdn) {
+                    Debug.Log($"enabling extraction zone: {zone}");
                     zone.EnableExtractionZone();
                     if (zone.ContainsPlayerLocation(playerObject.transform.position)) {
                         zone.HandlePlayerActivation();

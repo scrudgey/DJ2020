@@ -81,9 +81,9 @@ public class MissionPlanController : MonoBehaviour {
         plan = gameData.GetLevelPlan(template);
         loadoutController.Initialize(data, template, plan);
         // mapController.Initialize(data, template, plan);
-        SceneData sceneData = SceneData.loadSceneData(template.sceneName);
+        // SceneData sceneData = SceneData.loadSceneData(template.sceneName);
 
-        mapDisplay.Initialize(template, plan, sceneData);
+        mapDisplay.Initialize(template, plan, template.initialScene);
         tacticsController.Initialize(data, template, plan);
         overviewController.Initialize(data, template, plan);
         cyberController.Initialize(data, template, plan);

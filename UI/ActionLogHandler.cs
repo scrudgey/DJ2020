@@ -37,12 +37,12 @@ public class ActionLogHandler : IBinder<Interactor> {
         }
     }
     override public void HandleValueChanged(Interactor interactor) {
-        InteractorTargetData newData = interactor.ActiveTarget();
-        if (!InteractorTargetData.Equality(data, newData)) {
-            Disable();
-            data = newData;
-            DataChanged();
-        }
+        // InteractorTargetData newData = interactor.ActiveTarget();
+        // if (!InteractorTargetData.Equality(data, newData)) {
+        //     Disable();
+        //     data = newData;
+        //     DataChanged();
+        // }
     }
     void HandleActionDone(InteractorTargetData data) {
         CreateLogEntry($"{prefix}{data.target.actionPrompt}\n{data.target.ResponseString()}");

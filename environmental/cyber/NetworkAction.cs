@@ -13,7 +13,6 @@ public class NetworkAction {
     public float timer;
     public float lifetime;
     public CyberNode toNode;
-    // public bool fromPlayerNode;
     public List<CyberNode> path;
     public float timerRate = 1f;
     public bool complete;

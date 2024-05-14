@@ -454,6 +454,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
             // Reaction reaction = ReactToPlayerSuspicion();
             stateMachine.currentState.OnPlayerPerceived();
             if (playerHasGunOut) {
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case WorkerSearchDirectionState:
                     case WorkerGuardState:
@@ -463,6 +465,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                         break;
                 }
             } else if (playerTotalSuspicion == Suspiciousness.aggressive) {
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case WorkerSearchDirectionState:
                     case WorkerGuardState:
@@ -477,6 +481,8 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
                         break;
                 }
             } else if (playerTotalSuspicion == Suspiciousness.suspicious) {
+                GameManager.I.StickifySuspicion();
+
                 switch (stateMachine.currentState) {
                     case WorkerSearchDirectionState:
                     case WorkerGuardState:

@@ -483,7 +483,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
         state = GunStateEnum.reloading;
     }
     public void SwitchGun(GunState instance) {
-        Debug.Log($"switching gun: {instance}");
         if (instance == null || instance == gunInstance)
             return;
         fromGunType = gunInstance == null ? GunType.unarmed : gunInstance.template.type;

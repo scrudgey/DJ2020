@@ -44,7 +44,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
     Vector3 origin;
     float zoomFloatAmount;
     int zoomLevel;
-    LevelTemplate template;
+    // LevelTemplate template;
     SceneData sceneData;
 
     CyberGraph cyberGraph;
@@ -76,13 +76,40 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         gamePhase = GamePhase.mission;
         ChangeMode(Mode.playerfocus);
     }
+
     public void Initialize(LevelTemplate template, SceneData sceneData, LevelPlan plan) {
-        this.template = template;
+        loadTemplateData(template, plan);
+        Initialize(sceneData);
+    }
+
+    public void Initialize(SceneData sceneData) {
         this.sceneData = sceneData;
         gamePhase = GamePhase.plan;
 
-        allMapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+        allMapData = MapMarker.LoadMapMetaData(sceneData);
 
+        mapImages = LoadMapImages(sceneData);
+        nodeData = new Dictionary<string, MarkerConfiguration>();
+        numberFloors = mapImages.Count;
+        theta = 3.925f;
+
+        for (int i = 0; i < quads.Count; i++) {
+            MeshRenderer renderer = quads[i];
+            if (i >= mapImages.Count) {
+                renderer.enabled = false;
+            } else {
+                renderer.enabled = true;
+                renderer.material = materialFloorHidden;
+                renderer.material.mainTexture = mapImages[i];
+            }
+        }
+
+        zoomFloatAmount = 1.5f;
+        SetZoomLevel(1);
+        ChangeMode(Mode.playerfocus);
+    }
+
+    void loadTemplateData(LevelTemplate template, LevelPlan plan) {
         cyberGraph = CyberGraph.LoadAll(template.levelName);
         powerGraph = PowerGraph.LoadAll(template.levelName);
         alarmGraph = AlarmGraph.LoadAll(template.levelName);
@@ -108,31 +135,12 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         // cyberGraph.Apply(plan);
         // powerGraph.Apply(plan);
         // alarmGraph.Apply(plan);
-
-        mapImages = LoadMapImages(template.levelName, template.sceneName);
-        nodeData = new Dictionary<string, MarkerConfiguration>();
-        numberFloors = mapImages.Count;
-        theta = 3.925f;
-
-        for (int i = 0; i < quads.Count; i++) {
-            MeshRenderer renderer = quads[i];
-            if (i >= mapImages.Count) {
-                renderer.enabled = false;
-            } else {
-                renderer.enabled = true;
-                renderer.material = materialFloorHidden;
-                renderer.material.mainTexture = mapImages[i];
-            }
-        }
-        zoomFloatAmount = 1.5f;
-        SetZoomLevel(1);
-        ChangeMode(Mode.playerfocus);
     }
 
-    List<Texture2D> LoadMapImages(string levelName, string sceneName) {
+    List<Texture2D> LoadMapImages(SceneData sceneData) {
         List<Texture2D> maps = new List<Texture2D>();
         for (int i = 0; i < 10; i++) {
-            Texture2D map = Resources.Load<Texture2D>(MapMarker.MapPath(levelName, sceneName, i, includeDataPath: false, withExtension: false)) as Texture2D;
+            Texture2D map = Resources.Load<Texture2D>(MapMarker.MapPath(sceneData, i, includeDataPath: false, withExtension: false)) as Texture2D;
             if (map != null) maps.Add(map);
         }
         return maps;
@@ -311,8 +319,8 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         // this turns world position into (x,y) coordinates in the map images- but not justified to any origin?
         // (0,0) in world coordinates becomes something else in map coordinates but corresponds to the same point.
         return new Vector2(
-            template.mapUnitNorth.x * worldPosition.x,
-            template.mapUnitEast.y * worldPosition.z) + new Vector2(template.mapOrigin.x, template.mapOrigin.y);
+            sceneData.mapUnitNorth.x * worldPosition.x,
+            sceneData.mapUnitEast.y * worldPosition.z) + new Vector2(sceneData.mapOrigin.x, sceneData.mapOrigin.y);
     }
 
     public void UpdateWithInput(MapInput input) {
@@ -462,7 +470,7 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         currentGraphTitle = "";
     }
     public void LoadMarkers() {
-        mapData = MapMarker.LoadMapMetaData(template.levelName, template.sceneName);
+        mapData = MapMarker.LoadMapMetaData(sceneData);
     }
     public void DisplayCyberGraph() {
         DisplayGraph(cyberGraph);

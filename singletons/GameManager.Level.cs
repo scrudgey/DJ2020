@@ -53,8 +53,8 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
         gameData.playerState.ResetTemporaryState(plan);
-        SceneData sceneData = SceneData.loadSceneData(template.sceneName);
-        LoadScene(template.sceneName, () => StartMission(gameData.levelState, sceneData));
+        // SceneData sceneData = SceneData.loadSceneData(template.initialScene);
+        LoadScene(template.initialScene.name, () => StartMission(gameData.levelState, template.initialScene));
     }
 
     public void StartVRMission(VRMissionState state, SceneData sceneData) {
@@ -161,6 +161,7 @@ public partial class GameManager : Singleton<GameManager> {
         if (doCutscene)
             StartCutsceneCoroutine(StartMissionCutscene());
     }
+
     public void StartWorld(string sceneName) {
         if (SceneManager.GetSceneByName("UI").isLoaded) {
             uiController.Initialize();
@@ -195,6 +196,9 @@ public partial class GameManager : Singleton<GameManager> {
         TransitionToPhase(GamePhase.world);
     }
 
+    void LoadUI() {
+
+    }
 
     void LoadSkyboxForScene(SceneData sceneData) {
         LoadSkyBox(sceneData);
@@ -285,6 +289,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void ReturnToTitleScreen() {
         MusicController.I.Stop();
+        uiController.HideUI();
         LoadScene("title", () => {
             // Debug.Log("start title screen");
             activeMenuType = MenuType.none;
@@ -356,12 +361,9 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
-        // TODO: better system here
-        // if (targetScene != "UI" && targetScene != "NeoDialogueMenu" && targetScene != "VRMissionFinish" && targetScene != "cityskybox") {
         if (SetActiveScene) {
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetScene));
-
-        } // targetScene != "EscapeMenu"
+        }
 
         foreach (string sceneToUnload in scenesToUnload) {
             Debug.Log($"try unload scene async: {sceneToUnload} {SceneManager.GetSceneByName(sceneToUnload).isLoaded}");
@@ -455,12 +457,12 @@ public partial class GameManager : Singleton<GameManager> {
     private void InitializePlayerAndController(LevelPlan plan, SceneData sceneData) {
         ClearSceneData();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
-        if (characterCamera == null) {
-            Debug.Break();
-        }
-        if (InputController.I == null) {
-            Debug.Break();
-        }
+        // if (characterCamera == null) {
+        //     Debug.Break();
+        // }
+        // if (InputController.I == null) {
+        //     Debug.Break();
+        // }
         InputController.I.OrbitCamera = characterCamera;
         characterCamera.outlineEffect.Initialize();
         foreach (Outline outline in GameObject.FindObjectsOfType<Outline>()) {
@@ -482,7 +484,7 @@ public partial class GameManager : Singleton<GameManager> {
             List<Camera> skycams = new List<Camera>();
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
                 skycams.Add(skycam.myCamera);
-                skycam.Initialize(characterCamera.Camera, sceneData.skyboxOffset);
+                skycam.Initialize(playerObject.transform.position, characterCamera.Camera, sceneData.skyboxOffset);
             }
             characterCamera.skyBoxCameras = skycams.ToArray();
         }, unloadAll: false);
@@ -520,6 +522,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        // add player node
         gameData.levelState.delta.cyberGraph.nodes["localhost"] = new CyberNode() {
             compromised = true,
             payData = null,

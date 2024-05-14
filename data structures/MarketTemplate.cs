@@ -12,8 +12,8 @@ public class MarketTemplate : ScriptableObject {
     public string pitchTemplate;
 
     [Header("random")]
-    public LootPreferenceDataTemplate[] randomPreferences;
     public LoHi numberOfRandomPreferences;
+    public LootPreferenceDataTemplate[] randomPreferences;
     public LootPreferenceDataTemplate[] requiredRandomPreferences;
     [Header("required")]
     public LootPreferenceData[] requiredPreferences;
@@ -36,11 +36,84 @@ public class MarketTemplate : ScriptableObject {
             preferences.Add(template.Compile());
         }
 
-        string description = grammar.Parse(pitchTemplate);
+        string description;
+
+        Grammar marketGrammar = new Grammar();
+        marketGrammar.Load("markets");
+        marketGrammar.AddSymbol("name", GameManager.I.gameData.filename);
+        // string pronoun = fence.isMale ? "he" : "she";
+        // string passivePronoun = fence.isMale ? "him" : "her";
+        // string informalIdentifier = fence.isMale ? "the guy" : "the girl";
+
+        if (preferences.Count == 0) {
+            description = marketGrammar.Parse("{generic}");
+        } else if (preferences.Count == 1) {
+            LootPreferenceData data = preferences[0];
+
+            SetGrammarKeyForLootPreference(marketGrammar, data, "1");
+
+            if (data.bonus > 0) {
+                marketGrammar.SetSymbol("pattern", "{one-up}");
+            } else if (data.bonus < 0) {
+                marketGrammar.SetSymbol("pattern", "{one-down}");
+            }
+
+            description = marketGrammar.Parse("{prompt-1}");
+        } else {
+            LootPreferenceData data1 = preferences[0];
+            LootPreferenceData data2 = preferences[1];
+
+            SetGrammarKeyForLootPreference(marketGrammar, data1, "1");
+            SetGrammarKeyForLootPreference(marketGrammar, data2, "2");
+
+            if (data1.bonus > 0) {
+                marketGrammar.SetSymbol("pattern-1", "{one-up}");
+            } else {
+                marketGrammar.SetSymbol("pattern-1", "{one-down}");
+            }
+
+            if (data1.bonus > 0 && data2.bonus > 0) {
+                marketGrammar.SetSymbol("pattern", "{two-up}");
+            } else if (data1.bonus < 0 && data2.bonus < 0) {
+                marketGrammar.SetSymbol("pattern", "{two-down}");
+            } else {
+                marketGrammar.SetSymbol("pattern", "{one-up-one-down}");
+            }
+
+            description = marketGrammar.Parse("{prompt-2}");
+        }
+
         return new MarketData() {
             description = description,
             preferences = preferences
         };
+    }
+
+    void SetGrammarKeyForLootPreference(Grammar marketGrammar, LootPreferenceData data, string suffix) {
+        string lootname = data.type switch {
+            LootCategory.commercial => "commercial",
+            LootCategory.drug => "drug",
+            LootCategory.gem => "gem",
+            LootCategory.industrial => "industrial",
+            LootCategory.medical => "medical",
+            LootCategory.none => "none",
+        };
+
+        marketGrammar.SetSymbol($"type-{suffix}", $"{{{lootname}}}");
+
+        if (data.bonus > 0) {
+            marketGrammar.SetSymbol($"uptype", $"{{{lootname}}}");
+            marketGrammar.SetSymbol($"up-reason", $"{{{lootname}-up-reason}}");
+
+            marketGrammar.SetSymbol($"uptype-{suffix}", $"{{{lootname}}}");
+            marketGrammar.SetSymbol($"up-reason-{suffix}", $"{{{lootname}-up-reason}}");
+        } else {
+            marketGrammar.SetSymbol($"downtype", $"{{{lootname}}}");
+            marketGrammar.SetSymbol($"down-reason", $"{{{lootname}-down-reason}}");
+
+            marketGrammar.SetSymbol($"downtype-{suffix}", $"{{{lootname}}}");
+            marketGrammar.SetSymbol($"down-reason-{suffix}", $"{{{lootname}-down-reason}}");
+        }
     }
 }
 

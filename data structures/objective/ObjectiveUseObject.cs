@@ -10,7 +10,7 @@ public class ObjectiveUseObject : Objective {
     public string targetObject;
     bool objectHasBeenUsed;
     public override ObjectiveDelta ToDelta(LevelState state) {
-        string targetIdn = SelectSpawnPointIdn(state.template, state.plan);
+        string targetIdn = state.SetLocationOfObjective(this);
 
         ObjectiveLootSpawnpoint spawnpoint = state.spawnPoints[targetIdn];
 

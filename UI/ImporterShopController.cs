@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Easings;
+using Nimrod;
 using TMPro;
 using UnityEngine;
 public class ImporterShopController : MonoBehaviour {
@@ -25,6 +26,7 @@ public class ImporterShopController : MonoBehaviour {
     public AudioClip[] showDialogueSounds;
     public AudioClip[] discloseBottomSound;
     public AudioClip[] closeSounds;
+    Grammar grammar;
 
     void Awake() {
         myCanvas.enabled = false;
@@ -32,6 +34,13 @@ public class ImporterShopController : MonoBehaviour {
     }
 
     public void Initialize() {
+
+        grammar = new Grammar();
+        grammar.Load("loot");
+        string informalIdentifier = "the guy";
+        grammar.AddSymbol("informalIdentifier", informalIdentifier);
+        grammar.AddSymbol("name", GameManager.I.gameData.filename);
+
         dealDialogueObject.SetActive(false);
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         ClearDealButtons();
@@ -39,9 +48,10 @@ public class ImporterShopController : MonoBehaviour {
         PopulateDealButtons();
         PopulatePlayerInventory();
         if (GameManager.I.gameData.dealData.Count == 0) {
-            storeDialogueController.SetShopownerDialogue("I've got nothing cooking today, decker. Check back with me tomorrow.");
+            storeDialogueController.SetShopownerDialogue("{importer-empty}");
         } else {
-            storeDialogueController.SetShopownerDialogue("Help me out, decker. I've gotta move this shipment from singapore.");
+            storeDialogueController.SetShopownerDialogue(grammar.Parse("{importer-greet}")
+                );
         }
         myCanvas.enabled = true;
     }

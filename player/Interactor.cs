@@ -31,57 +31,58 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public InteractorTargetData cursorTarget;
     public AttackSurface selectedAttackSurface;
 
-    public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
+    // public Dictionary<Collider, Interactive> interactives = new Dictionary<Collider, Interactive>();
     public CharacterController characterController;
-    public void AddInteractive(Collider other) {
-        Interactive interactive = other.GetComponent<Interactive>();
-        if (interactive) {
-            interactives[other] = interactive;
-            interactive.interactor = this;
-        }
-        RemoveNullInteractives();
-        OnValueChanged?.Invoke(this);
-    }
-    public void RemoveInteractive(Collider other) {
-        if (interactives.ContainsKey(other)) {
-            interactives[other].interactor = null;
-            interactives.Remove(other);
-        }
-        RemoveNullInteractives();
-        OnValueChanged?.Invoke(this);
-    }
-    public void RemoveInteractive(Interactive other) {
-        foreach (var item in interactives.Where(kvp => kvp.Value == other).ToList()) {
-            item.Value.interactor = null;
-            interactives.Remove(item.Key);
-        }
-        OnValueChanged?.Invoke(this);
-    }
+    // public void AddInteractive(Collider other) {
+    //     Interactive interactive = other.GetComponent<Interactive>();
+    //     if (interactive) {
+    //         interactives[other] = interactive;
+    //         interactive.interactor = this;
+    //     }
+    //     RemoveNullInteractives();
+    //     OnValueChanged?.Invoke(this);
+    // }
+    // public void RemoveInteractive(Collider other) {
+    //     if (interactives.ContainsKey(other)) {
+    //         interactives[other].interactor = null;
+    //         interactives.Remove(other);
+    //     }
+    //     RemoveNullInteractives();
+    //     OnValueChanged?.Invoke(this);
+    // }
+    // public void RemoveInteractive(Interactive other) {
+    //     foreach (var item in interactives.Where(kvp => kvp.Value == other).ToList()) {
+    //         item.Value.interactor = null;
+    //         interactives.Remove(item.Key);
+    //     }
+    //     OnValueChanged?.Invoke(this);
+    // }
 
-    public InteractorTargetData ActiveTarget() {
-        RemoveNullInteractives();
-        if (interactives.Count == 0) {
-            return null;
-        }
-        List<InteractorTargetData> data = new List<InteractorTargetData>();
-        foreach (KeyValuePair<Collider, Interactive> kvp in interactives) {
-            if (kvp.Key != null && (kvp.Key.bounds.center.y - transform.position.y) > -1) {
-                data.Add(new InteractorTargetData(kvp.Value, kvp.Key, GameManager.I.playerPosition));
-            }
-        }
-        return Interactive.TopTarget(data);
-    }
-    void RemoveNullInteractives() {
-        interactives = interactives
-            .Where(f => f.Value != null && f.Key != null)
-            .ToDictionary(x => x.Key, x => x.Value);
-    }
+    // public InteractorTargetData ActiveTarget() {
+    //     RemoveNullInteractives();
+    //     // if (interactives.Count == 0) {
+    //     //     return null;
+    //     // }
+    //     List<InteractorTargetData> data = new List<InteractorTargetData>();
+    //     foreach (KeyValuePair<Collider, Interactive> kvp in interactives) {
+    //         if (!kvp.Value.interactible) continue;
+    //         if (kvp.Key != null && (kvp.Key.bounds.center.y - transform.position.y) > -1) {
+    //             data.Add(new InteractorTargetData(kvp.Value, kvp.Key, GameManager.I.playerPosition));
+    //         }
+    //     }
+    //     return Interactive.TopTarget(data);
+    // }
+    // void RemoveNullInteractives() {
+    //     interactives = interactives
+    //         .Where(f => f.Value != null && f.Key != null && f.Value.interactible)
+    //         .ToDictionary(x => x.Key, x => x.Value);
+    // }
 
-    void OnTriggerEnter(Collider other)
-        => AddInteractive(other);
+    // void OnTriggerEnter(Collider other)
+    //     => AddInteractive(other);
 
-    void OnTriggerExit(Collider other)
-        => RemoveInteractive(other);
+    // void OnTriggerExit(Collider other)
+    //     => RemoveInteractive(other);
 
     public void SetCursorData(CursorData cursorData) {
         cursorTarget = cursorData.highlightableTargetData;
@@ -92,8 +93,14 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         bool doAction = gunIsHolstered ? inputs.actionButtonPressed || inputs.Fire.FirePressed : inputs.actionButtonPressed;
         if (doAction && (inputs.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false)) {
             Interactive cursorInteractive = cursorTarget?.target.GetComponent<Interactive>();
-            if (cursorInteractive != null) {
-                return cursorInteractive.DoActionAndUpdateState(this);
+            if (cursorInteractive != null && cursorInteractive.interactible) {
+                ItemUseResult result = cursorInteractive.DoActionAndUpdateState(this);
+                // RemoveNullInteractives();
+                OnValueChanged?.Invoke(this);
+                if (!cursorInteractive.interactible) {
+                    cursorTarget = null;
+                }
+                return result;
             }
             return ItemUseResult.Empty();
         } else

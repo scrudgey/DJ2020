@@ -109,7 +109,7 @@ public class TitleController : MonoBehaviour {
             foreach (Skycam skycam in FindObjectsOfType<Skycam>()) {
                 // Debug.Log(skycam);
                 // skycams.Add(skycam.myCamera);
-                skycam.Initialize(UICam, new Vector3(0f, 8f, 0f));
+                skycam.Initialize(UICam.transform.position, UICam, new Vector3(0f, 8f, 0f));
                 skycam.transform.rotation = skyCamRotation * skycam.transform.rotation;
                 skycam.transform.position = new Vector3(0f, -2.4f, 0f);
             }

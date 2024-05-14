@@ -45,14 +45,6 @@ public class LevelBootstrapper : MonoBehaviour {
     void BootStrapMission() {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
-        List<ItemTemplate> allItems = new List<ItemTemplate> {
-            ItemTemplate.LoadItem("deck"),
-            ItemTemplate.LoadItem("C4"),
-            ItemTemplate.LoadItem("goggles"),
-            ItemTemplate.LoadItem("rocket"),
-            // ItemTemplate.LoadItem("grenade"),
-        };
-
         // initialize game state
         GameManager.I.gameData = GameData.TestInitialData();
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(GameManager.I.gameData.playerState), GameManager.I.gameData.playerState);
@@ -75,6 +67,7 @@ public class LevelBootstrapper : MonoBehaviour {
         GameManager.I.SetMarketData();
         GameManager.I.SetDealData();
         GameManager.I.SetFenceData();
+        GameManager.I.SetGunsForSale();
         Scene activeScene = SceneManager.GetActiveScene();
         GameManager.I.StartWorld(activeScene.name);
     }

@@ -25,6 +25,7 @@ namespace UI {
             commands["gunskill"] = GunSkill;
             commands["completeMission"] = CompleteMission;
             commands["sus"] = Suspicion;
+            commands["newday"] = NewDay;
         }
         public void OnEnable() {
             TakeFocus();
@@ -61,6 +62,10 @@ namespace UI {
         public void RunTests(string[] args) {
             Println($"running test suite...");
             TestSuite.RunToolboxTests();
+        }
+        public void NewDay(string[] args) {
+            GameManager.I.CloseMenu();
+            GameManager.I.StartNewDay();
         }
         public void ToggleAlarm(string[] args) {
             if (GameManager.I.gameData.levelState.anyAlarmTerminalActivated())

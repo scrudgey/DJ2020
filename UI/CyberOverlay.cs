@@ -4,8 +4,6 @@ using System.Linq;
 using Easings;
 using UnityEngine;
 public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndicator> {
-    // public RectTransform cyberdeckIndicator;
-    // public LineRenderer cyberdeckLineRenderer;
     public Material normalCyberdeckLineMaterial;
     public Material marchingAntsCyberdeckLineMaterial;
     public Color marchingAntsColor;

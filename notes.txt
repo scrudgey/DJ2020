@@ -3336,11 +3336,99 @@ speed up + pitch up blitting?
 * mapview is broken reference to scenedata
 * lootcanvashandler missing graph icon reference
 * missing headers for map markers in mission plan
-
-
-
-
-
+* fix save data serialization
+* fix crash to desktop
+* make UI don't destroy on load, never unload UI scene
+* fix starting gear
+* clean teardown of jobs/native collections on scene change
+* fix speechtextcontroller
+* stealing data was broken in elevator level
+* overhaul clearsighterx
+* connect new musics
+* broken after action cutscene
+* no pistol upgrades to start seems weird
+* go to club with no loots to unlock
+* lockpick perk- weird
+* perk pips dont activate
+* after activating a perk, it says LOCKED
+* rooftop zones in 7-11
+* better bar location descriptions
+* bar tells fence location
+* phone in bar
+* fix up interactive highlight
+* prevent objectives from choosing the same target
+* fix UI on title screen
+* fix UI in world scene
+* skybox in street is high
+? info panel would not go away
+* objectives information was not visible
+* change 7-11 objective description
+    * gaps in floor can see subway below
+    * edges of map
+    * flickery lights
+* change loading screen
+    * fix skybox again
+    * faster camera spin?
+* insertion/extraction point did not work
+* extraction point cutscene did not work
+* deploying hack tool didn't work from quick select menu
+* utility information should not look like a button
+    * closing overlay didn't work
+        * putting away the hack tool does not hide half-hack mode
+* hack interface did not close
+* couldn't snip wires
+* prevent cash register from double triggering
+* a guard came in to interrogate me, didn't ask about the register
+* cyber hacking the register did nothing
+* robbing the register means robbing the register.
+* punch up bar market report
+    * set market description on generation
+    * add reasons
+    * after action report should be fragmentary, show reward, over a transit cutscene    aim lock stats system 
+        scan time 
+        retain stats after breaking lock up to N 
+        small health bar 
+    * weapon wheel
+        * trees / plants / outside decor    * telephone sales contact
+        * world map with telephone numbers.
+        * choose your contact and pop up a trade dialogue
+    * raycastall and OverlapSphere
+    * bonus objectives can dicincentivize this
+    * random drug dealers on the corner will buy your drug loot
+        * scientist spritesheet
+    * show objectives as blit-in text on lower left?  
+    * way to hack camera without opening panel?
+* finish up world
+* grey building by apartment
+* red brick building by bar
+* red brick building by end of street
+* add perks to main escape menu / replace main escape menu
+    * disable objective tab
+    * jump to map tab first
+    * disentangle use of leveltemplate, level delta, and scenedata
+    * make map images
+    * label map with locations of shops
+    * display map markers correctly
+    * display correct nav bars in right hand side
+    * disable cyber/power/alarm tabs
+* better agreement between wallpress/third person post processing and isometric
+* make all map images
+* player shadow!
+    * duplicate sprites in shadows-only mode
+    * copy flipx
+* map pane:
+    * show type of location? city view? territory?
+* flickery rooftop in world
+* laptop wire in build
+? a separate gun sprite in aim?
+* reselect rocket launcher to put away
+* cutting wire on security camera did not work
+* hacking seccurity camera did not work
+* security cameras should be visible from floor!
+* doors are blocking people again?
+* softlock with expendable software
+    * cyberdeck always comes with infinte-use cracker that requires being connected
+    
 
 
 
@@ -3359,7 +3447,6 @@ uncertain:
         slow walk?
     apply skin graphics to corpse?
     "v" and "^" buttons on scrollbars?
-    * show objectives as blit-in text on lower left?  
         show days
     maybe fall damage from rooftop should be greater
     larger / more clear crosshairs cursor
@@ -3367,7 +3454,6 @@ uncertain:
         newtonsoft json is broken??
         bolt cutter?
     router panel conceals a second port?
-    * way to hack camera without opening panel?
     electrical zap effect around broken wires?
     shooting the objects
         shoot laser tripwire to disable?
@@ -3377,7 +3463,7 @@ uncertain:
 
 nice to have / future goals:
     one way to make an effective callout camera movement is linear
-    * after action report should be fragmentary, show reward, over a transit cutscene
+
     first level should set the tone
     aim: swing into position, then subtly zoom in to focus on reticle
         accompanied by rotating reticle element
@@ -3407,25 +3493,14 @@ nice to have / future goals:
 UI:
     adjust all UI buttons to have consistent semantics for Cancel / OK
     display different UI when in aim mode?
-    aim lock stats system 
-        scan time 
-        retain stats after breaking lock up to N 
-        small health bar 
-    * weapon wheel
     better clarity around alarm logic
         fix edge coloration from active node to alarm terminal
     show iconography when disguise is lost
     show iconography when optional objective is complete
 
-
 control
     controller support
     shoulder switch is a control
-
-sound
-    ambience
-        room tone in internal spaces
-        distant traffic sounds
 
 stealth:
     be able to shoot out lights
@@ -3474,6 +3549,7 @@ networks
     some computers trip honeypots
 
 graphics
+    more buildings
     graphic effects
         80s electricity 
         anime glow 
@@ -3490,12 +3566,10 @@ graphics
             rifle
             pistol
             shotgun
-        * scientist spritesheet
         civ_female portrait could use some work
     title screen animations 
     helicopters for skybox
     assign lens flares to lights?
-    * trees / plants / outside decor
     sprite props
         knives / swords / shuriken
         ground wires
@@ -3556,7 +3630,6 @@ graphics
         vent grate
     
 world:
-    random drug dealers on the corner will buy your drug loot
     locations:
         hardware dealer (the finn)
         night club 
@@ -3580,9 +3653,7 @@ world:
     more randomizable NPC
         random selection of head, torso, legs
         sometimes, torso + legs are set dependently.
-    telephone sales contact
-        world map with telephone numbers.
-        choose your contact and pop up a trade dialogue
+
     shop todo:
         bar:
             there is an underworld figure in the corner of the bar who will give you missions.
@@ -3600,20 +3671,14 @@ world:
                 "1x per mission"
                 "unlimited use"
             don't sell items player already has
-        bartender
-            rumors -> faction strength
         data merchant:
             buy hacking software
             buy hacking hardware
             commission a virus?
         street doc buy cyberware
             gated by a different progression mechanic
-        more fences
-            phone fence
         hacker?
             software, hardware?
-        sell guns
-        mystery man in bar
 
 perks to implement:
     gun_nut
@@ -3635,12 +3700,10 @@ perks to implement:
 
 performance:
     parallelize the pulselight
-    raycastall and OverlapSphere
     lots of garbage created in gamemanager update
     generating a lot of garbage in sphererobotai
 
 pretty easy to run in guns blazing
-    * bonus objectives can dicincentivize this
     when alarm is hit, doors come down and turrets pop out
     player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
 
@@ -3682,12 +3745,7 @@ AI
         transitions from this state?
 
 footsteps don't seem to matter any more
-doors are blocking people again?
 silencer shows in gameplay
-map pane:
-    show type of location? city view? territory?
-    show view of terrain?
-    cursor tracks in, box narrows down to target, texts pop up
 colors for item selector
 item selector clear slot
 display information about items in loadout
@@ -3697,8 +3755,8 @@ turrets
 hatch in the rooftop for jack that data
 receptionist at tower
 too many guards on jack that data bug ?
-flickery rooftop in world
-laptop wire in build
+
+
 rocket launcher explosion?
 hand grenade explosion
     hand grenade sound??
@@ -3711,20 +3769,14 @@ destructible radio dish tower
 plants can catch on fire
 randomly place lasers
 randomly place cameras
-a separate gun sprite in aim?
-ambient sound system
 holster to put away rocket launcher
 hide elements in inspector that are set by template
-cutting wire on security camera did not work
-hacking seccurity camera did not work
-security cameras should be visible from floor!
 are anonymous delegates memory leaks? i.e. objective deltas
     When you have an event handler attached to an event that delegate contains two things, an instance of an object and a method to run on that object. That referenced object won't be able to be garbage collected until either:
     The object with the event is no longer "alive".
     You remove the event handler (i.e. the reference to) your delegate, allowing your object to be freed earlier.
     https://stackoverflow.com/questions/13635505/anonymous-method-for-event-handler-not-a-leak
 711 HQ said dispatching strike team; no strike team arrived and guards were silent- they're supposed to search the building
-reselect rocket launcher to put away
 generic spritesheet template is not complete:
     head talking sprites
     head sprite on torso in many frames
@@ -3737,8 +3789,20 @@ jazz up elevator controller
 show bonus reward favors
 implement worker dialogue?
 guard spotted me during mission start
+7-11 worker doesnt see me frequently (probably blocked by register)
+cyber jump inside resulted in bizarre behavior
+
+system:
+    controls, settings
+        weapons, loadout, 
+        character stats, skills
 
 
+robots
+vehicles
+    strike team may arrive by vehicle
+    exfiltration / insertion may be by vehicle
+logos for omni, delta, elf
 
 tactics
     tactic dialogue is jumpy
@@ -3746,7 +3810,7 @@ tactics
     faster text blit
 
 burglar system
-    outline all burglar tools
+    list all burglar tools
     burglar tool mentor
     intelligence gathering
     attack surface card reader attack
@@ -3758,6 +3822,7 @@ burglar system
         locks for doubledoors with crash bars
     circuitry hacking
     alarm sensors
+    ATM
 
 more equipment to bring on mission?
     shuriken
@@ -3794,95 +3859,60 @@ unresolved mechanics / gameplay questions:
     circuits
     progression in shops? 
         items, guns
-    progression in world?
-        other towns connected by subway?
     backpack and duffel bag
-
-
-
-
-
-
-
-major initiatives:
-    destructible walls
-    robots
-    missions
-        1 way shootout
-        productionize office
-            redo apartment after office
-    system:
-        controls, settings
-            weapons, loadout, 
-            character stats, skills
-
-
-medium-effort mini systems work:
-    softlock with expendable software
     selling data / upgrading hack ability
-    key system
-    update the steam page graphic
-    armor piercing ammo to be indicated somewhere in the gun info display
-        first: gun shop progression
-        gun perks
-    finish up world
-        * gaps in floor can see subway below
-        edges of map
-        flickery lights
-    bar tells fence location
-    gun shop progression
-    vehicles
-        strike team may arrive by vehicle
-        exfiltration / insertion may be by vehicle
 
 
-polish
-    fix skybox again
-    better agreement between wallpress/third person post processing and isometric
-    faster camera spin?
-    elevator needs polish in general
-        footstep sounds- loud, weird?
-        cyber jump inside resulted in bizarre behavior
-        scientist said "if you see anything let me know"
 
 
-add perks to main escape menu / replace main escape menu
-    loot, data, key, map
-    no objective
 
-logos for omni, delta, elf
 
-player shadow!
-    duplicate sprites in shadows-only mode
 
+armor piercing ammo to be indicated somewhere in the gun info display
+    gun perks
+key system
 ambience system
     a separate channel in mixer
     non-spatial audio- let code control volume
     collider regions tied to audio clips
         police sirens
         city ambience
-        room tone
+        room tone 
+    collider regions are nested and have precedence
+    determine distance to collider region and fade out?
+        two regions? one for activation and one for distance?
 
 
+destructible walls
+    gibs
+    re-bake navmesh
 
-
-
-fix save data serialization
-    error writing to file: /Users/rfoltz/Library/Application Support/DefaultCompany/wetworks/saveGames/test Newtonsoft.Json.JsonSerializationException: Self referencing loop detected for property 'normalized' with type 'UnityEngine.Vector3'. Path 'levelState.delta.objectiveDeltas[0].template.spawnPointLocations[0].normalized'.
-prevent objectives from choosing the same target
-
-fix UI on title screen
-fix UI in world scene
-
+missions
+    1 way shootout
+    productionize office
+        redo apartment after office
 fix up the cyberdeck loadout screen
+update the steam page graphic
 
 
-* fix crash to desktop
-* make UI don't destroy on load, never unload UI scene
-* fix starting gear
-* clean teardown of jobs/native collections on scene change
-* fix speechtextcontroller
-* stealing data was broken in elevator level
-* overhaul clearsighterx
-* connect new musics
-* broken after action cutscene
+cyberdeck:
+    MB total? or slots?
+
+
+gun shop I.
+    * make guns for sale handled by gamestate and procedural generation
+    * allow gun perks
+        * gun perk icons in ui
+        tooltip mouseover
+    how do we make sure the end-game player has access to good guns?
+        1. new gun shop(s) in later game that have more good stuff
+        2. algorithm changes to favor more rare stuff as player progresses
+        3. shop in market with smaller selection but more random
+        4. a contact can get you anything you need at a premium
+        5. ask shop to hold a gun for you
+
+
+make hack selection automatic
+    prefer shorter paths, prefer cyberdeck
+    highlight edges from compromised nodes
+    x

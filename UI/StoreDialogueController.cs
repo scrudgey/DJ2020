@@ -73,7 +73,7 @@ public class StoreDialogueController : MonoBehaviour {
     }
 
     public IEnumerator BlitDialogueText(string content) {
-        Debug.Log($"blit dialogue text {content}");
+        // Debug.Log($"blit dialogue text {content}");
         dialogueText.text = "";
         int index = 0;
         float timer = 0f;

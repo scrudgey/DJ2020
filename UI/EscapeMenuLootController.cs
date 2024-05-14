@@ -20,6 +20,7 @@ public class EscapeMenuLootController : MonoBehaviour {
     public Image[] creditsImages;
     public void Initialize(List<LootData> loot) {
         PopulatePlayerInventory(loot);
+        ClearItemForSale();
     }
     void PopulatePlayerInventory(List<LootData> loot) {
         foreach (Transform child in inventoryContainer) {
@@ -52,8 +53,6 @@ public class EscapeMenuLootController : MonoBehaviour {
         GameObject obj = GameObject.Instantiate(lootButtonPrefab);
         return obj;
     }
-
-
     public void LootButtonCallback(List<LootData> data) {
         SetSaleData(data);
     }

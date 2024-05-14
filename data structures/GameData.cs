@@ -12,6 +12,7 @@ public record GameData {
     public float timePlayedInSeconds;
     public GamePhase phase;
     public PlayerState playerState;
+    [NonSerialized]
     public LevelState levelState;
     public List<string> unlockedLevels;
     public List<string> completedLevels;
@@ -19,6 +20,7 @@ public record GameData {
     public MarketData marketData;
     public List<DealData> dealData;
     public List<FenceData> fenceData;
+    public List<GunState> gunsForSale;
     public static GameData TestInitialData() {
         LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/missions/test/test") as LevelTemplate;
         // DateTime.Now;
@@ -42,7 +44,8 @@ public record GameData {
             },
             levelPlans = new SerializableDictionary<string, LevelPlan>(),
             fenceData = new List<FenceData>(),
-            dealData = new List<DealData>()
+            dealData = new List<DealData>(),
+            gunsForSale = new List<GunState>()
         };
     }
 

@@ -16,7 +16,7 @@ public class LootObject : Interactive {
     public override ItemUseResult DoAction(Interactor interactor) {
         Destroy(gameObject);
         GameManager.I.CollectLoot(data, transform.position);
-        interactor.RemoveInteractive(this);
+        // interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
         bool waveArm = transform.position.y - interactor.transform.position.y > -0.25f;
         bool crouchDown = !waveArm;

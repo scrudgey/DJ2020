@@ -485,10 +485,10 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
     public void SayFinalRemark() {
         string content = "content";
         if (dialogueResult == DialogueResult.success) {
-            content = "Let me know if you see anything suspicious.";
+            content = input.npcCharacter.parameters.conclusionSucces;
         } else if (dialogueResult == DialogueResult.fail) {
             GameManager.I.AddSuspicionRecord(GetFailSuspicion());
-            content = "You're coming with me, creep!";
+            content = input.npcCharacter.parameters.conclusionFail;
         }
         IEnumerator anticontinuer = Toolbox.CoroutineFunc(() => { continueButton.SetActive(false); });
         IEnumerator concludingRemark = neoDialogueController.SetLeftDialogueText(content, "");

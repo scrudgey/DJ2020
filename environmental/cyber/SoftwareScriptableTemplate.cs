@@ -6,6 +6,7 @@ public class SoftwareScriptableTemplate : ScriptableObject {
     public new string name;
     public SoftwareEffect.Type principalType;
     public List<SoftwareEffect> effects;
+    public bool infinteCharges;
     public int maxCharges;
     public Sprite icon;
     public List<SoftwareCondition> conditions;
@@ -18,7 +19,8 @@ public class SoftwareScriptableTemplate : ScriptableObject {
             icon = icon,
             principalType = principalType,
             conditions = conditions,
-            deploySounds = deploySounds.ToList()
+            deploySounds = deploySounds.ToList(),
+            infiniteCharges = infinteCharges
         };
     }
 

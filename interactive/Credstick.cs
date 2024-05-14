@@ -14,7 +14,7 @@ public class Credstick : Interactive {
     public override ItemUseResult DoAction(Interactor interactor) {
         Destroy(gameObject);
         GameManager.I.AddCredits(amount, transform.position);
-        interactor.RemoveInteractive(this);
+        // interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
         PoolManager.I.GetPool(creditIndicator).GetObject(transform.position);
         return ItemUseResult.Empty() with { crouchDown = true };

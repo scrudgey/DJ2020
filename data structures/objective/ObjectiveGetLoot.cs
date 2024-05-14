@@ -9,7 +9,7 @@ using UnityEngine;
 public class ObjectiveGetLoot : Objective {
     public GameObject targetLootPrefab;
     public override ObjectiveDelta ToDelta(LevelState state) {
-        string targetIdn = SelectSpawnPointIdn(state.template, state.plan);
+        string targetIdn = state.SetLocationOfObjective(this);
 
         ObjectiveLootSpawnpoint spawnpoint = state.spawnPoints[targetIdn];
         GameObject lootObj = GameObject.Instantiate(targetLootPrefab, spawnpoint.transform.position, Quaternion.identity);

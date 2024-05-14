@@ -102,7 +102,7 @@ public partial class GameManager : Singleton<GameManager> {
     /* REFRESH */
     public void RefreshCyberGraph() {
         if (applicationIsQuitting) return;
-        if (gameData.levelState.delta.cyberGraph == null) return;
+        if (gameData?.levelState?.delta?.cyberGraph == null) return;
 
         gameData.levelState.delta.cyberGraph.Refresh();
 
@@ -114,7 +114,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void RefreshAlarmGraph() {
         if (applicationIsQuitting) return;
-        if (gameData.levelState.delta.alarmGraph == null) return;
+        if (gameData?.levelState?.delta?.alarmGraph == null) return;
 
         // determine if any active alarm object reaches a terminal
         gameData.levelState.delta.alarmGraph.Refresh();
@@ -132,7 +132,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void RefreshPowerGraph() {
         if (applicationIsQuitting) return;
-        if (gameData.levelState.delta.powerGraph == null) return;
+        if (gameData?.levelState?.delta?.powerGraph == null) return;
 
         // power distribution algorithm
         gameData.levelState.delta.powerGraph.Refresh();

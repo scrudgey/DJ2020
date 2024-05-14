@@ -12,11 +12,11 @@ public class EscapeMenuKeyController : MonoBehaviour {
     public TextMeshProUGUI viewTitle;
     public Image viewIcon;
     public TextMeshProUGUI viewDescription;
-    public void Initialize(LevelState state) {
+    public void Initialize(LevelDelta delta) {
         ClearView();
-        List<KeyData> physicalKeys = state.delta.physicalKeys.Select(idn => new KeyData(KeyType.physical, idn)).ToList();
-        List<KeyData> keycardKeys = state.delta.keycards.Select(idn => new KeyData(KeyType.keycard, idn)).ToList();
-        List<KeyData> passwordKeys = state.delta.levelAcquiredPaydata
+        List<KeyData> physicalKeys = delta.physicalKeys.Select(idn => new KeyData(KeyType.physical, idn)).ToList();
+        List<KeyData> keycardKeys = delta.keycards.Select(idn => new KeyData(KeyType.keycard, idn)).ToList();
+        List<KeyData> passwordKeys = delta.levelAcquiredPaydata
             .Where(data => data.type == PayData.DataType.password)
             .Select(data => new KeyData(KeyType.password, Random.Range(0, 100))).ToList();
         PopulateKeyColumn(physicalKeys.Concat(keycardKeys).Concat(passwordKeys).ToList());

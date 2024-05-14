@@ -14,19 +14,40 @@ public class SoftwareView : MonoBehaviour {
     public TextMeshProUGUI viewCharges;
     PlayerState playerState;
     CyberNode target;
-    public void Initialize(PlayerState playerState, CyberNode target) {
+    CyberNode origin;
+    List<CyberNode> path;
+    public void Initialize(PlayerState playerState, CyberNode target, CyberNode origin, List<CyberNode> path) {
         this.playerState = playerState;
         this.target = target;
+        this.origin = origin;
+        this.path = path;
     }
 
     // TODO: display template mode
-    public void Display(SoftwareState state) {
-        Display(state.template);
+    public void DisplayState(SoftwareState state, List<CyberNode> path) {
+        DisplayTemplate(state.template);
 
-        viewCharges.text = $"charges: {state.charges}/{state.template.maxCharges}";
+        string requirements = "requirements:\n";
+        if (target != null) {
+            if (state.template.conditions.Count == 0) {
+                requirements += "none";
+            } else {
+                foreach (SoftwareCondition condition in state.template.conditions) {
+                    requirements += condition.DescriptionStringWithColor(target, origin, path) + "\n";
+                }
+            }
+
+        }
+        viewRequirements.text = requirements;
+
+        if (state.template.infiniteCharges) {
+            viewCharges.text = $"charges: unlimited";
+        } else {
+            viewCharges.text = $"charges: {state.charges}/{state.template.maxCharges}";
+        }
     }
 
-    public void Display(SoftwareTemplate template) {
+    public void DisplayTemplate(SoftwareTemplate template) {
         // set view 
         titleIcon.sprite = template.icon;
         viewTitle.text = template.name;
@@ -43,7 +64,7 @@ public class SoftwareView : MonoBehaviour {
                 requirements += "none";
             } else {
                 foreach (SoftwareCondition condition in template.conditions) {
-                    requirements += condition.DescriptionString(target) + "\n";
+                    requirements += condition.DescriptionString() + "\n";
                 }
             }
 

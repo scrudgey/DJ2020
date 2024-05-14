@@ -17,6 +17,10 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     public TextMeshProUGUI statsView;
     public Color selectedColor;
     public Color deselectedColor;
+    [Header("buttons")]
+    public Button cyberButton;
+    public Button powerButton;
+    public Button alarmButton;
     [Header("map markers")]
     public RectTransform markerContainer;
     public GameObject mapMarkerPrefab;
@@ -57,24 +61,44 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     MapMarkerIndicator playerMarker;
     List<Image> floorPips;
     int numberFloors;
-    LevelTemplate template;
+    // LevelTemplate template;
     SceneData sceneData;
     LevelPlan plan;
     LevelState state;
     MapMarkerIndicator selectedIndicator;
 
+    List<Objective> allObjectives = new List<Objective>();
+    List<ObjectiveDelta> allObjectiveDeltas = new List<ObjectiveDelta>();
+
+    public void InitializeWorldMode(SceneData sceneData) {
+        mapDisplay3Dgenerator.Initialize(sceneData);
+        mapDisplayController.InitializeWorld(sceneData, this);
+        Initialize(sceneData);
+        cyberButton.interactable = false;
+        powerButton.interactable = false;
+        alarmButton.interactable = false;
+    }
+
     public void Initialize(LevelState state, SceneData sceneData) {
         this.state = state;
+        allObjectiveDeltas = state.delta.AllObjectives();
         Initialize(state.template, state.plan, sceneData);
         mapDisplay3Dgenerator.Initialize(state, sceneData);
         mode = Mode.mission;
         mapDisplayController.HideInsertionPoints();
     }
     public void Initialize(LevelTemplate template, LevelPlan plan, SceneData sceneData) {
-        mode = Mode.plan;
-        this.template = template;
-        this.sceneData = sceneData;
         this.plan = plan;
+        allObjectives = template.AllObjectives();
+        mapDisplay3Dgenerator.Initialize(template, sceneData, plan);
+        mapDisplayController.Initialize(template, sceneData, plan, this);
+        Initialize(sceneData);
+        mode = Mode.plan;
+    }
+
+    public void Initialize(SceneData sceneData) {
+        mode = Mode.mission;
+        this.sceneData = sceneData;
         floorPips = new List<Image>();
         selectionBoxImage.enabled = false;
 
@@ -93,13 +117,9 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
             floorPips.Add(pip);
         }
 
-        mapDisplay3Dgenerator.Initialize(template, sceneData, plan);
         Bind(mapDisplay3Dgenerator.gameObject);
-
-        mapDisplayController.Initialize(template, sceneData, plan, this);
-
         selectedFloor = mapDisplay3Dgenerator.currentFloor;
-        floorNumberCaption.text = $"{template.sceneDescriptor}: floor {mapDisplay3Dgenerator.currentFloor}";
+        floorNumberCaption.text = $"{sceneData.sceneDescriptor}: floor {mapDisplay3Dgenerator.currentFloor}";
         flavorText.text = "";
         mapRawImage.uvRect = new Rect(0, 0, 1, 1);
     }
@@ -145,7 +165,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         if (selectedFloor != generator.currentFloor) {
             float amount = generator.currentFloor > selectedFloor ? -1f : 1f;
             selectedFloor = generator.currentFloor;
-            BlitFloorText($"{template.sceneDescriptor}: floor {generator.currentFloor}");
+            BlitFloorText($"{sceneData.sceneDescriptor}: floor {generator.currentFloor}");
             ShakeMp(amount);
             Toolbox.RandomizeOneShot(audioSource, floorChangeSound);
         }
@@ -160,15 +180,17 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
             if (data.markerType == MapMarkerData.MapMarkerType.objective || data.markerType == MapMarkerData.MapMarkerType.anchor) continue;
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && mode == Mode.mission) continue;
-            if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) {
-                if (indicators.ContainsKey(data))
-                    indicators[data].gameObject.SetActive(false);
-                continue;
-            }
-            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && data.idn != plan.insertionPointIdn) {
-                if (indicators.ContainsKey(data))
-                    indicators[data].gameObject.SetActive(false);
-                continue;
+            if (plan != null) {
+                if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) {
+                    if (indicators.ContainsKey(data))
+                        indicators[data].gameObject.SetActive(false);
+                    continue;
+                }
+                if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && data.idn != plan.insertionPointIdn) {
+                    if (indicators.ContainsKey(data))
+                        indicators[data].gameObject.SetActive(false);
+                    continue;
+                }
             }
 
             if (!indicators.ContainsKey(data)) {
@@ -214,7 +236,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
 
         if (mode == Mode.plan) {
-            foreach (Objective objective in template.AllObjectives()) {
+            foreach (Objective objective in allObjectives) {
                 if (objective.visibility == Objective.Visibility.unknown && !plan.objectiveLocations.ContainsKey(objective.name)) {
                     if (objectiveIndicators.ContainsKey(objective))
                         objectiveIndicators[objective].gameObject.SetActive(false);
@@ -235,7 +257,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 objectiveIndicators[objective].gameObject.SetActive(sceneData.GetMapFloorForPosition(position) == generator.currentFloor);
             }
         } else if (mode == Mode.mission) {
-            foreach (ObjectiveDelta delta in state.delta.AllObjectives()) {
+            foreach (ObjectiveDelta delta in allObjectiveDeltas) {
                 if (!delta.hasLocation) continue;
                 if (delta.visibility == Objective.Visibility.unknown || delta.status != ObjectiveStatus.inProgress) {
                     if (objectiveIndicators.ContainsKey(delta.template))

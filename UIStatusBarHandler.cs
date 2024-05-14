@@ -4,6 +4,7 @@ using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class UIStatusBarHandler : MonoBehaviour {
     public GameObject effectPrefab;
@@ -128,8 +129,9 @@ public class UIStatusBarHandler : MonoBehaviour {
 
     public void OnClick(string type) {
         GameManager.I.ShowMenu(MenuType.escapeMenu, () => {
+            string sceneName = SceneManager.GetActiveScene().name;
             EscapeMenuController escapeMenuController = GameObject.FindObjectOfType<EscapeMenuController>();
-            escapeMenuController.Initialize(GameManager.I.gameData);
+            escapeMenuController.Initialize(GameManager.I.gameData, sceneName);
             escapeMenuController.ChangeTabCallback(type switch {
                 "keys" => "key",
                 "credits" => "objective",

@@ -7,35 +7,31 @@ using UnityEngine;
 public class MapMarker : MonoBehaviour {
     public MapMarkerData data;
 
-    public static string MapPath(string levelName, string sceneName, int floorNumber, bool includeDataPath = true, bool withExtension = true) {
-        string scenePath = LevelState.LevelDataPath(levelName, includeDataPath: includeDataPath);
+    public static string MapPath(SceneData sceneData, int floorNumber, bool includeDataPath = true, bool withExtension = true) {
+        // string scenePath = LevelState.LevelDataPath(levelName, includeDataPath: includeDataPath);
+        string scenePath = sceneData.SceneDataPath(includeDataPath: includeDataPath);
         string filename = withExtension ? $"map_{floorNumber}.png" : $"map_{floorNumber}";
         return Path.Combine(scenePath, "map", filename);
     }
-    public static string MapMetaDataPath(string levelName, string sceneName, bool withExtension = true, bool includeDataPath = true) {
-        string scenePath = LevelState.LevelDataPath(levelName, includeDataPath: includeDataPath);
+    public static string MapMetaDataPath(SceneData sceneData, bool withExtension = true, bool includeDataPath = true) {
+        // string scenePath = LevelState.LevelDataPath(levelName, includeDataPath: includeDataPath);
+        string scenePath = sceneData.SceneDataPath(includeDataPath: includeDataPath);
         if (withExtension) {
 
         }
         string filename = withExtension ? "map_data.xml" : "map_data";
         return Path.Combine(scenePath, "map", filename);
     }
-    public static void WriteMapMetaData(string levelName, string sceneName, List<MapMarkerData> datas) {
+    public static void WriteMapMetaData(SceneData sceneData, List<MapMarkerData> datas) {
         XmlSerializer serializer = new XmlSerializer(typeof(List<MapMarkerData>));
-        string path = MapMarker.MapMetaDataPath(levelName, sceneName);
+        // string path = MapMarker.MapMetaDataPath(levelName);
+        string path = MapMarker.MapMetaDataPath(sceneData);
         using (FileStream sceneStream = File.Create(path)) {
             serializer.Serialize(sceneStream, datas);
         }
     }
-    public static void WriteMapImage(string levelName, string sceneName, Texture2D tex, int floorNumber) {
-        byte[] bytes = tex.EncodeToPNG();
-        string path = MapMarker.MapPath(levelName, sceneName, floorNumber);
-        Debug.Log($"writing {path}...");
-        System.IO.File.WriteAllBytes(path, bytes);
-    }
-
-    public static List<MapMarkerData> LoadMapMetaData(string levelName, string sceneName) {
-        string metaDataPath = MapMetaDataPath(levelName, sceneName, withExtension: false, includeDataPath: false);
+    public static List<MapMarkerData> LoadMapMetaData(SceneData sceneData) {
+        string metaDataPath = MapMetaDataPath(sceneData, withExtension: false, includeDataPath: false);
         TextAsset textAsset = Resources.Load<TextAsset>(metaDataPath) as TextAsset;
         XmlSerializer serializer = new XmlSerializer(typeof(List<MapMarkerData>));
         if (textAsset != null) {
@@ -43,7 +39,7 @@ public class MapMarker : MonoBehaviour {
                 return serializer.Deserialize(reader) as List<MapMarkerData>;
             }
         } else {
-            Debug.LogError($"{levelName} {sceneName} map data not readable : {textAsset}");
+            Debug.LogError($"{sceneData.name} map data not readable : {textAsset}");
             return null;
         }
     }

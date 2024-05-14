@@ -64,3 +64,51 @@ inventory equipment:
 special purpose gear:
     diamond tipped drill bit
     nuclear material container
+
+
+
+
+
+# idea
+
+1. person teaches you how to use tools to attack specific security, then sends you on a mission featuring the tool
+to unlock the tool
+2. items have a similar thing, a test arena you can try
+3. when encountering security feature, it is logged in some way. you can bring this log to the person and theyll teach
+you.
+4. missions that require a specific skill (safe cracking or whatever) can come with intel that unlocks the log.
+5. introductory dialogue can introduce the tutorial mission
+6. limit the tools to a bunch of general things that apply in many situations (lockpick, screwdriver, etc) and maybe the only unlock is upgrading them
+7. maybe the system is more automated than that. you pass a mission (early mission, no impossible obstacles) then you get an email from your friend saying "hey i've come up with a method to open up that ATM you saw on that last mission", this prompts the player to go learn
+8. the intel you collect on missions (basically, when you encounter a new thing like a camera or ATM) you can inquire about on the underground chat room ("anyone know how to deal with this ATM I saw?") then you'll get a half dozen responses from different characters explaining how they do it ("i blow it up with a little c4", "I found you can hotwire these things if you can open the rear panel", etc.)
+9. bringing upgraded equipment to a mission might bring the same feeling as intricate plan
+10. de-emphasize planning in advance. all tools are brought at all times. different ways of attacking a surface
+
+
+
+what about things that have multiple attacks?
+the basic idea behind a simulation driven game is that there are multiple solutions-
+modular pieces that combine and interact
+but security is the opposite: learning specific exploits, single-purpose tools
+
+burglar tool view is one vector of attack. for a given obstacle:
+    explode it
+    disable the power
+        on the object
+        remote from the object
+    disable the alarm system
+        on the object
+        remote from the object
+    burglar attack
+        destructive, non-destructive
+        leaves evidence vs. undetectable
+    
+    1. power drill to lock
+    2. pick the lock
+    3. use a key (stolen- )
+        keyed-alike
+
+
+
+we need to emphasize modular composing components
+e.g. two panels under screws that intercommunicate through wires with some alarm sensors

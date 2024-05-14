@@ -15,9 +15,8 @@ public class LevelTemplate : ScriptableObject {
     [Header("level and scene")]
     public string levelName;
     public string readableMissionName;
-    public string sceneName;
-    public string sceneDescriptor;
-    public int mapviewInitialFloor = 1;
+    public SceneData initialScene;
+    // public int mapviewInitialFloor = 1;
     // public List<float> floorHeights;
     public string tagline;
     public MusicTrack musicTrack;
@@ -57,10 +56,7 @@ public class LevelTemplate : ScriptableObject {
     public StrikeTeamCompletionThreshold strikeCompletionThreshold;
     public StrikeTeamCompletionBehavior strikeTeamCompletion;
 
-    [Header("map")]
-    public Vector3 mapOrigin;
-    public Vector3 mapUnitNorth;
-    public Vector3 mapUnitEast;
+
 
 
     public static LevelTemplate LoadAsInstance(string name) {

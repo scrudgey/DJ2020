@@ -75,6 +75,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         }
         if (input.selectItem != null) {
             ItemInstance instance = items.Where(item => item.template == input.selectItem).FirstOrDefault();
+            Debug.Log($"switch item {activeItem} {instance} {instance.toggleable}");
             if (activeItem == instance && instance.toggleable) {
                 ClearItem();
             } else {
@@ -92,8 +93,9 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         } else return ItemUseResult.Empty();
     }
     void SwitchToItem(ItemInstance item) {
-        OnItemExit(this.activeItem);
+        ItemInstance oldItem = this.activeItem;
         this.activeItem = item;
+        OnItemExit(oldItem);
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
     }
@@ -147,10 +149,10 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             return;
         switch (item) {
             case CyberDeck:
-                if (GameManager.I.activeOverlayType == OverlayType.limitedCyber)
-                    GameManager.I.SetOverlay(OverlayType.none);
                 GameManager.I.playerManualHacker.deployed = false;
                 GameManager.I.playerManualHacker.Disconnect();
+                if (GameManager.I.activeOverlayType == OverlayType.limitedCyber || GameManager.I.activeOverlayType == OverlayType.cyber)
+                    GameManager.I.SetOverlay(OverlayType.none);
                 break;
             case IRGoggles:
                 GameManager.I.gameData.playerState.cyberEyesThermalBuff = false;

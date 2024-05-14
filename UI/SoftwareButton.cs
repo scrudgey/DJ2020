@@ -12,7 +12,7 @@ public class SoftwareButton : MonoBehaviour {
     public TextMeshProUGUI levelCaption;
     public void Initialize(SoftwareState state) {
         icon.sprite = state.template.icon;
-        levelCaption.text = $"{state.charges}";
+        levelCaption.text = state.template.infiniteCharges ? "-" : $"{state.charges}";
     }
     public void Initialize(SoftwareTemplate template) {
         icon.sprite = template.icon;

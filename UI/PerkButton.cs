@@ -43,8 +43,10 @@ public class PerkButton : MonoBehaviour {
     void SetPips() {
         if (perk.IsMultiStagePerk()) {
             int i = 0;
+            int level = state.GetPerkLevel(perk);
             foreach (Image pip in pips) {
                 pip.gameObject.SetActive(i < perk.stages);
+                pip.sprite = i < level ? pipActive : pipDisabled;
                 i += 1;
             }
         } else {
@@ -55,25 +57,16 @@ public class PerkButton : MonoBehaviour {
     }
 
     public void SetActiveStatus() {
-        // if (perk.IsMultiStagePerk()) {
-        //     for (int i = 1; i < perk.stages + 1; i++) {
-        //         if (state.PerkLevelIsActivated(perk, i)) {
-        //             pips[i - 1].sprite = pipActive;
-        //         } else {
-        //             pips[i - 1].sprite = pipDisabled;
-        //         }
-        //     }
-        // }
         SetPips();
 
         if (state.PerkIsFullyActivated(perk)) {
             backgroundImage.color = activeBackgroundCOlor;
             icon.color = Color.black;
-        }
-
-        if (perk.CanBePurchased(state)) {
             lockIcon.SetActive(false);
-
+            caption.color = purchaseableColor;
+            mybutton.colors = purchasableButtonColors;
+        } else if (perk.CanBePurchased(state)) {
+            lockIcon.SetActive(false);
             icon.color = purchaseableColor;
             caption.color = purchaseableColor;
             mybutton.colors = purchasableButtonColors;

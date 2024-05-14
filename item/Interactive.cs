@@ -5,19 +5,18 @@ using System.Linq;
 using UnityEngine;
 public abstract class Interactive : Highlightable {
     public bool dontRequireRaycast;
+    [HideInInspector]
     public string actionPrompt;
     [HideInInspector]
     public Interactor interactor;
-    public string interactiveId;
 
     public Action OnUsed;
+    public bool interactible = true;
 
     public virtual string ResponseString() {
         return $"did {actionPrompt}";
     }
     public ItemUseResult DoActionAndUpdateState(Interactor interactor) {
-        // GameManager.I.gameData.levelState.delta.levelInteractedObjects.Add(interactiveId);
-        // GameManager.I.CheckObjectives();
         OnUsed?.Invoke();
         return DoAction(interactor);
     }
@@ -38,14 +37,15 @@ public abstract class Interactive : Highlightable {
     }
 
     public static T ClosestTarget<T>(HashSet<T> interactives) where T : InteractorTargetData {
-        if (interactives.Count == 0) return null;
+        if (interactives.Count == 0 || interactives.Where(t => t.target.interactible).Count() == 0) return null;
         return interactives
+            .Where(t => t.target.interactible)
             .OrderBy(t => Vector3.Distance(t.target.transform.position, GameManager.I.playerPosition))
             .First();
     }
     void OnDestroy() {
-        if (interactor != null) {
-            interactor.RemoveInteractive(this);
-        }
+        // if (interactor != null) {
+        //     interactor.RemoveInteractive(this);
+        // }
     }
 }

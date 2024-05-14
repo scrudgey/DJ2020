@@ -17,17 +17,19 @@ public class SoftwareSelector : MonoBehaviour {
     [Header("disabled colorblock")]
     public ColorBlock disabledColorblock;
     public bool softwareEnabled;
+    public List<CyberNode> path;
 
-    public void Initialize(SoftwareState softwareState, Action<SoftwareSelector> callback, CyberNode target) {
+    public void Initialize(SoftwareState softwareState, Action<SoftwareSelector> callback, CyberNode target, CyberNode origin, List<CyberNode> path) {
         this.callback = callback;
         this.softwareState = softwareState;
+        this.path = path;
         title.text = softwareState.template.name;
         softwareButton.Initialize(softwareState);
 
         softwareEnabled = true;
 
         if (target != null) {
-            softwareEnabled = softwareState.EvaluateCondition(target);
+            softwareEnabled = softwareState.EvaluateCondition(target, origin, path);
         }
 
         myButton.colors = softwareEnabled ? defaultColorblock : disabledColorblock;

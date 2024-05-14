@@ -103,12 +103,6 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
                     anyComplete = true;
                 }
 
-                // if (action.fromPlayerNode) {//&& !action.toNode.isManualHackerTarget) {
-                //     // broken path
-                //     anyComplete = true;
-                //     completedActions.Add(action);
-                // }
-
                 NetworkActionUpdate?.Invoke(action);
             }
             foreach (NetworkAction action in completedActions) {

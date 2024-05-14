@@ -86,12 +86,12 @@ public class CullingVolume {
     }
 
     public static string CullingFileWritePath(SceneData sceneData, string sceneName) {
-        string scenePath = SceneData.SceneDataPath();
+        string scenePath = sceneData.SceneDataPath();
         return Path.Combine(scenePath, $"cullingvolume_{sceneName}.xml");
     }
 
     public static CullingVolume Load(string sceneName) {
-        string path = $"data/sceneData/cullingvolume_{sceneName}";
+        string path = $"data/sceneData/{sceneName}/cullingvolume_{sceneName}";
         TextAsset textAsset = Resources.Load<TextAsset>(path) as TextAsset;
         XmlSerializer serializer = new XmlSerializer(typeof(CullingVolume));
         Debug.Log($"loading culling volume at {path}...");

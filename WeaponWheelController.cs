@@ -115,17 +115,18 @@ public class WeaponWheelController : MonoBehaviour {
     }
     void CloseMenu(ref PlayerInput input) {
         if (dialogueCoroutine != null) StopCoroutine(dialogueCoroutine);
-        // Debug.Log($"closing menu with theta {selectedOption}");
+        Debug.Log($"closing menu with theta {selectedOption} {selectedOption.weapon} {selectedOption.item}");
         if (selectedOption == null) {
             return;
-        } else if (selectedOption.weapon == GameManager.I.gameData.playerState.primaryGun) {
+        } else if (selectedOption.weapon != null && selectedOption.weapon == GameManager.I.gameData.playerState.primaryGun) {
             input.selectgun = 1;
-        } else if (selectedOption.weapon == GameManager.I.gameData.playerState.secondaryGun) {
+        } else if (selectedOption.weapon != null && selectedOption.weapon == GameManager.I.gameData.playerState.secondaryGun) {
             input.selectgun = 2;
-        } else if (selectedOption.weapon == GameManager.I.gameData.playerState.tertiaryGun) {
+        } else if (selectedOption.weapon != null && selectedOption.weapon == GameManager.I.gameData.playerState.tertiaryGun) {
             input.selectgun = 3;
         } else if (selectedOption.item != null) {
             input.selectItem = selectedOption.item;
+            Debug.Log($"input: select item: {input.selectItem}");
         } else if (selectedOption.holster) {
             input.selectgun = -1;
         }

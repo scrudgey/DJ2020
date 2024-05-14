@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using NavMeshBuilder = UnityEngine.AI.NavMeshBuilder;
 
 public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction, world }
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop, perkMenu, softwareModal, phoneMenu }
@@ -82,6 +84,9 @@ public partial class GameManager : Singleton<GameManager> {
     public MeleeHandler playerMeleeHandler;
     public ManualHacker playerManualHacker;
     public ItemHandler playerItemHandler;
+    float rebuildNavMeshTimer;
+    NavMeshData m_NavMesh;
+
     public void Start() {
         cursorType = CursorType.pointer;
         showDebugRays = true;
@@ -103,6 +108,8 @@ public partial class GameManager : Singleton<GameManager> {
         SetMarketData();
         SetDealData();
         SetFenceData();
+        SetGunsForSale();
+
         SaveGameData();
         ReturnToApartment();
     }
@@ -246,7 +253,6 @@ public partial class GameManager : Singleton<GameManager> {
                 }
                 break;
             case MenuType.escapeMenu:
-                // TODO: change this?
                 SetOverlay(OverlayType.none);
                 if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
                     LoadScene("EscapeMenu", callback, unloadAll: false);
@@ -478,12 +484,27 @@ public partial class GameManager : Singleton<GameManager> {
                 node.position = playerPosition + Vector3.up;
         }
 
+        if (rebuildNavMeshTimer > 0) {
+            // TODO: rebuild nav mesh
+            rebuildNavMeshTimer -= Time.deltaTime;
+            // if (rebuildNavMeshTimer <= 0) {
+            //     NavMeshSourceTag.Collect(ref m_Sources);
+            //     var defaultBuildSettings = NavMesh.GetSettingsByID(0);
+            //     var bounds = gameData.levelState.
+            //     NavMeshBuilder.UpdateNavMeshDataAsync(m_NavMesh, defaultBuildSettings, m_Sources, bounds);
+            // }
+        }
+
     }
     public void HandleEscapePressed() {
         if (gameData.phase == GamePhase.world) {
             if (activeMenuType == MenuType.none) {
-                // TODO: show world pause menu
-                ShowMenu(MenuType.mainEscapeMenu);
+                // ShowMenu(MenuType.mainEscapeMenu);
+                ShowMenu(MenuType.escapeMenu, () => {
+                    string sceneName = SceneManager.GetActiveScene().name;
+                    EscapeMenuController controller = GameObject.FindObjectOfType<EscapeMenuController>();
+                    controller.Initialize(gameData, sceneName);
+                });
             } else {
                 DoEscapeMenus();
             }
@@ -495,8 +516,9 @@ public partial class GameManager : Singleton<GameManager> {
                 if (activeMenuType == MenuType.none) {
                     MenuType escapeMenuType = gameData.phase == GamePhase.levelPlay ? MenuType.escapeMenu : MenuType.VREscapeMenu;
                     ShowMenu(escapeMenuType, () => {
+                        string sceneName = SceneManager.GetActiveScene().name;
                         EscapeMenuController controller = GameObject.FindObjectOfType<EscapeMenuController>();
-                        controller.Initialize(gameData);
+                        controller.Initialize(gameData, sceneName);
                     });
                 } else {
                     DoEscapeMenus();
@@ -667,6 +689,11 @@ public partial class GameManager : Singleton<GameManager> {
             medicalShopController.Initialize();
         }
         ,
+        StoreType.gun => () => {
+            GunShopController gunShopController = GameObject.FindObjectOfType<GunShopController>();
+            gunShopController.Initialize(gameData);
+        }
+        ,
         _ => null
     });
 
@@ -715,5 +742,11 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void PlayUISound(AudioClip[] clips) {
         Toolbox.RandomizeOneShot(audioSource, clips);
+    }
+
+    public void RebuildNavMeshAsync() {
+        if (rebuildNavMeshTimer <= 0) {
+            rebuildNavMeshTimer = 0.2f;
+        }
     }
 }

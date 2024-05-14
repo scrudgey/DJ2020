@@ -46,19 +46,27 @@ public class LevelDataUtilEditor : Editor {
         EditorGUILayout.PropertyField(levelData);
         EditorGUILayout.PropertyField(floorWidgetProperty);
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
+        SceneData sceneData = (SceneData)sceneDataProperty.objectReferenceValue;
+
         if (template != null) {
             GUILayout.Label("Level Template");
 
             string levelName = template.levelName;
+            EditorGUILayout.PropertyField(floorNumberProperty);
             if (GUILayout.Button("Write map image")) {
-                SaveMapData();
+                SaveMapData(sceneData);
+            }
+            if (GUILayout.Button("Set map floor level")) {
+                int floorNumber = floorNumberProperty.intValue;
+                SetMapFloorHeight(sceneData, floorNumber);
+                // EditorGUILayout.PropertyField(floorHeightsProperty);
             }
             GUILayout.Space(10);
             EditorGUILayout.Separator();
             GUILayout.Space(10);
             if (GUILayout.Button("Write all data")) {
                 WriteGraphDataButtonEffect(levelName);
-                SaveMapMetaData(template);
+                SaveMapMetaData(sceneData);
                 SetObjectiveData(template);
             }
             GUILayout.Space(10);
@@ -72,7 +80,7 @@ public class LevelDataUtilEditor : Editor {
                 WriteGraphDataButtonEffect(levelName);
             }
             if (GUILayout.Button("Write map marker data")) {
-                SaveMapMetaData(template);
+                SaveMapMetaData(sceneData);
             }
             if (GUILayout.Button("Write objective data")) {
                 SetObjectiveData(template);
@@ -91,7 +99,6 @@ public class LevelDataUtilEditor : Editor {
         EditorGUILayout.Separator();
         EditorGUILayout.PropertyField(sceneDataProperty);
         GUILayout.Space(10);
-        SceneData sceneData = (SceneData)sceneDataProperty.objectReferenceValue;
         if (sceneData != null) {
             GUILayout.Label("Scene Data");
             Editor.CreateEditor(sceneData).OnInspectorGUI();
@@ -99,17 +106,12 @@ public class LevelDataUtilEditor : Editor {
             SerializedObject serializedObject = new UnityEditor.SerializedObject(sceneData);
             SerializedProperty floorHeightsProperty = serializedObject.FindProperty("floorHeights");
 
-            EditorGUILayout.PropertyField(floorNumberProperty);
             if (GUILayout.Button("Set culling floor level")) {
                 int floorNumber = floorNumberProperty.intValue;
                 SetFloorHeight(sceneData, floorNumber);
                 // EditorGUILayout.PropertyField(floorHeightsProperty);
             }
-            if (GUILayout.Button("Set map floor level")) {
-                int floorNumber = floorNumberProperty.intValue;
-                SetMapFloorHeight(sceneData, floorNumber);
-                // EditorGUILayout.PropertyField(floorHeightsProperty);
-            }
+
             GUILayout.Space(20);
             EditorGUILayout.PropertyField(gridSpacingProperty);
             EditorGUILayout.PropertyField(boundingBoxProperty);
@@ -191,14 +193,14 @@ public class LevelDataUtilEditor : Editor {
     }
 
 
-    public void SaveMapData() {
+    public void SaveMapData(SceneData sceneData) {
         // map
         Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
         RenderTexture renderTexture = (RenderTexture)mapTextureProperty.objectReferenceValue;
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
         int floorNumber = floorNumberProperty.intValue;
 
-        SaveMapSnapshot(renderTexture, template, floorNumber);
+        SaveMapSnapshot(renderTexture, sceneData, floorNumber);
         // SaveMapMetaData(template);
 
         AssetDatabase.Refresh();
@@ -207,7 +209,9 @@ public class LevelDataUtilEditor : Editor {
         // map
         Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
         LevelTemplate template = (LevelTemplate)levelData.objectReferenceValue;
-        SaveMapMetaData(template);
+        SceneData sceneData = (SceneData)sceneDataProperty.objectReferenceValue;
+
+        SaveMapMetaData(sceneData);
         AssetDatabase.Refresh();
     }
 
@@ -245,23 +249,24 @@ public class LevelDataUtilEditor : Editor {
         EditorUtility.SetDirty(template);
     }
 
-    void SaveMapSnapshot(RenderTexture renderTexture, LevelTemplate template, int floorNumber) {
+    void SaveMapSnapshot(RenderTexture renderTexture, SceneData sceneData, int floorNumber) {
         Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
-
-        string levelName = template.levelName;
-        string sceneName = SceneManager.GetActiveScene().name;
-
         mapCam.targetTexture = renderTexture;
         mapCam.Render();
         mapCam.targetTexture = null;
         Texture2D tex = Toolbox.RenderToTexture2D(renderTexture);
-        MapMarker.WriteMapImage(levelName, sceneName, tex, floorNumber);
-
+        WriteMapImage(sceneData, tex, floorNumber);
     }
-    void SaveMapMetaData(LevelTemplate template) {
+    void WriteMapImage(SceneData sceneData, Texture2D tex, int floorNumber) {
+        byte[] bytes = tex.EncodeToPNG();
+        string path = MapMarker.MapPath(sceneData, floorNumber);
+        Debug.Log($"writing {path}...");
+        System.IO.File.WriteAllBytes(path, bytes);
+    }
+
+    void SaveMapMetaData(SceneData sceneData) {
         Camera mapCam = (Camera)mapCameraProperty.objectReferenceValue;
 
-        string levelName = template.levelName;
         string sceneName = SceneManager.GetActiveScene().name;
         List<MapMarkerData> datas = new List<MapMarkerData>();
         foreach (MapMarker marker in GameObject.FindObjectsOfType<MapMarker>()) {
@@ -274,17 +279,16 @@ public class LevelDataUtilEditor : Editor {
             EditorUtility.SetDirty(marker);
         }
         Debug.Log($"writing {datas.Count} map marker data...");
-        MapMarker.WriteMapMetaData(levelName, sceneName, datas);
-
+        MapMarker.WriteMapMetaData(sceneData, datas);
 
         Vector3 mapOrigin = mapCam.WorldToViewportPoint(Vector3.zero);
         Vector3 mapNorthPoint = mapCam.WorldToViewportPoint(new Vector3(1f, 0f, 0f));
         Vector3 mapEastPoint = mapCam.WorldToViewportPoint(new Vector3(0f, 0f, 1f));
-        template.mapOrigin = mapOrigin;
-        template.mapUnitNorth = mapNorthPoint - mapOrigin;
-        template.mapUnitEast = mapEastPoint - mapOrigin;
+        sceneData.mapOrigin = mapOrigin;
+        sceneData.mapUnitNorth = mapNorthPoint - mapOrigin;
+        sceneData.mapUnitEast = mapEastPoint - mapOrigin;
 
-        EditorUtility.SetDirty(template);
+        EditorUtility.SetDirty(sceneData);
     }
 
     void SetFloorHeight(SceneData sceneData, int floorNumber) {

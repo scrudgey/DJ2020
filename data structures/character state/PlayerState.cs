@@ -110,8 +110,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
-            // ItemTemplate.LoadItem("C4"),
-            // ItemTemplate.LoadItem("rocket"),
+            ItemTemplate.LoadItem("C4"),
+            ItemTemplate.LoadItem("rocket"),
             // ItemTemplate.LoadItem("goggles"),
             // ItemTemplate.LoadItem("grenade"),
             ItemTemplate.LoadItem("deck"),
@@ -157,6 +157,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         List<string> perks = new List<string>();
 
         List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
+            SoftwareScriptableTemplate.Load("crack_inf"),
             SoftwareScriptableTemplate.Load("scan"),
             SoftwareScriptableTemplate.Load("crack"),
             SoftwareScriptableTemplate.Load("exploit"),
@@ -172,7 +173,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             Resources.Load("data/tactics/cyberattack") as Tactic
         };
 
-        List<LootBuyerData> fences = new List<LootBuyerData>{
+        List<LootBuyerData> fences = new List<LootBuyerData> {
             Resources.Load("data/lootbuyer/snakeman") as LootBuyerData,
             // Resources.Load("data/lootbuyer/doctor") as LootBuyerData,
             // Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
@@ -230,7 +231,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
             // activePerks = new List<string>(),
             activePerks = perks,
-            skillpoints = 0,
+            skillpoints = 10,
 
             softwareTemplates = softwareTemplates,
             softwareStates = softwareStates,

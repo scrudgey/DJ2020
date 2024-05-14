@@ -11,19 +11,19 @@ public class GunShopButton : MonoBehaviour {
     public Image gunImage;
     public Image creditsImage;
 
-    [HideInInspector]
-    public GunSaleData saleData;
+    // [HideInInspector]
+    // public GunSaleData saleData;
     [HideInInspector]
     public GunState gunState;
     Action<GunShopButton> callback;
-    public void Initialize(GunSaleData saleData, Action<GunShopButton> callback) {
-        this.saleData = saleData;
-        this.callback = callback;
-        titleText.text = saleData.template.shortName;
-        costText.text = saleData.cost.ToString();
-        innerDescriptionText.text = saleData.template.name;
-        gunImage.sprite = saleData.template.images[0];
-    }
+    // public void Initialize(GunSaleData saleData, Action<GunShopButton> callback) {
+    //     this.saleData = saleData;
+    //     this.callback = callback;
+    //     titleText.text = saleData.template.shortName;
+    //     costText.text = saleData.cost.ToString();
+    //     innerDescriptionText.text = saleData.template.name;
+    //     gunImage.sprite = saleData.template.images[0];
+    // }
     public void Initialize(GunState state, Action<GunShopButton> callback) {
         this.gunState = state;
         this.callback = callback;

@@ -5,6 +5,7 @@ namespace Items {
     public class CyberDeck : ItemInstance {
         public CyberDeck(ItemTemplate baseData) : base(baseData) {
             subweapon = true;
+            toggleable = true;
         }
         public override bool EnablesManualHack() => true;
     }

@@ -192,7 +192,7 @@ public class GunModShopController : MonoBehaviour {
     public void InventoryButtonCallback(GunShopButton button) {
         // if (selectedGunButton.gunState == button.gunState) return;
         Toolbox.RandomizeOneShot(audioSource, gunSelectSound);
-        gunStatHandler.DisplayGunTemplate(button.gunState);
+        gunStatHandler.DisplayGunState(button.gunState);
         selectedGunButton = button;
         ClearModButtons();
         ClearModInformation();
@@ -247,7 +247,7 @@ public class GunModShopController : MonoBehaviour {
         selectedGunButton.gunState.delta.activeMods.Add(currentGunModButton.gunMod);
         InventoryButtonCallback(selectedGunButton);
         gunStatHandler.SetCompareGun(null);
-        gunStatHandler.DisplayGunTemplate(selectedGunButton.gunState);
+        gunStatHandler.DisplayGunState(selectedGunButton.gunState);
 
         ClearPlayerInventory();
         SetPlayerCredits();

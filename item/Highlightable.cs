@@ -7,26 +7,32 @@ public class Highlightable : MonoBehaviour {
     public string calloutText;
     public int priority;
     protected Outline outline;
+    public bool alwaysOutline;
+
     public virtual void Start() {
         StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
     }
     void Initialize() {
         try {
-
             this.outline = Toolbox.GetOrCreateComponent<Outline>(gameObject, inChildren: true);
             this.outline.color = 1;
-            DisableOutline();
+            if (alwaysOutline) {
+                EnableOutline();
+            } else {
+                DisableOutline();
+            }
         }
         catch (Exception e) {
             Debug.Log($"[highlightable] ******* trying to initialize {gameObject}: {e}");
         }
     }
-    public void EnableOutline() {
+    public virtual void EnableOutline() {
         if (outline != null) {
             outline.enabled = true;
         }
     }
-    public void DisableOutline() {
+    public virtual void DisableOutline() {
+        if (alwaysOutline) return;
         if (outline != null)
             outline.enabled = false;
     }

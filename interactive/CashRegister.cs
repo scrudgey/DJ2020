@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class CashRegister : Interactive, INodeBinder<CyberNode> {
     public AudioSource audioSource;
     public AudioClip openSound;
     public GameObject credstickPrefab;
+    public Action<List<Interactive>> OnRegisterOpened;
     public override void Start() {
         base.Start();
         audioSource = Toolbox.SetUpAudioSource(gameObject);
@@ -26,12 +28,22 @@ public class CashRegister : Interactive, INodeBinder<CyberNode> {
             return;
         opened = true;
         Toolbox.RandomizeOneShot(audioSource, openSound);
-        GameObject credstickObject = GameObject.Instantiate(credstickPrefab, transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity);
-        Rigidbody rigidbody = credstickObject.GetComponent<Rigidbody>();
+        List<Interactive> credsticks = new List<Interactive>();
 
-        Vector3 velocity = Random.Range(1f, 5f) * Random.insideUnitSphere;
-        velocity.y = Mathf.Abs(velocity.y);
+        for (int i = 0; i < 3; i++) {
+            GameObject credstickObject = GameObject.Instantiate(credstickPrefab, transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity);
+            Rigidbody rigidbody = credstickObject.GetComponent<Rigidbody>();
 
-        rigidbody.velocity = velocity;
+            Vector3 velocity = UnityEngine.Random.Range(1f, 5f) * UnityEngine.Random.insideUnitSphere;
+            velocity.y = Mathf.Abs(velocity.y);
+
+            rigidbody.velocity = velocity;
+
+            Interactive credstick = credstickObject.GetComponentInChildren<Interactive>();
+            credsticks.Add(credstick);
+        }
+        OnRegisterOpened?.Invoke(credsticks);
+        enabled = false;
+        interactible = false;
     }
 }

@@ -191,6 +191,7 @@ public class PerkMenuController : MonoBehaviour {
         RefreshDisplay(state);
         PerkButtonCallback(selectedPerkButton);
         Toolbox.RandomizeOneShot(audioSource, activatePerkSound);
+        selectedPerkButton.SetActiveStatus();
     }
 
     void PopulatePerkView(Perk perk) {
@@ -232,11 +233,11 @@ public class PerkMenuController : MonoBehaviour {
             perkViewActiveText.text = "activated";
 
             perkViewActivateButton.interactable = false;
-        } else if (state.skillpoints > 0 && perk.CanBePurchased(state)) {
+        } else if (perk.CanBePurchased(state)) {
             perkViewActiveText.gameObject.SetActive(false);
             perkViewActivateButton.gameObject.SetActive(true);
 
-            perkViewActivateButton.interactable = true;
+            perkViewActivateButton.interactable = state.skillpoints > 0;
         } else {
             perkViewActiveText.gameObject.SetActive(true);
             perkViewActivateButton.gameObject.SetActive(false);

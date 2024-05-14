@@ -44,7 +44,7 @@ public class MissionPlanCyberController : MonoBehaviour {
     }
 
     public void SelectorClickCallback(SoftwareSelector selector) {
-        softwareView.Display(selector.softwareTemplate);
+        softwareView.DisplayTemplate(selector.softwareTemplate);
         if (selectedItemSlot != -1) {
             SetItemSlot(selectedItemSlot, selector.softwareTemplate);
             plan.softwareTemplates[selectedItemSlot] = selector.softwareTemplate;

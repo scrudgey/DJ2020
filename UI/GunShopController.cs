@@ -45,48 +45,27 @@ public class GunShopController : MonoBehaviour {
 
     public AudioClip blitSound;
     Coroutine blitTextRoutine;
-    List<GunSaleData> gunSaleData = new List<GunSaleData>();
-    GunSaleData currentGunForSale;
+    // List<GunSaleData> gunSaleData = new List<GunSaleData>();
+    GunState currentGunForSale;
+    List<GunState> gunsForSale;
 
     void Awake() {
         myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
         bottomRect.sizeDelta = new Vector2(1f, 0f);
     }
-    public void Start() {
-        // rightDialogueName.text = GameManager.I.gameData.filename;
-        // leftDialogueName.text = "seller";
-        dialogueController.Initialize(GameManager.I.gameData.filename, "honest pete");
-        gunSaleData = LoadGunSaleData();
-        ClearInitialize();
+    public void Initialize(GameData gameData) {
+        dialogueController.Initialize(gameData.filename, "Zed");
         SetBuyMode();
         StartCoroutine(Toolbox.OpenStore(bottomRect, audioSource, discloseBottomSound));
         myCanvas.enabled = true;
-    }
 
-
-    List<GunSaleData> LoadGunSaleData() => new List<GunSaleData>() {
-        new GunSaleData(GunTemplate.Load("p1"), 600),
-        new GunSaleData(GunTemplate.Load("p2"), 500),
-        new GunSaleData(GunTemplate.Load("p3"), 800),
-        new GunSaleData(GunTemplate.Load("p4"), 750),
-        new GunSaleData(GunTemplate.Load("s1"), 1750),
-        new GunSaleData(GunTemplate.Load("s2"), 2450),
-        new GunSaleData(GunTemplate.Load("s3"), 2700),
-        new GunSaleData(GunTemplate.Load("r1"), 5620),
-        new GunSaleData(GunTemplate.Load("r2"), 8900),
-        new GunSaleData(GunTemplate.Load("sh1"), 2000),
-        new GunSaleData(GunTemplate.Load("sh2"), 2300),
-        // new GunSaleData(GunTemplate.Load("sh2"), 1900),
-    };
-
-    void ClearInitialize() {
-        PopulateStoreInventory();
+        this.gunsForSale = gameData.gunsForSale;
+        PopulateStoreInventory(gameData.gunsForSale);
         PopulatePlayerInventory();
         SetPlayerCredits();
-        // set portraits
-        dialogueController.Initialize(GameManager.I.gameData.filename, "Zed");
 
+        // set portraits
         dialogueController.SetShopownerDialogue("Check back with me tomorrow- I have a shipment coming in from Tangier.");
         creditsCost.text = "";
 
@@ -105,17 +84,17 @@ public class GunShopController : MonoBehaviour {
         buyModeButton.SetActive(true);
         sellModeButton.SetActive(false);
     }
-    void PopulateStoreInventory() {
+    void PopulateStoreInventory(List<GunState> gunsForSale) {
         foreach (Transform child in leftGunScrollContainer) {
             if (child.name == "empty") continue;
             Destroy(child.gameObject);
         }
-        CreateShopGunButtons(gunSaleData);
+        CreateShopGunButtons(gunsForSale);
     }
 
-    void CreateShopGunButtons(List<GunSaleData> saleData) {
+    void CreateShopGunButtons(List<GunState> saleData) {
         int numberGuns = 0;
-        saleData.GroupBy(saleData => saleData.template.type).ToList().ForEach(saleDataGroup => {
+        saleData.GroupBy(saleData => saleData.template.type).OrderBy(group => group.Key).ToList().ForEach(saleDataGroup => {
             string sectionHeader = saleDataGroup.Key switch {
                 GunType.pistol => "Pistols",
                 GunType.smg => "SMGs",
@@ -125,7 +104,7 @@ public class GunShopController : MonoBehaviour {
             };
             GameObject divider = CreateGunListDivider(sectionHeader);
             divider.transform.SetParent(leftGunScrollContainer, false);
-            foreach (GunSaleData data in saleDataGroup) {
+            foreach (GunState data in saleDataGroup) {
                 GameObject button = CreateStoreGunButton(data);
                 button.transform.SetParent(leftGunScrollContainer, false);
                 numberGuns += 1;
@@ -160,7 +139,7 @@ public class GunShopController : MonoBehaviour {
         text.text = title;
         return obj;
     }
-    GameObject CreateStoreGunButton(GunSaleData data) {
+    GameObject CreateStoreGunButton(GunState data) {
         GameObject obj = GameObject.Instantiate(gunButtonPrefab);
         GunShopButton button = obj.GetComponent<GunShopButton>();
         button.Initialize(data, ShopButtonCallback);
@@ -175,19 +154,19 @@ public class GunShopController : MonoBehaviour {
     }
 
     public void ShopButtonCallback(GunShopButton button) {
-        SetGunForSale(button.saleData);
+        SetGunForSale(button.gunState);
     }
     public void InventoryButtonCallback(GunShopButton button) {
         SetCompareGun(button.gunState);
     }
 
-    void SetGunForSale(GunSaleData data) {
-        gunStatHandler.DisplayGunTemplate(data.template);
-        SetSalePrice(data.cost);
+    void SetGunForSale(GunState data) {
+        gunStatHandler.DisplayGunState(data);
+        SetSalePrice(data.GetCost());
         dialogueController.SetShopownerDialogue(data.template.shopDescription);
         currentGunForSale = data;
         Toolbox.RandomizeOneShot(audioSource, selectGunSound, randomPitchWidth: 0.02f);
-        buyButton.interactable = GameManager.I.gameData.playerState.credits >= data.cost;
+        buyButton.interactable = GameManager.I.gameData.playerState.credits >= data.GetCost();
     }
     void ClearGunForSale() {
         gunStatHandler.ClearGunTemplate();
@@ -210,7 +189,7 @@ public class GunShopController : MonoBehaviour {
         if (currentGunForSale == null) {
             return;
         } else {
-            if (GameManager.I.gameData.playerState.credits >= currentGunForSale.cost) {
+            if (GameManager.I.gameData.playerState.credits >= currentGunForSale.GetCost()) {
                 Toolbox.RandomizeOneShot(audioSource, buySound, randomPitchWidth: 0.02f);
                 BuyGun(currentGunForSale);
             } else {
@@ -236,12 +215,12 @@ public class GunShopController : MonoBehaviour {
     }
 
 
-    void BuyGun(GunSaleData data) {
+    void BuyGun(GunState data) {
         // remove credits
-        GameManager.I.gameData.playerState.credits -= data.cost;
+        GameManager.I.gameData.playerState.credits -= data.GetCost();
 
         // remove gun from sale data
-        gunSaleData.Remove(data);
+        gunsForSale.Remove(data);
 
         // add instance to player arsenal
         GunState newGun = GunState.Instantiate(data.template);
@@ -250,7 +229,7 @@ public class GunShopController : MonoBehaviour {
         // clear stat view
         ClearGunForSale();
 
-        PopulateStoreInventory();
+        PopulateStoreInventory(gunsForSale);
         PopulatePlayerInventory();
         SetPlayerCredits();
         // set portraits

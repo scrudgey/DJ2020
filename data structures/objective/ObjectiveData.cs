@@ -29,7 +29,8 @@ public class ObjectiveData : Objective {
     //     return Toolbox.RandomFromList(dataNodes).idn;
     // }
     public override ObjectiveDelta ToDelta(LevelState state) {
-        string targetIdn = SelectSpawnPointIdn(state.template, state.plan);
+        // string targetIdn = SelectSpawnPointIdn(state.plan);
+        string targetIdn = state.SetLocationOfObjective(this);
 
         CyberNode target = state.delta.cyberGraph.nodes[targetIdn];
         target.payData = targetPaydata;

@@ -39,6 +39,8 @@ public record LevelDelta {
     public HashSet<int> physicalKeys;
     public HashSet<int> keycards;
     public int humansKilled;
+    public SerializableDictionary<string, string> objectiveLocations;
+
     public static LevelDelta Empty() => new LevelDelta {
         levelAcquiredPaydata = new List<PayData>(),
         levelAcquiredLoot = new List<LootData>(),
@@ -47,7 +49,8 @@ public record LevelDelta {
         objectiveDeltas = new List<ObjectiveDelta>(),
         optionalObjectiveDeltas = new List<ObjectiveDelta>(),
         physicalKeys = new HashSet<int>(),
-        keycards = new HashSet<int>()
+        keycards = new HashSet<int>(),
+        objectiveLocations = new SerializableDictionary<string, string>()
     };
     public List<ObjectiveDelta> AllObjectives() => objectiveDeltas.Concat(optionalObjectiveDeltas).ToList();
 

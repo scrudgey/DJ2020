@@ -45,8 +45,10 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
 
     void UpdateEnabled() {
         if (node == null) return;
-        spriteLight.enabled = node.overallEnabled;
-        IRCone.enabled = node.overallEnabled;
+        if (spriteLight != null)
+            spriteLight.enabled = node.overallEnabled;
+        if (IRCone != null)
+            IRCone.enabled = node.overallEnabled;
         if (!node.overallEnabled) {
             audioSource.Stop();
         }

@@ -25,7 +25,6 @@ public class MapDisplayController : MonoBehaviour {
     public MapDisplay3DGenerator mapDisplay3DGenerator;
 
     [Header("Containers")]
-    public bool doPopulateColumns;
     public Transform insertionPointContainer;
     public Transform extractionPointContainer;
     public Transform objectivePointContainer;
@@ -33,10 +32,10 @@ public class MapDisplayController : MonoBehaviour {
     public GameObject insertionPointButtonPrefab;
 
     public GameObject insertionBox;
+    public GameObject extractionBox;
+    public GameObject objectiveBox;
 
     List<InsertionPointSelector> selectors;
-    // public GameObject extractionBox;
-
     InsertionPointSelector extractionSelector;
     InsertionPointSelector insertionSelector;
 
@@ -60,7 +59,6 @@ public class MapDisplayController : MonoBehaviour {
     Objective clickedObjective;
 
     LevelPlan plan;
-    LevelTemplate template;
     SceneData sceneData;
 
     MapDisplay3DView view;
@@ -78,14 +76,38 @@ public class MapDisplayController : MonoBehaviour {
         mouseOverMap = false;
     }
 
+    public void InitializeWorld(SceneData sceneData, MapDisplay3DView view) {
+        Initialize(sceneData, view);
+        PopulateColumns();
+        insertionBox.SetActive(false);
+        extractionBox.SetActive(false);
+        objectiveBox.SetActive(false);
+    }
+
     public void Initialize(LevelTemplate levelTemplate, SceneData sceneData, LevelPlan plan, MapDisplay3DView view) {
         this.plan = plan;
+        Initialize(sceneData, view);
+        PopulateColumns();
+        PopulateObjectiveColumn(levelTemplate);
+    }
+
+    public void Initialize(SceneData sceneData, MapDisplay3DView view) {
         this.view = view;
-        this.template = levelTemplate;
         this.sceneData = sceneData;
-        if (doPopulateColumns)
-            PopulateColumns(levelTemplate);
         SwitchLegend(MapDisplayLegendType.markers);
+        selectors = new List<InsertionPointSelector>();
+        List<Transform> columns = new List<Transform>{
+            insertionPointContainer,
+            extractionPointContainer,
+            objectivePointContainer,
+            interestPointContainer
+        };
+        foreach (Transform column in columns) {
+            foreach (Transform child in column) {
+                if (child.name.Contains("header")) continue;
+                Destroy(child.gameObject);
+            }
+        }
     }
 
     public void HideInsertionPoints() {
@@ -203,24 +225,10 @@ public class MapDisplayController : MonoBehaviour {
         }
     }
 
-    public void PopulateColumns(LevelTemplate template) {
-        selectors = new List<InsertionPointSelector>();
-        List<Transform> columns = new List<Transform>{
-            insertionPointContainer,
-            extractionPointContainer,
-            objectivePointContainer,
-            interestPointContainer
-        };
-        foreach (Transform column in columns) {
-            foreach (Transform child in column) {
-                if (child.name.Contains("header")) continue;
-                Destroy(child.gameObject);
-            }
-        }
+    public void PopulateColumns() {
         foreach (MapMarkerData data in mapDisplay3DGenerator.allMapData) {
             if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint ||
                 data.markerType == MapMarkerData.MapMarkerType.extractionPoint ||
-                // data.markerType == MapMarkerData.MapMarkerType.objective ||
                 data.markerType == MapMarkerData.MapMarkerType.pointOfInterest) {
                 GameObject obj = GameObject.Instantiate(insertionPointButtonPrefab);
                 InsertionPointSelector selector = obj.GetComponent<InsertionPointSelector>();
@@ -234,24 +242,28 @@ public class MapDisplayController : MonoBehaviour {
 
                 selector.Configure(data, ColumnItemCallback);
 
-                if (data.idn == plan.insertionPointIdn) {
-                    SelectInsertionPoint(selector);
-                }
-                if (data.idn == plan.extractionPointIdn) {
-                    SelectExtractionPoint(selector);
-                }
+                if (plan != null) {
+                    if (data.idn == plan.insertionPointIdn) {
+                        SelectInsertionPoint(selector);
+                    }
+                    if (data.idn == plan.extractionPointIdn) {
+                        SelectExtractionPoint(selector);
+                    }
 
-                if (plan.insertionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
-                    SelectInsertionPoint(selector);
-                }
-                if (plan.extractionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
-                    SelectExtractionPoint(selector);
+                    if (plan.insertionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.insertionPoint) {
+                        SelectInsertionPoint(selector);
+                    }
+                    if (plan.extractionPointIdn == "" && data.markerType == MapMarkerData.MapMarkerType.extractionPoint) {
+                        SelectExtractionPoint(selector);
+                    }
                 }
 
                 selectors.Add(selector);
             }
         }
+    }
 
+    public void PopulateObjectiveColumn(LevelTemplate template) {
         // TODO: bonus objectives?
         foreach (Objective objective in template.AllObjectives()) {
             GameObject obj = GameObject.Instantiate(insertionPointButtonPrefab);
@@ -290,10 +302,6 @@ public class MapDisplayController : MonoBehaviour {
             selectedObjective = objective;
             clickedObjective = objective;
         }
-        // MapMarkerIndicator indicator = view.objectiveIndicators[objective];
-
-        // a different method is needed for selecting objectives- no map marker data exists for them.
-        // some are not selectable: their position is unknown
     }
 
     void SelectInsertionPoint(InsertionPointSelector selector) {

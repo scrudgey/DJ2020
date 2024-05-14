@@ -34,12 +34,7 @@ public class EscapeMenuController : MonoBehaviour {
 
 
     [Header("objective")]
-    public Transform objectivesContainer;
-    public GameObject objectiveIndicatorPrefab;
-    public GameObject bonusObjectiveHeader;
-    public TextMeshProUGUI missionTitle;
-    public TextMeshProUGUI missionTagline;
-    public TextMeshProUGUI missionStatusText;
+    public EscapeMenuObjectiveController objectiveController;
     [Header("map")]
     public MapDisplay3DView mapDisplayView;
     [Header("loot")]
@@ -60,51 +55,44 @@ public class EscapeMenuController : MonoBehaviour {
         myCanvas.enabled = false;
         DestroyImmediate(UIEditorCamera);
     }
-    public void Initialize(GameData data) {
+    public void Initialize(GameData data, string sceneName) {
         GameManager.I.PlayUISound(openSounds);
+        SceneData sceneData = SceneData.loadSceneData(sceneName);
 
-        foreach (Transform child in objectivesContainer) {
-            if (child.gameObject == bonusObjectiveHeader) continue;
-            if (child.name.ToLower().Contains("spacer")) continue;
-            Destroy(child.gameObject);
-        }
-        foreach (ObjectiveDelta objective in data.levelState.delta.objectiveDeltas) {
-            GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
-            obj.transform.SetParent(objectivesContainer, false);
-            MissionSelectorObjective controller = obj.GetComponent<MissionSelectorObjective>();
-            controller.Initialize(objective);
-        }
-        if (data.levelState.delta.optionalObjectiveDeltas.Count > 0) {
-            bonusObjectiveHeader.gameObject.SetActive(true);
-            bonusObjectiveHeader.transform.SetAsLastSibling();
-            foreach (ObjectiveDelta objective in data.levelState.delta.optionalObjectiveDeltas) {
-                GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
-                obj.transform.SetParent(objectivesContainer, false);
-                MissionSelectorObjective controller = obj.GetComponent<MissionSelectorObjective>();
-                controller.Initialize(objective, isBonus: true);
-            }
+        int currentLoots = data.playerState.loots.Count;
+        int currentData = data.playerState.payDatas.Count;
+        int numberPasswords = data.playerState.payDatas.Where(data => data.type == PayData.DataType.password).Count();
+        int currentKeys = 0;
+
+        if (data.phase == GamePhase.world) {
+            objectiveTabButton.gameObject.SetActive(false);
+            keyTabButton.gameObject.SetActive(false);
+
+            mapDisplayView.InitializeWorldMode(sceneData);
+
+            lootController.Initialize(data.playerState.loots.ToList());
+            dataController.Initialize(data.playerState.payDatas.ToList());
+
+            ChangeTabCallback("map");
         } else {
-            bonusObjectiveHeader.gameObject.SetActive(false);
+            currentLoots += data.levelState.delta.levelAcquiredLoot.Count;
+            currentData += data.levelState.delta.levelAcquiredPaydata.Count;
+            numberPasswords += data.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.password).Count();
+            currentKeys = data.levelState.delta.physicalKeys.Count + data.levelState.delta.keycards.Count + numberPasswords;
+
+            objectiveController.Initialize(data.levelState);
+            mapDisplayView.Initialize(data.levelState, sceneData);
+            lootController.Initialize(data.levelState.delta.levelAcquiredLoot.Concat(data.playerState.loots).ToList());
+            dataController.Initialize(data.playerState.payDatas.Concat(data.levelState.delta.levelAcquiredPaydata).ToList());
+            keyController.Initialize(data.levelState.delta);
+
+            ChangeTabCallback("objective");
         }
-        missionTitle.text = data.levelState.template.readableMissionName;
-        missionTagline.text = data.levelState.template.tagline;
-        missionStatusText.text = "status: active";
-
-        SceneData sceneData = SceneData.loadSceneData(data.levelState.template.sceneName);
-        mapDisplayView.Initialize(data.levelState, sceneData);
-        lootController.Initialize(data.levelState.delta.levelAcquiredLoot.Concat(data.playerState.loots).ToList());
-        keyController.Initialize(data.levelState);
-        dataController.Initialize(data);
-
-        int currentLoots = data.playerState.loots.Count + data.levelState.delta.levelAcquiredLoot.Count;
-        int currentData = data.playerState.payDatas.Count + data.levelState.delta.levelAcquiredPaydata.Count;
-        int numberPasswords = data.playerState.payDatas.Concat(data.levelState.delta.levelAcquiredPaydata).Where(data => data.type == PayData.DataType.password).Count();
-        int currentKeys = data.levelState.delta.physicalKeys.Count + data.levelState.delta.keycards.Count + numberPasswords;
 
         lootCount.text = $"{currentLoots}";
         dataCount.text = $"{currentData}";
         keyCount.text = $"{currentKeys}";
-        ChangeTabCallback("objective");
+
         myCanvas.enabled = true;
     }
 
@@ -172,10 +160,7 @@ public class EscapeMenuController : MonoBehaviour {
         }, unscaledTime: true);
     }
 
-
     void SetButtonSelectedColor(Button target) {
-        // foreach (Button button in tabButtons) {
-        // }
         objectiveTabButton.colors = normalTabColors;
         mapTabButton.colors = normalTabColors;
         dataTabButton.colors = normalTabColors;

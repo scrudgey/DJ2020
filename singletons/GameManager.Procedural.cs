@@ -44,4 +44,36 @@ public partial class GameManager : Singleton<GameManager> {
         }
         gameData.fenceData = fenceDatas;
     }
+
+    public void SetGunsForSale() {
+        GunTemplate[] allTemplates = Resources.LoadAll<GunTemplate>("data/guns") as GunTemplate[];
+
+        List<GunState> gunsForSale = new List<GunState>();
+        foreach (GunState gunState in gameData.gunsForSale) {
+            if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
+                // string message = $"gun state carryover from yesterday: {gunState.getName()}";
+                gunsForSale.Add(gunState);
+            }
+        }
+
+        float desiredSize = Toolbox.GetPoisson(12);
+        desiredSize = Mathf.Min(desiredSize, 26f);
+        int j = 0;
+        Debug.Log($"desired number of guns for sale: {desiredSize}");
+        while (gunsForSale.Count < desiredSize) {
+            GunTemplate template = Toolbox.RandomFromListByWeight(allTemplates, (GunTemplate template) => template.likelihoodWeight);
+            if (gunsForSale.Select(gun => gun.template).Where(existingGun => template == existingGun).Count() >= 2) {
+                j++;
+                if (j > 100) {
+                    break;
+                }
+                continue;
+            }
+            GunState newGun = GunState.Instantiate(template, applyRandomPerks: true);
+            gunsForSale.Add(newGun);
+        }
+        gameData.gunsForSale = gunsForSale;
+    }
+
+
 }

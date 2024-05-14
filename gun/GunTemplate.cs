@@ -10,6 +10,8 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public string shortName;
     [TextArea(15, 20)]
     public string shopDescription;
+    public int baseCost;
+    public float likelihoodWeight;
 
     // TODO: separate guntype as graphics from gun functionality. allow gun to specify manual cycling, e.g.
     public GunType type;
@@ -32,6 +34,9 @@ public class GunTemplate : ScriptableObject, IGunStatProvider {
     public LoHi recoil;
     public List<GunMod> availableMods;
     public int piercing;
+
+    public List<GunPerk> possiblePerks;
+    public List<GunPerk> intrinsicPerks;
 
     [Header("Resources")]
     public AudioClip[] shootSounds;

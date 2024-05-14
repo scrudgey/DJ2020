@@ -7,6 +7,7 @@ public class LootBuyerData : ScriptableObject {
     public Sprite portrait;
     public Sprite phonePortrait;
     public string buyerName;
+    public string informalNickname;
     public string phoneNumber;
     public bool isMale;
     public NPCTemplate template;

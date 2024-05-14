@@ -29,7 +29,7 @@ public class HackTerminalController : MonoBehaviour {
 
     Coroutine showRectRoutine;
     bool isHidden;
-    List<CyberNode> path;
+    public List<CyberNode> path;
     CyberNodeStatus currentCyberNodeStatus;
     NodeVisibility currentNodeVisibility;
     int currentLockLevel;
@@ -118,7 +118,8 @@ public class HackTerminalController : MonoBehaviour {
         GameManager.I.ShowMenu(MenuType.softwareModal);
     }
     public void DeploySoftware(SoftwareState state) {
-        state.charges -= 1;
+        if (!state.template.infiniteCharges)
+            state.charges -= 1;
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
         terminalAnimation.HandleSoftwareCallback(state);

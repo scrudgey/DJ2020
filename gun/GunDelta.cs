@@ -6,11 +6,21 @@ public record GunDelta {
     public int chamber;
     public float cooldownTimer;
     public List<GunMod> activeMods;
+    public List<GunPerk> perks;
 
-    public static GunDelta From(GunTemplate template) {
+    public static GunDelta From(GunTemplate template, bool applyRandomPerks = false) {
         if (template != null) {
+            List<GunPerk> perks = new List<GunPerk>();
+            if (applyRandomPerks) {
+                foreach (GunPerk perk in template.possiblePerks) {
+                    if (Random.Range(0f, 1f) < perk.probability) {
+                        perks.Add(perk);
+                    }
+                }
+            }
             return GunDelta.Empty() with {
-                clip = template.clipSize
+                clip = template.clipSize,
+                perks = perks
             };
         } else {
             return GunDelta.Empty();
@@ -47,7 +57,8 @@ public record GunDelta {
         clip = 0,
         chamber = 0,
         cooldownTimer = 0,
-        activeMods = new List<GunMod>()
+        activeMods = new List<GunMod>(),
+        perks = new List<GunPerk>()
     };
 
     // Save

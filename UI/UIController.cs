@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 public class UIController : MonoBehaviour {
+    [Header("canvas")]
     public Canvas canvas;
     public Canvas gunDisplayCanvas;
     public Canvas terminalCanvas;
@@ -13,6 +14,8 @@ public class UIController : MonoBehaviour {
     public Canvas missionSelectorCanvas;
     public Canvas interactiveHighlightCanvas;
     public Canvas statusBarCanvas;
+    public Canvas overlayCanvas;
+    [Header("controllers")]
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
     public MeleeWeaponUIHandler meleeWeaponUIHandler;
@@ -189,15 +192,22 @@ public class UIController : MonoBehaviour {
             burglarCanvas.enabled = false;
         if (statusBarCanvas != null)
             statusBarCanvas.enabled = false;
+        if (overlayCanvas != null)
+            overlayCanvas.enabled = false;
     }
     public void ShowUI() {
-        canvas.enabled = true;
-        gunDisplayCanvas.enabled = true;
-        interactiveHighlightCanvas.enabled = true;
+        if (canvas != null)
+            canvas.enabled = true;
+        if (gunDisplayCanvas != null)
+            gunDisplayCanvas.enabled = true;
+        if (interactiveHighlightCanvas != null)
+            interactiveHighlightCanvas.enabled = true;
         if (statusBarCanvas != null)
             statusBarCanvas.enabled = true;
         if (burglarMode)
             burglarCanvas.enabled = true;
+        if (overlayCanvas != null)
+            overlayCanvas.enabled = true;
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {
             ShowVRStats();
         }

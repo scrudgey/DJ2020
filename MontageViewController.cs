@@ -16,6 +16,10 @@ public class MontageViewController : MonoBehaviour {
     [Header("panels")]
     public GameObject mapPanel;
     public GameObject montagePanel;
+    [Header("buttons")]
+    public GameObject barbutton;
+    public GameObject foodButton;
+    public GameObject clubButton;
     [Header("bottom montage")]
     public GameObject plainTextHolder;
     public TextMeshProUGUI plainText;
@@ -76,6 +80,10 @@ public class MontageViewController : MonoBehaviour {
         worldmapView.Initialize();
 
         chibiJackAnimation.enabled = false;
+
+        barbutton.SetActive(GameManager.I.gameData.playerState.TacticsAvailableToUnlock().Count > 0);
+        clubButton.SetActive(GameManager.I.gameData.playerState.FencesAvailableToUnlock().Count > 0);
+
     }
     public void Finish() {
         gameObject.SetActive(false);

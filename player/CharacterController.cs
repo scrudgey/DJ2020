@@ -585,6 +585,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 break;
             case CharacterState.normal:
+                // Debug.Log(input.selectItem);
                 wallPressRatchet = false;
                 if (hitstunTimer <= 0) {
                     // Items
@@ -822,6 +823,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case 1:
                 itemHandler?.EvictSubweapon();
+                if (primaryWeapon == null) break;
+
                 if (primaryWeapon.type == WeaponType.gun) {
                     gunHandler.SwitchGun(primaryWeapon.gunInstance);
                     meleeHandler?.Holster();
@@ -832,6 +835,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case 2:
                 itemHandler?.EvictSubweapon();
+                if (secondaryWeapon == null) break;
                 if (secondaryWeapon.type == WeaponType.gun) {
                     gunHandler.SwitchGun(secondaryWeapon.gunInstance);
                     meleeHandler?.Holster();
@@ -842,6 +846,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 break;
             case 3:
                 if (!thirdGunSlotEnabled) break;
+                if (tertiaryWeapon == null) break;
+
                 itemHandler?.EvictSubweapon();
                 if (tertiaryWeapon.type == WeaponType.gun) {
                     gunHandler.SwitchGun(tertiaryWeapon.gunInstance);

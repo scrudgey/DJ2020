@@ -133,12 +133,11 @@ public class SuspicionRecord {
     public static SuspicionRecord robRegisterSuspicion() => new SuspicionRecord {
         content = "robbed a cash register",
         suspiciousness = Suspiciousness.aggressive,
-        lifetime = 160f,
-        maxLifetime = 160f,
+        lifetime = 5f,
+        maxLifetime = 5f,
         allowDataResponse = true,
         stickyable = true,
         getDialogue = parameters => parameters.RobbedRegisterParams
-
     };
 
     public static SuspicionRecord bodySuspicion() => new SuspicionRecord {

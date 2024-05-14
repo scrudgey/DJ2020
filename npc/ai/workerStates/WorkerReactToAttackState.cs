@@ -64,7 +64,6 @@ public class WorkerReactToAttackState : WorkerNPCControlState {
                 reorient = true
             }, 0.2f),
             new TaskLambda(() => {
-                Debug.Log("press button");
                 button.PressButton();
                 button = null;
             })

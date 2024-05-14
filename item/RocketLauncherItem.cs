@@ -12,6 +12,7 @@ namespace Items {
             maxCount = 1;
             consumable = true;
             subweapon = true;
+            toggleable = true;
         }
         protected override ItemUseResult DoUse(ItemHandler handler, PlayerInput input) {
             handler.rocketLauncher.ShootRocket(this, input, handler);

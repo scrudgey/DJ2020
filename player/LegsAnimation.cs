@@ -202,7 +202,7 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         }
 
         shadowCaster.localScale = new Vector3(0.25f, 0.8f, 0.25f);
-        shadowCaster.gameObject.SetActive(true);
+        // shadowCaster.gameObject.SetActive(true);
         if (input.state == CharacterState.hvac) {
             shadowCaster.gameObject.SetActive(false);
         } else if (input.hitState == HitState.dead || input.hitState == HitState.zapped || input.state == CharacterState.dead || input.state == CharacterState.keelOver) {

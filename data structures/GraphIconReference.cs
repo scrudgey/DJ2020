@@ -45,6 +45,11 @@ public class GraphIconReference : ScriptableObject {
     public Sprite medicalLootIcon;
     public Sprite industrialLootIcon;
     public Sprite gemLootIcon;
+    [Header("gun perk")]
+    public Sprite damageIcon;
+    public Sprite priceIcon;
+    public Sprite accuracyIcon;
+    public Sprite piercingIcon;
 
 
     public Sprite CyberNodeSprite(CyberNode node) {
@@ -120,6 +125,16 @@ public class GraphIconReference : ScriptableObject {
             LootCategory.medical => medicalLootIcon,
             LootCategory.none => drugLootIcon,
             _ => drugLootIcon
+        };
+    }
+
+    public Sprite GunPerkSprite(GunPerk.GunPerkType type) {
+        return type switch {
+            GunPerk.GunPerkType.accuracy => accuracyIcon,
+            GunPerk.GunPerkType.armorPiercing => piercingIcon,
+            GunPerk.GunPerkType.cost => priceIcon,
+            GunPerk.GunPerkType.damage => damageIcon,
+            _ => priceIcon
         };
     }
 }

@@ -1,17 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum GunModType { none, silencer, clipSize, damage, fireRate }
-[CreateAssetMenu(menuName = "ScriptableObjects/GunMod")]
-public class GunMod : ScriptableObject, IGunStatProvider {
-    public GunModType type;
-    public string title;
-    [TextArea(15, 20)]
-    public string description;
+[CreateAssetMenu(menuName = "ScriptableObjects/GunPerk")]
+public class GunPerk : ScriptableObject, IGunStatProvider {
+    public enum GunPerkType { cost, damage, accuracy, armorPiercing }
+    public GunPerkType type;
     public int cost;
-    public string requiredSpriteSuffix;
+    public float probability;
     [Header("stats")]
     public int armorPiercing;
     public float shootInterval;
