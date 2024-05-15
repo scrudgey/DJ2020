@@ -50,6 +50,52 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         DrawMarchingAntsForAllActiveActions();
     }
 
+    public override void RefreshIndicators() {
+        base.RefreshIndicators();
+        FindHackOrigin();
+    }
+
+    void FindHackOrigin() {
+        if (overlayHandler.selectedCyberNodeIndicator == null) return;
+
+        // prefer manual hack node if it is within 1 hop
+        // otherwise, take first node in range
+        CyberNode hackOriginNode = null;
+        Debug.Log("finding hack origin");
+        foreach (CyberNode node in graph.nodes.Values.Where(node => node.getStatus() == CyberNodeStatus.compromised)) {
+            List<CyberNode> path = graph.GetPath(node, overlayHandler.selectedCyberNodeIndicator.node);
+            Debug.Log($"node: {node.idn}\tdistance: {path.Count}");
+
+            if (path.Count == 0) continue;
+
+            if (node.idn == "localhost" && path.Count <= 2) {
+                hackOriginNode = node;
+                break;
+            }
+            if (path.Count <= 3) {
+                hackOriginNode = node;
+            }
+        }
+        Debug.Log($"hack origin: {hackOriginNode}");
+        if (hackOriginNode != null) {
+            NeoCyberNodeIndicator indicator = GetIndicator(hackOriginNode);
+            overlayHandler.HackOriginSelectCallback(indicator);
+        }
+        // hack origin is compromised node within x hops of the selected node
+
+        // if (overlayHandler.selectedCyberNodeIndicator != null &&
+        //     nodeStatus == CyberNodeStatus.compromised &&
+        //     overlayHandler.selectedHackOrigin != this &&
+        //     overlayHandler.selectedCyberNodeIndicator != this) {
+        //     List<CyberNode> path = graph.GetPath(node, overlayHandler.selectedCyberNodeIndicator.node);
+        //     if (path.Count <= 3) {
+        //         hackButton.SetActive(true);
+        //     } else hackButton.SetActive(false);
+        // } else {
+        //     hackButton.SetActive(false);
+        // }
+    }
+
     public override void RefreshEdgeGraphicState() {
         base.RefreshEdgeGraphicState();
     }

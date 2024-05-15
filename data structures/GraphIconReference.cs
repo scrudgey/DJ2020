@@ -53,9 +53,11 @@ public class GraphIconReference : ScriptableObject {
 
 
     public Sprite CyberNodeSprite(CyberNode node) {
-        // if (node.lockLevel > 0) {
-        //     return lockIcon;
-        // }
+        CyberNodeStatus nodeStatus = node.getStatus();
+
+        if (nodeStatus == CyberNodeStatus.compromised && node.type != CyberNodeType.WAN) {
+            return skullAndBonesIcon;
+        }
         if (node.visibility < NodeVisibility.known) {
             return mysteryIcon;
         }

@@ -3435,6 +3435,9 @@ speed up + pitch up blitting?
     * allow gun perks
         * gun perk icons in ui
         * tooltip mouseover
+* make hack selection automatic
+    * prefer shorter paths, prefer cyberdeck
+    ? highlight edges from compromised nodes
 
 
 
@@ -3879,11 +3882,6 @@ missions
     productionize office
         redo apartment after office
 
-
-make hack selection automatic
-    prefer shorter paths, prefer cyberdeck
-    highlight edges from compromised nodes
-    x
 key system
 ambience system
     a separate channel in mixer
@@ -3903,3 +3901,10 @@ destructible walls
 fix up the cyberdeck loadout screen
     MB total? or slots?
 update the steam page graphic
+
+
+
+progression in software
+    1. core idea is designing software with design points budget
+        point budget can increase with skill
+    2. maybe all software type stuff is from skill tree

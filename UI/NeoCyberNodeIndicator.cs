@@ -72,15 +72,10 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         }
         CyberNodeStatus nodeStatus = node.getStatus();
 
-        // TODO: set sprite to skull & crossbones when compromised
         iconImage.sprite = icons.CyberNodeSprite(node);
         if (node.type == CyberNodeType.datanode && node.dataStolen) {
             iconImage.enabled = false;
         }
-        if (nodeStatus == CyberNodeStatus.compromised && node.type != CyberNodeType.WAN) {
-            iconImage.sprite = icons.skullAndBonesIcon;
-        }
-
 
         Color nodeColor = nodeStatus switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
@@ -98,17 +93,17 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         // lockWidget2.SetActive(node.lockLevel > 0);
         lockWidget2.SetActive(false);
 
-        if (overlayHandler.selectedCyberNodeIndicator != null &&
-            nodeStatus == CyberNodeStatus.compromised &&
-            overlayHandler.selectedHackOrigin != this &&
-            overlayHandler.selectedCyberNodeIndicator != this) {
-            List<CyberNode> path = graph.GetPath(node, overlayHandler.selectedCyberNodeIndicator.node);
-            if (path.Count <= 3) {
-                hackButton.SetActive(true);
-            } else hackButton.SetActive(false);
-        } else {
-            hackButton.SetActive(false);
-        }
+        // if (overlayHandler.selectedCyberNodeIndicator != null &&
+        //     nodeStatus == CyberNodeStatus.compromised &&
+        //     overlayHandler.selectedHackOrigin != this &&
+        //     overlayHandler.selectedCyberNodeIndicator != this) {
+        //     List<CyberNode> path = graph.GetPath(node, overlayHandler.selectedCyberNodeIndicator.node);
+        //     if (path.Count <= 3) {
+        //         hackButton.SetActive(true);
+        //     } else hackButton.SetActive(false);
+        // } else {
+        //     hackButton.SetActive(false);
+        // }
 
         // lockWidget.SetColor(nodeColor);
         // dataWidget.SetColor(nodeColor);
@@ -193,13 +188,13 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     }
     public void SetHackOrigin(bool value) {
         hackOriginIndicator.SetActive(value);
-        hackButton.SetActive(!value);
+        // hackButton.SetActive(!value);
         stopHackButton.SetActive(value);
     }
-    public void HackButtonCallback() {
-        overlayHandler.HackOriginSelectCallback(this);
-    }
-    public void StophackButtonCallback() {
-        overlayHandler.HackOriginSelectCallback(null);
-    }
+    // public void HackButtonCallback() {
+    //     overlayHandler.HackOriginSelectCallback(this);
+    // }
+    // public void StophackButtonCallback() {
+    //     overlayHandler.HackOriginSelectCallback(null);
+    // }
 }
