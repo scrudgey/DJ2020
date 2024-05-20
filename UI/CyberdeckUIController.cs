@@ -76,8 +76,8 @@ public class CyberdeckUIController : MonoBehaviour {
         }
         AddSoftwareButton(new SoftwareEffect() {
             type = SoftwareEffect.Type.compromise,
-            level = 1,
-            name = "crack.exe"
+            // level = 1,
+            // name = "crack.exe"
         });
     }
 

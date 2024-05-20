@@ -319,7 +319,12 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
             case MenuType.missionSelect:
                 uiController.HideUI();
-                uiController.ShowMissionSelector(gameData);
+                if (!SceneManager.GetSceneByName("MissionSelect").isLoaded) {
+                    LoadScene("MissionSelect", () => {
+                        MissionComputerController controller = GameObject.FindObjectOfType<MissionComputerController>();
+                        controller.Initialize(gameData);
+                    }, unloadAll: false);
+                }
                 break;
             case MenuType.softwareModal:
                 uiController.ShowUI();
@@ -391,7 +396,7 @@ public partial class GameManager : Singleton<GameManager> {
                 SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("PerkMenu"));
                 break;
             case MenuType.missionSelect:
-                uiController.HideMissionSelector();
+                SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("MissionSelect"));
                 break;
             case MenuType.softwareModal:
                 uiController.HideSoftwareDeployModal();

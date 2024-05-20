@@ -12,6 +12,7 @@ public class SoftwareView : MonoBehaviour {
     public TextMeshProUGUI viewDescription;
     public TextMeshProUGUI viewRequirements;
     public TextMeshProUGUI viewCharges;
+    public TextMeshProUGUI viewSize;
     PlayerState playerState;
     CyberNode target;
     CyberNode origin;
@@ -45,6 +46,7 @@ public class SoftwareView : MonoBehaviour {
         } else {
             viewCharges.text = $"charges: {state.charges}/{state.template.maxCharges}";
         }
+
     }
 
     public void DisplayTemplate(SoftwareTemplate template) {
@@ -53,25 +55,33 @@ public class SoftwareView : MonoBehaviour {
         viewTitle.text = template.name;
 
         string description = "";
+        if (template.softwareType == SoftwareTemplate.SoftwareType.exploit) {
+            description = "type: exploit\n";
+        } else if (template.softwareType == SoftwareTemplate.SoftwareType.virus) {
+            description = "type: virus\n";
+        }
         foreach (SoftwareEffect effect in template.effects) {
             description += effect.DescriptionString() + "\n";
         }
         viewDescription.text = description;
 
         string requirements = "requirements:\n";
-        if (target != null) {
-            if (template.conditions.Count == 0) {
-                requirements += "none";
-            } else {
-                foreach (SoftwareCondition condition in template.conditions) {
-                    requirements += condition.DescriptionString() + "\n";
-                }
+        if (template.conditions.Count == 0) {
+            requirements += "none";
+        } else {
+            foreach (SoftwareCondition condition in template.conditions) {
+                requirements += condition.DescriptionString() + "\n";
             }
-
         }
         viewRequirements.text = requirements;
 
-        viewCharges.text = $"charges: {template.maxCharges}";
+        if (template.infiniteCharges) {
+            viewCharges.text = $"charges: unlimited";
+        } else {
+            viewCharges.text = $"charges: {template.maxCharges}";
+        }
+
+        viewSize.text = $"size: {template.CalculateSize()} MB";
     }
 
 }

@@ -2,23 +2,37 @@ using System.Collections.Generic;
 
 [System.Serializable]
 public class SoftwareCondition {
-    public enum Type { nodeType, lockLevel, hops, nodevisibilty, manualHack }
+    public enum Type { nodeType, unlocked, nodeKnown, manualHack, locked, uncompromised, nodeUnknown, fileUnknown, edgesUnknown }
     public Type type;
     public CyberNodeType matchType;
-    public NodeVisibility nodeVisibilityGreaterThan;
-    public int magnitude;
+    public SoftwareCondition(Type type) {
+        this.type = type;
+        matchType = CyberNodeType.normal;
+    }
+    public SoftwareCondition(Type type, CyberNodeType nodeType) {
+        this.type = type;
+        this.matchType = nodeType;
+    }
     public bool Evaluate(CyberNode target, CyberNode origin, List<CyberNode> path) {
         switch (type) {
-            case Type.lockLevel:
-                return target.lockLevel <= magnitude;
+            case Type.unlocked:
+                return target.lockLevel == 0;
             case Type.nodeType:
                 return target.type == matchType;
-            case Type.nodevisibilty:
-                return target.visibility > nodeVisibilityGreaterThan;
+            case Type.nodeKnown:
+                return target.visibility > NodeVisibility.mystery;
             case Type.manualHack:
                 return origin?.idn == "localhost";
-            case Type.hops:
-                return path.Count <= magnitude;
+            case Type.locked:
+                return target.lockLevel > 0;
+            case Type.uncompromised:
+                return !target.compromised;
+            case Type.nodeUnknown:
+                return target.visibility <= NodeVisibility.mystery;
+            case Type.fileUnknown:
+                return !target.datafileVisibility;
+            case Type.edgesUnknown:
+                return true;
         }
         return true;
     }
@@ -38,13 +52,21 @@ public class SoftwareCondition {
 
     public string DescriptionString() {
         string description = type switch {
-            Type.lockLevel => "node is unlocked",
+            Type.unlocked => "node is unlocked",
             Type.nodeType => $"node is {matchType}",
-            Type.nodevisibilty => "node is scanned",
+            Type.nodeKnown => "node is scanned",
             Type.manualHack => "using cyberdeck",
-            Type.hops => $"fewer than {magnitude} hops"
+            Type.locked => "node is locked",
+            Type.uncompromised => "node is not compromised",
+            Type.nodeUnknown => "node type is unknown",
+            Type.fileUnknown => "file type is unknown",
+            Type.edgesUnknown => "neighbors not discovered"
         };
         return $"{description}";
+    }
+
+    public int Cost() {
+        return -1;
     }
 
     // required for serialization?

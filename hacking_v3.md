@@ -611,3 +611,137 @@ come up with overall design:
     draw image of sorts
 
 # craft software between missions
+
+what parameters of software?
+    type: targeted, virus
+    charges: number, max, unlimited
+    upload time ?
+    effects:
+        reveal node type
+        reveal node edges
+        reveal datafile
+        crack password
+        exploit
+        disable utility
+        "cover trakcs"
+    conditions:
+        limit on node type          (likely for exploits?)
+        limit on node encryption    (likely for crack?)
+        limit on hops (part of cyberdeck?)
+    timed vs. permanent ?
+
+# enemy counterattacks
+
+hide node / hide edges
+make node unknown again
+repair compromised nodes
+
+# sketch out
+
+1. what does software inventory look like?
+2. what does cyberdeck load interface look like?
+3. what does cyberdeck use interface look like?
+
+
+
+# crafting interface
+
+* first screen is list of software with inspector
+    * software view
+    * delete modal
+    * a button opens the craft interface
+* craft interface:
+
+* wire up
+* design payload picker
+    * payload picker button
+* close initial dialogue
+* number icon on effect selector
+* move design points / cost
+* add software view close button
+* fix "set name" warning
+ *type, 
+* design conditionals system / picker / options
+* hide virus params when exploit is selected
+* conditions per effect?
+* prevent double-adding effects
+* modify view to show size
+* change how close mission select works
+* change costs and sizes
+* icons
+* fix name input
+* allow edit template
+
+
+
+conditions a little weird still?
+overall modifiers?
+implement edges condition
+
+
+fix software loadout
+fix hacking interface
+fix software view
+
+
+## purpose of conditonals vs. design 
+
+originally i made the conditionals to give direction to the player and prevent
+them from wasting charges.
+1. can't unlock an already unlocked node
+2. cant scan an already scanned node
+3. cant compromise a locked node
+4. cant scan file on a node that isnt a datanode
+
+this style of constraint can be determined based on payload. it is bedrock limitation.
+we can make it transitive:
+1. exploit -> requirement: node is unlocked
+2. exploit + unlock -> requirement: none
+
+
+the idea for design constraints was a way to recoup design points.
+are there examples of other constraints we could voluntarily apply:
+    1. node type:
+        camera, datanode, router, alarm, etc.
+    2. node levels ?
+    3. time limit?
+
+
+## cyberdeck stats
+
+upload speed
+slots 
+size limit
+concurrent hacks
+
+
+// if exploit, require unlocked     (lockLevel)
+// if unlock, require discovered ?? (nodevis > mystery)
+// if scan, require not discovered
+// if explot + unlock
+
+
+crack:
+    node is locked
+    node is known?
+crack_inf: 
+    node is locked
+    manual hack
+exploit:
+    node is unlocked
+    node is not compromised
+scan:
+    node is mystery
+scanData:
+    nodetype is datanode
+    data is not known
+scanEdges:
+    node edges are not known
+scanNode:
+    node is mystery
+
+
+
+
+
+

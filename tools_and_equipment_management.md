@@ -112,3 +112,17 @@ burglar tool view is one vector of attack. for a given obstacle:
 
 we need to emphasize modular composing components
 e.g. two panels under screws that intercommunicate through wires with some alarm sensors
+tools can be basic and self-explanatory if not multi-purpose
+
+
+the guy at the bar says he has a mission for you
+    "oh but do you know how to crack a safe?"
+
+
+crack a safe -> safecracking tools
+basic lockpicking -> 3 different types of lock, (padlock, tubular lock, regular lock)
+disable a security camera -> different methods
+cut a fence
+bypass a keycard reader
+spoof rfid
+exploit a RTE sensor

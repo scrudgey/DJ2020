@@ -61,10 +61,10 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         // prefer manual hack node if it is within 1 hop
         // otherwise, take first node in range
         CyberNode hackOriginNode = null;
-        Debug.Log("finding hack origin");
+        // Debug.Log("finding hack origin");
         foreach (CyberNode node in graph.nodes.Values.Where(node => node.getStatus() == CyberNodeStatus.compromised)) {
             List<CyberNode> path = graph.GetPath(node, overlayHandler.selectedCyberNodeIndicator.node);
-            Debug.Log($"node: {node.idn}\tdistance: {path.Count}");
+            // Debug.Log($"node: {node.idn}\tdistance: {path.Count}");
 
             if (path.Count == 0) continue;
 
@@ -76,7 +76,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
                 hackOriginNode = node;
             }
         }
-        Debug.Log($"hack origin: {hackOriginNode}");
+        // Debug.Log($"hack origin: {hackOriginNode}");
         if (hackOriginNode != null) {
             NeoCyberNodeIndicator indicator = GetIndicator(hackOriginNode);
             overlayHandler.HackOriginSelectCallback(indicator);

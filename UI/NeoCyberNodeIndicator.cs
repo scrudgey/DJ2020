@@ -49,7 +49,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             default:
             case SoftwareEffect.Type.none:
                 break;
-            case SoftwareEffect.Type.scan:
+            case SoftwareEffect.Type.scanAll:
                 scanEffectImage.enabled = true;
                 scanEffectAnimator.Play("animateScanEffect");
                 break;

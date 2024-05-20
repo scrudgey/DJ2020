@@ -6,33 +6,49 @@ using UnityEngine;
 using UnityEngine.UI;
 [System.Serializable]
 public class SoftwareEffect {
-    public enum Type { scan, download, unlock, compromise, none, scanNode, scanEdges, scanFile }
+    public enum Type { scanAll, download, unlock, compromise, none, scanNode, scanEdges, scanFile }
     public Type type;
-    public int level;
-    public string name;
     public string DescriptionString() {
+        if (type == Type.none) {
+            return "no effect";
+        } else {
+            return $"<b>{TitleString()}</b>: {JustDescription()}";
+        }
+    }
+    public string TitleString() => type switch {
+        Type.scanAll => "scan",
+        Type.scanNode => "scan node",
+        Type.scanEdges => "scan edges",
+        Type.scanFile => "scan data",
+        Type.download => "download",
+        Type.unlock => "crack",
+        Type.compromise => "exploit",
+        _ => "no effect"
+    };
+
+    public string JustDescription() {
         switch (type) {
-            case Type.scan:
-                return "<b>scan</b>: reveal the node type, neighbors, and data";
+            case Type.scanAll:
+                return "reveal the node type, neighbors, and data";
             case Type.scanNode:
-                return "<b>scan node</b>: reveal the node type";
+                return "reveal the node type";
             case Type.scanEdges:
-                return "<b>scan edges</b>: reveal the node neighbors";
+                return "reveal the node neighbors";
             case Type.scanFile:
-                return "<b>scan data</b>: reveal the node data";
+                return "reveal the node data";
             case Type.download:
-                return "<b>download</b>: download the node data";
+                return "download the node data";
             case Type.unlock:
-                return "<b>crack</b>: crack the password for the node";
+                return "crack the password for the node";
             case Type.compromise:
-                return "<b>exploit</b>: take control of the node";
+                return "take control of the node";
             default:
                 return "no effect";
         }
     }
     public void ApplyToNode(CyberNode node, CyberGraph graph) {
         switch (type) {
-            case Type.scan:
+            case Type.scanAll:
                 GameManager.I.DiscoverNode(node, NodeVisibility.known, discoverEdges: true, discoverFile: true);
                 break;
             case Type.scanNode:
@@ -60,4 +76,26 @@ public class SoftwareEffect {
                 break;
         }
     }
+
+    public int CalculateDesignPoints() => type switch {
+        Type.scanAll => 4,
+        Type.scanNode => 1,
+        Type.scanEdges => 1,
+        Type.scanFile => 1,
+        Type.download => 1,
+        Type.unlock => 6,
+        Type.compromise => 8,
+        _ => 1
+    };
+
+    public int CalculateSize() => type switch {
+        Type.scanAll => 2,
+        Type.scanNode => 1,
+        Type.scanEdges => 1,
+        Type.scanFile => 1,
+        Type.download => 1,
+        Type.unlock => 2,
+        Type.compromise => 3,
+        _ => 1
+    };
 }

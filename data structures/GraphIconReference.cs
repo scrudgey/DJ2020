@@ -50,7 +50,15 @@ public class GraphIconReference : ScriptableObject {
     public Sprite priceIcon;
     public Sprite accuracyIcon;
     public Sprite piercingIcon;
-
+    [Header("software effect")]
+    public Sprite effectScanIcon;
+    public Sprite effectDownloadIcon;
+    public Sprite effectUnlockIcon;
+    public Sprite effectCompromiseIcon;
+    public Sprite effectNoneIcon;
+    public Sprite effectScanNodeIcon;
+    public Sprite effectScaneEdgeIcon;
+    public Sprite effectScanFileIcon;
 
     public Sprite CyberNodeSprite(CyberNode node) {
         CyberNodeStatus nodeStatus = node.getStatus();
@@ -139,4 +147,14 @@ public class GraphIconReference : ScriptableObject {
             _ => priceIcon
         };
     }
+    public Sprite SoftwareEffectSprite(SoftwareEffect effect) => effect.type switch {
+        SoftwareEffect.Type.compromise => effectCompromiseIcon,
+        SoftwareEffect.Type.download => effectDownloadIcon,
+        SoftwareEffect.Type.unlock => effectUnlockIcon,
+        SoftwareEffect.Type.none => effectNoneIcon,
+        SoftwareEffect.Type.scanNode => effectScanNodeIcon,
+        SoftwareEffect.Type.scanEdges => effectScaneEdgeIcon,
+        SoftwareEffect.Type.scanFile => effectScanFileIcon,
+        _ => effectNoneIcon
+    };
 }

@@ -11,7 +11,7 @@ public class UIController : MonoBehaviour {
     public Canvas gunDisplayCanvas;
     public Canvas terminalCanvas;
     public Canvas burglarCanvas;
-    public Canvas missionSelectorCanvas;
+    // public Canvas missionSelectorCanvas;
     public Canvas interactiveHighlightCanvas;
     public Canvas statusBarCanvas;
     public Canvas overlayCanvas;
@@ -39,7 +39,7 @@ public class UIController : MonoBehaviour {
     public BurglarCanvasController burglarCanvasController;
     public ObjectiveCanvasController objectiveCanvasController;
     public ObjectivesCompleteController objectivesCompleteController;
-    public MissionComputerController missionComputerController;
+    // public MissionComputerController missionComputerController;
     public SaveIndicatorController saveIndicatorController;
     public WeaponWheelController weaponWheelController;
     public TargetPracticeUIHandler targetPracticeUIHandler;
@@ -73,7 +73,7 @@ public class UIController : MonoBehaviour {
         HideVRStats();
         HideTerminal();
         HideBurglar();
-        HideMissionSelector();
+        // HideMissionSelector();
         saveIndicatorController.HideIndicator();
         objectivesCompleteController.Initialize();
         weaponUIHandler.Initialize();
@@ -154,15 +154,15 @@ public class UIController : MonoBehaviour {
         burglarCanvasController.TearDown();
         // ShowUI();
     }
-    public void ShowMissionSelector(GameData gameData) {
-        // HideUI();
-        missionSelectorCanvas.enabled = true;
-        missionComputerController.Initialize(gameData);
-    }
-    public void HideMissionSelector() {
-        missionSelectorCanvas.enabled = false;
-        // ShowUI();
-    }
+    // public void ShowMissionSelector(GameData gameData) {
+    //     // HideUI();
+    //     missionSelectorCanvas.enabled = true;
+    //     missionComputerController.Initialize(gameData);
+    // }
+    // public void HideMissionSelector() {
+    //     missionSelectorCanvas.enabled = false;
+    //     // ShowUI();
+    // }
     void HandleCaptionChange(string newCaption) {
         caption.text = newCaption;
     }

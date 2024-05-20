@@ -3523,7 +3523,7 @@ VR mission designer
 weapons
     aim sway responds to movement and gun skill
     bullets that can pass through targets
-    armor & armor piercing
+    * armor & armor piercing
     colt 2037 sped up sounds great
     attachments
     laser pointer attachment
@@ -3682,7 +3682,7 @@ world:
                 "unlimited use"
             don't sell items player already has
         data merchant:
-            buy hacking software
+            * buy hacking software
             buy hacking hardware
             commission a virus?
         street doc buy cyberware
@@ -3707,6 +3707,17 @@ perks to implement:
     hack perks
         visually identify weaknesses / identify types
         hotwire
+
+ambience system
+    a separate channel in mixer
+    non-spatial audio- let code control volume
+    collider regions tied to audio clips
+        police sirens
+        city ambience
+        room tone 
+    collider regions are nested and have precedence
+    determine distance to collider region and fade out?
+        two regions? one for activation and one for distance?
 
 performance:
     parallelize the pulselight
@@ -3797,7 +3808,7 @@ jazz up elevator controller
     sound effects
     click effect
 show bonus reward favors
-implement worker dialogue?
+* implement worker dialogue?
 guard spotted me during mission start
 7-11 worker doesnt see me frequently (probably blocked by register)
 cyber jump inside resulted in bizarre behavior
@@ -3835,44 +3846,47 @@ burglar system
     ATM
 
 more equipment to bring on mission?
-    shuriken
-    throwing knife
-    key duplicator
+    (item) shuriken
+    (item) throwing knife
+    (item) emp grenade
+    (item) flashbang?
+    (item) gas grenade?
+    (item) remote mine
+    (item) rope
+    (item) grapple
+    (item) smoke grenade
+    (item) ninja vanish
+    (item) duffel bag
+        can be placed somewhere inside the mission ahead of time
+    (item) fence cutters (self explanatory)
+    (item) high voltage bolt cutters
+
+    (tool) key duplicator
         what is the purpose? only if someone will notice a missing key.
         or a key is too hard to steal, but 
-    rfid sniffer
-    duffel bag
-        can be placed somewhere inside the mission ahead of time
-    crowbar uses:
-        open door
+    (tool) rfid sniffer
+    (tool) crowbar uses:
+        open doors
         open elevator door
         open hatch
         open cars
         break windows
         melee weapon
-    fence cutters (self explanatory)
-    high voltage bolt cutters
-    power drill
+    (tool) power drill
         can destroy a lock, but is noisy
-    safe cracking equipment
+    (tool) safe cracking equipment
         destructive / noisy vs. silent
-    emp grenade
-    flashbang?
-    gas grenade?
-    remote mine
-    rope
-    grapple
-    smoke grenade
-    ninja vanish
+
 
 unresolved mechanics / gameplay questions:
     circuits
     progression in shops? 
         items, guns
-    backpack and duffel bag
+    * backpack and duffel bag
     selling data / upgrading hack ability
 
 
+record new gameplay footage
 
 
 
@@ -3881,30 +3895,27 @@ missions
     1 way shootout
     productionize office
         redo apartment after office
-
 key system
-ambience system
-    a separate channel in mixer
-    non-spatial audio- let code control volume
-    collider regions tied to audio clips
-        police sirens
-        city ambience
-        room tone 
-    collider regions are nested and have precedence
-    determine distance to collider region and fade out?
-        two regions? one for activation and one for distance?
-
 destructible walls
     gibs
     re-bake navmesh
-
 fix up the cyberdeck loadout screen
     MB total? or slots?
 update the steam page graphic
 
 
-
+progression in burglar tools
+    maybe there is no progression, no unlocking
+    1. how to explain the use of special tools
+    2. how to explain use of normal tools to attack novel thing like card reader
+        it must always be a remix of basic actions:
+            unscrew, remove the plate, snip the wires, etc.
+        is there no room for special gadgets?
+            when you buy the special gadget (id card spoofer) it shows a video of how and where it is used?
+            separate
 progression in software
     1. core idea is designing software with design points budget
         point budget can increase with skill
     2. maybe all software type stuff is from skill tree
+    outline all the possibilities and then we'll see
+

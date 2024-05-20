@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
@@ -6,17 +7,20 @@ using UnityEngine;
 using UnityEngine.UI;
 public class MissionComputerController : MonoBehaviour {
     public AudioSource audioSource;
-    public AudioClip[] openMenuSound;
-    public AudioClip[] missionButtonClickSound;
+    public GameObject UIEditorCamera;
+    public Canvas myCanvas;
+
+
+    [Header("missionSelect")]
+    public GameObject contractsNotificationObject;
+    public TextMeshProUGUI contractsNotificationText;
+    public GameObject missionSelectBody;
     public Transform missionButtonContainer;
     public GameObject missionButtonPrefab;
     public GameObject objectivePrefab;
     public GameObject spacerPrefab;
     public GameObject dividerPrefab;
 
-    public LevelTemplate activeLevelTemplate;
-    GameData data;
-    List<MissionSelectorButton> selectorButtons;
 
     [Header("details")]
     public GameObject detailsPanel;
@@ -31,7 +35,6 @@ public class MissionComputerController : MonoBehaviour {
     public GameObject bonusObjectiveDivider;
 
     [Header("faction")]
-    bool factionIsShowing;
     public GameObject factionPanel;
     public RectTransform factionRect;
     public Image factionLogo;
@@ -40,30 +43,48 @@ public class MissionComputerController : MonoBehaviour {
     public WorldmapView worldmapView;
     public GameObject mapPanel;
     public RectTransform mapRect;
-    // public Image mapImage;
-    // public Color mapColor1;
-    // public Color mapColor2;
-    // public float timer;
-    // public float colorFlipInterval;
-    // public TextMeshProUGUI mapDescriptionTitle;
-    // public TextMeshProUGUI mapDescriptionBody;
-    // public TextMeshProUGUI mapDescriptionTarget;
 
     [Header("objects")]
     public GameObject rewardBox;
-    // [Header("easing")]
-    // public LayoutElement bottomLayoutElement;
+    [Header("sounds")]
+    public AudioClip[] openMenuSound;
+    public AudioClip[] missionButtonClickSound;
+    [Header("softwareview")]
+    public GameObject softwareViewObject;
+    public MissionSelectSoftwareView missionSelectSoftwareView;
+    [Header("softwareCraft")]
+    public GameObject softwareCraftViewObject;
+    public MissionSelectSoftwareCraftController softwareCraftController;
+    [Header("modal")]
+    public GameObject modalDialogue;
+    public TextMeshProUGUI modalText;
+    public GameObject modalAcceptButton;
+    Action modalAcceptCallback;
+
     bool bottomIsShowing;
-    // List<Coroutine> blitRoutines;
+    bool factionIsShowing;
+    LevelTemplate activeLevelTemplate;
+    GameData data;
+    List<MissionSelectorButton> selectorButtons;
+    void Awake() {
+        myCanvas.enabled = false;
+        DestroyImmediate(UIEditorCamera);
+    }
 
     public void Initialize(GameData data) {
-        // bottomPanel.SetActive(false);
-        // blitRoutines = new List<Coroutine>();
+        this.data = data;
         bottomIsShowing = false;
         factionIsShowing = false;
         mapPanel.SetActive(false);
+        missionSelectBody.SetActive(false);
         factionPanel.SetActive(false);
         detailsPanel.SetActive(false);
+
+        softwareViewObject.SetActive(false);
+        softwareCraftViewObject.SetActive(false);
+        softwareCraftController.CloseAddPayloadDialogue();
+        modalDialogue.SetActive(false);
+
         Toolbox.RandomizeOneShot(audioSource, openMenuSound);
         selectorButtons = new List<MissionSelectorButton>();
         this.data = data;
@@ -77,7 +98,11 @@ public class MissionComputerController : MonoBehaviour {
             MissionSelectorButton button = CreateMissionButton(template);
             selectorButtons.Add(button);
         }
+        contractsNotificationObject.SetActive(data.unlockedLevels.Count > 0);
+        contractsNotificationText.text = $"{data.unlockedLevels.Count}";
         ClearAll();
+
+        myCanvas.enabled = true;
     }
     void ClearAll() {
         rewardAmountText.text = "-";
@@ -91,7 +116,6 @@ public class MissionComputerController : MonoBehaviour {
         missionNameText.gameObject.SetActive(false);
         taglineText.gameObject.SetActive(false);
         rewardBox.SetActive(false);
-        // factionBox.SetActive(false);
     }
     MissionSelectorButton CreateMissionButton(LevelTemplate template) {
         GameObject obj = GameObject.Instantiate(missionButtonPrefab);
@@ -106,9 +130,6 @@ public class MissionComputerController : MonoBehaviour {
         }
         Toolbox.RandomizeOneShot(audioSource, missionButtonClickSound);
         LoadTemplate(button.template);
-        // foreach (MissionSelectorButton selectorButton in selectorButtons) {
-        //     selectorButton.SetFocus(selectorButton == button);
-        // }
         GUI.FocusControl(null);
     }
     public void MissionButtonMouseover(MissionSelectorButton button) {
@@ -121,15 +142,6 @@ public class MissionComputerController : MonoBehaviour {
         factionLogo.enabled = true;
         factionLogo.sprite = button.template.faction.logo;
         factionText.text = button.template.faction.factionName;
-
-        // foreach (Coroutine coroutine in blitRoutines) {
-        //     StopCoroutine(coroutine);
-        // }
-
-        // blitRoutines.Clear();
-        // blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTitle, "NEO BOSTON")));
-        // blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionBody, "Pop: 2,654,776\n42°21′37″N\n71°3′28″W")));
-        // blitRoutines.Add(StartCoroutine(Toolbox.BlitText(mapDescriptionTarget, $"TARGET: {button.template.sceneDescriptor}")));
     }
     void ShowDetailsDialogue() {
         bottomIsShowing = true;
@@ -164,35 +176,7 @@ public class MissionComputerController : MonoBehaviour {
             }, unscaledTime: true))
         );
     }
-    // IEnumerator EaseInPanel() {
-    //     float timer = 0f;
-    //     float duration = 1f;
-    //     while (timer < duration) {
-    //         timer += Time.unscaledDeltaTime;
-    //         float size = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 200, 425, duration);
-    //         bottomLayoutElement.minHeight = size;
-    //         yield return null;
-    //     }
-    //     bottomLayoutElement.minHeight = 625f;
-    // }
     void EaseInDetailsPanel() {
-        // float timer = 0f;
-        // float duration = 0.4f;
-        // detailsRect.sizeDelta = new Vector2(50f, 50f);
-        // while (timer < duration) {
-        //     timer += Time.unscaledDeltaTime;
-        //     float width = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 1750, duration);
-        //     detailsRect.sizeDelta = new Vector2(width, 50f);
-        //     yield return null;
-        // }
-        // timer = 0f;
-        // while (timer < duration) {
-        //     timer += Time.unscaledDeltaTime;
-        //     float height = (float)PennerDoubleAnimation.ExpoEaseOut(timer, 50, 940, duration);
-        //     detailsRect.sizeDelta = new Vector2(1800f, height);
-        //     yield return null;
-        // }
-        // detailsRect.sizeDelta = new Vector2(1800f, 990f);
         StartCoroutine(Toolbox.Ease(null, 0.2f, 50, 1700, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             detailsRect.sizeDelta = new Vector2(amount, detailsRect.rect.height);
         }, unscaledTime: true));
@@ -207,14 +191,9 @@ public class MissionComputerController : MonoBehaviour {
         missionNameText.gameObject.SetActive(true);
         taglineText.gameObject.SetActive(true);
         rewardBox.SetActive(true);
-        // factionBox.SetActive(true);
 
         rewardAmountText.text = template.creditReward.ToString("#,#");
         creditAmountText.text = data.playerState.credits.ToString("#,#");
-
-        // factionLogo.enabled = true;
-        // factionLogo.sprite = template.faction.logo;
-        // factionText.text = template.faction.description;
 
         emailText.text = template.proposalEmail.text;
 
@@ -267,20 +246,53 @@ public class MissionComputerController : MonoBehaviour {
         GameManager.I.CloseMenu();
         GameManager.I.ShowMissionPlanner(activeLevelTemplate);
     }
+    public void ContractsButtonCallback() {
+        missionSelectBody.SetActive(true);
+        softwareViewObject.SetActive(false);
+        softwareCraftViewObject.SetActive(false);
+        modalDialogue.SetActive(false);
+    }
+    public void SoftwareButtonCallback() {
+        ShowSoftwareListView(true);
+    }
+    public void ShowSoftwareListView(bool value) {
+        if (value) {
+            missionSelectSoftwareView.Initialize(data);
+        }
+        missionSelectBody.SetActive(false);
+        softwareViewObject.SetActive(value);
+        softwareCraftViewObject.SetActive(false);
+        modalDialogue.SetActive(false);
+    }
+    public void ShowSoftwareCraftView(bool value) {
+        softwareCraftViewObject.SetActive(value);
+        softwareCraftController.Initialize(data);
+    }
+    public void ShowSoftwareCraftViewEditMode(SoftwareTemplate template) {
+        softwareCraftViewObject.SetActive(true);
+        softwareCraftController.Initialize(data, template);
+    }
+
+    public void ShowModalDialogue(string text, Action acceptAction) {
+        modalAcceptCallback = acceptAction;
+        modalText.text = text;
+        modalDialogue.SetActive(true);
+        modalAcceptButton.SetActive(true);
+    }
+    public void ShowModalDialogue(string text) {
+        modalAcceptButton.SetActive(false);
+        modalText.text = text;
+        modalDialogue.SetActive(true);
+    }
+    public void ModalAcceptCallback() {
+        modalDialogue.SetActive(false);
+        modalAcceptCallback?.Invoke();
+    }
+    public void ModalCancelCallback() {
+        modalDialogue.SetActive(false);
+    }
 
     public void DetailPanelCloseCallback() {
         HideDetailsDialogue();
     }
-
-    // void Update() {
-    //     timer += Time.unscaledDeltaTime;
-    //     if (timer > colorFlipInterval) {
-    //         timer -= colorFlipInterval;
-    //         if (mapImage.color == mapColor1) {
-    //             mapImage.color = mapColor2;
-    //         } else {
-    //             mapImage.color = mapColor1;
-    //         }
-    //     }
-    // }
 }
