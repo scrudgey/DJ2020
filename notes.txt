@@ -3525,13 +3525,12 @@ weapons
     bullets that can pass through targets
     * armor & armor piercing
     colt 2037 sped up sounds great
-    attachments
+    * attachments
     laser pointer attachment
     flashlight attachment
-    fix silenced smg
-    code-controlled shoot animation
-        AnimationUtility?
-        fix shooting animation and automatic interval
+    * fix silenced smg
+    * code-controlled shoot animation
+    * fix shooting animation and automatic interval
         faster shotgun
             click to rack faster?
             raise - shoot - pump
@@ -3791,7 +3790,6 @@ plants can catch on fire
 randomly place lasers
 randomly place cameras
 holster to put away rocket launcher
-hide elements in inspector that are set by template
 are anonymous delegates memory leaks? i.e. objective deltas
     When you have an event handler attached to an event that delegate contains two things, an instance of an object and a method to run on that object. That referenced object won't be able to be garbage collected until either:
     The object with the event is no longer "alive".

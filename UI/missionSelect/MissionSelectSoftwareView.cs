@@ -26,7 +26,7 @@ public class MissionSelectSoftwareView : MonoBehaviour {
         foreach (SoftwareTemplate template in data.playerState.softwareTemplates) {
             GameObject obj = GameObject.Instantiate(softwareButtonPrefab);
             SoftwareSelector selector = obj.GetComponent<SoftwareSelector>();
-            selector.Initialize(template, SoftwareClickCallback);
+            selector.Initialize(template, SoftwareClickCallback, null, null);
             obj.transform.SetParent(softwareButtonContainer, false);
             if (selectedTemplate == null) {
                 SoftwareClickCallback(selector);

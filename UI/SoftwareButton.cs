@@ -20,7 +20,7 @@ public class SoftwareButton : MonoBehaviour {
     public void Initialize(SoftwareTemplate template) {
         this.template = template;
         icon.sprite = template.icon;
-        levelCaption.text = $"{template.maxCharges}";
+        levelCaption.text = template.infiniteCharges ? "-" : $"{template.maxCharges}";
     }
 }
 

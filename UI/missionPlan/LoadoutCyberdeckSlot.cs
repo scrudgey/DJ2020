@@ -7,30 +7,52 @@ using UnityEngine.UI;
 
 public class LoadoutCyberdeckSlot : MonoBehaviour {
     public MissionPlanCyberController controller;
-    public Image softwareImage;
+    public SoftwareButton softwareButton;
     public SoftwareTemplate template;
-    public TextMeshProUGUI softwareName;
-    int index;
-
-    public void Initialize(MissionPlanCyberController controller, int index) {
+    public Image highlight;
+    public bool isIntrinsicSoftware;
+    Coroutine blinkHighlightRoutine;
+    public void Initialize(MissionPlanCyberController controller) {
         this.controller = controller;
-        this.index = index;
+        highlight.enabled = false;
     }
     public void SetItem(SoftwareTemplate template) {
+        this.template = template;
         if (template == null) {
             Clear();
-            return;
+        } else {
+            softwareButton.gameObject.SetActive(true);
+            softwareButton.Initialize(template);
         }
-        this.template = template;
-        softwareImage.enabled = true;
-        softwareImage.sprite = template.icon;
-        softwareName.text = template.name;
     }
     public void Clear() {
-        softwareImage.enabled = false;
-        softwareName.text = "";
+        template = null;
+        softwareButton.gameObject.SetActive(false);
     }
     public void OnClick() {
-        controller.SoftwareSlotClicked(index, this);
+        controller.SoftwareSlotClicked(this);
+    }
+
+    public void ShowHighlight(bool value) {
+        if (blinkHighlightRoutine != null) {
+            StopCoroutine(blinkHighlightRoutine);
+        }
+        if (value) {
+            blinkHighlightRoutine = StartCoroutine(doBlink());
+        } else {
+            highlight.enabled = false;
+        }
+    }
+    IEnumerator doBlink() {
+        float timer = 0f;
+        float interval = 0.03f;
+        while (true) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > interval) {
+                timer -= interval;
+                highlight.enabled = !highlight.enabled;
+            }
+            yield return null;
+        }
     }
 }

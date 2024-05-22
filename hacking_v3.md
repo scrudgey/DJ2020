@@ -582,16 +582,10 @@ it can be clearly explained now, origin, destination, hops, software eligibility
     * plan templates -> player state analogous to items
 * deploy buttons during gameplay
 * populate slots with default
+* check all instances when node visibility changes
 
 
 
-firewalls
-password entry
-check all instances when node visibility changes
-
-
-disconnecting / closing: how? when? escape key?
-effect when revealing edges
 
 
 # load up cyberdeck during mission planning
@@ -671,16 +665,33 @@ repair compromised nodes
 * icons
 * fix name input
 * allow edit template
+* fix software loadout
+    * when clicking a slot, if empty, show selector
+    * if not empty, populate software view
+    * allow permanent software on cyberdeck
+    * create cyberdeck template
+    * display for storage capacity
+    clear slot button?
 
 
+
+firewalls
+password entry
+
+disconnecting / closing: how? when? escape key?
+effect when revealing edges
+disabled alarm graph icon should be more blatant
 
 conditions a little weird still?
 overall modifiers?
 implement edges condition
 
-
-fix software loadout
 fix hacking interface
+    requirements not working
+    could deploy when requirement not met
+    could deploy crack_inf at distance
+    cyber graph inspection should use new clearsighter
+
 fix software view
 
 
@@ -713,6 +724,8 @@ upload speed
 slots 
 size limit
 concurrent hacks
+
+
 
 
 // if exploit, require unlocked     (lockLevel)

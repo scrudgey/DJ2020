@@ -23,7 +23,7 @@ public record LevelPlan {
 
     public static LevelPlan Default(PlayerState playerState) {
         List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
-        List<SoftwareTemplate> softwares = new List<SoftwareTemplate>() { SoftwareScriptableTemplate.Load("crack_inf").ToTemplate(), null, null, null };
+        SoftwareTemplate[] softwares = new SoftwareTemplate[3];
 
         // initialize item loadout
         if (playerState.allItems.Count >= 1) {
@@ -40,13 +40,9 @@ public record LevelPlan {
         }
 
         // initialize software loadout
-        if (playerState.softwareTemplates.Count > 0) {
-            int j = 0;
-            for (int i = 1; i < softwares.Count; i++) {
-                softwares[i] = playerState.softwareTemplates[j];
-                j++;
-                if (j >= playerState.softwareTemplates.Count) j = 0;
-            }
+        for (int i = 1; i < softwares.Length; i++) {
+            SoftwareTemplate template = i < playerState.softwareTemplates.Count ? playerState.softwareTemplates[i] : null;
+            softwares[i] = template;
         }
 
         return new LevelPlan {
@@ -56,7 +52,7 @@ public record LevelPlan {
             nodeVisibility = new SerializableDictionary<string, NodeVisibility>(),
             objectiveLocations = new SerializableDictionary<string, string>(),
             activeTactics = new List<Tactic>(),
-            softwareTemplates = softwares
+            softwareTemplates = softwares.ToList()
             // activeTactics = new List<Tactic>() { new TacticDisguise(), new TacticFakeID() }
             // activeTactics = new List<Tactic>() { Resources.Load("data/tactics/fakeID") as Tactic }
         };

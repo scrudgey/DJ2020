@@ -65,6 +65,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
     public List<SoftwareTemplate> softwareTemplates;
     public List<SoftwareState> softwareStates;
+    public CyberdeckTemplate cyberdeck;
 
     public static PlayerState DefaultState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
@@ -157,7 +158,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         List<string> perks = new List<string>();
 
         List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
-            SoftwareScriptableTemplate.Load("crack_inf"),
             SoftwareScriptableTemplate.Load("scan"),
             SoftwareScriptableTemplate.Load("crack"),
             SoftwareScriptableTemplate.Load("exploit"),
@@ -179,6 +179,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             // Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
             // Resources.Load("data/lootbuyer/posh") as LootBuyerData,
         };
+
+        CyberdeckTemplate cyberdeck = Resources.Load("data/cyberdecks/basic1") as CyberdeckTemplate;
 
         return new PlayerState() {
             legSkin = "Jack",
@@ -236,7 +238,8 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             softwareTemplates = softwareTemplates,
             softwareStates = softwareStates,
             unlockedTactics = tactis,
-            unlockedFences = fences
+            unlockedFences = fences,
+            cyberdeck = cyberdeck
         };
     }
 
@@ -274,7 +277,9 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         tertiaryGun?.ResetTemporaryState();
 
         // softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
-        softwareStates = plan.softwareTemplates.Select(template => new SoftwareState(template)).ToList();
+        softwareStates = plan.softwareTemplates.Select(template => new SoftwareState(template))
+            .Concat(cyberdeck.intrinsicSoftware.Select(template => new SoftwareState(template.ToTemplate())))
+            .ToList();
     }
     public int PlayerLevel() {
         return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;

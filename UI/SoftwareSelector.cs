@@ -8,7 +8,11 @@ using UnityEngine.UI;
 public class SoftwareSelector : MonoBehaviour {
     public SoftwareButton softwareButton;
     Action<SoftwareSelector> callback;
+    Action<SoftwareSelector> mouseoverCallback;
+    Action<SoftwareSelector> mouseExitCallback;
+
     public TextMeshProUGUI title;
+    public TextMeshProUGUI sizeText;
     public SoftwareState softwareState;
     public SoftwareTemplate softwareTemplate;
     public Button myButton;
@@ -24,6 +28,8 @@ public class SoftwareSelector : MonoBehaviour {
         this.softwareState = softwareState;
         this.path = path;
         title.text = softwareState.template.name;
+        sizeText.text = $"{softwareState.template.CalculateSize()} MB";
+        sizeText.gameObject.SetActive(false);
         softwareButton.Initialize(softwareState);
 
         softwareEnabled = true;
@@ -34,14 +40,26 @@ public class SoftwareSelector : MonoBehaviour {
 
         myButton.colors = softwareEnabled ? defaultColorblock : disabledColorblock;
     }
-    public void Initialize(SoftwareTemplate template, Action<SoftwareSelector> callback) {
+    public void Initialize(SoftwareTemplate template, Action<SoftwareSelector> callback, Action<SoftwareSelector> mouseoverCallback, Action<SoftwareSelector> mouseExitCallback) {
         this.callback = callback;
+        this.mouseoverCallback = mouseoverCallback;
         this.softwareTemplate = template;
+        this.mouseExitCallback = mouseExitCallback;
         title.text = template.name;
+        sizeText.text = $"{template.CalculateSize()} MB";
         softwareButton.Initialize(template);
         myButton.colors = defaultColorblock;
     }
     public void ClickCallback() {
         callback?.Invoke(this);
+    }
+    public void MouseoverCallback() {
+        mouseoverCallback?.Invoke(this);
+    }
+    public void MouseExitCallback() {
+        mouseExitCallback?.Invoke(this);
+    }
+    public void SetInteractivility(bool value) {
+        myButton.interactable = value;
     }
 }
