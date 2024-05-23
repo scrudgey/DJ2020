@@ -747,7 +747,19 @@ conditions a little weird still?
 implement edges condition
 deploy sounds - can be tied to icon 
 
- 
+implement viruses
+
+
+
+
 
 skill tree
-implement viruses
+    * lockpick +
+    * craft viruses 
+    * design points +
+    * design points +
+    * design points +
+    * compressor: reduce size
+
+    2 payloads, 3 payloads?
+    add new software effects

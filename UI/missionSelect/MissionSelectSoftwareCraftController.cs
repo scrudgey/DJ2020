@@ -15,6 +15,7 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
     public Image exploitSelectorBackground;
     public Image virustSelectorBackground;
     public SoftwareButton softwareIcon;
+    public GameObject virusTypeButton;
     [Header("params")]
     public TextMeshProUGUI paramChargesNumber;
     public TextMeshProUGUI paramChargesCost;
@@ -44,9 +45,15 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
     GameData data;
     bool inEditMode;
     SoftwareTemplate copyOfOriginalTemplate;
+    int designPointBudget;
+    int sizeOffset;
+    bool canCraftViruses = false;
     public void Initialize(GameData data) {
         this.data = data;
         this.template = SoftwareTemplate.Empty();
+        designPointBudget = data.playerState.SoftwareDesignPointBudget();
+        canCraftViruses = data.playerState.CanCraftViruses();
+        sizeOffset = data.playerState.SoftwareDesignSizeBonus();
         template.icon = Toolbox.RandomFromList(availableSprites);
         CloseAddPayloadDialogue();
         Refresh();
@@ -55,6 +62,10 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
         this.data = data;
         this.template = template;
         this.copyOfOriginalTemplate = new SoftwareTemplate(template);
+        designPointBudget = data.playerState.SoftwareDesignPointBudget();
+        canCraftViruses = data.playerState.CanCraftViruses();
+        sizeOffset = data.playerState.SoftwareDesignSizeBonus();
+
         inEditMode = true;
         template.nameHasBeenSet = true;
         CloseAddPayloadDialogue();
@@ -62,6 +73,8 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
     }
 
     void Refresh() {
+        virusTypeButton.SetActive(canCraftViruses);
+
         nameInputField.text = template.name;
         if (template.softwareType == SoftwareTemplate.SoftwareType.exploit) {
             exploitSelectorBackground.enabled = true;
@@ -106,15 +119,14 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
             SoftwareCraftConditional controller = obj.GetComponent<SoftwareCraftConditional>();
             controller.Initialize(condition);
         }
-
-        designPointsText.text = $"{template.TotalDesignPointsCost()}/20";
+        designPointsText.text = $"{template.TotalDesignPointsCost()}/{designPointBudget}";
         sizeText.text = $"{template.CalculateSize()} MB";
 
         ValidateButtons();
     }
 
     void ValidateButtons() {
-        bool designPointsValid = template.TotalDesignPointsCost() <= 20;
+        bool designPointsValid = template.TotalDesignPointsCost() <= designPointBudget;
         bool templateNameValid = template.name != "";
         bool valid = designPointsValid;// && templateNameValid;
         if (valid) {

@@ -43,4 +43,11 @@ public interface PerkIdConstants {
     public static readonly string PERKID_SPEECH_TRUST = "trustworthy";
     public static readonly string PERKID_SPEECH_STALL = "stall";
     public static readonly string PERKID_SPEECH_EASE = "ease";
+
+    public static readonly string PERKID_CODER_1 = "coder";
+    public static readonly string PERKID_CODER_2 = "coder2";
+    public static readonly string PERKID_CODER_3 = "coder3";
+    public static readonly string PERKID_CRAFT_VIRUSES = "craft_virus";
+    public static readonly string PERKID_CODE_COMPRESS = "craft_compress";
+
 }

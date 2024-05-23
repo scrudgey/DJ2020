@@ -3897,8 +3897,8 @@ key system
 destructible walls
     gibs
     re-bake navmesh
-fix up the cyberdeck loadout screen
-    MB total? or slots?
+* fix up the cyberdeck loadout screen
+    * MB total? or slots?
 update the steam page graphic
 
 
@@ -3911,9 +3911,7 @@ progression in burglar tools
         is there no room for special gadgets?
             when you buy the special gadget (id card spoofer) it shows a video of how and where it is used?
             separate
-progression in software
-    1. core idea is designing software with design points budget
+* progression in software
+    * core idea is designing software with design points budget
         point budget can increase with skill
-    2. maybe all software type stuff is from skill tree
-    outline all the possibilities and then we'll see
 

@@ -154,6 +154,15 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         //     "ease"
         //     // "smg2"
         // };
+        // List<string> perks = new List<string>{
+        //     "coder_1",
+        //     "coder_2",
+        //     "coder_3",
+        //     "coder2_1",
+        //     "craft_virus",
+        //     "craft_compress_1",
+        //     "craft_compress_2"
+        // };
         List<string> perks = new List<string>();
 
         List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
@@ -400,6 +409,20 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     }
     public int PerkLockpickLevel() {
         return GetPerkLevel(PerkIdConstants.PERKID_LOCKPICK);
+    }
+    public int SoftwareDesignPointBudget() {
+        int totalLevel = 0;
+        totalLevel += GetPerkLevel(PerkIdConstants.PERKID_CODER_1);
+        totalLevel += GetPerkLevel(PerkIdConstants.PERKID_CODER_2);
+        totalLevel += GetPerkLevel(PerkIdConstants.PERKID_CODER_3);
+        return 17 + (totalLevel * 2);
+    }
+    public bool CanCraftViruses() {
+        return PerkIsActivated(PerkIdConstants.PERKID_CRAFT_VIRUSES);
+    }
+    public int SoftwareDesignSizeBonus() {
+        int totalLevel = GetPerkLevel(PerkIdConstants.PERKID_CODE_COMPRESS);
+        return -1 * totalLevel;
     }
 
     public DialogueCard NewDialogueCard() {
