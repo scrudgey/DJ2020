@@ -9,50 +9,48 @@ using UnityEngine.UI;
 public class SoftwareModalController : MonoBehaviour {
     public Transform selectorList;
     public GameObject softwareSelectorPrefab;
-    public SoftwareView modalView;
+    public SoftwareView softwareView;
     public Button deployButton;
     HackTerminalController terminalController;
     SoftwareSelector activeSelector;
+    List<CyberNode> path;
 
-    void HandleSelectedChange(SoftwareSelector newSelector) {
-        activeSelector = newSelector;
-        if (activeSelector != null) {
-            deployButton.interactable = activeSelector.softwareEnabled;
-        } else {
-            deployButton.interactable = false; ;
-        }
-    }
-    public void Initialize(HackTerminalController terminalController, PlayerState playerState) {
+    public void Initialize(HackTerminalController terminalController, List<SoftwareState> softwareStates) {
         this.terminalController = terminalController;
         CyberNode target = terminalController?.hackTarget?.node ?? null;
         CyberNode origin = terminalController?.hackOrigin?.node ?? null;
-        List<CyberNode> path = terminalController.path;
-        modalView.Initialize(GameManager.I.gameData.playerState, target, origin, path);
-        PopulateSoftwareList(playerState, target, origin, path);
+        path = terminalController.path;
+        softwareView.Initialize(target, origin, path);
+        PopulateSoftwareList(softwareStates, target, origin);
     }
-    void PopulateSoftwareList(PlayerState playerState, CyberNode target, CyberNode origin, List<CyberNode> path) {
+    void PopulateSoftwareList(List<SoftwareState> softwareStates, CyberNode target, CyberNode origin) {
         foreach (Transform child in selectorList) {
             Destroy(child.gameObject);
         }
-        foreach (SoftwareState state in playerState.softwareStates) {
-            SoftwareSelector newselector = CreateSoftwareSelector(state, target, origin, path);
+        foreach (SoftwareState state in softwareStates) {
+            SoftwareSelector newselector = CreateSoftwareSelector(state, target, origin);
             if (activeSelector == null) {
                 SelectorClickCallback(newselector);
             }
         }
     }
-    SoftwareSelector CreateSoftwareSelector(SoftwareState softwareState, CyberNode target, CyberNode origin, List<CyberNode> path) {
+    SoftwareSelector CreateSoftwareSelector(SoftwareState softwareState, CyberNode target, CyberNode origin) {
         GameObject obj = GameObject.Instantiate(softwareSelectorPrefab);
         SoftwareSelector selector = obj.GetComponent<SoftwareSelector>();
-        selector.Initialize(softwareState, SelectorClickCallback, target, origin, path);
+        bool softwareEnabled = false;
+        if (target != null) {
+            softwareEnabled = softwareState.EvaluateCondition(target, origin, path) && softwareState.charges > 0;
+        }
+        selector.Initialize(softwareState, SelectorClickCallback, softwareEnabled);
         selector.transform.SetParent(selectorList, false);
         return selector;
     }
     public void SelectorClickCallback(SoftwareSelector selector) {
-        modalView.DisplayState(selector.softwareState, selector.path);
+        softwareView.DisplayState(selector.softwareState);
         activeSelector = selector;
+        deployButton.interactable = activeSelector != null && activeSelector.softwareEnabled;
+        // Debug.Log($"{activeSelector} {activeSelector.softwareEnabled} {deployButton.interactable}");
     }
-
     public void CancelCalback() {
         GameManager.I.CloseMenu();
     }

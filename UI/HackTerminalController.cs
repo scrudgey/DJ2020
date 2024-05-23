@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
@@ -41,7 +42,13 @@ public class HackTerminalController : MonoBehaviour {
         this.hackOrigin = hackOrigin;
         this.hackTarget = hackTarget;
         this.path = path;
-        modalController.Initialize(this, GameManager.I.gameData.playerState);
+
+        // Debug.Log($"{GameManager.I.gameData.levelState == null} {GameManager.I.gameData.levelState.plan == null} {GameManager.I.gameData.levelState.plan.softwareTemplates == null} {GameManager.I.gameData.playerState.cyberdeck == null}");
+        // Debug.Log($"{GameManager.I.gameData.playerState.cyberdeck.intrinsicSoftware}");
+        // List<SoftwareState> softwareStates = GameManager.I.gameData.levelState.plan.softwareTemplates.Where(template => template != null).Select(template => template.toState())
+        //         .Concat(GameManager.I.gameData.playerState.cyberdeck.intrinsicSoftware.Select(template => template.ToTemplate().toState())).ToList();
+
+        modalController.Initialize(this, GameManager.I.gameData.levelState.delta.softwareStates);
 
         if (hackTarget != null) {
             CyberNodeStatus nodeStatus = hackTarget.node.getStatus();

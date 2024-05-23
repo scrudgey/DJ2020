@@ -131,6 +131,8 @@ public class SoftwareTemplate {
         nameHasBeenSet = true;
     }
 
+    public SoftwareState toState() => new SoftwareState(this);
+
 
     // public static List<string> randomRestaurantNames = new List<string>{
     //     "Soy Beef Bucket",

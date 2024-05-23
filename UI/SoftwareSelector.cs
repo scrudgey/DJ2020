@@ -21,23 +21,15 @@ public class SoftwareSelector : MonoBehaviour {
     [Header("disabled colorblock")]
     public ColorBlock disabledColorblock;
     public bool softwareEnabled;
-    public List<CyberNode> path;
 
-    public void Initialize(SoftwareState softwareState, Action<SoftwareSelector> callback, CyberNode target, CyberNode origin, List<CyberNode> path) {
+    public void Initialize(SoftwareState softwareState, Action<SoftwareSelector> callback, bool softwareEnabled) {
         this.callback = callback;
         this.softwareState = softwareState;
-        this.path = path;
+        this.softwareEnabled = softwareEnabled;
         title.text = softwareState.template.name;
         sizeText.text = $"{softwareState.template.CalculateSize()} MB";
         sizeText.gameObject.SetActive(false);
         softwareButton.Initialize(softwareState);
-
-        softwareEnabled = true;
-
-        if (target != null) {
-            softwareEnabled = softwareState.EvaluateCondition(target, origin, path);
-        }
-
         myButton.colors = softwareEnabled ? defaultColorblock : disabledColorblock;
     }
     public void Initialize(SoftwareTemplate template, Action<SoftwareSelector> callback, Action<SoftwareSelector> mouseoverCallback, Action<SoftwareSelector> mouseExitCallback) {

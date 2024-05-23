@@ -13,19 +13,16 @@ public class SoftwareView : MonoBehaviour {
     public TextMeshProUGUI viewRequirements;
     public TextMeshProUGUI viewCharges;
     public TextMeshProUGUI viewSize;
-    PlayerState playerState;
     CyberNode target;
     CyberNode origin;
     List<CyberNode> path;
-    public void Initialize(PlayerState playerState, CyberNode target, CyberNode origin, List<CyberNode> path) {
-        this.playerState = playerState;
+    public void Initialize(CyberNode target, CyberNode origin, List<CyberNode> path) {
         this.target = target;
         this.origin = origin;
         this.path = path;
     }
 
-    // TODO: display template mode
-    public void DisplayState(SoftwareState state, List<CyberNode> path) {
+    public void DisplayState(SoftwareState state) {
         DisplayTemplate(state.template);
 
         string requirements = "requirements:\n";

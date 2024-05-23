@@ -65,6 +65,18 @@ public class NeoClearsighterV4 : MonoBehaviour {
     public static string PathToCullingDataResource(string levelName, string sceneName) {
         return $"data/missions/{levelName}/culling_{sceneName}";
     }
+    void Start() {
+        OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
+    }
+    void HandleNodeFocusChange(INodeCameraProvider indicator) {
+        if (indicator == null) {
+            followTransform = GameManager.I.playerObject.transform;
+        } else {
+            string nodeId = indicator.GetNodeId();
+            GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);
+            followTransform = newFocus.transform;
+        }
+    }
     public void Initialize(Transform focus, CharacterCamera characterCamera, CharacterController characterController, SceneData sceneData, string sceneName) {
         this.followTransform = focus;
         this.sceneData = sceneData;

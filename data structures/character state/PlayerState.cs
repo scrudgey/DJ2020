@@ -64,7 +64,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     public int speechSkillPoints;
 
     public List<SoftwareTemplate> softwareTemplates;
-    public List<SoftwareState> softwareStates;
     public CyberdeckTemplate cyberdeck;
 
     public static PlayerState DefaultState() {
@@ -167,8 +166,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         };
         List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
 
-        List<SoftwareState> softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
-
         List<Tactic> tactis = new List<Tactic>{
             Resources.Load("data/tactics/cyberattack") as Tactic
         };
@@ -236,7 +233,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             skillpoints = 10,
 
             softwareTemplates = softwareTemplates,
-            softwareStates = softwareStates,
             unlockedTactics = tactis,
             unlockedFences = fences,
             cyberdeck = cyberdeck
@@ -275,11 +271,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         primaryGun?.ResetTemporaryState();
         secondaryGun?.ResetTemporaryState();
         tertiaryGun?.ResetTemporaryState();
-
-        // softwareStates = softwareTemplates.Select(template => new SoftwareState(template)).ToList();
-        softwareStates = plan.softwareTemplates.Select(template => new SoftwareState(template))
-            .Concat(cyberdeck.intrinsicSoftware.Select(template => new SoftwareState(template.ToTemplate())))
-            .ToList();
     }
     public int PlayerLevel() {
         return bodySkillPoints + gunSkillPoints + hackSkillPoints + speechSkillPoints;

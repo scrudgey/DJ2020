@@ -18,6 +18,9 @@ public class LevelState : PerkIdConstants {
     public static LevelState Instantiate(LevelTemplate template, LevelPlan plan, PlayerState playerState) {
         int numberDialogueCards = playerState.PerkIsActivated(PerkIdConstants.PERKID_SPEECH_3CARD) ? 3 : 2;
 
+        List<SoftwareState> softwareStates = plan.softwareTemplates.Where(template => template != null).Select(template => template.toState())
+                .Concat(playerState.cyberdeck.intrinsicSoftware.Select(template => template.ToTemplate().toState())).ToList();
+
         CyberGraph cyberGraph = CyberGraph.LoadAll(template.levelName);
         PowerGraph powerGraph = PowerGraph.LoadAll(template.levelName);
         AlarmGraph alarmGraph = AlarmGraph.LoadAll(template.levelName);
@@ -46,7 +49,8 @@ public class LevelState : PerkIdConstants {
                 // objectivesState = template.objectives.Concat(template.bonusObjectives)
                 // .ToDictionary(t => t, t => ObjectiveStatus.inProgress),
                 // levelAcquiredPaydata = new List<PayData> { Resources.Load("data/paydata/personnel_data") as PayData }
-                levelAcquiredPaydata = new List<PayData> { }
+                levelAcquiredPaydata = new List<PayData> { },
+                softwareStates = softwareStates
             }
         };
     }

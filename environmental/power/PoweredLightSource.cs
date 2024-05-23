@@ -19,6 +19,7 @@ public class PoweredLightSource : MonoBehaviour, INodeBinder<PowerNode> {
         }
 
         foreach (Light light in lights) {
+            if (light == null) continue;
             light.enabled = node.powered;
         }
     }

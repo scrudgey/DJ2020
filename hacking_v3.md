@@ -583,7 +583,44 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 * deploy buttons during gameplay
 * populate slots with default
 * check all instances when node visibility changes
-
+* first screen is list of software with inspector
+    * software view
+    * delete modal
+    * a button opens the craft interface
+* craft interface:
+* wire up
+* design payload picker
+    * payload picker button
+* close initial dialogue
+* number icon on effect selector
+* move design points / cost
+* add software view close button
+* fix "set name" warning
+ *type, 
+* design conditionals system / picker / options
+* hide virus params when exploit is selected
+* conditions per effect?
+* prevent double-adding effects
+* modify view to show size
+* change how close mission select works
+* change costs and sizes
+* icons
+* fix name input
+* allow edit template
+* fix software loadout
+    * when clicking a slot, if empty, show selector
+    * if not empty, populate software view
+    * allow permanent software on cyberdeck
+    * create cyberdeck template
+    * display for storage capacity
+    clear slot button?
+* fix software view
+* charges not consumed
+    * state needs to be more 
+    * requirements not working
+    * could deploy when requirement not met
+    * could deploy crack_inf at distance
+    * cyber graph inspection should use new clearsighter
 
 
 
@@ -637,64 +674,6 @@ repair compromised nodes
 3. what does cyberdeck use interface look like?
 
 
-
-# crafting interface
-
-* first screen is list of software with inspector
-    * software view
-    * delete modal
-    * a button opens the craft interface
-* craft interface:
-
-* wire up
-* design payload picker
-    * payload picker button
-* close initial dialogue
-* number icon on effect selector
-* move design points / cost
-* add software view close button
-* fix "set name" warning
- *type, 
-* design conditionals system / picker / options
-* hide virus params when exploit is selected
-* conditions per effect?
-* prevent double-adding effects
-* modify view to show size
-* change how close mission select works
-* change costs and sizes
-* icons
-* fix name input
-* allow edit template
-* fix software loadout
-    * when clicking a slot, if empty, show selector
-    * if not empty, populate software view
-    * allow permanent software on cyberdeck
-    * create cyberdeck template
-    * display for storage capacity
-    clear slot button?
-
-
-
-firewalls
-password entry
-
-disconnecting / closing: how? when? escape key?
-effect when revealing edges
-disabled alarm graph icon should be more blatant
-
-conditions a little weird still?
-overall modifiers?
-implement edges condition
-
-fix hacking interface
-    requirements not working
-    could deploy when requirement not met
-    could deploy crack_inf at distance
-    cyber graph inspection should use new clearsighter
-
-fix software view
-
-
 ## purpose of conditonals vs. design 
 
 originally i made the conditionals to give direction to the player and prevent
@@ -718,21 +697,10 @@ are there examples of other constraints we could voluntarily apply:
     3. time limit?
 
 
-## cyberdeck stats
-
-upload speed
-slots 
-size limit
-concurrent hacks
-
-
-
-
 // if exploit, require unlocked     (lockLevel)
 // if unlock, require discovered ?? (nodevis > mystery)
 // if scan, require not discovered
 // if explot + unlock
-
 
 crack:
     node is locked
@@ -753,6 +721,28 @@ scanEdges:
 scanNode:
     node is mystery
 
+
+
+
+
+
+
+# crafting interface
+
+firewalls
+password entry
+disconnecting / closing: how? when? escape key?
+effect when revealing edges
+disabled alarm graph icon should be more blatant
+
+
+conditions a little weird still?
+overall modifiers?
+implement edges condition
+
+
+fix hacking interface
+    failed to connect cyberdeck -> camera after a few scans
 
 
 

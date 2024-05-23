@@ -23,7 +23,7 @@ public record LevelPlan {
 
     public static LevelPlan Default(PlayerState playerState) {
         List<ItemTemplate> itemList = new List<ItemTemplate>() { null, null, null, null, null };
-        SoftwareTemplate[] softwares = new SoftwareTemplate[3];
+        SoftwareTemplate[] softwares = new SoftwareTemplate[playerState.cyberdeck.softwareSlots];
 
         // initialize item loadout
         if (playerState.allItems.Count >= 1) {
@@ -40,9 +40,10 @@ public record LevelPlan {
         }
 
         // initialize software loadout
-        for (int i = 1; i < softwares.Length; i++) {
+        for (int i = 0; i < softwares.Length; i++) {
             SoftwareTemplate template = i < playerState.softwareTemplates.Count ? playerState.softwareTemplates[i] : null;
             softwares[i] = template;
+            Debug.Log($"plan default software: {i} {template} {playerState.softwareTemplates.Count}");
         }
 
         return new LevelPlan {

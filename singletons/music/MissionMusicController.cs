@@ -27,7 +27,7 @@ public class MissionMusicController : MusicMixController {
 
         GameManager.OnSuspicionChange -= HandleSuspicionChange;
         foreach (Coroutine routine in fadeRoutines) {
-            if (routine == null) continue;
+            if (routine == null || GameManager.I == null) continue;
 
             GameManager.I.StopCoroutine(routine);
         }

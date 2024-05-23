@@ -189,7 +189,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public void SetHackOrigin(bool value) {
         hackOriginIndicator.SetActive(value);
         // hackButton.SetActive(!value);
-        stopHackButton.SetActive(value);
+        // stopHackButton.SetActive(value);
     }
     // public void HackButtonCallback() {
     //     overlayHandler.HackOriginSelectCallback(this);
