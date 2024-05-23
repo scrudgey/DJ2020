@@ -173,7 +173,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public GameObject GetNodeComponent(string idn) {
-        if (idn == "localhost") {
+        if (idn == "cyberdeck") {
             return playerObject;
         }
         PoweredComponent[] poweredComponents = FindObjectsOfType<PoweredComponent>();

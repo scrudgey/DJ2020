@@ -22,7 +22,7 @@ public class SoftwareCondition {
             case Type.nodeKnown:
                 return target.visibility > NodeVisibility.mystery;
             case Type.manualHack:
-                return origin?.idn == "localhost";
+                return origin?.idn == "cyberdeck";
             case Type.locked:
                 return target.lockLevel > 0;
             case Type.uncompromised:

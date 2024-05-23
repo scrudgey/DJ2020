@@ -131,9 +131,14 @@ public class OverlayHandler : MonoBehaviour {
         switch (type) {
             case OverlayType.none:
             default:
+                // GameManager.I.playerManualHacker.Disconnect();
                 if (GameManager.I.playerItemHandler.activeItem is CyberDeck) {
                     GameManager.I.SetOverlay(OverlayType.limitedCyber);
                     return;
+                } else {
+                    if (selectedHackOrigin != null) {
+                        selectedHackOrigin.SetHackOrigin(false);
+                    }
                 }
                 foreach (Image image in colorImages) {
                     image.color = powerOverlayColors.enabledColor;
@@ -150,6 +155,8 @@ public class OverlayHandler : MonoBehaviour {
                 cyberdeckController.Hide();
                 break;
             case OverlayType.power:
+                // GameManager.I.playerManualHacker.Disconnect();
+
                 foreach (Image image in colorImages) {
                     image.color = powerOverlayColors.enabledColor;
                 }
@@ -180,6 +187,8 @@ public class OverlayHandler : MonoBehaviour {
                 closeButtonObject.SetActive(true);
                 break;
             case OverlayType.alarm:
+                // GameManager.I.playerManualHacker.Disconnect();
+
                 foreach (Image image in colorImages) {
                     image.color = alarmOverlayColors.enabledColor;
                 }
@@ -262,7 +271,7 @@ public class OverlayHandler : MonoBehaviour {
         switch (indicator) {
             case NeoCyberNodeIndicator cybernode:
                 selectedCyberNodeIndicator = cybernode;
-                if (GameManager.I.playerManualHacker.deployed) {
+                if (GameManager.I.playerManualHacker.deployed && GameManager.I.playerManualHacker.targetNode == null) {
                     GameManager.I.playerManualHacker.Connect(cybernode.node);
                 }
                 infoPane = cyberNodeInfoRect;
@@ -299,7 +308,7 @@ public class OverlayHandler : MonoBehaviour {
 
     void UpdateHackPath() {
         // TODO: shortest path
-        if (selectedHackOrigin == null || selectedCyberNodeIndicator == null) {
+        if (selectedHackOrigin == null || selectedCyberNodeIndicator == null || selectedCyberNodeIndicator.node.nodeTitle == "WAN") {
             hackOriginToPathTarget = new List<CyberNode>();
         } else {
             hackOriginToPathTarget = GameManager.I.gameData.levelState.delta.cyberGraph.GetPath(selectedHackOrigin.node, selectedCyberNodeIndicator.node);

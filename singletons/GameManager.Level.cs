@@ -523,7 +523,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         // add player node
-        gameData.levelState.delta.cyberGraph.nodes["localhost"] = new CyberNode() {
+        gameData.levelState.delta.cyberGraph.nodes["cyberdeck"] = new CyberNode() {
             compromised = true,
             payData = null,
             type = CyberNodeType.player,
@@ -536,8 +536,8 @@ public partial class GameManager : Singleton<GameManager> {
             status = CyberNodeStatus.compromised,
             visibility = NodeVisibility.known,
             sceneName = SceneManager.GetActiveScene().name,
-            idn = "localhost",
-            nodeTitle = "localhost",
+            idn = "cyberdeck",
+            nodeTitle = "cyberdeck",
             enabled = true,
             fixedVisibility = true,
             alwaysOnScreen = true,

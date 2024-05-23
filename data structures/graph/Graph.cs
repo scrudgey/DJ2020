@@ -49,9 +49,10 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     void RemoveLink(Node<T> from, Node<T> to) {
         if (from == to) return;
         if (!edges.ContainsKey(from.idn)) {
-            edges[from.idn] = new HashSet<string>();
+            // edges[from.idn] = new HashSet<string>();
+            return;
         }
-        edges[from.idn].Add(to.idn);
+        edges[from.idn].Remove(to.idn);
     }
 
     public List<T> Neighbors(Node<T> source) {

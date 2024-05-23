@@ -13,6 +13,9 @@ public class SoftwareView : MonoBehaviour {
     public TextMeshProUGUI viewRequirements;
     public TextMeshProUGUI viewCharges;
     public TextMeshProUGUI viewSize;
+    [Header("effects")]
+    public GameObject effectViewPrefab;
+    public Transform effectViewContainer;
     CyberNode target;
     CyberNode origin;
     List<CyberNode> path;
@@ -43,6 +46,7 @@ public class SoftwareView : MonoBehaviour {
         } else {
             viewCharges.text = $"charges: {state.charges}/{state.template.maxCharges}";
         }
+        viewSize.gameObject.SetActive(false);
 
     }
 
@@ -51,17 +55,27 @@ public class SoftwareView : MonoBehaviour {
         titleIcon.sprite = template.icon;
         viewTitle.text = template.name;
 
+        // description
         string description = "";
         if (template.softwareType == SoftwareTemplate.SoftwareType.exploit) {
-            description = "type: exploit\n";
+            description = "type: targeted\n";
         } else if (template.softwareType == SoftwareTemplate.SoftwareType.virus) {
             description = "type: virus\n";
         }
+
+        // effects
+        foreach (Transform child in effectViewContainer) {
+            Destroy(child.gameObject);
+        }
         foreach (SoftwareEffect effect in template.effects) {
-            description += effect.DescriptionString() + "\n";
+            GameObject obj = GameObject.Instantiate(effectViewPrefab);
+            EffectView effectView = obj.GetComponent<EffectView>();
+            effectView.Initialize(effect);
+            obj.transform.SetParent(effectViewContainer, false);
         }
         viewDescription.text = description;
 
+        // requirements
         string requirements = "requirements:\n";
         if (template.conditions.Count == 0) {
             requirements += "none";

@@ -62,9 +62,9 @@ public class NeoClearsighterV4 : MonoBehaviour {
 
 
 
-    public static string PathToCullingDataResource(string levelName, string sceneName) {
-        return $"data/missions/{levelName}/culling_{sceneName}";
-    }
+    // public static string PathToCullingDataResource(string levelName, string sceneName) {
+    //     return $"data/missions/{levelName}/culling_{sceneName}";
+    // }
     void Start() {
         OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
     }
@@ -576,6 +576,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
      *                           cleanup
      *------------------------------------------------------------------------**/
     void OnDestroy() {
+        OverlayHandler.OnSelectedNodeChange -= HandleNodeFocusChange;
         DisposeOfNativeArrays();
     }
     void OnApplicationQuit() {

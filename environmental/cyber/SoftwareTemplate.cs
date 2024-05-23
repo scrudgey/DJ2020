@@ -6,8 +6,9 @@ using UnityEngine;
 
 [System.Serializable]
 public class SoftwareTemplate {
-    public string name;
     public enum SoftwareType { exploit, virus }
+
+    public string name;
     public SoftwareType softwareType;
     public SoftwareEffect.Type principalType;
     public List<SoftwareEffect> effects;
@@ -17,16 +18,29 @@ public class SoftwareTemplate {
     public int virusHops;
     public int virusDup;
 
+    public List<SoftwareCondition> conditions;
+
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite icon;
 
-    public List<SoftwareCondition> conditions;
-
     [JsonConverter(typeof(ObjectListJsonConverter<AudioClip>))]
     public List<AudioClip> deploySounds;
-
-
     public bool nameHasBeenSet;
+
+    public SoftwareTemplate(SoftwareTemplate other) {
+        this.name = other.name;
+        this.softwareType = other.softwareType;
+        this.principalType = other.principalType;
+        this.effects = new List<SoftwareEffect>(other.effects);
+        this.infiniteCharges = other.infiniteCharges;
+        this.maxCharges = other.maxCharges;
+        this.virusHops = other.virusHops;
+        this.virusDup = other.virusDup;
+        this.conditions = new List<SoftwareCondition>(other.conditions);
+        this.icon = other.icon;
+        this.deploySounds = new List<AudioClip>(other.deploySounds);
+        this.nameHasBeenSet = other.nameHasBeenSet;
+    }
 
     public SoftwareTemplate() { }
     public static SoftwareTemplate Download() {

@@ -484,7 +484,7 @@ public partial class GameManager : Singleton<GameManager> {
             playerPosition = playerObject.transform.position;
 
             // set player cybernode
-            CyberNode node = GetCyberNode("localhost");
+            CyberNode node = GetCyberNode("cyberdeck");
             if (node != null)
                 node.position = playerPosition + Vector3.up;
         }

@@ -68,7 +68,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
 
             if (path.Count == 0) continue;
 
-            if (node.idn == "localhost" && path.Count <= 2) {
+            if (node.idn == "cyberdeck" && path.Count <= 2) {
                 hackOriginNode = node;
                 break;
             }

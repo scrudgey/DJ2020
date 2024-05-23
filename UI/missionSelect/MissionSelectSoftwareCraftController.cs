@@ -43,6 +43,7 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
     public Color invalidColor;
     GameData data;
     bool inEditMode;
+    SoftwareTemplate copyOfOriginalTemplate;
     public void Initialize(GameData data) {
         this.data = data;
         this.template = SoftwareTemplate.Empty();
@@ -53,6 +54,7 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
     public void Initialize(GameData data, SoftwareTemplate template) {
         this.data = data;
         this.template = template;
+        this.copyOfOriginalTemplate = new SoftwareTemplate(template);
         inEditMode = true;
         template.nameHasBeenSet = true;
         CloseAddPayloadDialogue();
@@ -267,6 +269,10 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
         Refresh();
     }
     public void CallbackCancel() {
+        if (inEditMode) {
+            // template = copyOfOriginalTemplate;
+            data.playerState.softwareTemplates[data.playerState.softwareTemplates.IndexOf(template)] = copyOfOriginalTemplate;
+        }
         missionComputerController.ShowSoftwareListView(true);
     }
     public void CallbackBuild() {

@@ -14,10 +14,12 @@ public class MissionSelectSoftwareView : MonoBehaviour {
 
     SoftwareTemplate selectedTemplate;
     GameData data;
+
     public void Initialize(GameData data) {
         this.data = data;
         PopulateSoftwareList(data);
     }
+
     void PopulateSoftwareList(GameData data) {
         foreach (Transform child in softwareButtonContainer) {
             Destroy(child.gameObject);
@@ -33,6 +35,7 @@ public class MissionSelectSoftwareView : MonoBehaviour {
             }
         }
     }
+
     public void SoftwareClickCallback(SoftwareSelector button) {
         selectedTemplate = button.softwareTemplate;
         softwareView.DisplayTemplate(button.softwareTemplate);

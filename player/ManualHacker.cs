@@ -63,16 +63,16 @@ public class ManualHacker : MonoBehaviour {
 
     public void Connect(CyberNode target) {
         if (!deployed) return;
-        if (Vector3.Distance(target.position, transform.position) > 3f) return;
+        if (Vector3.Distance(target.position, transform.position) > 3f) return; // TODO: add raycast condition
         Disconnect(dontRefreshCyberGraph: true);
         targetNode = target;
-        CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
+        CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("cyberdeck");
         GameManager.I.gameData.levelState.delta.cyberGraph.AddEdge(playerNode, target);
         GameManager.I.RefreshCyberGraph();
     }
     public void Disconnect(bool dontRefreshCyberGraph = false) {
         if (targetNode != null) {
-            CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("localhost");
+            CyberNode playerNode = GameManager.I.gameData.levelState.delta.cyberGraph.GetNode("cyberdeck");
             GameManager.I.gameData.levelState.delta.cyberGraph.RemoveEdge(playerNode, targetNode);
         }
         targetNode = null;

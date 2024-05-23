@@ -161,7 +161,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public override void OnPointerEnter(PointerEventData eventData) {
         if (!node.notClickable) {
             base.OnPointerEnter(eventData);
-            if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
+            if (GameManager.I.activeOverlayType == OverlayType.limitedCyber && GameManager.I.playerManualHacker.targetNode == null) {
                 GameManager.I.playerManualHacker.Connect(node);
             } else if (GameManager.I.activeOverlayType == OverlayType.cyber && GameManager.I.playerManualHacker.targetNode == null) {
                 GameManager.I.playerManualHacker.Connect(node);

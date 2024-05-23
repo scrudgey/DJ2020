@@ -545,7 +545,7 @@ it can be clearly explained now, origin, destination, hops, software eligibility
 * smaller terminal window
 * hacking from cyberdeck
 * color of text in cybernode info panel
-* "player" should be "localhost"
+* "player" should be "cyberdeck"
 * remove edge line render when edge is removed
 * cybernodeinfo overlaps item view
 * player -> node edge should not have elbowing
@@ -621,7 +621,13 @@ it can be clearly explained now, origin, destination, hops, software eligibility
     * could deploy when requirement not met
     * could deploy crack_inf at distance
     * cyber graph inspection should use new clearsighter
-
+* fix hacking interface
+    * failed to connect cyberdeck -> camera after a few scans
+* dont show mb size in hack view
+* software view
+    * separate requirements, description, charges
+    * effects should show icons
+* cancel edit does not cancel
 
 
 
@@ -735,16 +741,13 @@ disconnecting / closing: how? when? escape key?
 effect when revealing edges
 disabled alarm graph icon should be more blatant
 
-
 conditions a little weird still?
-overall modifiers?
+    i had a compromised node but with unknown edges- i wanted to scan it but couldn't because the node type was known.
+    overall modifiers?
 implement edges condition
+deploy sounds - can be tied to icon 
 
+ 
 
-fix hacking interface
-    failed to connect cyberdeck -> camera after a few scans
-
-
-
-
-
+skill tree
+implement viruses
