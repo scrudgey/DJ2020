@@ -744,12 +744,16 @@ disabled alarm graph icon should be more blatant
 conditions a little weird still?
     i had a compromised node but with unknown edges- i wanted to scan it but couldn't because the node type was known.
     overall modifiers?
+        fast upload
 implement edges condition
 deploy sounds - can be tied to icon 
 
 implement viruses
-
-
+    * virus duplications
+    * speed
+    * loiter time
+    duplication chance?
+    indicator in icons
 
 
 
@@ -763,3 +767,9 @@ skill tree
 
     2 payloads, 3 payloads?
     add new software effects
+        bot traps
+
+
+virus crafting:
+    cap duplication at 2
+    

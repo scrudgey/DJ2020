@@ -166,12 +166,13 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         List<string> perks = new List<string>();
 
         List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
-            SoftwareScriptableTemplate.Load("scan"),
-            SoftwareScriptableTemplate.Load("crack"),
-            SoftwareScriptableTemplate.Load("exploit"),
-            SoftwareScriptableTemplate.Load("scanData"),
-            SoftwareScriptableTemplate.Load("scanEdges"),
-            SoftwareScriptableTemplate.Load("scanNode"),
+            SoftwareScriptableTemplate.Load("virus_scan")
+            // SoftwareScriptableTemplate.Load("scan"),
+            // SoftwareScriptableTemplate.Load("crack"),
+            // SoftwareScriptableTemplate.Load("exploit"),
+            // SoftwareScriptableTemplate.Load("scanData"),
+            // SoftwareScriptableTemplate.Load("scanEdges"),
+            // SoftwareScriptableTemplate.Load("scanNode"),
         };
         List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
 

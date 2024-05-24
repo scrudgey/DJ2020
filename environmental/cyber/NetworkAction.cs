@@ -26,8 +26,12 @@ public class NetworkAction {
 
     void DoComplete(CyberGraph graph) {
         complete = true;
-        foreach (SoftwareEffect effect in softwareTemplate.effects) {
-            effect.ApplyToNode(toNode, graph);
+        if (softwareTemplate.softwareType == SoftwareTemplate.SoftwareType.virus) {
+            graph.AddVirusProgram(softwareTemplate.ToVirusProgram(toNode, graph));
+        } else {
+            foreach (SoftwareEffect effect in softwareTemplate.effects) {
+                effect.ApplyToNode(toNode, graph);
+            }
         }
     }
 }

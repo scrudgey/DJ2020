@@ -130,16 +130,16 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
                 node2.position
             };
         } else {
-            points = pointsBetweenNodes(node1, node2);
+            points = pointsBetweenNodes(node1.position, node2.position);
         }
 
         renderer.positionCount = points.Count;
         renderer.SetPositions(points.ToArray());
     }
 
-    protected List<Vector3> pointsBetweenNodes(U node1, U node2) {
-        Vector3 position1 = Toolbox.Round(node1.position, decimalPlaces: 1);
-        Vector3 position2 = Toolbox.Round(node2.position, decimalPlaces: 1);
+    public static List<Vector3> pointsBetweenNodes(Vector3 position1, Vector3 position2) {
+        position1 = Toolbox.Round(position1, decimalPlaces: 1);
+        position2 = Toolbox.Round(position2, decimalPlaces: 1);
 
         // bool yFlag = Mathf.Abs(position1.y - position2.y) > 2f;
         // bool xFlag = Mathf.Abs(position1.x - position2.x) > 1f;

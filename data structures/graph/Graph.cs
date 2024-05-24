@@ -235,9 +235,10 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                 }
             }
         }
-        if (discoverEdges) {
-            doSfx = true;
+        if (discoverEdges) { // TODO: only return true if there are undiscovered edges
+            // doSfx = true;
             foreach (string neighborId in edges[node.idn]) {
+                if (edgeVisibility[(node.idn, neighborId)] < EdgeVisibility.known) doSfx = true;
                 SetEdgeVisibility(node.idn, neighborId, EdgeVisibility.known);
             }
         }

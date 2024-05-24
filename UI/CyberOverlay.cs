@@ -21,6 +21,9 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     public Color dimCompromisedColor;
     [Header("hack")]
     public HackTerminalController hackTerminalController;
+    public GameObject virusIndicatorPrefab;
+
+    Dictionary<VirusProgram, VirusIndicator> virusIndicators;
 
     Coroutine threatPathRoutine;
     List<CyberNode> currentThreatPath;
@@ -32,6 +35,9 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         if (subscribed) {
             graph.NetworkActionComplete -= HandleCompleteNetworkAction;
             graph.NetworkActionsChanged -= HandleNetworkActionsChange;
+
+            graph.OnAddVirusProgram -= HandleAddVirus;
+            graph.OnRemoveVirusProgram -= HandleRemoveVirus;
         }
     }
 
@@ -41,6 +47,9 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             subscribed = true;
             graph.NetworkActionComplete += HandleCompleteNetworkAction;
             graph.NetworkActionsChanged += HandleNetworkActionsChange;
+
+            graph.OnAddVirusProgram += HandleAddVirus;
+            graph.OnRemoveVirusProgram += HandleRemoveVirus;
         }
         if (GameManager.I.activeOverlayType == OverlayType.cyber) {
             base.UpdateNodes();
@@ -48,6 +57,7 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
             LimitedUpdate();
         }
         DrawMarchingAntsForAllActiveActions();
+        DisplayViruses();
     }
 
     public override void RefreshIndicators() {
@@ -156,17 +166,17 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
 
 
-    public void DrawThreat(NetworkAction networkAction) {
-        if (networkAction.path.ToHashSet().Count > 1) {
-            DrawMatchingAntsOnPath(networkAction);
-        }
-    }
-    public void EraseThreat(NetworkAction networkAction) {
-        if (networkAction.path.ToHashSet().Count > 1) {
-            EraseMatchingAntsOnPath(networkAction);
-            RefreshEdgeGraphicState();
-        }
-    }
+    // public void DrawThreat(NetworkAction networkAction) {
+    //     if (networkAction.path.ToHashSet().Count > 1) {
+    //         DrawMatchingAntsOnPath(networkAction);
+    //     }
+    // }
+    // public void EraseThreat(NetworkAction networkAction) {
+    //     if (networkAction.path.ToHashSet().Count > 1) {
+    //         EraseMatchingAntsOnPath(networkAction);
+    //         RefreshEdgeGraphicState();
+    //     }
+    // }
     void DrawMarchingAntsForAllActiveActions() {
 
         foreach (NetworkAction action in graph.ActiveNetworkActions()) {
@@ -183,6 +193,36 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
     }
     void HandleNetworkActionsChange(Dictionary<CyberNode, List<NetworkAction>> actions) {
         RefreshEdgeGraphicState();
+    }
+    void HandleAddVirus(VirusProgram virus) {
+        if (virusIndicators == null) {
+            virusIndicators = new Dictionary<VirusProgram, VirusIndicator>();
+        }
+        if (virusIndicators.ContainsKey(virus)) {
+
+        } else {
+            GameObject obj = GameObject.Instantiate(virusIndicatorPrefab);
+            obj.transform.SetParent(this.transform, false);
+            VirusIndicator indicator = obj.GetComponent<VirusIndicator>();
+            indicator.Initialize(virus, cam);
+            virusIndicators[virus] = indicator;
+        }
+    }
+    void HandleRemoveVirus(VirusProgram virus) {
+        if (virusIndicators == null) {
+            virusIndicators = new Dictionary<VirusProgram, VirusIndicator>();
+        }
+        if (virusIndicators.ContainsKey(virus)) {
+            Destroy(virusIndicators[virus].gameObject);
+        }
+        virusIndicators.Remove(virus);
+    }
+    void DisplayViruses() {
+        if (virusIndicators == null) return;
+        foreach (VirusIndicator indicat in virusIndicators.Values) {
+            if (indicat == null) continue;
+            indicat.OverlayUpdate();
+        }
     }
     void HandleCompleteNetworkAction(NetworkAction networkAction) {
         Toolbox.RandomizeOneShot(overlayHandler.audioSource, finishDownloadSound);

@@ -12,15 +12,25 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
     [System.NonSerialized]
     [XmlIgnore]
     public Action<Dictionary<CyberNode, List<NetworkAction>>> NetworkActionsChanged;
-    [System.NonSerialized]
-    [XmlIgnore]
-    public Action<NetworkAction> NetworkActionUpdate;
+    // [System.NonSerialized]
+    // [XmlIgnore]
+    // public Action<NetworkAction> NetworkActionUpdate;
     [System.NonSerialized]
     [XmlIgnore]
     public Action<NetworkAction> NetworkActionComplete;
     [System.NonSerialized]
     [XmlIgnore]
     public Dictionary<CyberNode, List<NetworkAction>> networkActions;
+    [System.NonSerialized]
+    [XmlIgnore]
+    public List<VirusProgram> virusPrograms;
+
+    [System.NonSerialized]
+    [XmlIgnore]
+    public Action<VirusProgram> OnAddVirusProgram;
+    [System.NonSerialized]
+    [XmlIgnore]
+    public Action<VirusProgram> OnRemoveVirusProgram;
     public bool IsCyberNodeVulnerable(CyberNode node) {
         if (node.compromised)
             return false;
@@ -89,11 +99,23 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         networkActions[action.toNode].Add(action);
         NetworkActionsChanged?.Invoke(networkActions);
     }
+    public void AddVirusProgram(VirusProgram virus) {
+        if (virusPrograms == null) {
+            virusPrograms = new List<VirusProgram>();
+        }
+        virusPrograms.Add(virus);
+        OnAddVirusProgram?.Invoke(virus);
+    }
     public void UpdateNetworkActions(float timeDelta) {
         bool anyComplete = false;
         if (networkActions == null) {
             networkActions = new Dictionary<CyberNode, List<NetworkAction>>();
         }
+        if (virusPrograms == null) {
+            virusPrograms = new List<VirusProgram>();
+        }
+
+        // update network actions
         foreach (List<NetworkAction> actions in networkActions.Values) {
             List<NetworkAction> completedActions = new List<NetworkAction>();
             foreach (NetworkAction action in actions) {
@@ -102,14 +124,40 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
                     completedActions.Add(action);
                     anyComplete = true;
                 }
-
-                NetworkActionUpdate?.Invoke(action);
             }
             foreach (NetworkAction action in completedActions) {
                 actions.Remove(action);
                 NetworkActionComplete?.Invoke(action);
             }
         }
+
+        // update viruses
+        List<VirusProgram> completedViruses = new List<VirusProgram>();
+        List<VirusProgram> newViruses = new List<VirusProgram>();
+        foreach (VirusProgram virus in virusPrograms) {
+            // display virus at position
+            virus.Update(timeDelta);
+            if (virus.updated) {
+                anyComplete = true;
+                virus.updated = false;
+            }
+            if (virus.complete) {
+                anyComplete = true;
+                completedViruses.Add(virus);
+            }
+            if (virus.duplicate) {
+                virus.duplicate = false;
+                newViruses.Add(virus.Duplicate());
+            }
+        }
+        foreach (VirusProgram virus in newViruses) {
+            AddVirusProgram(virus);
+        }
+        foreach (VirusProgram virus in completedViruses) {
+            virusPrograms.Remove(virus);
+            OnRemoveVirusProgram?.Invoke(virus);
+        }
+
         if (anyComplete) {
             GameManager.I.RefreshCyberGraph();
             NetworkActionsChanged?.Invoke(networkActions);

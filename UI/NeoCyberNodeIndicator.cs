@@ -127,7 +127,11 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
             NetworkAction networkAction = graph.networkActions[node][0];
             float progess = networkAction.timer / networkAction.lifetime;
             SetProgress(progess);
-            SetEffect(networkAction.softwareTemplate.principalType);
+            if (networkAction.softwareTemplate.softwareType == SoftwareTemplate.SoftwareType.virus) {
+                SetEffect(SoftwareEffect.Type.compromise);
+            } else {
+                SetEffect(networkAction.softwareTemplate.principalType);
+            }
         } else {
             ShowProgressBar(false);
             SetEffect(SoftwareEffect.Type.none);

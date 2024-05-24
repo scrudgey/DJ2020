@@ -17,6 +17,9 @@ public class SoftwareTemplate {
     public int maxCharges;
     public int virusHops;
     public int virusDup;
+    public float loiterTimeLow;
+    public float transitTimeLow;
+    public float timeSpread = 1.5f;
 
     public List<SoftwareCondition> conditions;
 
@@ -65,6 +68,7 @@ public class SoftwareTemplate {
         //     SoftwareEffect.Type.unlock => 6f,
         //     _ => 1f
         // };
+        // TODO:
         float lifetime = 2.5f;
 
         NetworkAction networkAction = new NetworkAction() {
@@ -78,6 +82,20 @@ public class SoftwareTemplate {
         };
 
         return networkAction;
+    }
+    public VirusProgram ToVirusProgram(CyberNode target, CyberGraph graph) {
+        return new VirusProgram() {
+            graph = graph,
+            position = target.position,
+            currentNode = target,
+            hops = virusHops,
+            maxHops = virusHops,
+            duplication = virusDup,
+            timer = 0,
+            effects = effects,
+            waitAtNodeTimeRange = new LoHi(loiterTimeLow, loiterTimeLow * timeSpread),
+            transitTimeRange = new LoHi(transitTimeLow, transitTimeLow * timeSpread),
+        };
     }
 
     public static SoftwareTemplate Empty() {

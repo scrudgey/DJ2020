@@ -36,12 +36,12 @@ public class CyberdeckUIController : MonoBehaviour {
         this.graph = graph;
         PopulateSoftwareButtons();
         PopulateHackIndicators(new Dictionary<CyberNode, List<NetworkAction>>());
-        graph.NetworkActionsChanged += HandleNetworkActionChange;
-        graph.NetworkActionUpdate += HandleNetworkActionUpdate;
+        // graph.NetworkActionsChanged += HandleNetworkActionChange;
+        // graph.NetworkActionUpdate += HandleNetworkActionUpdate;
     }
     void OnDestroy() {
-        graph.NetworkActionsChanged -= HandleNetworkActionChange;
-        graph.NetworkActionUpdate -= HandleNetworkActionUpdate;
+        // graph.NetworkActionsChanged -= HandleNetworkActionChange;
+        // graph.NetworkActionUpdate -= HandleNetworkActionUpdate;
     }
     public void Refresh(NeoCyberNodeIndicator indicator) {
         this.indicator = indicator;
