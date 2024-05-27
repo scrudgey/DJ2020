@@ -75,10 +75,8 @@ public class WireCutterToolIndicator : MonoBehaviour {
             index += 1;
             yield return null;
         }
-
         snipRoutine = null;
     }
-
 
     BurglarAttackResult CutWires(AttackSurface attackSurface, Vector2 position) {
         Ray projection = burglarCanvasController.MousePositionToAttackCamRay(position);

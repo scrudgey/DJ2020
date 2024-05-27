@@ -126,3 +126,113 @@ cut a fence
 bypass a keycard reader
 spoof rfid
 exploit a RTE sensor
+
+
+
+* fix level load
+
+
+# todo
+
+fix up existing system
+    redraw tools to have more shadow
+    * snippable wires are broken in some cases
+    remove cyber
+    change lockpicking
+add to existing system
+    attack surface for card reader
+determine loadout system
+    tools that are added to burglar toolkit
+    tools that are loaded prior to mission - item slot?
+    duffel bag and backpack
+add new tools
+    keycard spoofer
+    power drill
+add tutorial mission guy in the bar
+    interface
+    some missions
+determine how electronics hacking will work
+
+tower map is messed up
+
+
+
+
+## equipment selection considerations
+
+regardless of how tools are introduced and taught, we have the problem of how tools are brought on a mission
+
+several possible modes:
+
+1. tools are automatically added to the burglar toolkit
+    ensures that critical equipment (lockpick, screwdriver) cannot be skipped.
+    small tools that fit in the kit
+        lockpick, screwdriver, probe
+
+2. tools are selected before mission with limited space
+    allows interesting tradeoffs
+    less critical tools that offer interesting approaches
+        duct tape
+        power drill
+
+3. tools are actually items 
+    item-like equipment is brought in item slots
+        fence cutter
+        glass cutter
+        safe cracking equipment
+
+
+
+sounds like:
+    there are basic tools that are always brought.
+    (the tools might be upgraded and *maybe* expanded upon but otherwise the basic capabilities are always there)
+
+    there are extra tools that have to be selected
+    you start with one slot. if you need extra slots you bring a backpack or duffel bag
+    it is possible that duffel bag slots act as extra item slots too.
+
+
+## how are tools used?
+
+the other problem is, how does the player use the tool?
+i.e. fence cutter is an item to be used in normal mode.
+    tubular lockpick is an item to be used in burglar mode.
+    power drill does not fit in burglar toolkit
+
+
+## backpack and duffel bag
+extra space for tools is provided by backpack or duffel bag
+for this to be a possibility, there has to be selection (2, 3) and there has to be limited space (2, 3)
+
+what is the upside / downside to having a duffel bag?
+    1. you cannot use two-handed weapons while carrying duffel bag.
+        you automatically drop it when pulling out a weapon
+    2. it is extra suspicion
+so you can bring critical tools in the mission 
+    this really only ever becomes an issue if there's more than one "critical tool" that you feel like bringing- it would have to be pretty important
+
+how do you use the tools in a duffel bag?
+
+
+
+
+
+(tool) key duplicator
+(tool) key card creator
+    advantage: create a legit-seeming key card so you don't have to hack the reader
+
+    somehow, you have to determine the correct key though. 
+    get the correct key code
+
+(tool) rfid sniffer
+(tool) crowbar uses:
+    open doors
+    open elevator door
+    open hatch
+    open cars
+    break windows
+    melee weapon
+(tool) power drill
+    can destroy a lock, but is noisy
+(tool) safe cracking equipment
+    destructive / noisy vs. silent

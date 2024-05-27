@@ -366,6 +366,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         selectionBoxCorotuine = StartCoroutine(ActivateSelectionBox(indicator));
     }
     void BlitFloorText(string text) {
+        if (!gameObject.activeInHierarchy) return;
         if (floorBlitCoroutine != null) {
             StopCoroutine(floorBlitCoroutine);
         }

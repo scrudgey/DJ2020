@@ -52,7 +52,6 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void StickifySuspicion() {
-        Debug.Log("** apply sticky! **");
         foreach (SuspicionRecord record in suspicionRecords.Values) {
             if (record.stickyable) {
                 record.MakeSticky();

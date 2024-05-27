@@ -91,9 +91,10 @@ public partial class GameManager : Singleton<GameManager> {
             }, unloadAll: false);
         }
 
-        InitializeLevel(state.plan, sceneData);
         LoadSkyboxForScene(sceneData);
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
+
+        InitializeLevel(state.plan, sceneData);
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
 
         NPCSpawnPoint[] nPCSpawnPoints = GameObject.FindObjectsOfType<NPCSpawnPoint>();

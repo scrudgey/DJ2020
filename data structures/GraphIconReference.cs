@@ -74,6 +74,10 @@ public class GraphIconReference : ScriptableObject {
             case CyberNodeType.normal:
                 return normalIcon;
             case CyberNodeType.datanode:
+                if (node.payData == null) {
+                    // Debug.Log("null paydata on cybernode sprite");
+                    return iconGenericData;
+                }
                 return DataSprite(node.payData.type, node.datafileVisibility);
             case CyberNodeType.utility:
                 return utilityIcon;

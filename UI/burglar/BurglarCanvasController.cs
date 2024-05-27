@@ -308,6 +308,7 @@ public class BurglarCanvasController : MonoBehaviour {
             case BurglarToolType.lockpick:
             case BurglarToolType.probe:
             case BurglarToolType.screwdriver:
+            case BurglarToolType.wirecutter:
                 GameManager.I.AddSuspicionRecord(SuspicionRecord.tamperingSuspicion(data));
                 break;
         }

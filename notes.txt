@@ -3438,6 +3438,18 @@ speed up + pitch up blitting?
 * make hack selection automatic
     * prefer shorter paths, prefer cyberdeck
     ? highlight edges from compromised nodes
+* fix up the cyberdeck loadout screen
+    * MB total? or slots?
+* progression in software
+    * core idea is designing software with design points budget
+        * point budget can increase with skill
+    * fix silenced smg
+    * code-controlled shoot animation
+    * fix shooting animation and automatic interval
+* progression in burglar tools
+    * attachments
+    * armor & armor piercing
+
 
 
 
@@ -3523,18 +3535,10 @@ VR mission designer
 weapons
     aim sway responds to movement and gun skill
     bullets that can pass through targets
-    * armor & armor piercing
+    faster shotgun
     colt 2037 sped up sounds great
-    * attachments
     laser pointer attachment
     flashlight attachment
-    * fix silenced smg
-    * code-controlled shoot animation
-    * fix shooting animation and automatic interval
-        faster shotgun
-            click to rack faster?
-            raise - shoot - pump
-            animator speed can be adjusted
 
 planning mode
     HP / def indicators
@@ -3897,21 +3901,6 @@ key system
 destructible walls
     gibs
     re-bake navmesh
-* fix up the cyberdeck loadout screen
-    * MB total? or slots?
 update the steam page graphic
 
-
-progression in burglar tools
-    maybe there is no progression, no unlocking
-    1. how to explain the use of special tools
-    2. how to explain use of normal tools to attack novel thing like card reader
-        it must always be a remix of basic actions:
-            unscrew, remove the plate, snip the wires, etc.
-        is there no room for special gadgets?
-            when you buy the special gadget (id card spoofer) it shows a video of how and where it is used?
-            separate
-* progression in software
-    * core idea is designing software with design points budget
-        point budget can increase with skill
 

@@ -43,7 +43,6 @@ public record LevelPlan {
         for (int i = 0; i < softwares.Length; i++) {
             SoftwareTemplate template = i < playerState.softwareTemplates.Count ? playerState.softwareTemplates[i] : null;
             softwares[i] = template;
-            Debug.Log($"plan default software: {i} {template} {playerState.softwareTemplates.Count}");
         }
 
         return new LevelPlan {

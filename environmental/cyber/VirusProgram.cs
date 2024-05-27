@@ -44,10 +44,10 @@ public class VirusProgram {
                 }
 
                 if (hops <= 0) {
-                    Debug.Log($"virus program complete");
+                    // Debug.Log($"virus program complete");
                     complete = true;
                 } else {
-                    Debug.Log($"virus program hopping: {hops}");
+                    // Debug.Log($"virus program hopping: {hops}");
                     hops--;
                     SetDestination();
                     if (duplication > 0) {

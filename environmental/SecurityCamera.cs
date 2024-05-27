@@ -117,7 +117,7 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
         if (cooldown > 0f) {
             cooldown -= Time.deltaTime;
         }
-        if (!node.overallEnabled)
+        if (node == null || !node.overallEnabled)
             return;
         if (doRotate) {
             timer += Time.deltaTime;
