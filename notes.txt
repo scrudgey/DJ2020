@@ -3904,3 +3904,5 @@ destructible walls
 update the steam page graphic
 
 
+"i'm from keyscan, i'm troubleshooting some things"
+"i'm checking out some issues with your water sensors"

@@ -213,26 +213,88 @@ so you can bring critical tools in the mission
 
 how do you use the tools in a duffel bag?
 
+potentially unify item slots and burglar tool slots
+    or, burglar tools are always available,
+
+
+    
 
 
 
+traveler hook: should have a cutaway view like pick / require some interaction
 
-(tool) key duplicator
-(tool) key card creator
+key duplicator
+key card creator
     advantage: create a legit-seeming key card so you don't have to hack the reader
-
     somehow, you have to determine the correct key though. 
-    get the correct key code
+    get the correct key code: decoder pick
+        now, you can bypass this door and others without raising suspicion!
 
-(tool) rfid sniffer
-(tool) crowbar uses:
+duct tape
+    apply to door after opening- prevents latch
+rfid sniffer
+crowbar uses:
     open doors
     open elevator door
     open hatch
     open cars
-    break windows
-    melee weapon
-(tool) power drill
+    break windows?
+    melee weapon?
+power drill
     can destroy a lock, but is noisy
-(tool) safe cracking equipment
+safe cracking equipment
     destructive / noisy vs. silent
+
+shim
+under-door tool
+dot magnets
+uv powder
+
+
+
+surfaces:
+    combination lock
+        1. use the probe as a decoder
+    multiple varieties of padlock 
+    multiple varieties of tumbler locks
+        lockpicking variety comes into play
+    wafer lock
+        basic lockpick is easy
+    alarm sensors
+        use a magnet to prevent their tripping
+    remove hinges from door?
+    numpad door
+        1. open a panel and attach oscilloscope. it shows a pattern. press buttons until you match the pattern (differential power analysis)
+        2. UV reactive powder 
+    rotary lock
+        auto-spinner gadget
+        x-ray the wheels
+        drilling
+
+
+electronics:
+    1. read out / decode a code from a chip inside
+        stored door combinations
+        cached keycard ids
+    2. send signals
+        enter the door code
+        enter the keycard signal
+
+keycard door example:
+    0. decode the keycard id:
+        read from access controller
+        read from keycard buffer
+        install a keycard data stealer
+        scan someone with an rfid stealer
+    1. decode the keycard id, then flash a keycard using a card maker tool
+    2. decode the keycard id, then enter the keycard id to trigger the unlock
+    3. hack the keycard controller 
+        get the correct keycard id and create a card
+        enter a new keycard id of either a current card or one you can make
+
+physical door example:
+    1. pick the lock- allows entrance
+    2. bypass the latch - opens the door but remains locked
+    3. tape the latch - prevents latch from operating
+    4. decode the key - special tool or pick - allows to create a key and therefore not raise suspicion
+        pak-a-punch
