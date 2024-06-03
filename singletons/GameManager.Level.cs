@@ -130,6 +130,11 @@ public partial class GameManager : Singleton<GameManager> {
             }
         }
 
+        // spawn loot
+        foreach (SpawnRandom spawnRandom in GameObject.FindObjectsOfType<SpawnRandom>()) {
+            spawnRandom.Spawn();
+        }
+
         // randomize doors
         foreach (DoorRandomizer doorRandomizer in GameObject.FindObjectsOfType<DoorRandomizer>()) {
             doorRandomizer.ApplyState(state.template);
@@ -307,6 +312,13 @@ public partial class GameManager : Singleton<GameManager> {
         });
     }
 
+    public void RandomFunctionThing() {
+        Debug.Log("function 1");
+    }
+    public void LogMe(string value) {
+        Debug.Log(value);
+    }
+
     public void LoadScene(string targetScene, Action callback, bool unloadAll = true) {
         isLoadingLevel = true;
 
@@ -330,7 +342,7 @@ public partial class GameManager : Singleton<GameManager> {
                 DestroyImmediate(bootstrapper.gameObject);
             }
             if (callback != null)
-                callback();
+                callback.Invoke();
 
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
                 SceneManager.UnloadSceneAsync("LoadingScreen");

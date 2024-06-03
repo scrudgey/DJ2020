@@ -12,7 +12,14 @@ public enum GamePhase { none, levelPlay, vrMission, mainMenu, plan, afteraction,
 public enum MenuType { none, console, dialogue, VRMissionFinish, escapeMenu, missionFail, missionSelect, gunshop, itemshop, lootshop, mainEscapeMenu, barShop, VREscapeMenu, importerShop, gunModShop, payDataShop, medicalShop, perkMenu, softwareModal, phoneMenu }
 public enum OverlayType { none, power, cyber, alarm, limitedCyber }
 public enum CursorType { none, gun, pointer, hand }
-public enum InputMode { none, gun, cyber, aim, wallpressAim, burglar }
+public enum InputMode {
+    none,
+    gun,
+    cyber,
+    aim,
+    wallpressAim,
+    burglar
+}
 public struct PointerData {
     public Texture2D mouseCursor;
     public Vector2 hotSpot;
@@ -159,6 +166,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void TransitionToInputMode(InputMode newInputMode) {
         if (newInputMode == inputMode)
             return;
+        Debug.Log($"transition to input mode: {newInputMode}");
         OnInputModeChange?.Invoke(inputMode, newInputMode);
         _inputMode = newInputMode;
         SetOverlay(activeOverlayType);
@@ -257,6 +265,7 @@ public partial class GameManager : Singleton<GameManager> {
                 if (!SceneManager.GetSceneByName("EscapeMenu").isLoaded) {
                     LoadScene("EscapeMenu", callback, unloadAll: false);
                 }
+                // TODO
                 break;
             case MenuType.VREscapeMenu:
                 if (!SceneManager.GetSceneByName("VREscapeMenu").isLoaded) {
@@ -578,6 +587,12 @@ public partial class GameManager : Singleton<GameManager> {
             }
 
             characterCamera.UpdateWithInput(input);
+        } else if (activeMenuType != MenuType.none) { // timescale == 0
+            if (resetMouseControl) {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                resetMouseControl = false;
+            }
         }
 
         if (playerInput.incrementOverlay != 0) {
@@ -612,6 +627,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
 
             if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
+                Debug.Log("[cursor]  cursor visible false");
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
                 resetMouseControl = true;

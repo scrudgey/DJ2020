@@ -227,7 +227,7 @@ public class GunStatHandler : MonoBehaviour {
     }
 
     public IEnumerator LerpBarsRoutine(GunStats template) {
-        float duration = 1f;
+        float duration = 0.3f;
         float timer = 0f;
 
         // Enum.GetValues(typeof(Colors))

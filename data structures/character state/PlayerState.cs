@@ -87,49 +87,49 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         GunState gunState7 = GunState.Instantiate(gun7);
         GunState gunState8 = GunState.Instantiate(gun8);
 
-        // GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
-        // gunState1.delta.activeMods.Add(silencer);
+        GunMod silencer = Resources.Load("data/guns/mods/silencer") as GunMod;
+        gunState1.delta.activeMods.Add(silencer);
 
         WeaponState sword = new WeaponState(swordTemplate);
 
-        // List<WeaponState> allGuns = new List<WeaponState> {
-        //     new WeaponState( gunState1),
-        //     new WeaponState( gunState2),
-        //     new WeaponState( gunState3),
-        //     new WeaponState( gunState4),
-        //     new WeaponState( gunState5),
-        //     new WeaponState( gunState6),
-        //     new WeaponState( gunState7),
-        //     new WeaponState( gunState8),
-        //     sword
-        // };
-
         List<WeaponState> allGuns = new List<WeaponState> {
-            new WeaponState( gunState1)
+            new WeaponState( gunState1),
+            new WeaponState( gunState2),
+            new WeaponState( gunState3),
+            new WeaponState( gunState4),
+            new WeaponState( gunState5),
+            new WeaponState( gunState6),
+            new WeaponState( gunState7),
+            new WeaponState( gunState8),
+            sword
         };
+
+        // List<WeaponState> allGuns = new List<WeaponState> {
+        //     new WeaponState( gunState1)
+        // };
 
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
             ItemTemplate.LoadItem("C4"),
             ItemTemplate.LoadItem("rocket"),
-            // ItemTemplate.LoadItem("goggles"),
-            // ItemTemplate.LoadItem("grenade"),
-            ItemTemplate.LoadItem("deck"),
+            ItemTemplate.LoadItem("goggles"),
+            ItemTemplate.LoadItem("grenade"),
+            // ItemTemplate.LoadItem("deck"),
         };
 
-        // List<LootData> loots = new List<LootData> {
-        //     Resources.Load("data/loot/drug/rush") as LootData,
-        //     Resources.Load("data/loot/drug/rush") as LootData,
-        //     Resources.Load("data/loot/drug/rush") as LootData,
-        //     Resources.Load("data/loot/drug/vial") as LootData,
-        //     Resources.Load("data/loot/drug/vial") as LootData,
-        //     Resources.Load("data/loot/drug/zyme") as LootData,
-        //     Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
-        //     Resources.Load("data/loot/industrial/tungstenRod") as LootData,
-        //     Resources.Load("data/loot/industrial/flask") as LootData,
-        // };
+        List<LootData> loots = new List<LootData> {
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/rush") as LootData,
+            Resources.Load("data/loot/drug/vial") as LootData,
+            Resources.Load("data/loot/drug/vial") as LootData,
+            Resources.Load("data/loot/drug/zyme") as LootData,
+            Resources.Load("data/loot/industrial/deuteriumOxide") as LootData,
+            Resources.Load("data/loot/industrial/tungstenRod") as LootData,
+            Resources.Load("data/loot/industrial/flask") as LootData,
+        };
 
-        List<LootData> loots = new List<LootData>();
+        // List<LootData> loots = new List<LootData>();
         // List<string> perks = new List<string>{
         //     "p1_1",
         //     "p1_2",
@@ -168,22 +168,24 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
             SoftwareScriptableTemplate.Load("virus_scan"),
             SoftwareScriptableTemplate.Load("scan"),
-            // SoftwareScriptableTemplate.Load("crack"),
-            // SoftwareScriptableTemplate.Load("exploit"),
+            SoftwareScriptableTemplate.Load("crack"),
+            SoftwareScriptableTemplate.Load("exploit"),
             SoftwareScriptableTemplate.Load("scanData"),
-            // SoftwareScriptableTemplate.Load("scanEdges"),
-            // SoftwareScriptableTemplate.Load("scanNode"),
+            SoftwareScriptableTemplate.Load("scanEdges"),
+            SoftwareScriptableTemplate.Load("scanNode"),
         };
         List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
 
         List<Tactic> tactis = new List<Tactic>{
-            Resources.Load("data/tactics/cyberattack") as Tactic
+            Resources.Load("data/tactics/cyberattack") as Tactic,
+            Resources.Load("data/tactics/disguise") as Tactic,
+            Resources.Load("data/tactics/fakeID") as Tactic,
         };
 
         List<LootBuyerData> fences = new List<LootBuyerData> {
             Resources.Load("data/lootbuyer/snakeman") as LootBuyerData,
-            // Resources.Load("data/lootbuyer/doctor") as LootBuyerData,
-            // Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
+            Resources.Load("data/lootbuyer/doctor") as LootBuyerData,
+            Resources.Load("data/lootbuyer/gummy") as LootBuyerData,
             // Resources.Load("data/lootbuyer/posh") as LootBuyerData,
         };
 

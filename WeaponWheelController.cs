@@ -23,7 +23,11 @@ public class WeaponWheelController : MonoBehaviour {
     WeaponWheelOption selectedOption;
     WeaponWheelOption previousSelectedOption;
     float thetaDelta;
+    List<ItemTemplate> items;
     public void Initialize() {
+        items = new List<ItemTemplate>(GameManager.I.gameData.levelState.plan.items);
+        items.Add(ItemTemplate.LoadItem("deck"));
+
         wheelOptions = new List<WeaponWheelOption>();
         foreach (Transform child in optionContainer) {
             Destroy(child.gameObject);
@@ -38,13 +42,13 @@ public class WeaponWheelController : MonoBehaviour {
         if (GameManager.I.gameData.playerState.tertiaryGun != null && GameManager.I.gameData.playerState.PerkThirdWeaponSlot()) {
             guns.Add(GameManager.I.gameData.playerState.tertiaryGun);
         }
-        thetaDelta = 2f * Mathf.PI / (guns.Count + GameManager.I.gameData.levelState.plan.items.Where(item => item != null).Count() + 1);
+        thetaDelta = 2f * Mathf.PI / (guns.Count + items.Where(item => item != null).Count() + 1);
         float theta = 0f;
         foreach (WeaponState gun in guns) {
             WeaponWheelOption option = CreateSelectorOption(theta, gun);
             theta += thetaDelta;
         }
-        foreach (ItemTemplate item in GameManager.I.gameData.levelState.plan.items) {
+        foreach (ItemTemplate item in items) {
             if (item == null) continue;
             WeaponWheelOption option = CreateSelectorOption(theta, item);
             theta += thetaDelta;

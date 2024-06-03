@@ -139,7 +139,7 @@ connections can be cut or manipulated
             power component?
         cutting the cyber connection just prevents this from being hacked remotely- disconnects it from the network
         cutting the power connection powers down the whole camera. success- but somewhat destructive. central can notice it and send a tech
-        cutting the alarm connection prevents alarm source from communicating with alarm central.
+        cutting the alarm connection prevents alarm source from communicating with alarm central. but it can still alert nearby guards.
         attack alarm source: if there is a more detailed way to attack this, then this is the best attack. leave everything else intact, prevent it from alarming.
     example 2 (good): numeric keypad door lock / keycard lock
         connections: cyber connection, ?door?

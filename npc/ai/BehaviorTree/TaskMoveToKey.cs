@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AI;
-// using KinematicCharacterController;
 using UnityEngine;
 using UnityEngine.AI;
 namespace AI {
@@ -12,7 +11,6 @@ namespace AI {
         public HeadBehavior headBehavior;
         readonly float CORNER_ARRIVAL_DISTANCE = 0.15f;
         float finalCornerArrivalDistance = 0.15f;
-        // public NavMeshPath navMeshPath;
         public int pathIndex;
         Transform transform;
         string key;
@@ -28,7 +26,6 @@ namespace AI {
         CharacterController controller;
         Vector3[] path;
         public TaskMoveToKey(Transform transform, string key, HashSet<int> keyIds, CharacterController controller, float arrivalDistance = 0.15f, SpottedHighlight highlight = null) : base() {
-            // navMeshPath = new NavMeshPath();
             pathIndex = -1;
             this.transform = transform;
             this.key = key;
@@ -100,8 +97,6 @@ namespace AI {
                 // Debug.DrawLine(transform.position, nextPoint, Color.cyan);
                 inputVector.y = 0;
                 baseLookDirection = inputVector;
-                // input.moveDirection = speedCoefficient * inputVector.normalized;
-                // input.moveDirection = speedCoefficient * inputVector.normalized;
                 if (speedCoefficient > 1) {
                     input.moveDirection = Mathf.Min(1f, speedCoefficient) * inputVector.normalized;
                     input.runDown = true;

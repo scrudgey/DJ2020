@@ -47,6 +47,7 @@ public class LaserTripwire : MonoBehaviour, INodeBinder<AlarmNode> {//, INodeBin
 
     public void DisableSource() {
         foreach (LaserData data in laserData) {
+            if (data.laser == null) continue;
             if (data.laser.gameObject == null) continue;
             data.laser.gameObject.SetActive(false);
             data.emissionSprite.enabled = false;

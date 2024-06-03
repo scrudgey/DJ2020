@@ -3903,6 +3903,30 @@ destructible walls
     re-bake navmesh
 update the steam page graphic
 
+* broken loot spawning basically everywhere
+* broke some mission objectives
+* didnt bring cyberdeck on missions
+* 3rd person view -> menu broken
+* couldn't select gun in loadout screen
+* weird spawn point in elevator? 
+? keys / data incrementing the counter to "2"
 
-"i'm from keyscan, i'm troubleshooting some things"
-"i'm checking out some issues with your water sensors"
+
+
+7. lots of broken UI around info panels
+UI status bar doesn't appear when mission starts / appears when not needed
+
+
+maps kind of messed up in mission planning
+    yamachi
+    tower
+some things are weird about loadout / cyber loadout
+    open the dialogue with only forbidden software- confusing
+4. died and restarted mission, cyber graph state broken
+add more cull padding to various lintels in elevator mission
+
+equipment plan:
+    clear weapon/item slot
+    cancel weapon select
+    * lerp 
+

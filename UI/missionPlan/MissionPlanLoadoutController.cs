@@ -105,7 +105,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         statsRect.gameObject.SetActive(true);
         statsRect.sizeDelta = new Vector2(440f, 35f);
         statsCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 0.5f, 35f, 375f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+            Toolbox.Ease(null, 0.15f, 35f, 446f, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
                 statsRect.sizeDelta = new Vector2(440f, height);
             }, unscaledTime: true),
             Toolbox.CoroutineFunc(() => statsCoroutine = null)
@@ -119,7 +119,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         }
         statsOpen = false;
         statsCoroutine = StartCoroutine(Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 0.5f, 375, 35, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
+            Toolbox.Ease(null, 0.15f, 446, 35, PennerDoubleAnimation.ExpoEaseOut, (float height) => {
                 statsRect.sizeDelta = new Vector2(440f, height);
             }, unscaledTime: true),
             Toolbox.CoroutineFunc(() => {
@@ -178,9 +178,8 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
 
     public void WeaponSlotClicked(int slotIndex, WeaponState weaponState, bool clear = false) {
-        if (clear) {
+        if (weaponState == null || clear) {
             gunStatHandler.ClearGunTemplate();
-
         } else {
             ShowStatsView();
             if (weaponState.type == WeaponType.gun) {
@@ -264,11 +263,12 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         selectedWeaponSlot = 0;
     }
     public void StashPickerMouseOverCallback(LoadoutStashPickerButton picker) {
+        if (!statsOpen) return;
         switch (picker.type) {
             case LoadoutStashPickerButton.PickerType.gun:
                 // gunStatHandler.SetCompareGun(picker.gunstate.template);
                 // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
-                if (picker.gunstate.type == WeaponType.gun) {
+                if (picker.gunstate != null && picker.gunstate.type == WeaponType.gun) {
                     gunStatHandler.DisplayGunState(picker.gunstate.gunInstance);
                 } else {
                     gunStatHandler.ClearGunTemplate();
@@ -279,12 +279,13 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public void StashPickerMouseExitCallback(LoadoutStashPickerButton picker) {
         switch (picker.type) {
             case LoadoutStashPickerButton.PickerType.gun:
-                // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
                 LoadoutWeaponButton button = selectedWeaponSlot switch {
+                    0 => null,
                     1 => primaryWeaponButton,
                     2 => secondaryWeaponButton,
                     3 => tertiaryWeaponButton
                 };
+                if (button == null || button.gunState == null) break;
                 if (button.gunState.type == WeaponType.gun) {
                     gunStatHandler.DisplayGunState(button.gunState.gunInstance);
                 } else {

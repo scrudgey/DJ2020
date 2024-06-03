@@ -260,6 +260,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public void UpdateWithInput(CameraInput input, bool ignoreAttractor = false) {
         // if (FollowTransform == null)
         // return;
+        if (Camera == null) return;
         CameraState camState = CameraState.normal;
         currentAttractor = null;
 
