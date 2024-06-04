@@ -43,8 +43,10 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
         foreach (Transform child in neighborbuttonContainer) {
             Destroy(child.gameObject);
         }
+        // Debug.Log($"[neighbor] configure neighbors: {node.idn} {graph.edges.ContainsKey(node.idn)}");
         if (graph.edges.ContainsKey(node.idn) && graph.edges[node.idn].Count > 0) {
             foreach (string neighborId in graph.edges[node.idn]) {
+                Debug.Log($"[neighbor] neighbor: {neighborId}");
                 U neighborNode = graph.nodes[neighborId];
                 GameObject obj = GameObject.Instantiate(neighborButtonPrefab) as GameObject;
 
@@ -54,6 +56,7 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
                 obj.transform.SetParent(neighborbuttonContainer, false);
                 NeighborButton button = obj.GetComponent<NeighborButton>();
                 button.Configure(this, neighborNode, graph.edgeVisibility[(node.idn, neighborId)], node.visibility);
+                Debug.Log(obj);
             }
             neighborContainer.SetActive(true);
         } else {

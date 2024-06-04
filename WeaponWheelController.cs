@@ -25,8 +25,9 @@ public class WeaponWheelController : MonoBehaviour {
     float thetaDelta;
     List<ItemTemplate> items;
     public void Initialize() {
-        items = new List<ItemTemplate>(GameManager.I.gameData.levelState.plan.items);
-        items.Add(ItemTemplate.LoadItem("deck"));
+        items = GameManager.I.playerItemHandler.items.Where(item => item != null).Select(item => item.template).ToList();
+        // items = GameManager.I.gameData.levelState.plan.GetAllItems();
+        // items.Add(ItemTemplate.LoadItem("deck"));
 
         wheelOptions = new List<WeaponWheelOption>();
         foreach (Transform child in optionContainer) {
@@ -119,7 +120,7 @@ public class WeaponWheelController : MonoBehaviour {
     }
     void CloseMenu(ref PlayerInput input) {
         if (dialogueCoroutine != null) StopCoroutine(dialogueCoroutine);
-        Debug.Log($"closing menu with theta {selectedOption} {selectedOption.weapon} {selectedOption.item}");
+        // Debug.Log($"closing menu with theta {selectedOption} {selectedOption.weapon} {selectedOption.item}");
         if (selectedOption == null) {
             return;
         } else if (selectedOption.weapon != null && selectedOption.weapon == GameManager.I.gameData.playerState.primaryGun) {
@@ -130,7 +131,7 @@ public class WeaponWheelController : MonoBehaviour {
             input.selectgun = 3;
         } else if (selectedOption.item != null) {
             input.selectItem = selectedOption.item;
-            Debug.Log($"input: select item: {input.selectItem}");
+            // Debug.Log($"input: select item: {input.selectItem}");
         } else if (selectedOption.holster) {
             input.selectgun = -1;
         }

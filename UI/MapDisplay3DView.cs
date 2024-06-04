@@ -382,7 +382,8 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         if (mapShakeCoroutine != null) {
             StopCoroutine(mapShakeCoroutine);
         }
-        mapShakeCoroutine = StartCoroutine(ActivateMapShake(amount));
+        if (gameObject.activeInHierarchy)
+            mapShakeCoroutine = StartCoroutine(ActivateMapShake(amount));
     }
     IEnumerator ActivateSelectionBox(MapMarkerIndicator indicator) {
         WaitForSecondsRealtime briefPause = new WaitForSecondsRealtime(0.025f);

@@ -3905,24 +3905,29 @@ update the steam page graphic
 
 * broken loot spawning basically everywhere
 * broke some mission objectives
-* didnt bring cyberdeck on missions
 * 3rd person view -> menu broken
 * couldn't select gun in loadout screen
 * weird spawn point in elevator? 
 ? keys / data incrementing the counter to "2"
+* UI status bar doesn't appear when mission starts / appears when not needed
+    * hide all during after-action report
+    * show status bar when mission starts
+    * nodes discovered appears initially
+* didnt bring cyberdeck on missions
+* lots of broken UI around info panels
+* died and restarted mission, cyber graph state broken
 
 
+neighbor buttons not showing for alarm / power
 
-7. lots of broken UI around info panels
-UI status bar doesn't appear when mission starts / appears when not needed
-
+AI can spot you right when mission starts
 
 maps kind of messed up in mission planning
-    yamachi
+    * yamachi
     tower
+
 some things are weird about loadout / cyber loadout
     open the dialogue with only forbidden software- confusing
-4. died and restarted mission, cyber graph state broken
 add more cull padding to various lintels in elevator mission
 
 equipment plan:

@@ -53,7 +53,6 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
         gameData.playerState.ResetTemporaryState(plan);
-        // SceneData sceneData = SceneData.loadSceneData(template.initialScene);
         LoadScene(template.initialScene.name, () => StartMission(gameData.levelState, template.initialScene));
     }
 
@@ -80,16 +79,6 @@ public partial class GameManager : Singleton<GameManager> {
     }
     public void StartMission(LevelState state, SceneData sceneData, bool spawnNpcs = true, bool doCutscene = true) {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
-        if (SceneManager.GetSceneByName("UI").isLoaded) {
-            uiController.Initialize();
-            uiController.InitializeObjectivesController(gameData);
-        } else {
-            LoadScene("UI", () => {
-                uiController = GameObject.FindObjectOfType<UIController>();
-                uiController.Initialize();
-                uiController.InitializeObjectivesController(gameData);
-            }, unloadAll: false);
-        }
 
         LoadSkyboxForScene(sceneData);
         GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
@@ -163,6 +152,21 @@ public partial class GameManager : Singleton<GameManager> {
 
         lastObjectivesStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.objectiveDeltas.Select(objective => objective.status).ToList());
         lastOptionalObjectiveStatusHashCode = Toolbox.ListHashCode<ObjectiveStatus>(state.delta.optionalObjectiveDeltas.Select(objective => objective.status).ToList());
+
+        if (SceneManager.GetSceneByName("UI").isLoaded) {
+            uiController.Initialize();
+            uiController.ShowUI();
+            uiController.InitializeObjectivesController(gameData);
+        } else {
+            LoadScene("UI", () => {
+                uiController = GameObject.FindObjectOfType<UIController>();
+                uiController.Initialize();
+                uiController.ShowUI();
+                uiController.InitializeObjectivesController(gameData);
+            }, unloadAll: false);
+        }
+
+        SetOverlay(OverlayType.none);
 
         if (doCutscene)
             StartCutsceneCoroutine(StartMissionCutscene());
@@ -303,20 +307,15 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void LoadAfterActionReport() {
+        SetOverlay(OverlayType.none);
         MusicController.I.Stop();
         MusicController.I.PlaySimpleTrack(MusicTrack.bestLaidPlans);
         TransitionToPhase(GamePhase.afteraction);
         LoadScene("AfterAction", () => {
+            uiController.HideUI();
             NeoAfterActionReport handler = GameObject.FindObjectOfType<NeoAfterActionReport>();
             handler.Initialize(gameData);
         });
-    }
-
-    public void RandomFunctionThing() {
-        Debug.Log("function 1");
-    }
-    public void LogMe(string value) {
-        Debug.Log(value);
     }
 
     public void LoadScene(string targetScene, Action callback, bool unloadAll = true) {
@@ -329,8 +328,10 @@ public partial class GameManager : Singleton<GameManager> {
             int sceneCount = SceneManager.sceneCount;
             for (int i = 0; i < sceneCount; i++) {
                 string activeSceneName = SceneManager.GetSceneAt(i).name;
-                if (activeSceneName != "UI")
+                if (activeSceneName != "UI") {
                     scenesToUnload.Add(activeSceneName);
+                    Debug.Log($"[unload all] add scene to unload: {activeSceneName}");
+                }
             }
 
             // Debug.Log("show loading screen");
@@ -354,15 +355,19 @@ public partial class GameManager : Singleton<GameManager> {
         scenesLoading = new List<AsyncOperation>();
 
         // if target scene is in scenes to unload, then that means it must be loaded right now, so we want to reload it.
-        LoadSceneMode targetSceneLoadMode = scenesToUnload.Contains(targetScene) ? LoadSceneMode.Single : LoadSceneMode.Additive;
+        // LoadSceneMode targetSceneLoadMode = scenesToUnload.Contains(targetScene) ? LoadSceneMode.Single : LoadSceneMode.Additive;
+        if (scenesToUnload.Contains(targetScene)) {
+            Scene scene = SceneManager.GetSceneByName(targetScene);
+            yield return SceneManager.UnloadSceneAsync(scene);
+        }
         foreach (string sceneToLoad in scenesToLoad) {
-            if (sceneToLoad == targetScene) {
-                Debug.Log($"loading scene async {sceneToLoad} {targetSceneLoadMode}");
-                scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, targetSceneLoadMode));
-            } else {
-                Debug.Log($"loading scene async {sceneToLoad} {LoadSceneMode.Additive}");
-                scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive));
-            }
+            // if (sceneToLoad == targetScene) {
+            //     Debug.Log($"loading scene async {sceneToLoad} {targetSceneLoadMode}");
+            //     scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, targetSceneLoadMode));
+            // } else {
+            Debug.Log($"loading scene async {sceneToLoad} {LoadSceneMode.Additive}");
+            scenesLoading.Add(SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive));
+            // }
         }
         // don't unload the scene we just loaded!
         if (scenesToUnload.Contains(targetScene)) {

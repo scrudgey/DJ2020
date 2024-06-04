@@ -61,6 +61,7 @@ public class OverlayHandler : MonoBehaviour {
     public List<CyberNode> hackOriginToPathTarget;
     RectTransform activeInfoPane;
     Coroutine showInfoRoutine;
+    bool bound;
     public Camera cam {
         get { return _cam; }
         set {
@@ -75,10 +76,13 @@ public class OverlayHandler : MonoBehaviour {
         cyberdeckController.Hide();
     }
     public void Bind() {
-        GameManager.OnOverlayChange += HandleOverlayChange;
-        GameManager.OnPowerGraphChange += RefreshPowerGraph;
-        GameManager.OnCyberGraphChange += RefreshCyberGraph;
-        GameManager.OnAlarmGraphChange += RefreshAlarmGraph;
+        if (!bound) {
+            bound = true;
+            GameManager.OnOverlayChange += HandleOverlayChange;
+            GameManager.OnPowerGraphChange += RefreshPowerGraph;
+            GameManager.OnCyberGraphChange += RefreshCyberGraph;
+            GameManager.OnAlarmGraphChange += RefreshAlarmGraph;
+        }
 
         powerOverlay.overlayHandler = this;
         cyberOverlay.overlayHandler = this;
@@ -90,6 +94,11 @@ public class OverlayHandler : MonoBehaviour {
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
         RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
         HandleOverlayChange(GameManager.I.activeOverlayType, false);
+    }
+    public void ClearAllIndicatorsAndEdges() {
+        powerOverlay.ClearAllIndicatorsAndEdges();
+        cyberOverlay.ClearAllIndicatorsAndEdges();
+        alarmOverlay.ClearAllIndicatorsAndEdges();
     }
     void OnDestroy() {
         GameManager.OnOverlayChange -= HandleOverlayChange;
@@ -372,6 +381,7 @@ public class OverlayHandler : MonoBehaviour {
     }
     public void ShowInfoPane(RectTransform infoPane) {
         if (showInfoRoutine != null) {
+            Debug.Log($"[info pane] stop ease info pane");
             StopCoroutine(showInfoRoutine);
         }
         if (infoPane != activeInfoPane) {
@@ -394,6 +404,7 @@ public class OverlayHandler : MonoBehaviour {
         float y = infoPaneRect.anchoredPosition.y;
         float startX = infoPaneRect.anchoredPosition.x;
         float finishX = value ? -575 : -14;
+        Debug.Log($"[info pane] ease info pane: {value} {infoPaneRect} {startX}->{finishX}");
         yield return Toolbox.Ease(null, 0.5f, startX, finishX, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             infoPaneRect.anchoredPosition = new Vector2(amount, y);
         }, unscaledTime: true);

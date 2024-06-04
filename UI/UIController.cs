@@ -57,6 +57,7 @@ public class UIController : MonoBehaviour {
         interactiveHighlightHandler.cam = Camera.main;
         overlayHandler.uIController = this;
         overlayHandler.cam = Camera.main;
+        overlayHandler.ClearAllIndicatorsAndEdges();
         aimIndicatorHandler.UICamera = Camera.main;
         lockRadiusIndicatorHandler.UICamera = Camera.main;
         lockIndicatorHandler.UICamera = Camera.main;

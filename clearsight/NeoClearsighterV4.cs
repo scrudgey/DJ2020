@@ -70,7 +70,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     }
     void HandleNodeFocusChange(INodeCameraProvider indicator) {
         if (indicator == null) {
-            followTransform = GameManager.I.playerObject.transform;
+            followTransform = GameManager.I.playerObject?.transform ?? null;
         } else {
             string nodeId = indicator.GetNodeId();
             GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);

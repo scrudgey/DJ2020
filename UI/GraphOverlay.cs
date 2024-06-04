@@ -175,7 +175,16 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         renderer.positionCount = points.Count;
         renderer.SetPositions(points.ToArray());
     }
-
+    public void ClearAllIndicatorsAndEdges() {
+        foreach (Transform child in transform) {
+            if (child.name.ToLower().Contains("permanent")) continue;
+            Destroy(child.gameObject);
+        }
+        indicators = new Dictionary<U, V>();
+        lineRenderers = new Dictionary<(string, string), LineRenderer>();
+        soloLineRenders = new Dictionary<(string, string), LineRenderer>();
+        partialLineRenderers = new Dictionary<(string, string), LineRenderer>();
+    }
     protected V GetIndicator(U node) {
         if (indicators.ContainsKey(node)) {
             return indicators[node];

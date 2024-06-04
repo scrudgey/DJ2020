@@ -74,7 +74,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             SwitchToItem(items[index]);
         }
         if (input.selectItem != null) {
-            ItemInstance instance = items.Where(item => item.template == input.selectItem).FirstOrDefault();
+            ItemInstance instance = items.Where(item => item != null).Where(item => item.template == input.selectItem).FirstOrDefault();
             if (activeItem == instance && instance.toggleable) {
                 ClearItem();
             } else {

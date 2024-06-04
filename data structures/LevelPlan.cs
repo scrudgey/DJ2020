@@ -58,12 +58,18 @@ public record LevelPlan {
         };
     }
 
+    public List<ItemTemplate> GetAllItems() {
+        List<ItemTemplate> allItems = new List<ItemTemplate>(items);
+        allItems.Add(ItemTemplate.LoadItem("deck"));
+        return allItems;
+    }
+
     public bool startWithDisguise() => activeTactics.Any(tactic => tactic is TacticDisguise);
     // public bool startWithFakeID() => activeTactics.Any(tactic => tactic is TacticFakeID);
 
     public void ApplyState(GameObject playerObject) {
         foreach (ItemHandler itemHandler in playerObject.GetComponentsInChildren<ItemHandler>()) {
-            itemHandler.LoadItemState(items);
+            itemHandler.LoadItemState(GetAllItems());
             // if (startWithFakeID()) {
             //     itemHandler.items.Add(ItemInstance.LoadItem("ID"));
             // }
