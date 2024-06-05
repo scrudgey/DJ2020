@@ -21,6 +21,8 @@ public class SoftwareSelector : MonoBehaviour {
     [Header("disabled colorblock")]
     public ColorBlock disabledColorblock;
     public bool softwareEnabled;
+    public Color allowedSizeColor;
+    public Color forbiddenSizeColor;
 
     public void Initialize(SoftwareState softwareState, Action<SoftwareSelector> callback, bool softwareEnabled) {
         this.callback = callback;
@@ -52,6 +54,8 @@ public class SoftwareSelector : MonoBehaviour {
         mouseExitCallback?.Invoke(this);
     }
     public void SetInteractivility(bool value) {
+        sizeText.color = value ? allowedSizeColor : forbiddenSizeColor;
+        myButton.colors = value ? defaultColorblock : disabledColorblock;
         myButton.interactable = value;
     }
 }

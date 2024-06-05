@@ -8,7 +8,6 @@ public enum SkyBoxType { none, city }
 
 [CreateAssetMenu(menuName = "ScriptableObjects/SceneData")]
 public class SceneData : ScriptableObject {
-    public string sceneName;
     public string sceneDescriptor;
 
     public SkyBoxType skyBoxType;

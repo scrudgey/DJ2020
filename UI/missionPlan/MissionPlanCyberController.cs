@@ -87,6 +87,7 @@ public class MissionPlanCyberController : MonoBehaviour {
             softwareView.gameObject.SetActive(false);
         }
         SetListStorageText(null);
+        SetMainStorageText(null);
         yield return Toolbox.ChainCoroutines(
              Toolbox.Ease(null, 0.1f, start, end, PennerDoubleAnimation.Linear, (amount) => {
                  selectorRectTransform.sizeDelta = new Vector2(500f, amount);
@@ -110,8 +111,15 @@ public class MissionPlanCyberController : MonoBehaviour {
         softwareListStorageText.color = currentStorage > maxCapacity ? invalidColor : validColor;
         softwareListStorageText.text = $"storage: {currentStorage}/{maxCapacity} MB";
     }
-    void SetMainStorageText() {
+    void SetMainStorageText(SoftwareSelector selected) {
         int currentStorage = TotalStorageAmount();
+        if (selected == null) {
+
+        } else {
+            currentStorage -= selectedItemSlot?.template?.CalculateSize() ?? 0;
+            currentStorage += selected.softwareTemplate.CalculateSize();
+        }
+
         int maxCapacity = cyberdeck.storageCapacity;
         storageText.color = currentStorage > maxCapacity ? invalidColor : validColor;
         storageText.text = $"{currentStorage}/{maxCapacity} MB";
@@ -132,6 +140,8 @@ public class MissionPlanCyberController : MonoBehaviour {
                 SelectorMouseoverCallback(newselector);
             }
         }
+        SetListStorageText(null);
+        SetMainStorageText(null);
     }
     SoftwareSelector CreateSoftwareSelector(SoftwareTemplate template) {
         int currentStorage = TotalStorageAmount();
@@ -151,11 +161,13 @@ public class MissionPlanCyberController : MonoBehaviour {
     }
     public void SelectorMouseoverCallback(SoftwareSelector selector) {
         SetListStorageText(selector);
+        SetMainStorageText(selector);
         softwareView.gameObject.SetActive(true);
         softwareView.DisplayTemplate(selector.softwareTemplate);
     }
     public void SelectorMouseExitCallback(SoftwareSelector selector) {
         SetListStorageText(null);
+        SetMainStorageText(null);
     }
 
     void SetItemSlot(LoadoutCyberdeckSlot slot, SoftwareTemplate softwareTemplate) {
@@ -167,7 +179,7 @@ public class MissionPlanCyberController : MonoBehaviour {
         if (index < plan.softwareTemplates.Count) {
             plan.softwareTemplates[index] = softwareTemplate;
         }
-        SetMainStorageText();
+        SetMainStorageText(null);
     }
     public void SoftwareSlotClicked(LoadoutCyberdeckSlot button) {
         selectedItemSlot?.ShowHighlight(false);
@@ -182,6 +194,12 @@ public class MissionPlanCyberController : MonoBehaviour {
         PopulateSoftwareList(data.playerState);
         if (!softwareListIsShown)
             StartCoroutine(ShowSoftwareList(true));
+    }
+    public void SoftwareClearClicked(LoadoutCyberdeckSlot button) {
+        SetItemSlot(button, null);
+        if (softwareListIsShown) {
+            PopulateSoftwareList(data.playerState);
+        }
     }
 
     public void SlotMouseover(LoadoutCyberdeckSlot button) {

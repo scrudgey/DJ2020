@@ -231,7 +231,10 @@ public class MissionPlanLoadoutController : MonoBehaviour {
             Toolbox.RandomizeOneShot(audioSource, openPickerSounds, randomPitchWidth: 0.05f);
             StartPickerCoroutine(OpenPicker());
         }
+    }
 
+    public void CancelSelect() {
+        WeaponSlotClicked(0, null, clear: true);
     }
     public void ItemSlotClicked(int slotIndex, LoadoutGearSlotButton button) {
         // Debug.Log($"item slot {slotIndex} {button.item}");
@@ -263,11 +266,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         selectedWeaponSlot = 0;
     }
     public void StashPickerMouseOverCallback(LoadoutStashPickerButton picker) {
-        if (!statsOpen) return;
+        if (!statsOpen) {
+            ShowStatsView();
+        }
         switch (picker.type) {
             case LoadoutStashPickerButton.PickerType.gun:
-                // gunStatHandler.SetCompareGun(picker.gunstate.template);
-                // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
                 if (picker.gunstate != null && picker.gunstate.type == WeaponType.gun) {
                     gunStatHandler.DisplayGunState(picker.gunstate.gunInstance);
                 } else {
@@ -285,7 +288,10 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                     2 => secondaryWeaponButton,
                     3 => tertiaryWeaponButton
                 };
-                if (button == null || button.gunState == null) break;
+                if (button == null || button.gunState == null) {
+                    HideStatsView();
+                    break;
+                }
                 if (button.gunState.type == WeaponType.gun) {
                     gunStatHandler.DisplayGunState(button.gunState.gunInstance);
                 } else {

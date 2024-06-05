@@ -3449,8 +3449,35 @@ speed up + pitch up blitting?
 * progression in burglar tools
     * attachments
     * armor & armor piercing
-
-
+* broken loot spawning basically everywhere
+* broke some mission objectives
+* 3rd person view -> menu broken
+* couldn't select gun in loadout screen
+* weird spawn point in elevator? 
+? keys / data incrementing the counter to "2"
+* UI status bar doesn't appear when mission starts / appears when not needed
+    * hide all during after-action report
+    * show status bar when mission starts
+    * nodes discovered appears initially
+* didnt bring cyberdeck on missions
+* lots of broken UI around info panels
+* died and restarted mission, cyber graph state broken
+* neighbor buttons not showing for alarm / power
+* AI can spot you right when mission starts
+* maps kind of messed up in mission planning
+    * yamachi
+    * tower
+    * jack that data
+    * 711
+* red dot on mission planning map
+* lerp 
+* click on empty slot and mouse over a selector- 
+* open the dialogue with only forbidden software- confusing
+    * color storage red
+    * color background black
+    * on mouseover, change storage bar
+* cancel weapon select
+* add more cull padding to various lintels in elevator mission
 
 
 
@@ -3833,9 +3860,8 @@ tactics
     faster text blit
 
 burglar system
-    list all burglar tools
+    * list all burglar tools
     burglar tool mentor
-    intelligence gathering
     attack surface card reader attack
     attack surface for keycard reader
     electronic access control
@@ -3861,34 +3887,18 @@ more equipment to bring on mission?
     (item) duffel bag
         can be placed somewhere inside the mission ahead of time
     (item) fence cutters (self explanatory)
-    (item) high voltage bolt cutters
-
-    (tool) key duplicator
-        what is the purpose? only if someone will notice a missing key.
-        or a key is too hard to steal, but 
-    (tool) rfid sniffer
-    (tool) crowbar uses:
-        open doors
-        open elevator door
-        open hatch
-        open cars
-        break windows
-        melee weapon
-    (tool) power drill
-        can destroy a lock, but is noisy
-    (tool) safe cracking equipment
-        destructive / noisy vs. silent
-
+    equipment plan:
+        clear item slot
 
 unresolved mechanics / gameplay questions:
-    circuits
+    * circuits
+    * backpack and duffel bag
     progression in shops? 
         items, guns
-    * backpack and duffel bag
     selling data / upgrading hack ability
 
 
-record new gameplay footage
+
 
 
 
@@ -3898,40 +3908,12 @@ missions
     productionize office
         redo apartment after office
 key system
+    physical, keycard, password
 destructible walls
     gibs
     re-bake navmesh
 update the steam page graphic
 
-* broken loot spawning basically everywhere
-* broke some mission objectives
-* 3rd person view -> menu broken
-* couldn't select gun in loadout screen
-* weird spawn point in elevator? 
-? keys / data incrementing the counter to "2"
-* UI status bar doesn't appear when mission starts / appears when not needed
-    * hide all during after-action report
-    * show status bar when mission starts
-    * nodes discovered appears initially
-* didnt bring cyberdeck on missions
-* lots of broken UI around info panels
-* died and restarted mission, cyber graph state broken
 
-
-neighbor buttons not showing for alarm / power
-
-AI can spot you right when mission starts
-
-maps kind of messed up in mission planning
-    * yamachi
-    tower
-
-some things are weird about loadout / cyber loadout
-    open the dialogue with only forbidden software- confusing
-add more cull padding to various lintels in elevator mission
-
-equipment plan:
-    clear weapon/item slot
-    cancel weapon select
-    * lerp 
-
+record new gameplay footage
+* street culling issues

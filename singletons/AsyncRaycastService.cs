@@ -56,6 +56,7 @@ public partial class AsyncRaycastService : Singleton<AsyncRaycastService> {
     }
 
     public void RequestRaycast(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, Action<RaycastHit> callback) {
+        if (GameManager.I.isLoadingLevel) return;
         backBufferOrigins[index] = origin;
         backBufferDirections[index] = direction;
         backBufferDistances[index] = distance;

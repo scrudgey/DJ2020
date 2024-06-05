@@ -71,6 +71,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
     List<ObjectiveDelta> allObjectiveDeltas = new List<ObjectiveDelta>();
 
     public void InitializeWorldMode(SceneData sceneData) {
+        mode = Mode.mission;
         mapDisplay3Dgenerator.Initialize(sceneData);
         mapDisplayController.InitializeWorld(sceneData, this);
         Initialize(sceneData);
@@ -81,23 +82,22 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
     public void Initialize(LevelState state, SceneData sceneData) {
         this.state = state;
+        mode = Mode.mission;
         allObjectiveDeltas = state.delta.AllObjectives();
         Initialize(state.template, state.plan, sceneData);
         mapDisplay3Dgenerator.Initialize(state, sceneData);
-        mode = Mode.mission;
         mapDisplayController.HideInsertionPoints();
     }
     public void Initialize(LevelTemplate template, LevelPlan plan, SceneData sceneData) {
         this.plan = plan;
+        mode = Mode.plan;
         allObjectives = template.AllObjectives();
         mapDisplay3Dgenerator.Initialize(template, sceneData, plan);
         mapDisplayController.Initialize(template, sceneData, plan, this);
         Initialize(sceneData);
-        mode = Mode.plan;
     }
 
     public void Initialize(SceneData sceneData) {
-        mode = Mode.mission;
         this.sceneData = sceneData;
         floorPips = new List<Image>();
         selectionBoxImage.enabled = false;

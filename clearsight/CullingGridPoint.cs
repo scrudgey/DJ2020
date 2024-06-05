@@ -60,13 +60,7 @@ public class CullingGridPoint {
         RaycastHit[] hits = Physics.RaycastAll(ray, 100f, layerMask);
         HashSet<CullingComponent> cullingComponents = new HashSet<CullingComponent>();
         HashSet<RooftopZone> roofZones = new HashSet<RooftopZone>();
-        // Color color = orientation switch {
-        //     CharacterCamera.IsometricOrientation.NE => Color.red,
-        //     CharacterCamera.IsometricOrientation.SE => Color.clear,
-        //     CharacterCamera.IsometricOrientation.SW => Color.green,
-        //     CharacterCamera.IsometricOrientation.NW => Color.clear
-        // };
-        // Debug.DrawRay(position, 10f * ray.direction, Color.white);
+
 
         foreach (RaycastHit hit in hits) {
             if (hit.collider.bounds.Contains(position)) continue;
@@ -86,6 +80,17 @@ public class CullingGridPoint {
                 }
             }
             if (cullingComponent != null) {
+
+                if (cullingComponent.debug) {
+                    Color color = orientation switch {
+                        CharacterCamera.IsometricOrientation.NE => Color.red,
+                        CharacterCamera.IsometricOrientation.SE => Color.clear,
+                        CharacterCamera.IsometricOrientation.SW => Color.green,
+                        CharacterCamera.IsometricOrientation.NW => Color.clear
+                    };
+                    Debug.DrawRay(position, 10f * ray.direction, Color.white, 120);
+                }
+
                 TagSystem tagSystem = cullingComponent.GetComponent<TagSystem>();
                 if (tagSystem != null && tagSystem.data.invisibleOnPlayerFloor) {
 

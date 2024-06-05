@@ -221,7 +221,7 @@ public class MissionPlanTacticsController : MonoBehaviour {
     void InitializeDialogue(PurchaseTacticEntry entry) {
         staticObject.SetActive(true);
         ClearDialogueResponseContainer();
-        storeDialogueController.MoveDialogueBox(true);
+        storeDialogueController.MoveDialogueBox(false); // TODO: fixed?
         storeDialogueController.Clear();
         storeDialogueController.Initialize(GameManager.I.gameData.filename, entry.tactic.vendorName);
         storeDialogueController.SetImages(null);

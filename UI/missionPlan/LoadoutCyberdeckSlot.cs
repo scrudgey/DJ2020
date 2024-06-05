@@ -32,6 +32,10 @@ public class LoadoutCyberdeckSlot : MonoBehaviour {
     public void OnClick() {
         controller.SoftwareSlotClicked(this);
     }
+    public void OnClearClick() {
+        Clear();
+        controller.SoftwareClearClicked(this);
+    }
 
     public void ShowHighlight(bool value) {
         if (blinkHighlightRoutine != null) {
