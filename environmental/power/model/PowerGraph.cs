@@ -20,8 +20,8 @@ public class PowerGraph : Graph<PowerNode, PowerGraph> {
     }
     void DFS(PowerNode node) {
         node.powered = true;
-        if (node.getEnabled() && edges.ContainsKey(node.idn))
-            foreach (string neighborID in edges[node.idn]) {
+        if (node.getEnabled())
+            foreach (string neighborID in EnabledEdges(node.idn)) {
                 if (!nodes[neighborID].powered) {
                     // Debug.Log($"propagating from {node.idn} to {neighborID}");
                     DFS(nodes[neighborID]);

@@ -122,12 +122,17 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         if (overlayHandler.selectedNode == indicator1 || overlayHandler.selectedNode == indicator2) {
             doHighlight = true;
         }
-        renderer.material.color = doHighlight ? invulnerableColor : dimInvulnerableColor;
 
         bool edgeIsPartOfHackPath = overlayHandler.hackOriginToPathTarget.Contains(node1) && overlayHandler.hackOriginToPathTarget.Contains(node2);
-        if (edgeIsPartOfHackPath && threatPathRoutine == null) {
+
+        if (graph.disabledEdges.Contains((node1.idn, node2.idn))) {
+            renderer.material.color = Color.red;
+        } else if (edgeIsPartOfHackPath && threatPathRoutine == null) {
             renderer.material.color = compromisedColor;
+        } else {
+            renderer.material.color = doHighlight ? invulnerableColor : dimInvulnerableColor;
         }
+
 
         // if (node1.getStatus() == CyberNodeStatus.vulnerable && node2.getStatus() == CyberNodeStatus.compromised) {
         //     renderer.material.color = doHighlight ? vulnerableColor : dimVulnerableColor;

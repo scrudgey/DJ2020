@@ -8,7 +8,6 @@ public class AttackSurfaceWire : MonoBehaviour, INodeBinder<PowerNode>, INodeBin
     CyberNode INodeBinder<CyberNode>.node { get; set; }
     AlarmNode INodeBinder<AlarmNode>.node { get; set; }
 
-    // TODO: replace this with some sort of enum / selector
     public bool disablePowerNode;
     public bool disableCyberNode;
     public bool disableAlarmNode;

@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNodeComponent<T, U> where U : Node<U>, new() {
     public string idn;
     public string nodeTitle;
+    [HideInInspector]
     public bool nodeEnabled;
     [HideInInspector]
     public U node;

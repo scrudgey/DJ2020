@@ -32,7 +32,9 @@ public class BurglarCanvasController : MonoBehaviour {
     public Image keyCardImage;
     // public 
     public WireCutterToolIndicator wireCutterImage;
+    [Header("buttons")]
     public GameObject panelButton;
+    public GameObject returnCameraButton;
     [Header("tools")]
     public GameObject keyringButton;
     public GameObject probeToolButton;
@@ -44,7 +46,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public GameObject keycardButton;
 
     [Header("cyber")]
-    public CyberdeckCanvasController cyberdeckController;
+    // public CyberdeckCanvasController cyberdeckController;
     public RectTransform usbRectTransform;
     public GameObject usbCable;
     public bool usbCableAttached;
@@ -83,8 +85,12 @@ public class BurglarCanvasController : MonoBehaviour {
 
     float mouseOverTimeout;
 
+
+    Camera currentAttackCamera;
     public void Initialize(BurgleTargetData data) {
         this.data = data;
+        SetCamera(data.target.attackCam);
+
         finishing = false;
 
         if (data.target.obiSolver != null) {
@@ -96,6 +102,7 @@ public class BurglarCanvasController : MonoBehaviour {
         feedbackText.text = "";
         foreach (Transform child in uiElementsContainer) {
             if (child.name == "panelButton") continue;
+            if (child.gameObject == returnCameraButton) continue;
             Destroy(child.gameObject);
         }
         SetTool(BurglarToolType.none);
@@ -139,12 +146,13 @@ public class BurglarCanvasController : MonoBehaviour {
         }
 
         data.target.CreateTamperEvidence(data);
-
+        returnCameraButton.SetActive(false);
         panelButton.SetActive(data.target.replaceablePanel != null);
     }
     public void TearDown() {
         foreach (Transform child in uiElementsContainer) {
             if (child.name == "panelButton") continue;
+            if (child.gameObject == returnCameraButton) continue;
             Destroy(child.gameObject);
         }
         if (data != null)
@@ -199,7 +207,6 @@ public class BurglarCanvasController : MonoBehaviour {
         if (mouseOverTimeout > 0) {
             mouseOverTimeout -= Time.unscaledDeltaTime;
         }
-
     }
 
     public Ray MousePositionToAttackCamRay(Vector2 mousePosition) {
@@ -219,21 +226,30 @@ public class BurglarCanvasController : MonoBehaviour {
         // float rectWidth = (uiElementsRectTransform.anchorMax.x - uiElementsRectTransform.anchorMin.x) * Screen.width;
         // float rectHeight = (uiElementsRectTransform.anchorMax.y - uiElementsRectTransform.anchorMin.y) * Screen.height;
 
-        float rectWidth = (uiElementsRectTransform.anchorMax.x - uiElementsRectTransform.anchorMin.x) * data.target.attackCam.pixelWidth * pixelToCanvasRatio;
-        float rectHeight = (uiElementsRectTransform.anchorMax.y - uiElementsRectTransform.anchorMin.y) * data.target.attackCam.pixelHeight * pixelToCanvasRatio;
+        float rectWidth = (uiElementsRectTransform.anchorMax.x - uiElementsRectTransform.anchorMin.x) * currentAttackCamera.pixelWidth * pixelToCanvasRatio;
+        float rectHeight = (uiElementsRectTransform.anchorMax.y - uiElementsRectTransform.anchorMin.y) * currentAttackCamera.pixelHeight * pixelToCanvasRatio;
 
-        Vector3 viewPortPoint = new Vector3(cursorPoint.x / rectWidth, cursorPoint.y / rectHeight, data.target.attackCam.nearClipPlane);
+        Vector3 viewPortPoint = new Vector3(cursorPoint.x / rectWidth, cursorPoint.y / rectHeight, currentAttackCamera.nearClipPlane);
         // Debug.Log($"camImageTransform position: {camImageTransform.position}\ncursorpoint translated: {cursorPoint}\nnew viewportpoint: {viewPortPoint}\n rect: {rectWidth} x {rectHeight}");
 
-        Ray projection = data.target.attackCam.ViewportPointToRay(viewPortPoint);
+        Ray projection = currentAttackCamera.ViewportPointToRay(viewPortPoint);
 
         return projection;
+    }
+
+    void SetCamera(Camera camera) {
+        if (currentAttackCamera != null) {
+            currentAttackCamera.enabled = false;
+        }
+        currentAttackCamera = camera;
+        currentAttackCamera.enabled = true;
+        rawImage.texture = camera.targetTexture;
     }
 
     void RaycastToolPosition(Vector2 mousePosition) {
         Ray projection = MousePositionToAttackCamRay(mousePosition);
 
-        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.interactive, Layer.attackSurface, Layer.bulletOnly));
+        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.interactive, Layer.attackSurface, Layer.bulletOnly, Layer.skyboxNoLight));
         bool noHitFound = true;
         foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
             AttackSurfaceElement element = hit.collider.GetComponentInChildren<AttackSurfaceElement>();
@@ -266,7 +282,7 @@ public class BurglarCanvasController : MonoBehaviour {
 
         bool newMouseDown = input.mouseDown;
         if (newMouseDown != mouseDown && newMouseDown && !outOfBounds) {
-            ClickDownCallback(selectedElement);
+            ClickDown(selectedElement);
         }
         mouseDown = newMouseDown;
 
@@ -329,7 +345,7 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         HandleAttackResult(result);
     }
-    public void ClickDownCallback(AttackSurfaceElement element) {
+    public void ClickDown(AttackSurfaceElement element) {
         if (element == null || finishing)
             return;
         BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
@@ -337,7 +353,7 @@ public class BurglarCanvasController : MonoBehaviour {
     }
 
     public void HandleAttackResult(BurglarAttackResult result) {
-        if (selectedTool == BurglarToolType.usb && result.success) {
+        if (selectedTool == BurglarToolType.usb && result.success) { // TODO
             usbCableAttached = true;
             SetTool(BurglarToolType.none);
             usbRectTransform.position = result.element.uiElement.rectTransform.position;
@@ -345,47 +361,67 @@ public class BurglarCanvasController : MonoBehaviour {
             usbCableCanvasGroup.enabled = false;
             cyberdeckRect.transform.SetAsLastSibling();
             uSBCordTool.Slacken(true);
-            Rect bounds = Toolbox.GetTotalRenderBoundingBox(result.element.transform, data.target.attackCam);
+            Rect bounds = Toolbox.GetTotalRenderBoundingBox(result.element.transform, currentAttackCamera);
             uSBCordTool.SetSize(bounds.width / 1.8f);
-            cyberdeckController.HandleConnection(result);
+            // cyberdeckController.HandleConnection(result);
         }
         if (result != BurglarAttackResult.None) {
             AddText(result.feedbackText);
         }
+
         if (result.hideTamperEvidence) {
             data.target.tamperEvidence.gameObject.SetActive(false);
         } else if (result.revealTamperEvidence) {
             data.target.tamperEvidence.gameObject.SetActive(true);
         }
+
         if (result.makeTamperEvidenceSuspicious) {
             data.target.tamperEvidence.suspicious = true;
         }
+
         if (result.tamperEvidenceReportString != "") {
             data.target.tamperEvidence.reportText = result.tamperEvidenceReportString;
         }
+
         if (result.lockPositions != null)
             foreach (Vector3 lockPosition in result.lockPositions) {
                 CreateLockIndicator(lockPosition);
             }
+
         if (result.panel != null) {
             data.target.replaceablePanel = result.panel;
             panelButton.SetActive(true);
         }
+
         if (result.electricDamage != null) {
             foreach (IDamageReceiver receiver in data.burglar.transform.root.GetComponentsInChildren<IDamageReceiver>()) {
                 receiver.TakeDamage(result.electricDamage);
             }
             CloseBurglar(transitionCharacter: false);
         }
+
+        if (result.changeCamera != null) {
+            SetCamera(result.changeCamera);
+            ShowReturnButton();
+        }
+
         if (result.finish) {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
     }
 
+    void ShowReturnButton() {
+        returnCameraButton.SetActive(true);
+    }
+    public void ReturnButtonCallback() {
+        SetCamera(data.target.attackCam);
+        returnCameraButton.SetActive(false);
+    }
+
     void CloseBurglar(bool transitionCharacter = true) {
         ResetUSBTool();
-        cyberdeckController.CancelHackInProgress();
+        // cyberdeckController.CancelHackInProgress();
         if (data.target.obiSolver != null) {
             data.target.obiSolver.enabled = false;
         }
@@ -404,7 +440,7 @@ public class BurglarCanvasController : MonoBehaviour {
         RectTransform rectTransform = lockIndicatorObject.GetComponent<RectTransform>();
         rectTransform.anchorMin = Vector2.zero;
         rectTransform.anchorMax = Vector2.zero;
-        rectTransform.anchoredPosition = data.target.attackCam.WorldToScreenPoint(lockPosition);
+        rectTransform.anchoredPosition = currentAttackCamera.WorldToScreenPoint(lockPosition);
         rectTransform.sizeDelta = 100f * Vector2.one;
     }
 
@@ -598,7 +634,7 @@ public class BurglarCanvasController : MonoBehaviour {
     void ResetUSBTool() {
         usbCable.transform.SetParent(toolPoint, false);
         usbCable.transform.localPosition = Vector2.zero;
-        cyberdeckController.HandleConnection(null);
+        // cyberdeckController.HandleConnection(null);
         usbCableAttached = false;
         usbToolButton.SetActive(false);
         uSBCordTool.Slacken(false);

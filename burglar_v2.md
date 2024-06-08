@@ -193,9 +193,57 @@ specialized tools:
     11. UV-reactive powder and blacklight   - one route to decode keypad lock   - burglar tool / could be item slot?
 
 
+## implementation
+if we need different aspect ratios, we can always adjust the viewport rect dimensions relative to the game resolution
+change how text / highlights work in camera image
+
+1250 x 750
+625 x 375
+312.5 x 187.5
+156.25 x 93.75
+
+* attack surface has a circuit
+    * circuit has a camera
+    * camera has a render texture
+* when click on element (circuit board, etc) 
+    * result: change render texture and current camera
+    * use current camera for raycasting
+    * a button on burglar view is activated, and on click it returns us to the main camera
+    * raycast to skyboxnoshadow too
+* draw circuit, wires
+* snippable wires
+* wire configuration controlled by graph edges
+* snipping wires disables edges in graph
 
 
 
+broken connection display in overlay
+add circuit to more elements
+    laser component
+    alarm central
+
+circuit components
+    configurabe on hack surface?
+    RAM chip- keycard and keypad doors
+    door controller- play keycode to open door
+    alarm source
+    power source?
+    cyber source?
+an LED turns off when powered down
+
+new tool: multitool
+    connect to wire to discover connection
+    connect to ram to decode
+    1. LCD display with different modes
+    2. digits 1-9 light up when connected to something that allows input
+    3. probe that can connect to wires, chips- what does this look like?
+        it should be clear to the player that this tool cannot be used except for circuits- maybe it stays hidden until circuit view is active.
+        alligator clip
+        remove cyberdeck
+    
+
+draw more circuit board layouts
+randomized circuit layouts
 
 
 

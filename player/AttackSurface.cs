@@ -11,18 +11,16 @@ public class AttackSurface : MonoBehaviour {
     public bool useBurgleCam;
     [HideInInspector]
     public RenderTexture renderTexture;
+
     public Transform mainCameraPosition;
     public Outline outline;
     public Transform attackElementRoot;
     public float interactionDistance = 2f;
     public TamperEvidence tamperEvidence;
-    // public List<ObiRope> obiRopes;
-    // Dictionary<ObiRope, MeshCollider>
     Dictionary<MeshCollider, MeshFilter> ropeMeshes;
     Dictionary<MeshCollider, MeshRenderer> ropeRenderers;
     public AttackSurfaceVentCover replaceablePanel;
     public ObiSolver obiSolver;
-    // public GameObject playerPlane;
     public bool usePlayerPlane;
     public Vector3 playerPlaneNormal;
     public void Start() {
@@ -48,7 +46,6 @@ public class AttackSurface : MonoBehaviour {
         GameObject impactPrefab = Resources.Load("prefabs/tamperEvidence") as GameObject;
         GameObject obj = GameObject.Instantiate(impactPrefab, data.burglar.transform.position, Quaternion.identity);
         tamperEvidence = obj.GetComponent<TamperEvidence>();
-        // tamperEvidence.targetName = data.target.name;
         tamperEvidence.suspicionRecord = SuspicionRecord.tamperEvidenceSuspicion(data.target.name);
         tamperEvidence.reportText = "HQ respond. Someone has tampered with the equipment.";
         obj.SetActive(false);
@@ -86,7 +83,7 @@ public class AttackSurface : MonoBehaviour {
     public BurglarAttackResult HandleRopeCutting(Ray projection) {
         RefreshRopeColliders();
         BurglarAttackResult result = BurglarAttackResult.None;
-        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.attackSurface, Layer.bulletOnly));
+        RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.attackSurface, Layer.bulletOnly, Layer.skyboxNoLight));
         foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
             ObiRope rope = hit.collider.gameObject.GetComponent<ObiRope>();
             Debug.Log($"{hit.collider.gameObject} {rope}");

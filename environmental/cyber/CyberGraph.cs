@@ -177,7 +177,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
     }
 
     public CyberNode GetNearestCompromisedNode(CyberNode origin) {
-        foreach (String neighborId in edges[origin.idn]) {
+        foreach (String neighborId in EnabledEdges(origin.idn)) {
             CyberNode neighbor = nodes[neighborId];
             if (neighbor.getStatus() == CyberNodeStatus.compromised) {
                 return neighbor;
@@ -226,30 +226,29 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             return path;
         }
 
-        if (edges.ContainsKey(node.idn))
-            foreach (string neighborID in edges[node.idn]) {
-                if (visitedNodes.Contains(neighborID)) {
-                    continue;
-                }
-
-                CyberNode neighborNode = nodes[neighborID];
-                if (!neighborNode.getEnabled()) {
-                    continue;
-                    // } else if (node.visibility != NodeVisibility.mapped && neighborNode.visibility != NodeVisibility.mapped) {
-                } else if (edgeVisibility[(node.idn, neighborID)] == EdgeVisibility.unknown) {
-                    // neither node is mapped- edge is unknwon
-                    continue;
-                }
-
-                HashSet<string> newNodes = visitedNodes.ToHashSet();
-                HashSet<string> newPath = path.ToHashSet();
-                HashSet<string> output = DFS(neighborNode, newNodes, newPath, targetEvaluator);
-                if (output.Count == 0) {
-                    continue;
-                } else {
-                    return output;
-                }
+        foreach (string neighborID in EnabledEdges(node.idn)) {
+            if (visitedNodes.Contains(neighborID)) {
+                continue;
             }
+
+            CyberNode neighborNode = nodes[neighborID];
+            if (!neighborNode.getEnabled()) {
+                continue;
+                // } else if (node.visibility != NodeVisibility.mapped && neighborNode.visibility != NodeVisibility.mapped) {
+            } else if (edgeVisibility[(node.idn, neighborID)] == EdgeVisibility.unknown) {
+                // neither node is mapped- edge is unknwon
+                continue;
+            }
+
+            HashSet<string> newNodes = visitedNodes.ToHashSet();
+            HashSet<string> newPath = path.ToHashSet();
+            HashSet<string> output = DFS(neighborNode, newNodes, newPath, targetEvaluator);
+            if (output.Count == 0) {
+                continue;
+            } else {
+                return output;
+            }
+        }
         return new HashSet<string>();
     }
 

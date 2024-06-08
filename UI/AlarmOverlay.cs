@@ -5,10 +5,14 @@ using UnityEngine;
 
 public class AlarmOverlay : GraphOverlay<AlarmGraph, AlarmNode, AlarmNodeIndicator> {
     public override void SetEdgeState(LineRenderer renderer, AlarmNode node1, AlarmNode node2) {
-        renderer.material.color = colorSet.disabledColor;
-        if (edgeIsActive(node1, node2)) {
+        if (graph.disabledEdges.Contains((node1.idn, node2.idn))) {
+            renderer.material.color = Color.red;
+        } else if (edgeIsActive(node1, node2)) {
             renderer.material.color = colorSet.enabledColor;
+        } else {
+            renderer.material.color = colorSet.disabledColor;
         }
+
     }
 
     bool edgeIsActive(AlarmNode node1, AlarmNode node2) {

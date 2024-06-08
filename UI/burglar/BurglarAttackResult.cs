@@ -16,6 +16,9 @@ public record BurglarAttackResult {
     public List<Vector3> lockPositions;
     public AttackSurfaceVentCover panel;
     public ElectricalDamage electricDamage;
+
+    public Camera changeCamera;
+
     public static BurglarAttackResult None => new BurglarAttackResult {
         success = false,
         feedbackText = "",

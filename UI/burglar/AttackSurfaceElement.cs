@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 public class AttackSurfaceElement : MonoBehaviour, IBindable<AttackSurfaceElement> {
     public Action<AttackSurfaceElement> OnValueChanged { get; set; }
-    // public RectTransform rectTransform;
     public string elementName;
     [HideInInspector]
     public float progressPercent;

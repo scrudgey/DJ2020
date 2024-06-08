@@ -44,7 +44,18 @@ public partial class GameManager : Singleton<GameManager> {
                 break;
         }
     }
-
+    public void SetCyberEdgeDisabled(string from, string to) {
+        gameData.levelState.delta.cyberGraph.DisableEdge(from, to);
+        RefreshCyberGraph();
+    }
+    public void SetPowerEdgeDisabled(string from, string to) {
+        gameData.levelState.delta.powerGraph.DisableEdge(from, to);
+        RefreshPowerGraph();
+    }
+    public void SetAlarmEdgeDisabled(string from, string to) {
+        gameData.levelState.delta.alarmGraph.DisableEdge(from, to);
+        RefreshAlarmGraph();
+    }
     /* POWER NODE */
     public void SetPowerNodeState(PoweredComponent poweredComponent, bool state) {
         if (applicationIsQuitting) return;

@@ -13,11 +13,13 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     public SerializableDictionary<string, HashSet<string>> edges;
     public HashSet<(string, string)> edgePairs;
     public SerializableDictionary<(string, string), EdgeVisibility> edgeVisibility;
+    public HashSet<(string, string)> disabledEdges;
     public Graph() {
         nodes = new SerializableDictionary<string, T>();
         edgePairs = new HashSet<(string, string)>();
         edges = new SerializableDictionary<string, HashSet<string>>();
         edgeVisibility = new SerializableDictionary<(string, string), EdgeVisibility>();
+        disabledEdges = new HashSet<(string, string)>();
     }
     public T GetNode(string idn) {
         return nodes.ContainsKey(idn) ? nodes[idn] : null;
@@ -37,7 +39,29 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         edgePairs.Remove((to.idn, from.idn));
         // edgeArrays.Remove(new string[2] { from.idn, to.idn });
     }
-
+    public void DisableEdge(string fromId, string toId) {
+        disabledEdges.Add((fromId, toId));
+        disabledEdges.Add((toId, fromId));
+    }
+    public HashSet<string> EnabledEdges(string fromId) {
+        HashSet<string> output = new HashSet<string>();
+        if (edges.ContainsKey(fromId)) {
+            foreach (string toId in edges[fromId]) {
+                if (!disabledEdges.Contains((fromId, toId))) {
+                    output.Add(toId);
+                }
+            }
+        }
+        return output;
+    }
+    public List<T> Neighbors(Node<T> source) {
+        return edges
+        .GetValueOrDefault(source.idn, new HashSet<string>())
+        .Where(idn => !disabledEdges.Contains((source.idn, idn)))
+        .Select(idn => nodes.GetValueOrDefault(idn, null))
+        .Where(node => node != null)
+        .ToList();
+    }
     void AddLink(Node<T> from, Node<T> to) {
         if (from == to) return;
         if (!edges.ContainsKey(from.idn)) {
@@ -55,13 +79,6 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         edges[from.idn].Remove(to.idn);
     }
 
-    public List<T> Neighbors(Node<T> source) {
-        return edges
-        .GetValueOrDefault(source.idn, new HashSet<string>())
-        .Select(idn => nodes.GetValueOrDefault(idn, null))
-        .Where(node => node != null)
-        .ToList();
-    }
 
 
     public static W Load(TextAsset textAsset) {

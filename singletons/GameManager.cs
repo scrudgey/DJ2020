@@ -627,7 +627,7 @@ public partial class GameManager : Singleton<GameManager> {
             }
 
             if (inputMode == InputMode.aim && activeMenuType == MenuType.none) {
-                Debug.Log("[cursor]  cursor visible false");
+                // Debug.Log("[cursor]  cursor visible false");
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
                 resetMouseControl = true;
