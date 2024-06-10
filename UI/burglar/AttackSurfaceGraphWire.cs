@@ -9,8 +9,8 @@ public class AttackSurfaceGraphWire : AttackSurfaceElement { //, INodeBinder<Pow
     public bool isAlarm;
     public bool isPower;
     bool isCut;
-    string fromId;
-    string toId;
+    public string fromId;
+    public string toId;
     public void Initialize(string fromId, string toId) {
         this.fromId = fromId;
         this.toId = toId;
@@ -23,6 +23,14 @@ public class AttackSurfaceGraphWire : AttackSurfaceElement { //, INodeBinder<Pow
                 feedbackText = $"wire cut {fromId}->{toId}",
                 success = true,
                 makeTamperEvidenceSuspicious = true
+            };
+        } else if (activeTool == BurglarToolType.usb) {
+            // Toolbox.RandomizeOneShot(audioSource, attachSound);
+            return BurglarAttackResult.None with {
+                success = true,
+                feedbackText = "connected wire",
+                element = this,
+                // attachedCyberNode = node
             };
         } else {
             return BurglarAttackResult.None;

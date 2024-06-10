@@ -214,42 +214,36 @@ change how text / highlights work in camera image
 * snippable wires
 * wire configuration controlled by graph edges
 * snipping wires disables edges in graph
+* refactor tool selectors:
+    * bag starts out at top
+    * cyberdeck starts hidden
+    * when electronic panel selected, cyberdeck rises up too
+* mode: tool is out, usb not selected: show prompt
+* mode: usb selected: show "scanning..."
+* mode: usb selected, mouse over: show info on connected node
+* mouse exit not doing anything
+* start from "none"
+* when returning usb to anchor, reset to none
+* allow click to attach
 
 
-
+raycast can extend far
+draw more circuit board layouts
+randomized circuit layouts
+clicking unzips
 broken connection display in overlay
 add circuit to more elements
     laser component
     alarm central
+    router
 
 circuit components
-    configurabe on hack surface?
     RAM chip- keycard and keypad doors
     door controller- play keycode to open door
     alarm source
-    power source?
-    cyber source?
-an LED turns off when powered down
+    an LED turns off when powered down
 
-new tool: multitool
-    connect to wire to discover connection
-    connect to ram to decode
-    1. LCD display with different modes
-    2. digits 1-9 light up when connected to something that allows input
-    3. probe that can connect to wires, chips- what does this look like?
-        it should be clear to the player that this tool cannot be used except for circuits- maybe it stays hidden until circuit view is active.
-        alligator clip
-        remove cyberdeck
-    
-
-draw more circuit board layouts
-randomized circuit layouts
-
-
-
-
-
-
+mode: usb connected to ram chip: show decode mode
 
 
 
