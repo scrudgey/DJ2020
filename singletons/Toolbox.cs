@@ -855,6 +855,23 @@ public class Toolbox {
         }
         textmesh.color = color;
     }
+    public static IEnumerator BlinkColor(Image image, Color normalColor, Color offColor, int pulses = 7, bool unlimited = false) {
+        float timer = 0f;
+        int cycles = 0;
+        bool enable = false;
+        float duration = 0.025f;
+        while (cycles < pulses && !unlimited) {
+            timer += Time.unscaledDeltaTime;
+            if (timer > duration) {
+                enable = !enable;
+                timer -= duration;
+                cycles += 1;
+                image.color = enable ? normalColor : offColor;
+            }
+            yield return null;
+        }
+        image.color = normalColor;
+    }
     public static IEnumerator BlinkVis(Image image, Action inbetweener, float blinkInterval = 0.05f) {
         WaitForSecondsRealtime waiter = new WaitForSecondsRealtime(blinkInterval / 2f);
         image.enabled = false;
@@ -863,6 +880,7 @@ public class Toolbox {
         yield return waiter;
         image.enabled = true;
     }
+
 
     public static Vector3 Round(Vector3 vector3, int decimalPlaces = 2) {
         float multiplier = 1;

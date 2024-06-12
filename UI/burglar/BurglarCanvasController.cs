@@ -465,7 +465,6 @@ public class BurglarCanvasController : MonoBehaviour {
             Toolbox.RandomizeOneShot(audioSource, toolOverElementSound);
         }
         SetSelectedElement(element);
-
         if (selectedTool == BurglarToolType.usb) {
             multiToolController.MouseOverUIElementCallback(element);
         } else if (selectedTool == BurglarToolType.none) {

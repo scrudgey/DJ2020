@@ -29,6 +29,7 @@ public class ElevatorOccluder : MonoBehaviour {
         interloperMaterials = new Dictionary<Renderer, Material>();
         showZones = GameObject.FindObjectsOfType<ElevatorShowZone>().ToArray();
         foreach (Renderer renderer in renderers) {
+            if (renderer == null) continue;
             initialMaterials[renderer] = renderer.sharedMaterial;
             initialShadowCastingMode[renderer] = renderer.shadowCastingMode;
             interloperMaterials[renderer] = NeoClearsighter.NewInterloperMaterial(renderer);
@@ -46,7 +47,9 @@ public class ElevatorOccluder : MonoBehaviour {
             MakeTranslucent();
         } else if (showZones.Any(zone => zone.collider.bounds.Contains(GameManager.I.playerPosition))) {
             MakeOpaque();
-        } else if (!currentDoors.doorsAreClosed) {
+        } else if (currentDoors != null && !currentDoors.doorsAreClosed) {
+            MakeOpaque();
+        } else if (currentDoors == null) {
             MakeOpaque();
         } else {
             MakeInvisible();
@@ -67,6 +70,7 @@ public class ElevatorOccluder : MonoBehaviour {
 
     void MakeInvisible() {
         foreach (Renderer renderer in renderers) {
+            if (renderer == null) continue;
             renderer.material = initialMaterials[renderer];
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         }
@@ -74,6 +78,8 @@ public class ElevatorOccluder : MonoBehaviour {
 
     void MakeOpaque() {
         foreach (Renderer renderer in renderers) {
+            if (renderer == null) continue;
+
             renderer.material = initialMaterials[renderer];
             renderer.shadowCastingMode = initialShadowCastingMode[renderer];
         }
@@ -81,6 +87,8 @@ public class ElevatorOccluder : MonoBehaviour {
 
     void MakeTranslucent() {
         foreach (Renderer renderer in renderers) {
+            if (renderer == null) continue;
+
             if (renderer == counterWeightRenderer) {
                 renderer.material = initialMaterials[renderer];
                 renderer.shadowCastingMode = initialShadowCastingMode[renderer];

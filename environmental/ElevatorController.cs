@@ -43,7 +43,7 @@ public class ElevatorController : MonoBehaviour {
         foreach (ElevatorFloorData data in floors) {
             floorDictionary[data.floorNumber] = data;
             // Debug.Log($"closing doors {data.doors}");
-            data.doors.CloseDoors(silent: true);
+            data.doors?.CloseDoors(silent: true);
         }
         elevatorCar.CloseDoors();
         floorsAscending = floors.OrderBy(floor => floor.floorNumber).ToArray();
@@ -118,7 +118,7 @@ public class ElevatorController : MonoBehaviour {
             case State.move:
 
                 if (currentFloor != null && currentFloor != targetMoveFloor) {
-                    currentFloor.doors.CloseDoors();
+                    currentFloor.doors?.CloseDoors();
                 }
                 elevatorCar.CloseDoors();
 
@@ -151,8 +151,8 @@ public class ElevatorController : MonoBehaviour {
                 );
                 break;
             case State.load:
-                currentFloor.doors.elevatorIndicator.ShowLight(true);
-                currentFloor.doors.OpenDoors();
+                currentFloor.doors?.elevatorIndicator.ShowLight(true);
+                currentFloor.doors?.OpenDoors();
                 elevatorCar.OpenDoors();
                 coroutine = StartCoroutine(Toolbox.ChainCoroutines(
                     new WaitForSecondsRealtime(5f),
@@ -162,15 +162,15 @@ public class ElevatorController : MonoBehaviour {
                 ));
                 break;
             case State.idle:
-                currentFloor.doors.CloseDoors();
+                currentFloor.doors?.CloseDoors();
                 elevatorCar.CloseDoors();
                 break;
             case State.close:
                 if (currentFloor != null && currentFloor != targetMoveFloor) {
-                    currentFloor.doors.CloseDoors();
+                    currentFloor.doors?.CloseDoors();
                     elevatorCar.CloseDoors();
                     StartCoroutine(Toolbox.ChainCoroutines(
-                        currentFloor.doors.WaitForDoorsToShut(),
+                        currentFloor.doors?.WaitForDoorsToShut(),
                         new WaitForSecondsRealtime(1f),
                         Toolbox.CoroutineFunc(() => {
                             ChangeState(State.move);
@@ -248,10 +248,10 @@ public class ElevatorController : MonoBehaviour {
 
     void SetCurrentFloor(ElevatorFloorData data) {
         currentFloor = data;
-        currentFloor.doors.elevatorIndicator.ElevatorArrival();
-        data.doors.callButton.AnswerCallButton();
+        currentFloor.doors?.elevatorIndicator.ElevatorArrival();
+        data.doors?.callButton.AnswerCallButton();
         foreach (ElevatorFloorData floor in floors) {
-            floor.doors.elevatorIndicator.UpdateCurrentFloor(data.floorNumber);
+            floor.doors?.elevatorIndicator.UpdateCurrentFloor(data.floorNumber);
         }
         elevatorCar.SetCurrentFloor(data.floorNumber);
     }

@@ -51,6 +51,15 @@ public partial class GameManager : Singleton<GameManager> {
             case DoorLock.LockType.keycard:
                 AddKeyCard(keyId);
                 break;
+            case DoorLock.LockType.keycardCode:
+                AddKeycardCode(keyId);
+                break;
+            case DoorLock.LockType.keypadCode:
+                AddKeypadCode(keyId);
+                break;
+            case DoorLock.LockType.physicalCode:
+                AddPhysicalKeyCode(keyId);
+                break;
         }
         OnGameStateChange?.Invoke(new StatusUpdateData() {
             type = StatusUpdateData.StatusType.key,
@@ -66,9 +75,19 @@ public partial class GameManager : Singleton<GameManager> {
         gameData.levelState.delta.keycards.Add(keyId);
         OnItemPickup?.Invoke(0, $"{keyId}");
     }
-    public void CompleteAllObjectives() {
-
+    public void AddKeycardCode(int keyId) {
+        gameData.levelState.delta.keycardCodes.Add(keyId);
+        OnItemPickup?.Invoke(0, $"{keyId}");
     }
+    public void AddPhysicalKeyCode(int keyId) {
+        gameData.levelState.delta.physicalKeys.Add(keyId);
+        OnItemPickup?.Invoke(0, $"{keyId}");
+    }
+    public void AddKeypadCode(int keyId) {
+        gameData.levelState.delta.keypadCodes.Add(keyId);
+        OnItemPickup?.Invoke(0, $"{keyId}");
+    }
+
 
     public void CheckObjectives(ObjectiveDelta changedDelta) {
         if (gameData.phase != GamePhase.levelPlay) return;

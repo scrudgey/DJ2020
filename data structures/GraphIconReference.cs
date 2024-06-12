@@ -161,4 +161,14 @@ public class GraphIconReference : ScriptableObject {
         SoftwareEffect.Type.scanFile => effectScanFileIcon,
         _ => effectNoneIcon
     };
+
+    public Sprite KeyinfoSprite(KeyData data) => data.type switch {
+        KeyType.keycard => keyCard,
+        KeyType.physical => physicalKey,
+        KeyType.password => password,
+        KeyType.physicalCode => physicalKey,    // TODO
+        KeyType.keycardCode => keyCard,         // TODO
+        KeyType.keypadCode => keyCard,          // TODO
+        _ => keyCard
+    };
 }

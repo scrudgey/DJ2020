@@ -7,62 +7,53 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
     PowerNode INodeBinder<PowerNode>.node { get; set; }
     CyberNode INodeBinder<CyberNode>.node { get; set; }
     AlarmNode INodeBinder<AlarmNode>.node { get; set; }
-    public List<AttackSurfaceGraphWire> cyberWires;
-    public List<AttackSurfaceGraphWire> alarmWires;
-    public List<AttackSurfaceGraphWire> powerWires;
+    [Header("config")]
+    public DoorLock doorlockChipTarget;
+    [Header("circuits")]
+    public List<CircuitLayoutView> circuitLayouts;
+    CircuitLayoutView selectedCircuitLayout;
+
     public Camera myCamera;
     [HideInInspector]
     public RenderTexture renderTexture;
+
+
+    void MaybeSelectCircuit() {
+        if (selectedCircuitLayout == null) {
+            selectedCircuitLayout = Toolbox.RandomFromList(circuitLayouts);
+        }
+    }
     void INodeBinder<CyberNode>.HandleNodeChange() {
 
-    }
-    void INodeBinder<CyberNode>.NodeBindInitialize() {
-        CyberNode node = ((INodeBinder<CyberNode>)this).node;
-        List<CyberNode> neighbors = GameManager.I.gameData.levelState.delta.cyberGraph.Neighbors(node); // 0, 1
-        List<AttackSurfaceGraphWire> wires = cyberWires.OrderBy(item => Random.Range(0f, 1f)).ToList();
-        for (int i = 0; i < wires.Count; i++) {
-            if (i < neighbors.Count) {
-                wires[i].gameObject.SetActive(true);
-                wires[i].Initialize(node.idn, neighbors[i].idn);
-            } else {
-                wires[i].gameObject.SetActive(false);
-            }
-        }
     }
     void INodeBinder<PowerNode>.HandleNodeChange() {
 
     }
-    void INodeBinder<PowerNode>.NodeBindInitialize() {
-        PowerNode node = ((INodeBinder<PowerNode>)this).node;
-        List<PowerNode> neighbors = GameManager.I.gameData.levelState.delta.powerGraph.Neighbors(node); // 0, 1
-        List<AttackSurfaceGraphWire> wires = powerWires.OrderBy(item => Random.Range(0f, 1f)).ToList();
-
-        for (int i = 0; i < wires.Count; i++) {
-            if (i < neighbors.Count) {
-                wires[i].gameObject.SetActive(true);
-                wires[i].Initialize(node.idn, neighbors[i].idn);
-            } else {
-                wires[i].gameObject.SetActive(false);
-            }
-        }
-    }
     void INodeBinder<AlarmNode>.HandleNodeChange() {
 
     }
+
+    void INodeBinder<CyberNode>.NodeBindInitialize() {
+        CyberNode node = ((INodeBinder<CyberNode>)this).node;
+        MaybeSelectCircuit();
+        selectedCircuitLayout.InitializeCyber(node);
+    }
+
+    void INodeBinder<PowerNode>.NodeBindInitialize() {
+        PowerNode node = ((INodeBinder<PowerNode>)this).node;
+        MaybeSelectCircuit();
+        selectedCircuitLayout.InitializePower(node);
+    }
+
     void INodeBinder<AlarmNode>.NodeBindInitialize() {
         AlarmNode node = ((INodeBinder<AlarmNode>)this).node;
-        List<AlarmNode> neighbors = GameManager.I.gameData.levelState.delta.alarmGraph.Neighbors(node); // 0, 1
-        List<AttackSurfaceGraphWire> wires = alarmWires.OrderBy(item => Random.Range(0f, 1f)).ToList();
-        for (int i = 0; i < wires.Count; i++) {
-            if (i < neighbors.Count) {
-                wires[i].gameObject.SetActive(true);
-                wires[i].Initialize(node.idn, neighbors[i].idn);
-            } else {
-                wires[i].gameObject.SetActive(false);
-            }
-        }
+        MaybeSelectCircuit();
+        selectedCircuitLayout.InitializeAlarm(node);
     }
     public void Start() {
+        MaybeSelectCircuit();
+        selectedCircuitLayout.InitializeDoorlockChip(doorlockChipTarget);
+
         myCamera.enabled = false;
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         myCamera.targetTexture = renderTexture;

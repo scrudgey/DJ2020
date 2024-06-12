@@ -158,7 +158,7 @@ public class LevelDataUtilEditor : Editor {
         V[] components = GameObject.FindObjectsOfType<V>();
         string sceneName = SceneManager.GetActiveScene().name;
 
-        foreach (V component in components) {
+        foreach (V component in components.Where(component => component.linkedComponent == null)) {
             Guid guid = Guid.NewGuid();
             string idn = guid.ToString();
             Vector3 position = component.NodePosition();
@@ -169,6 +169,13 @@ public class LevelDataUtilEditor : Editor {
             U node = component.NewNode();
             node.sceneName = sceneName;
             graph.nodes[idn] = node;
+            EditorUtility.SetDirty(component);
+        }
+        foreach (V component in components.Where(component => component.linkedComponent != null)) {
+            string idn = component.linkedComponent.idn;
+            U node = graph.nodes[idn];
+            component.idn = idn;
+            component.enabled = true;
             EditorUtility.SetDirty(component);
         }
 

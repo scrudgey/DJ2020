@@ -61,7 +61,6 @@ public class EscapeMenuController : MonoBehaviour {
 
         int currentLoots = data.playerState.loots.Count;
         int currentData = data.playerState.payDatas.Count;
-        int numberPasswords = data.playerState.payDatas.Where(data => data.type == PayData.DataType.password).Count();
         int currentKeys = 0;
 
         if (data.phase == GamePhase.world) {
@@ -77,8 +76,7 @@ public class EscapeMenuController : MonoBehaviour {
         } else {
             currentLoots += data.levelState.delta.levelAcquiredLoot.Count;
             currentData += data.levelState.delta.levelAcquiredPaydata.Count;
-            numberPasswords += data.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.password).Count();
-            currentKeys = data.levelState.delta.physicalKeys.Count + data.levelState.delta.keycards.Count + numberPasswords;
+            currentKeys = data.levelState.totalNumberKeys();
 
             objectiveController.Initialize(data.levelState);
             mapDisplayView.Initialize(data.levelState, sceneData);

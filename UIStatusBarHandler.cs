@@ -33,8 +33,7 @@ public class UIStatusBarHandler : MonoBehaviour {
         currentCredits = data.playerState.credits + data.levelState.delta.levelAcquiredCredits;
         currentLoots = data.playerState.loots.Count + data.levelState.delta.levelAcquiredLoot.Count;
         currentData = data.playerState.payDatas.Count + data.levelState.delta.levelAcquiredPaydata.Count;
-        int numberPasswords = data.playerState.payDatas.Concat(data.levelState.delta.levelAcquiredPaydata).Where(data => data.type == PayData.DataType.password).Count();
-        currentKeys = data.levelState.delta.physicalKeys.Count + data.levelState.delta.keycards.Count + numberPasswords;
+        currentKeys = data.levelState.totalNumberKeys();
         SetTextAmounts();
     }
 

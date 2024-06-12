@@ -20,7 +20,7 @@ public class AttackSurfaceGraphWire : AttackSurfaceElement { //, INodeBinder<Pow
         if (activeTool == BurglarToolType.wirecutter && !isCut) {
             DoCut();
             return BurglarAttackResult.None with {
-                feedbackText = $"wire cut {fromId}->{toId}",
+                feedbackText = $"wire cut",
                 success = true,
                 makeTamperEvidenceSuspicious = true
             };

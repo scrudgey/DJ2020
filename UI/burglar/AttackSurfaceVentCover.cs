@@ -19,7 +19,9 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
         foreach (GameObject element in obscuredElements) {
             element.SetActive(false);
         }
+        if (obscuredRenderers != null)
         foreach (MeshRenderer renderer in obscuredRenderers) {
+            if (renderer == null) continue;
             renderer.enabled = false;
         }
     }

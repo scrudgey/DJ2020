@@ -16,10 +16,13 @@ public class EscapeMenuKeyController : MonoBehaviour {
         ClearView();
         List<KeyData> physicalKeys = delta.physicalKeys.Select(idn => new KeyData(KeyType.physical, idn)).ToList();
         List<KeyData> keycardKeys = delta.keycards.Select(idn => new KeyData(KeyType.keycard, idn)).ToList();
+        List<KeyData> keycardCodes = delta.keycardCodes.Select(idn => new KeyData(KeyType.keycardCode, idn)).ToList();
+        List<KeyData> physicalCodes = delta.physicalCodes.Select(idn => new KeyData(KeyType.physicalCode, idn)).ToList();
+        List<KeyData> keypadCodes = delta.keypadCodes.Select(idn => new KeyData(KeyType.keypadCode, idn)).ToList();
         List<KeyData> passwordKeys = delta.levelAcquiredPaydata
             .Where(data => data.type == PayData.DataType.password)
             .Select(data => new KeyData(KeyType.password, Random.Range(0, 100))).ToList();
-        PopulateKeyColumn(physicalKeys.Concat(keycardKeys).Concat(passwordKeys).ToList());
+        PopulateKeyColumn(physicalKeys.Concat(keycardKeys).Concat(passwordKeys).Concat(keycardCodes).Concat(physicalCodes).Concat(keypadCodes).ToList());
     }
 
     void PopulateKeyColumn(List<KeyData> keyDatas) {
@@ -28,6 +31,7 @@ public class EscapeMenuKeyController : MonoBehaviour {
         }
         bool selectedInitialValue = false;
         foreach (KeyData keyData in keyDatas) {
+            Debug.Log(keyData);
             GameObject obj = GameObject.Instantiate(keyEntryPrefab);
 
             KeyEntry entry = obj.GetComponent<KeyEntry>();

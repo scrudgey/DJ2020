@@ -1,4 +1,4 @@
-public enum KeyType { physical, keycard, password }
+public enum KeyType { physical, keycard, password, keycardCode, physicalCode, keypadCode }
 public class KeyData {
     public int idn;
     public KeyType type;

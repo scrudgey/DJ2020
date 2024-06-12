@@ -15,12 +15,7 @@ public class KeyEntry : MonoBehaviour {
     public void Configure(Action<KeyData> callback, KeyData data) {
         this.callback = callback;
         this.data = data;
-        icon.sprite = data.type switch {
-            KeyType.keycard => graphIconReference.keyCard,
-            KeyType.physical => graphIconReference.physicalKey,
-            KeyType.password => graphIconReference.password,
-            _ => graphIconReference.keyCard
-        };
+        icon.sprite = graphIconReference.KeyinfoSprite(data);
         icon.color = data.type == KeyType.password ? green : Color.white;
         nameText.text = $"{data.idn}";
     }

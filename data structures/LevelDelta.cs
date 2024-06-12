@@ -38,6 +38,11 @@ public record LevelDelta {
 
     public HashSet<int> physicalKeys;
     public HashSet<int> keycards;
+    public HashSet<int> keycardCodes;
+    public HashSet<int> physicalCodes;
+    public HashSet<int> keypadCodes;
+
+
     public int humansKilled;
     public SerializableDictionary<string, string> objectiveLocations;
     public List<SoftwareState> softwareStates;
@@ -50,6 +55,9 @@ public record LevelDelta {
         optionalObjectiveDeltas = new List<ObjectiveDelta>(),
         physicalKeys = new HashSet<int>(),
         keycards = new HashSet<int>(),
+        keycardCodes = new HashSet<int>(),
+        physicalCodes = new HashSet<int>(),
+        keypadCodes = new HashSet<int>(),
         objectiveLocations = new SerializableDictionary<string, string>(),
         softwareStates = new List<SoftwareState>()
     };

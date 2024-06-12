@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 [System.Serializable]
 public class DoorLock : MonoBehaviour {
-    public enum LockType { physical, keycard }
+    public enum LockType { physical, keycard, physicalCode, keycardCode, keypadCode }
     // public Door door;
     public AudioSource audioSource;
     public LockType lockType;
@@ -10,6 +10,7 @@ public class DoorLock : MonoBehaviour {
     public int lockId;
     public AudioClip[] unlockSounds;
     public Transform[] rotationElements;
+    public bool isDecoded;
 
     public bool TryKeyToggle(LockType keyType, int keyId) {
         if (keyType == lockType && keyId == lockId) {

@@ -196,54 +196,92 @@ specialized tools:
 ## implementation
 if we need different aspect ratios, we can always adjust the viewport rect dimensions relative to the game resolution
 change how text / highlights work in camera image
-
 1250 x 750
 625 x 375
 312.5 x 187.5
 156.25 x 93.75
 
-* attack surface has a circuit
-    * circuit has a camera
-    * camera has a render texture
-* when click on element (circuit board, etc) 
-    * result: change render texture and current camera
-    * use current camera for raycasting
-    * a button on burglar view is activated, and on click it returns us to the main camera
-    * raycast to skyboxnoshadow too
-* draw circuit, wires
-* snippable wires
-* wire configuration controlled by graph edges
-* snipping wires disables edges in graph
-* refactor tool selectors:
-    * bag starts out at top
-    * cyberdeck starts hidden
-    * when electronic panel selected, cyberdeck rises up too
-* mode: tool is out, usb not selected: show prompt
-* mode: usb selected: show "scanning..."
-* mode: usb selected, mouse over: show info on connected node
-* mouse exit not doing anything
-* start from "none"
-* when returning usb to anchor, reset to none
-* allow click to attach
 
 
-raycast can extend far
-draw more circuit board layouts
-randomized circuit layouts
+
+
+
+
+
+
+raycast can extend far?
 clicking unzips
 broken connection display in overlay
+multitool stays present when leaving burglar view
+remove attack surfaces from cyber objects
+allow keycard reader to read card in burglar view
+would be nice to zoom in to chip
+randomize the key
+error in permutations at index = 9?
+
+
+
+draw
+    jazz up multitool display
+    draw more circuit board layouts
+
 add circuit to more elements
-    laser component
-    alarm central
-    router
+    elevator keycard reader
+    alarm panel
+    create keypad lock
 
 circuit components
-    RAM chip- keycard and keypad doors
     door controller- play keycode to open door
     alarm source
     an LED turns off when powered down
 
-mode: usb connected to ram chip: show decode mode
+play sound on reveal
+
+
+
+
+
+
+don't click to remove panel AND jump into circuit
+change burglar tool captions etc.
+draw
+    draw ram chips
+    draw alligator clip
+    draw waveforms
+    icons for codes in escape menu
+
+* disable multitool buttons until in ram chip mode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -354,3 +392,53 @@ suppose we get a good answer to electronic hacking. is that enough to go forward
 
 3. gadgets- how?
     i like the idea that the player has a reprogramable key and keycard that integrates with the multitool.
+
+* attack surface has a circuit
+    * circuit has a camera
+    * camera has a render texture
+* when click on element (circuit board, etc) 
+    * result: change render texture and current camera
+    * use current camera for raycasting
+    * a button on burglar view is activated, and on click it returns us to the main camera
+    * raycast to skyboxnoshadow too
+* draw circuit, wires
+* snippable wires
+* wire configuration controlled by graph edges
+* snipping wires disables edges in graph
+* refactor tool selectors:
+    * bag starts out at top
+    * cyberdeck starts hidden
+    * when electronic panel selected, cyberdeck rises up too
+* mode: tool is out, usb not selected: show prompt
+* mode: usb selected: show "scanning..."
+* mode: usb selected, mouse over: show info on connected node
+* mouse exit not doing anything
+* start from "none"
+* when returning usb to anchor, reset to none
+* allow click to attach
+* announce decoded in some way
+* easings / coroutines
+    * ease in indicators
+    * flash buttons on reveal
+    * flash waveforms on correct
+    * flash total waveform on match
+* RAM chip- keycard and keypad doors
+* implement power analysis mode
+    * detect when entered code is correct  
+        * store key entry
+        * disable buttons
+    * mouse over ram chip
+* randomize waveforms per key
+* mode: usb connected to ram chip: show decode mode
+* randomized circuit layouts
+* add circuit board randomization before we add to everything
+    * laser component
+        * bridge from laser unit to control unit
+    * alarm central
+    * router
+    * transformer
+    * keycard reader
+        * move doorlock to keycard reader
+        * create ram chip
+
+
