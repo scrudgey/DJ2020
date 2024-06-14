@@ -1,17 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MultiToolController : MonoBehaviour {
-    enum State { none, usbScan, wireConnect, ramConnect }
+    enum State { none, usbScan, wireConnect, ramConnect, input }
     State state;
-    // mode: tool is out, usb not selected: show prompt
-    // mode: usb selected: show "scanning..."
-    // mode: usb selected, mouse over: show info on connected node
-    // mode: usb connected to ram chip: show decode mode
     public AudioSource audioSource;
     public AudioClip[] numberButtonTone;
     [Header("state none")]
@@ -43,7 +40,7 @@ public class MultiToolController : MonoBehaviour {
     public GameObject inputDisplay;
     public TextMeshProUGUI inputTextDisplay;
     public List<TextMeshProUGUI> inputNumerals;
-
+    public HorizontalLayoutGroup inputNumeralLayoutGroup;
 
     [Header("buttons")]
     public List<Button> buttons;
@@ -54,6 +51,7 @@ public class MultiToolController : MonoBehaviour {
     BurglarToolType currentTool;
     AttackSurfaceElement connectedElement;
     AttackSurfaceDoorLockChip currentDoorLockChip;
+    AttackSurfaceInputChip currentInputChip;
     int currentNumericSlotIndex;
     Coroutine highlightBlinkRoutine;
     public void Initialize() {
@@ -62,6 +60,7 @@ public class MultiToolController : MonoBehaviour {
         wireDisplay.SetActive(false);
         scanDisplay.SetActive(false);
         noneDisplay.SetActive(true);
+        inputDisplay.SetActive(false);
         ChangeState(State.none);
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
@@ -73,7 +72,9 @@ public class MultiToolController : MonoBehaviour {
             } else if (element is AttackSurfaceDoorLockChip) {
                 ChangeState(State.wireConnect);
                 wireDisplayText.text = $"RAM chip detected: door lock code";
-                // displayText.text = $"RAM chip detected: door lock code";
+            } else if (element is AttackSurfaceInputChip) {
+                ChangeState(State.wireConnect);
+                wireDisplayText.text = $"Key input chip detected";
             } else {
                 ChangeState(State.usbScan);
             }
@@ -147,9 +148,12 @@ public class MultiToolController : MonoBehaviour {
                 wireDisplay.SetActive(true);
                 break;
             case State.ramConnect:
-                currentNumericSlotIndex = 0;
                 ramDisplay.SetActive(true);
                 ramDisplayText.text = "power analysis";
+                break;
+            case State.input:
+                inputDisplay.SetActive(true);
+                inputTextDisplay.text = "input door code";
                 break;
         }
     }
@@ -167,6 +171,9 @@ public class MultiToolController : MonoBehaviour {
             case State.ramConnect:
                 ramDisplay.SetActive(false);
                 break;
+            case State.input:
+                inputDisplay.SetActive(false);
+                break;
         }
     }
 
@@ -179,25 +186,32 @@ public class MultiToolController : MonoBehaviour {
             if (result.element is AttackSurfaceDoorLockChip) {
                 ChangeState(State.ramConnect);
                 InitializePowerAnalysis((AttackSurfaceDoorLockChip)result.element);
+            } else if (result.element is AttackSurfaceInputChip) {
+                ChangeState(State.input);
+                InitializeInputChip((AttackSurfaceInputChip)result.element);
             }
         }
     }
 
     public void NumericButtonCallback(int digit) {
-        if (currentDoorLockChip?.doorLock.isDecoded ?? false) return;
         Toolbox.RandomizeOneShot(audioSource, numberButtonTone);
-        SetTargetDigit(currentNumericSlotIndex, digit);
-        if (!currentDoorLockChip.doorLock.isDecoded) {
-            currentNumericSlotIndex += 1;
-            if (currentNumericSlotIndex > 3) {
-                currentNumericSlotIndex = 0;
+        if (state == State.ramConnect) {
+            if (currentDoorLockChip?.doorLock.isDecoded ?? false) return;
+            SetTargetDigit(currentNumericSlotIndex, digit);
+            if (!currentDoorLockChip.doorLock.isDecoded) {
+                currentNumericSlotIndex += 1;
+                if (currentNumericSlotIndex > 3) {
+                    currentNumericSlotIndex = 0;
+                }
+                if (highlightBlinkRoutine != null) StopCoroutine(highlightBlinkRoutine);
+                for (int i = 0; i < 4; i++) {
+                    slotHighlights[i].enabled = i == currentNumericSlotIndex;
+                    if (i == currentNumericSlotIndex)
+                        highlightBlinkRoutine = StartCoroutine(blinker(slotHighlights[i]));
+                }
             }
-            if (highlightBlinkRoutine != null) StopCoroutine(highlightBlinkRoutine);
-            for (int i = 0; i < 4; i++) {
-                slotHighlights[i].enabled = i == currentNumericSlotIndex;
-                if (i == currentNumericSlotIndex)
-                    highlightBlinkRoutine = StartCoroutine(blinker(slotHighlights[i]));
-            }
+        } else if (state == State.input) {
+            InputDigit(digit);
         }
     }
     IEnumerator blinker(Image target) {
@@ -244,6 +258,7 @@ public class MultiToolController : MonoBehaviour {
     }
 
     void InitializePowerAnalysis(AttackSurfaceDoorLockChip chip) {
+        currentNumericSlotIndex = 0;
         currentDoorLockChip = chip;
         int lockId = chip.doorLock.lockId;
         waveformPermutation = chip.waveformPermutation;
@@ -277,7 +292,22 @@ public class MultiToolController : MonoBehaviour {
             );
         }
     }
-
+    void InitializeInputChip(AttackSurfaceInputChip chip) {
+        currentInputChip = chip;
+        int lockId = chip.doorLock.lockId;
+        currentNumericSlotIndex = 0;
+        foreach (Button button in buttons) {
+            button.interactable = true;
+        }
+        for (int i = 0; i < 4; i++) {
+            int digit = (int)Mathf.Abs((lockId / (Mathf.Pow(10, 3 - i))) % 10);
+            targetDigits[i] = digit;
+            enteredDigits[i] = -1;
+            inputNumerals[i].text = "-";
+            inputNumerals[i].color = waveformColor;
+        }
+        BlinkButtons();
+    }
 
     void CheckIfDecoded(DoorLock doorLock) {
         bool match = true;
@@ -359,11 +389,6 @@ public class MultiToolController : MonoBehaviour {
             wait,
             Toolbox.CoroutineFunc(() => {
                 buttons[8].colors = normalColors;
-                buttons[9].colors = colorBlock;
-            }),
-            wait,
-            Toolbox.CoroutineFunc(() => {
-                buttons[9].colors = normalColors;
             })
         ));
     }
@@ -404,5 +429,87 @@ public class MultiToolController : MonoBehaviour {
                 waveforms[3].color = waveformColor;
             })
         );
+    }
+
+    void InputDigit(int digit) {
+        enteredDigits[currentNumericSlotIndex] = digit;
+        inputNumerals[currentNumericSlotIndex].text = $"{digit}";
+        currentNumericSlotIndex += 1;
+        if (currentNumericSlotIndex > 3) {
+            bool match = true;
+            int keyId = 0;
+            for (int i = 0; i < 4; i++) {
+                match &= targetDigits[i] == enteredDigits[i];
+                keyId += enteredDigits[i] * (int)Mathf.Pow(10, 3 - i);
+            }
+
+            Debug.Log($"attempt to input: {keyId}");
+            if (currentInputChip.keycardReader != null) {
+                currentInputChip.keycardReader.AttemptSingleKey(keyId);
+            } else {
+                currentInputChip.doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+            }
+
+            // InitializeInputChip(currentInputChip);
+            if (match) {
+                StartCoroutine(SuccessfulDigitInput());
+            } else {
+                StartCoroutine(FailDigitInput());
+            }
+        }
+    }
+
+    IEnumerator SuccessfulDigitInput() {
+        foreach (Button button in buttons) {
+            button.interactable = false;
+        }
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(1f);
+        WaitForSecondsRealtime shortWait = new WaitForSecondsRealtime(0.08f);
+
+        yield return Toolbox.ChainCoroutines(
+             Toolbox.CoroutineFunc(() => inputNumerals[0].color = Color.white),
+             shortWait,
+             Toolbox.CoroutineFunc(() => {
+                 inputNumerals[0].color = waveformColor;
+                 inputNumerals[1].color = Color.white;
+             }),
+             shortWait,
+             Toolbox.CoroutineFunc(() => {
+                 inputNumerals[1].color = waveformColor;
+                 inputNumerals[2].color = Color.white;
+             }),
+             shortWait,
+             Toolbox.CoroutineFunc(() => {
+                 inputNumerals[2].color = waveformColor;
+                 inputNumerals[3].color = Color.white;
+             }),
+             shortWait,
+             Toolbox.CoroutineFunc(() => {
+                 inputNumerals[3].color = waveformColor;
+             })
+         );
+        yield return wait;
+        InitializeInputChip(currentInputChip);
+    }
+
+    IEnumerator FailDigitInput() {
+        foreach (Button button in buttons) {
+            button.interactable = false;
+        }
+        // RectTransform[] rectTransforms = inputNumerals.Select(numeral => numeral.GetComponent<RectTransform>()).ToArray();
+
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(1f);
+        yield return wait;
+        // foreach(RectTransform rectTransform in rectTransforms){
+        foreach (TextMeshProUGUI numeral in inputNumerals) {
+            numeral.color = Color.red;
+        }
+        yield return Toolbox.Ease(null, 0.5f, 200f, 0f, PennerDoubleAnimation.ElasticEaseOut, (amount) => {
+            inputNumeralLayoutGroup.padding.left = (int)amount;
+            inputNumeralLayoutGroup.padding.right = -(int)amount;
+        });
+        // }
+        InitializeInputChip(currentInputChip);
+
     }
 }

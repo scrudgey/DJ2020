@@ -20,10 +20,10 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
             element.SetActive(false);
         }
         if (obscuredRenderers != null)
-        foreach (MeshRenderer renderer in obscuredRenderers) {
-            if (renderer == null) continue;
-            renderer.enabled = false;
-        }
+            foreach (MeshRenderer renderer in obscuredRenderers) {
+                if (renderer == null) continue;
+                renderer.enabled = false;
+            }
     }
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
@@ -49,12 +49,15 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
         Toolbox.AudioSpeaker(transform.position, openSounds);
         ventSprite.enabled = false;
         foreach (GameObject parentVentObject in parentVentObjects) {
+            if (parentVentObject == null) continue;
             parentVentObject.SetActive(false);
         }
         foreach (GameObject element in obscuredElements) {
+            if (element == null) continue;
             element.SetActive(true);
         }
         foreach (MeshRenderer renderer in obscuredRenderers) {
+            if (renderer == null) continue;
             renderer.enabled = true;
         }
     }

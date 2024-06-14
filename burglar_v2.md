@@ -208,49 +208,45 @@ change how text / highlights work in camera image
 
 
 
+create keypad lock
 
-raycast can extend far?
+
+
 clicking unzips
 broken connection display in overlay
-multitool stays present when leaving burglar view
-remove attack surfaces from cyber objects
-allow keycard reader to read card in burglar view
+play sound on reveal code
 would be nice to zoom in to chip
 randomize the key
 error in permutations at index = 9?
 
-
+add circuit to more elements
+    elevator keycard reader
+    ? alarm panel
+? circuit components
+    ? alarm source
 
 draw
     jazz up multitool display
     draw more circuit board layouts
-
-add circuit to more elements
-    elevator keycard reader
-    alarm panel
-    create keypad lock
-
-circuit components
-    door controller- play keycode to open door
-    alarm source
-    an LED turns off when powered down
-
-play sound on reveal
-
-
-
-
-
-
-don't click to remove panel AND jump into circuit
-change burglar tool captions etc.
 draw
     draw ram chips
     draw alligator clip
-    draw waveforms
     icons for codes in escape menu
+change burglar tool captions etc.
+    it would be nice to highlight the element with a box and with text on mouseover
+    then blit text in, top left, with a lifetime
 
+
+* display lock status on LED chip
+. an LED turns off when powered down
+* multitool stays present when leaving burglar view
+* remove attack surfaces from cyber objects
+* allow keycard reader to read card in burglar view
+. raycast can extend far?
+* don't click to remove panel AND jump into circuit
+* draw waveforms
 * disable multitool buttons until in ram chip mode
+    * door controller- play keycode to open door
 
 
 

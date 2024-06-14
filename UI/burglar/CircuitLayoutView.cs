@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
-
 public class CircuitLayoutView : MonoBehaviour {
     [Header("wires")]
     public List<AttackSurfaceGraphWire> cyberWires;
@@ -11,7 +11,10 @@ public class CircuitLayoutView : MonoBehaviour {
 
     [Header("chips")]
     public AttackSurfaceDoorLockChip doorlockChip;
-    // add ram chips
+    public AttackSurfaceInputChip inputChip;
+    public GameObject powerLED;
+    public GameObject lockDisplayObject;
+    public TextMeshPro lockDisplayText;
 
     bool cyberNodeInitialized;
     bool alarmNodeInitialized;
@@ -64,6 +67,13 @@ public class CircuitLayoutView : MonoBehaviour {
             doorlockChip.Initialize(doorLock);
         }
     }
+    public void InitializeInputChip(DoorLock doorLock) {
+        lockDisplayObject.gameObject.SetActive(doorLock != null);
+        inputChip.gameObject.SetActive(doorLock != null);
+        if (doorLock != null) {
+            inputChip.Initialize(doorLock);
+        }
+    }
     void Start() {
         if (!cyberNodeInitialized) {
             foreach (AttackSurfaceGraphWire wire in cyberWires) {
@@ -79,6 +89,12 @@ public class CircuitLayoutView : MonoBehaviour {
             foreach (AttackSurfaceGraphWire wire in powerWires) {
                 wire.gameObject.SetActive(false);
             }
+        }
+    }
+
+    void Update() {
+        if (inputChip.isActiveAndEnabled && inputChip.doorLock != null) {
+            lockDisplayText.text = inputChip.doorLock.locked ? "door status:\nlocked" : "door status:\nunlocked";
         }
     }
 }

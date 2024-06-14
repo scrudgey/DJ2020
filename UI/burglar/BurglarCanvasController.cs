@@ -283,6 +283,7 @@ public class BurglarCanvasController : MonoBehaviour {
 
         bool newMouseDown = input.mouseDown;
         if (newMouseDown != mouseDown && newMouseDown && !outOfBounds) {
+            Debug.Log($"clickdown: {selectedElement}");
             ClickDown(selectedElement);
         }
         mouseDown = newMouseDown;
@@ -342,7 +343,6 @@ public class BurglarCanvasController : MonoBehaviour {
         BurglarAttackResult result = element.HandleClickHeld(selectedTool, data);
         if (result.success) {
             mouseOverElement = false;
-            // selectedElement = null;
             SetSelectedElement(null);
         }
         HandleAttackResult(result);
@@ -425,6 +425,7 @@ public class BurglarCanvasController : MonoBehaviour {
     }
 
     void CloseBurglar(bool transitionCharacter = true) {
+        ShowCyberDeck(false);
         ResetUSBTool();
         // cyberdeckController.CancelHackInProgress();
         if (data.target.obiSolver != null) {

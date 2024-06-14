@@ -27,7 +27,9 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
 
     }
     void INodeBinder<PowerNode>.HandleNodeChange() {
-
+        PowerNode node = ((INodeBinder<PowerNode>)this).node;
+        MaybeSelectCircuit();
+        selectedCircuitLayout.powerLED.SetActive(node.powered);
     }
     void INodeBinder<AlarmNode>.HandleNodeChange() {
 
@@ -53,6 +55,7 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
     public void Start() {
         MaybeSelectCircuit();
         selectedCircuitLayout.InitializeDoorlockChip(doorlockChipTarget);
+        selectedCircuitLayout.InitializeInputChip(doorlockChipTarget);
 
         myCamera.enabled = false;
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);

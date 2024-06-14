@@ -31,6 +31,21 @@ public class KeycardReader : Interactive {
             waveArm = true
         };
     }
+    public bool AttemptSingleKey(int keyId) {
+        bool success = doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+        AudioClip[] sound;
+        Color color;
+        if (success) {
+            sound = successSound;
+            color = successColor;
+        } else {
+            sound = failSound;
+            color = failColor;
+        }
+        Toolbox.RandomizeOneShot(audioSource, sound);
+        BlinkLight(color);
+        return success;
+    }
 
     void BlinkLight(Color newColor) {
         if (coroutine != null) {

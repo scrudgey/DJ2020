@@ -25,7 +25,7 @@ public class AttackSurfaceKeycardReader : AttackSurfaceElement {
             }
             if (success) {
                 Toolbox.RandomizeOneShot(audioSource, successSound);
-                elevatorController.EnableTemporaryAuthorization();
+                elevatorController?.EnableTemporaryAuthorization();
                 BlinkSuccessLight();
                 return BurglarAttackResult.None with {
                     success = true,
