@@ -428,7 +428,7 @@ public class Toolbox {
         Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
 
         if (useColliders) {
-            foreach (Collider collider in root.GetComponentsInChildren<Collider>()) {
+            foreach (Collider collider in root.GetComponents<Collider>()) {
                 // collider.bounds.size
                 Bounds bounds = collider.bounds;
                 Vector3 rescale = collider.transform.lossyScale;

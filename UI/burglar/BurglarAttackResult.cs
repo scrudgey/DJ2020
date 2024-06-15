@@ -18,6 +18,7 @@ public record BurglarAttackResult {
     public ElectricalDamage electricDamage;
 
     public Camera changeCamera;
+    public Renderer changeCameraQuad;
 
     public static BurglarAttackResult None => new BurglarAttackResult {
         success = false,

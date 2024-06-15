@@ -418,9 +418,13 @@ public class BurglarCanvasController : MonoBehaviour {
         }
 
         if (result.changeCamera != null) {
-            SetCamera(result.changeCamera);
-            ShowReturnButton();
-            ShowCyberDeck(true);
+            if (result.changeCameraQuad != null) {
+                StartCoroutine(zoomIntoCamera(result.changeCameraQuad, result.changeCamera));
+            } else {
+                SetCamera(result.changeCamera);
+                ShowReturnButton();
+                ShowCyberDeck(true);
+            }
         }
 
         if (result.finish) {
@@ -429,10 +433,72 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
 
+    IEnumerator zoomIntoCamera(Renderer quad, Camera changeCamera) {
+        quad.enabled = true;
+        changeCamera.enabled = true;
+
+
+
+        // camera = UnityEngine.Camera.main;
+        // halfViewport = (changeCamera.orthographicSize * changeCamera.aspect);
+        // Vector3 viewPos = changeCamera.WorldToViewportPoint( )
+
+        Vector3 displacement = quad.transform.position - currentAttackCamera.transform.position;
+        Vector3 forwardDisplacement = Vector3.Project(displacement, currentAttackCamera.transform.forward);
+
+        Vector3 initialQuadPosition = quad.transform.position;
+        Vector3 finalQuadPosition = currentAttackCamera.transform.position + forwardDisplacement;
+
+        Quaternion targetRotation = currentAttackCamera.transform.rotation;
+        Quaternion initialRotation = quad.transform.rotation;
+
+        Vector3 initialScale = quad.transform.localScale;
+
+        /*
+                   /  |
+                /     | h/2
+             /θ/2     |
+            *----------
+                d
+        tan θ = h / 2d
+        h = 2 d tan θ/2
+         */
+
+
+        float distance = forwardDisplacement.magnitude;
+
+        float rescaleStart = initialScale.y;
+        float rescaleFinish = 2f * distance * Mathf.Tan(Mathf.Deg2Rad * currentAttackCamera.fieldOfView / 2f);
+
+        yield return Toolbox.Ease(null, 0.5f, 0f, 1f, PennerDoubleAnimation.CubicEaseOut, (amount) => {
+            quad.transform.position = Vector3.Lerp(initialQuadPosition, finalQuadPosition, amount);
+            quad.transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, amount);
+        });
+        Transform parent = quad.transform.parent;
+        quad.transform.SetParent(null, true);
+        yield return Toolbox.Ease(null, 0.5f, rescaleStart, rescaleFinish, PennerDoubleAnimation.CubicEaseOut, (amount) => {
+            quad.transform.localScale = new Vector3(1.6f * amount, amount, 1f);
+        });
+
+        quad.transform.SetParent(parent, true);
+
+        quad.enabled = false;
+        quad.transform.position = initialQuadPosition;
+        quad.transform.rotation = initialRotation;
+        quad.transform.localScale = initialScale;
+
+        SetCamera(changeCamera);
+        ShowReturnButton();
+        ShowCyberDeck(true);
+    }
+
     void ShowReturnButton() {
         returnCameraButton.SetActive(true);
     }
     public void ReturnButtonCallback() {
+        if (selectedTool == BurglarToolType.usb) {
+            SetTool(BurglarToolType.none);
+        }
         SetCamera(data.target.attackCam);
         returnCameraButton.SetActive(false);
         ShowCyberDeck(false);

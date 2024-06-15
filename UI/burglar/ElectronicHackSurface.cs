@@ -17,6 +17,9 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
     [HideInInspector]
     public RenderTexture renderTexture;
 
+    public Renderer quad;
+    public Material quadMaterial;
+
 
     void MaybeSelectCircuit() {
         if (selectedCircuitLayout == null) {
@@ -60,12 +63,17 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
         myCamera.enabled = false;
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);
         myCamera.targetTexture = renderTexture;
+
+        quadMaterial.mainTexture = renderTexture;
+        quad.enabled = false;
     }
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
+        quadMaterial.mainTexture = myCamera.targetTexture;
         return BurglarAttackResult.None with {
-            changeCamera = myCamera
+            changeCamera = myCamera,
+            changeCameraQuad = quad,
         };
     }
 }

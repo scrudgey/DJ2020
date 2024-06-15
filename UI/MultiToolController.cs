@@ -226,7 +226,9 @@ public class MultiToolController : MonoBehaviour {
         enteredDigits[index] = value;
         ramBottomNumerals[index].text = $"{value}";
         ramBottomWaveImages[index].enabled = true;
-        ramBottomWaveImages[index].sprite = waveforms[waveformPermutation[value]];
+        Debug.Log($"permutations: {waveformPermutation.Count}\twaveforms: {waveforms.Count}\tdigit-1: {value - 1}\tpermutation: {waveformPermutation[value - 1]}");
+
+        ramBottomWaveImages[index].sprite = waveforms[waveformPermutation[value - 1]];
 
         if (value == targetDigits[index]) {
             slotIndicators[index].color = correctColor;
@@ -266,10 +268,11 @@ public class MultiToolController : MonoBehaviour {
             int digit = (int)Mathf.Abs((lockId / (Mathf.Pow(10, 3 - i))) % 10);
             targetDigits[i] = digit;
             enteredDigits[i] = -1;
-            ramTopWaveImages[i].sprite = waveforms[waveformPermutation[digit]];
+
+            ramTopWaveImages[i].sprite = waveforms[waveformPermutation[digit - 1]];
             if (chip.doorLock.isDecoded) {
                 ramBottomWaveImages[i].enabled = true;
-                ramBottomWaveImages[i].sprite = waveforms[waveformPermutation[digit]];
+                ramBottomWaveImages[i].sprite = waveforms[waveformPermutation[digit - 1]];
                 ramBottomNumerals[i].text = $"{digit}";
                 slotHighlights[i].enabled = false;
                 slotIndicators[i].enabled = true;

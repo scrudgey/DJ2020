@@ -213,8 +213,15 @@ randomize the key
 broken connection display in overlay
 
 
+sounds
+    play sound on reveal code
 
-clicking unzips
+
+
+
+
+
+
 
 add circuit to more elements
     elevator keycard reader
@@ -225,19 +232,33 @@ add circuit to more elements
 draw
     jazz up multitool display
     draw more circuit board layouts
-draw
     draw ram chips
     draw alligator clip
     icons for codes in escape menu
 
-play sound on reveal code
-error in permutations at index = 9?
-would be nice to zoom in to chip
+clicking unzips
+dont replace panel when in electrical view? / panel goes somewhere else
 
 
+    the quad has a size in world space
+    the quad is a distance from the camera
+    the camera has a fov (The vertical field of view of the Camera, in degrees)
 
+         /|
+      /   | h/2
+   /θ/2     |
+*----------
+     d
+tan θ = h / 2d
+h = 2 d tan θ/2
 
-
+* if we are going to scale perfectly, then we need:
+* shared material needs a reset of sorts
+* click 'return' button should put away usb tool
+* lerp quaternion should be relative to world space
+* resent electrical circuit position
+* would be nice to zoom in to chip
+* error in permutations at index = 9?
 * show tool names in-place when mouseover
 * change burglar tool captions etc.
     * it would be nice to highlight the element with a box and with text on mouseover
