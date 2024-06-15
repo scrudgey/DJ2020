@@ -29,7 +29,7 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
     void INodeBinder<PowerNode>.HandleNodeChange() {
         PowerNode node = ((INodeBinder<PowerNode>)this).node;
         MaybeSelectCircuit();
-        selectedCircuitLayout.powerLED.SetActive(node.powered);
+        selectedCircuitLayout.powerLED?.SetActive(node.powered);
     }
     void INodeBinder<AlarmNode>.HandleNodeChange() {
 

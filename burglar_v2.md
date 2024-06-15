@@ -209,15 +209,12 @@ change how text / highlights work in camera image
 
 
 create keypad lock
+randomize the key
+broken connection display in overlay
 
 
 
 clicking unzips
-broken connection display in overlay
-play sound on reveal code
-would be nice to zoom in to chip
-randomize the key
-error in permutations at index = 9?
 
 add circuit to more elements
     elevator keycard reader
@@ -232,11 +229,19 @@ draw
     draw ram chips
     draw alligator clip
     icons for codes in escape menu
-change burglar tool captions etc.
-    it would be nice to highlight the element with a box and with text on mouseover
-    then blit text in, top left, with a lifetime
+
+play sound on reveal code
+error in permutations at index = 9?
+would be nice to zoom in to chip
 
 
+
+
+
+* show tool names in-place when mouseover
+* change burglar tool captions etc.
+    * it would be nice to highlight the element with a box and with text on mouseover
+    * then blit text in, top left, with a lifetime
 * display lock status on LED chip
 . an LED turns off when powered down
 * multitool stays present when leaving burglar view

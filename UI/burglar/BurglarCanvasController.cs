@@ -23,7 +23,16 @@ public class BurglarCanvasController : MonoBehaviour {
     public RectTransform uiElementsRectTransform;
     public TextMeshProUGUI selectedToolText;
     public TextMeshProUGUI captionText;
-    public TextMeshProUGUI feedbackText;
+    Coroutine selectedToolTextRoutine;
+    Coroutine captionRoutine;
+    Coroutine elementHighlightTextRoutine;
+    public Color feedbackColor;
+    public Image elementHighlight;
+    public RectTransform elementHighlightRectTransform;
+    public TextMeshProUGUI elementHighlightText;
+
+    // public TextMeshProUGUI feedbackText;
+    public TerminalAnimation feedback;
     public RectTransform toolPoint;
     public Image probeImage;
     public Image lockpickImage;
@@ -100,10 +109,14 @@ public class BurglarCanvasController : MonoBehaviour {
 
         // initialize display
         captionText.text = "";
-        feedbackText.text = "";
+        elementHighlight.enabled = false;
+        elementHighlightText.text = "";
+        // feedbackText.text = "";
+        feedback.Clear();
         foreach (Transform child in uiElementsContainer) {
             if (child.name == "panelButton") continue;
             if (child.gameObject == returnCameraButton) continue;
+            if (child.gameObject == elementHighlight.gameObject) continue;
             Destroy(child.gameObject);
         }
         SetTool(BurglarToolType.none);
@@ -154,6 +167,7 @@ public class BurglarCanvasController : MonoBehaviour {
         foreach (Transform child in uiElementsContainer) {
             if (child.name == "panelButton") continue;
             if (child.gameObject == returnCameraButton) continue;
+            if (child.gameObject == elementHighlight.gameObject) continue;
             Destroy(child.gameObject);
         }
         if (data != null)
@@ -451,13 +465,21 @@ public class BurglarCanvasController : MonoBehaviour {
     }
 
     void AddText(string newLine) {
-        feedbackText.text = feedbackText.text + $"\n{newLine}";
-        string[] lines = feedbackText.text.Split('\n');
-        int numLines = lines.Length;
-        if (numLines > 3) {
-            feedbackText.text = "";
-            feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
-        }
+        // feedbackText.text = feedbackText.text + $"\n{newLine}";
+        // string[] lines = feedbackText.text.Split('\n');
+        // int numLines = lines.Length;
+        // if (numLines > 3) {
+        //     feedbackText.text = "";
+        //     feedbackText.text = $"{lines[1]}\n{lines[2]}\n{lines[3]}";
+        // } 
+        // feedback.
+        Writeln[] writes = new Writeln[1]{
+            new Writeln("", $"{newLine}", feedbackColor) {
+                destroyAfter = 5f,
+            }
+        };
+
+        feedback.DoWriteMany(writes);
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
         mouseOverElement = true;
@@ -469,15 +491,35 @@ public class BurglarCanvasController : MonoBehaviour {
         if (selectedTool == BurglarToolType.usb) {
             multiToolController.MouseOverUIElementCallback(element);
         } else if (selectedTool == BurglarToolType.none) {
-            captionText.text = $"Use {element.elementName}";
+            SetCaptionText($"Use {element.elementName}");
         } else {
-            captionText.text = $"Use {selectedTool} on {element.elementName}";
+            SetCaptionText($"Use {selectedTool} on {element.elementName}");
         }
+        elementHighlight.enabled = true;
+        SetHighlightText(element.elementName);
+        elementHighlightRectTransform.position = element.uiElement.rectTransform.position;
+        Rect bounds = Toolbox.GetTotalRenderBoundingBox(element.transform, currentAttackCamera, adjustYScale: false, useColliders: true);
+        elementHighlightRectTransform.sizeDelta = new Vector2(bounds.width, bounds.height);
         element.OnMouseOver();
+    }
+    void SetCaptionText(string content) {
+        if (captionRoutine != null) {
+            StopCoroutine(captionRoutine);
+        }
+        // captionRoutine = StartCoroutine(Toolbox.BlitText(captionText, content));
+        captionText.text = content;
+    }
+    void SetHighlightText(string content) {
+        if (elementHighlightTextRoutine != null) {
+            StopCoroutine(elementHighlightTextRoutine);
+        }
+        elementHighlightTextRoutine = StartCoroutine(Toolbox.BlitText(elementHighlightText, content));
     }
     public void MouseExitUIElementCallback(AttackSurfaceElement element) {
         captionText.text = "";
         mouseOverElement = false;
+        elementHighlight.enabled = false;
+        elementHighlightText.text = "";
         SetSelectedElement(null);
         if (selectedTool == BurglarToolType.usb) {
             multiToolController.MouseExitUIElementCallback(element);
@@ -491,10 +533,21 @@ public class BurglarCanvasController : MonoBehaviour {
         selectedElement = newElement;
     }
     public void MouseEnterToolButton(string toolName) {
-        selectedToolText.text = toolName;
+        if (selectedToolTextRoutine != null) {
+            StopCoroutine(selectedToolTextRoutine);
+        }
+        if (toolName.ToLower().Contains("none")) {
+            selectedToolText.text = "";
+        } else {
+            selectedToolTextRoutine = StartCoroutine(Toolbox.BlitText(selectedToolText, toolName));
+        }
     }
     public void MouseExitToolButton() {
-        selectedToolText.text = selectedTool.ToString();
+        if (selectedToolTextRoutine != null) {
+            StopCoroutine(selectedToolTextRoutine);
+        }
+        // selectedToolText.text = selectedTool.ToString();
+        selectedToolText.text = "";
     }
     public void ToolSelectCallback(string toolName) {
         // this is just so that we can properly wire up the buttons in unity editor.
@@ -536,7 +589,11 @@ public class BurglarCanvasController : MonoBehaviour {
         }
 
         selectedTool = toolType;
-        selectedToolText.text = toolType.ToString();
+        // selectedToolText.text = toolType.ToString();
+        if (selectedToolTextRoutine != null) {
+            StopCoroutine(selectedToolTextRoutine);
+        }
+        selectedToolText.text = "";
 
         lockpickToolButton.SetActive(true);
         probeToolButton.SetActive(true);
