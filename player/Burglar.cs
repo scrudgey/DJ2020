@@ -6,6 +6,7 @@ using UnityEngine;
 public class BurgleTargetData {
     public Burglar burglar;
     public AttackSurface target;
+    public Camera camera;
     public BurgleTargetData(AttackSurface target, Burglar burglar) {
         this.target = target;
         this.burglar = burglar;

@@ -19,6 +19,6 @@ public class HVACEntryPoint : Interactive {
 
     public override bool AllowInteraction() {
         // return true;
-        return ventCover == null || !ventCover.ventCoverIsShut;
+        return ventCover == null || ventCover.state == AttackSurfaceVentCover.State.closed;
     }
 }

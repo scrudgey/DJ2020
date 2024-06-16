@@ -19,7 +19,7 @@ public class AttackSurface : MonoBehaviour {
     public TamperEvidence tamperEvidence;
     Dictionary<MeshCollider, MeshFilter> ropeMeshes;
     Dictionary<MeshCollider, MeshRenderer> ropeRenderers;
-    public AttackSurfaceVentCover replaceablePanel;
+    // public AttackSurfaceVentCover replaceablePanel;
     public ObiSolver obiSolver;
     public bool usePlayerPlane;
     public Vector3 playerPlaneNormal;
@@ -50,10 +50,10 @@ public class AttackSurface : MonoBehaviour {
         tamperEvidence.reportText = "HQ respond. Someone has tampered with the equipment.";
         obj.SetActive(false);
     }
-    public void ReplacePanel() {
-        replaceablePanel?.ReplacePanel();
-        replaceablePanel = null;
-    }
+    // public void ReplacePanel() {
+    //     replaceablePanel?.ReplacePanel();
+    //     replaceablePanel = null;
+    // }
     public void EnableAttackSurface() {
         attackCam.enabled = true;
     }

@@ -14,7 +14,7 @@ public record BurglarAttackResult {
     public AttackSurfaceElement element;
     public CyberNode attachedCyberNode;
     public List<Vector3> lockPositions;
-    public AttackSurfaceVentCover panel;
+    // public AttackSurfaceVentCover panel;
     public ElectricalDamage electricDamage;
 
     public Camera changeCamera;

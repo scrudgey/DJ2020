@@ -42,7 +42,6 @@ public class BurglarCanvasController : MonoBehaviour {
     // public 
     public WireCutterToolIndicator wireCutterImage;
     [Header("buttons")]
-    public GameObject panelButton;
     public GameObject returnCameraButton;
     [Header("tools")]
     public GameObject keyringButton;
@@ -161,7 +160,7 @@ public class BurglarCanvasController : MonoBehaviour {
 
         data.target.CreateTamperEvidence(data);
         returnCameraButton.SetActive(false);
-        panelButton.SetActive(data.target.replaceablePanel != null);
+        // panelButton.SetActive(data.target.replaceablePanel != null);
     }
     public void TearDown() {
         foreach (Transform child in uiElementsContainer) {
@@ -364,6 +363,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public void ClickDown(AttackSurfaceElement element) {
         if (element == null || finishing)
             return;
+        data.camera = currentAttackCamera;
         BurglarAttackResult result = element.HandleSingleClick(selectedTool, data);
         HandleAttackResult(result);
     }
@@ -405,10 +405,13 @@ public class BurglarCanvasController : MonoBehaviour {
                 CreateLockIndicator(lockPosition);
             }
 
-        if (result.panel != null) {
-            data.target.replaceablePanel = result.panel;
-            panelButton.SetActive(true);
-        }
+        // if (result.panel != null) {
+        //     // data.target.replaceablePanel = result.panel;
+        //     // panelButton.SetActive(true);
+        //     // TODO
+
+        //     data.target.tamperEvidence.gameObject.SetActive(false);
+        // }
 
         if (result.electricDamage != null) {
             foreach (IDamageReceiver receiver in data.burglar.transform.root.GetComponentsInChildren<IDamageReceiver>()) {
@@ -465,17 +468,27 @@ public class BurglarCanvasController : MonoBehaviour {
          */
 
 
-        float distance = forwardDisplacement.magnitude;
-
-        float rescaleStart = initialScale.y;
-        float rescaleFinish = 2f * distance * Mathf.Tan(Mathf.Deg2Rad * currentAttackCamera.fieldOfView / 2f);
-
         yield return Toolbox.Ease(null, 0.5f, 0f, 1f, PennerDoubleAnimation.CubicEaseOut, (amount) => {
             quad.transform.position = Vector3.Lerp(initialQuadPosition, finalQuadPosition, amount);
             quad.transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, amount);
         });
+
         Transform parent = quad.transform.parent;
         quad.transform.SetParent(null, true);
+
+        // change position and scale simultaneously to bring it closer to camera
+        float distance = forwardDisplacement.magnitude;
+        float initialAngle = Mathf.Atan(quad.transform.localScale.y / distance);
+
+        float nearDistance = 0.35f;
+        float rescaleStart = 2f * nearDistance * Mathf.Tan(initialAngle);
+        float rescaleFinish = 2f * nearDistance * Mathf.Tan(Mathf.Deg2Rad * currentAttackCamera.fieldOfView / 2f);
+
+        Vector3 nearPosition = currentAttackCamera.transform.position + (forwardDisplacement.normalized * nearDistance);
+
+        quad.transform.position = nearPosition;
+        quad.transform.localScale = new Vector3(1.6f * rescaleStart, rescaleStart, 1f);
+
         yield return Toolbox.Ease(null, 0.5f, rescaleStart, rescaleFinish, PennerDoubleAnimation.CubicEaseOut, (amount) => {
             quad.transform.localScale = new Vector3(1.6f * amount, amount, 1f);
         });
@@ -514,11 +527,11 @@ public class BurglarCanvasController : MonoBehaviour {
         GameManager.I.CloseBurglar(transitionCharacter: transitionCharacter);
     }
 
-    public void ReplacePanelButtonCallback() {
-        data.target.ReplacePanel();
-        panelButton.SetActive(data.target.replaceablePanel != null);
-        data.target.tamperEvidence.gameObject.SetActive(false);
-    }
+    // public void ReplacePanelButtonCallback() {
+    //     data.target.ReplacePanel();
+    //     panelButton.SetActive(data.target.replaceablePanel != null);
+    //     data.target.tamperEvidence.gameObject.SetActive(false);
+    // }
 
     void CreateLockIndicator(Vector3 lockPosition) {
         GameObject lockIndicatorObject = GameObject.Instantiate(lockIndicatorPrefab);

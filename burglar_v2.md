@@ -237,20 +237,9 @@ draw
     icons for codes in escape menu
 
 clicking unzips
+
 dont replace panel when in electrical view? / panel goes somewhere else
 
-
-    the quad has a size in world space
-    the quad is a distance from the camera
-    the camera has a fov (The vertical field of view of the Camera, in degrees)
-
-         /|
-      /   | h/2
-   /θ/2     |
-*----------
-     d
-tan θ = h / 2d
-h = 2 d tan θ/2
 
 * if we are going to scale perfectly, then we need:
 * shared material needs a reset of sorts
