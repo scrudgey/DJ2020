@@ -9,6 +9,7 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
     AlarmNode INodeBinder<AlarmNode>.node { get; set; }
     [Header("config")]
     public DoorLock doorlockChipTarget;
+    public ElevatorController elevatorController;
     [Header("circuits")]
     public List<CircuitLayoutView> circuitLayouts;
     CircuitLayoutView selectedCircuitLayout;
@@ -58,7 +59,7 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
     public void Start() {
         MaybeSelectCircuit();
         selectedCircuitLayout.InitializeDoorlockChip(doorlockChipTarget);
-        selectedCircuitLayout.InitializeInputChip(doorlockChipTarget);
+        selectedCircuitLayout.InitializeInputChip(doorlockChipTarget, elevatorController);
 
         myCamera.enabled = false;
         renderTexture = new RenderTexture(1250, 750, 16, RenderTextureFormat.Default);

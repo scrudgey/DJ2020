@@ -5,8 +5,10 @@ using UnityEngine;
 public class AttackSurfaceInputChip : AttackSurfaceElement {
     public DoorLock doorLock;
     public KeycardReader keycardReader;
-    public void Initialize(DoorLock doorLock) {
+    public ElevatorController elevatorController;
+    public void Initialize(DoorLock doorLock, ElevatorController elevatorController) {
         this.doorLock = doorLock;
+        this.elevatorController = elevatorController;
     }
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {

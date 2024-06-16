@@ -448,9 +448,13 @@ public class MultiToolController : MonoBehaviour {
 
             Debug.Log($"attempt to input: {keyId}");
             if (currentInputChip.keycardReader != null) {
-                currentInputChip.keycardReader.AttemptSingleKey(keyId);
+                bool success = currentInputChip.keycardReader.AttemptSingleKey(keyId);
+                if (success)
+                    currentInputChip.elevatorController?.EnableTemporaryAuthorization();
             } else {
-                currentInputChip.doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+                bool success = currentInputChip.doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+                if (success)
+                    currentInputChip.elevatorController?.EnableTemporaryAuthorization();
             }
 
             // InitializeInputChip(currentInputChip);

@@ -67,11 +67,11 @@ public class CircuitLayoutView : MonoBehaviour {
             doorlockChip.Initialize(doorLock);
         }
     }
-    public void InitializeInputChip(DoorLock doorLock) {
+    public void InitializeInputChip(DoorLock doorLock, ElevatorController elevatorController) {
         lockDisplayObject.gameObject.SetActive(doorLock != null);
         inputChip.gameObject.SetActive(doorLock != null);
         if (doorLock != null) {
-            inputChip.Initialize(doorLock);
+            inputChip.Initialize(doorLock, elevatorController);
         }
     }
     void Start() {

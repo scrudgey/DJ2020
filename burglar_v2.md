@@ -212,7 +212,6 @@ create keypad lock
 randomize the key
 broken connection display in overlay
 
-
 sounds
     play sound on reveal code
 
@@ -223,11 +222,8 @@ sounds
 
 
 
-add circuit to more elements
-    elevator keycard reader
-    ? alarm panel
-? circuit components
-    ? alarm source
+? alarm panel
+? alarm source
 
 draw
     jazz up multitool display
@@ -236,11 +232,12 @@ draw
     draw alligator clip
     icons for codes in escape menu
 
-clicking unzips
-
-dont replace panel when in electrical view? / panel goes somewhere else
+maybe a button for switching back to hand
 
 
+* elevator keycard reader
+* clicking unzips
+* dont replace panel when in electrical view? / panel goes somewhere else
 * if we are going to scale perfectly, then we need:
 * shared material needs a reset of sorts
 * click 'return' button should put away usb tool

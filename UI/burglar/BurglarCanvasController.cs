@@ -71,8 +71,8 @@ public class BurglarCanvasController : MonoBehaviour {
     public AudioClip[] toolOverElementSound;
     [Header("selectors")]
     // public RectTransform mainPanelRect;
-    // public RectTransform selectorRect;
-    // public RectTransform burglarToolsRect;
+    public RectTransform selectorRect;
+    public RectTransform burglarToolsRect;
     public RectTransform cyberdeckRect;
     // public GameObject burglarSelectorObject;
     // public GameObject cyberdeckSelectorObject;
@@ -160,7 +160,6 @@ public class BurglarCanvasController : MonoBehaviour {
 
         data.target.CreateTamperEvidence(data);
         returnCameraButton.SetActive(false);
-        // panelButton.SetActive(data.target.replaceablePanel != null);
     }
     public void TearDown() {
         foreach (Transform child in uiElementsContainer) {
@@ -309,7 +308,6 @@ public class BurglarCanvasController : MonoBehaviour {
             if (selectedTool == BurglarToolType.none) {
                 DoneButtonCallback();
             } else {
-                // SetTool(BurglarToolType.none);
                 ToolSelectCallback("none");
             }
         } else if (input.mouseDown && outOfBounds) {
@@ -404,14 +402,6 @@ public class BurglarCanvasController : MonoBehaviour {
             foreach (Vector3 lockPosition in result.lockPositions) {
                 CreateLockIndicator(lockPosition);
             }
-
-        // if (result.panel != null) {
-        //     // data.target.replaceablePanel = result.panel;
-        //     // panelButton.SetActive(true);
-        //     // TODO
-
-        //     data.target.tamperEvidence.gameObject.SetActive(false);
-        // }
 
         if (result.electricDamage != null) {
             foreach (IDamageReceiver receiver in data.burglar.transform.root.GetComponentsInChildren<IDamageReceiver>()) {
@@ -810,9 +800,11 @@ public class BurglarCanvasController : MonoBehaviour {
         DoneButtonCallback();
     }
 
-    // public void BurglarSelectorCallback() {
-    //     ChangeMode(Mode.burglarTool);
-    // }
+    public void BurglarSelectorCallback() {
+        burglarToolMaskRect.sizeDelta = new Vector2(0, 300);
+        ShowBurglarTools(true);
+        StartCoroutine(MoveRectY(selectorRect, 106, -100, PennerDoubleAnimation.Linear));
+    }
     // public void CyberdeckSelectorCallback() {
     //     ChangeMode(Mode.cyberdeck);
     // }
@@ -881,38 +873,35 @@ public class BurglarCanvasController : MonoBehaviour {
     //     }
     // }
     // void HideSelectorPanel(bool value) {
-    //     if (moveSelectorPanelCoroutine != null) {
-    //         StopCoroutine(moveSelectorPanelCoroutine);
-    //     }
+    //     // if (moveSelectorPanelCoroutine != null) {
+    //     //     StopCoroutine(moveSelectorPanelCoroutine);
+    //     // }
     //     if (value) {
-    //         moveSelectorPanelCoroutine = StartCoroutine(MoveRectY(selectorRect, 0, -100, moveSelectorPanelCoroutine, PennerDoubleAnimation.Linear));
+    //         StartCoroutine(MoveRectY(selectorRect, 0, -100, PennerDoubleAnimation.Linear));
     //     } else {
-    //         moveSelectorPanelCoroutine = StartCoroutine(MoveRectY(selectorRect, -100, 0, moveSelectorPanelCoroutine, PennerDoubleAnimation.Linear));
+    //         StartCoroutine(MoveRectY(selectorRect, -100, 0, PennerDoubleAnimation.Linear));
     //     }
     // }
-    // void ShowBurglarTools(bool value) {
-    //     if (exposeBurglarToolsCoroutine != null) {
-    //         StopCoroutine(exposeBurglarToolsCoroutine);
-    //     }
-    //     if (value) {
-    //         Toolbox.RandomizeOneShot(audioSource, burglarBagShowSound);
-    //         exposeBurglarToolsCoroutine = StartCoroutine(
-    //             Toolbox.ChainCoroutines(MoveRectY(burglarToolsRect, -313, -40, exposeBurglarToolsCoroutine, PennerDoubleAnimation.BounceEaseOut), UnzipBurglarKit())
-    //         );
-    //     } else {
-    //         exposeBurglarToolsCoroutine = StartCoroutine(MoveRectY(burglarToolsRect, burglarToolsRect.anchoredPosition.y, -313, exposeBurglarToolsCoroutine, PennerDoubleAnimation.ExpoEaseOut));
-    //     }
-    // }
+    void ShowBurglarTools(bool value) {
+        if (value) {
+            Toolbox.RandomizeOneShot(audioSource, burglarBagShowSound);
+            StartCoroutine(
+               Toolbox.ChainCoroutines(MoveRectY(burglarToolsRect, -313, -40, PennerDoubleAnimation.BounceEaseOut), UnzipBurglarKit())
+           );
+        } else {
+            StartCoroutine(MoveRectY(burglarToolsRect, burglarToolsRect.anchoredPosition.y, -313, PennerDoubleAnimation.ExpoEaseOut));
+        }
+    }
     void ShowCyberDeck(bool value) {
         if (exposeCyberdeckCoroutine != null) {
             StopCoroutine(exposeCyberdeckCoroutine);
         }
         if (value) {
             // Toolbox.RandomizeOneShot(audioSource, cyberdeckShowSound);
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -515, 127, exposeCyberdeckCoroutine, PennerDoubleAnimation.BounceEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -515, 127, PennerDoubleAnimation.BounceEaseOut));
             multiToolController.Initialize();
         } else {
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, cyberdeckRect.anchoredPosition.y, -515, exposeCyberdeckCoroutine, PennerDoubleAnimation.ExpoEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, cyberdeckRect.anchoredPosition.y, -515, PennerDoubleAnimation.ExpoEaseOut));
             ResetUSBTool();
         }
     }
@@ -929,7 +918,7 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         rect.sizeDelta = new Vector2(1256, 300);
     }
-    IEnumerator MoveRectY(RectTransform rect, float startY, float endY, Coroutine routine, Func<double, double, double, double, double> easing) {
+    IEnumerator MoveRectY(RectTransform rect, float startY, float endY, Func<double, double, double, double, double> easing) {
         float timer = 0;
         float duration = 0.5f;
         while (timer < duration) {
@@ -941,6 +930,5 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         Vector2 finalPosition = new Vector3(rect.anchoredPosition.x, endY);
         rect.anchoredPosition = finalPosition;
-        routine = null;
     }
 }
