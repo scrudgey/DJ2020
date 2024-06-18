@@ -34,15 +34,15 @@ public class ResourceReferencePopulatorEditor : Editor {
             List<ResourceEntry> entries = EnumerateAllResources();
             keyList.ClearArray();
             valueList.ClearArray();
-            int i = 0;
-            foreach (ResourceEntry entry in entries) {
-                keyList.InsertArrayElementAtIndex(i);
-                valueList.InsertArrayElementAtIndex(i);
+            // int i = 0;
+            // foreach (ResourceEntry entry in entries) {
+            //     keyList.InsertArrayElementAtIndex(i);
+            //     valueList.InsertArrayElementAtIndex(i);
 
-                keyList.GetArrayElementAtIndex(i).objectReferenceValue = entry.key;
-                valueList.GetArrayElementAtIndex(i).stringValue = entry.value;
-                i++;
-            }
+            //     keyList.GetArrayElementAtIndex(i).objectReferenceValue = entry.key;
+            //     valueList.GetArrayElementAtIndex(i).stringValue = entry.value;
+            //     i++;
+            // }
             // populate list
         }
 

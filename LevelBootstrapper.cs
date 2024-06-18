@@ -27,7 +27,7 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log("bootstrapping VR mission...");
 
         // initialize game state
-        GameManager.I.gameData = GameData.TestInitialData();
+        GameManager.I.gameData = GameData.TestState();
 
         // GameManager.I.gameData.playerState.allGuns[0].delta.activeMods.Add(Resources.Load("data/guns/mods/silencer") as GunMod);
 
@@ -46,7 +46,7 @@ public class LevelBootstrapper : MonoBehaviour {
         Debug.Log($"bootstrapping mission {levelTemplate.levelName}...");
 
         // initialize game state
-        GameManager.I.gameData = GameData.TestInitialData();
+        GameManager.I.gameData = GameData.TestState();
         LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(GameManager.I.gameData.playerState), GameManager.I.gameData.playerState);
 
         // select a random extraction point
@@ -63,7 +63,7 @@ public class LevelBootstrapper : MonoBehaviour {
 
     void BootStrapWorld() {
         Debug.Log($"bootstrapping world ...");
-        GameManager.I.gameData = GameData.TestInitialData();
+        GameManager.I.gameData = GameData.TestState();
         GameManager.I.SetMarketData();
         GameManager.I.SetDealData();
         GameManager.I.SetFenceData();

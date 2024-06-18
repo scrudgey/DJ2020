@@ -24,6 +24,7 @@ public class EscapeMenuObjectiveController : MonoBehaviour {
         foreach (ObjectiveDelta objective in levelState.delta.objectiveDeltas) {
             GameObject obj = GameObject.Instantiate(objectiveIndicatorPrefab);
             obj.transform.SetParent(objectivesContainer, false);
+            obj.transform.SetAsFirstSibling();
             MissionSelectorObjective controller = obj.GetComponent<MissionSelectorObjective>();
             controller.Initialize(objective);
         }

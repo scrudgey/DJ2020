@@ -51,7 +51,6 @@ public partial class GameManager : Singleton<GameManager> {
         List<GunState> gunsForSale = new List<GunState>();
         foreach (GunState gunState in gameData.gunsForSale) {
             if (UnityEngine.Random.Range(0f, 1f) < 0.5f) {
-                // string message = $"gun state carryover from yesterday: {gunState.getName()}";
                 gunsForSale.Add(gunState);
             }
         }

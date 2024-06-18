@@ -192,73 +192,23 @@ specialized tools:
     10. rfid scanner                - one route to decode keycard lock          - item slot
     11. UV-reactive powder and blacklight   - one route to decode keypad lock   - burglar tool / could be item slot?
 
-
-## implementation
-if we need different aspect ratios, we can always adjust the viewport rect dimensions relative to the game resolution
-change how text / highlights work in camera image
 1250 x 750
 625 x 375
 312.5 x 187.5
 156.25 x 93.75
 
 
-
-
-
-
-
+## implementation
 
 create keypad lock
 randomize the key
 broken connection display in overlay
-
 sounds
     play sound on reveal code
-
-
-
-
-
-
-
-
 ? alarm panel
 ? alarm source
-
-draw
-    jazz up multitool display
-    draw more circuit board layouts
-    draw ram chips
-    draw alligator clip
-    icons for codes in escape menu
-
 maybe a button for switching back to hand
 
-
-* elevator keycard reader
-* clicking unzips
-* dont replace panel when in electrical view? / panel goes somewhere else
-* if we are going to scale perfectly, then we need:
-* shared material needs a reset of sorts
-* click 'return' button should put away usb tool
-* lerp quaternion should be relative to world space
-* resent electrical circuit position
-* would be nice to zoom in to chip
-* error in permutations at index = 9?
-* show tool names in-place when mouseover
-* change burglar tool captions etc.
-    * it would be nice to highlight the element with a box and with text on mouseover
-    * then blit text in, top left, with a lifetime
-* display lock status on LED chip
-. an LED turns off when powered down
-* multitool stays present when leaving burglar view
-* remove attack surfaces from cyber objects
-* allow keycard reader to read card in burglar view
-. raycast can extend far?
-* don't click to remove panel AND jump into circuit
-* draw waveforms
-* disable multitool buttons until in ram chip mode
-    * door controller- play keycode to open door
 
 
 
@@ -448,5 +398,29 @@ suppose we get a good answer to electronic hacking. is that enough to go forward
     * keycard reader
         * move doorlock to keycard reader
         * create ram chip
+* elevator keycard reader
+* clicking unzips
+* dont replace panel when in electrical view? / panel goes somewhere else
+* if we are going to scale perfectly, then we need:
+* shared material needs a reset of sorts
+* click 'return' button should put away usb tool
+* lerp quaternion should be relative to world space
+* resent electrical circuit position
+* would be nice to zoom in to chip
+* error in permutations at index = 9?
+* show tool names in-place when mouseover
+* change burglar tool captions etc.
+    * it would be nice to highlight the element with a box and with text on mouseover
+    * then blit text in, top left, with a lifetime
+* display lock status on LED chip
+. an LED turns off when powered down
+* multitool stays present when leaving burglar view
+* remove attack surfaces from cyber objects
+* allow keycard reader to read card in burglar view
+. raycast can extend far?
+* don't click to remove panel AND jump into circuit
+* draw waveforms
+* disable multitool buttons until in ram chip mode
+    * door controller- play keycode to open door
 
 

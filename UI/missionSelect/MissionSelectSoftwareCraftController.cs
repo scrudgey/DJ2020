@@ -282,10 +282,9 @@ public class MissionSelectSoftwareCraftController : MonoBehaviour {
     }
     public void CallbackCancel() {
         if (inEditMode) {
-            // template = copyOfOriginalTemplate;
             data.playerState.softwareTemplates[data.playerState.softwareTemplates.IndexOf(template)] = copyOfOriginalTemplate;
         }
-        missionComputerController.ShowSoftwareListView(true);
+        missionComputerController.ShowSoftwareCraftView(false);
     }
     public void CallbackBuild() {
         bool templateNameValid = template.name != "";

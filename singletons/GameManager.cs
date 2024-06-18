@@ -104,7 +104,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void StartNewGame(string filename) {
         timePlayed = 0f;
 
-        GameData data = GameData.TestInitialData() with {
+        GameData data = GameData.DefaultState() with {
             filename = filename
         };
 

@@ -108,6 +108,11 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
 
     public override void RefreshEdgeGraphicState() {
         base.RefreshEdgeGraphicState();
+        foreach (KeyValuePair<(string, string), LineRenderer> kvp in lineRenderers) {
+            if (!graph.edgePairs.Contains(kvp.Key)) {
+                kvp.Value.enabled = false;
+            }
+        }
     }
 
     override public void SetEdgeState(LineRenderer renderer, CyberNode node1, CyberNode node2) {

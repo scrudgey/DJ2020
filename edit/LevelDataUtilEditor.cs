@@ -321,32 +321,38 @@ public class LevelDataUtilEditor : Editor {
             zone.idn = System.Guid.NewGuid().ToString();
         }
 
-        List<Renderer> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
+        List<GameObject> staticRenderers = GameObject.FindObjectsOfType<Renderer>()
                     .Where(renderer => renderer.gameObject.isStatic)
                     .Where(renderer => !renderer.CompareTag("noCulling"))
+                    .Select(renderer => renderer.gameObject)
                     .Concat(
                         GameObject.FindObjectsOfType<SpriteRenderer>()
                             .Where(obj => obj.CompareTag("decor"))
-                            .Select(obj => obj.GetComponent<Renderer>())
+                            .Select(obj => obj.gameObject)
                     )
                     .Concat(
                         GameObject.FindObjectsOfType<TextMeshPro>()
                             .Where(tmp => tmp.gameObject.isStatic)
-                            .Select(obj => obj.GetComponent<Renderer>())
+                            .Select(obj => obj.gameObject)
+                    )
+                    .Concat(
+                        GameObject.FindObjectsOfType<ParticleSystem>()
+                            .Where(obj => obj.CompareTag("decor"))
+                            .Select(obj => obj.gameObject)
                     )
                     .ToList();
 
-        foreach (Renderer renderer in staticRenderers) {
-            if (renderer == null) continue;
+        foreach (GameObject obj in staticRenderers) {
+            if (obj == null) continue;
             CullingComponent cullingComponent;
 
-            if (renderer.transform.GetRoot(skipHierarchyFolders: true) != null) {
-                cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.transform.GetRoot(skipHierarchyFolders: true).gameObject);
+            if (obj.transform.GetRoot(skipHierarchyFolders: true) != null) {
+                cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(obj.transform.GetRoot(skipHierarchyFolders: true).gameObject);
             } else {
-                if (renderer.transform.root.gameObject.IsHierarchyFolder()) {
-                    cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.gameObject);
+                if (obj.transform.root.gameObject.IsHierarchyFolder()) {
+                    cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(obj);
                 } else {
-                    cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(renderer.transform.root.gameObject);
+                    cullingComponent = Toolbox.GetOrCreateComponent<CullingComponent>(obj.transform.root.gameObject);
                 }
             }
 

@@ -1059,7 +1059,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     /// This is the ONLY place where you can set the character's velocity
     /// </summary>
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-        bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
+        // bool pressingOnWall = _lastInput.preventWallPress ? false : DetectWallPress();
+        bool pressingOnWall = false;
         Vector3 targetMovementVelocity = Vector3.zero;
 
         if (!Motor.GroundingStatus.IsStableOnGround) {

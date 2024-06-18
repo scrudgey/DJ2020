@@ -55,18 +55,82 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     [JsonConverter(typeof(ScriptableObjectJsonConverter<Sprite>))]
     public Sprite portrait;
 
-
     public List<string> activePerks;
     public int skillpoints;
     public int bodySkillPoints;
     public int gunSkillPoints;
     public int hackSkillPoints;
     public int speechSkillPoints;
-
     public List<SoftwareTemplate> softwareTemplates;
+
+    [JsonConverter(typeof(ScriptableObjectJsonConverter<CyberdeckTemplate>))]
     public CyberdeckTemplate cyberdeck;
 
     public static PlayerState DefaultState() {
+        GunTemplate gun1 = GunTemplate.Load("p1");
+
+        GunState gunState1 = GunState.Instantiate(gun1);
+
+        List<WeaponState> allGuns = new List<WeaponState> {
+            new WeaponState(gunState1),
+        };
+
+        List<ItemTemplate> allItems = new List<ItemTemplate> {
+        };
+
+        List<LootData> loots = new List<LootData> {
+        };
+
+        List<string> perks = new List<string>();
+
+        List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
+            SoftwareScriptableTemplate.Load("crack"),
+            SoftwareScriptableTemplate.Load("exploit"),
+            SoftwareScriptableTemplate.Load("scanEdges"),
+            SoftwareScriptableTemplate.Load("scanNode"),
+            SoftwareScriptableTemplate.Load("scanData"),
+        };
+        List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
+
+        List<Tactic> tactis = new List<Tactic> {
+        };
+
+        List<LootBuyerData> fences = new List<LootBuyerData> {
+            Resources.Load("data/lootbuyer/snakeman") as LootBuyerData,
+        };
+
+        CyberdeckTemplate cyberdeck = Resources.Load("data/cyberdecks/basic1") as CyberdeckTemplate;
+
+        return new PlayerState() {
+            legSkin = "Jack",
+            bodySkin = "Jack",
+            headSkin = "Jack",
+            allGuns = allGuns,
+            allItems = allItems,
+            primaryGun = new WeaponState(gunState1),
+            secondaryGun = null,
+            tertiaryGun = null,
+            activeGun = -1,
+            cyberlegsLevel = 0,
+            maxConcurrentNetworkHacks = 1,
+            hackSpeedCoefficient = 1f,
+            hackRadius = 1.5f,
+            health = 150f,
+            etiquettes = new SpeechEtiquette[] { SpeechEtiquette.street },
+            portrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite,
+            payDatas = new List<PayData>(),
+            credits = 1250,
+            favors = 0,
+            loots = loots,
+            activePerks = perks,
+            skillpoints = 0,
+            softwareTemplates = softwareTemplates,
+            unlockedTactics = tactis,
+            unlockedFences = fences,
+            cyberdeck = cyberdeck
+        };
+    }
+    public static PlayerState TestState() {
         GunTemplate gun1 = GunTemplate.Load("p1");
         GunTemplate gun2 = GunTemplate.Load("s1");
         GunTemplate gun3 = GunTemplate.Load("r1");
@@ -264,7 +328,7 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         }
     }
 
-    public static PlayerState Instantiate(PlayerTemplate template) => DefaultState() with {
+    public static PlayerState Instantiate(PlayerTemplate template) => TestState() with {
         primaryGun = new WeaponState(GunState.Instantiate(template.primaryGun)),
         secondaryGun = new WeaponState(GunState.Instantiate(template.secondaryGun)),
         tertiaryGun = new WeaponState(GunState.Instantiate(template.tertiaryGun)),

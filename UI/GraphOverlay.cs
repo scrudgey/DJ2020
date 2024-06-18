@@ -11,7 +11,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public Material lineRendererMaterial;
     public Material marchingAntsMaterial;
     (string, string) neighborEdge;
-    Dictionary<(string, string), LineRenderer> lineRenderers = new Dictionary<(string, string), LineRenderer>();
+    protected Dictionary<(string, string), LineRenderer> lineRenderers = new Dictionary<(string, string), LineRenderer>();
     Dictionary<(string, string), LineRenderer> soloLineRenders = new Dictionary<(string, string), LineRenderer>();
     Dictionary<(string, string), LineRenderer> marchingAntsRenderers = new Dictionary<(string, string), LineRenderer>();
     Dictionary<(string, string), LineRenderer> partialLineRenderers = new Dictionary<(string, string), LineRenderer>();
@@ -66,9 +66,9 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             if (node.sceneName != sceneName)
                 continue;
             V indicator = GetIndicator(node);
+            // TODO: only show nodes on my floor?
             indicator.SetScreenPosition(cam.WorldToScreenPoint(node.position));
             indicator.Configure(node, graph, overlayHandler, NodeMouseOverCallback, NodeMouseExitCallback);
-
         }
     }
     public virtual void RefreshEdgeGraphicState() {
@@ -268,7 +268,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
         renderer.generateLightingData = false;
         // renderer.widthCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(1f, 1f) });
         // renderer.widthMultiplier = 0.2f;
-        renderer.widthMultiplier = 0.05f;
+        renderer.widthMultiplier = 0.025f;
         renderer.materials = new Material[1] { lineRendererMaterial };
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;

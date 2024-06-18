@@ -48,7 +48,7 @@ public class CullingComponent : MonoBehaviour {
             this.handlers = new Dictionary<Renderer, SubRenderHandler>();
             this.handlerList = new List<SubRenderHandler>();
             foreach (Renderer renderer in renderers) {
-                if (renderer is ParticleSystemRenderer) continue;
+                // if (renderer is ParticleSystemRenderer) continue;    
                 if (renderer is TrailRenderer) continue;
                 if (renderer.name == "cutaway") continue;
                 AddSubRenderHandler(renderer);

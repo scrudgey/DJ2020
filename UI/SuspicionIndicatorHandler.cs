@@ -105,7 +105,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
     }
 
     void LateUpdate() {
-        if (GameManager.I.gameData.levelState.template == null) return;
+        if (GameManager.I.gameData.levelState?.template == null) return;
         if (doUpdate) {
             UpdateSensitivity();
 
@@ -193,7 +193,7 @@ public class SuspicionIndicatorHandler : MonoBehaviour {
             disguiseChevronRect.sizeDelta = new Vector2(215f, factor * 33f);
             bottomSpacerRect.sizeDelta = new Vector2(215f, factor * 33f);
         }
-        if (GameManager.I.gameData.levelState.anyAlarmTerminalActivated()) {
+        if (GameManager.I.gameData.levelState?.anyAlarmTerminalActivated() ?? false) {
             Rect fillBarRect = alarmFillBarRectTransform.rect;
             float factor = 150f * (GameManager.I.alarmCountdown() / 30f);
             alarmFillBarRectTransform.sizeDelta = new Vector2(factor, 1f);

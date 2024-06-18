@@ -21,26 +21,19 @@ public record GameData {
     public List<DealData> dealData;
     public List<FenceData> fenceData;
     public List<GunState> gunsForSale;
-    public static GameData TestInitialData() {
-        LevelTemplate levelTemplate = Resources.Load<LevelTemplate>("data/missions/test/test") as LevelTemplate;
-        // DateTime.Now;
-        PlayerState playerState = PlayerState.DefaultState();
 
+    public static GameData DefaultState() {
+        PlayerState playerState = PlayerState.DefaultState();
         return new GameData() {
             createdAtTime = DateTime.Now,
             timePlayedInSeconds = 0,
             filename = "test",
             phase = GamePhase.none,
             playerState = playerState,
-            levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState), playerState),
+            levelState = null,
             completedLevels = new List<string>(),
             unlockedLevels = new List<string>{
-                "Jack That Data",
-                "Tower",
                 "711",
-                "yamachi",
-                "elevator",
-                "office"
             },
             levelPlans = new SerializableDictionary<string, LevelPlan>(),
             fenceData = new List<FenceData>(),
@@ -48,6 +41,16 @@ public record GameData {
             gunsForSale = new List<GunState>()
         };
     }
+
+    public static GameData TestState() => DefaultState() with {
+        playerState = PlayerState.TestState(),
+        unlockedLevels = new List<string>{
+                "711",
+                "yamachi",
+                "elevator",
+                "office"
+            },
+    };
 
     public LevelPlan GetLevelPlan(LevelTemplate template) {
         if (levelPlans.ContainsKey(template.levelName)) {
@@ -62,7 +65,6 @@ public record GameData {
     public void SetLevelPlan(LevelTemplate template, LevelPlan plan) {
         levelPlans[template.levelName] = plan;
     }
-
 
     public void Save() {
         CreateSaveGameFolderIfMissing();
@@ -93,7 +95,7 @@ public record GameData {
         }
         catch (Exception e) {
             Debug.LogError($"error reading game data: {path} {e}");
-            return GameData.TestInitialData();
+            return GameData.DefaultState();
         }
     }
 

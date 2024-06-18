@@ -22,6 +22,7 @@ public class SubRenderHandler {
     public Renderer renderer;
     public float myAlpha;
     public CullingComponent parent;
+    public ParticleSystem particleSystem;
 
     public SubRenderHandler(Renderer renderer, CullingComponent parent) {
         this.renderer = renderer;
@@ -38,6 +39,7 @@ public class SubRenderHandler {
             cutawayRenderer = cutaway.gameObject;
         }
         TagSystem system = renderer.GetComponentInParent<TagSystem>();
+        particleSystem = renderer.GetComponent<ParticleSystem>();
         if (system != null) {
             this.data = system.data;
         } else {
@@ -87,6 +89,8 @@ public class SubRenderHandler {
         }
         if (isCutaway)
             cutawayRenderer.SetActive(false);
+        if (particleSystem != null)
+            particleSystem.Stop();
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
@@ -115,6 +119,8 @@ public class SubRenderHandler {
         }
         if (isCutaway)
             cutawayRenderer.SetActive(false);
+        if (particleSystem != null)
+            particleSystem.Play();
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = initialShadowCastingMode;
     }

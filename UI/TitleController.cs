@@ -176,7 +176,7 @@ public class TitleController : MonoBehaviour {
                 ItemTemplate.LoadItem("rocket"),
                 ItemTemplate.LoadItem("grenade"),
             };
-            GameManager.I.gameData = GameData.TestInitialData();
+            GameManager.I.gameData = GameData.TestState();
 
             LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(GameManager.I.gameData.playerState), GameManager.I.gameData.playerState);
 

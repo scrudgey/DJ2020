@@ -16,7 +16,6 @@ public class NewGameMenuController : MonoBehaviour {
     public void NewGameCallback() {
         Debug.Log("newgame");
 
-        // TODO: verify save name does not exist
         string filename = inputField.text;
         string path = GameData.SaveGamePath(filename);
         if (filename == "") {
@@ -34,7 +33,6 @@ public class NewGameMenuController : MonoBehaviour {
 
     void StartNewGame(string filename) {
         // todo: check for collision with existing save file
-
         GameManager.I.StartNewGame(filename);
     }
 }

@@ -3478,8 +3478,17 @@ speed up + pitch up blitting?
     * on mouseover, change storage bar
 * cancel weapon select
 * add more cull padding to various lintels in elevator mission
-
-
+    * attack surface card reader attack
+    * attack surface for keycard reader
+    * electronic access control
+    * circuitry hacking
+    * list all burglar tools
+    * circuits
+    * backpack and duffel bag
+* holster to put away rocket launcher
+* street culling issues
+* implement worker dialogue?
+* guard spotted me during mission start
 
 
 
@@ -3569,6 +3578,7 @@ weapons
 
 planning mode
     HP / def indicators
+    overview pane
     tactics pane
         disable when no tactoics
         purchase keycard
@@ -3754,7 +3764,7 @@ performance:
     lots of garbage created in gamemanager update
     generating a lot of garbage in sphererobotai
 
-pretty easy to run in guns blazing
+pretty easy to run in guns blazing?>
     when alarm is hit, doors come down and turrets pop out
     player noise increases as more gunshots fired, allowing guards to track you through the building- dont lose you so easily.
 
@@ -3817,10 +3827,10 @@ destructible light pylon
 destructible dumpster
 destructible AC unit
 destructible radio dish tower
-plants can catch on fire
+plants can catch on fire?
 randomly place lasers
 randomly place cameras
-holster to put away rocket launcher
+
 are anonymous delegates memory leaks? i.e. objective deltas
     When you have an event handler attached to an event that delegate contains two things, an instance of an object and a method to run on that object. That referenced object won't be able to be garbage collected until either:
     The object with the event is no longer "alive".
@@ -3837,8 +3847,7 @@ jazz up elevator controller
     sound effects
     click effect
 show bonus reward favors
-* implement worker dialogue?
-guard spotted me during mission start
+
 7-11 worker doesnt see me frequently (probably blocked by register)
 cyber jump inside resulted in bizarre behavior
 
@@ -3847,12 +3856,10 @@ system:
         weapons, loadout, 
         character stats, skills
 
-
 robots
 vehicles
     strike team may arrive by vehicle
     exfiltration / insertion may be by vehicle
-logos for omni, delta, elf
 
 tactics
     tactic dialogue is jumpy
@@ -3860,16 +3867,11 @@ tactics
     faster text blit
 
 burglar system
-    * list all burglar tools
     burglar tool mentor
-    attack surface card reader attack
-    attack surface for keycard reader
-    electronic access control
     using key in lock should spin the keyway'
     doors
         more door types? more explotable latch? more handles and things?
         locks for doubledoors with crash bars
-    circuitry hacking
     alarm sensors
     ATM
 
@@ -3891,15 +3893,11 @@ more equipment to bring on mission?
         clear item slot
 
 unresolved mechanics / gameplay questions:
-    * circuits
-    * backpack and duffel bag
     progression in shops? 
         items, guns
     selling data / upgrading hack ability
-
-
-
-
+    bringing items, tools, duffel bag
+    how does password data work??
 
 
 
@@ -3907,13 +3905,48 @@ missions
     1 way shootout
     productionize office
         redo apartment after office
+
 key system
     physical, keycard, password
 destructible walls
     gibs
     re-bake navmesh
-update the steam page graphic
-
-
 record new gameplay footage
-* street culling issues
+
+draw
+    jazz up multitool display
+    draw more circuit board layouts
+    draw ram chips
+    draw alligator clip
+    icons for codes in escape menu
+    logos for omni, delta, elf
+    update the steam page graphic
+
+make graphs more readable
+    smaller icons?
+    thinner lines
+    limit icons shown to current floor / show other floors as transparent gray
+    sub-nodes
+
+tune impacts
+tune gibbing
+
+
+basic playable
+    * hp/def caption should be legit
+    * set up a real initial data separate from test data
+    . fix id
+    * dialogue- change personell data icon
+    * put 'craft' on computer desktop
+    * set level unlocking
+    * atm highlights
+    * steam
+    * fire sparks
+
+    write some real mission descriptions
+    swat portrait
+    zero graphical errors
+        subway
+        buildings reappear when i am in subway tracks
+    planning mode: gear
+        rotate the character, show him with weapon drawn / not, running etc

@@ -30,10 +30,10 @@ public class UIStatusBarHandler : MonoBehaviour {
         SetInitialValues(GameManager.I.gameData);
     }
     void SetInitialValues(GameData data) {
-        currentCredits = data.playerState.credits + data.levelState.delta.levelAcquiredCredits;
-        currentLoots = data.playerState.loots.Count + data.levelState.delta.levelAcquiredLoot.Count;
-        currentData = data.playerState.payDatas.Count + data.levelState.delta.levelAcquiredPaydata.Count;
-        currentKeys = data.levelState.totalNumberKeys();
+        currentCredits = data.playerState.credits + data.levelState?.delta.levelAcquiredCredits ?? 0;
+        currentLoots = data.playerState.loots.Count + data.levelState?.delta.levelAcquiredLoot.Count ?? 0;
+        currentData = data.playerState.payDatas.Count + data.levelState?.delta.levelAcquiredPaydata.Count ?? 0;
+        currentKeys = data.levelState?.totalNumberKeys() ?? 0;
         SetTextAmounts();
     }
 

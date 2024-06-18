@@ -46,7 +46,7 @@ public class MissionPlanController : MonoBehaviour {
 
     void Start() {
         if (debugStart) {
-            GameManager.I.gameData = GameData.TestInitialData();
+            GameManager.I.gameData = GameData.TestState();
             GunTemplate gun1 = GunTemplate.Load("p1");
             GunTemplate gun2 = GunTemplate.Load("s1");
             GunTemplate gun3 = GunTemplate.Load("r1");

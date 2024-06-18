@@ -21,6 +21,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public Transform pickerContainer;
     public GameObject pickerEntryPrefab;
     public GameObject pickerHeaderPrefab;
+    public TextMeshProUGUI captionText;
 
     [Header("weapon slots")]
     public LoadoutWeaponButton primaryWeaponButton;
@@ -64,6 +65,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         this.data = data;
         this.plan = plan;
         InitializeSkins(data);
+        SetCaptionText(data.playerState);
 
         initialTorsoPosition = torsoImage.transform.localPosition;
         initialHeadPosition = headImage.transform.localPosition;
@@ -89,12 +91,14 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         tertiaryHighlight.SetActive(false);
 
         thirdWeaponSlot.SetActive(data.playerState.PerkThirdWeaponSlot());
-
-        itemSlot5.SetActive(GameManager.I.gameData.playerState.PerkNumberOfItemSlots() == 5);
+        itemSlot5.SetActive(data.playerState.PerkNumberOfItemSlots() == 5);
 
         initialized = true;
     }
 
+    void SetCaptionText(PlayerState playerState) {
+        string caption = $"HP: {playerState.health}/{playerState.fullHealthAmount()}\nDEF: {playerState.armorLevel}";
+    }
 
     void ShowStatsView() {
         if (statsOpen) return;

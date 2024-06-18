@@ -88,11 +88,13 @@ public class OverlayHandler : MonoBehaviour {
         cyberOverlay.overlayHandler = this;
         alarmOverlay.overlayHandler = this;
 
-        cyberdeckController.Initialize(this, GameManager.I.gameData.levelState.delta.cyberGraph);
+        if (GameManager.I.gameData.levelState != null) {
+            cyberdeckController.Initialize(this, GameManager.I.gameData.levelState?.delta.cyberGraph);
+            RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
+            RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
+            RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
+        }
 
-        RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
-        RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
-        RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
         HandleOverlayChange(GameManager.I.activeOverlayType, false);
     }
     public void ClearAllIndicatorsAndEdges() {

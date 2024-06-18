@@ -39,7 +39,7 @@ public partial class GameManager : Singleton<GameManager> {
         PlayerState playerState = PlayerState.Instantiate(template.playerState);
         LevelState levelState = LevelState.Instantiate(levelTemplate, LevelPlan.Default(playerState), playerState);
         // instantiate gamedata
-        gameData = GameData.TestInitialData() with {
+        gameData = GameData.DefaultState() with {
             playerState = playerState,
             levelState = levelState
         };
@@ -514,6 +514,7 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
             PowerNode node = GetPowerNode(component.idn);
+            // Debug.Log($"{component} {component.idn} {node}");
             component.node = node;
             foreach (INodeBinder<PowerNode> binder in component.GetComponentsInChildren<INodeBinder<PowerNode>>(true)) {
                 binder.Bind(node);

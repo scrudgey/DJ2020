@@ -168,7 +168,7 @@ public class NeoDialogueMenu : MonoBehaviour, PerkIdConstants {
         if (escapeCard != null) {
             Destroy(escapeCard.gameObject);
         }
-        if (challenge.allowIDCardResponse) { // TODO: ???
+        if (challenge.allowIDCardResponse && input.playerHasID) {
             NeoDialogueCardController cardController = InstantiateBlankCard();
             cardController.InitializeIDCard(this, IDCardClick);
             specialCard = cardController;
