@@ -98,6 +98,7 @@ public class MissionPlanLoadoutController : MonoBehaviour {
 
     void SetCaptionText(PlayerState playerState) {
         string caption = $"HP: {playerState.health}/{playerState.fullHealthAmount()}\nDEF: {playerState.armorLevel}";
+        captionText.text = caption;
     }
 
     void ShowStatsView() {

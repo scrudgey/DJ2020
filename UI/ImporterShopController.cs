@@ -63,7 +63,7 @@ public class ImporterShopController : MonoBehaviour {
     }
     void ClearPlayerInventoryDisplay() {
         foreach (Transform child in playerInventoryContainer) {
-            if (child.name == "creds") continue;
+            if (child.name == "CreditBalanceIndicator") continue;
             Destroy(child.gameObject);
         }
     }

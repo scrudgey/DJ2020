@@ -82,11 +82,11 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
 
     public void Initialize(LevelState state, SceneData sceneData) {
         this.state = state;
-        mode = Mode.mission;
         allObjectiveDeltas = state.delta.AllObjectives();
         Initialize(state.template, state.plan, sceneData);
         mapDisplay3Dgenerator.Initialize(state, sceneData);
         mapDisplayController.HideInsertionPoints();
+        mode = Mode.mission;
     }
     public void Initialize(LevelTemplate template, LevelPlan plan, SceneData sceneData) {
         this.plan = plan;

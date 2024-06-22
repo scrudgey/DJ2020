@@ -3923,8 +3923,8 @@ draw
     update the steam page graphic
 
 make graphs more readable
-    smaller icons?
-    thinner lines
+    * smaller icons?
+    * thinner lines
     limit icons shown to current floor / show other floors as transparent gray
     sub-nodes
 
@@ -3932,8 +3932,8 @@ tune impacts
 tune gibbing
 
 
-basic playable
-    . hp/def caption should be legit
+* basic playable
+    * hp/def caption should be legit
     * set up a real initial data separate from test data
     . fix id
     * dialogue- change personell data icon
@@ -3944,16 +3944,22 @@ basic playable
     * fire sparks
     * subway
     * buildings reappear when i am in subway tracks
+    * shadowcasters on npc are probably offset
+    * culling error: dynamic aboves seem to reset to visible and never go back to invisible either around burglar mode or
+    * fix map data, again
+        * elevator
 
+
+planning mode: gear
+    rotate the character, show him with weapon drawn / not, running etc
+
+should be a way to level up during world mode
+    general character overview info panel
+
+zero graphical errors
+
+polish 
     write some real mission descriptions
     swat portrait
-    zero graphical errors
-    planning mode: gear
-        rotate the character, show him with weapon drawn / not, running etc
-
-    shadowcasters on npc are probably offset
-    should be a way to level up during world mode
-
-    fix map data, again
-
-    culling error: dynamic aboves seem to reset to visible and never go back to invisible either around burglar mode or
+    
+fix elevator map data

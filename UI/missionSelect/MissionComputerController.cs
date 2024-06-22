@@ -142,6 +142,7 @@ public class MissionComputerController : MonoBehaviour {
         factionLogo.enabled = true;
         factionLogo.sprite = button.template.faction.logo;
         factionText.text = button.template.faction.factionName;
+        worldmapView.HighlightPoint(button.template.worldmapPoint);
     }
     void ShowDetailsDialogue() {
         bottomIsShowing = true;

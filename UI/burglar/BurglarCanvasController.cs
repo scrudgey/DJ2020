@@ -56,7 +56,6 @@ public class BurglarCanvasController : MonoBehaviour {
     [Header("usb")]
     // public CyberdeckCanvasController cyberdeckController;
     public MultiToolController multiToolController;
-    public RectTransform usbRectTransform;
     public GameObject usbCable;
     public bool usbCableAttached;
     public CanvasGroup usbCableCanvasGroup;
@@ -897,10 +896,10 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         if (value) {
             // Toolbox.RandomizeOneShot(audioSource, cyberdeckShowSound);
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -515, 127, PennerDoubleAnimation.BounceEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, -600, 127, PennerDoubleAnimation.BounceEaseOut));
             multiToolController.Initialize();
         } else {
-            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, cyberdeckRect.anchoredPosition.y, -515, PennerDoubleAnimation.ExpoEaseOut));
+            exposeCyberdeckCoroutine = StartCoroutine(MoveRectY(cyberdeckRect, cyberdeckRect.anchoredPosition.y, -600, PennerDoubleAnimation.ExpoEaseOut));
             ResetUSBTool();
         }
     }
