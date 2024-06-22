@@ -86,7 +86,6 @@ public class AttackSurface : MonoBehaviour {
         RaycastHit[] hits = Physics.RaycastAll(projection, 1000, LayerUtil.GetLayerMask(Layer.attackSurface, Layer.bulletOnly, Layer.skyboxNoLight));
         foreach (RaycastHit hit in hits.OrderBy(hit => hit.distance)) {
             ObiRope rope = hit.collider.gameObject.GetComponent<ObiRope>();
-            Debug.Log($"{hit.collider.gameObject} {rope}");
             if (rope != null) {
                 MeshRenderer meshRenderer = rope.GetComponent<MeshRenderer>();
                 if (!meshRenderer.enabled) continue;

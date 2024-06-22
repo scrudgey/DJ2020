@@ -383,7 +383,6 @@ public class OverlayHandler : MonoBehaviour {
     }
     public void ShowInfoPane(RectTransform infoPane) {
         if (showInfoRoutine != null) {
-            Debug.Log($"[info pane] stop ease info pane");
             StopCoroutine(showInfoRoutine);
         }
         if (infoPane != activeInfoPane) {
@@ -406,13 +405,14 @@ public class OverlayHandler : MonoBehaviour {
         float y = infoPaneRect.anchoredPosition.y;
         float startX = infoPaneRect.anchoredPosition.x;
         float finishX = value ? -575 : -14;
-        Debug.Log($"[info pane] ease info pane: {value} {infoPaneRect} {startX}->{finishX}");
+        // Debug.Log($"[info pane] ease info pane: {value} {infoPaneRect} {startX}->{finishX}");
         yield return Toolbox.Ease(null, 0.5f, startX, finishX, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             infoPaneRect.anchoredPosition = new Vector2(amount, y);
         }, unscaledTime: true);
     }
 
     public void CloseButtonCallback() {
+        SetSelectedNode(null);
         GameManager.I.SetOverlay(OverlayType.none);
     }
 }

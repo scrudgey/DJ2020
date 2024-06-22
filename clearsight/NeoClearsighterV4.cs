@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -5,7 +6,6 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
-
 public class NeoClearsighterV4 : MonoBehaviour {
     enum State { normal, showAll, aboveOnly }
     enum FloorState { visible, invisible }
@@ -76,6 +76,9 @@ public class NeoClearsighterV4 : MonoBehaviour {
             GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);
             followTransform = newFocus.transform;
         }
+        playerPosition = followTransform.position;
+        RectifyPlayerFloor();
+        StartRefreshFloorsCoroutine();
     }
     public void Initialize(Transform focus, CharacterCamera characterCamera, CharacterController characterController, SceneData sceneData, string sceneName) {
         this.followTransform = focus;
@@ -160,7 +163,6 @@ public class NeoClearsighterV4 : MonoBehaviour {
         switch (state) {
             case State.normal:
                 StartRefreshFloorsCoroutine();
-
                 break;
             case State.aboveOnly:
                 StartRefreshFloorsCoroutine();
@@ -169,6 +171,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
                 StartRefreshFloorsCoroutine();
                 break;
         }
+        Debug.Log($"transition to culling state: {state}");
         state = newstate;
     }
     IEnumerator HandleGeometry() {
@@ -286,6 +289,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         foreach (KeyValuePair<string, Dictionary<int, FloorState>> kvp in floorStatesPerRoofZone) {
             string zoneId = kvp.Key;
             Dictionary<int, FloorState> floorStates = kvp.Value;
+            RooftopZone zone = zoneId != "-1" ? roofZones[zoneId] : null;
 
             // if playerfloor >= floorIndex or (the player is not in the roof zone and the roof zone is not an interloper), the desired state is visible
             // if there is a between floor
@@ -296,6 +300,8 @@ public class NeoClearsighterV4 : MonoBehaviour {
                 desiredState = FloorState.visible;
             } else if (maxFloor >= floorIndex) {
                 desiredState = FloorState.visible;
+            } else if (zone != null && zone.invisibleWhenPlayerBelowFloor != -1 && maxFloor < zone.invisibleWhenPlayerBelowFloor) {
+                desiredState = FloorState.invisible;
             } else if (zoneId != "-1" && playerRoofZone != zoneId && !activeRoofZoneInterlopers.ContainsKey(zoneId)) {
                 desiredState = FloorState.visible;
             } else {
@@ -517,7 +523,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     }
 
     IEnumerator HandleDynamicAbove() {
-        if (state == State.normal) {
+        if (state == State.normal || state == State.aboveOnly) {
 
             int maxFloor = Mathf.Max(playerBetweenFloorHigh - 1, playerFloor);
 
@@ -561,13 +567,20 @@ public class NeoClearsighterV4 : MonoBehaviour {
     }
 
     CullingComponent GetDynamicHandler(Collider key, Transform root) {
-        if (dynamicCullingComponents.ContainsKey(key)) {
-            return dynamicCullingComponents[key];
-        } else {
-            CullingComponent component = Toolbox.GetOrCreateComponent<CullingComponent>(root.gameObject);
-            dynamicCullingComponents[key] = component;
-            component.Initialize(sceneData, isDynamic: true);
-            return component;
+        try {
+            if (dynamicCullingComponents.ContainsKey(key)) {
+                return dynamicCullingComponents[key];
+            } else {
+                CullingComponent component = Toolbox.GetOrCreateComponent<CullingComponent>(root.gameObject);
+                dynamicCullingComponents[key] = component;
+                component.Initialize(sceneData, isDynamic: true);
+                return component;
+            }
+        }
+        catch (Exception e) {
+            Debug.LogError($"error getting dynamic handler for collider: {key}\troot:{root}");
+            Debug.LogError(e);
+            return null;
         }
     }
 
@@ -614,8 +627,6 @@ public class NeoClearsighterV4 : MonoBehaviour {
             results = default;
         }
     }
-
-
 }
 
 

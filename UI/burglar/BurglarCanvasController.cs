@@ -295,7 +295,6 @@ public class BurglarCanvasController : MonoBehaviour {
 
         bool newMouseDown = input.mouseDown;
         if (newMouseDown != mouseDown && newMouseDown && !outOfBounds) {
-            Debug.Log($"clickdown: {selectedElement}");
             ClickDown(selectedElement);
         }
         mouseDown = newMouseDown;

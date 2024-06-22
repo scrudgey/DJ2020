@@ -50,7 +50,8 @@ public class SecurityCamera : IBinder<SightCone>, INodeBinder<AlarmNode> {
         if (IRCone != null)
             IRCone.enabled = node.overallEnabled;
         if (!node.overallEnabled) {
-            audioSource?.Stop();
+            if (audioSource != null)
+                audioSource.Stop();
         }
     }
     override public void OnDestroy() {

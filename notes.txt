@@ -3933,7 +3933,7 @@ tune gibbing
 
 
 basic playable
-    * hp/def caption should be legit
+    . hp/def caption should be legit
     * set up a real initial data separate from test data
     . fix id
     * dialogue- change personell data icon
@@ -3942,11 +3942,18 @@ basic playable
     * atm highlights
     * steam
     * fire sparks
+    * subway
+    * buildings reappear when i am in subway tracks
 
     write some real mission descriptions
     swat portrait
     zero graphical errors
-        subway
-        buildings reappear when i am in subway tracks
     planning mode: gear
         rotate the character, show him with weapon drawn / not, running etc
+
+    shadowcasters on npc are probably offset
+    should be a way to level up during world mode
+
+    fix map data, again
+
+    culling error: dynamic aboves seem to reset to visible and never go back to invisible either around burglar mode or

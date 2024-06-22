@@ -120,7 +120,6 @@ public class MultiToolController : MonoBehaviour {
         wireDisplayText.text = $"connected\ntype:{type}\nconnected to: {targetName}";
     }
     void ChangeState(State newState) {
-        Debug.Log($"change state: {newState}");
         ExitState(state);
         state = newState;
         EnterState(newState);

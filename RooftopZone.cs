@@ -6,6 +6,7 @@ public class RooftopZone : MonoBehaviour {
     public string idn;
     public List<Collider> playerDetectionColliders;
     public List<Collider> geometryInclusionColliders;
+    public int invisibleWhenPlayerBelowFloor = -1;
 
     public bool ContainsPlayerPoint(Vector3 point) {
         return playerDetectionColliders.Any(collider => collider.bounds.Contains(point));

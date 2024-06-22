@@ -166,7 +166,7 @@ public partial class GameManager : Singleton<GameManager> {
     public void TransitionToInputMode(InputMode newInputMode) {
         if (newInputMode == inputMode)
             return;
-        Debug.Log($"transition to input mode: {newInputMode}");
+        // Debug.Log($"transition to input mode: {newInputMode}");
         OnInputModeChange?.Invoke(inputMode, newInputMode);
         _inputMode = newInputMode;
         SetOverlay(activeOverlayType);
@@ -351,7 +351,7 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
     public void CloseMenu() {
-        uiController.ShowInteractiveHighlight();
+        uiController?.ShowInteractiveHighlight();
 
         switch (activeMenuType) {
             default:

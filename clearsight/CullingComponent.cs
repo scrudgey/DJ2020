@@ -50,6 +50,7 @@ public class CullingComponent : MonoBehaviour {
             foreach (Renderer renderer in renderers) {
                 // if (renderer is ParticleSystemRenderer) continue;    
                 if (renderer is TrailRenderer) continue;
+                if (renderer is LineRenderer) continue;
                 if (renderer.name == "cutaway") continue;
                 AddSubRenderHandler(renderer);
                 tmpBounds.Encapsulate(renderer.bounds);

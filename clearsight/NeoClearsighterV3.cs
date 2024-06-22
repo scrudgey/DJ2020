@@ -69,9 +69,9 @@ public class NeoClearsighterV3 : MonoBehaviour {
         initialized = true;
         StartCoroutine(Toolbox.RunJobRepeatedly(HandleGeometry));
     }
-    void Start() {
-        OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
-    }
+    // void Start() {
+    //     OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
+    // }
 
     void HandleNodeFocusChange(INodeCameraProvider indicator) {
         if (indicator == null) {
@@ -142,7 +142,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
     void OnDestroy() {
-        OverlayHandler.OnSelectedNodeChange -= HandleNodeFocusChange;
+        // OverlayHandler.OnSelectedNodeChange -= HandleNodeFocusChange;
         DisposeOfNativeArrays();
     }
     void OnApplicationQuit() {
@@ -497,13 +497,13 @@ public class NeoClearsighterV3 : MonoBehaviour {
     }
 
 
-    public static Material NewInterloperMaterial(Renderer renderer) {
-        Material interloperMaterial = new Material(renderer.sharedMaterial);
-        Texture albedo = renderer.sharedMaterial.mainTexture;
-        interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
-        interloperMaterial.SetTexture("_Texture", albedo);
-        return interloperMaterial;
-    }
+    // public static Material NewInterloperMaterial(Renderer renderer) {
+    //     Material interloperMaterial = new Material(renderer.sharedMaterial);
+    //     Texture albedo = renderer.sharedMaterial.mainTexture;
+    //     interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
+    //     interloperMaterial.SetTexture("_Texture", albedo);
+    //     return interloperMaterial;
+    // }
 
     ClearsightRendererHandler GetDynamicHandler(Collider key) {
         // TODO: what to do if this is called on a static renderer?

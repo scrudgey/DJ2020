@@ -30,7 +30,7 @@ public class SubRenderHandler {
         propBlock = new MaterialPropertyBlock();
         renderer.GetPropertyBlock(propBlock);
         initialMaterial = renderer.sharedMaterial;
-        interloperMaterial = NeoClearsighterV3.NewInterloperMaterial(renderer);
+        interloperMaterial = NewInterloperMaterial(renderer);
         initialShadowCastingMode = renderer.shadowCastingMode;
         if (renderer.CompareTag("cutaway")) {
             isCutaway = true;
@@ -123,5 +123,17 @@ public class SubRenderHandler {
             particleSystem.Play();
         renderer.material = initialMaterial;
         renderer.shadowCastingMode = initialShadowCastingMode;
+    }
+
+    public static Material NewInterloperMaterial(Renderer renderer) {
+        if (renderer.sharedMaterial == null) {
+            // Debug.LogError($"null shared material: {renderer}");
+            return null;
+        }
+        Material interloperMaterial = new Material(renderer.sharedMaterial);
+        Texture albedo = renderer.sharedMaterial.mainTexture;
+        interloperMaterial.shader = Resources.Load("Scripts/shaders/InterloperShadow") as Shader;
+        interloperMaterial.SetTexture("_Texture", albedo);
+        return interloperMaterial;
     }
 }
