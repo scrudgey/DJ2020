@@ -58,7 +58,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public MultiToolController multiToolController;
     public GameObject usbCable;
     public bool usbCableAttached;
-    public CanvasGroup usbCableCanvasGroup;
+    // public CanvasGroup usbCableCanvasGroup;
     public USBCordTool uSBCordTool;
     // public AudioClip[] cyberdeckShowSound;
 
@@ -92,7 +92,7 @@ public class BurglarCanvasController : MonoBehaviour {
     Coroutine exposeCyberdeckCoroutine;
 
     float mouseOverTimeout;
-
+    float rejectClickTimeout;
 
     Camera currentAttackCamera;
     public void Initialize(BurgleTargetData data) {
@@ -218,6 +218,9 @@ public class BurglarCanvasController : MonoBehaviour {
     void Update() {
         if (mouseOverTimeout > 0) {
             mouseOverTimeout -= Time.unscaledDeltaTime;
+        }
+        if (rejectClickTimeout > 0) {
+            rejectClickTimeout -= Time.unscaledDeltaTime;
         }
     }
 
@@ -366,11 +369,12 @@ public class BurglarCanvasController : MonoBehaviour {
 
     public void HandleAttackResult(BurglarAttackResult result) {
         if (selectedTool == BurglarToolType.usb && result.success) { // TODO
+            rejectClickTimeout = 0.2f;
             usbCableAttached = true;
             SetTool(BurglarToolType.none);
             // usbRectTransform.position = result.element.uiElement.rectTransform.position;
             usbCable.transform.SetParent(transform, true);
-            usbCableCanvasGroup.enabled = false;
+            // usbCableCanvasGroup.enabled = false;
             cyberdeckRect.transform.SetAsLastSibling();
             uSBCordTool.Slacken(true);
             // Rect bounds = Toolbox.GetTotalRenderBoundingBox(result.element.transform, currentAttackCamera);
@@ -411,6 +415,8 @@ public class BurglarCanvasController : MonoBehaviour {
         if (result.changeCamera != null) {
             if (result.changeCameraQuad != null) {
                 StartCoroutine(zoomIntoCamera(result.changeCameraQuad, result.changeCamera));
+                elementHighlight.enabled = false;
+                elementHighlightText.enabled = false;
             } else {
                 SetCamera(result.changeCamera);
                 ShowReturnButton();
@@ -557,6 +563,7 @@ public class BurglarCanvasController : MonoBehaviour {
         SetSelectedElement(element);
         if (selectedTool == BurglarToolType.usb) {
             multiToolController.MouseOverUIElementCallback(element);
+            uSBCordTool.SetSpriteOpen(false);
         } else if (selectedTool == BurglarToolType.none) {
             SetCaptionText($"Use {element.elementName}");
         } else {
@@ -590,6 +597,7 @@ public class BurglarCanvasController : MonoBehaviour {
         SetSelectedElement(null);
         if (selectedTool == BurglarToolType.usb) {
             multiToolController.MouseExitUIElementCallback(element);
+            uSBCordTool.SetSpriteOpen(true);
         }
         if (element != null)
             element.OnMouseExit();
@@ -617,6 +625,7 @@ public class BurglarCanvasController : MonoBehaviour {
         selectedToolText.text = "";
     }
     public void ToolSelectCallback(string toolName) {
+        if (rejectClickTimeout > 0) return;
         // this is just so that we can properly wire up the buttons in unity editor.
         BurglarToolType toolType = toolName switch {
             "none" => BurglarToolType.none,
@@ -631,6 +640,7 @@ public class BurglarCanvasController : MonoBehaviour {
         };
         SetTool(toolType);
         multiToolController.OnToolSelect(toolType);
+        rejectClickTimeout = 0.2f;
     }
     public AudioClip[] ToolPickupSound(BurglarToolType toolType) {
         switch (toolType) {
@@ -669,7 +679,7 @@ public class BurglarCanvasController : MonoBehaviour {
         usbToolButton.SetActive(!usbCableAttached);
         wireCutterButton.SetActive(true);
         keycardButton.SetActive(true);
-        usbCableCanvasGroup.enabled = (!usbCableAttached);
+        // usbCableCanvasGroup.enabled = (!usbCableAttached);
 
         switch (toolType) {
             case BurglarToolType.none:
@@ -737,10 +747,11 @@ public class BurglarCanvasController : MonoBehaviour {
                 wireCutterImage.gameObject.SetActive(false);
 
                 ResetUSBTool();
+                uSBCordTool.SetSpriteOpen(true);
 
                 usbCable.transform.SetParent(toolPoint, true);
                 usbCable.SetActive(true);
-                usbCableCanvasGroup.enabled = true;
+                // usbCableCanvasGroup.enabled = true;
                 break;
             case BurglarToolType.wirecutter:
                 probeImage.enabled = false;
@@ -801,7 +812,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public void BurglarSelectorCallback() {
         burglarToolMaskRect.sizeDelta = new Vector2(0, 300);
         ShowBurglarTools(true);
-        StartCoroutine(MoveRectY(selectorRect, 106, -100, PennerDoubleAnimation.Linear));
+        StartCoroutine(MoveRectY(selectorRect, 106, -100, PennerDoubleAnimation.Linear, duration: 0.1f));
     }
     // public void CyberdeckSelectorCallback() {
     //     ChangeMode(Mode.cyberdeck);
@@ -916,9 +927,8 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         rect.sizeDelta = new Vector2(1256, 300);
     }
-    IEnumerator MoveRectY(RectTransform rect, float startY, float endY, Func<double, double, double, double, double> easing) {
+    IEnumerator MoveRectY(RectTransform rect, float startY, float endY, Func<double, double, double, double, double> easing, float duration = 0.5f) {
         float timer = 0;
-        float duration = 0.5f;
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             float y = (float)easing(timer, startY, endY - startY, duration);

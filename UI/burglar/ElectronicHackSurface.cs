@@ -34,6 +34,7 @@ public class ElectronicHackSurface : AttackSurfaceElement, INodeBinder<PowerNode
         PowerNode node = ((INodeBinder<PowerNode>)this).node;
         MaybeSelectCircuit();
         selectedCircuitLayout.powerLED?.SetActive(node.powered);
+        selectedCircuitLayout.powerLEDBackground.color = node.powered ? selectedCircuitLayout.ledPoweredColor : selectedCircuitLayout.ledUnpoweredColor;
     }
     void INodeBinder<AlarmNode>.HandleNodeChange() {
 

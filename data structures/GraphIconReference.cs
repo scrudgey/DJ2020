@@ -34,6 +34,9 @@ public class GraphIconReference : ScriptableObject {
     public Sprite physicalKey;
     public Sprite keyCard;
     public Sprite password;
+    public Sprite keycardCode;
+    public Sprite physicalKeyCode;
+    public Sprite keypadCode;
     [Header("UI")]
     public Sprite scanIcon;
     public Sprite downloadIcon;
@@ -166,9 +169,9 @@ public class GraphIconReference : ScriptableObject {
         KeyType.keycard => keyCard,
         KeyType.physical => physicalKey,
         KeyType.password => password,
-        KeyType.physicalCode => physicalKey,    // TODO
-        KeyType.keycardCode => keyCard,         // TODO
-        KeyType.keypadCode => keyCard,          // TODO
+        KeyType.physicalCode => physicalKeyCode,
+        KeyType.keycardCode => keycardCode,
+        KeyType.keypadCode => keypadCode,
         _ => keyCard
     };
 }

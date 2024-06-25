@@ -13,6 +13,9 @@ public class CircuitLayoutView : MonoBehaviour {
     public AttackSurfaceDoorLockChip doorlockChip;
     public AttackSurfaceInputChip inputChip;
     public GameObject powerLED;
+    public SpriteRenderer powerLEDBackground;
+    public Color ledPoweredColor;
+    public Color ledUnpoweredColor;
     public GameObject lockDisplayObject;
     public TextMeshPro lockDisplayText;
 
@@ -94,7 +97,7 @@ public class CircuitLayoutView : MonoBehaviour {
 
     void Update() {
         if (inputChip.isActiveAndEnabled && inputChip.doorLock != null) {
-            lockDisplayText.text = inputChip.doorLock.locked ? "door status:\nlocked" : "door status:\nunlocked";
+            lockDisplayText.text = inputChip.doorLock.locked ? "door lock:\nengaged" : "door lock:\nopen";
         }
     }
 }

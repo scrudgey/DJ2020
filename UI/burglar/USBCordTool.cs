@@ -10,6 +10,9 @@ public class USBCordTool : MonoBehaviour {
     public RectTransform toolTip;
     public RectTransform anchor;
     public RectTransform graphicRect;
+    public Image image;
+    public Sprite openSprite;
+    public Sprite closedSprite;
     Catenary catenary;
     float slack;
     float slackFactor;
@@ -38,6 +41,10 @@ public class USBCordTool : MonoBehaviour {
 
     public void SetSize(float scale) {
         graphicRect.sizeDelta = scale * Vector2.one;
+    }
+    public void SetSpriteOpen(bool value) {
+        Debug.Log($"set sprite: {value}");
+        image.sprite = value ? openSprite : closedSprite;
     }
 
     Vector2[] GetPoints() {

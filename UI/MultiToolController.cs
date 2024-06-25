@@ -54,6 +54,7 @@ public class MultiToolController : MonoBehaviour {
     AttackSurfaceInputChip currentInputChip;
     int currentNumericSlotIndex;
     Coroutine highlightBlinkRoutine;
+    Coroutine wireDisplayRoutine;
     public void Initialize() {
         decodedMessage.SetActive(false);
         ramDisplay.SetActive(false);
@@ -71,10 +72,10 @@ public class MultiToolController : MonoBehaviour {
                 DisplayWire((AttackSurfaceGraphWire)element);
             } else if (element is AttackSurfaceDoorLockChip) {
                 ChangeState(State.wireConnect);
-                wireDisplayText.text = $"RAM chip detected: door lock code";
+                wireDisplayText.text = $"RAM chip detected\n\ncontent: door lock code";
             } else if (element is AttackSurfaceInputChip) {
                 ChangeState(State.wireConnect);
-                wireDisplayText.text = $"Key input chip detected";
+                wireDisplayText.text = $"I/O chip detected\n\ntype: door code input";
             } else {
                 ChangeState(State.usbScan);
             }
@@ -92,7 +93,6 @@ public class MultiToolController : MonoBehaviour {
         currentTool = toolType;
         if (toolType == BurglarToolType.usb) {
             connectedElement = null;
-            Debug.Log($"on tool select: {toolType}");
             ChangeState(State.usbScan);
         } else {
             if (connectedElement == null)
@@ -108,16 +108,16 @@ public class MultiToolController : MonoBehaviour {
         string type = "";
         string targetName = "";
         if (wire.isAlarm) {
-            type = "alarm network";
+            type = "alarm";
             targetName = GameManager.I.GetAlarmNode(wire.toId).nodeTitle;
         } else if (wire.isCyber) {
-            type = "cyber network";
+            type = "cyber";
             targetName = GameManager.I.GetCyberNode(wire.toId).nodeTitle;
         } else if (wire.isPower) {
-            type = "power network";
+            type = "power";
             targetName = GameManager.I.GetPowerNode(wire.toId).nodeTitle;
         }
-        wireDisplayText.text = $"connected\ntype:{type}\nconnected to: {targetName}";
+        wireDisplayText.text = $"network analysis\n\ntype: {type}\n\nconnection: {targetName}";
     }
     void ChangeState(State newState) {
         ExitState(state);
@@ -131,18 +131,24 @@ public class MultiToolController : MonoBehaviour {
                     button.interactable = false;
                 }
                 noneDisplay.SetActive(true);
-                noneDisplayText.text = "select tool";
+                noneDisplayText.text = "electronic multitool v2.0";
                 break;
             case State.usbScan:
                 foreach (Button button in buttons) {
                     button.interactable = false;
                 }
                 wireDisplay.SetActive(true);
-                wireDisplayText.text = "scanning...";
+                if (wireDisplayRoutine != null) {
+                    StopCoroutine(wireDisplayRoutine);
+                }
+                wireDisplayRoutine = StartCoroutine(AnimateWireDisplay());
                 break;
             case State.wireConnect:
                 foreach (Button button in buttons) {
                     button.interactable = false;
+                }
+                if (wireDisplayRoutine != null) {
+                    StopCoroutine(wireDisplayRoutine);
                 }
                 wireDisplay.SetActive(true);
                 break;
@@ -152,7 +158,7 @@ public class MultiToolController : MonoBehaviour {
                 break;
             case State.input:
                 inputDisplay.SetActive(true);
-                inputTextDisplay.text = "input door code";
+                inputTextDisplay.text = "input door code:";
                 break;
         }
     }
@@ -225,7 +231,7 @@ public class MultiToolController : MonoBehaviour {
         enteredDigits[index] = value;
         ramBottomNumerals[index].text = $"{value}";
         ramBottomWaveImages[index].enabled = true;
-        Debug.Log($"permutations: {waveformPermutation.Count}\twaveforms: {waveforms.Count}\tdigit-1: {value - 1}\tpermutation: {waveformPermutation[value - 1]}");
+        // Debug.Log($"permutations: {waveformPermutation.Count}\twaveforms: {waveforms.Count}\tdigit-1: {value - 1}\tpermutation: {waveformPermutation[value - 1]}");
 
         ramBottomWaveImages[index].sprite = waveforms[waveformPermutation[value - 1]];
 
@@ -445,7 +451,6 @@ public class MultiToolController : MonoBehaviour {
                 keyId += enteredDigits[i] * (int)Mathf.Pow(10, 3 - i);
             }
 
-            Debug.Log($"attempt to input: {keyId}");
             if (currentInputChip.keycardReader != null) {
                 bool success = currentInputChip.keycardReader.AttemptSingleKey(keyId);
                 if (success)
@@ -502,11 +507,9 @@ public class MultiToolController : MonoBehaviour {
         foreach (Button button in buttons) {
             button.interactable = false;
         }
-        // RectTransform[] rectTransforms = inputNumerals.Select(numeral => numeral.GetComponent<RectTransform>()).ToArray();
 
         WaitForSecondsRealtime wait = new WaitForSecondsRealtime(1f);
         yield return wait;
-        // foreach(RectTransform rectTransform in rectTransforms){
         foreach (TextMeshProUGUI numeral in inputNumerals) {
             numeral.color = Color.red;
         }
@@ -517,5 +520,19 @@ public class MultiToolController : MonoBehaviour {
         // }
         InitializeInputChip(currentInputChip);
 
+    }
+
+    IEnumerator AnimateWireDisplay() {
+        WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.3f);
+        while (true) {
+            wireDisplayText.text = "scanning...";
+            yield return wait;
+            wireDisplayText.text = "scanning";
+            yield return wait;
+            wireDisplayText.text = "scanning.";
+            yield return wait;
+            wireDisplayText.text = "scanning..";
+            yield return wait;
+        }
     }
 }

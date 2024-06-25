@@ -110,7 +110,7 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
             transform.position = Vector3.Lerp(initialPosition, towardCameraPosition, amount);
         });
 
-        yield return Toolbox.Ease(null, 0.5f, 0f, 1f, PennerDoubleAnimation.Linear, (amount) => {
+        yield return Toolbox.Ease(null, 0.45f, 0f, 1f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, amount);
         });
 
@@ -139,7 +139,7 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
 
         Vector3 cornerPosition = (camera.transform.position + forwardDisplacement) - (halfHeight * camera.transform.up) - (halfWidth * camera.transform.right);
 
-        yield return Toolbox.Ease(null, 0.7f, 0f, 1f, PennerDoubleAnimation.Linear, (amount) => {
+        yield return Toolbox.Ease(null, 0.65f, 0f, 1f, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             transform.position = Vector3.Lerp(towardCameraPosition, cornerPosition, amount);
         });
         state = State.open;
