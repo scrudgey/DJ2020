@@ -28,7 +28,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
     public WeaponState primaryGun { get; set; }
     public WeaponState secondaryGun { get; set; }
     public WeaponState tertiaryGun { get; set; }
-    public int activeGun { get; set; }
     public int numberOfShellsPerReload() {
         return PerkNumberOfShellsPerReload();
     }
@@ -110,7 +109,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             primaryGun = new WeaponState(gunState1),
             secondaryGun = null,
             tertiaryGun = null,
-            activeGun = -1,
             cyberlegsLevel = 0,
             maxConcurrentNetworkHacks = 1,
             hackSpeedCoefficient = 1f,
@@ -276,7 +274,6 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
             // secondaryGun = sword,
             tertiaryGun = null,
             // tertiaryGun = new WeaponState(gunState3),
-            activeGun = -1,
 
             // items = new List<string> { "explosive", "deck", "goggles", "tools" },
 

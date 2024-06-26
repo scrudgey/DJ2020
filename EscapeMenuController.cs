@@ -32,6 +32,8 @@ public class EscapeMenuController : MonoBehaviour {
     public Button dataTabButton;
     public TextMeshProUGUI dataCount;
 
+    public GameObject characterTab;
+    public Button characterTabButton;
 
     [Header("objective")]
     public EscapeMenuObjectiveController objectiveController;
@@ -43,6 +45,9 @@ public class EscapeMenuController : MonoBehaviour {
     public EscapeMenuKeyController keyController;
     [Header("data")]
     public EscapeMenuDataController dataController;
+    [Header("character")]
+    public EscapeMenuCharacterTabController characterController;
+
     [Header("colors")]
     public ColorBlock normalTabColors;
     public ColorBlock selectedTabColors;
@@ -62,6 +67,7 @@ public class EscapeMenuController : MonoBehaviour {
         int currentLoots = data.playerState.loots.Count;
         int currentData = data.playerState.payDatas.Count;
         int currentKeys = 0;
+        characterController.Initialize(data);
 
         if (data.phase == GamePhase.world) {
             objectiveTabButton.gameObject.SetActive(false);
@@ -72,7 +78,7 @@ public class EscapeMenuController : MonoBehaviour {
             lootController.Initialize(data.playerState.loots.ToList());
             dataController.Initialize(data.playerState.payDatas.ToList());
 
-            ChangeTabCallback("map");
+            ChangeTabCallback("character");
         } else {
             currentLoots += data.levelState.delta.levelAcquiredLoot.Count;
             currentData += data.levelState.delta.levelAcquiredPaydata.Count;
@@ -115,6 +121,7 @@ public class EscapeMenuController : MonoBehaviour {
         lootTab.SetActive(false);
         keyTab.SetActive(false);
         dataTab.SetActive(false);
+        characterTab.SetActive(false);
         switch (tabName) {
             case "objective":
                 objectiveTab.SetActive(true);
@@ -141,6 +148,11 @@ public class EscapeMenuController : MonoBehaviour {
                 SetButtonSelectedColor(dataTabButton);
                 ChangeMenuSize(1060);
                 break;
+            case "character":
+                characterTab.SetActive(true);
+                SetButtonSelectedColor(characterTabButton);
+                ChangeMenuSize(1060);
+                break;
         }
     }
 
@@ -164,6 +176,8 @@ public class EscapeMenuController : MonoBehaviour {
         dataTabButton.colors = normalTabColors;
         keyTabButton.colors = normalTabColors;
         lootTabButton.colors = normalTabColors;
+        characterTabButton.colors = normalTabColors;
+
         target.colors = selectedTabColors;
     }
 }

@@ -3518,6 +3518,21 @@ speed up + pitch up blitting?
         * jazz up multitool display
         * animate "scanning ..."
         * better text
+* general character overview info panel / unify with loadout view
+    inventory layout as grid instead of list? with drag and drop?
+    a stats view for items selected
+    a stats view for player character
+* character tab
+    * disable "clear" buttons in this view
+    * make buttons not interactible
+    * show health
+    * show name
+    * skill points and level up button
+    * body / hack / speech levels
+    weapon proficiency?
+    * during mission, use current weapon to set skin
+
+
 
 
 
@@ -3937,29 +3952,19 @@ destructible walls
     re-bake navmesh
 record new gameplay footage
 
-
-
-
-
-
-
-
-
-
 draw
     logos for omni, delta, elf
     update the steam page graphic
     draw more circuit board layouts
     swat portrait
 
-general character overview info panel / unify with loadout view
-    empty gun icon for gun slots
-    inventory layout as grid instead of list? with drag and drop?
-    armor slots
-        head and torso?
-    a stats view for items selected
-    a stats view for player character
-    rotate the character, show him with weapon drawn / not, running etc
+
+
+
+
+
+
+
 
 make graphs more readable
     limit icons shown to current floor / show other floors as transparent gray
@@ -3981,5 +3986,6 @@ tune impacts
 tune gibbing
 write some real mission descriptions 
 fix elevator maqp data
-
-
+armor slot
+head slot?
+rotate the character, show him with weapon drawn / not, running etc

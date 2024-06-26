@@ -5,15 +5,15 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class LoadoutGearSlotButton : MonoBehaviour {
-    public MissionPlanLoadoutController loadoutController;
     public Image weaponImage;
     public ItemTemplate item;
     public TextMeshProUGUI itemName;
-    int index;
+    public int index;
+    CharacterView characterView;
 
-    public void Initialize(MissionPlanLoadoutController controller, int index) {
-        this.loadoutController = controller;
+    public void Initialize(CharacterView characterView, int index) {
         this.index = index;
+        this.characterView = characterView;
     }
     public void SetItem(ItemTemplate item) {
         if (item == null) {
@@ -30,6 +30,6 @@ public class LoadoutGearSlotButton : MonoBehaviour {
         itemName.text = "";
     }
     public void OnClick() {
-        loadoutController.ItemSlotClicked(index, this);
+        characterView.ItemButtonClicked(this);
     }
 }

@@ -8,33 +8,21 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MissionPlanLoadoutController : MonoBehaviour {
+    public CharacterView characterView;
     public AudioClip[] openPickerSounds;
     public AudioClip[] pickerCallbackSounds;
     public AudioClip[] weaponSelectorSounds;
     public AudioSource audioSource;
-
-    public GameObject thirdWeaponSlot;
-    public Image headImage;
-    public Image torsoImage;
-    public Image legsImage;
     public GunStatHandler gunStatHandler;
     public Transform pickerContainer;
     public GameObject pickerEntryPrefab;
     public GameObject pickerHeaderPrefab;
-    public TextMeshProUGUI captionText;
 
     [Header("weapon slots")]
-    public LoadoutWeaponButton primaryWeaponButton;
-    public LoadoutWeaponButton secondaryWeaponButton;
-    public LoadoutWeaponButton tertiaryWeaponButton;
-
     public GameObject primaryHighlight;
     public GameObject secondaryHighlight;
     public GameObject tertiaryHighlight;
 
-    [Header("item slots")]
-    public LoadoutGearSlotButton[] itemSlots;
-    public GameObject itemSlot5;
     [Header("picker")]
     public GameObject pickerObject;
     public RectTransform statsRect;
@@ -46,37 +34,12 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     int selectedItemSlot;
     GameData data;
     LevelPlan plan;
-
-    // animation
-    Vector3 initialTorsoPosition;
-    Vector3 initialHeadPosition;
-    float timer;
-
-    Skin legsSkin;
-    Skin bodySkin;
-    Skin headSkin;
-
-    float headAngle;
-
     Coroutine pickerCoroutine;
     Coroutine statsCoroutine;
     bool initialized;
     public void Initialize(GameData data, LevelTemplate template, LevelPlan plan) {
         this.data = data;
         this.plan = plan;
-        InitializeSkins(data);
-        SetCaptionText(data.playerState);
-
-        initialTorsoPosition = torsoImage.transform.localPosition;
-        initialHeadPosition = headImage.transform.localPosition;
-
-        ApplyGunTemplate(primaryWeaponButton, data.playerState.primaryGun);
-        ApplyGunTemplate(secondaryWeaponButton, data.playerState.secondaryGun);
-        ApplyGunTemplate(tertiaryWeaponButton, data.playerState.tertiaryGun);
-
-        // hide tertiary box
-
-        InitializeItemSlots(plan);
 
         selectedWeaponSlot = 0;
 
@@ -90,15 +53,9 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         secondaryHighlight.SetActive(false);
         tertiaryHighlight.SetActive(false);
 
-        thirdWeaponSlot.SetActive(data.playerState.PerkThirdWeaponSlot());
-        itemSlot5.SetActive(data.playerState.PerkNumberOfItemSlots() == 5);
+        characterView.Initialize(data, plan);
 
         initialized = true;
-    }
-
-    void SetCaptionText(PlayerState playerState) {
-        string caption = $"HP: {playerState.health}/{playerState.fullHealthAmount()}\nDEF: {playerState.armorLevel}";
-        captionText.text = caption;
     }
 
     void ShowStatsView() {
@@ -135,55 +92,11 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         ));
     }
 
+    public void WeaponSlotClicked(LoadoutWeaponButton weaponButton) {
+        WeaponState weaponState = weaponButton.gunState;
+        int slotIndex = weaponButton.weaponIndex;
 
-    void ApplyGunTemplate(LoadoutWeaponButton button, WeaponState gunstate) {
-        if (gunstate != null) {
-            button.ApplyGunTemplate(gunstate);
-        } else {
-            button.WeaponClearCallback();
-        }
-    }
-
-    void InitializeItemSlots(LevelPlan plan) {
-        int numberOfItemSlots = GameManager.I.gameData.playerState.PerkNumberOfItemSlots();
-        for (int i = 0; i < numberOfItemSlots; i++) {
-            itemSlots[i].Initialize(this, i);
-            if (i < plan.items.Count) {
-                // BaseItem item = BaseItem.LoadItem(plan.items[i]);
-                SetItemSlot(i, plan.items[i]);
-            } else {
-                SetItemSlot(i, null);
-            }
-        }
-    }
-    void SetItemSlot(int index, ItemTemplate item) {
-        if (item == null) {
-            itemSlots[index].Clear();
-            return;
-        } else {
-            itemSlots[index].SetItem(item);
-        }
-    }
-
-    void InitializeSkins(GameData data) {
-        string legSkinName = data.playerState.legSkin;
-        string torsoSkinName = data.playerState.bodySkin;
-        string headSkinName = data.playerState.headSkin;
-
-        legsSkin = Skin.LoadSkin(legSkinName);
-        bodySkin = Skin.LoadSkin(torsoSkinName);
-        headSkin = Skin.LoadSkin(headSkinName);
-
-        Direction headDirection = Direction.rightDown;
-
-        headImage.sprite = headSkin.headIdle[headDirection][0];
-        torsoImage.sprite = bodySkin.smgIdle[Direction.rightDown][0];
-        legsImage.sprite = legsSkin.legsIdle[Direction.rightDown][0];
-    }
-
-
-    public void WeaponSlotClicked(int slotIndex, WeaponState weaponState, bool clear = false) {
-        if (weaponState == null || clear) {
+        if (weaponState == null) {
             gunStatHandler.ClearGunTemplate();
         } else {
             ShowStatsView();
@@ -212,41 +125,37 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 break;
         }
         InitializeWeaponPicker();
-        if (weaponState == null) {
-            torsoImage.sprite = bodySkin.unarmedIdle[Direction.rightDown][0];
-        }
-        if (clear) {
-            selectedWeaponSlot = 0;
-            primaryHighlight.SetActive(false);
-            secondaryHighlight.SetActive(false);
-            tertiaryHighlight.SetActive(false);
-            StartPickerCoroutine(ClosePicker());
-            switch (slotIndex) {
-                case 1:
-                    data.playerState.primaryGun = null;
-                    break;
-                case 2:
-                    data.playerState.secondaryGun = null;
-                    break;
-                case 3:
-                    data.playerState.tertiaryGun = null;
-                    break;
-            }
-        } else if (!pickerOpen) {
+
+        if (!pickerOpen) {
             Toolbox.RandomizeOneShot(audioSource, openPickerSounds, randomPitchWidth: 0.05f);
             StartPickerCoroutine(OpenPicker());
         }
     }
-
-    public void CancelSelect() {
-        WeaponSlotClicked(0, null, clear: true);
+    public void ClearWeaponSlot(LoadoutWeaponButton button) {
+        int slotIndex = button.weaponIndex;
+        selectedWeaponSlot = 0;
+        primaryHighlight.SetActive(false);
+        secondaryHighlight.SetActive(false);
+        tertiaryHighlight.SetActive(false);
+        StartPickerCoroutine(ClosePicker());
+        switch (slotIndex) {
+            case 1:
+                data.playerState.primaryGun = null;
+                break;
+            case 2:
+                data.playerState.secondaryGun = null;
+                break;
+            case 3:
+                data.playerState.tertiaryGun = null;
+                break;
+        }
     }
-    public void ItemSlotClicked(int slotIndex, LoadoutGearSlotButton button) {
-        // Debug.Log($"item slot {slotIndex} {button.item}");
+
+    public void ItemSlotClicked(LoadoutGearSlotButton button) {
         HideStatsView();
         selectedWeaponSlot = 0;
 
-        selectedItemSlot = slotIndex;
+        selectedItemSlot = button.index;
         InitializeItemPicker();
 
         primaryHighlight.SetActive(false);
@@ -287,18 +196,18 @@ public class MissionPlanLoadoutController : MonoBehaviour {
     public void StashPickerMouseExitCallback(LoadoutStashPickerButton picker) {
         switch (picker.type) {
             case LoadoutStashPickerButton.PickerType.gun:
-                LoadoutWeaponButton button = selectedWeaponSlot switch {
+                WeaponState gunState = selectedWeaponSlot switch {
                     0 => null,
-                    1 => primaryWeaponButton,
-                    2 => secondaryWeaponButton,
-                    3 => tertiaryWeaponButton
+                    1 => data.playerState.primaryGun,
+                    2 => data.playerState.secondaryGun,
+                    3 => data.playerState.tertiaryGun
                 };
-                if (button == null || button.gunState == null) {
+                if (gunState == null) {
                     HideStatsView();
                     break;
                 }
-                if (button.gunState.type == WeaponType.gun) {
-                    gunStatHandler.DisplayGunState(button.gunState.gunInstance);
+                if (gunState.type == WeaponType.gun) {
+                    gunStatHandler.DisplayGunState(gunState.gunInstance);
                 } else {
                     gunStatHandler.ClearGunTemplate();
                 }
@@ -314,17 +223,6 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         secondaryHighlight.SetActive(false);
         tertiaryHighlight.SetActive(false);
 
-        LoadoutWeaponButton button = selectedWeaponSlot switch {
-            1 => primaryWeaponButton,
-            2 => secondaryWeaponButton,
-            3 => tertiaryWeaponButton
-        };
-
-        // WeaponState weaponState = new WeaponState(gunstate);
-        button.ApplyGunTemplate(weaponState);
-        // TODO: apply total state, not just template
-        // gunStatHandler.DisplayGunTemplate(picker.gunstate.template);
-        // TODO: change plan, not player state (requires change to VR mission designer too?)
         switch (selectedWeaponSlot) {
             case 1:
                 data.playerState.primaryGun = weaponState;
@@ -336,24 +234,20 @@ public class MissionPlanLoadoutController : MonoBehaviour {
                 data.playerState.tertiaryGun = weaponState;
                 break;
         }
-        Octet<Sprite[]> octet;
-        if (weaponState.type == WeaponType.melee) {
-            octet = bodySkin.swordIdle;
-        } else {
-            octet = weaponState.gunInstance.template.type switch {
-                GunType.pistol => bodySkin.pistolIdle,
-                GunType.smg => bodySkin.smgIdle,
-                GunType.rifle => bodySkin.rifleIdle,
-                GunType.shotgun => bodySkin.shotgunIdle,
-            };
-        }
-        torsoImage.sprite = octet[Direction.rightDown][0];
+        characterView.currentWeaponState = weaponState;
+
+        // view stuff
+        characterView.Refresh(data.playerState, plan);
     }
     void ItemPickerCallback(LoadoutStashPickerButton picker) {
-        SetItemSlot(selectedItemSlot, picker.item);
-        // plan.items.Add(picker.item.data.shortName);
         plan.items[selectedItemSlot] = picker.item;
         InitializeItemPicker();
+
+        // view stuff
+        characterView.Refresh(data.playerState, plan);
+    }
+    public void ClearItemSlot() {
+        // TODO
     }
 
     void InitializeItemPicker() {
@@ -447,41 +341,6 @@ public class MissionPlanLoadoutController : MonoBehaviour {
         text.text = caption;
         return text;
     }
-
-    void Update() {
-        if (!initialized) return;
-        timer += Time.unscaledDeltaTime;
-
-        Vector3 torsoPosition = new Vector3(initialTorsoPosition.x, initialTorsoPosition.y, initialTorsoPosition.z);
-        Vector3 headPosition = new Vector3(initialHeadPosition.x, initialHeadPosition.y, initialHeadPosition.z);
-
-        torsoPosition.y += 0.35f * Mathf.Sin(timer);
-        headPosition.y += 0.55f * Mathf.Sin(timer + Mathf.PI / 8);
-
-        torsoImage.transform.localPosition = torsoPosition;
-        headImage.transform.localPosition = headPosition;
-
-        torsoImage.transform.localScale = (1 + Mathf.Clamp(Mathf.Sin(timer), 0f, 1f) * 0.02f) * Vector3.one;
-
-        Direction headDirection = Direction.rightDown;
-        headAngle = Mathf.Sin(timer + Mathf.PI * 3f / 4f);
-        switch (headAngle) {
-            case float n when (n < -0.5f):
-                headDirection = Direction.leftDown;
-                break;
-            case float n when (n >= -0.5f && n < 0):
-                headDirection = Direction.down;
-                break;
-            case float n when (n >= 0 && n < 0.5f):
-                headDirection = Direction.rightDown;
-                break;
-            case float n when (n > 0.5f):
-                headDirection = Direction.right;
-                break;
-        }
-        headImage.sprite = headSkin.headIdle[headDirection][0];
-    }
-
 
     public void OnWeaponSlotMouseOver(LoadoutWeaponButton button) {
         if (button.gunState != null) {
