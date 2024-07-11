@@ -10,10 +10,12 @@ public class SphereClearPointsState : SphereControlState {
     CharacterController characterController;
     ClearPoint targetPoint;
     ClearPoint[] allClearPoints;
-    public SphereClearPointsState(SphereRobotAI ai, CharacterController characterController, ClearPoint[] allClearPoints) : base(ai) {
+    float speedCoefficient;
+    public SphereClearPointsState(SphereRobotAI ai, CharacterController characterController, ClearPoint[] allClearPoints, float speed = 1f) : base(ai) {
         this.ai = ai;
         this.characterController = characterController;
         this.allClearPoints = allClearPoints;
+        this.speedCoefficient = speed;
     }
     public override void Enter() {
         base.Enter();
@@ -26,11 +28,12 @@ public class SphereClearPointsState : SphereControlState {
             new TaskConditional(() => targetPoint != null),
             new TaskMoveToKey(owner.transform, NAV_POINT_KEY, owner.physicalKeys, characterController) {
                 headBehavior = TaskMoveToKey.HeadBehavior.search,
-                speedCoefficient = 1f
+                speedCoefficient = speedCoefficient
             },
             new TaskLambda(() => {
                 // Debug.Log($"target point {targetPoint} cleared");
                 targetPoint.cleared = true;
+                targetPoint.claimed = false;
                 targetPoint = GetClosestUncheckedClearpoint();
                 if (targetPoint != null)
                     rootTaskNode.SetData(NAV_POINT_KEY, targetPoint.transform.position);
@@ -48,9 +51,20 @@ public class SphereClearPointsState : SphereControlState {
         return input;
     }
     ClearPoint GetClosestUncheckedClearpoint() {
-        return allClearPoints
+        ClearPoint nearestUnclaimed = allClearPoints
+                .Where(point => !point.cleared && !point.claimed)
+                .OrderByDescending(point => Vector3.Distance(point.transform.position, owner.transform.position))
+                .FirstOrDefault();
+
+        if (nearestUnclaimed == null) {
+            nearestUnclaimed = allClearPoints
                 .Where(point => !point.cleared)
                 .OrderByDescending(point => Vector3.Distance(point.transform.position, owner.transform.position))
                 .FirstOrDefault();
+        }
+
+        if (nearestUnclaimed != null)
+            nearestUnclaimed.claimed = true;
+        return nearestUnclaimed;
     }
 }

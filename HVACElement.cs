@@ -19,7 +19,8 @@ public class HVACElement : MonoBehaviour {
         if (grate == null) {
             controller.TransitionToState(CharacterState.normal);
         } else {
-            GameManager.I.ShowGrateKickCutscene(this, controller);
+            // GameManager.I.ShowGrateKickCutscene(this, controller);
+            CutsceneManager.I.StartCutscene(new KickOutHVACGrateCutscene(this));
             grate = null;
         }
     }

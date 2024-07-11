@@ -3531,8 +3531,49 @@ speed up + pitch up blitting?
     * body / hack / speech levels
     weapon proficiency?
     * during mission, use current weapon to set skin
-
-
+    * culling floors
+    * heavy door
+    * truck        
+    * lab bench
+        * large tanks, horizontal
+        * large tanks, vertical 
+        * lockers
+        * overhead pipes
+        * wall_b with vent access
+        * wall pipes
+* connect up truck parts
+    * allow passengers
+    * wheels move when truck moves
+    * passenger dismount
+* scripting the level
+    * communication at start: this is the place, find a way in
+    * cutscene:
+        * move & point camera
+        * truck arrives
+        * dialogue: hey look the lab is open
+        * point camera
+* triggers in the level call back to the cutscene manager with string ids, to be handled by ienumerator subroutines
+* spawn points and other level specific locations / tags can be specified by special components, 
+* correct truck rotation
+* wheels rotate
+* move camera to position
+* text blinks on screen
+* dialogue box
+? allow dialogue to time out instead of continue
+* change status to trespassing inside the lab
+    * guards attack on sight- apply suspicion record
+* handle timescale in cutscene management
+* npcs move into search mode
+* npcs don't run
+* better clearpoints state
+* prevent door from shutting
+* vehicle exit sound
+* vehicle engine sounds
+    * loop
+    * start engine when first passenger enters
+    * stop engine when last passenger exits
+* randomize punks
+* spotted highlight in cutscene
 
 
 
@@ -3705,6 +3746,10 @@ graphics
             in wetworks project
             in pixaki
     models:
+        lab equipment   
+            fume hood
+            containers
+        wall buttresses
         another car
         buildings
         barrel not on fire
@@ -3941,7 +3986,6 @@ unresolved mechanics / gameplay questions:
 
 missions
     1 way shootout
-    investigate the laboratory
     productionize office
         redo apartment after office
 
@@ -3970,16 +4014,6 @@ make graphs more readable
     limit icons shown to current floor / show other floors as transparent gray
     sub-nodes
 
-ambience system
-    a separate channel in mixer
-    non-spatial audio- let code control volume
-    collider regions tied to audio clips
-        police sirens
-        city ambience
-        room tone 
-    collider regions are nested and have precedence
-    determine distance to collider region and fade out?
-        two regions? one for activation and one for distance?
 
 fix up key info pane
 tune impacts
@@ -3989,3 +4023,38 @@ fix elevator maqp data
 armor slot
 head slot?
 rotate the character, show him with weapon drawn / not, running etc
+? vehicle accelerate / decelerate
+? smoke
+
+
+investigate the laboratory
+    rain
+    spritesheets
+    guards got stuck/bunched up- otherwise v. good
+
+
+grill texture on lights
+using keycard reader should open door
+using door should interact with keycard reader
+AC unit entry is broken
+check crawling wall grates
+wall with hole cutaway
+clearsighter should bind to camera
+prevent pause / escape during cutscene
+? door can be interacted with from a distance
+figure out why cutscene skybox is blank
+
+
+
+ambience system
+    a separate channel in mixer
+    non-spatial audio- let code control volume
+        location: set when camera target position changes
+        set location like we set audiolistener in cutscene manager
+    collider regions tied to audio clips
+        police sirens
+        city ambience
+        room tone 
+    collider regions are nested and have precedence
+    determine distance to collider region and fade out?
+        two regions? one for activation and one for distance?

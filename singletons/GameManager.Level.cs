@@ -169,7 +169,7 @@ public partial class GameManager : Singleton<GameManager> {
         SetOverlay(OverlayType.none);
 
         if (doCutscene)
-            StartCutsceneCoroutine(StartMissionCutscene());
+            CutsceneManager.I.StartCutscene(new StartMissionCutscene());
     }
 
     public void StartWorld(string sceneName) {
@@ -348,6 +348,10 @@ public partial class GameManager : Singleton<GameManager> {
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
+            CutsceneManager.I.InitializeSceneReferences();
+            foreach (ScriptInitializer script in GameObject.FindObjectsOfType<ScriptInitializer>()) {
+                script.StartCutscene();
+            }
             isLoadingLevel = false;
         }, unloadAll));
     }
@@ -514,9 +518,9 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log("connecting power grid...");
         foreach (PoweredComponent component in GameObject.FindObjectsOfType<PoweredComponent>()) {
             PowerNode node = GetPowerNode(component.idn);
-            // Debug.Log($"{component} {component.idn} {node}");
             component.node = node;
             foreach (INodeBinder<PowerNode> binder in component.GetComponentsInChildren<INodeBinder<PowerNode>>(true)) {
+                // Debug.Log($"{component}\t{component.idn}\t{node}\t{binder}");
                 binder.Bind(node);
             }
         }

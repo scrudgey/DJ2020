@@ -14,7 +14,8 @@ public struct CameraInput {
     public Vector2 lastWallInput;
     public bool crouchHeld;
     public Vector3 playerPosition;
-    public CharacterState state;
+    public CharacterState characterState;
+    public CameraState state;
     public CursorData targetData;
     public Vector3 playerDirection;
     public PopoutParity popoutParity;
@@ -24,4 +25,5 @@ public struct CameraInput {
     public bool atLeftEdge;
     public bool atRightEdge;
     public AttackSurface currentAttackSurface;
+    public bool ignoreAttractor;
 }

@@ -49,7 +49,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
     [Header("Rotation")]
     public float RotationSpeed = 1f;
-    // public float RotationSharpness = 100000f;
     public float RotationSharpness = 1f;
     Quaternion targetRotation = Quaternion.identity;
     public Quaternion idealRotation = Quaternion.identity;
@@ -63,12 +62,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     public List<Collider> IgnoredColliders = new List<Collider>();
 
     public Transform Transform { get; private set; }
-    // public Transform FollowTransform { get; private set; }
     public Vector3 PlanarDirection { get; set; }
     public float TargetDistance { get; set; }
     public bool disableLockOn;
 
-    // private bool _distanceIsObstructed;
     private float _currentDistance;
     private RaycastHit _obstructionHit;
     private int _obstructionCount;
@@ -140,7 +137,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
         targetRotation = planarRot * verticalRot;
 
-        // cardinalDirections = new List<float> { 45f, 135f, 225f, 315f }.Select(angle => Quaternion.Euler(0f, angle, 0f) * rotationFromInput).ToList();
         cardinalDirections = new Dictionary<Quaternion, IsometricOrientation>(){
             {Quaternion.Euler(0f, 45f, 0f) * rotationFromInput, IsometricOrientation.NE},
             {Quaternion.Euler(0f, 135f, 0f) * rotationFromInput, IsometricOrientation.SE},
@@ -162,8 +158,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             if (collider != null)
                 attractors.Add(collider);
         }
-        // IgnoredColliders.Clear();
-        // IgnoredColliders.AddRange(Character.gameObject.GetComponentsInChildren<Collider>());
     }
     void HandleEyeVisibilityChange(PlayerState playerData) {
         thermalGogglesActive = playerData.cyberEyesThermalBuff;
@@ -249,7 +243,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 break;
         }
     }
-    // Set the transform that the camera will orbit around
     public void SetFollowTransform(GameObject g) {
         if (g == null)
             return;
@@ -257,24 +250,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         IgnoredColliders.AddRange(g.GetComponentsInChildren<Collider>());
     }
 
-    public void UpdateWithInput(CameraInput input, bool ignoreAttractor = false) {
-        // if (FollowTransform == null)
-        // return;
+    public void UpdateWithInput(CameraInput input) {
         if (Camera == null) return;
-        CameraState camState = CameraState.normal;
+        CameraState camState = input.state;
         currentAttractor = null;
 
-        if (input.state == CharacterState.overlayView) {
-            camState = CameraState.overlayView;
-        } else if (input.state == CharacterState.hvacAim) {
-            camState = CameraState.firstPerson;
-        } else if (input.state == CharacterState.aim) {
-            camState = CameraState.aim;
-        } else if (input.state == CharacterState.wallPress || input.state == CharacterState.popout) {
-            camState = CameraState.wallPress;
-        } else if (input.state == CharacterState.burgle) {
-            camState = CameraState.burgle;
-        } else if (!ignoreAttractor) {
+        if (camState == CameraState.normal && !input.ignoreAttractor) {
             // check / update Attractor
             foreach (CameraAttractorZone attractor in attractors) {
                 if (attractor == null) continue;
@@ -339,6 +320,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
                 volume.profile = aimProfile;
                 SetSkyBoxCamerasEnabled(true);
                 break;
+            case CameraState.free:
+                RenderSettings.skybox = wallPressSkybox;
+                ApplyTargetParameters(FreeCamParameters(input));
+                volume.profile = isometricProfile;
+                SetSkyBoxCamerasEnabled(true);
+                break;
         }
         if (thermalGogglesActive) {
             volume.profile = thermalProfile;
@@ -391,12 +378,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             desiredOrthographicSize = Math.Min(20f, desiredOrthographicSize);
             // orthographic size is half-size physical length
             fieldOfView = (float)Mathf.Atan(desiredOrthographicSize / (_currentDistance * Camera.aspect)) * (360f / 6.28f) * 2f;
-            // Debug.Log($"{input.orthographicSize} {Camera.fieldOfView}");
         }
         currentOrthographicSize = desiredOrthographicSize;
 
         Vector3 targetPosition = lastTargetPosition;
-        if (input.state == CharacterState.superJump || input.state == CharacterState.landStun) {
+        if (input.characterState == CharacterState.superJump || input.characterState == CharacterState.landStun) {
             zoomCoefficientTarget += Time.unscaledDeltaTime * 0.1f;
         } else if (transitionTime >= 0.1f && input.targetData != null) {
             Vector3 screenOffset = Vector3.zero;
@@ -423,13 +409,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             deltaTime = input.deltaTime,
             targetDistance = MaxDistance,
             targetPosition = targetPosition,
-            orthographicSize = currentOrthographicSize, // 8 TODO: set by attractor and/or level
-                                                        // orthographicSize = 3, // 8 TODO: set by attractor and/or level
+            orthographicSize = currentOrthographicSize,
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
-            distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state,
-            playerDirection = input.playerDirection,
             minDistance = MinDistance
 
         };
@@ -438,7 +420,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         CameraTargetParameters parameters = NormalParameters(input);
         if (currentAttractor != null) {
             parameters.followingSharpness = currentAttractor.movementSharpness;
-            // Vector3 delta = input.targetPosition - currentAttractor.sphereCollider.bounds.center;
             if (ORTHOGRAPHIC_MODE) {
                 parameters.targetPosition = (currentAttractor.sphereCollider.bounds.center * (zoomCoefficient - 0.25f)) + (parameters.targetPosition * (1.25f - zoomCoefficient));
             } else {
@@ -458,7 +439,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         } else if (input.atRightEdge) {
             LROffset += -0.9f * input.targetTransform.right;
         }
-        if (input.state == CharacterState.popout) LROffset = -1f * LROffset;
+        if (input.characterState == CharacterState.popout) LROffset = -1f * LROffset;
 
         Vector3 distOffset = input.wallNormal * TargetDistance;
         // Vector3 heightOffset = new Vector3(0, -0.5f, 0);
@@ -484,14 +465,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state,
-            playerDirection = input.playerDirection,
             minDistance = MinDistance
-
         };
 
-        if (input.state == CharacterState.wallPress || input.state == CharacterState.burgle) {
+        if (input.characterState == CharacterState.wallPress || input.characterState == CharacterState.burgle) {
             lastWallPressTargetParameters = targetParameters;
             return targetParameters;
         } else {
@@ -507,7 +484,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Vector3 distOffset = Vector3.zero;
 
         Vector3 heightOffset = Vector3.zero;
-        // Vector3 heightOffset = new Vector3(0, 0.25f, 0);
         if (input.crouchHeld) {
             heightOffset -= new Vector3(0, 0.5f, 0);
         }
@@ -548,11 +524,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             targetDistance = 0.5f,
             targetPosition = input.targetPosition + horizontalOffset + heightOffset,
             orthographicSize = 4f,
-            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state,
-            playerDirection = input.playerDirection,
+            // distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            // followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            rotationSharpness = 1000f,
+            distanceMovementSharpness = 1000f,
+            followingSharpness = 1000f,
             minDistance = MinDistance
 
         };
@@ -581,39 +557,36 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state,
-            playerDirection = input.playerDirection,
             minDistance = 0
         };
     }
     public CameraTargetParameters BurgleParameters(CameraInput input) {
-        // Quaternion verticalRot = Quaternion.Euler((float)PennerDoubleAnimation.ExpoEaseIn(transitionTime, verticalRotationOffset, -1f * verticalRotationOffset, 1f), 0, 0);
-
-        // Quaternion verticalRot = Quaternion.Euler(verticalRotationOffset, 0, 0);
-        // PlanarDirection = Vector3.Cross(Vector3.up, Vector3.Cross(PlanarDirection, Vector3.up));
-        // Quaternion planarRot = Quaternion.LookRotation(PlanarDirection, Vector3.up);
-
         return new CameraTargetParameters() {
             fieldOfView = 50f,
             orthographic = false,
-            // orthographic = true,
-            // rotation = planarRot,
             rotation = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.rotation,
-            // rotation = planarRot * verticalRot,
             snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 0f,
-            // targetDistance = MaxDistance,
             targetPosition = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.position,
-            // targetPosition = lastTargetPosition,
             orthographicSize = 4f,
-            // orthographicSize = currentOrthographicSize,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 200, -199, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            distanceMovementSpeed = currentDistanceMovementSpeed,
-            state = input.state,
-            playerDirection = input.playerDirection,
+            minDistance = 0
+        };
+    }
+    public CameraTargetParameters FreeCamParameters(CameraInput input) {
+        return new CameraTargetParameters() {
+            fieldOfView = 65f,
+            orthographic = false,
+            rotation = input.aimCameraRotation,
+            snapToRotation = input.aimCameraRotation,
+            deltaTime = input.deltaTime,
+            targetDistance = 0f,
+            targetPosition = input.targetPosition,
+            orthographicSize = 4f,
+            distanceMovementSharpness = 100,
+            followingSharpness = 100,
             minDistance = 0
         };
     }
@@ -626,23 +599,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         TargetDistance = input.targetDistance;
         TargetDistance = Mathf.Clamp(TargetDistance, input.minDistance, MaxDistance);
 
-
         // apply orthographic
         Camera.orthographicSize = input.orthographicSize;
-        // if (ORTHOGRAPHIC_MODE) {
         Camera.orthographic = input.orthographic;
         Camera.fieldOfView = input.fieldOfView;
-        // } else {
-        //     Camera.orthographic = false;
-        //     // orthographic size is half-size physical length
-        //     Camera.fieldOfView = (float)Mathf.Atan(input.orthographicSize / (_currentDistance * Camera.aspect)) * (360f / 6.28f) * 2f;
-        //     // Camera.fiel
-        //     Debug.Log($"{input.orthographicSize} {Camera.fieldOfView}");
-        // }
 
         // apply rotation
         idealRotation = input.rotation;
-        targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-RotationSharpness * input.deltaTime));
+        targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-input.rotationSharpness * input.deltaTime));
         if (input.snapToRotation != Quaternion.identity) {
             targetRotation = input.snapToRotation;
         }
@@ -656,7 +620,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, followPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
 
         // Handle obstructions
-        if (input.state == CharacterState.wallPress || state == CameraState.aim) {
+        if (state == CameraState.aim) {
             RaycastHit closestHit = new RaycastHit();
             closestHit.distance = Mathf.Infinity;
             _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetLayerMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
@@ -676,7 +640,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             if (closestHit.distance < Mathf.Infinity) {
                 _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
             } else {
-                _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
+                // _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
+                _currentDistance = TargetDistance;
             }
         }
 
@@ -705,7 +670,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Vector3 cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
         Ray clickRay = new Ray(projection.origin, transform.forward);
-        // Plane playerPlane = new Plane(-1f * Transform.forward, GameManager.I.playerPosition);
         Plane playerPlane = new Plane(Vector3.up, GameManager.I.playerPosition);
         RaycastHit[] hits = Physics.RaycastAll(clickRay, 1000, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletOnly));
         Vector3 targetPoint = Vector3.zero;
@@ -864,7 +828,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             cursorPoint = new Vector3(cursorPosition.x, cursorPosition.y, Camera.nearClipPlane);
         }
         Ray projection = Camera.ScreenPointToRay(cursorPoint);
-        // Vector3 direction = transform.forward;
 
         // TODO: nonalloc
         RaycastHit[] hits = Physics.RaycastAll(projection, 100, LayerUtil.GetLayerMask(Layer.def, Layer.obj, Layer.interactive, Layer.bulletOnly), QueryTriggerInteraction.Ignore);
@@ -887,18 +850,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             TagSystemData data = Toolbox.GetTagData(hit.collider.gameObject);
             if (data == null || data.targetPriority == -1) {
                 if (!prioritySet && !targetSet) {
-                    // targetPoint = hit.point;
                     targetSet = true;
                 }
                 continue;
             }
             if (priorityData == null || data.targetPriority > priorityData.targetPriority) {
                 priorityData = data;
-                // if (data.targetPoint != null) {
-                //     targetPoint = data.targetPoint.position;
-                // } else {
-                //     targetPoint = hit.collider.bounds.center;
-                // }
                 prioritySet = true;
             }
             targetPoint = hit.point;

@@ -171,7 +171,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
                 StartRefreshFloorsCoroutine();
                 break;
         }
-        Debug.Log($"transition to culling state: {state}");
+        // Debug.Log($"transition to culling state: {state}");
         state = newstate;
     }
     IEnumerator HandleGeometry() {
@@ -566,7 +566,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         }
     }
 
-    CullingComponent GetDynamicHandler(Collider key, Transform root) {
+    public CullingComponent GetDynamicHandler(Collider key, Transform root) {
         try {
             if (dynamicCullingComponents.ContainsKey(key)) {
                 return dynamicCullingComponents[key];
@@ -581,6 +581,30 @@ public class NeoClearsighterV4 : MonoBehaviour {
             Debug.LogError($"error getting dynamic handler for collider: {key}\troot:{root}");
             Debug.LogError(e);
             return null;
+        }
+    }
+
+    public void ResetCullingComponent(Transform root) {
+        foreach (CullingComponent component in root.GetComponentsInChildren<CullingComponent>()) {
+            component.ChangeState(CullingComponent.CullingState.normal);
+            if (cullingComponents.ContainsKey(component.idn)) {
+                cullingComponents.Remove(component.idn);
+            }
+            cullingComponentsByZoneAndFloors[component.rooftopZoneIdn][component.floor].Remove(component);
+            if (activeInterlopers.ContainsKey(component)) {
+                activeInterlopers.Remove(component);
+            }
+            if (activeDynamicInterlopers.ContainsKey(component)) {
+                activeDynamicInterlopers.Remove(component);
+            }
+            Destroy(component);
+        }
+
+        foreach (Collider collider in root.GetComponentsInChildren<Collider>()) {
+            if (dynamicCullingComponents.ContainsKey(collider)) {
+                dynamicCullingComponents.Remove(collider);
+            }
+
         }
     }
 

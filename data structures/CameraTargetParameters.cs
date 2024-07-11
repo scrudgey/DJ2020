@@ -9,9 +9,7 @@ public record CameraTargetParameters {
     public float targetDistance;
     public Vector3 targetPosition;
     public float followingSharpness;
-    public float distanceMovementSpeed;
     public float distanceMovementSharpness;
-    public CharacterState state; // TODO: remove this
-    public Vector3 playerDirection;
+    public float rotationSharpness = 10f;
     public float minDistance;
 }

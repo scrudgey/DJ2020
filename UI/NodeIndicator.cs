@@ -67,7 +67,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             lastWallInput = Vector2.zero,
             crouchHeld = false,
             playerPosition = node.position,
-            state = CharacterState.overlayView,
+            state = CameraState.overlayView,
             targetData = data,
             playerDirection = Vector3.zero,
             popoutParity = PopoutParity.left,

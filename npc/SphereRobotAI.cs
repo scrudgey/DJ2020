@@ -87,6 +87,8 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             SpottedHighlight spottedHighlight = obj.GetComponent<SpottedHighlight>();
             this.highlight = spottedHighlight;
             highlight.followTransform = transform;
+            highlight.target = null;
+            highlight.FixedUpdate();
         }
     }
     void Start() {
@@ -116,9 +118,9 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
             switch (GameManager.I.gameData.levelState.delta.strikeTeamBehavior) {
                 case LevelTemplate.StrikeTeamResponseBehavior.clear:
                     ClearPoint[] allClearPoints = FindObjectsOfType<ClearPoint>();
-                    // foreach (ClearPoint point in allClearPoints) {
-                    //     point.cleared = false;
-                    // }
+                    foreach (ClearPoint point in allClearPoints) {
+                        point.cleared = false;
+                    }
                     if (allClearPoints.Length > 0) {
                         ChangeState(new SphereClearPointsState(this, characterController, allClearPoints));
                     } else {
@@ -486,10 +488,11 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
                     case FollowTheLeaderState:
                     case StopAndListenState:
                     case SphereClearPointsState:
-
                         if (timeSinceInterrogatedStranger <= 0) {
                             alertHandler.ShowWarn();
-                            GameManager.I.StartSpottedCutscene(this);
+                            if (!GameObject.FindObjectsOfType<SphereRobotAI>().Any(ai => ai.stateMachine.currentState is SphereInvestigateState)) {
+                                CutsceneManager.I.StartCutscene(new SpottedCutscene(this));
+                            }
                             ChangeState(new PauseState(this, new SphereInvestigateState(this, highlight, characterController, speechTextController), 1f));
                         }
                         break;

@@ -853,13 +853,13 @@ public class Toolbox {
         return Mathf.Clamp(std * sigma + mean, minValue, maxValue);
     }
 
-    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7, bool unlimited = false) {
+    public static IEnumerator BlinkEmphasis(MonoBehaviour component, int pulses = 7, bool unlimited = false, float duration = 0.1f) {
         float timer = 0f;
         int cycles = 0;
         while (cycles < pulses && !unlimited) {
             timer += Time.unscaledDeltaTime;
-            if (timer > 0.1f) {
-                timer -= 0.05f;
+            if (timer > duration) {
+                timer -= duration;
                 cycles += 1;
                 component.enabled = !component.enabled;
             }

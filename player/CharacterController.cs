@@ -22,7 +22,7 @@ public enum CharacterState {
     zapped,
     hvac,
     hvacAim,
-    overlayView
+    overlayView,
 }
 public enum ClimbingState {
     Anchoring,
@@ -194,7 +194,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private float landStunTimer;
     private PlayerInput _lastInput = PlayerInput.none;
     private CursorData lastTargetDataInput;
-    private Vector3 lookAtDirection;
+    public Vector3 lookAtDirection;
     private float inputDirectionHeldTimer;
     private float crouchMovementInputTimer;
     private float crouchMovementSoundTimer;
@@ -921,7 +921,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     // lerp character orientation toward the aim point
                     Vector3 projectedCameraForward = Vector3.ProjectOnPlane(aimCameraRotation * Vector3.forward, Vector3.up);
                     Quaternion levelRotation = Quaternion.LookRotation(projectedCameraForward, Vector3.up);
-                    currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
+                    // currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
+                    currentRotation = levelRotation;
 
                     // clamp pitch [0, 45] , [365, 315]
                     Vector3 currentRotationEulerAngles = aimCameraRotation.eulerAngles;
@@ -933,6 +934,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     aimCameraRotation = Quaternion.Euler(currentRotationEulerAngles);
 
                     lookAtDirection = Vector3.Lerp(lookAtDirection, aimCameraRotation * Vector3.forward, 0.05f);
+
                 }
                 break;
             case CharacterState.normal:
@@ -1689,13 +1691,28 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public CameraInput BuildCameraInput() {
         Vector2 finalLastWallInput = wallPressRatchet ? lastWallInput : Vector2.zero;
 
+        CameraState camState = CameraState.normal;
+
+        if (state == CharacterState.overlayView) {
+            camState = CameraState.overlayView;
+        } else if (state == CharacterState.hvacAim) {
+            camState = CameraState.firstPerson;
+        } else if (state == CharacterState.aim) {
+            camState = CameraState.aim;
+        } else if (state == CharacterState.wallPress || state == CharacterState.popout) {
+            camState = CameraState.wallPress;
+        } else if (state == CharacterState.burgle) {
+            camState = CameraState.burgle;
+        }
+
         CameraInput input = new CameraInput {
             deltaTime = Time.deltaTime,
             wallNormal = wallNormal,
             lastWallInput = finalLastWallInput,
             crouchHeld = isCrouching,
             playerPosition = transform.position,
-            state = state,
+            state = camState,
+            characterState = state,
             targetData = lastTargetDataInput,
             playerDirection = direction,
             // playerLookDirection = lookAtDirection,

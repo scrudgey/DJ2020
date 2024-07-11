@@ -4,4 +4,5 @@ using UnityEngine;
 
 public class ClearPoint : MonoBehaviour {
     public bool cleared;
+    public bool claimed;
 }

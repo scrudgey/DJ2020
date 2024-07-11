@@ -94,4 +94,11 @@ public class StoreDialogueController : MonoBehaviour {
         blitTextRoutine = null;
     }
 
+    public IEnumerator CutsceneDialogue(string content) {
+        dialogueLeftSpacer.minWidth = 20f;
+        dialogueRightSpacer.minWidth = 150f;
+        return BlitDialogueText(content);
+    }
+
+
 }

@@ -22,7 +22,7 @@ public class ExtractionZone : MapMarker {
         meshRenderer.enabled = true;
         StartCoroutine(PulseExtractionZone());
         if (showCutscene) {
-            GameManager.I.ShowExtractionZoneCutscene(this);
+            CutsceneManager.I.StartCutscene(new ExtractionZoneCutscene(this));
         }
     }
 

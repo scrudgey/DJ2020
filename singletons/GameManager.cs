@@ -245,9 +245,6 @@ public partial class GameManager : Singleton<GameManager> {
                 }
                 break;
             case MenuType.dialogue:
-                // if (!SceneManager.GetSceneByName("DialogueMenu").isLoaded) {
-                //     LoadScene("DialogueMenu", callback, unloadAll: false);
-                // }
                 if (!SceneManager.GetSceneByName("NeoDialogueMenu").isLoaded) {
                     LoadScene("NeoDialogueMenu", callback, unloadAll: false);
                 }
@@ -475,7 +472,7 @@ public partial class GameManager : Singleton<GameManager> {
             UpdateReportTickets();
             UpdateGraphs();
 
-            if (cutsceneIsRunning) {
+            if (CutsceneManager.I.cutsceneIsRunning()) {
                 playerCharacterController.ResetMovement();
             } else {
                 DoInputs();

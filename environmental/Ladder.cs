@@ -59,7 +59,7 @@ public class Ladder : Interactive {
 
 
     public override ItemUseResult DoAction(Interactor interactor) {
-        return new ItemUseResult() {
+        return ItemUseResult.Empty() with {
             useLadder = this
         };
     }

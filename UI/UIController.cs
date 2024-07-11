@@ -15,6 +15,8 @@ public class UIController : MonoBehaviour {
     public Canvas interactiveHighlightCanvas;
     public Canvas statusBarCanvas;
     public Canvas overlayCanvas;
+    public Canvas cutsceneTextCanvas;
+    public Canvas cutsceneDialogueCanvas;
     [Header("controllers")]
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
@@ -45,6 +47,8 @@ public class UIController : MonoBehaviour {
     public TargetPracticeUIHandler targetPracticeUIHandler;
     public UIStatusBarHandler statusBarHandler;
     public SoftwareModalController softwareModalController;
+    public TextMeshProUGUI cutsceneText;
+    public CutsceneDialogueController cutsceneDialogueController;
     public bool mouseOverScrollBox;
     bool burglarMode;
     void Awake() {
@@ -74,6 +78,8 @@ public class UIController : MonoBehaviour {
         HideVRStats();
         HideTerminal();
         HideBurglar();
+        HideCutsceneDialogue();
+        HideCutsceneText();
         // HideMissionSelector();
         saveIndicatorController.HideIndicator();
         objectivesCompleteController.Initialize();
@@ -195,6 +201,10 @@ public class UIController : MonoBehaviour {
             statusBarCanvas.enabled = false;
         if (overlayCanvas != null)
             overlayCanvas.enabled = false;
+        if (cutsceneTextCanvas != null)
+            cutsceneTextCanvas.enabled = false;
+        if (cutsceneDialogueCanvas != null)
+            cutsceneDialogueCanvas.enabled = false;
     }
     public void ShowUI() {
         if (canvas != null)
@@ -209,6 +219,10 @@ public class UIController : MonoBehaviour {
             burglarCanvas.enabled = true;
         if (overlayCanvas != null)
             overlayCanvas.enabled = true;
+        if (cutsceneTextCanvas != null)
+            cutsceneTextCanvas.enabled = false;
+        if (cutsceneDialogueCanvas != null)
+            cutsceneDialogueCanvas.enabled = false;
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {
             ShowVRStats();
         }
@@ -226,6 +240,24 @@ public class UIController : MonoBehaviour {
 
     public CameraInput GetOverlayCameraInput() {
         return overlayHandler.selectedNode.GetCameraInput();
+    }
+
+    public void ShowCutsceneText(string content) {
+        cutsceneTextCanvas.enabled = true;
+        cutsceneText.text = content;
+        StartCoroutine(Toolbox.BlinkEmphasis(cutsceneText, 6, duration: 0.45f));
+    }
+    public void HideCutsceneText() {
+        cutsceneTextCanvas.enabled = false;
+    }
+
+    public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content) {
+        IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content);
+        cutsceneDialogueCanvas.enabled = true;
+        return routine;
+    }
+    public void HideCutsceneDialogue() {
+        cutsceneDialogueCanvas.enabled = false;
     }
 
 }

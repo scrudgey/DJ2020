@@ -9,21 +9,27 @@ public class NPCSpawnPoint : MonoBehaviour {
     public PatrolRoute[] patrolRoutes;
     public List<LootDropElementWithProbability> lootDrops;
 
-    PrefabPool effectPool;
-    PrefabPool NPCPool;
+    static PrefabPool effectPool;
+    static PrefabPool NPCPool;
     void Start() {
         InitializePools();
     }
-    void InitializePools() {
+    static void InitializePools() {
         NPCPool = PoolManager.I?.RegisterPool("prefabs/NPC", poolSize: 10);
-        effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
     }
     public GameObject SpawnNPC(NPCTemplate template, bool useSpawnEffect = true) {
         if (effectPool == null) {
-            InitializePools();
+            effectPool = PoolManager.I?.RegisterPool(spawnEffect, poolSize: 5);
         }
         effectPool.GetObject(transform.position);
-        GameObject npc = NPCPool.GetObject(transform.position);
+        return SpawnNPC(template, transform.position, patrolRoutes, lootDrops);
+    }
+
+    public static GameObject SpawnNPC(NPCTemplate template, Vector3 position, PatrolRoute[] patrolRoutes, List<LootDropElementWithProbability> lootDrops) {
+        if (NPCPool == null) {
+            InitializePools();
+        }
+        GameObject npc = NPCPool.GetObject(position);
 
         PatrolRoute route = Toolbox.RandomFromList(patrolRoutes != null && patrolRoutes.Length > 0 ? patrolRoutes : GameObject.FindObjectsOfType<PatrolRoute>());
         CharacterCamera cam = GameObject.FindObjectOfType<CharacterCamera>();
@@ -37,19 +43,19 @@ public class NPCSpawnPoint : MonoBehaviour {
         ai.patrolRoute = route;
         ai.prefabPool = NPCPool;
 
-
         LootDropper lootDropper = npc.GetComponentInChildren<LootDropper>();
-        if (lootDropper != null) {
+        if (lootDropper != null && lootDrops != null) {
             lootDropper.loot.AddRange(lootDrops);
         }
 
-        motor.SetPosition(transform.position, bypassInterpolation: true);
+        motor.SetPosition(position, bypassInterpolation: true);
         ApplyNPCState(template, npc);
 
         ai.Initialize();
         return npc;
     }
-    void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
+
+    static void ApplyNPCState(NPCTemplate template, GameObject npcObject) {
         NPCState state = NPCState.Instantiate(template);
 
         state.activeGun = 1;

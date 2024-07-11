@@ -52,15 +52,7 @@ public class LevelDataUtilEditor : Editor {
             GUILayout.Label("Level Template");
 
             string levelName = template.levelName;
-            EditorGUILayout.PropertyField(floorNumberProperty);
-            if (GUILayout.Button("Write map image")) {
-                SaveMapData(sceneData);
-            }
-            if (GUILayout.Button("Set map floor level")) {
-                int floorNumber = floorNumberProperty.intValue;
-                SetMapFloorHeight(sceneData, floorNumber);
-                // EditorGUILayout.PropertyField(floorHeightsProperty);
-            }
+
             GUILayout.Space(10);
             EditorGUILayout.Separator();
             GUILayout.Space(10);
@@ -100,19 +92,30 @@ public class LevelDataUtilEditor : Editor {
         EditorGUILayout.PropertyField(sceneDataProperty);
         GUILayout.Space(10);
         if (sceneData != null) {
-            GUILayout.Label("Scene Data");
-            Editor.CreateEditor(sceneData).OnInspectorGUI();
+            // GUILayout.Label("Scene Data");
+            // Editor.CreateEditor(sceneData).OnInspectorGUI();
 
             SerializedObject serializedObject = new UnityEditor.SerializedObject(sceneData);
             SerializedProperty floorHeightsProperty = serializedObject.FindProperty("floorHeights");
 
+            GUILayout.Label("Map Data");
+
+            EditorGUILayout.PropertyField(floorNumberProperty);
+            if (GUILayout.Button("Write map image")) {
+                SaveMapData(sceneData);
+            }
+            if (GUILayout.Button("Set map floor level")) {
+                int floorNumber = floorNumberProperty.intValue;
+                SetMapFloorHeight(sceneData, floorNumber);
+                // EditorGUILayout.PropertyField(floorHeightsProperty);
+            }
+            GUILayout.Space(20);
+            GUILayout.Label("Culling Data");
             if (GUILayout.Button("Set culling floor level")) {
                 int floorNumber = floorNumberProperty.intValue;
                 SetFloorHeight(sceneData, floorNumber);
                 // EditorGUILayout.PropertyField(floorHeightsProperty);
             }
-
-            GUILayout.Space(20);
             EditorGUILayout.PropertyField(gridSpacingProperty);
             EditorGUILayout.PropertyField(boundingBoxProperty);
             if (GUILayout.Button("Write culling data")) {
