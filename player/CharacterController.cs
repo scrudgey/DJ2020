@@ -921,8 +921,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     // lerp character orientation toward the aim point
                     Vector3 projectedCameraForward = Vector3.ProjectOnPlane(aimCameraRotation * Vector3.forward, Vector3.up);
                     Quaternion levelRotation = Quaternion.LookRotation(projectedCameraForward, Vector3.up);
-                    // currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
-                    currentRotation = levelRotation;
+
+                    if (gunHandler.HasGun()) {
+                        currentRotation = levelRotation;
+                    } else {
+                        currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
+                    }
 
                     // clamp pitch [0, 45] , [365, 315]
                     Vector3 currentRotationEulerAngles = aimCameraRotation.eulerAngles;
@@ -1710,14 +1714,12 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             wallNormal = wallNormal,
             lastWallInput = finalLastWallInput,
             crouchHeld = isCrouching,
-            playerPosition = transform.position,
-            state = camState,
+            cameraState = camState,
             characterState = state,
             targetData = lastTargetDataInput,
             playerDirection = direction,
-            // playerLookDirection = lookAtDirection,
             popoutParity = popoutParity,
-            aimCameraRotation = aimCameraRotation,
+            targetRotation = aimCameraRotation,
             targetTransform = cameraFollowTransform,
             targetPosition = cameraFollowTransform.position,
             atLeftEdge = atLeftEdge,

@@ -30,17 +30,16 @@ public abstract class Cutscene {
             wallNormal = Vector2.zero,
             lastWallInput = Vector2.zero,
             crouchHeld = false,
-            playerPosition = position,
-            state = state,
+            cameraState = state,
             targetData = CursorData.none,
             playerDirection = playerCharacterController.direction,
             popoutParity = PopoutParity.left,
-            aimCameraRotation = Quaternion.identity,
-            targetPosition = position
+            targetRotation = Quaternion.identity,
+            targetPosition = position,
+            ignoreAttractor = true
         };
         characterCamera.UpdateWithInput(input);
         characterCamera.transform.position = position;
-        // characterCamera.state = state;
     }
     protected void SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state) {
         CameraInput input = new CameraInput {
@@ -48,18 +47,18 @@ public abstract class Cutscene {
             wallNormal = Vector2.zero,
             lastWallInput = Vector2.zero,
             crouchHeld = false,
-            playerPosition = position,
-            state = state,
+            cameraState = state,
             targetData = CursorData.none,
             playerDirection = playerCharacterController.direction,
             popoutParity = PopoutParity.left,
-            aimCameraRotation = Quaternion.identity,
-            targetPosition = position
+            targetRotation = Quaternion.identity,
+            targetPosition = position,
+            ignoreAttractor = true
+
         };
         characterCamera.UpdateWithInput(input);
         characterCamera.transform.position = position;
         characterCamera.transform.rotation = rotation;
-        // characterCamera.state = state;
     }
 
     protected void SetCameraPosition(string idn) {
@@ -69,13 +68,14 @@ public abstract class Cutscene {
             wallNormal = Vector2.zero,
             lastWallInput = Vector2.zero,
             crouchHeld = false,
-            playerPosition = data.transform.position,
-            state = CameraState.free,
+            cameraState = CameraState.free,
             targetData = CursorData.none,
             playerDirection = playerCharacterController.direction,
             popoutParity = PopoutParity.left,
-            aimCameraRotation = data.transform.rotation,
-            targetPosition = data.transform.position
+            targetRotation = data.transform.rotation,
+            targetPosition = data.transform.position,
+            ignoreAttractor = true
+
         };
         characterCamera.UpdateWithInput(input);
         characterCamera.transform.position = data.transform.position;

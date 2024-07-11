@@ -63,20 +63,15 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         data.screenPositionNormalized = HALFSIES;
         return new CameraInput {
             deltaTime = Time.deltaTime,
-            wallNormal = Vector3.zero,
-            lastWallInput = Vector2.zero,
             crouchHeld = false,
-            playerPosition = node.position,
-            state = CameraState.overlayView,
+            cameraState = CameraState.overlayView,
             targetData = data,
             playerDirection = Vector3.zero,
             popoutParity = PopoutParity.left,
-            aimCameraRotation = Quaternion.identity,
-            targetTransform = null,
+            targetRotation = Quaternion.identity,
             targetPosition = node.position,
             atLeftEdge = false,
             atRightEdge = false,
-            currentAttackSurface = null
         };
     }
 

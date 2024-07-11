@@ -4028,7 +4028,7 @@ rotate the character, show him with weapon drawn / not, running etc
 
 
 investigate the laboratory
-    rain
+    ? rain
     spritesheets
     guards got stuck/bunched up- otherwise v. good
 
@@ -4042,7 +4042,8 @@ wall with hole cutaway
 clearsighter should bind to camera
 prevent pause / escape during cutscene
 ? door can be interacted with from a distance
-figure out why cutscene skybox is blank
+* figure out why cutscene skybox is blank
+* relax third person aim snap when no gun out
 
 
 

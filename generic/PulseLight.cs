@@ -33,7 +33,7 @@ public class PulseLight : MonoBehaviour {
     }
     void Update() {
         if (doPulse) {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             float intensity = 0f;
             if (type == PulseType.fadeInOut) {
                 intensity = Mathf.Sin(timer * (2 * Mathf.PI / period));

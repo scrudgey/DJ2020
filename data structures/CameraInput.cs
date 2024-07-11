@@ -10,20 +10,25 @@ using UnityEngine.Rendering.PostProcessing;
 public struct CameraInput {
     public enum RotateInput { none, left, right }
     public float deltaTime;
-    public Vector3 wallNormal;
-    public Vector2 lastWallInput;
     public bool crouchHeld;
-    public Vector3 playerPosition;
     public CharacterState characterState;
-    public CameraState state;
+    public CameraState cameraState;
     public CursorData targetData;
-    public Vector3 playerDirection;
-    public PopoutParity popoutParity;
-    public Quaternion aimCameraRotation;
+
+
+    public Quaternion targetRotation;
     public Vector3 targetPosition;
+    public Vector3 playerDirection;
     public Transform targetTransform;
+
+
+    [Header("wallpress")]
     public bool atLeftEdge;
     public bool atRightEdge;
+    public Vector3 wallNormal;
+    public Vector2 lastWallInput;
+    public PopoutParity popoutParity;
+
     public AttackSurface currentAttackSurface;
     public bool ignoreAttractor;
 }

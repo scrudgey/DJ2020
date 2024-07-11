@@ -186,6 +186,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         // Debug.Log($"entering state {state} from {fromState}");
         Camera.clearFlags = CameraClearFlags.SolidColor;
         switch (state) {
+            case CameraState.free:
+                Camera.clearFlags = CameraClearFlags.Skybox;
+                break;
             case CameraState.firstPerson:
                 Camera.clearFlags = CameraClearFlags.Skybox;
                 currentDistanceMovementSharpness = distanceMovementSharpnessDefault * 3f;
@@ -252,14 +255,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
     public void UpdateWithInput(CameraInput input) {
         if (Camera == null) return;
-        CameraState camState = input.state;
+        CameraState camState = input.cameraState;
         currentAttractor = null;
 
         if (camState == CameraState.normal && !input.ignoreAttractor) {
             // check / update Attractor
             foreach (CameraAttractorZone attractor in attractors) {
                 if (attractor == null) continue;
-                if (attractor.sphereCollider.bounds.Contains(input.playerPosition)) {
+                if (attractor.sphereCollider.bounds.Contains(input.targetPosition)) {
                     currentAttractor = attractor;
                     camState = CameraState.attractor;
                     break;
@@ -500,7 +503,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
 
         Quaternion cameraRotation = Quaternion.identity;
         if (GameManager.I.inputMode == InputMode.aim) {
-            cameraRotation = input.aimCameraRotation;
+            cameraRotation = input.targetRotation;
         } else {
             input.playerDirection.y = 0f;
             Vector3 camDirectionPoint = Vector3.zero;
@@ -540,7 +543,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
 
         Quaternion cameraRotation = Quaternion.identity;
-        cameraRotation = input.aimCameraRotation;
+        cameraRotation = input.targetRotation;
 
         // update PlanarDirection to snap to nearest of 4 quadrants
         Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections.Keys.ToList());
@@ -553,7 +556,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             snapToRotation = cameraRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0f,
-            targetPosition = input.playerPosition,
+            targetPosition = input.targetPosition,
             orthographicSize = 4f,
             distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
             followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
@@ -579,8 +582,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
         return new CameraTargetParameters() {
             fieldOfView = 65f,
             orthographic = false,
-            rotation = input.aimCameraRotation,
-            snapToRotation = input.aimCameraRotation,
+            rotation = input.targetRotation,
+            snapToRotation = input.targetRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0f,
             targetPosition = input.targetPosition,
