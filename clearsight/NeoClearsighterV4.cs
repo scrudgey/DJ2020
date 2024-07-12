@@ -438,7 +438,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
             if (result.collider == null) {
                 (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPoint);
 
-                Debug.DrawLine(origin, origin + displacement, Color.green);
+                // Debug.DrawLine(origin, origin + displacement, Color.green);
                 // point.DrawRay(orientation);
                 CharacterCamera.IsometricOrientation orientation = (CharacterCamera.IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
                 foreach (string idn in point.GetInterlopers(orientation)) {
@@ -450,7 +450,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
                 }
             } else {
                 (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPoint);
-                Debug.DrawLine(origin, origin + displacement, Color.red);
+                // Debug.DrawLine(origin, origin + displacement, Color.red);
             }
         }
 

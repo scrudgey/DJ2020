@@ -3574,6 +3574,26 @@ speed up + pitch up blitting?
     * stop engine when last passenger exits
 * randomize punks
 * spotted highlight in cutscene
+* figure out why cutscene skybox is blank
+* relax third person aim snap when no gun out
+* ambience system
+    * a separate channel in mixer
+    * non-spatial audio- let code control volume
+        * location: set when camera target position changes
+        * set location like we set audiolistener in cutscene manager
+        * collider regions are nested and have precedence
+    * determine distance to collider region and fade out?
+        * two regions? one for activation and one for distance?
+* closest point on bounds from inside box
+* ambience types:
+    * looping random
+        set the audio clip and play with loop=true
+        start a coroutine that changes the clip after n seconds
+    * sporadic random
+        start a coroutine that waits n seconds then plays
+    * stop
+        stop the coroutine
+
 
 
 
@@ -3981,16 +4001,13 @@ unresolved mechanics / gameplay questions:
     ICE in cyber
     firewalls in cyber
     crafting 2.0 / additional payloads / additional conditions
-
+    
 
 
 missions
     1 way shootout
     productionize office
         redo apartment after office
-
-key system
-    physical, keycard, password
 destructible walls
     gibs
     re-bake navmesh
@@ -4014,7 +4031,6 @@ make graphs more readable
     limit icons shown to current floor / show other floors as transparent gray
     sub-nodes
 
-
 fix up key info pane
 tune impacts
 tune gibbing
@@ -4026,12 +4042,11 @@ rotate the character, show him with weapon drawn / not, running etc
 ? vehicle accelerate / decelerate
 ? smoke
 
-
 investigate the laboratory
     ? rain
+        better effect?
     spritesheets
     guards got stuck/bunched up- otherwise v. good
-
 
 grill texture on lights
 using keycard reader should open door
@@ -4042,20 +4057,10 @@ wall with hole cutaway
 clearsighter should bind to camera
 prevent pause / escape during cutscene
 ? door can be interacted with from a distance
-* figure out why cutscene skybox is blank
-* relax third person aim snap when no gun out
 
+ambience
+    police sirens
+    city ambience
+    room tone 
+    
 
-
-ambience system
-    a separate channel in mixer
-    non-spatial audio- let code control volume
-        location: set when camera target position changes
-        set location like we set audiolistener in cutscene manager
-    collider regions tied to audio clips
-        police sirens
-        city ambience
-        room tone 
-    collider regions are nested and have precedence
-    determine distance to collider region and fade out?
-        two regions? one for activation and one for distance?

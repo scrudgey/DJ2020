@@ -1236,5 +1236,20 @@ public class Toolbox {
             return lf[n];
         }
     }
+
+    public static Vector3 BoundsOnBoxFromInside(Bounds bounds, Vector3 point) {
+        Vector3 localPoint = point - bounds.center;
+        Dictionary<string, float> faceDistances = new Dictionary<string, float>{
+            {"x", bounds.extents.x - Math.Abs(localPoint.x)},
+            {"y", bounds.extents.y - Math.Abs(localPoint.y)},
+            {"z", bounds.extents.z - Math.Abs(localPoint.z)},
+        };
+        string nearestFace = faceDistances.Keys.OrderBy(key => faceDistances[key]).ToList()[0];
+        return bounds.center + nearestFace switch {
+            "x" => localPoint.x > 0 ? new Vector3(bounds.extents.x, localPoint.y, localPoint.z) : new Vector3(-bounds.extents.x, localPoint.y, localPoint.z),
+            "y" => localPoint.y > 0 ? new Vector3(localPoint.x, bounds.extents.y, localPoint.z) : new Vector3(localPoint.x, -bounds.extents.y, localPoint.z),
+            "z" => localPoint.z > 0 ? new Vector3(localPoint.x, localPoint.y, bounds.extents.z) : new Vector3(localPoint.x, localPoint.y, -bounds.extents.z)
+        };
+    }
 }
 

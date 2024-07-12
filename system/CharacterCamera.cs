@@ -11,7 +11,8 @@ using UnityEngine.Rendering.PostProcessing;
 // TODO: eliminate this enum
 public enum CameraState { normal, wallPress, attractor, aim, burgle, free, firstPerson, overlayView }
 
-public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<CharacterController>, 
+public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<CharacterCamera> { //IBinder<CharacterController>, 
+    public Action<CharacterCamera> OnValueChanged { get; set; }
     public static bool ORTHOGRAPHIC_MODE = true;
     // public static bool ORTHOGRAPHIC_MODE = false;
     public enum IsometricOrientation { NE, SE, SW, NW }
@@ -89,6 +90,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
     CameraAttractorZone currentAttractor = null;
     private static float shakeJitter = 0f;
     private float currentOrthographicSize;
+    public Vector3 targetPosition;
     bool thermalGogglesActive;
     CameraTargetParameters lastWallPressTargetParameters;
     void OnValidate() {
@@ -338,6 +340,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver { //IBinder<Charact
             subCamera.orthographic = Camera.orthographic;
             subCamera.fieldOfView = Camera.fieldOfView;
         }
+        targetPosition = input.targetPosition;
+        OnValueChanged?.Invoke(this);
     }
     public void SetSkyBoxCamerasEnabled(bool enabled) {
         foreach (Camera camera in skyBoxCameras) {

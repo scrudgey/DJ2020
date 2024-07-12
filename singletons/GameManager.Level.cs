@@ -479,12 +479,8 @@ public partial class GameManager : Singleton<GameManager> {
     private void InitializePlayerAndController(LevelPlan plan, SceneData sceneData) {
         ClearSceneData();
         characterCamera = GameObject.FindObjectOfType<CharacterCamera>();
-        // if (characterCamera == null) {
-        //     Debug.Break();
-        // }
-        // if (InputController.I == null) {
-        //     Debug.Break();
-        // }
+        AmbienceManager.I.Bind(characterCamera);
+        AmbienceManager.I.InitializeScene();
         InputController.I.OrbitCamera = characterCamera;
         characterCamera.outlineEffect.Initialize();
         foreach (Outline outline in GameObject.FindObjectsOfType<Outline>()) {
