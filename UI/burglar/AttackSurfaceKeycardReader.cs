@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AttackSurfaceKeycardReader : AttackSurfaceElement {
     public DoorLock doorLock;
+    public KeycardReader keycardReader;
     public ElevatorController elevatorController;
     public AudioSource audioSource;
     public AudioClip[] successSound;
@@ -19,26 +20,31 @@ public class AttackSurfaceKeycardReader : AttackSurfaceElement {
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.keycard) {
-            bool success = false;
-            foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
-                success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+            if (keycardReader != null) {
+                keycardReader.AttemptToOpenDoors();
+            } else if (elevatorController != null) {
+                bool success = false;
+                foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
+                    success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+                }
+                if (success) {
+                    Toolbox.RandomizeOneShot(audioSource, successSound);
+                    elevatorController?.EnableTemporaryAuthorization();
+                    BlinkSuccessLight();
+                    return BurglarAttackResult.None with {
+                        success = true,
+                        feedbackText = "success"
+                    };
+                } else {
+                    Toolbox.RandomizeOneShot(audioSource, failSound);
+                    BlinkFailLight();
+                    return BurglarAttackResult.None with {
+                        success = false,
+                        feedbackText = "Your keys don't work"
+                    };
+                }
             }
-            if (success) {
-                Toolbox.RandomizeOneShot(audioSource, successSound);
-                elevatorController?.EnableTemporaryAuthorization();
-                BlinkSuccessLight();
-                return BurglarAttackResult.None with {
-                    success = true,
-                    feedbackText = "success"
-                };
-            } else {
-                Toolbox.RandomizeOneShot(audioSource, failSound);
-                BlinkFailLight();
-                return BurglarAttackResult.None with {
-                    success = false,
-                    feedbackText = "Your keys don't work"
-                };
-            }
+
         }
 
         return BurglarAttackResult.None;

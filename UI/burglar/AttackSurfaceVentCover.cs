@@ -65,10 +65,10 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
         state = State.moving;
         Toolbox.AudioSpeaker(transform.position, openSounds);
 
-        // foreach (GameObject parentVentObject in parentVentObjects) {
-        //     if (parentVentObject == null) continue;
-        //     parentVentObject.SetActive(false);
-        // }
+        foreach (GameObject parentVentObject in parentVentObjects) {
+            if (parentVentObject == null) continue;
+            parentVentObject.SetActive(false);
+        }
         foreach (GameObject element in obscuredElements) {
             if (element == null) continue;
             element.SetActive(true);

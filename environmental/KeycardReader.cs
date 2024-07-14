@@ -10,8 +10,28 @@ public class KeycardReader : Interactive {
     public SpriteRenderer lightSprite;
     public Color successColor;
     public Color failColor;
+    public HeavyDoor heavyDoor;
+    public SlidingDoor slidingDoor;
     Coroutine coroutine;
     public override ItemUseResult DoAction(Interactor interactor) {
+        AttemptToOpenDoors();
+        return ItemUseResult.Empty() with {
+            waveArm = true
+        };
+    }
+    public void AttemptToOpenDoors() {
+        bool success = TryUnlock();
+        if (success) {
+            if (heavyDoor != null) {
+                heavyDoor.OpenDoors();
+            }
+            if (slidingDoor != null) {
+                slidingDoor.OpenDoors();
+            }
+        }
+    }
+
+    public bool TryUnlock() {
         bool success = false;
         foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
             success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
@@ -25,11 +45,10 @@ public class KeycardReader : Interactive {
             sound = failSound;
             color = failColor;
         }
+
         Toolbox.RandomizeOneShot(audioSource, sound);
         BlinkLight(color);
-        return ItemUseResult.Empty() with {
-            waveArm = true
-        };
+        return success;
     }
     public bool AttemptSingleKey(int keyId) {
         bool success = doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);

@@ -38,7 +38,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
 
             requester.characterCamera = GameManager.I.characterCamera;
             requester.playerCharacterController = GameManager.I.playerCharacterController;
-            requester.clearsighter = GameManager.I.clearsighterV4;
+            // requester.clearsighter = GameManager.I.clearsighterV4;
             requester.playerObject = GameManager.I.playerObject;
 
             GameManager.I.uiController.HideUI();

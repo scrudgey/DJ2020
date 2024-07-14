@@ -16,7 +16,7 @@ class ExtractionZoneCutscene : Cutscene {
         float duration = 4f;
 
         characterCamera.followCursorCoefficient = 1f;
-        clearsighter.followTransform = zone.transform;      // TODO: bind clearsighter to camera
+        // clearsighter.followTransform = zone.transform;      // TODO: bind clearsighter to camera
 
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
@@ -31,7 +31,7 @@ class ExtractionZoneCutscene : Cutscene {
         Time.timeScale = 1f;
         characterCamera.followCursorCoefficient = 5f;
 
-        clearsighter.followTransform = playerObject.transform;
+        // clearsighter.followTransform = playerObject.transform;
 
         yield return null;
     }

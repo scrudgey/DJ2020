@@ -12,7 +12,7 @@ public class HeavyDoor : Interactive {
     public AudioClip[] doorCloseStart;
     public AudioClip[] doorOpenEnd;
     Coroutine coroutine;
-    public DoorLock doorLock;
+    // public DoorLock doorLock;
     public KeycardReader keycardReader;
     [Header("upper door")]
     public Transform upperDoor;
@@ -23,18 +23,12 @@ public class HeavyDoor : Interactive {
     public Vector3 lowerDoorLocalClosedPosition;
     public Vector3 lowerDoorLocalOpenPosition;
     public override ItemUseResult DoAction(Interactor interactor) {
-        bool isLocked = false;
-        if (keycardReader != null) {
-            keycardReader.DoAction(interactor);
-            isLocked = keycardReader.doorLock.locked;
-        } else if (doorLock != null) {
-            isLocked = doorLock.locked;
-        }
+        bool isUnlocked = keycardReader != null ? keycardReader.TryUnlock() : false;
 
         switch (_state) {
             case State.none:
             case State.closed:
-                if (!isLocked)
+                if (isUnlocked)
                     OpenDoors();
                 break;
             case State.open:

@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
-public class NeoClearsighterV4 : MonoBehaviour {
+public class NeoClearsighterV4 : IBinder<CharacterCamera> {
     enum State { normal, showAll, aboveOnly }
     enum FloorState { visible, invisible }
     State state;
@@ -14,6 +14,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
     readonly static int jobBatchSize = 18;
 
     public Transform followTransform;
+    Vector3 targetPosition;
     public CharacterCamera characterCamera;
     public CharacterController characterController;
     SceneData sceneData;
@@ -62,9 +63,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
 
 
 
-    // public static string PathToCullingDataResource(string levelName, string sceneName) {
-    //     return $"data/missions/{levelName}/culling_{sceneName}";
-    // }
+
     void Start() {
         OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
     }
@@ -76,12 +75,16 @@ public class NeoClearsighterV4 : MonoBehaviour {
             GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);
             followTransform = newFocus.transform;
         }
+        targetPosition = followTransform.position;
         playerPosition = followTransform.position;
         RectifyPlayerFloor();
         StartRefreshFloorsCoroutine();
     }
+    override public void HandleValueChanged(CharacterCamera cam) {
+        targetPosition = cam.targetPosition;
+    }
     public void Initialize(Transform focus, CharacterCamera characterCamera, CharacterController characterController, SceneData sceneData, string sceneName) {
-        this.followTransform = focus;
+        // this.followTransform = focus;
         this.sceneData = sceneData;
         this.characterCamera = characterCamera;
         this.characterController = characterController;
@@ -133,7 +136,8 @@ public class NeoClearsighterV4 : MonoBehaviour {
         }
         Debug.Log($"cached {cullingComponents.Count} culling components...");
 
-        playerPosition = followTransform.position;
+        // playerPosition = followTransform.position;
+        playerPosition = targetPosition;
         playerRoofZone = "-1";
         playerFloor = -99;
 
@@ -175,7 +179,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         state = newstate;
     }
     IEnumerator HandleGeometry() {
-        while (!initialized || followTransform == null) {
+        while (!initialized) {
             yield return waitForFrame;
         }
 
@@ -196,7 +200,8 @@ public class NeoClearsighterV4 : MonoBehaviour {
         int j = 0;
         commandQueue.Clear();
 
-        playerPosition = followTransform.position;
+        // playerPosition = followTransform.position;
+        playerPosition = targetPosition;
         RectifyPlayerFloor();
 
         if (state == State.normal) {
@@ -366,9 +371,9 @@ public class NeoClearsighterV4 : MonoBehaviour {
 
 
         var allocator = Allocator.TempJob;
-        previousFramePoints = cullingVolume.SubgridAroundWorldPoint(followTransform.position, 15f);
+        previousFramePoints = cullingVolume.SubgridAroundWorldPoint(targetPosition, 15f);
         if (playerBetweenFloorHigh != -99) {
-            List<CullingGridPoint> additionalPoints = cullingVolume.SubgridAroundWorldPoint(playerBetweenFloorHigh - 1, followTransform.position, 15f);
+            List<CullingGridPoint> additionalPoints = cullingVolume.SubgridAroundWorldPoint(playerBetweenFloorHigh - 1, targetPosition, 15f);
             previousFramePoints.AddRange(additionalPoints);
         }
         int numberOfPoints = previousFramePoints.Count;
@@ -378,7 +383,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
         results = new NativeArray<RaycastHit>(numberOfPoints, allocator);
 
 
-        Vector3 followPosition = followTransform.position;
+        Vector3 followPosition = targetPosition;
         for (int i = 0; i < numberOfPoints; i++) {
             CullingGridPoint point = previousFramePoints[i];
             (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPosition);
@@ -428,7 +433,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
      *                           asynchronous geometry logic
      *------------------------------------------------------------------------**/
     IEnumerator EnqueueInterloperCulling(int j, Vector3 playerPosition, int playerFloor) {
-        Vector3 followPoint = followTransform.position + Vector3.up;
+        Vector3 followPoint = targetPosition + Vector3.up;
         int numberPoints = points.Count;
         HashSet<(int, string)> hits = new HashSet<(int, string)>();
         HashSet<string> roofZoneHits = new HashSet<string>();
@@ -531,7 +536,7 @@ public class NeoClearsighterV4 : MonoBehaviour {
             yield return waitForFrame;
             for (int i = 0; i < numberHits; i++) {
                 Collider collider = colliderHits[i];
-                if (collider == null || collider.name == "cutaway" || collider.gameObject == null || collider.transform.IsChildOf(followTransform))
+                if (collider == null || collider.name == "cutaway" || collider.gameObject == null || followTransform == null || collider.transform.IsChildOf(followTransform))
                     continue;
 
                 CullingComponent handler = GetDynamicHandler(collider, collider.transform.root);

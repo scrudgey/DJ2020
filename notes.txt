@@ -3593,7 +3593,13 @@ speed up + pitch up blitting?
         start a coroutine that waits n seconds then plays
     * stop
         stop the coroutine
-
+* clearsighter should bind to camera
+* prevent pause / escape during cutscene
+* wall with hole cutaway
+* check crawling wall grates
+* using keycard reader should open door
+* using door should interact with keycard reader
+* connect up attack surface keycard readers and keycard reader
 
 
 
@@ -4041,26 +4047,25 @@ head slot?
 rotate the character, show him with weapon drawn / not, running etc
 ? vehicle accelerate / decelerate
 ? smoke
-
-investigate the laboratory
-    ? rain
-        better effect?
-    spritesheets
-    guards got stuck/bunched up- otherwise v. good
-
-grill texture on lights
-using keycard reader should open door
-using door should interact with keycard reader
-AC unit entry is broken
-check crawling wall grates
-wall with hole cutaway
-clearsighter should bind to camera
-prevent pause / escape during cutscene
+? better rain
+more spritesheets
+grill texture on truck lights
 ? door can be interacted with from a distance
 
-ambience
+investigate the laboratory
+    mission / objective descriptions
+
+
+ambience add to other scenes
     police sirens
     city ambience
     room tone 
     
+
+
+
+AC unit entry is broken ??
+    new UI button: enter appears when mouse over target. prelude to keys
+
+
 

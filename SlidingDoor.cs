@@ -11,15 +11,15 @@ public class SlidingDoor : Interactive {
     public AudioClip[] doorCloseEnd;
     public AudioClip[] doorCloseStart;
     public ElevatorDoorData doorData;
+    public KeycardReader keycardReader;
     Coroutine coroutine;
-    public List<DoorLock> doorLocks;
     public override ItemUseResult DoAction(Interactor interactor) {
-        bool isLocked = doorLocks.Where(doorLock => doorLock != null && doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked);
+        bool isUnlocked = keycardReader != null ? keycardReader.TryUnlock() : false;
 
         switch (_state) {
             case State.none:
             case State.closed:
-                if (!isLocked)
+                if (isUnlocked)
                     OpenDoors();
                 break;
             case State.open:

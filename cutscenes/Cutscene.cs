@@ -7,7 +7,7 @@ public abstract class Cutscene {
     public bool hasFocus;
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
-    public NeoClearsighterV4 clearsighter;
+    // public NeoClearsighterV4 clearsighter;
     public GameObject playerObject;
 
 

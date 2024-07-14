@@ -137,7 +137,7 @@ namespace AI {
                     if (door) {
                         OpenDoor(position, door);
                     } else {
-                        SlidingDoor slidingDoor = hit.collider.gameObject.GetComponent<SlidingDoor>();
+                        SlidingDoor slidingDoor = hit.collider.gameObject.GetComponentInParent<SlidingDoor>();
                         if (slidingDoor) {
                             slidingDoor.OpenDoors();
                         }

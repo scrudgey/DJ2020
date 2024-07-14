@@ -508,9 +508,9 @@ public partial class GameManager : Singleton<GameManager> {
 
     }
     public void HandleEscapePressed() {
+        if (CutsceneManager.I.cutsceneIsRunning()) return;
         if (gameData.phase == GamePhase.world) {
             if (activeMenuType == MenuType.none) {
-                // ShowMenu(MenuType.mainEscapeMenu);
                 ShowMenu(MenuType.escapeMenu, () => {
                     string sceneName = SceneManager.GetActiveScene().name;
                     EscapeMenuController controller = GameObject.FindObjectOfType<EscapeMenuController>();

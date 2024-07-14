@@ -422,6 +422,8 @@ public partial class GameManager : Singleton<GameManager> {
         this.clearSighterV3 = GameObject.FindObjectOfType<NeoClearsighterV3>();
         this.clearsighterV4 = GameObject.FindObjectOfType<NeoClearsighterV4>();
 
+        clearsighterV4.Bind(characterCamera.gameObject);
+
         playerGunHandler.isPlayerCharacter = true;
         playerMeleeHandler.isPlayerCharacter = true;
 

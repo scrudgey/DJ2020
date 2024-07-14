@@ -124,7 +124,7 @@ public class CharacterView : MonoBehaviour {
         legsImage.sprite = legsSkin.legsIdle[Direction.rightDown][0];
 
         Octet<Sprite[]> octet;
-        if (currentWeaponState == null) {
+        if (currentWeaponState == null || currentWeaponState.gunInstance == null) {
             octet = bodySkin.unarmedIdle;
         } else if (currentWeaponState.type == WeaponType.melee) {
             octet = bodySkin.swordIdle;
