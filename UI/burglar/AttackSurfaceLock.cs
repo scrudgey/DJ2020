@@ -132,7 +132,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
     }
 
     protected virtual BurglarAttackResult DoPick() {
-        bool success = doorLock.lockType == DoorLock.LockType.physical && doorLock.locked;
+        bool success = doorLock.lockType == KeyType.physical && doorLock.locked;
         doorLock.PickLock();
         if (success) {
             complete = true;

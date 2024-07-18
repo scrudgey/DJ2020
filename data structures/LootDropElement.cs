@@ -27,7 +27,8 @@ public class LootDropElement : ScriptableObject {
         // apply keyId if prefab is a key
         Key key = obj.GetComponentInChildren<Key>();
         if (key != null) {
-            key.keyId = Toolbox.RandomFromList(keyIds);
+            // key.keyId = Toolbox.RandomFromList(keyIds);
+            key.keyId = GameManager.I.gameData.levelState.delta.keyClassMap[(key.type, key.keyClass)];
         }
 
         // apply credit range if prefab is credstick

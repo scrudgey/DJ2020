@@ -124,11 +124,28 @@ public partial class GameManager : Singleton<GameManager> {
             spawnRandom.Spawn();
         }
 
-        // TODO: set up mapping from key class to key id
-
+        // set up key class mapping
+        state.delta.keyClassMap = new SerializableDictionary<(KeyType, KeyClass), int>();
+        foreach (KeyType keyType in Enum.GetValues(typeof(KeyType))) {
+            foreach (KeyClass keyclass in Enum.GetValues(typeof(KeyClass))) {
+                int keycode = 0;
+                keycode += UnityEngine.Random.Range(1, 9);
+                keycode += UnityEngine.Random.Range(1, 9) * 10;
+                keycode += UnityEngine.Random.Range(1, 9) * 100;
+                keycode += UnityEngine.Random.Range(1, 9) * 1000;
+                state.delta.keyClassMap[(keyType, keyclass)] = keycode;
+            }
+        }
         // randomize doors
         foreach (DoorRandomizer doorRandomizer in GameObject.FindObjectsOfType<DoorRandomizer>()) {
             doorRandomizer.ApplyState(state.template);
+        }
+        // randomize doorlock
+        foreach (DoorLock doorLock in GameObject.FindObjectsOfType<DoorLock>(true)) {
+            doorLock.lockId = state.delta.keyClassMap[(doorLock.lockType, doorLock.keyClass)];
+        }
+        foreach (Key key in GameObject.FindObjectsOfType<Key>(true)) {
+            key.keyId = state.delta.keyClassMap[(key.type, key.keyClass)];
         }
 
         state.spawnPoints = GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>().ToDictionary(s => s.idn, s => s);

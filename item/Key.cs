@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+public enum KeyClass { A, B, C, D }
 public class Key : Interactive {
+    public KeyClass keyClass;
     public KeyType type;
+    [HideInInspector]
     public int keyId;
     public AudioClip[] pickupSounds;
 
@@ -11,7 +13,6 @@ public class Key : Interactive {
     public override ItemUseResult DoAction(Interactor interactor) {
         Destroy(gameObject);
         GameManager.I.AddKey(keyId, type, transform.position);
-        // interactor.RemoveInteractive(this);
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
         if (suspicious) {
             string lootName = type switch {

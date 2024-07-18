@@ -233,7 +233,7 @@ public class Door : Interactive {
         if (!isLocked) {
             StartCoroutine(TemporarilyDisableCollisions(interactor.transform.root.gameObject));
         } else {
-            Vector3 indicatorPosition = GameManager.I.playerPosition + -1f * GameManager.I.characterCamera.transform.forward + 1.2f * Vector3.up;
+            Vector3 indicatorPosition = GameManager.I.playerPosition + -0.1f * GameManager.I.characterCamera.transform.forward + 1.2f * Vector3.up;
             GameObject obj = PoolManager.I.GetPool(lockIndicatorPrefab).GetObject(indicatorPosition);
         }
         return ItemUseResult.Empty() with {

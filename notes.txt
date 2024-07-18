@@ -3600,6 +3600,10 @@ speed up + pitch up blitting?
 * using keycard reader should open door
 * using door should interact with keycard reader
 * connect up attack surface keycard readers and keycard reader
+    * less intense wall sticking?
+    * router panel conceals a second port?
+    * adjust rate of fire for pistols?
+    * when pause menu changes sizes, relevant buttons should stay in place.- how?
 
 
 
@@ -3611,7 +3615,6 @@ more shooting range?
     configuration: breakable targets? target reset?
 
 uncertain:
-    less intense wall sticking?
     creep button (crawling is?)
         slow walk?
     apply skin graphics to corpse?
@@ -3622,13 +3625,10 @@ uncertain:
     upgrade unity
         newtonsoft json is broken??
         bolt cutter?
-    router panel conceals a second port?
     electrical zap effect around broken wires?
     shooting the objects
         shoot laser tripwire to disable?
         shoot alarm box to disable?
-    adjust rate of fire for pistols?
-    ? when pause menu changes sizes, relevant buttons should stay in place.- how?
 
 nice to have / future goals:
     one way to make an effective callout camera movement is linear
@@ -3707,7 +3707,6 @@ minimap?
 
 networks
     DFS path finding doesn't quite work right for highlighting alarm path
-    some computers trip honeypots
 
 graphics
     more buildings
@@ -3839,11 +3838,9 @@ world:
         data merchant:
             * buy hacking software
             buy hacking hardware
-            commission a virus?
+            * commission a virus?
         street doc buy cyberware
             gated by a different progression mechanic
-        hacker?
-            software, hardware?
 
 perks to implement:
     gun_nut
@@ -3913,7 +3910,7 @@ AI
 footsteps don't seem to matter any more
 silencer shows in gameplay
 colors for item selector
-item selector clear slot
+.? item selector clear slot
 display information about items in loadout
 some way to distract guards
 sphere robot
@@ -3958,8 +3955,6 @@ cyber jump inside resulted in bizarre behavior
 
 system:
     controls, settings
-        weapons, loadout, 
-        character stats, skills
 
 robots
 vehicles
@@ -4004,9 +3999,14 @@ unresolved mechanics / shops / gameplay questions:
     upgrading hack ability
     bringing items, tools, duffel bag
     ICE in cyber
+    some computers trip honeypots
     firewalls in cyber
     crafting 2.0 / additional payloads / additional conditions
     
+
+? vehicle accelerate / decelerate
+? better rain
+? door can be interacted with from a distance
 
 
 
@@ -4014,6 +4014,7 @@ missions
     1 way shootout
     productionize office
         redo apartment after office
+
 destructible walls
     gibs
     re-bake navmesh
@@ -4031,9 +4032,7 @@ character view:
     armor slot
     head slot?
     cyberware slots
-
-
-
+    items
 
 make graphs more readable
     limit icons shown to current floor / show other floors as transparent gray
@@ -4041,18 +4040,14 @@ make graphs more readable
 
 tune impacts
 tune gibbing
+
+
 write some real mission descriptions & objectives
-
 fix elevator map data
-
-? vehicle accelerate / decelerate
-? better rain
-? door can be interacted with from a distance
-
 ambience add to other scenes
     police sirens
     city ambience
     room tone 
-
 AC unit entry is broken ??
     new UI button: enter appears when mouse over target. prelude to keys
+first dialogue in abandoned lab

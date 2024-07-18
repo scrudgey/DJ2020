@@ -3,11 +3,11 @@ using UnityEditor;
 using UnityEngine;
 [System.Serializable]
 public class DoorLock : MonoBehaviour {
-    public enum LockType { physical, keycard, physicalCode, keycardCode, keypadCode }
-    // public Door door;
     public AudioSource audioSource;
-    public LockType lockType;
+    public KeyType lockType;
+    public KeyClass keyClass;
     public bool locked;
+    [HideInInspector]
     public int lockId;
     public AudioClip[] unlockSounds;
     public AudioClip[] failedUnlockSounds;
@@ -17,11 +17,8 @@ public class DoorLock : MonoBehaviour {
     public bool isDecoded;
 
     public bool TryKeyUnlock(KeyData keyData) {
-        bool keyTypeMatches = keyData.type switch {
-            KeyType.keycard => lockType == LockType.keycard,
-            KeyType.physical => lockType == LockType.physical,
-            _ => false
-        };
+        bool keyTypeMatches = keyData.type == lockType;
+
         if (keyTypeMatches && keyData.idn == lockId) {
             this.locked = false;
             Toolbox.RandomizeOneShot(audioSource, unlockSounds);
@@ -40,7 +37,7 @@ public class DoorLock : MonoBehaviour {
         Toolbox.RandomizeOneShot(audioSource, unlockSounds);
     }
     public void PickLock() {
-        if (lockType == LockType.physical) {
+        if (lockType == KeyType.physical) {
             this.locked = false;
         }
     }

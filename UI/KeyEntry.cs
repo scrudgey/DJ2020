@@ -22,9 +22,6 @@ public class KeyEntry : MonoBehaviour {
         nameText.text = $"{data.idn}";
         button.interactable = enabled;
         xKeyImage.SetActive(!enabled);
-        // if (!enabled) {
-        //     button.interactable = false;
-        // }
     }
     public void Clicked() {
         callback?.Invoke(data);

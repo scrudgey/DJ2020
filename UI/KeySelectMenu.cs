@@ -38,10 +38,7 @@ public class KeySelectMenu : MonoBehaviour {
         }
         DoorLock doorLock = targetLocks[0];
         initialDistanceFromTarget = Vector3.Distance(doorLock.transform.position, GameManager.I.playerPosition);
-        KeyType desiredKeyType = doorLock.lockType switch {
-            DoorLock.LockType.keycard => KeyType.keycard,
-            DoorLock.LockType.physical => KeyType.physical
-        };
+        KeyType desiredKeyType = doorLock.lockType;
         HashSet<KeyData> keys = GameManager.I.gameData.levelState.delta.keys.Where(key => key.type == desiredKeyType).ToHashSet();
         PopulateKeyEntries(desiredKeyType, keys, doorLock);
         if (keys.Count > 0)
