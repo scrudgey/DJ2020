@@ -10,14 +10,18 @@ public class KeyEntry : MonoBehaviour {
     public Image icon;
     public KeyData data;
     public Color green;
+    public Button button;
     Action<KeyData> callback;
 
-    public void Configure(Action<KeyData> callback, KeyData data) {
+    public void Configure(Action<KeyData> callback, KeyData data, bool enabled = true) {
         this.callback = callback;
         this.data = data;
         icon.sprite = graphIconReference.KeyinfoSprite(data);
-        icon.color = data.type == KeyType.password ? green : Color.white;
+        icon.color = green;
         nameText.text = $"{data.idn}";
+        if (!enabled) {
+            button.interactable = false;
+        }
     }
     public void Clicked() {
         callback?.Invoke(data);

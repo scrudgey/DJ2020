@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Key : Interactive {
-    public DoorLock.LockType type;
+    public KeyType type;
     public int keyId;
     public AudioClip[] pickupSounds;
 
@@ -15,8 +15,8 @@ public class Key : Interactive {
         Toolbox.AudioSpeaker(transform.position, pickupSounds);
         if (suspicious) {
             string lootName = type switch {
-                DoorLock.LockType.keycard => "keycard",
-                DoorLock.LockType.physical => "key",
+                KeyType.keycard => "keycard",
+                KeyType.physical => "key",
                 _ => "key"
             };
             GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(lootName));

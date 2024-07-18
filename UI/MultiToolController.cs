@@ -331,7 +331,7 @@ public class MultiToolController : MonoBehaviour {
             foreach (Image highlight in slotHighlights) {
                 highlight.enabled = false;
             }
-            GameManager.I.AddKey(doorLock.lockId, DoorLock.LockType.keycardCode, GameManager.I.playerPosition);
+            GameManager.I.AddKey(doorLock.lockId, KeyType.keycardCode, GameManager.I.playerPosition);
             StartCoroutine(Toolbox.ChainCoroutines(
                 BlinkWaveforms(ramBottomWaveImages),
                 BlinkWaveforms(ramBottomWaveImages),
@@ -450,13 +450,14 @@ public class MultiToolController : MonoBehaviour {
                 match &= targetDigits[i] == enteredDigits[i];
                 keyId += enteredDigits[i] * (int)Mathf.Pow(10, 3 - i);
             }
+            KeyData keyData = new KeyData(KeyType.keycard, keyId);
 
             if (currentInputChip.keycardReader != null) {
-                bool success = currentInputChip.keycardReader.AttemptSingleKey(keyId);
+                bool success = currentInputChip.keycardReader.AttemptSingleKey(keyData);
                 if (success)
                     currentInputChip.elevatorController?.EnableTemporaryAuthorization();
             } else {
-                bool success = currentInputChip.doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+                bool success = currentInputChip.doorLock.TryKeyUnlock(keyData);
                 if (success)
                     currentInputChip.elevatorController?.EnableTemporaryAuthorization();
             }

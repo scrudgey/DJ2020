@@ -5,21 +5,17 @@ using UnityEditor;
 using UnityEngine;
 
 public class AttackSurfaceDoorknob : AttackSurfaceElement {
-    public GameObject door;
-    IDoor idoor;
+    public Door door;
     public List<DoorLock> doorLocks;
     public AudioSource audioSource;
-    public virtual void Start() {
-        // only required because unity doesn't support interfaces in editor
-        idoor = door.GetComponent<IDoor>();
-    }
+
     public bool IsLocked() => doorLocks.Where(doorLock => doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked); // doorLock.locked;
 
     public override BurglarAttackResult HandleSingleClick(BurglarToolType activeTool, BurgleTargetData data) {
         base.HandleSingleClick(activeTool, data);
         if (activeTool == BurglarToolType.none) {
             bool success = !IsLocked();
-            idoor.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform, doorLocks);
+            door.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform, doorLocks);
             if (success) {
                 return BurglarAttackResult.None with {
                     finish = success,

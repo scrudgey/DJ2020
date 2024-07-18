@@ -26,6 +26,8 @@ public record ItemUseResult {
     public HvacUseResult hvacUseResult;
     public bool changeScene;
     public string toSceneName;
+    public bool showKeyMenu;
+    public List<DoorLock> doorlocks;
     public static ItemUseResult Empty() => new ItemUseResult {
         hvacUseResult = HvacUseResult.Empty()
     };

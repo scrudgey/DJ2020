@@ -27,7 +27,7 @@ public partial class GameManager : Singleton<GameManager> {
 
     public void AddCredits(int amount, Vector3 position) {
         gameData.levelState.delta.levelAcquiredCredits += amount;
-        OnItemPickup?.Invoke(1, $"{amount}");
+        // OnItemPickup?.Invoke(1, $"{amount}");
         OnGameStateChange?.Invoke(new StatusUpdateData() {
             type = StatusUpdateData.StatusType.credit,
             increment = amount,
@@ -43,49 +43,16 @@ public partial class GameManager : Singleton<GameManager> {
             originLocation = position
         });
     }
-    public void AddKey(int keyId, DoorLock.LockType type, Vector3 position) {
-        switch (type) {
-            case DoorLock.LockType.physical:
-                AddPhysicalKey(keyId);
-                break;
-            case DoorLock.LockType.keycard:
-                AddKeyCard(keyId);
-                break;
-            case DoorLock.LockType.keycardCode:
-                AddKeycardCode(keyId);
-                break;
-            case DoorLock.LockType.keypadCode:
-                AddKeypadCode(keyId);
-                break;
-            case DoorLock.LockType.physicalCode:
-                AddPhysicalKeyCode(keyId);
-                break;
-        }
+    public void AddKey(int keyId, KeyType type, Vector3 position) {
+        AddKeyToState(keyId, type);
         OnGameStateChange?.Invoke(new StatusUpdateData() {
             type = StatusUpdateData.StatusType.key,
             increment = 1,
             originLocation = position
         });
     }
-    public void AddPhysicalKey(int keyId) {
-        gameData.levelState.delta.physicalKeys.Add(keyId);
-        OnItemPickup?.Invoke(0, $"{keyId}");
-    }
-    public void AddKeyCard(int keyId) {
-        gameData.levelState.delta.keycards.Add(keyId);
-        OnItemPickup?.Invoke(0, $"{keyId}");
-    }
-    public void AddKeycardCode(int keyId) {
-        gameData.levelState.delta.keycardCodes.Add(keyId);
-        OnItemPickup?.Invoke(0, $"{keyId}");
-    }
-    public void AddPhysicalKeyCode(int keyId) {
-        gameData.levelState.delta.physicalKeys.Add(keyId);
-        OnItemPickup?.Invoke(0, $"{keyId}");
-    }
-    public void AddKeypadCode(int keyId) {
-        gameData.levelState.delta.keypadCodes.Add(keyId);
-        OnItemPickup?.Invoke(0, $"{keyId}");
+    public void AddKeyToState(int keyId, KeyType keyType) {
+        gameData.levelState.delta.keys.Add(new KeyData(keyType, keyId));
     }
 
 

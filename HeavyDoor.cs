@@ -23,12 +23,13 @@ public class HeavyDoor : Interactive {
     public Vector3 lowerDoorLocalClosedPosition;
     public Vector3 lowerDoorLocalOpenPosition;
     public override ItemUseResult DoAction(Interactor interactor) {
-        bool isUnlocked = keycardReader != null ? keycardReader.TryUnlock() : false;
+        // bool isUnlocked = keycardReader != null ? keycardReader.TryUnlock() : false;
+        bool isLocked = keycardReader.doorLock.isActiveAndEnabled && keycardReader.doorLock.locked;
 
         switch (_state) {
             case State.none:
             case State.closed:
-                if (isUnlocked)
+                if (!isLocked)
                     OpenDoors();
                 break;
             case State.open:
@@ -44,7 +45,9 @@ public class HeavyDoor : Interactive {
                 break;
         }
         return ItemUseResult.Empty() with {
-            waveArm = true
+            waveArm = true,
+            showKeyMenu = isLocked,
+            doorlocks = new List<DoorLock> { keycardReader.doorLock }
         };
     }
 

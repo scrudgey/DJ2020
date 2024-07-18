@@ -85,3 +85,38 @@ password data unlocks passwords. as is, this doesn't make much sense:
 stolen via rfid sniffer, replayed via cloner?
 
 ### keycard
+
+
+
+
+
+# keys v2
+
+interacting with a door just trys to open/close
+    if unlocked, behave as normal
+    if locked, do not open
+unify the iconography with hack interface "password" button
+unify this system with burglar tools interface?
+    is there any reason to allow keys and keycards in this interface?
+        yes: not all locks are obvious from world
+
+* don't show key popup when key unlocked
+* we should unify keydata at the gamedata level.
+* hide key menu when appropriate
+* have more than one key
+* effect for try / success / fail
+    * door locked: show lock popup
+    * key fail: blink key and red x
+    * keys success: blink key and green ✓
+* indicate failed keys in menu
+    * red x, button not usable
+? how to handle when no keys?
+
+
+sound effects for using key
+randomize door keys
+
+fix up key info pane
+    dividers between sections
+    smaller icon
+    better description / image

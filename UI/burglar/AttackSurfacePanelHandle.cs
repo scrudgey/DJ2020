@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using UnityEngine;
-public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
+public class AttackSurfacePanelHandle : AttackSurfaceElement {
     public Transform hingeTransform;
     public LoHi hingeAngles;
     public Coroutine swingRoutine;
@@ -108,10 +108,6 @@ public class AttackSurfacePanelHandle : AttackSurfaceElement, IDoor {
     }
 
     public bool IsLocked() => doorLocks.Any(doorLock => doorLock.locked); // doorLock.locked;
-
-    public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
-
-    }
 
     public void PickJiggleKnob(DoorLock doorlock) {
         // if (knobs == null || knobs.Count() == 0)

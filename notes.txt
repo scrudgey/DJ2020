@@ -3997,17 +3997,17 @@ more equipment to bring on mission?
     equipment plan:
         clear item slot
 
-unresolved mechanics / gameplay questions:
+unresolved mechanics / shops / gameplay questions:
     progression in shops? 
         items, guns
-    selling data / upgrading hack ability
+    selling data 
+    upgrading hack ability
     bringing items, tools, duffel bag
-    how does password data work??
-    how do keys work?
     ICE in cyber
     firewalls in cyber
     crafting 2.0 / additional payloads / additional conditions
     
+
 
 
 missions
@@ -4017,18 +4017,20 @@ missions
 destructible walls
     gibs
     re-bake navmesh
-record new gameplay footage
 
 draw
     logos for omni, delta, elf
     update the steam page graphic
     draw more circuit board layouts
     swat portrait
+    more spritesheets
+    grill texture on truck lights
 
-
-
-
-
+character view: 
+    rotate the character, show him with weapon drawn / not, running etc
+    armor slot
+    head slot?
+    cyberware slots
 
 
 
@@ -4037,35 +4039,20 @@ make graphs more readable
     limit icons shown to current floor / show other floors as transparent gray
     sub-nodes
 
-fix up key info pane
 tune impacts
 tune gibbing
-write some real mission descriptions 
-fix elevator maqp data
-armor slot
-head slot?
-rotate the character, show him with weapon drawn / not, running etc
+write some real mission descriptions & objectives
+
+fix elevator map data
+
 ? vehicle accelerate / decelerate
-? smoke
 ? better rain
-more spritesheets
-grill texture on truck lights
 ? door can be interacted with from a distance
-
-investigate the laboratory
-    mission / objective descriptions
-
 
 ambience add to other scenes
     police sirens
     city ambience
     room tone 
-    
-
-
 
 AC unit entry is broken ??
     new UI button: enter appears when mouse over target. prelude to keys
-
-
-

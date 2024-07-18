@@ -49,6 +49,7 @@ public class UIController : MonoBehaviour {
     public SoftwareModalController softwareModalController;
     public TextMeshProUGUI cutsceneText;
     public CutsceneDialogueController cutsceneDialogueController;
+    public KeySelectMenu keySelectMenu;
     public bool mouseOverScrollBox;
     bool burglarMode;
     void Awake() {
@@ -90,6 +91,7 @@ public class UIController : MonoBehaviour {
         targetPracticeUIHandler.canvas.enabled = false;
         statusBarHandler.Initialize();
         HideSoftwareDeployModal();
+        keySelectMenu.Hide();
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
@@ -189,6 +191,7 @@ public class UIController : MonoBehaviour {
     }
     public void HideUI() {
         HideVRStats();
+        keySelectMenu.Hide();
         if (canvas != null)
             canvas.enabled = false;
         if (gunDisplayCanvas != null)
@@ -259,5 +262,7 @@ public class UIController : MonoBehaviour {
     public void HideCutsceneDialogue() {
         cutsceneDialogueCanvas.enabled = false;
     }
-
+    public void ShowKeyMenu(List<DoorLock> doorLocks) {
+        keySelectMenu.Initialize(doorLocks);
+    }
 }

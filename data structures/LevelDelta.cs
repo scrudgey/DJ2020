@@ -36,12 +36,12 @@ public record LevelDelta {
     public int stallsAvailable = 1;
     public int easesAvailable = 1;
 
-    public HashSet<int> physicalKeys;
-    public HashSet<int> keycards;
-    public HashSet<int> keycardCodes;
-    public HashSet<int> physicalCodes;
-    public HashSet<int> keypadCodes;
-
+    // public HashSet<int> physicalKeys;
+    // public HashSet<int> keycards;
+    // public HashSet<int> keycardCodes;
+    // public HashSet<int> physicalCodes;
+    // public HashSet<int> keypadCodes;
+    public HashSet<KeyData> keys;
 
     public int humansKilled;
     public SerializableDictionary<string, string> objectiveLocations;
@@ -53,11 +53,12 @@ public record LevelDelta {
         lastTactics = new Stack<DialogueTacticType>(),
         objectiveDeltas = new List<ObjectiveDelta>(),
         optionalObjectiveDeltas = new List<ObjectiveDelta>(),
-        physicalKeys = new HashSet<int>(),
-        keycards = new HashSet<int>(),
-        keycardCodes = new HashSet<int>(),
-        physicalCodes = new HashSet<int>(),
-        keypadCodes = new HashSet<int>(),
+        // physicalKeys = new HashSet<int>(),
+        // keycards = new HashSet<int>(),
+        // keycardCodes = new HashSet<int>(),
+        // physicalCodes = new HashSet<int>(),
+        // keypadCodes = new HashSet<int>(),
+        keys = new HashSet<KeyData>(),
         objectiveLocations = new SerializableDictionary<string, string>(),
         softwareStates = new List<SoftwareState>()
     };

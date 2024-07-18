@@ -5,9 +5,11 @@ using Easings;
 using UnityEditor;
 using UnityEngine;
 
-public class Door : Interactive, IDoor {
+public class Door : Interactive {
     public enum DoorState { closed, opening, closing, open, ajar }
     public enum DoorParity { twoWay, openIn, openOut }
+    public GameObject lockIndicatorPrefab;
+
     public bool reverse;
     public GameObject normalMapWedge;
     public GameObject reverseMapWedge;
@@ -64,7 +66,9 @@ public class Door : Interactive, IDoor {
         ChangeState(DoorState.closed);
 
     }
-
+    void Start() {
+        PoolManager.I.RegisterPool(lockIndicatorPrefab, poolSize: 20);
+    }
     void Update() {
         switch (state) {
             case DoorState.closing:
@@ -223,23 +227,26 @@ public class Door : Interactive, IDoor {
         }
         doorLocks.AddRange(universalLocks);
 
-        StartCoroutine(TemporarilyDisableCollisions(interactor.transform.root.gameObject));
-        ActivateDoorknob(interactor.transform.position, interactor.transform, doorLocks, withKeySet: GameManager.I.gameData.levelState.delta.physicalKeys);
-        return ItemUseResult.Empty() with { waveArm = true };
+        ActivateDoorknob(interactor.transform.position, interactor.transform, doorLocks);
+
+        bool isLocked = doorLocks.Where(doorLock => doorLock != null && doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked);
+        if (!isLocked) {
+            StartCoroutine(TemporarilyDisableCollisions(interactor.transform.root.gameObject));
+        } else {
+            Vector3 indicatorPosition = GameManager.I.playerPosition + -1f * GameManager.I.characterCamera.transform.forward + 1.2f * Vector3.up;
+            GameObject obj = PoolManager.I.GetPool(lockIndicatorPrefab).GetObject(indicatorPosition);
+        }
+        return ItemUseResult.Empty() with {
+            waveArm = true,
+            showKeyMenu = isLocked,
+            doorlocks = doorLocks
+        };
     }
     public void StartLockTimer() {
         lockTimer = 1f;
     }
-    public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, HashSet<int> withKeySet = null, bool bypassKeyCheck = false, bool openOnly = false) {
+    public void ActivateDoorknob(Vector3 position, Transform activator, List<DoorLock> doorLocks, bool bypassKeyCheck = false, bool openOnly = false) {
         lastInteractorTransform = activator;
-
-        if (!bypassKeyCheck)
-            foreach (int keyId in GameManager.I.gameData.levelState.delta.physicalKeys) {
-                foreach (DoorLock doorLock in doorLocks) {
-                    doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
-                }
-            }
-
         bool isLocked = bypassKeyCheck ? false : doorLocks.Where(doorLock => doorLock != null && doorLock.isActiveAndEnabled).Any(doorLock => doorLock.locked);
 
         switch (state) {

@@ -150,7 +150,7 @@ namespace AI {
         void OpenDoor(Vector3 position, Door door) {
             // Debug.Log($"open door state: {door.state}");
             if (door.state == Door.DoorState.closed) {
-                door.ActivateDoorknob(position, transform, new List<DoorLock>(), withKeySet: keyIds, bypassKeyCheck: true, openOnly: true);
+                door.ActivateDoorknob(position, transform, new List<DoorLock>(), bypassKeyCheck: true, openOnly: true);
                 door.StartLockTimer();
                 waitForDoor = door;
             }

@@ -12,6 +12,7 @@ public abstract class Interactive : Highlightable {
 
     public Action OnUsed;
     public bool interactible = true;
+    // public List<DoorLock> doorLocks;
 
     public virtual string ResponseString() {
         return $"did {actionPrompt}";

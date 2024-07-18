@@ -16,8 +16,11 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public Image cursorImage;
     private float timer;
     public Color color;
+    [Header("buttons")]
     public Button interactButton;
+    // public Button keyButton;
     public RectTransform interactButtonRect;
+    // public RectTransform keyButtonRect;
     public AttackSurface currentAttackSurface;
     void Awake() {
         blitTextCoroutine = null;
@@ -36,6 +39,11 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
                 } else {
                     Disable();
                 }
+                // if (currentInteractorTarget.target.doorLocks != null && currentInteractorTarget.target.doorLocks.Count > 0) {
+                //     keyButton.gameObject.SetActive(true);
+                // } else {
+                //     keyButton.gameObject.SetActive(false);
+                // }
             }
         }
         if (currentAttackSurface != interactor.selectedAttackSurface) {
@@ -48,6 +56,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
 
             Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);
             interactButtonRect.position = screenPoint;
+
             bool interactible = GameManager.I.playerCharacterController.state == CharacterState.normal ||
                                 GameManager.I.playerCharacterController.state == CharacterState.wallPress;
             interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < currentAttackSurface.interactionDistance;
@@ -80,6 +89,8 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             DataChanged();
             return;
         } else if (currentInteractorTarget != null) {
+
+            // TODO: change ?
             Vector3 screenPoint = cam.WorldToScreenPoint(currentInteractorTarget.target.transform.position);
             cursor.position = screenPoint;
             cursorText.color = color;
@@ -88,10 +99,8 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             SetScale();
             cursorImage.enabled = false;
         }
-
-
-
     }
+
     void Disable() {
         dotText.enabled = false;
         cursorText.enabled = false;
@@ -120,6 +129,11 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public void InteractButtonCallback() {
         if (currentAttackSurface) {
             target.HandleInteractButtonCallback(currentAttackSurface);
+        }
+    }
+    public void KeyButtonCallback() {
+        if (currentInteractorTarget != null) {
+            Debug.Log($"key callback");
         }
     }
     public IEnumerator BlitCalloutText(string actionText) {

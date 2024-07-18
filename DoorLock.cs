@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 [System.Serializable]
@@ -9,22 +10,24 @@ public class DoorLock : MonoBehaviour {
     public bool locked;
     public int lockId;
     public AudioClip[] unlockSounds;
+    public AudioClip[] failedUnlockSounds;
     public Transform[] rotationElements;
+
+    public List<KeyData> attemptedKeys = new List<KeyData>();
     public bool isDecoded;
 
-    public bool TryKeyToggle(LockType keyType, int keyId) {
-        if (keyType == lockType && keyId == lockId) {
-            this.locked = !this.locked;
-            Toolbox.RandomizeOneShot(audioSource, unlockSounds);
-            return true;
-        }
-        return false;
-    }
-    public bool TryKeyUnlock(LockType keyType, int keyId) {
-        if (keyType == lockType && keyId == lockId) {
+    public bool TryKeyUnlock(KeyData keyData) {
+        bool keyTypeMatches = keyData.type switch {
+            KeyType.keycard => lockType == LockType.keycard,
+            KeyType.physical => lockType == LockType.physical,
+            _ => false
+        };
+        if (keyTypeMatches && keyData.idn == lockId) {
             this.locked = false;
             Toolbox.RandomizeOneShot(audioSource, unlockSounds);
             return true;
+        } else {
+            Toolbox.RandomizeOneShot(audioSource, failedUnlockSounds);
         }
         return false;
     }

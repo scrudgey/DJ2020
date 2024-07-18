@@ -14,12 +14,12 @@ public class SlidingDoor : Interactive {
     public KeycardReader keycardReader;
     Coroutine coroutine;
     public override ItemUseResult DoAction(Interactor interactor) {
-        bool isUnlocked = keycardReader != null ? keycardReader.TryUnlock() : false;
+        bool isLocked = keycardReader.doorLock.isActiveAndEnabled && keycardReader.doorLock.locked;
 
         switch (_state) {
             case State.none:
             case State.closed:
-                if (isUnlocked)
+                if (!isLocked)
                     OpenDoors();
                 break;
             case State.open:
@@ -27,7 +27,9 @@ public class SlidingDoor : Interactive {
                 break;
         }
         return ItemUseResult.Empty() with {
-            waveArm = true
+            waveArm = true,
+            showKeyMenu = isLocked,
+            doorlocks = new List<DoorLock> { keycardReader.doorLock }
         };
     }
 

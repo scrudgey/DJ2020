@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Easings;
 using UnityEngine;
+
 public class AttackSurfaceLock : AttackSurfaceElement {
     public AudioSource audioSource;
     public DoorLock doorLock;
@@ -43,8 +45,8 @@ public class AttackSurfaceLock : AttackSurfaceElement {
             Toolbox.RandomizeOneShot(audioSource, manipulateSounds);
         } else if (activeTool == BurglarToolType.key) {
             bool success = false;
-            foreach (int keyId in GameManager.I.gameData.levelState.delta.physicalKeys) {
-                success |= doorLock.TryKeyUnlock(DoorLock.LockType.physical, keyId);
+            foreach (KeyData keyData in GameManager.I.gameData.levelState.delta.keys.Where(key => key.type == KeyType.physical)) {
+                success |= doorLock.TryKeyUnlock(keyData);
             }
             Toolbox.RandomizeOneShot(audioSource, keySounds);
             if (success) {

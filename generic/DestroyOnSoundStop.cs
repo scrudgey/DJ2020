@@ -12,8 +12,6 @@ public class DestroyOnSoundStop : MonoBehaviour {
         if (clip.Length > 0)
             Toolbox.RandomizeOneShot(audioSource, clip);
     }
-
-    // Update is called once per frame
     void Update() {
         if (!audioSource.isPlaying) {
             PoolManager.I.RecallObject(gameObject);

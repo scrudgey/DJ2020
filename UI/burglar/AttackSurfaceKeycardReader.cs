@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
 public class AttackSurfaceKeycardReader : AttackSurfaceElement {
     public DoorLock doorLock;
     public KeycardReader keycardReader;
@@ -24,8 +24,8 @@ public class AttackSurfaceKeycardReader : AttackSurfaceElement {
                 keycardReader.AttemptToOpenDoors();
             } else if (elevatorController != null) {
                 bool success = false;
-                foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
-                    success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+                foreach (KeyData keyData in GameManager.I.gameData.levelState.delta.keys.Where(key => key.type == KeyType.keycard)) {
+                    success |= doorLock.TryKeyUnlock(keyData);
                 }
                 if (success) {
                     Toolbox.RandomizeOneShot(audioSource, successSound);

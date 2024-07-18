@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class KeycardReader : Interactive {
@@ -33,8 +34,8 @@ public class KeycardReader : Interactive {
 
     public bool TryUnlock() {
         bool success = false;
-        foreach (int keyId in GameManager.I.gameData.levelState.delta.keycards) {
-            success |= doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+        foreach (KeyData keyData in GameManager.I.gameData.levelState.delta.keys.Where(key => key.type == KeyType.keycard)) {
+            success |= doorLock.TryKeyUnlock(keyData);
         }
         AudioClip[] sound;
         Color color;
@@ -50,8 +51,8 @@ public class KeycardReader : Interactive {
         BlinkLight(color);
         return success;
     }
-    public bool AttemptSingleKey(int keyId) {
-        bool success = doorLock.TryKeyUnlock(DoorLock.LockType.keycard, keyId);
+    public bool AttemptSingleKey(KeyData keyData) {
+        bool success = doorLock.TryKeyUnlock(keyData);
         AudioClip[] sound;
         Color color;
         if (success) {
