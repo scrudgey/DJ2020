@@ -8,6 +8,7 @@ public class KeySelectMenu : MonoBehaviour {
     public GameObject keyEntryPrefab;
     public Transform keyEntryContainer;
     public RectTransform rectTransform;
+    public AudioSource audioSource;
 
     [Header("indicator")]
     public RectTransform lockIndicatorRect;
@@ -18,6 +19,11 @@ public class KeySelectMenu : MonoBehaviour {
     public Color successColor;
     public Color failColor;
     public Color iconColor;
+    [Header("sounds")]
+    public AudioClip[] showSounds;
+    public AudioClip[] hideSounds;
+    public AudioClip[] successSounds;
+    public AudioClip[] failSounds;
     List<DoorLock> targetLocks;
     Coroutine routine;
     Coroutine indicatorRoutine;
@@ -67,12 +73,17 @@ public class KeySelectMenu : MonoBehaviour {
         bool success = false;
         targetLocks.ForEach((doorlock) => { success |= doorlock.TryKeyUnlock(keyData); });
         if (success) {
-
+            Toolbox.RandomizeOneShot(audioSource, successSounds);
         } else {
+            Toolbox.RandomizeOneShot(audioSource, failSounds);
             targetLocks.ForEach((doorlock) => { doorlock.attemptedKeys.Add(keyData); });
         }
         if (indicatorRoutine != null) StopCoroutine(indicatorRoutine);
         indicatorRoutine = StartCoroutine(BlinkIcon(keyData, success));
+        ItemUseResult itemUseResult = ItemUseResult.Empty() with {
+            waveArm = true
+        };
+        GameManager.I.playerCharacterController.HandleItemUseResult(itemUseResult);
         Hide();
     }
     public void Show(int numberEntries) {
@@ -80,6 +91,7 @@ public class KeySelectMenu : MonoBehaviour {
             StopCoroutine(routine);
         }
         float targetHeight = numberEntries * 40f + 25;
+        Toolbox.RandomizeOneShot(audioSource, showSounds);
         routine = StartCoroutine(Toolbox.Ease(null, 0.1f, 0f, targetHeight, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             rectTransform.sizeDelta = new Vector2(175, amount);
         }));
@@ -90,6 +102,7 @@ public class KeySelectMenu : MonoBehaviour {
             StopCoroutine(routine);
         }
         float initialHeight = rectTransform.rect.height;
+        Toolbox.RandomizeOneShot(audioSource, hideSounds);
         routine = StartCoroutine(Toolbox.Ease(null, 0.1f, initialHeight, 0, PennerDoubleAnimation.ExpoEaseIn, (amount) => {
             rectTransform.sizeDelta = new Vector2(175, amount);
         }));
@@ -103,11 +116,13 @@ public class KeySelectMenu : MonoBehaviour {
 
         bool parity = false;
         float timer = 0f;
-        float duration = 0.2f;
+        float duration = 0.075f;
         int cycles = 6;
         int cycleIndex = 0;
 
-        SetIndicatorKeyIcon(data);
+        // SetIndicatorKeyIcon(data);
+        SetIndicatorFeedback(isSuccess);
+
 
         while (cycleIndex < cycles) {
             timer += Time.unscaledDeltaTime;
@@ -116,15 +131,16 @@ public class KeySelectMenu : MonoBehaviour {
                 cycleIndex += 1;
                 parity = !parity;
                 if (parity) {
-                    SetIndicatorFeedback(isSuccess);
-                } else {
                     SetIndicatorKeyIcon(data);
+                } else {
+                    SetIndicatorFeedback(isSuccess);
                 }
             }
             lockIndicatorRect.position = GameManager.I.characterCamera.Camera.WorldToScreenPoint(indicatorPosition);
             yield return null;
         }
-
+        yield return Toolbox.BlinkEmphasis(lockIndicatorImage, duration: 0.05f);
+        yield return new WaitForSecondsRealtime(0.3f);
         lockIndicatorRect.gameObject.SetActive(false);
     }
 

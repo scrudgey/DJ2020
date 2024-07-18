@@ -124,6 +124,8 @@ public partial class GameManager : Singleton<GameManager> {
             spawnRandom.Spawn();
         }
 
+        // TODO: set up mapping from key class to key id
+
         // randomize doors
         foreach (DoorRandomizer doorRandomizer in GameObject.FindObjectsOfType<DoorRandomizer>()) {
             doorRandomizer.ApplyState(state.template);

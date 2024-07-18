@@ -111,12 +111,15 @@ unify this system with burglar tools interface?
 * indicate failed keys in menu
     * red x, button not usable
 ? how to handle when no keys?
+* sound effects for using key
+. wave arm
 
 
-sound effects for using key
 randomize door keys
+
 
 fix up key info pane
     dividers between sections
     smaller icon
-    better description / image
+    better description
+    better image?

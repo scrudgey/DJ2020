@@ -8,6 +8,7 @@ public class KeyEntry : MonoBehaviour {
     public TextMeshProUGUI nameText;
     public GraphIconReference graphIconReference;
     public Image icon;
+    public GameObject xKeyImage;
     public KeyData data;
     public Color green;
     public Button button;
@@ -19,9 +20,11 @@ public class KeyEntry : MonoBehaviour {
         icon.sprite = graphIconReference.KeyinfoSprite(data);
         icon.color = green;
         nameText.text = $"{data.idn}";
-        if (!enabled) {
-            button.interactable = false;
-        }
+        button.interactable = enabled;
+        xKeyImage.SetActive(!enabled);
+        // if (!enabled) {
+        //     button.interactable = false;
+        // }
     }
     public void Clicked() {
         callback?.Invoke(data);
