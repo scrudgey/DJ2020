@@ -50,7 +50,7 @@ public class AmbienceManager : Singleton<AmbienceManager> {
     }
 
     public void HandleValueChanged(CharacterCamera cam) {
-        targetPosition = cam.targetPosition;
+        targetPosition = cam.cullingTargetPosition;
     }
     public void Stop() {
         if (zoneRoutine != null) StopCoroutine(zoneRoutine);

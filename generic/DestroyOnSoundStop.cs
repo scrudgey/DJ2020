@@ -7,6 +7,7 @@ public class DestroyOnSoundStop : MonoBehaviour {
     public AudioClip[] clip;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.minDistance = 2f;
     }
     void Start() {
         if (clip.Length > 0)

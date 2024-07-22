@@ -16,7 +16,8 @@ public class Footsteps : MonoBehaviour {
     void Start() {
         raycastHits = new RaycastHit[1];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
-        audioSource.volume = 0.65f;
+        audioSource.volume = 0.4f;
+        // audioSource.maxDistance = 23f;
         footstepData = Resources.Load("data/footstep/default") as FootstepData;
     }
     public void UpdateWithVelocity(Vector3 velocity, bool isRunning) {

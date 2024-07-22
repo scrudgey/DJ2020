@@ -9,20 +9,28 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CharacterView : MonoBehaviour {
-
+    public bool animate;
     public GameObject thirdWeaponSlot;
     public Image headImage;
     public Image torsoImage;
     public Image legsImage;
     public TextMeshProUGUI captionText;
 
+    [Header("animation")]
+    public CustomAnimator customAnimator;
+    public AnimationClip idleAnimation;
+    public AnimationClip unarmedWalkAnimation;
+    // public AnimationClip unarmedWalkSlowAnimation;
+
     [Header("weapon slots")]
     public LoadoutWeaponButton primaryWeaponButton;
     public LoadoutWeaponButton secondaryWeaponButton;
     public LoadoutWeaponButton tertiaryWeaponButton;
+
     [Header("item slots")]
     public LoadoutGearSlotButton[] itemSlots;
     public GameObject itemSlot5;
+
     [Header("buttons")]
     public Button[] allButtons;
     public GameObject itemsContainer;
@@ -37,6 +45,16 @@ public class CharacterView : MonoBehaviour {
     bool initialized;
     PlayerState playerState;
     LevelPlan plan;
+
+    float movementTypeFactor;
+    float baseAngle;
+    Direction headDirection;
+    Direction baseDirection;
+    Octet<Sprite[]> torsoOctet;
+    Octet<Sprite[]> legsOctet;
+    float headAngle2;
+    int _frame;
+
     public WeaponState currentWeaponState;
     public MissionPlanLoadoutController loadoutController;
     public void Initialize(GameData data, LevelPlan plan) {
@@ -75,32 +93,49 @@ public class CharacterView : MonoBehaviour {
 
         Vector3 torsoPosition = new Vector3(initialTorsoPosition.x, initialTorsoPosition.y, initialTorsoPosition.z);
         Vector3 headPosition = new Vector3(initialHeadPosition.x, initialHeadPosition.y, initialHeadPosition.z);
-
         torsoPosition.y += 0.35f * Mathf.Sin(timer);
         headPosition.y += 0.55f * Mathf.Sin(timer + Mathf.PI / 8);
-
         torsoImage.transform.localPosition = torsoPosition;
         headImage.transform.localPosition = headPosition;
-
         torsoImage.transform.localScale = (1 + Mathf.Clamp(Mathf.Sin(timer), 0f, 1f) * 0.02f) * Vector3.one;
 
-        Direction headDirection = Direction.rightDown;
-        headAngle = Mathf.Sin(timer + Mathf.PI * 3f / 4f);
-        switch (headAngle) {
-            case float n when (n < -0.5f):
-                headDirection = Direction.leftDown;
-                break;
-            case float n when (n >= -0.5f && n < 0):
-                headDirection = Direction.down;
-                break;
-            case float n when (n >= 0 && n < 0.5f):
-                headDirection = Direction.rightDown;
-                break;
-            case float n when (n > 0.5f):
-                headDirection = Direction.right;
-                break;
+        if (animate) {
+            movementTypeFactor = Mathf.Sin((timer / 10f) * (2 * Mathf.PI));    // 2𝛑 = 1 cycle. t -> 2𝛑 / T
+            baseAngle -= Time.unscaledDeltaTime * 10f;
         }
+        headAngle2 = Mathf.Sin(timer + Mathf.PI * 3f / 4f) * 90;
+
+        if (baseAngle > 180f) baseAngle -= 360f;
+        if (baseAngle < -180f) baseAngle += 360f;
+        Direction baseDirection = Toolbox.DirectionFromAngle(baseAngle);
+        headDirection = Toolbox.DirectionFromAngle(baseAngle + headAngle2);
+
+        // -1, 0, 1
+        int movementIndex = movementTypeFactor switch {
+            < 0 => 0,
+            < 0.5f => 1,
+            _ => 2
+        };
+        if (movementIndex == 0) _frame = 0;
+        SetTorsoOctet(movementIndex);
+        AnimationClip animationClip = movementIndex == 0 ? idleAnimation : unarmedWalkAnimation;
+        SetAnimation(animationClip);
+
+
         headImage.sprite = headSkin.headIdle[headDirection][0];
+        legsImage.sprite = legsOctet[baseDirection][_frame];
+        _frame = Math.Min(_frame, torsoOctet[baseDirection].Length - 1);
+        torsoImage.sprite = torsoOctet[baseDirection][_frame];
+
+        if (baseDirection == Direction.left || baseDirection == Direction.leftUp || baseDirection == Direction.leftDown) {
+            Vector3 legscale = legsImage.transform.localScale;
+            legscale.x = -Math.Abs(legscale.x);
+            legsImage.transform.localScale = legscale;
+        } else {
+            Vector3 legscale = legsImage.transform.localScale;
+            legscale.x = Math.Abs(legscale.x);
+            legsImage.transform.localScale = legscale;
+        }
     }
 
 
@@ -117,26 +152,15 @@ public class CharacterView : MonoBehaviour {
         bodySkin = Skin.LoadSkin(torsoSkinName);
         headSkin = Skin.LoadSkin(headSkinName);
 
-        Direction headDirection = Direction.rightDown;
+        SetTorsoOctet(0);
+
+        headDirection = Direction.rightDown;
+        movementTypeFactor = -1;
+        baseAngle = -90;
 
         headImage.sprite = headSkin.headIdle[headDirection][0];
-        // torsoImage.sprite = bodySkin.smgIdle[Direction.rightDown][0];
         legsImage.sprite = legsSkin.legsIdle[Direction.rightDown][0];
-
-        Octet<Sprite[]> octet;
-        if (currentWeaponState == null || currentWeaponState.gunInstance == null) {
-            octet = bodySkin.unarmedIdle;
-        } else if (currentWeaponState.type == WeaponType.melee) {
-            octet = bodySkin.swordIdle;
-        } else {
-            octet = currentWeaponState.gunInstance.template.type switch {
-                GunType.pistol => bodySkin.pistolIdle,
-                GunType.smg => bodySkin.smgIdle,
-                GunType.rifle => bodySkin.rifleIdle,
-                GunType.shotgun => bodySkin.shotgunIdle,
-            };
-        }
-        torsoImage.sprite = octet[Direction.rightDown][0];
+        torsoImage.sprite = torsoOctet[Direction.rightDown][0];
     }
     void RefreshItemSlots(PlayerState playerState, LevelPlan plan) {
         if (plan == null) {
@@ -188,5 +212,61 @@ public class CharacterView : MonoBehaviour {
             loadoutController.ClearWeaponSlot(button);
             Refresh(playerState, plan);
         }
+    }
+
+
+    void SetTorsoOctet(int index) {
+        if (currentWeaponState == null || currentWeaponState.gunInstance == null) {
+            torsoOctet = index switch {
+                0 => bodySkin.unarmedIdle,
+                1 => bodySkin.unarmedWalk,
+                2 => bodySkin.unarmedRun
+            };
+        } else if (currentWeaponState.type == WeaponType.melee) {
+            torsoOctet = bodySkin.swordIdle;
+        } else {
+            torsoOctet = currentWeaponState.gunInstance.template.type switch {
+                GunType.pistol => index switch {
+                    0 => bodySkin.pistolIdle,
+                    1 => bodySkin.pistolIdle,
+                    2 => bodySkin.pistolRun
+                },
+                GunType.smg => index switch {
+                    0 => bodySkin.smgIdle,
+                    1 => bodySkin.smgIdle,
+                    2 => bodySkin.smgRun
+                },
+                GunType.rifle => index switch {
+                    0 => bodySkin.rifleIdle,
+                    1 => bodySkin.rifleIdle,
+                    2 => bodySkin.smgRun
+                },
+                GunType.shotgun => index switch {
+                    0 => bodySkin.shotgunIdle,
+                    1 => bodySkin.shotgunIdle,
+                    2 => bodySkin.smgRun
+                }
+            };
+        }
+        if (index == 0) {
+            legsOctet = legsSkin.legsIdle;
+        } else if (index == 1) {
+            legsOctet = legsSkin.legsWalk;
+        } else if (index == 2) {
+            legsOctet = legsSkin.legsRun;
+        }
+    }
+    private void SetAnimation(AnimationClip clip) {
+        customAnimator.playbackSpeed = 1f;
+
+        if (customAnimator.clip != clip) {
+            customAnimator.Stop();
+            // bob = false;
+            customAnimator.clip = clip;
+            customAnimator.Play();
+        }
+    }
+    public void SetFrame(int frame) {
+        _frame = frame;
     }
 }

@@ -12,26 +12,12 @@ class ExtractionZoneCutscene : Cutscene {
 
     public override IEnumerator DoCutscene() {
         yield return WaitForFocus();
-        float timer = 0f;
-        float duration = 4f;
-
         characterCamera.followCursorCoefficient = 1f;
-        // clearsighter.followTransform = zone.transform;      // TODO: bind clearsighter to camera
-
-        while (timer < duration) {
-            timer += Time.unscaledDeltaTime;
-            Time.timeScale = Mathf.Lerp(Time.timeScale, 0f, 0.01f);
-            PlayerInput playerInput = PlayerInput.none;
-            playerInput.zoomInput = new Vector2(0f, 5f);
-            characterCamera.SetInputs(playerInput);
-
-            SetCameraPosition(zone.myCollider.bounds.center, CameraState.normal);
-            yield return null;
-        }
+        Vector2 zoomInput = new Vector2(0f, 5f);
+        yield return MoveCamera(zone.myCollider.bounds.center, Quaternion.identity, 2f, CameraState.normal, zoomInput, PennerDoubleAnimation.ExpoEaseOut);
+        yield return new WaitForSecondsRealtime(2f);
         Time.timeScale = 1f;
         characterCamera.followCursorCoefficient = 5f;
-
-        // clearsighter.followTransform = playerObject.transform;
 
         yield return null;
     }

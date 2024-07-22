@@ -18,6 +18,7 @@ public struct CameraInput {
 
     public Quaternion targetRotation;
     public Vector3 targetPosition;
+    public Vector3 cullingTargetPosition;
     public Vector3 playerDirection;
     public Transform targetTransform;
 

@@ -48,7 +48,8 @@ public record GameData {
                 "711",
                 "yamachi",
                 "elevator",
-                "Jack That Data"
+                "Jack That Data",
+                "abandonedLab"
             },
     };
 

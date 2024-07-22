@@ -90,7 +90,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
     CameraAttractorZone currentAttractor = null;
     private static float shakeJitter = 0f;
     private float currentOrthographicSize;
-    public Vector3 targetPosition;
+    public Vector3 cullingTargetPosition;
     bool thermalGogglesActive;
     CameraTargetParameters lastWallPressTargetParameters;
     void OnValidate() {
@@ -106,7 +106,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         }
         zoomCoefficientTarget -= input.zoomInput.y * Time.unscaledDeltaTime * 0.1f;
         zoomCoefficientTarget = Math.Clamp(zoomCoefficientTarget, 0.25f, 1.0f);
-        zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f);
+        zoomCoefficient = Mathf.SmoothDamp(zoomCoefficient, zoomCoefficientTarget, ref zoomVelocity, 0.05f, 100f, Time.unscaledDeltaTime);
     }
     void Awake() {
         Transform = this.transform;
@@ -340,7 +340,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             subCamera.orthographic = Camera.orthographic;
             subCamera.fieldOfView = Camera.fieldOfView;
         }
-        targetPosition = input.targetPosition;
+        cullingTargetPosition = input.cullingTargetPosition;
         OnValueChanged?.Invoke(this);
     }
     public void SetSkyBoxCamerasEnabled(bool enabled) {
@@ -407,12 +407,10 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             targetPosition = input.targetPosition + worldOffset;
             lastTargetPosition = targetPosition;
         }
-
         return new CameraTargetParameters() {
             fieldOfView = fieldOfView,
             orthographic = ORTHOGRAPHIC_MODE,
             rotation = planarRot * verticalRot,
-            snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = MaxDistance,
             targetPosition = targetPosition,
@@ -465,7 +463,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             fieldOfView = 50f,
             orthographic = false,
             rotation = planarRot,
-            snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 1.5f,
             targetPosition = input.targetPosition + distOffset + LROffset + heightOffset,
@@ -526,7 +523,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             fieldOfView = 75f,
             orthographic = false,
             rotation = cameraRotation,
-            snapToRotation = cameraRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0.5f,
             targetPosition = input.targetPosition + horizontalOffset + heightOffset,
@@ -557,7 +553,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             fieldOfView = 65f,
             orthographic = false,
             rotation = cameraRotation,
-            snapToRotation = cameraRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0f,
             targetPosition = input.targetPosition,
@@ -572,7 +567,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             fieldOfView = 50f,
             orthographic = false,
             rotation = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.rotation,
-            snapToRotation = Quaternion.identity,
             deltaTime = input.deltaTime,
             targetDistance = 0f,
             targetPosition = GameManager.I.activeBurgleTargetData.target.mainCameraPosition.position,
@@ -587,14 +581,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             fieldOfView = 65f,
             orthographic = false,
             rotation = input.targetRotation,
-            snapToRotation = input.targetRotation,
             deltaTime = input.deltaTime,
             targetDistance = 0f,
             targetPosition = input.targetPosition,
             orthographicSize = 4f,
             distanceMovementSharpness = 100,
             followingSharpness = 100,
-            minDistance = 0
+            minDistance = 0,
+            snapTo = true
         };
     }
 
@@ -612,56 +606,59 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         Camera.fieldOfView = input.fieldOfView;
 
         // apply rotation
-        idealRotation = input.rotation;
-        targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-input.rotationSharpness * input.deltaTime));
-        if (input.snapToRotation != Quaternion.identity) {
-            targetRotation = input.snapToRotation;
-        }
-        Transform.rotation = targetRotation;
+        if (input.snapTo) {
+            Transform.rotation = input.rotation;
+            Transform.position = input.targetPosition;
+        } else {
+            idealRotation = input.rotation;
+            targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-input.rotationSharpness * input.deltaTime));
 
-        // apply distance
-        _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
+            Transform.rotation = targetRotation;
 
-        // Find the smoothed follow position
-        Vector3 followPosition = input.targetPosition + (UnityEngine.Random.insideUnitSphere * shakeJitter);
-        _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, followPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
+            // apply distance
+            _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
 
-        // Handle obstructions
-        if (state == CameraState.aim) {
-            RaycastHit closestHit = new RaycastHit();
-            closestHit.distance = Mathf.Infinity;
-            _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetLayerMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
-            for (int i = 0; i < _obstructionCount; i++) {
-                bool isIgnored = false;
-                for (int j = 0; j < IgnoredColliders.Count; j++) {
-                    if (IgnoredColliders[j] == _obstructions[i].collider) {
-                        isIgnored = true;
-                        break;
+            // Find the smoothed follow position
+            Vector3 followPosition = input.targetPosition + (UnityEngine.Random.insideUnitSphere * shakeJitter);
+            _currentFollowPosition = Vector3.Lerp(_currentFollowPosition, followPosition, 1f - Mathf.Exp(-input.followingSharpness * input.deltaTime));
+
+            // Handle obstructions
+            if (state == CameraState.aim) {
+                RaycastHit closestHit = new RaycastHit();
+                closestHit.distance = Mathf.Infinity;
+                _obstructionCount = Physics.SphereCastNonAlloc(_currentFollowPosition, ObstructionCheckRadius, -Transform.forward, _obstructions, TargetDistance, LayerUtil.GetLayerMask(Layer.obj, Layer.def), QueryTriggerInteraction.Ignore);
+                for (int i = 0; i < _obstructionCount; i++) {
+                    bool isIgnored = false;
+                    for (int j = 0; j < IgnoredColliders.Count; j++) {
+                        if (IgnoredColliders[j] == _obstructions[i].collider) {
+                            isIgnored = true;
+                            break;
+                        }
+                    }
+
+                    if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance >= 0) {
+                        closestHit = _obstructions[i];
                     }
                 }
-
-                if (!isIgnored && _obstructions[i].distance < closestHit.distance && _obstructions[i].distance >= 0) {
-                    closestHit = _obstructions[i];
+                if (closestHit.distance < Mathf.Infinity) {
+                    _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
+                } else {
+                    // _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
+                    _currentDistance = TargetDistance;
                 }
             }
-            if (closestHit.distance < Mathf.Infinity) {
-                _currentDistance = Mathf.Lerp(_currentDistance, closestHit.distance, 1 - Mathf.Exp(-ObstructionSharpness * input.deltaTime));
-            } else {
-                // _currentDistance = Mathf.Lerp(_currentDistance, TargetDistance, 1 - Mathf.Exp(-input.distanceMovementSharpness * input.deltaTime));
-                _currentDistance = TargetDistance;
-            }
+
+            // Find the smoothed camera orbit position
+            Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);
+
+            // Handle framing
+            targetPosition += Transform.right * FollowPointFraming.x;
+            targetPosition += Vector3.up * FollowPointFraming.y;
+
+            // Apply position
+            Transform.position = targetPosition;
+            isometricRotation = Transform.rotation;
         }
-
-        // Find the smoothed camera orbit position
-        Vector3 targetPosition = _currentFollowPosition - ((targetRotation * Vector3.forward) * _currentDistance);
-
-        // Handle framing
-        targetPosition += Transform.right * FollowPointFraming.x;
-        targetPosition += Vector3.up * FollowPointFraming.y;
-
-        // Apply position
-        Transform.position = targetPosition;
-        isometricRotation = Transform.rotation;
 
         Debug.DrawRay(transform.position, 100f * transform.forward, Color.yellow);
     }

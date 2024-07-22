@@ -27,6 +27,7 @@ public class Vehicle : MonoBehaviour {
     void Awake() {
         bodyInitialLocalPosition = body.localPosition;
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.minDistance = 3f;
         passengers = new CharacterController[passengerSlots.Length];
     }
 

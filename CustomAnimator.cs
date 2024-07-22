@@ -5,6 +5,7 @@ using UnityEngine;
 public class CustomAnimator : MonoBehaviour {
     private AnimationClip _legacyClip;
     public float playbackSpeed = 1f;
+    public bool unscaled;
     public AnimationClip clip {
         set {
             _legacyClip = value;
@@ -25,7 +26,7 @@ public class CustomAnimator : MonoBehaviour {
     }
     public void Play() {
         if (!isPlaying) {
-            referenceTime = Time.time;
+            referenceTime = unscaled ? Time.unscaledTime : Time.time;
         }
         isPlaying = true;
     }
@@ -39,7 +40,7 @@ public class CustomAnimator : MonoBehaviour {
 
     void Update() {
         if (isPlaying && _clip != null) {
-            timer = (Time.time - referenceTime) * playbackSpeed;
+            timer = ((unscaled ? Time.unscaledTime : Time.time) - referenceTime) * playbackSpeed;
             while (nextEvents.Count > 0 && timer > nextEvents.Peek().time && isPlaying) {
                 FireEvent(nextEvents.Pop());
             }
@@ -62,7 +63,7 @@ public class CustomAnimator : MonoBehaviour {
             }
         }
         // TODO: handle overflow time on looping clips
-        referenceTime = Time.time;
+        referenceTime = unscaled ? Time.unscaledTime : Time.time;
     }
     void FireEvent(AnimationEvent animationEvent) {
         // Debug.Log($"{transform.root.gameObject} sending event: {animationEvent.functionName}({animationEvent.intParameter})");

@@ -67,6 +67,7 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
     void Start() {
         OverlayHandler.OnSelectedNodeChange += HandleNodeFocusChange;
     }
+
     void HandleNodeFocusChange(INodeCameraProvider indicator) {
         if (indicator == null) {
             followTransform = GameManager.I.playerObject?.transform ?? null;
@@ -80,9 +81,19 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
         RectifyPlayerFloor();
         StartRefreshFloorsCoroutine();
     }
+
     override public void HandleValueChanged(CharacterCamera cam) {
-        targetPosition = cam.targetPosition;
+        // the problem is: during normal game, the target position is the character followtransform which is an offset
+        // but clearsighter needs the foot location.
+        targetPosition = cam.cullingTargetPosition;
+        // // TODO hack: fix later
+        // if (CutsceneManager.I.cutsceneIsRunning()) {
+
+        // } else {
+        //     targetPosition -= new Vector3(0f, 1.31f, 0f);
+        // }
     }
+
     public void Initialize(Transform focus, CharacterCamera characterCamera, CharacterController characterController, SceneData sceneData, string sceneName) {
         // this.followTransform = focus;
         this.sceneData = sceneData;

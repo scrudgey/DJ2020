@@ -70,6 +70,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             popoutParity = PopoutParity.left,
             targetRotation = Quaternion.identity,
             targetPosition = node.position,
+            cullingTargetPosition = node.position,
             atLeftEdge = false,
             atRightEdge = false,
         };

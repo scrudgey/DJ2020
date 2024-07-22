@@ -46,6 +46,7 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     void Awake() {
         lockOnColliders = new Collider[32];
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.minDistance = 3f;
     }
     public void ShootCallback() {
         Shoot(lastShootInput);

@@ -1637,6 +1637,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
     public bool IsColliderValidForCollisions(Collider coll) {
         if (coll.CompareTag("actor")) return false;
+        coll.gameObject.SendMessage("OnKinematicCharacterImpact", SendMessageOptions.DontRequireReceiver);
         return !ignoredColliders.Contains(coll);
         // return true;
     }
@@ -1722,6 +1723,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             targetRotation = aimCameraRotation,
             targetTransform = cameraFollowTransform,
             targetPosition = cameraFollowTransform.position,
+            cullingTargetPosition = transform.position,
             atLeftEdge = atLeftEdge,
             atRightEdge = atRightEdge,
             currentAttackSurface = currentAttackSurface

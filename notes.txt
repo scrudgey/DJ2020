@@ -3604,6 +3604,23 @@ speed up + pitch up blitting?
     * router panel conceals a second port?
     * adjust rate of fire for pistols?
     * when pause menu changes sizes, relevant buttons should stay in place.- how?
+* ambience add to other scenes
+    * police sirens
+    * city ambience
+    * room tone 
+* planning mode
+    * HP / def indicators
+* extraction point cutscene
+* first dialogue in abandoned lab
+* map
+* extraction point
+* neoclearsighter targetposition vs. followpoint vs. camera behavior
+    * show him with weapon drawn / not 
+    * idle, walking, running  
+    * rotate the character, 
+    * important lights in street?
+. sound effects volume is off: guns too quiet, loot grab too quiet, engine too quiet
+* new clearsighter binding vs. attractor mode
 
 
 
@@ -3631,9 +3648,6 @@ uncertain:
         shoot alarm box to disable?
 
 nice to have / future goals:
-    one way to make an effective callout camera movement is linear
-
-    first level should set the tone
     aim: swing into position, then subtly zoom in to focus on reticle
         accompanied by rotating reticle element
     impact knockback
@@ -3647,29 +3661,19 @@ nice to have / future goals:
     head look around if player has been idle
     NPC better take cover
         move into another room
-    HQ will be level specific state:
-        HQ might be disabled if player assaults it
-        what to do if there is no HQ?
-            run to the alarm panel if there is no HQ
-                do nothing if there is no alarm panel
-            how to decide who to run to alarm panel?
     dust / smoke shader
     digitized voice for "operation jetlag"
     after passing a lie check, npc discovers body: reconsiders player status
     sphere robot might not investigate?
     allow renaming gun?
 
-UI:
-    adjust all UI buttons to have consistent semantics for Cancel / OK
-    display different UI when in aim mode?
-    better clarity around alarm logic
-        fix edge coloration from active node to alarm terminal
-    show iconography when disguise is lost
-    show iconography when optional objective is complete
 
-control
-    controller support
-    shoulder switch is a control
+
+
+
+show iconography when disguise is lost
+show iconography when optional objective is complete
+ 
 
 stealth:
     be able to shoot out lights
@@ -3687,17 +3691,6 @@ weapons
     laser pointer attachment
     flashlight attachment
 
-planning mode
-    HP / def indicators
-    overview pane
-    tactics pane
-        disable when no tactoics
-        purchase keycard
-        locate key items
-        locate traps / sensors / weapon emplacements: intel
-        locate guards / patrols / security operations center: intel
-        learn info to be used in dialogue
-        when map data is bought, show notification on map tab
 
 minimap?
     orient relative to main camera
@@ -3909,7 +3902,7 @@ AI
 
 footsteps don't seem to matter any more
 silencer shows in gameplay
-colors for item selector
+* colors for item selector
 .? item selector clear slot
 display information about items in loadout
 some way to distract guards
@@ -3949,12 +3942,11 @@ jazz up elevator controller
     sound effects
     click effect
 show bonus reward favors
+    ? vehicle accelerate / decelerate
 
 7-11 worker doesnt see me frequently (probably blocked by register)
 cyber jump inside resulted in bizarre behavior
 
-system:
-    controls, settings
 
 robots
 vehicles
@@ -3965,8 +3957,15 @@ tactics
     tactic dialogue is jumpy
     replace credit symbol when price is favor, not credits
     faster text blit
+    purchase keycard
+    locate key items
+    locate traps / sensors / weapon emplacements: intel
+    locate guards / patrols / security operations center: intel
+    learn info to be used in dialogue
+    when map data is bought, show notification on map tab
 
 burglar system
+    more circuit boards
     burglar tool mentor
     using key in lock should spin the keyway'
     doors
@@ -3992,47 +3991,25 @@ more equipment to bring on mission?
     equipment plan:
         clear item slot
 
-unresolved mechanics / shops / gameplay questions:
-    progression in shops? 
-        items, guns
-    selling data 
-    upgrading hack ability
+unresolved systems:
     bringing items, tools, duffel bag
-    ICE in cyber
-    some computers trip honeypots
-    firewalls in cyber
-    crafting 2.0 / additional payloads / additional conditions
+    shops
+        progression: items, guns
+        selling data 
+        hardware
+        burglar tools
+    cyber
+        ICE in cyber
+        some computers trip honeypots
+        firewalls in cyber
+        crafting 2.0 
+    armor / helmet
+    cyberware
+
     
-
-? vehicle accelerate / decelerate
-? better rain
-? door can be interacted with from a distance
-
-
-
 missions
-    1 way shootout
+    3 way shootout alley
     productionize office
-        redo apartment after office
-
-destructible walls
-    gibs
-    re-bake navmesh
-
-draw
-    logos for omni, delta, elf
-    update the steam page graphic
-    draw more circuit board layouts
-    swat portrait
-    more spritesheets
-    grill texture on truck lights
-
-character view: 
-    rotate the character, show him with weapon drawn / not, running etc
-    armor slot
-    head slot?
-    cyberware slots
-    items
 
 make graphs more readable
     limit icons shown to current floor / show other floors as transparent gray
@@ -4040,14 +4017,45 @@ make graphs more readable
 
 tune impacts
 tune gibbing
+tune destructible wall gibs
 
 
-write some real mission descriptions & objectives
-fix elevator map data
-ambience add to other scenes
-    police sirens
-    city ambience
-    room tone 
-AC unit entry is broken ??
-    new UI button: enter appears when mouse over target. prelude to keys
-first dialogue in abandoned lab
+
+
+
+
+
+
+what is needed for demo?
+    tutorial mission
+        determine how we will handle fail / retry / shooting etc
+        retry can be: everyone freezes, ! appears, everyone runs back to the last checkpoint, mentor says something, continue
+    world and apartment complete
+    redo tower
+    overview pane
+    tactics pane
+        disable when no tactics
+    UI
+        adjust all UI buttons to have consistent semantics for Cancel / OK
+    destructible walls
+        re-bake navmesh on the fly
+    write some real mission descriptions & objectives
+    fix elevator map data
+    AC unit entry is broken ??
+        new UI button: enter appears when mouse over target
+    draw
+        logos for omni, delta, elf
+        update the steam page graphic
+        draw more circuit board layouts
+        swat portrait
+        more spritesheets
+        grill texture on truck lights
+    possibly, npc teams
+    system:
+        controls, settings
+    tune AI
+
+character view: 
+    tune how it plays
+    items
+
