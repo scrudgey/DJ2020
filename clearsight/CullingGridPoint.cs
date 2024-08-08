@@ -26,23 +26,23 @@ public class CullingGridPoint {
 
         LayerMask mask = LayerUtil.GetLayerMask(Layer.def, Layer.bulletPassThrough, Layer.clearsighterBlock);
 
-        (NEInterlopers, NERoofZones) = DoRaycast(CharacterCamera.IsometricOrientation.NE, mask);
+        (NEInterlopers, NERoofZones) = DoRaycast(IsometricOrientation.NE, mask);
 
-        (NWInterlopers, NWRoofZones) = DoRaycast(CharacterCamera.IsometricOrientation.NW, mask);
+        (NWInterlopers, NWRoofZones) = DoRaycast(IsometricOrientation.NW, mask);
 
-        (SEInterlopers, SERoofZones) = DoRaycast(CharacterCamera.IsometricOrientation.SE, mask);
+        (SEInterlopers, SERoofZones) = DoRaycast(IsometricOrientation.SE, mask);
 
-        (SWInterlopers, SWRoofZones) = DoRaycast(CharacterCamera.IsometricOrientation.SW, mask);
+        (SWInterlopers, SWRoofZones) = DoRaycast(IsometricOrientation.SW, mask);
 
         isEmpty = NEInterlopers.Count + NERoofZones.Count + NWInterlopers.Count + NWRoofZones.Count +
                   SEInterlopers.Count + SERoofZones.Count + SWInterlopers.Count + SWRoofZones.Count == 0;
     }
-    Ray OrientationToRay(CharacterCamera.IsometricOrientation orientation) {
+    Ray OrientationToRay(IsometricOrientation orientation) {
         float initialPlanarAngle = orientation switch {
-            CharacterCamera.IsometricOrientation.NE => 45f,
-            CharacterCamera.IsometricOrientation.SE => 135f,
-            CharacterCamera.IsometricOrientation.SW => 225f,
-            CharacterCamera.IsometricOrientation.NW => 315f,
+            IsometricOrientation.NE => 45f,
+            IsometricOrientation.SE => 135f,
+            IsometricOrientation.SW => 225f,
+            IsometricOrientation.NW => 315f,
             _ => 45f
         };
         float initialRotationOffset = 20f;
@@ -55,7 +55,7 @@ public class CullingGridPoint {
         Quaternion rotation = rotationOffset * planarRot * verticalRot;
         return new Ray(position, -1f * (rotation * Vector3.forward));
     }
-    (List<string>, List<string>) DoRaycast(CharacterCamera.IsometricOrientation orientation, LayerMask layerMask) {
+    (List<string>, List<string>) DoRaycast(IsometricOrientation orientation, LayerMask layerMask) {
         Ray ray = OrientationToRay(orientation);
         RaycastHit[] hits = Physics.RaycastAll(ray, 100f, layerMask);
         HashSet<CullingComponent> cullingComponents = new HashSet<CullingComponent>();
@@ -83,10 +83,10 @@ public class CullingGridPoint {
 
                 if (cullingComponent.debug) {
                     Color color = orientation switch {
-                        CharacterCamera.IsometricOrientation.NE => Color.red,
-                        CharacterCamera.IsometricOrientation.SE => Color.clear,
-                        CharacterCamera.IsometricOrientation.SW => Color.green,
-                        CharacterCamera.IsometricOrientation.NW => Color.clear
+                        IsometricOrientation.NE => Color.red,
+                        IsometricOrientation.SE => Color.clear,
+                        IsometricOrientation.SW => Color.green,
+                        IsometricOrientation.NW => Color.clear
                     };
                     Debug.DrawRay(position, 10f * ray.direction, Color.white, 120);
                 }
@@ -105,22 +105,22 @@ public class CullingGridPoint {
         return (cullingIds, roofIds);
     }
 
-    public void DrawRay(CharacterCamera.IsometricOrientation orientation) {
+    public void DrawRay(IsometricOrientation orientation) {
         Ray ray = OrientationToRay(orientation);
         Debug.DrawRay(position, 7.5f * ray.direction, Color.white);
     }
-    public List<string> GetInterlopers(CharacterCamera.IsometricOrientation orientation) => orientation switch {
-        CharacterCamera.IsometricOrientation.NE => NEInterlopers,
-        CharacterCamera.IsometricOrientation.NW => NWInterlopers,
-        CharacterCamera.IsometricOrientation.SE => SEInterlopers,
-        CharacterCamera.IsometricOrientation.SW => SWInterlopers,
+    public List<string> GetInterlopers(IsometricOrientation orientation) => orientation switch {
+        IsometricOrientation.NE => NEInterlopers,
+        IsometricOrientation.NW => NWInterlopers,
+        IsometricOrientation.SE => SEInterlopers,
+        IsometricOrientation.SW => SWInterlopers,
         _ => NEInterlopers
     };
-    public List<string> GetRooftopZones(CharacterCamera.IsometricOrientation orientation) => orientation switch {
-        CharacterCamera.IsometricOrientation.NE => NERoofZones,
-        CharacterCamera.IsometricOrientation.NW => NWRoofZones,
-        CharacterCamera.IsometricOrientation.SE => SERoofZones,
-        CharacterCamera.IsometricOrientation.SW => SWRoofZones,
+    public List<string> GetRooftopZones(IsometricOrientation orientation) => orientation switch {
+        IsometricOrientation.NE => NERoofZones,
+        IsometricOrientation.NW => NWRoofZones,
+        IsometricOrientation.SE => SERoofZones,
+        IsometricOrientation.SW => SWRoofZones,
         _ => NERoofZones
     };
     public (Vector3, Vector3) rayCastOriginAndDirection(Vector3 playerPosition) {

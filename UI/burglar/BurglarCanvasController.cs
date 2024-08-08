@@ -73,6 +73,7 @@ public class BurglarCanvasController : MonoBehaviour {
     public RectTransform selectorRect;
     public RectTransform burglarToolsRect;
     public RectTransform cyberdeckRect;
+    public bool burglarToolsSelected;
     // public GameObject burglarSelectorObject;
     // public GameObject cyberdeckSelectorObject;
     // public BurglarSelectorButton[] selectorButtons;
@@ -95,6 +96,7 @@ public class BurglarCanvasController : MonoBehaviour {
     float rejectClickTimeout;
 
     Camera currentAttackCamera;
+    Coroutine tutorialDialogueCoroutine;
     public void Initialize(BurgleTargetData data) {
         this.data = data;
         SetCamera(data.target.attackCam);
@@ -159,6 +161,9 @@ public class BurglarCanvasController : MonoBehaviour {
 
         data.target.CreateTamperEvidence(data);
         returnCameraButton.SetActive(false);
+        if (!burglarToolsSelected) {
+            BurglarSelectorCallback();
+        }
     }
     public void TearDown() {
         foreach (Transform child in uiElementsContainer) {
@@ -658,6 +663,10 @@ public class BurglarCanvasController : MonoBehaviour {
     }
     void SetTool(BurglarToolType toolType) {
         // if (selectedTool != BurglarToolType.none || toolType != BurglarToolType.none)
+        if (tutorialDialogueCoroutine != null) {
+            GameManager.I.uiController.HideCutsceneDialogue();
+            StopCoroutine(tutorialDialogueCoroutine);
+        }
         Toolbox.RandomizeOneShot(audioSource, ToolPickupSound(toolType));
         toolPoint.rotation = Quaternion.identity;
 
@@ -776,6 +785,8 @@ public class BurglarCanvasController : MonoBehaviour {
                 keycardButton.SetActive(false);
                 break;
         }
+
+        CutsceneManager.I.HandleTrigger($"burglartool_{toolType}");
     }
 
     void ResetUSBTool() {
@@ -814,84 +825,8 @@ public class BurglarCanvasController : MonoBehaviour {
         ShowBurglarTools(true);
         StartCoroutine(MoveRectY(selectorRect, 106, -100, PennerDoubleAnimation.Linear, duration: 0.1f));
     }
-    // public void CyberdeckSelectorCallback() {
-    //     ChangeMode(Mode.cyberdeck);
-    // }
-    // public void BurglarSelectorCancelCallback() {
-    //     ChangeMode(Mode.none);
-    // }
-
-    // void ChangeMode(Mode newMode) {
-    //     OnModeExit(mode);
-    //     mode = newMode;
-    //     OnModeEnter(mode);
-    // }
-
-    // void OnModeExit(Mode oldMode) {
-    //     switch (oldMode) {
-    //         case Mode.burglarTool:
-    //             ShowBurglarTools(false);
-    //             break;
-    //         case Mode.cyberdeck:
-    //             ShowCyberDeck(false);
-    //             break;
-    //     }
-    // }
-    // void OnModeEnter(Mode oldMode) {
-    //     // foreach (BurglarSelectorButton button in selectorButtons) {
-    //     //     button.ResetPosition();
-    //     // }
-    //     switch (oldMode) {
-    //         case Mode.none:
-    //             // MoveMainPanelToTop(false);
-    //             HideSelectorPanel(false);
-    //             ShowBurglarTools(false);
-    //             ShowCyberDeck(false);
-    //             // burglarSelectorObject.SetActive(true);
-    //             // cyberdeckSelectorObject.SetActive(true);
-    //             break;
-    //         case Mode.burglarTool:
-    //             burglarToolMaskRect.sizeDelta = new Vector2(0, 300);
-    //             // MoveMainPanelToTop(true);
-    //             ShowBurglarTools(true);
-    //             HideSelectorPanel(true);
-    //             // burglarSelectorObject.SetActive(false);
-    //             // cyberdeckSelectorObject.SetActive(true);
-    //             break;
-    //         case Mode.cyberdeck:
-    //             // MoveMainPanelToTop(true);
-    //             ShowCyberDeck(true);
-    //             HideSelectorPanel(true);
-    //             burglarSelectorObject.SetActive(true);
-    //             cyberdeckSelectorObject.SetActive(false);
-    //             break;
-    //     }
-    //     ResetUSBTool();
-    //     SetTool(BurglarToolType.none);
-    // }
-
-
-    // void MoveMainPanelToTop(bool value) {
-    //     if (moveMainPanelCoroutine != null) {
-    //         StopCoroutine(moveMainPanelCoroutine);
-    //     }
-    //     if (value) {
-    //         moveMainPanelCoroutine = StartCoroutine(MoveRectY(mainPanelRect, -150, -20, moveMainPanelCoroutine, PennerDoubleAnimation.ExpoEaseOut));
-    //     } else {
-    //         moveMainPanelCoroutine = StartCoroutine(MoveRectY(mainPanelRect, -20, -150, moveMainPanelCoroutine, PennerDoubleAnimation.ExpoEaseOut));
-    //     }
-    // }
-    // void HideSelectorPanel(bool value) {
-    //     // if (moveSelectorPanelCoroutine != null) {
-    //     //     StopCoroutine(moveSelectorPanelCoroutine);
-    //     // }
-    //     if (value) {
-    //         StartCoroutine(MoveRectY(selectorRect, 0, -100, PennerDoubleAnimation.Linear));
-    //     } else {
-    //         StartCoroutine(MoveRectY(selectorRect, -100, 0, PennerDoubleAnimation.Linear));
-    //     }
-    // }
     void ShowBurglarTools(bool value) {
+        burglarToolsSelected = value;
         if (value) {
             Toolbox.RandomizeOneShot(audioSource, burglarBagShowSound);
             StartCoroutine(

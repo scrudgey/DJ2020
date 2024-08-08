@@ -16,7 +16,7 @@ class TruckCutscene : Cutscene {
     }
 
     public override IEnumerator DoCutscene() {
-        yield return CutsceneManager.WaitForTrigger("enterLab");
+        yield return WaitForTrigger("enterLab");
         yield return new WaitForSeconds(20f);
 
         CharacterController driver = null;

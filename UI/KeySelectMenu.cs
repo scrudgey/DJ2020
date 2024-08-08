@@ -41,8 +41,10 @@ public class KeySelectMenu : MonoBehaviour {
         KeyType desiredKeyType = doorLock.lockType;
         HashSet<KeyData> keys = GameManager.I.gameData.levelState.delta.keys.Where(key => key.type == desiredKeyType).ToHashSet();
         PopulateKeyEntries(desiredKeyType, keys, doorLock);
-        if (keys.Count > 0)
+        if (keys.Count > 0) {
+            Toolbox.RandomizeOneShot(audioSource, showSounds);
             Show(keys.Count);
+        }
     }
     void PopulateKeyEntries(KeyType type, HashSet<KeyData> keys, DoorLock doorLock) {
         foreach (Transform child in keyEntryContainer) {
@@ -82,13 +84,13 @@ public class KeySelectMenu : MonoBehaviour {
         };
         GameManager.I.playerCharacterController.HandleItemUseResult(itemUseResult);
         Hide();
+        Toolbox.RandomizeOneShot(audioSource, hideSounds);
     }
     public void Show(int numberEntries) {
         if (routine != null) {
             StopCoroutine(routine);
         }
         float targetHeight = numberEntries * 40f + 25;
-        Toolbox.RandomizeOneShot(audioSource, showSounds);
         routine = StartCoroutine(Toolbox.Ease(null, 0.1f, 0f, targetHeight, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             rectTransform.sizeDelta = new Vector2(175, amount);
         }));
@@ -99,7 +101,6 @@ public class KeySelectMenu : MonoBehaviour {
             StopCoroutine(routine);
         }
         float initialHeight = rectTransform.rect.height;
-        Toolbox.RandomizeOneShot(audioSource, hideSounds);
         routine = StartCoroutine(Toolbox.Ease(null, 0.1f, initialHeight, 0, PennerDoubleAnimation.ExpoEaseIn, (amount) => {
             rectTransform.sizeDelta = new Vector2(175, amount);
         }));

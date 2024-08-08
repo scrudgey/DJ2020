@@ -149,7 +149,9 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         state.spawnPoints = GameObject.FindObjectsOfType<ObjectiveLootSpawnpoint>().ToDictionary(s => s.idn, s => s);
-
+        // foreach (KeyValuePair<string, ObjectiveLootSpawnpoint> kvp in state.spawnPoints) {
+        //     Debug.Log($"state.spawnPoints: {kvp.Key} {kvp.Value}");
+        // }
 
         // randomize cyber state:
         state.delta.cyberGraph.InfillRandomData();
@@ -182,13 +184,24 @@ public partial class GameManager : Singleton<GameManager> {
                 uiController.Initialize();
                 uiController.ShowUI();
                 uiController.InitializeObjectivesController(gameData);
+
+
             }, unloadAll: false);
         }
 
         SetOverlay(OverlayType.none);
 
+        CutsceneManager.I.InitializeSceneReferences();
+
         if (doCutscene)
             CutsceneManager.I.StartCutscene(new StartMissionCutscene());
+
+        foreach (ScriptInitializer script in GameObject.FindObjectsOfType<ScriptInitializer>()) {
+            script.StartCutscene();
+        }
+        foreach (TutorialScriptInitializer tutorialScript in GameObject.FindObjectsOfType<TutorialScriptInitializer>()) {
+            tutorialScript.StartCutscene();
+        }
     }
 
     public void StartWorld(string sceneName) {
@@ -338,6 +351,7 @@ public partial class GameManager : Singleton<GameManager> {
     }
 
     public void LoadScene(string targetScene, Action callback, bool unloadAll = true) {
+        Debug.Log($"loading scene {targetScene}");
         isLoadingLevel = true;
 
         List<string> scenesToUnload = new List<string>();
@@ -367,10 +381,7 @@ public partial class GameManager : Singleton<GameManager> {
             if (unloadAll && SceneManager.GetSceneByName("LoadingScreen").isLoaded) {
                 SceneManager.UnloadSceneAsync("LoadingScreen");
             }
-            CutsceneManager.I.InitializeSceneReferences();
-            foreach (ScriptInitializer script in GameObject.FindObjectsOfType<ScriptInitializer>()) {
-                script.StartCutscene();
-            }
+
             isLoadingLevel = false;
         }, unloadAll));
     }

@@ -10,12 +10,12 @@ using UnityEngine.Rendering.PostProcessing;
 
 // TODO: eliminate this enum
 public enum CameraState { normal, wallPress, attractor, aim, burgle, free, firstPerson, overlayView }
+public enum IsometricOrientation { NE, SE, SW, NW }
 
 public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<CharacterCamera> { //IBinder<CharacterController>, 
     public Action<CharacterCamera> OnValueChanged { get; set; }
     public static bool ORTHOGRAPHIC_MODE = true;
     // public static bool ORTHOGRAPHIC_MODE = false;
-    public enum IsometricOrientation { NE, SE, SW, NW }
     public IsometricOrientation initialOrientation;
     public IsometricOrientation currentOrientation;
     private CameraState _state;
@@ -74,7 +74,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
     private float _obstructionTime;
     public Vector3 _currentFollowPosition;
     private const int MaxObstructions = 32;
-    private float transitionTime;
+    public float transitionTime;
     private float currentDistanceMovementSharpness;
     private float currentFollowingSharpness;
     private float currentDistanceMovementSpeed;
@@ -386,6 +386,12 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             // orthographic size is half-size physical length
             fieldOfView = (float)Mathf.Atan(desiredOrthographicSize / (_currentDistance * Camera.aspect)) * (360f / 6.28f) * 2f;
         }
+        if (input.snapToOrthographicSize) {
+            desiredOrthographicSize = input.orthographicSize;
+            currentOrthographicSize = input.orthographicSize;
+            zoomCoefficient = desiredOrthographicSize / 9f;
+            zoomCoefficientTarget = zoomCoefficient;
+        }
         currentOrthographicSize = desiredOrthographicSize;
 
         Vector3 targetPosition = lastTargetPosition;
@@ -417,8 +423,8 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             orthographicSize = currentOrthographicSize,
             distanceMovementSharpness = currentDistanceMovementSharpness,
             followingSharpness = currentFollowingSharpness,
-            minDistance = MinDistance
-
+            minDistance = MinDistance,
+            snapTo = input.snapTo
         };
     }
     public CameraTargetParameters AttractorParameters(CameraInput input) {
@@ -609,6 +615,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         if (input.snapTo) {
             Transform.rotation = input.rotation;
             Transform.position = input.targetPosition;
+            if (state == CameraState.normal) {
+                // Find the smoothed camera orbit position
+                Transform.position = input.targetPosition - ((input.rotation * Vector3.forward) * input.targetDistance);
+            }
+            _currentFollowPosition = input.targetPosition;
+            _currentDistance = input.targetDistance;
+            targetRotation = input.rotation;
+
         } else {
             idealRotation = input.rotation;
             targetRotation = Quaternion.Slerp(targetRotation, input.rotation, 1f - Mathf.Exp(-input.rotationSharpness * input.deltaTime));

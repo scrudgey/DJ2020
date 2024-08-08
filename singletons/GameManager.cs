@@ -641,6 +641,7 @@ public partial class GameManager : Singleton<GameManager> {
         // TODO: enter menu state
         activeBurgleTargetData = data;
         uiController.ShowBurglar(data);
+        CutsceneManager.I.HandleTrigger("burglar_open");
     }
     public void CloseBurglar(bool transitionCharacter = true) {
         uiController.HideBurglar();

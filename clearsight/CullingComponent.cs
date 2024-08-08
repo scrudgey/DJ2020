@@ -10,6 +10,7 @@ using UnityEngine.Rendering;
 
 public class CullingComponent : MonoBehaviour {
     public bool debug;
+    public bool dontCull;
     public SceneData sceneData;
     public enum CullingState { normal, interloper, above }
     public enum RendererState { opaque, transparent, invisible }
@@ -119,11 +120,13 @@ public class CullingComponent : MonoBehaviour {
         return floor > playerFloor;
     }
     void Invisible() {
+        if (dontCull) return;
         foreach (SubRenderHandler handler in handlers.Values) {
             handler.TotallyInvisible(debug);
         }
     }
     void Cutaway() {
+        if (dontCull) return;
         foreach (SubRenderHandler handler in handlers.Values) {
             if (handler.data.partialTransparentIsInvisible) {
                 handler.TotallyInvisible(debug);

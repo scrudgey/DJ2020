@@ -618,6 +618,13 @@ public class Toolbox {
             yield return coroutine;
         }
     }
+    public static IEnumerator Parallelize(params IEnumerator[] ienumerators) {
+        List<CheckableCutscene> cutscenes = ienumerators.Select(enumerator => new CheckableCutscene(enumerator)).ToList();
+        cutscenes.ForEach(cutscene => CutsceneManager.I.StartCoroutine(cutscene.Do()));
+        while (cutscenes.Any(cutscene => cutscene.isRunning)) {
+            yield return null;
+        }
+    }
 
     public static IEnumerator OpenStore(RectTransform bottomRect, AudioSource audioSource, AudioClip[] discloseBottomSound) {
         bottomRect.sizeDelta = new Vector2(1f, 0f);

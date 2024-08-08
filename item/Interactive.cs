@@ -19,6 +19,7 @@ public abstract class Interactive : Highlightable {
     }
     public ItemUseResult DoActionAndUpdateState(Interactor interactor) {
         OnUsed?.Invoke();
+        CutsceneManager.I.HandleTrigger($"interact_{calloutText}");
         return DoAction(interactor);
     }
     public abstract ItemUseResult DoAction(Interactor interactor);

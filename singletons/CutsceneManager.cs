@@ -12,6 +12,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
 
     List<Coroutine> runningCutscenes;
     public void InitializeSceneReferences() {
+        Debug.Log("[cutscene] clearing OnTrigger");
         OnTrigger = null;
         runningCutscenes = new List<Coroutine>();
         cutscenesAwaitingFocus = new Stack<Cutscene>();
@@ -27,19 +28,24 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     }
 
     public void HandleTrigger(string idn) {
+        Debug.Log($"[cutscene manager] trigger: {idn}");
         OnTrigger?.Invoke(idn);
     }
 
-
-    public void RequestFocus(Cutscene requester) {
+    public IEnumerator RequestFocus(Cutscene requester) {
+        // Debug.Log($"cutsceneWithFocus: {cutsceneWithFocus}");
         if (cutsceneWithFocus == null) {
+            // Debug.Log("grant focus immediately");
             requester.hasFocus = true;
             cutsceneWithFocus = requester;
 
             requester.characterCamera = GameManager.I.characterCamera;
             requester.playerCharacterController = GameManager.I.playerCharacterController;
-            // requester.clearsighter = GameManager.I.clearsighterV4;
             requester.playerObject = GameManager.I.playerObject;
+
+            while (GameManager.I.uiController == null) {
+                yield return null;
+            }
 
             GameManager.I.uiController.HideUI();
             AudioListener cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
@@ -50,24 +56,33 @@ public class CutsceneManager : Singleton<CutsceneManager> {
             Time.timeScale = 0;
         } else {
             cutscenesAwaitingFocus.Push(requester);
+            // Debug.Log($"request focus: wait in line {cutscenesAwaitingFocus.Count}");
         }
     }
 
-    public void LeaveFocus(Cutscene requester) {
-        if (cutsceneWithFocus == requester) {
-            cutsceneWithFocus.hasFocus = false;
-            cutsceneWithFocus = null;
-        }
-        if (cutscenesAwaitingFocus.Count > 0) {
-            Cutscene nextCutscene = cutscenesAwaitingFocus.Pop();
-            RequestFocus(nextCutscene);
+    public IEnumerator LeaveFocus(Cutscene requester) {
+        if (cutsceneWithFocus == null) {
+            yield return null;
         } else {
-            GameManager.I.uiController.ShowUI();
-            Time.timeScale = 1;
-            AudioListener cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
-            AudioListener playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
-            cameraListener.enabled = false;
-            playerListener.enabled = true;
+            if (cutsceneWithFocus == requester) {
+                bool focusCutsceneIsRunning = cutsceneWithFocus.isPlaying;
+
+                cutsceneWithFocus.hasFocus = false;
+                cutsceneWithFocus = null;
+
+                if (cutscenesAwaitingFocus.Count > 0) {
+                    Cutscene nextCutscene = cutscenesAwaitingFocus.Pop();
+                    yield return RequestFocus(nextCutscene);
+                } else {
+                    // if (!focusCutsceneIsRunning)
+                    GameManager.I.uiController.ShowUI(hideCutsceneText: false);
+                    Time.timeScale = 1;
+                    AudioListener cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
+                    AudioListener playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
+                    cameraListener.enabled = false;
+                    playerListener.enabled = true;
+                }
+            }
         }
     }
 
@@ -112,18 +127,5 @@ public class CutsceneManager : Singleton<CutsceneManager> {
         SphereRobotAI ai = character.GetComponent<SphereRobotAI>();
         ai.ChangeState(new SphereClearPointsState(ai, character, FindObjectsOfType<ClearPoint>(), speed: 0.5f));
     }
-
-    public static IEnumerator WaitForTrigger(string idn) {
-        bool trigger = false;
-        Action<string> callback = (string triggerId) => {
-            trigger |= triggerId == idn;
-        };
-        CutsceneManager.OnTrigger += callback;
-        while (!trigger) {
-            yield return null;
-        }
-        CutsceneManager.OnTrigger -= callback;
-    }
-
 }
 

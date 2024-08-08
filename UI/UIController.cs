@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Easings;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class UIController : MonoBehaviour {
     public Canvas overlayCanvas;
     public Canvas cutsceneTextCanvas;
     public Canvas cutsceneDialogueCanvas;
+    // public Canvas 
     [Header("controllers")]
     public TerminalController terminal;
     public WeaponUIHandler weaponUIHandler;
@@ -47,10 +49,20 @@ public class UIController : MonoBehaviour {
     public TargetPracticeUIHandler targetPracticeUIHandler;
     public UIStatusBarHandler statusBarHandler;
     public SoftwareModalController softwareModalController;
-    public TextMeshProUGUI cutsceneText;
-    public CutsceneDialogueController cutsceneDialogueController;
     public KeySelectMenu keySelectMenu;
     public bool mouseOverScrollBox;
+    [Header("cutscene stuff")]
+    public TextMeshProUGUI creditsText;
+
+    public TextMeshProUGUI cutsceneText;
+    public TextMeshProUGUI tutorialText;
+    public CutsceneDialogueController cutsceneDialogueController;
+    public bool tutorialBurglarInterrupt;
+    public bool tutorialBurglarAwaitLockpick;
+    public CanvasGroup burglarCanvasGroup;
+    public RectTransform overlayButtonHighlight;
+    public CanvasGroup overlayButtonGroup;
+    Coroutine overlayButtonHighlightRoutine;
     bool burglarMode;
     void Awake() {
         DestroyImmediate(UIEditorCamera);
@@ -92,6 +104,8 @@ public class UIController : MonoBehaviour {
         statusBarHandler.Initialize();
         HideSoftwareDeployModal();
         keySelectMenu.Hide();
+        creditsText.text = "";
+        creditsText.color = Color.clear;
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
@@ -103,6 +117,8 @@ public class UIController : MonoBehaviour {
         objectivesCompleteController.DisplayMessage(messages);
     }
     public void UpdateWithPlayerInput(ref PlayerInput input) {
+        burglarCanvasGroup.interactable = !tutorialBurglarInterrupt;
+        if (tutorialBurglarInterrupt) return;
         if (burglarCanvas != null && burglarCanvas.enabled)
             burglarCanvasController?.UpdateWithInput(input);
         aimIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);
@@ -208,8 +224,9 @@ public class UIController : MonoBehaviour {
             cutsceneTextCanvas.enabled = false;
         if (cutsceneDialogueCanvas != null)
             cutsceneDialogueCanvas.enabled = false;
+        Debug.Log("hide UI");
     }
-    public void ShowUI() {
+    public void ShowUI(bool hideCutsceneText = true) {
         if (canvas != null)
             canvas.enabled = true;
         if (gunDisplayCanvas != null)
@@ -222,13 +239,15 @@ public class UIController : MonoBehaviour {
             burglarCanvas.enabled = true;
         if (overlayCanvas != null)
             overlayCanvas.enabled = true;
-        if (cutsceneTextCanvas != null)
+
+        if (hideCutsceneText && cutsceneTextCanvas != null)
             cutsceneTextCanvas.enabled = false;
         if (cutsceneDialogueCanvas != null)
             cutsceneDialogueCanvas.enabled = false;
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {
             ShowVRStats();
         }
+        Debug.Log("show UI");
     }
     public void ShowInteractiveHighlight() {
         interactiveHighlightCanvas.enabled = true;
@@ -247,11 +266,22 @@ public class UIController : MonoBehaviour {
 
     public void ShowCutsceneText(string content) {
         cutsceneTextCanvas.enabled = true;
+        tutorialText.enabled = false;
+        cutsceneText.enabled = true;
         cutsceneText.text = content;
         StartCoroutine(Toolbox.BlinkEmphasis(cutsceneText, 6, duration: 0.45f));
     }
+    public void ShowTutorialText(string content) {
+        tutorialText.text = "";
+        cutsceneTextCanvas.enabled = true;
+        tutorialText.enabled = true;
+        cutsceneText.enabled = false;
+        StartCoroutine(Toolbox.BlitText(tutorialText, content, interval: 0.02f));
+
+    }
     public void HideCutsceneText() {
         cutsceneTextCanvas.enabled = false;
+        Debug.Log("[cutscene] hide cutscene text");
     }
 
     public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content) {
@@ -264,5 +294,52 @@ public class UIController : MonoBehaviour {
     }
     public void ShowKeyMenu(List<DoorLock> doorLocks) {
         keySelectMenu.Initialize(doorLocks);
+    }
+
+    public void ShowStatusBar(bool value) {
+        statusBarCanvas.enabled = value;
+    }
+    public void ShowAppearanceInfo(bool value) {
+        suspicionIndicatorHandler.gameObject.SetActive(value);
+    }
+    public void ShowVisibilityInfo(bool value) {
+        visibilityUIHandler.gameObject.SetActive(value);
+    }
+    public void ShowOverlayControls(bool value) {
+        overlayCanvas.enabled = value;
+    }
+
+    public IEnumerator FadeInCreditsText(string content, float duration) {
+        creditsText.text = content;
+        creditsText.enabled = true;
+        yield return Toolbox.Ease(null, duration, 0f, 1f, PennerDoubleAnimation.Linear, (amount) => {
+            Color newColor = Color.white;
+            newColor.a = amount;
+            creditsText.color = newColor;
+        }, unscaledTime: true);
+    }
+    public IEnumerator FadeOutCreditsText(float duration) {
+        yield return Toolbox.Ease(null, duration, 1f, 0f, PennerDoubleAnimation.Linear, (amount) => {
+            Color newColor = Color.white;
+            newColor.a = amount;
+            creditsText.color = newColor;
+        }, unscaledTime: true);
+        creditsText.enabled = false;
+    }
+
+    public void ShowOverlayButtonHighlight(bool value) {
+        overlayButtonHighlight.gameObject.SetActive(value);
+        if (value) {
+            overlayButtonHighlightRoutine = StartCoroutine(Toolbox.Ease(null, 1f, -50f, 0f, PennerDoubleAnimation.BounceEaseOut, (amount) => {
+                overlayButtonHighlight.anchoredPosition = new Vector2(0f, amount);
+            }, unscaledTime: true, looping: true));
+        } else {
+            if (overlayButtonHighlightRoutine != null) {
+                StopCoroutine(overlayButtonHighlightRoutine);
+            }
+        }
+    }
+    public void SetOverlayButtonInteractible(bool value) {
+        overlayButtonGroup.interactable = value;
     }
 }

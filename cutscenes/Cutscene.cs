@@ -1,32 +1,52 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using AI;
 using Easings;
 using UnityEngine;
 public abstract class Cutscene {
     public bool hasFocus;
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
-    // public NeoClearsighterV4 clearsighter;
     public GameObject playerObject;
-
     readonly static Vector2 defaultZoomInput = Vector2.zero;
-
-
+    public bool isPlaying;
+    LocationHighlight locationHighlight;
     public IEnumerator Play() {
+        isPlaying = true;
         yield return DoCutscene();
         // request unfocus
-        CutsceneManager.I.LeaveFocus(this);
+        isPlaying = false;
+        yield return CutsceneManager.I.LeaveFocus(this);
     }
 
     protected IEnumerator WaitForFocus() {
-        CutsceneManager.I.RequestFocus(this);
+        Debug.Log("start wait for focus");
+        yield return CutsceneManager.I.RequestFocus(this);
+        Debug.Log($"wait until cutscene has focus {this}");
         yield return new WaitUntil(() => this.hasFocus);
+        Debug.Log($"got focus");
     }
 
     public abstract IEnumerator DoCutscene();
 
-    protected void SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state) {
+
+    protected IEnumerator WaitForTrigger(string idn) {
+        bool trigger = false;
+        Action<string> callback = (string triggerId) => {
+            trigger |= triggerId == idn;
+            // Debug.Log($"process incoming trigger: {triggerId}, {triggerId} == {idn}\t trigger: {trigger}");
+        };
+        CutsceneManager.OnTrigger += callback;
+        while (!trigger) {
+            // Debug.Log($"waiting for cutscene  trigger: {idn}");
+            yield return null;
+        }
+        CutsceneManager.OnTrigger -= callback;
+    }
+
+    protected void SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false) {
         CameraInput input = new CameraInput {
             deltaTime = Time.unscaledDeltaTime,
             wallNormal = Vector2.zero,
@@ -40,13 +60,17 @@ public abstract class Cutscene {
             targetPosition = position,
             cullingTargetPosition = position,
             ignoreAttractor = true,
+            orthographicSize = orthographicSize,
+            snapToOrthographicSize = snapToOrthographicSize,
+            snapTo = snapToPosition
         };
+        characterCamera.transitionTime = 1f;
         characterCamera.UpdateWithInput(input);
     }
 
-    protected void SetCameraPosition(string idn, CameraState state) {
+    protected void SetCameraPosition(string idn, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false) {
         ScriptSceneCameraPosition data = CutsceneManager.I.cameraLocations[idn];
-        SetCameraPosition(data.transform.position, data.transform.rotation, state);
+        SetCameraPosition(data.transform.position, data.transform.rotation, state, orthographicSize: orthographicSize, snapToOrthographicSize: snapToOrthographicSize, snapToPosition: snapToPosition);
     }
 
     protected IEnumerator MoveCamera(string idn, float duration, CameraState state) {
@@ -76,9 +100,47 @@ public abstract class Cutscene {
     protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput) {
         return MoveCamera(targetPosition, targetRotation, duration, state, zoomInput, PennerDoubleAnimation.Linear);
     }
+    protected IEnumerator MoveCamera(string idn, float duration, CameraState state, Vector2 zoomInput, Func<double, double, double, double, double> easing) {
+        ScriptSceneCameraPosition data = CutsceneManager.I.cameraLocations[idn];
+        return MoveCamera(data.transform.position, data.transform.rotation, duration, state, zoomInput, easing);
+    }
+    protected IEnumerator RotateIsometricCamera(IsometricOrientation desiredOrientation, Vector3 targetPosition) {
+        PlayerInput playerInput = PlayerInput.none;
+        playerInput.rotateCameraLeftPressedThisFrame = true;
+        while (characterCamera.currentOrientation != desiredOrientation) {
+            characterCamera.SetInputs(playerInput);
+
+            float timer = 0;
+            while (timer < 0.1f) {
+                CameraInput input = new CameraInput {
+                    deltaTime = Time.unscaledDeltaTime,
+                    wallNormal = Vector2.zero,
+                    lastWallInput = Vector2.zero,
+                    crouchHeld = false,
+                    cameraState = CameraState.normal,
+                    targetData = CursorData.none,
+                    playerDirection = playerCharacterController.direction,
+                    popoutParity = PopoutParity.left,
+                    ignoreAttractor = true,
+                    targetPosition = targetPosition,
+                    cullingTargetPosition = targetPosition,
+                    // snapTo = true 
+                };
+                // characterCamera.transitionTime = 1f;
+                characterCamera.UpdateWithInput(input);
+                // Debug.Log($"cam orientation: {characterCamera.currentOrientation} {desiredOrientation}");
+                timer += Time.unscaledDeltaTime;
+                characterCamera.SetInputs(PlayerInput.none);
+                yield return null;
+            }
+
+            yield return null;
+        }
+        yield return new WaitForSecondsRealtime(0.1f);
+    }
     protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput, Func<double, double, double, double, double> easing) {
         float timer = 0f;
-        Vector3 initialPosition = characterCamera.transform.position;
+        Vector3 initialPosition = characterCamera.lastTargetPosition;
         Quaternion initialRotation = characterCamera.transform.rotation;
         while (timer < duration) {
             PlayerInput playerInput = PlayerInput.none;
@@ -94,6 +156,37 @@ public abstract class Cutscene {
             SetCameraPosition(position, rotation, state);
             timer += Time.unscaledDeltaTime;
             yield return null;
+        }
+    }
+
+    protected IEnumerator MoveCharacter(CharacterController controller, string key, float speedCoefficient = 1f) {
+        ScriptSceneLocation data = CutsceneManager.I.worldLocations[key];
+        TaskMoveToKey task = new TaskMoveToKey(controller.transform, "walkToKey", new HashSet<int>(), controller);
+        task.speedCoefficient = speedCoefficient;
+        task.SetData("walkToKey", data.transform.position);
+        task.Initialize();
+
+        TaskState result = TaskState.failure;
+        PlayerInput input = PlayerInput.none;
+        while (result != TaskState.success) {
+            result = task.DoEvaluate(ref input);
+            controller.SetInputs(input);
+            yield return null;
+        }
+    }
+
+    protected void HighlightLocation(string idn) {
+        if (locationHighlight == null) {
+            GameObject obj = GameObject.Instantiate(Resources.Load("prefabs/cutsceneLocationHighlight")) as GameObject;
+            locationHighlight = obj.GetComponent<LocationHighlight>();
+        }
+        ScriptSceneLocation data = CutsceneManager.I.worldLocations[idn];
+        locationHighlight.target = data.transform.position;
+        locationHighlight.gameObject.SetActive(true);
+    }
+    protected void HideLocationHighlight() {
+        if (locationHighlight != null) {
+            locationHighlight.gameObject.SetActive(false);
         }
     }
 }

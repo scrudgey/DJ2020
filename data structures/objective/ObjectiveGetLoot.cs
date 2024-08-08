@@ -10,7 +10,7 @@ public class ObjectiveGetLoot : Objective {
     public GameObject targetLootPrefab;
     public override ObjectiveDelta ToDelta(LevelState state) {
         string targetIdn = state.SetLocationOfObjective(this);
-
+        // Debug.Log($"objective to delta: {this} {targetIdn}");
         ObjectiveLootSpawnpoint spawnpoint = state.spawnPoints[targetIdn];
         GameObject lootObj = GameObject.Instantiate(targetLootPrefab, spawnpoint.transform.position, Quaternion.identity);
         LootObject loot = lootObj.GetComponent<LootObject>();

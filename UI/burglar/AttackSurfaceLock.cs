@@ -139,6 +139,7 @@ public class AttackSurfaceLock : AttackSurfaceElement {
             audioSource.Stop();
             Toolbox.AudioSpeaker(transform.position, finishSound);
             OnValueChanged?.Invoke(this);
+            CutsceneManager.I.HandleTrigger("lock_picked");
             return BurglarAttackResult.None with {
                 success = true,
                 feedbackText = "Door unlocked"

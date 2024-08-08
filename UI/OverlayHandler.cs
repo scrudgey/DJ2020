@@ -253,6 +253,7 @@ public class OverlayHandler : MonoBehaviour {
         OverlayType newOverlay = (OverlayType)overlayIndex;
         GameManager.I.SetOverlay(newOverlay);
         Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds);
+        CutsceneManager.I.HandleTrigger($"overlay_change_{overlayIndex}");
     }
     public void PreviousOverlayButton() {
         int overlayIndex;
@@ -267,6 +268,7 @@ public class OverlayHandler : MonoBehaviour {
         OverlayType newOverlay = (OverlayType)overlayIndex;
         GameManager.I.SetOverlay(newOverlay);
         Toolbox.RandomizeOneShot(audioSource, overlayButtonSounds, randomPitchWidth: 0.05f);
+        CutsceneManager.I.HandleTrigger($"overlay_change_{overlayIndex}");
     }
     public void NodeSelectCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
         if (selectedNode != indicator) {

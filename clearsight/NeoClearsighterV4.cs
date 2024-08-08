@@ -456,7 +456,7 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
 
                 // Debug.DrawLine(origin, origin + displacement, Color.green);
                 // point.DrawRay(orientation);
-                CharacterCamera.IsometricOrientation orientation = (CharacterCamera.IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
+                IsometricOrientation orientation = (IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
                 foreach (string idn in point.GetInterlopers(orientation)) {
                     hits.Add((point.floor, idn));
                 }

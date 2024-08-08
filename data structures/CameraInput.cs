@@ -22,6 +22,10 @@ public struct CameraInput {
     public Vector3 playerDirection;
     public Transform targetTransform;
 
+    public float orthographicSize;
+    public bool snapToOrthographicSize;
+    public bool snapTo;
+
 
     [Header("wallpress")]
     public bool atLeftEdge;
