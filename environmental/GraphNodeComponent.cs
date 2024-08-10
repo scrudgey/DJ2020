@@ -11,14 +11,17 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
     [HideInInspector]
     public U node;
     public T[] edges = new T[0];
-    public T linkedComponent;
+    public EdgeVisibility minimumEdgeVisibility;
+    public NodeVisibility minimumNodeVisibility;
     public virtual U NewNode() {
         return new U() {
             idn = idn,
             position = NodePosition(),
             enabled = true,
             nodeTitle = nodeTitle,
-            visibility = NodeVisibility.known
+            visibility = NodeVisibility.known,
+            minimumEdgeVisibility = minimumEdgeVisibility,
+            minimumNodeVisibility = minimumNodeVisibility
         };
     }
 

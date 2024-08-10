@@ -158,7 +158,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     }
 
 
-    public void ApplyVisibilityState(Dictionary<string, NodeVisibility> visibilityData) {
+    public void ApplyNodeVisibility(Dictionary<string, NodeVisibility> visibilityData) {
         foreach (KeyValuePair<string, NodeVisibility> kvp in visibilityData) {
             if (nodes.ContainsKey(kvp.Key)) {
                 nodes[kvp.Key].visibility = kvp.Value;
@@ -167,7 +167,9 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
     }
 
 
-    public void ApplyVisibilityDefault(LevelTemplate.GraphVisibilityDefault visibilityDefault) {
+    public void ApplyEdgeVisibility(LevelTemplate.GraphVisibilityDefault visibilityDefault) {
+
+        // initialize edge visibility for all edges
         foreach (KeyValuePair<string, T> kvp in nodes) {
             if (edges.ContainsKey(kvp.Value.idn))
                 foreach (string neighborId in edges[kvp.Value.idn]) {
@@ -175,6 +177,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                 }
         }
 
+        // apply level default
         switch (visibilityDefault) {
             case LevelTemplate.GraphVisibilityDefault.all:
                 foreach ((string, string) edge in edgePairs) {
@@ -206,6 +209,7 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                 break;
         }
 
+        // if nodes have fixed visibility, set edge visibility to known
         foreach (KeyValuePair<string, T> kvp in nodes) {
             if (kvp.Value.fixedVisibility) {
                 kvp.Value.visibility = NodeVisibility.known;
@@ -215,13 +219,27 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                     }
             }
         }
+
+        // ensure all nodes and edges respect minimum visibility
+        foreach (KeyValuePair<string, T> kvp in nodes) {
+            T node = kvp.Value;
+            if (edges.ContainsKey(node.idn))
+                foreach (string neighborId in edges[node.idn]) {
+                    EdgeVisibility visibility = edgeVisibility[(node.idn, neighborId)];
+                    visibility = (EdgeVisibility)Math.Max((int)visibility, (int)node.minimumEdgeVisibility);
+                    edgeVisibility[(node.idn, neighborId)] = visibility;
+                }
+            NodeVisibility nodeVisibility = node.visibility;
+            nodeVisibility = (NodeVisibility)Math.Max((int)nodeVisibility, (int)node.minimumNodeVisibility);
+            node.visibility = nodeVisibility;
+        }
     }
     public void Apply(LevelPlan levelPlan) {
         // TODO: apply plan paydata
         // TODO: set edge visibility
 
         // apply plan visibility
-        ApplyVisibilityState(levelPlan.nodeVisibility);
+        ApplyNodeVisibility(levelPlan.nodeVisibility);
     }
 
     // TODO: apply randomizer
@@ -236,6 +254,13 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
                 nodes[id2].visibility = NodeVisibility.mystery;
             }
         }
+    }
+
+    public bool AllEdgesVisible(string idn) {
+        if (edges.ContainsKey(idn)) {
+            return edges[idn].All(neighbor => edgeVisibility[(idn, neighbor)] > EdgeVisibility.unknown);
+        }
+        return true;
     }
 
     public virtual bool DiscoverNode(T node,

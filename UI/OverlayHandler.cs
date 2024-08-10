@@ -305,6 +305,7 @@ public class OverlayHandler : MonoBehaviour {
             ShowInfoPane(infoPane);
             activeInfoPane = infoPane;
         }
+        CutsceneManager.I.HandleTrigger($"node_select_{indicator.node.nodeTitle}");
     }
     public void HackOriginSelectCallback(NeoCyberNodeIndicator newOrigin) {
         if (newOrigin == selectedHackOrigin) return;

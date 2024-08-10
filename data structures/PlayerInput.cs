@@ -54,6 +54,60 @@ public struct PlayerInput {
     };
     public Vector2 MoveAxis() => new Vector2(MoveAxisRight, MoveAxisForward);
     public Vector3 MoveInputVector() => Vector3.ClampMagnitude(new Vector3(MoveAxisRight, 0f, MoveAxisForward), 1f);
+
+
+    public void ApplyInputMask(InputProfile profile) {
+        if (!profile.allowPlayerFireInput) {
+            Fire = FireInputs.none;
+        }
+        if (!profile.allowPlayerMovement) {
+            MoveAxisForward = 0;
+            MoveAxisRight = 0;
+            JumpDown = false;
+            jumpHeld = false;
+            jumpReleased = false;
+            CrouchDown = false;
+            unCrawl = false;
+            runDown = false;
+            reload = false;
+            selectgun = 0;
+            actionButtonPressed = false;
+            useItem = false;
+            moveDirection = Vector3.zero;
+            orientTowardPoint = Vector3.zero;
+            orientTowardDirection = Vector3.zero;
+            aimWeapon = false;
+            mouseDown = false;
+            rightMouseDown = false;
+            mouseClicked = false;
+
+            // public Vector3 lookAtDirection= Vector3.zero;
+            // public Vector3 lookAtPosition;
+            // public bool snapToLook;
+
+            // public bool preventWallPress;
+            // public Vector2 zoomInput
+            // public bool escapePressed = false
+            // public Vector2 mousePosition;
+            // public Vector2 viewPortPoint;
+            // public bool armsRaised;
+            // public bool revealWeaponWheel;
+        }
+        if (!profile.allowCameraControl) {
+            rotateCameraRightPressedThisFrame = false;
+            rotateCameraLeftPressedThisFrame = false;
+            CameraRotation = Quaternion.identity;
+            // mouseDelta = Vector2.zero;
+        }
+        if (!profile.allowePlayerItemSelect) {
+            incrementItem = 0;
+            selectItem = null;
+            revealWeaponWheel = false;
+        }
+        if (!profile.allowOverlayControl) {
+            incrementOverlay = 0;
+        }
+    }
 }
 
 public struct OverrideInput {

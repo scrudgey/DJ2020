@@ -455,7 +455,8 @@ public partial class GameManager : Singleton<GameManager> {
         }
 
         if (gameData.phase == GamePhase.world) {
-            DoInputs();
+            InputProfile inputProfile = CutsceneManager.I.runningCutscene()?.inputProfile ?? InputProfile.allowAll;
+            DoInputs(inputProfile);
         } else if (gameData.phase == GamePhase.plan) {
             // this is pretty hacky!
             PlayerInput playerInput = InputController.I.HandleCharacterInput(false, escapePressedThisFrame);
@@ -471,12 +472,8 @@ public partial class GameManager : Singleton<GameManager> {
             UpdateNPCSpawning();
             UpdateReportTickets();
             UpdateGraphs();
-
-            if (CutsceneManager.I.cutsceneIsRunning()) {
-                playerCharacterController.ResetMovement();
-            } else {
-                DoInputs();
-            }
+            InputProfile inputProfile = CutsceneManager.I.runningCutscene()?.inputProfile ?? InputProfile.allowAll;
+            DoInputs(inputProfile);
         } else {
             if (resetMouseControl) {
                 Cursor.lockState = CursorLockMode.None;
@@ -548,22 +545,24 @@ public partial class GameManager : Singleton<GameManager> {
         }
     }
 
-    void DoInputs() {
+    void DoInputs(InputProfile inputProfile) {
         bool uiclick = EventSystem.current?.IsPointerOverGameObject() ?? true;
 
         PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
+        playerInput.ApplyInputMask(inputProfile);
 
         // TODO: probably a better way of handling this
         if (Time.timeScale > 0) {
 
             if (gameData.levelState != null)
-                uiController?.UpdateWithPlayerInput(ref playerInput);
+                uiController?.UpdateWithPlayerInput(ref playerInput, inputProfile);
 
             UpdateCursor(uiclick, playerInput);
 
-            CameraInput input = default;
+            CameraInput cameraInput = default;
             if (activeOverlayType != OverlayType.none && uiController.OverlayNodeIsSelected()) {
-                input = uiController.GetOverlayCameraInput();
+
+                cameraInput = uiController.GetOverlayCameraInput();
                 if (uiController.mouseOverScrollBox) {
                     playerInput.zoomInput = Vector2.zero;
                 }
@@ -575,25 +574,28 @@ public partial class GameManager : Singleton<GameManager> {
                     characterCamera.SetInputs(playerInput);
 
             } else {
-                input = playerCharacterController.BuildCameraInput();
+
+                cameraInput = playerCharacterController.BuildCameraInput();
                 foreach (IInputReceiver i in inputReceivers) {
                     Vector3 directionToCursor = (playerInput.Fire.cursorData.worldPosition - i.transform.position).normalized;
                     playerInput.lookAtDirection = directionToCursor;
                     i.SetInputs(playerInput);
                 }
+
             }
 
-            characterCamera.UpdateWithInput(input);
+            if (inputProfile.allowCameraControl)
+                characterCamera.UpdateWithInput(cameraInput);
+
+            if (playerInput.incrementOverlay != 0) {
+                IncrementOverlay(playerInput.incrementOverlay);
+            }
         } else if (activeMenuType != MenuType.none) { // timescale == 0
             if (resetMouseControl) {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 resetMouseControl = false;
             }
-        }
-
-        if (playerInput.incrementOverlay != 0) {
-            IncrementOverlay(playerInput.incrementOverlay);
         }
 
         // kind of weird

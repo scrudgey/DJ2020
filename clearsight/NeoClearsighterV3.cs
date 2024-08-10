@@ -78,7 +78,7 @@ public class NeoClearsighterV3 : MonoBehaviour {
             followTransform = GameManager.I.playerObject.transform;
         } else {
             string nodeId = indicator.GetNodeId();
-            GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);
+            GameObject newFocus = GameManager.I.GetNodeGameObject(nodeId);
             followTransform = newFocus.transform;
         }
     }

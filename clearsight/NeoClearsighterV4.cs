@@ -73,7 +73,7 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
             followTransform = GameManager.I.playerObject?.transform ?? null;
         } else {
             string nodeId = indicator.GetNodeId();
-            GameObject newFocus = GameManager.I.GetNodeComponent(nodeId);
+            GameObject newFocus = GameManager.I.GetNodeGameObject(nodeId);
             followTransform = newFocus.transform;
         }
         targetPosition = followTransform.position;

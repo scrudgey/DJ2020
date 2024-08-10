@@ -12,13 +12,14 @@ public abstract class Cutscene {
     public GameObject playerObject;
     readonly static Vector2 defaultZoomInput = Vector2.zero;
     public bool isPlaying;
+    public InputProfile inputProfile = InputProfile.allowNone;
     LocationHighlight locationHighlight;
     public IEnumerator Play() {
         isPlaying = true;
         yield return DoCutscene();
         // request unfocus
         isPlaying = false;
-        yield return CutsceneManager.I.LeaveFocus(this);
+        yield return LeaveFocus();
     }
 
     protected IEnumerator WaitForFocus() {
@@ -27,6 +28,10 @@ public abstract class Cutscene {
         Debug.Log($"wait until cutscene has focus {this}");
         yield return new WaitUntil(() => this.hasFocus);
         Debug.Log($"got focus");
+    }
+
+    protected IEnumerator LeaveFocus() {
+        yield return CutsceneManager.I.LeaveFocus(this);
     }
 
     public abstract IEnumerator DoCutscene();
@@ -94,6 +99,7 @@ public abstract class Cutscene {
 
             SetCameraPosition(position, rotation, state);
             timer += Time.unscaledDeltaTime;
+            // Debug.Break();
             yield return null;
         }
     }
@@ -173,6 +179,13 @@ public abstract class Cutscene {
             controller.SetInputs(input);
             yield return null;
         }
+    }
+
+    protected void CharacterLookAt(CharacterController controller, string key) {
+        ScriptSceneLocation data = CutsceneManager.I.worldLocations[key];
+        PlayerInput input = PlayerInput.none;
+        input.lookAtPosition = data.transform.position;
+        controller.SetInputs(input);
     }
 
     protected void HighlightLocation(string idn) {

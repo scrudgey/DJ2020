@@ -114,9 +114,9 @@ public class MapDisplay3DGenerator : MonoBehaviour, IBindable<MapDisplay3DGenera
         powerGraph = PowerGraph.LoadAll(template.levelName);
         alarmGraph = AlarmGraph.LoadAll(template.levelName);
 
-        cyberGraph.ApplyVisibilityDefault(template.cyberGraphVisibilityDefault);
-        powerGraph.ApplyVisibilityDefault(template.powerGraphVisibilityDefault);
-        alarmGraph.ApplyVisibilityDefault(template.alarmGraphVisibiltyDefault);
+        cyberGraph.ApplyEdgeVisibility(template.cyberGraphVisibilityDefault);
+        powerGraph.ApplyEdgeVisibility(template.powerGraphVisibilityDefault);
+        alarmGraph.ApplyEdgeVisibility(template.alarmGraphVisibiltyDefault);
 
         cyberGraph.InfillDummyData();
 

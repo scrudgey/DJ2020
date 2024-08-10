@@ -59,7 +59,7 @@ public class ClearsightRendererHandler {
         this.bounds = tmpBounds;
         Transform findAnchor = root.Find("clearSighterAnchor");
         if (findAnchor != null) {
-            // Debug.Log($"found clear sighter anchor: {root.gameObject} {findAnchor}");
+            Debug.Log($"found clear sighter anchor: {root.gameObject} {findAnchor}");
             this.adjustedPosition = findAnchor.position;
         } else {
             this.adjustedPosition = tmpBounds.center;

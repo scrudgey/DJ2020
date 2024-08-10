@@ -13,6 +13,8 @@ public class Node<U> : IMarkerProvider where U : Node<U> {
     public bool enabled;
     public Vector3 position;
     public NodeVisibility visibility;
+    public EdgeVisibility minimumEdgeVisibility;
+    public NodeVisibility minimumNodeVisibility;
     public bool fixedVisibility;
     public bool alwaysOnScreen;
     public bool straightLine;

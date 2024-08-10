@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 [System.Serializable]
 public class SoftwareCondition {
-    public enum Type { nodeType, unlocked, nodeKnown, manualHack, locked, uncompromised, nodeUnknown, fileUnknown, edgesUnknown }
+    public enum Type { nodeType, unlocked, nodeKnown, manualHack, locked, uncompromised, nodeUnknown, fileUnknown, edgesUnknown, anyUnknown }
     public Type type;
     public CyberNodeType matchType;
     public SoftwareCondition(Type type) {
@@ -22,7 +22,7 @@ public class SoftwareCondition {
             case Type.nodeKnown:
                 return target.visibility > NodeVisibility.mystery;
             case Type.manualHack:
-                return origin?.idn == "cyberdeck";
+                return origin?.idn == "cyberdeck" && path.Count <= 1;
             case Type.locked:
                 return target.lockLevel > 0;
             case Type.uncompromised:
@@ -31,8 +31,10 @@ public class SoftwareCondition {
                 return target.visibility <= NodeVisibility.mystery;
             case Type.fileUnknown:
                 return !target.datafileVisibility;
+            case Type.anyUnknown:
+                return target.visibility <= NodeVisibility.mystery || !GameManager.I.gameData.levelState.delta.cyberGraph.AllEdgesVisible(target.idn);
             case Type.edgesUnknown:
-                return true;
+                return !GameManager.I.gameData.levelState.delta.cyberGraph.AllEdgesVisible(target.idn);
         }
         return true;
     }
@@ -60,7 +62,8 @@ public class SoftwareCondition {
             Type.uncompromised => "node is not compromised",
             Type.nodeUnknown => "node type is unknown",
             Type.fileUnknown => "file type is unknown",
-            Type.edgesUnknown => "neighbors not discovered"
+            Type.edgesUnknown => "neighbors not discovered",
+            Type.anyUnknown => "node is not fully scanned"
         };
         return $"{description}";
     }

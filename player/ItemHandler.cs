@@ -99,6 +99,11 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         OnItemExit(oldItem);
         OnItemEnter(this.activeItem);
         OnValueChanged?.Invoke(this);
+        if (item != null) {
+            CutsceneManager.I.HandleTrigger($"item_select_{item.template.shortName}");
+        } else {
+            CutsceneManager.I.HandleTrigger($"item_select_null");
+        }
     }
     void ClearItem() {
         SwitchToItem(null);

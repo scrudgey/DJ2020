@@ -57,8 +57,8 @@ public class UIController : MonoBehaviour {
     public TextMeshProUGUI cutsceneText;
     public TextMeshProUGUI tutorialText;
     public CutsceneDialogueController cutsceneDialogueController;
-    public bool tutorialBurglarInterrupt;
-    public bool tutorialBurglarAwaitLockpick;
+    // public bool tutorialBurglarInterrupt;
+    // public bool tutorialBurglarAwaitLockpick;
     public CanvasGroup burglarCanvasGroup;
     public RectTransform overlayButtonHighlight;
     public CanvasGroup overlayButtonGroup;
@@ -116,11 +116,12 @@ public class UIController : MonoBehaviour {
     public void DisplayObjectiveCompleteMessage(params string[] messages) {
         objectivesCompleteController.DisplayMessage(messages);
     }
-    public void UpdateWithPlayerInput(ref PlayerInput input) {
-        burglarCanvasGroup.interactable = !tutorialBurglarInterrupt;
-        if (tutorialBurglarInterrupt) return;
+    public void UpdateWithPlayerInput(ref PlayerInput input, InputProfile inputProfile) {
+        burglarCanvasGroup.interactable = inputProfile.allowBurglarInterface;
+        // if (tutorialBurglarInterrupt) return;
         if (burglarCanvas != null && burglarCanvas.enabled)
             burglarCanvasController?.UpdateWithInput(input);
+
         aimIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);
         weaponWheelController.UpdateWithPlayerInput(ref input);
         lockRadiusIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);

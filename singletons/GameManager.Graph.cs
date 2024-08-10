@@ -183,7 +183,7 @@ public partial class GameManager : Singleton<GameManager> {
         return gameData?.levelState?.delta.alarmGraph?.GetNode(idn) ?? null;
     }
 
-    public GameObject GetNodeComponent(string idn) {
+    public GameObject GetNodeGameObject(string idn) {
         if (idn == "cyberdeck") {
             return playerObject;
         }
@@ -204,6 +204,13 @@ public partial class GameManager : Singleton<GameManager> {
         }
         return null;
     }
+    // public GraphNodeComponent<T, U> GetNodeComponent<T, U>(U node) where T : GraphNodeComponent<T, U> where U : Node<U>, new() {
+    //     return node switch {
+    //         Node<CyberNode> => (GraphNodeComponent<CyberComponent, CyberNode>)FindObjectsOfType<CyberComponent>().Where(component => component.idn == node.idn).FirstOrDefault(),
+    //         PowerNode => FindObjectsOfType<PoweredComponent>().Where(component => component.idn == node.idn).FirstOrDefault(),
+    //         AlarmNode => FindObjectsOfType<AlarmComponent>().Where(component => component.idn == node.idn).FirstOrDefault(),
+    //     };
+    // }
 
     public void DiscoverNode<U>(U node,
                                 NodeVisibility newNodeVisibility = NodeVisibility.unknown,

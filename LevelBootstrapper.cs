@@ -5,22 +5,38 @@ using Items;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class LevelBootstrapper : MonoBehaviour {
+    public enum BootStrapType { mission, world, VR, tutorial }
+    public BootStrapType type;
     public bool spawnNPCs;
     public LevelTemplate levelTemplate;
     public bool VRMission;
-    public bool world;
+    // public bool world;
     void Start() {
         StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
     }
 
     void Initialize() {
-        if (world) {
-            BootStrapWorld();
-        } else if (VRMission) {
-            BootStrapVR();
-        } else {
-            BootStrapMission();
+        switch (type) {
+            case BootStrapType.mission:
+                BootStrapMission();
+                break;
+            case BootStrapType.world:
+                BootStrapWorld();
+                break;
+            case BootStrapType.VR:
+                BootStrapVR();
+                break;
+            case BootStrapType.tutorial:
+                BootStrapTutorial();
+                break;
         }
+        // if (world) {
+        //     BootStrapWorld();
+        // } else if (VRMission) {
+        //     BootStrapVR();
+        // } else {
+        //     BootStrapMission();
+        // }
     }
 
     void BootStrapVR() {
@@ -57,6 +73,41 @@ public class LevelBootstrapper : MonoBehaviour {
 
         string sceneName = SceneManager.GetActiveScene().name;
         SceneData sceneData = SceneData.loadSceneData(sceneName);
+        // start the game state
+        GameManager.I.StartMission(level, sceneData, spawnNpcs: spawnNPCs, doCutscene: false);
+    }
+
+    void BootStrapTutorial() {
+        Debug.Log($"bootstrapping tutorial {levelTemplate.levelName}...");
+
+        GameData gameData = GameData.DefaultState();
+        PlayerState playerState = PlayerState.DefaultState();
+
+        playerState.allItems = new List<ItemTemplate> {
+
+        };
+        playerState.softwareTemplates = new List<SoftwareScriptableTemplate>{
+            SoftwareScriptableTemplate.Load("scan"),
+            SoftwareScriptableTemplate.Load("crack"),
+            SoftwareScriptableTemplate.Load("exploit"),
+            SoftwareScriptableTemplate.Load("scanData"),
+        }.Select(template => template.ToTemplate()).ToList();
+        gameData.playerState = playerState;
+
+        // initialize game state
+        GameManager.I.gameData = gameData;
+
+        LevelState level = LevelState.Instantiate(levelTemplate, LevelPlan.Default(GameManager.I.gameData.playerState), GameManager.I.gameData.playerState);
+
+        // select a random extraction point
+        string extractionIdn = Toolbox.RandomFromList(GameObject.FindObjectsOfType<ExtractionZone>().Select(zone => zone.data.idn).ToList());
+        level.plan.extractionPointIdn = extractionIdn;
+
+        GameManager.I.gameData.levelState = level;
+
+        string sceneName = SceneManager.GetActiveScene().name;
+        SceneData sceneData = SceneData.loadSceneData(sceneName);
+
         // start the game state
         GameManager.I.StartMission(level, sceneData, spawnNpcs: spawnNPCs, doCutscene: false);
     }

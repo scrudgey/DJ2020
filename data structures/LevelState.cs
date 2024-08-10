@@ -25,9 +25,9 @@ public class LevelState : PerkIdConstants {
         PowerGraph powerGraph = PowerGraph.LoadAll(template.levelName);
         AlarmGraph alarmGraph = AlarmGraph.LoadAll(template.levelName);
 
-        cyberGraph.ApplyVisibilityDefault(template.cyberGraphVisibilityDefault);
-        powerGraph.ApplyVisibilityDefault(template.powerGraphVisibilityDefault);
-        alarmGraph.ApplyVisibilityDefault(template.alarmGraphVisibiltyDefault);
+        cyberGraph.ApplyEdgeVisibility(template.cyberGraphVisibilityDefault);
+        powerGraph.ApplyEdgeVisibility(template.powerGraphVisibilityDefault);
+        alarmGraph.ApplyEdgeVisibility(template.alarmGraphVisibiltyDefault);
 
         cyberGraph.Apply(plan);
         powerGraph.Apply(plan);

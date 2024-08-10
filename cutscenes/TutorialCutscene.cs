@@ -9,6 +9,7 @@ class TutorialCutscene : Cutscene {
     GameObject mentorObject;
     CharacterController mentorController;
     Sprite mentorPortrait;
+    Vector2 zoomInput = new Vector2(0f, 5f);
 
     public TutorialCutscene(NPCTemplate mentorTemplate, Sprite mentorPortrait) {
         this.mentorTemplate = mentorTemplate;
@@ -16,30 +17,42 @@ class TutorialCutscene : Cutscene {
     }
 
     public override IEnumerator DoCutscene() {
-        Vector2 zoomInput = new Vector2(0f, 5f);
         // HideBasicUI();
 
+        mentorObject = CutsceneManager.I.SpawnNPC("mentorSpawn", mentorTemplate);
+        mentorController = mentorObject.GetComponent<CharacterController>();
+
+        ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
+        mentorObject.transform.position = mentorLockpickData.transform.position;
+        mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
+        mentorObject.SetActive(true);
+
+        // yield return FromStartToGreet();
+
+        yield return GreetHackSequence();
+
+        yield return FenceAndNetworks();
+
+    }
+
+    IEnumerator FromStartToGreet() {
 
         yield return WaitForFocus();
         Time.timeScale = 1f;
         SetCameraPosition("alleystart", CameraState.normal, orthographicSize: 5f, snapToOrthographicSize: true, snapToPosition: true);
-
-        mentorObject = CutsceneManager.I.SpawnNPC("mentorSpawn", mentorTemplate);
-        mentorController = mentorObject.GetComponent<CharacterController>();
 
         yield return Toolbox.Parallelize(MoveCharacter(mentorController, "mentorWalk1"), MoveCharacter(GameManager.I.playerCharacterController, "playerWalk1"));
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Alright kid, this is the place. Follow my lead and we'll be in and out with the score before they know what hit them.");
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Our target is in a data warehouse just up ahead. I'll go ahead to scout it out.");
         yield return MoveCharacter(mentorController, "mentorWalk2");
 
-        // move mentor to mentor_lockpick
-        // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_lockpick"];
+        // move mentor to mentor_greet
         ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
         mentorObject.transform.position = mentorLockpickData.transform.position;
         mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
         mentorObject.SetActive(true);
 
-        yield return CutsceneManager.I.LeaveFocus(this);
+        yield return LeaveFocus();
         HideBasicUI();
         GameManager.I.uiController.ShowTutorialText("Movement: WASD");
         yield return WaitForTrigger("walk1");
@@ -51,7 +64,7 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.ShowTutorialText("Hold Control while moving to crawl");
         yield return MoveCamera(crawlData.transform.position, crawlData.transform.rotation, 2f, CameraState.normal, zoomInput, PennerDoubleAnimation.ExpoEaseOut);
         yield return new WaitForSecondsRealtime(1f);
-        yield return CutsceneManager.I.LeaveFocus(this);
+        yield return LeaveFocus();
         HideBasicUI();
 
 
@@ -62,7 +75,7 @@ class TutorialCutscene : Cutscene {
         yield return MoveCamera("ladder", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
         GameManager.I.uiController.ShowTutorialText("Click on the ladder to climb");
         yield return new WaitForSecondsRealtime(1.7f);
-        yield return CutsceneManager.I.LeaveFocus(this);
+        yield return LeaveFocus();
 
         HighlightLocation("ladder");
         HideBasicUI();
@@ -71,12 +84,56 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.ShowTutorialText("Use W / S to climb up and down the ladder\nClimb to the top to dismount");
         yield return WaitForTrigger("ladder_dismount");
         GameManager.I.uiController.HideCutsceneText();
+    }
 
-
+    IEnumerator GreetHackSequence() {
         /* greet sequence */
         yield return WaitForTrigger("greet");
         yield return WaitForFocus();
-        yield return MoveCharacter(playerCharacterController, "hide2", speedCoefficient: 0.4f);
+        HideBasicUI();
+
+        Time.timeScale = 1f;
+        yield return MoveCharacter(playerCharacterController, "player_greet", speedCoefficient: 1f);
+        CharacterLookAt(playerCharacterController, "building_look");
+        CharacterLookAt(mentorController, "building_look");
+        yield return MoveCamera("greet", 0.5f, CameraState.free);
+        yield return new WaitForSecondsRealtime(1f);
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Alright kid, this is the place. Quiet night, all the better for us.");
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Before we go in there, let's scan the network and see if we can locate our target first.");
+        yield return LeaveFocus();
+        HideBasicUI();
+
+        Coroutine mentorWalking = CutsceneManager.I.StartCoroutine(MoveCharacter(mentorController, "mentor_kiosk", speedCoefficient: 1f));
+        HighlightLocation("player_kiosk");
+        yield return WaitForTrigger("kiosk");
+        HideLocationHighlight();
+        yield return WaitForFocus();
+        GameManager.I.uiController.ShowOverlayControls(true);
+        Time.timeScale = 1f;
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Okay, we should be able to tap into their network from this wallcom. Get out your cyberdeck.");
+        inputProfile = inputProfile with {
+            allowePlayerItemSelect = true,
+            allowCameraControl = true
+        };
+        Debug.Log("set input profile");
+        GameManager.I.uiController.ShowTutorialText("Hold X to open inventory menu. Select cyberdeck and release X.");
+
+        yield return WaitForTrigger("item_select_deck");
+        inputProfile = InputProfile.allowNone with {
+            allowCameraControl = true
+        };
+
+        GameManager.I.uiController.HideCutsceneDialogue();
+
+        // yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Good. Let's connect to the wallcom.");
+        GameManager.I.uiController.ShowTutorialText("Click on the wallcom node (icon) to connect to it.");
+
+        yield return WaitForTrigger("node_select_wallcom");
+        inputProfile = InputProfile.allowNone;
+        
+    }
+
+    IEnumerator FenceAndNetworks() {
 
         // yield return WaitForTrigger("lockpick");
         // yield return WaitForFocus();
@@ -124,7 +181,6 @@ class TutorialCutscene : Cutscene {
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "It's pointing right at the door we want. If we move in now, they'll spot us right away.");
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Let's scope out the situation a bit. Turn on your alarm network display.");
         GameManager.I.uiController.ShowOverlayControls(true);
-
         GameManager.I.uiController.ShowOverlayButtonHighlight(true);
         yield return WaitForTrigger("overlay_change_3");
         GameManager.I.uiController.ShowOverlayButtonHighlight(false);
@@ -144,7 +200,7 @@ class TutorialCutscene : Cutscene {
         yield return MoveCamera("powerbox", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "It's getting power from that power relay. Take it out and the camera will shut down. Let's move.");
 
-        yield return CutsceneManager.I.LeaveFocus(this);
+        yield return LeaveFocus();
         GameManager.I.uiController.SetOverlayButtonInteractible(true);
 
         GameManager.I.uiController.ShowStatusBar(false);
@@ -159,11 +215,11 @@ class TutorialCutscene : Cutscene {
         HideLocationHighlight();
 
         yield return WaitForTrigger("burglar_open");
-        GameManager.I.uiController.tutorialBurglarInterrupt = true;
+        inputProfile.allowBurglarInterface = false;
         yield return new WaitForSecondsRealtime(0.75f);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Alright. Use your screwdriver to remove those screws.");
-        GameManager.I.uiController.tutorialBurglarInterrupt = false;
-
+        // GameManager.I.uiController.tutorialBurglarInterrupt = false;
+        inputProfile.allowBurglarInterface = true;
     }
 
     void HideBasicUI() {

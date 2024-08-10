@@ -23,6 +23,9 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     public bool cutsceneIsRunning() {
         return cutsceneWithFocus != null;
     }
+    public Cutscene runningCutscene() {
+        return cutsceneWithFocus;
+    }
     public void StartCutscene(Cutscene cutscene) {
         runningCutscenes.Add(StartCoroutine(cutscene.Play()));
     }

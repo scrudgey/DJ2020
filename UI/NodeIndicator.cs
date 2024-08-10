@@ -16,12 +16,14 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     Action<NodeIndicator<T, U>> onMouseOver;
     Action<NodeIndicator<T, U>> onMouseExit;
     protected OverlayHandler overlayHandler;
+    Transform anchor;
     public void Configure(T node, U graph, OverlayHandler overlayHandler, Action<NodeIndicator<T, U>> onMouseOver, Action<NodeIndicator<T, U>> onMouseExit) {
         this.node = node;
         this.overlayHandler = overlayHandler;
         this.onMouseOver = onMouseOver;
         this.onMouseExit = onMouseExit;
         this.graph = graph;
+        anchor = GameManager.I.GetNodeGameObject(node.idn).transform.Find("anchor");
         SetGraphicalState(node);
     }
     public virtual void SetGraphicalState(T node) {
@@ -61,6 +63,7 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
     public CameraInput GetCameraInput() {
         CursorData data = CursorData.none;
         data.screenPositionNormalized = HALFSIES;
+        Vector3 targetPosition = anchor != null ? anchor.position : node.position;
         return new CameraInput {
             deltaTime = Time.deltaTime,
             crouchHeld = false,
@@ -69,8 +72,8 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
             playerDirection = Vector3.zero,
             popoutParity = PopoutParity.left,
             targetRotation = Quaternion.identity,
-            targetPosition = node.position,
-            cullingTargetPosition = node.position,
+            targetPosition = targetPosition,
+            cullingTargetPosition = targetPosition,
             atLeftEdge = false,
             atRightEdge = false,
         };
