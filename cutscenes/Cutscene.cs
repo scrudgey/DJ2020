@@ -6,6 +6,8 @@ using AI;
 using Easings;
 using UnityEngine;
 public abstract class Cutscene {
+    static readonly Vector2 HALFSIES = Vector2.one / 2f;
+
     public bool hasFocus;
     public CharacterCamera characterCamera;
     public CharacterController playerCharacterController;
@@ -51,14 +53,18 @@ public abstract class Cutscene {
         CutsceneManager.OnTrigger -= callback;
     }
 
-    protected void SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false) {
+    protected void SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false, bool debug = false) {
+        CursorData targetData = CursorData.none;
+        targetData.screenPositionNormalized = HALFSIES;
+
+
         CameraInput input = new CameraInput {
             deltaTime = Time.unscaledDeltaTime,
             wallNormal = Vector2.zero,
             lastWallInput = Vector2.zero,
             crouchHeld = false,
             cameraState = state,
-            targetData = CursorData.none,
+            targetData = targetData,
             playerDirection = playerCharacterController.direction,
             popoutParity = PopoutParity.left,
             targetRotation = rotation,
@@ -70,7 +76,7 @@ public abstract class Cutscene {
             snapTo = snapToPosition
         };
         characterCamera.transitionTime = 1f;
-        characterCamera.UpdateWithInput(input);
+        characterCamera.UpdateWithInput(input, debug: debug);
     }
 
     protected void SetCameraPosition(string idn, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false) {
@@ -86,9 +92,14 @@ public abstract class Cutscene {
         ScriptSceneCameraPosition data = CutsceneManager.I.cameraLocations[idn];
         yield return MoveCamera(data.transform.position, data.transform.rotation, duration, state, Vector2.zero, easing);
     }
-    protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state) {
+    protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, bool debug = false) {
         float timer = 0f;
-        Vector3 initialPosition = characterCamera.transform.position;
+        Vector3 initialPosition;
+        if (state == CameraState.normal) {
+            initialPosition = characterCamera.lastTargetPosition;
+        } else {
+            initialPosition = characterCamera.transform.position;
+        }
         Quaternion initialRotation = characterCamera.transform.rotation;
         while (timer < duration) {
 
@@ -96,12 +107,13 @@ public abstract class Cutscene {
 
             Vector3 position = Vector3.Lerp(initialPosition, targetPosition, completion);
             Quaternion rotation = Quaternion.Lerp(initialRotation, targetRotation, completion);
-
+            // Debug.Log($"{timer}\t{duration}\t{completion}\t{targetPosition} -> {position}");
             SetCameraPosition(position, rotation, state);
             timer += Time.unscaledDeltaTime;
             // Debug.Break();
             yield return null;
         }
+        SetCameraPosition(targetPosition, targetRotation, state, debug: debug);
     }
     protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput) {
         return MoveCamera(targetPosition, targetRotation, duration, state, zoomInput, PennerDoubleAnimation.Linear);
@@ -113,6 +125,9 @@ public abstract class Cutscene {
     protected IEnumerator RotateIsometricCamera(IsometricOrientation desiredOrientation, Vector3 targetPosition) {
         PlayerInput playerInput = PlayerInput.none;
         playerInput.rotateCameraLeftPressedThisFrame = true;
+        CursorData targetData = CursorData.none;
+        targetData.screenPositionNormalized = HALFSIES;
+
         while (characterCamera.currentOrientation != desiredOrientation) {
             characterCamera.SetInputs(playerInput);
 
@@ -124,7 +139,7 @@ public abstract class Cutscene {
                     lastWallInput = Vector2.zero,
                     crouchHeld = false,
                     cameraState = CameraState.normal,
-                    targetData = CursorData.none,
+                    targetData = targetData,
                     playerDirection = playerCharacterController.direction,
                     popoutParity = PopoutParity.left,
                     ignoreAttractor = true,
@@ -163,6 +178,10 @@ public abstract class Cutscene {
             timer += Time.unscaledDeltaTime;
             yield return null;
         }
+    }
+
+    protected IEnumerator CameraIsometricZoom(float targetOrthographicSize, float duration) {
+        yield return characterCamera.DoZoom(targetOrthographicSize, duration);
     }
 
     protected IEnumerator MoveCharacter(CharacterController controller, string key, float speedCoefficient = 1f) {

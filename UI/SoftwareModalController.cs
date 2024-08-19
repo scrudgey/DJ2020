@@ -15,6 +15,8 @@ public class SoftwareModalController : MonoBehaviour {
     SoftwareSelector activeSelector;
     List<CyberNode> path;
 
+    public Dictionary<string, RectTransform> selectorIndicators;
+
     public void Initialize(HackTerminalController terminalController, List<SoftwareState> softwareStates) {
         this.terminalController = terminalController;
         CyberNode target = terminalController?.hackTarget?.node ?? null;
@@ -27,6 +29,7 @@ public class SoftwareModalController : MonoBehaviour {
         foreach (Transform child in selectorList) {
             Destroy(child.gameObject);
         }
+        selectorIndicators = new Dictionary<string, RectTransform>();
         foreach (SoftwareState state in softwareStates) {
             SoftwareSelector newselector = CreateSoftwareSelector(state, target, origin);
             if (activeSelector == null) {
@@ -43,6 +46,7 @@ public class SoftwareModalController : MonoBehaviour {
         }
         selector.Initialize(softwareState, SelectorClickCallback, softwareEnabled);
         selector.transform.SetParent(selectorList, false);
+        selectorIndicators.Add(softwareState.template.name, obj.GetComponent<RectTransform>());
         return selector;
     }
     public void SelectorClickCallback(SoftwareSelector selector) {
@@ -58,6 +62,8 @@ public class SoftwareModalController : MonoBehaviour {
         GameManager.I.CloseMenu();
         if (activeSelector != null) {
             terminalController.DeploySoftware(activeSelector.softwareState);
+            CutsceneManager.I.HandleTrigger($"software_deploy_{activeSelector.softwareState.template.name}");
         }
+
     }
 }

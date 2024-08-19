@@ -4059,3 +4059,31 @@ character view:
     tune how it plays
     items
 
+bonus 20% non neg
+base 250
+rsus 
+total 400
+
+
+
+
+
+Sep 3 - 
+3 interview 5 hr
+1.
+mlsc craft proj deep dive
+    describe beam bullet points
+systems design- solve prob ml
+    trickier- ask Qs
+    what type of model, why, train, develop, deploy, monitor
+coding
+    code design- clarity etc.
+
+2. technical 2
+systems design- same as before 2x long
+
+3. personal
+
+
+
+the fool the lovers teh devil

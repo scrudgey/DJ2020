@@ -23,6 +23,12 @@ public class Gibs : ScriptableObject {
         .ForEach(gib => {
             gib.Emit(host, result.damage, bounds);
         });
+
+    public void DoEmit(GameObject host, Damage damage, Collider bounds) {
+        gibs?.ForEach(gib => {
+            gib.Emit(host, damage, bounds);
+        });
+    }
 }
 public enum GibType { normal, particleEffect }
 

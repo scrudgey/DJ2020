@@ -35,7 +35,6 @@ public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Gra
             ConfigureNode();
         }
         ConfigureNeighbors(graph);
-
     }
     public abstract void ConfigureNode();
     public abstract void ConfigureMysteryNode();

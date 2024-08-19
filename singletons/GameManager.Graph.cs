@@ -183,7 +183,9 @@ public partial class GameManager : Singleton<GameManager> {
         return gameData?.levelState?.delta.alarmGraph?.GetNode(idn) ?? null;
     }
 
+    // TODO: this code is very bad
     public GameObject GetNodeGameObject(string idn) {
+        Debug.Log($"get node gameobject: {idn}");
         if (idn == "cyberdeck") {
             return playerObject;
         }

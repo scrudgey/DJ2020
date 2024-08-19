@@ -16,9 +16,20 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
     public GameObject lockBlock;
 
     public override void ConfigureNode() {
-        type.text = $"{indicator.node.type}";
+        type.text = indicator.node.type switch {
+            CyberNodeType.datanode => "data store",
+            CyberNodeType.normal => "",
+            CyberNodeType.player => "cyberdeck",
+            CyberNodeType.utility => "utility",
+            CyberNodeType.WAN => "internet"
+        };
         status.text = $"{indicator.node.getStatus()}";
-        lockStatus.text = $"lock: {indicator.node.lockLevel}";
+        if (indicator.node.lockLevel > 0) {
+            lockStatus.text = $"LOCKED";
+        } else {
+            lockStatus.text = $"ACCESS GRANTED";
+        }
+        // lockStatus.text = $"lock: {indicator.node.lockLevel}";
         // lockBlock.SetActive(indicator.node.lockLevel > 0);
         lockBlock.SetActive(false);
 

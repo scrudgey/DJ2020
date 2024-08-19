@@ -17,7 +17,7 @@ public class AlarmNodeInfoDisplay : NodeInfoPaneDisplay<AlarmGraph, AlarmNode, A
                 nodeTypeText.text = "sensor";
                 break;
             case AlarmNode.AlarmNodeType.terminal:
-                nodeTypeText.text = "terminal";
+                nodeTypeText.text = "central alarm system";
                 break;
             case AlarmNode.AlarmNodeType.radio:
                 nodeTypeText.text = "radio";
@@ -25,10 +25,10 @@ public class AlarmNodeInfoDisplay : NodeInfoPaneDisplay<AlarmGraph, AlarmNode, A
         }
 
         if (node.alarmTriggered) {
-            triggeredText.text = "triggered";
+            triggeredText.text = "active";
             countdownText.text = $"{node.countdownTimer}";
         } else {
-            triggeredText.text = "not triggered";
+            triggeredText.text = "silent";
             countdownText.text = $"";
         }
     }

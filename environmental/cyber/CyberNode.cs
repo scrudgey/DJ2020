@@ -20,7 +20,10 @@ public class CyberNode : Node<CyberNode> {
     [XmlIgnore]
     public Action OnDataStolen;
     public override NodeVisibility GetVisibility() {
-        return base.GetVisibility();
+        // TODO: this is weird
+        if (datafileVisibility) {
+            return NodeVisibility.known;
+        } else return base.GetVisibility();
     }
     public CyberNodeStatus getStatus() {
         if (compromised) {

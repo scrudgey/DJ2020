@@ -21,10 +21,18 @@ public struct AnimationInput {
             aimWeapon = false
         };
     }
+    public struct ItemHandlerInput {
+        public ItemInstance activeItem;
+        public ItemHandler.State state;
+        public static ItemHandlerInput None() => new ItemHandlerInput {
+            activeItem = null,
+            state = ItemHandler.State.idle
+        };
+    }
     public GunAnimationInput gunInput;
+    public ItemHandlerInput itemInput;
     public Direction orientation;
     public PlayerInput playerInputs;
-    public ItemInstance activeItem;
     public bool isMoving;
     public bool isCrouching;
     public bool isProne;

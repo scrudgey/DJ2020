@@ -6,7 +6,7 @@ using Items;
 using KinematicCharacterController;
 using UnityEngine;
 public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
-    private GunHandler.GunStateEnum state;
+    // private GunHandler.GunStateEnum state;
     private CharacterState characterState;
     private int _frame;
     private Direction direction;
@@ -25,6 +25,8 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     public AnimationClip swordSwingAnimation;
     public AnimationClip swordUnholsterAnimation;
     public AnimationClip swordHolsterAnimation;
+    [Header("fence cutter")]
+    public AnimationClip fenceCutterSnipAnimation;
     public Skin skin;
     public float trailInterval = 0.05f;
     private bool bob;
@@ -34,10 +36,10 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     GunType gunType;
 
 
-    void SetState(GunHandler.GunStateEnum newState) {
-        state = newState;
-        // Debug.Log("set gunstate: " + state);
-    }
+    // void SetState(GunHandler.GunStateEnum newState) {
+    //     state = newState;
+    //     // Debug.Log("set gunstate: " + state);
+    // }
     void OnEnable() {
         animator.Play();
     }
@@ -84,7 +86,6 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
             transform.localPosition -= new Vector3(0f, 0.02f, 0f); // TODO: ?
         }
 
-        SetState(input.gunInput.gunState);
         characterState = input.state;
 
         isMoving = input.isMoving;
@@ -99,7 +100,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         if (input.hitState == HitState.dead) {
             animator.Stop();
         } else if (input.gunInput.gunType == GunType.sword || input.gunInput.fromGunType == GunType.sword) {
-            switch (state) {
+            switch (input.gunInput.gunState) {
                 case GunHandler.GunStateEnum.holstering:
                     if (input.gunInput.toGunType == GunType.unarmed) {
                         Debug.Log("set animation sword holster");
@@ -118,7 +119,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
                     break;
             }
         } else if (input.gunInput.hasGun) {
-            switch (state) {
+            switch (input.gunInput.gunState) {
                 case GunHandler.GunStateEnum.holstering:
                     if (input.gunInput.toGunType == GunType.unarmed) {
                         SetAnimation(holsterAnimation);
@@ -150,6 +151,12 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
                     }
                     break;
             }
+        } else if (input.itemInput.activeItem != null && input.itemInput.activeItem is FenceCutterItem) {
+            if (input.itemInput.state == ItemHandler.State.inUse) {
+                SetAnimation(fenceCutterSnipAnimation);
+            } else {
+                SetAnimation(idleAnimation);
+            }
         } else {
             if (input.armsRaised) {
                 _frame = 0;
@@ -170,20 +177,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
         return ApplyTorsoSpriteData(input);
     }
     SpriteData ApplyTorsoSpriteData(AnimationInput input) {
-        // int sheetIndex = int.Parse(spriteRenderer.sprite.name.Split("_").Last());
-        // SpriteData[] torsoSpriteDatas = input.gunInput.gunType switch {
-        //     GunType.unarmed => skin.unarmedSpriteData,
-        //     GunType.pistol => skin.pistolSpriteData,
-        //     GunType.smg => skin.smgSpriteData,
-        //     GunType.rifle => input.isRunning ? skin.smgSpriteData : skin.rifleSpriteData,
-        //     GunType.shotgun => input.isRunning ? skin.smgSpriteData : skin.shotgunSpriteData,
-        //     _ => skin.unarmedSpriteData
-        // };
-        // if (input.isProne || input.hitState == HitState.dead || input.wavingArm || input.isJumping) { // crawling
-        //     torsoSpriteDatas = skin.unarmedSpriteData;
-        // }
         try {
-            // SpriteData torsoSpriteData = torsoSpriteDatas[sheetIndex];
             SpriteData spriteData = skin.allSpriteData[spriteRenderer.sprite.name];
             Vector3 headOffset = new Vector3(spriteData.headOffset.x / 100f, spriteData.headOffset.y / 100f, 0f);
             headAnimation.transform.localPosition = headOffset;
@@ -197,7 +191,7 @@ public class TorsoAnimation : MonoBehaviour, ISkinStateLoader {
     }
 
     void SetItemSprite(AnimationInput input) {
-        switch (input.activeItem) {
+        switch (input.itemInput.activeItem) {
             case RocketLauncherItem rocketItem:
                 rocketLauncher.spritesheet = rocketItem.rocketData.spritesheet;
                 rocketLauncher.gameObject.SetActive(true);

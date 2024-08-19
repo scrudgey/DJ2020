@@ -18,6 +18,7 @@ public class UIController : MonoBehaviour {
     public Canvas overlayCanvas;
     public Canvas cutsceneTextCanvas;
     public Canvas cutsceneDialogueCanvas;
+    public Canvas indicatorCanvas;
     // public Canvas 
     [Header("controllers")]
     public TerminalController terminal;
@@ -51,17 +52,17 @@ public class UIController : MonoBehaviour {
     public SoftwareModalController softwareModalController;
     public KeySelectMenu keySelectMenu;
     public bool mouseOverScrollBox;
+    public IndicatorUIController indicatorUIController;
     [Header("cutscene stuff")]
     public TextMeshProUGUI creditsText;
 
     public TextMeshProUGUI cutsceneText;
     public TextMeshProUGUI tutorialText;
     public CutsceneDialogueController cutsceneDialogueController;
-    // public bool tutorialBurglarInterrupt;
-    // public bool tutorialBurglarAwaitLockpick;
     public CanvasGroup burglarCanvasGroup;
     public RectTransform overlayButtonHighlight;
     public CanvasGroup overlayButtonGroup;
+    public bool cutsceneDialogueEnabled;
     Coroutine overlayButtonHighlightRoutine;
     bool burglarMode;
     void Awake() {
@@ -106,6 +107,7 @@ public class UIController : MonoBehaviour {
         keySelectMenu.Hide();
         creditsText.text = "";
         creditsText.color = Color.clear;
+        HideAllIndicators();
 
         if (GameManager.I.playerObject != null)
             BindToNewTarget(GameManager.I.playerObject);
@@ -225,6 +227,8 @@ public class UIController : MonoBehaviour {
             cutsceneTextCanvas.enabled = false;
         if (cutsceneDialogueCanvas != null)
             cutsceneDialogueCanvas.enabled = false;
+        if (indicatorCanvas != null)
+            indicatorCanvas.enabled = false;
         Debug.Log("hide UI");
     }
     public void ShowUI(bool hideCutsceneText = true) {
@@ -245,6 +249,8 @@ public class UIController : MonoBehaviour {
             cutsceneTextCanvas.enabled = false;
         if (cutsceneDialogueCanvas != null)
             cutsceneDialogueCanvas.enabled = false;
+        if (indicatorCanvas != null)
+            indicatorCanvas.enabled = true;
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {
             ShowVRStats();
         }
@@ -282,11 +288,11 @@ public class UIController : MonoBehaviour {
     }
     public void HideCutsceneText() {
         cutsceneTextCanvas.enabled = false;
-        Debug.Log("[cutscene] hide cutscene text");
+        // Debug.Log("[cutscene] hide cutscene text");
     }
 
     public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content) {
-        IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content);
+        IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content, this);
         cutsceneDialogueCanvas.enabled = true;
         return routine;
     }
@@ -340,7 +346,27 @@ public class UIController : MonoBehaviour {
             }
         }
     }
+
     public void SetOverlayButtonInteractible(bool value) {
         overlayButtonGroup.interactable = value;
+    }
+
+    public void ShowIndicator(RectTransform target, Vector3 offset, IndicatorUIController.Direction direction) {
+        indicatorCanvas.enabled = true;
+        ShowIndicators(new RectTransform[] { target }, new Vector3[] { offset }, new IndicatorUIController.Direction[] { direction });
+    }
+    public void ShowIndicators(RectTransform[] targets, Vector3[] offsets, IndicatorUIController.Direction[] directions) {
+        indicatorCanvas.enabled = true;
+        indicatorUIController.ShowIndicators(targets, offsets, directions);
+    }
+    public void DrawLine(RectTransform target, Vector3 offset) {
+        indicatorCanvas.enabled = true;
+        indicatorUIController.DrawLine(target, offset, this);
+    }
+    public void HideAllIndicators() {
+        indicatorUIController.HideAllIndicators();
+    }
+    public void HideIndicator(RectTransform target) {
+        indicatorUIController.HideIndicator(target);
     }
 }

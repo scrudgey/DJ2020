@@ -9,33 +9,11 @@ using UnityEngine;
 public class ObjectiveData : Objective {
     public PayData targetPaydata;
 
-    // public override string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
-    //     if (plan.objectiveLocations.ContainsKey(name)) {
-    //         return plan.objectiveLocations[name];
-    //     }
-    //     return Toolbox.RandomFromList(potentialSpawnPoints);
-    // }
-
-    // public override string SelectSpawnPointIdn(LevelTemplate template, LevelPlan plan) {
-    //     if (plan.objectiveLocations.ContainsKey(template.name)) {
-    //         return plan.objectiveLocations[template.name];
-    //     }
-
-    //     CyberGraph cyberGraph = CyberGraph.LoadAll(template.levelName);
-    //     List<CyberNode> dataNodes = cyberGraph.nodes.Values.Where(node => node.type == CyberNodeType.datanode).ToList();
-    //     if (dataNodes.Count == 0) {
-    //         Debug.LogError("Not enough data nodes to support level objectives! Mission is not possible.");
-    //     }
-    //     return Toolbox.RandomFromList(dataNodes).idn;
-    // }
     public override ObjectiveDelta ToDelta(LevelState state) {
-        // string targetIdn = SelectSpawnPointIdn(state.plan);
         string targetIdn = state.SetLocationOfObjective(this);
 
         CyberNode target = state.delta.cyberGraph.nodes[targetIdn];
         target.payData = targetPaydata;
-
-        // dataNodes.Remove(target); // TODO: fix this so that multiple objectives can't select the same target node!
 
         ObjectiveDelta delta = new ObjectiveDelta(this, () => target.position, targetIdn);
         target.OnDataStolen += () => delta.status = ObjectiveStatus.complete;

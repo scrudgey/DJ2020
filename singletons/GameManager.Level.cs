@@ -156,6 +156,11 @@ public partial class GameManager : Singleton<GameManager> {
         // randomize cyber state:
         state.delta.cyberGraph.InfillRandomData();
 
+        // apply fixed data state:
+        foreach (CyberComponent dataStore in GameObject.FindObjectsOfType<CyberComponent>().Where(component => component.nodeType == CyberNodeType.datanode && component.setPaydata)) {
+            dataStore.node.payData = dataStore.payData;
+        }
+
         // initialize objectives- this will affect graph visibility
         foreach (Objective objective in state.template.objectives) {
             ObjectiveDelta delta = objective.ToDelta(state);
@@ -166,7 +171,6 @@ public partial class GameManager : Singleton<GameManager> {
             state.delta.optionalObjectiveDeltas.Add(delta);
         }
 
-        // MusicController.I.LoadTrack(state.template.musicTrack);
         MusicController.I.PlayMissionTrack(state.template.musicTrack);
 
         TransitionToPhase(GamePhase.levelPlay);

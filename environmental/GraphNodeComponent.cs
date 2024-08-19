@@ -17,6 +17,7 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         return new U() {
             idn = idn,
             position = NodePosition(),
+            anchorPosition = AnchorPosition(),
             enabled = true,
             nodeTitle = nodeTitle,
             visibility = NodeVisibility.known,
@@ -31,6 +32,14 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
             return nodePositioner.position;
         } else return transform.position;
     }
+
+    public Vector3 AnchorPosition() {
+        Transform nodePositioner = transform.Find("anchor");
+        if (nodePositioner) {
+            return nodePositioner.position;
+        } else return transform.position;
+    }
+
 
     public Action<T> OnStateChange;
 

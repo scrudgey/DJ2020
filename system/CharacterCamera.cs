@@ -255,8 +255,11 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         IgnoredColliders.AddRange(g.GetComponentsInChildren<Collider>());
     }
 
-    public void UpdateWithInput(CameraInput input) {
+    public void UpdateWithInput(CameraInput input, bool debug = false) {
         if (Camera == null) return;
+        if (debug) {
+            Debug.Log("entering debug");
+        }
         CameraState camState = input.cameraState;
         currentAttractor = null;
 
@@ -675,6 +678,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         }
 
         Debug.DrawRay(transform.position, 100f * transform.forward, Color.yellow);
+        // Debug.DrawLine(transform.position, _currentFollowPosition, Color.magenta);
+        // Debug.Log($"{input.targetPosition} {_currentFollowPosition} {FollowPointFraming}");
+        // Debug.Log(input);
     }
 
     public CursorData GetTargetData(Vector2 cursorPosition, InputMode inputMode) {
@@ -911,7 +917,14 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         }
 
     }
-
+    public IEnumerator DoZoom(float targetOrthographicSize, float duration) {
+        return Toolbox.Ease(null, duration, Camera.orthographicSize, targetOrthographicSize, PennerDoubleAnimation.Linear, (amount) => {
+            Camera.orthographicSize = amount;
+            zoomCoefficient = amount / 9f;
+            zoomCoefficientTarget = zoomCoefficient;
+            currentOrthographicSize = amount;
+        }, unscaledTime: true);
+    }
     public static IEnumerator DoShake(float intensity, float lifetime) {
         float timer = 0;
         shakeJitter = intensity;

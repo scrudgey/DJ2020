@@ -8,9 +8,8 @@ namespace Items {
         public GrenadeData grenadeData;
         public GrenadeItem(GrenadeData grenadeData) : base(grenadeData) {
             this.grenadeData = grenadeData;
-            count = 3;
-            maxCount = 3;
-            consumable = true;
+            maxCount = GameManager.I.gameData.playerState.PerkNumberOfExplosives() + 1;
+            count = maxCount;
         }
         protected override ItemUseResult DoUse(ItemHandler handler, PlayerInput input) {
             base.DoUse(handler, input);

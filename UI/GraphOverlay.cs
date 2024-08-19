@@ -312,6 +312,17 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
             SetEdgeState(neighborEdge);
         }
     }
+
+
+    public V GetIndicator(string nodeTitle) {
+        foreach (KeyValuePair<U, V> kvp in indicators) {
+            // Debug.Log($"{kvp.Key.nodeTitle}");
+            if (kvp.Key.nodeTitle == nodeTitle) {
+                return kvp.Value;
+            }
+        }
+        return null;
+    }
 }
 
 

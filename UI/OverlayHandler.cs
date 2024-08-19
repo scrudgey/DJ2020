@@ -35,7 +35,7 @@ public class OverlayHandler : MonoBehaviour {
     [Header("details")]
     public AudioSource audioSource;
     public INodeCameraProvider selectedNode;
-    public INodeCameraProvider mouseOverNode;
+    public INodeCameraProvider mousedOverNode;
     public CyberNodeInfoPaneDisplay cyberInfoPaneDisplay;
     public PowerNodeInfoDisplay powerInfoPaneDisplay;
     public AlarmNodeInfoDisplay alarmInfoPaneDisplay;
@@ -51,6 +51,10 @@ public class OverlayHandler : MonoBehaviour {
     public NeoCyberNodeIndicator selectedCyberNodeIndicator;
     public AlarmNodeIndicator selectedAlarmNodeIndicator;
     public PowerNodeIndicator selectedPowerNodeIndicator;
+
+    public NeoCyberNodeIndicator mousedOverCyberNodeIndicator;
+    public AlarmNodeIndicator mousedOverAlarmNodeIndicator;
+    public PowerNodeIndicator mousedOverPowerNodeIndicator;
     [Header("sound effects")]
     public AudioClip[] mouseOverSound;
     public AudioClip[] nodeSelectSound;
@@ -112,28 +116,45 @@ public class OverlayHandler : MonoBehaviour {
     public void RefreshPowerGraph(PowerGraph graph) {
         powerOverlay.cam = cam;
         powerOverlay.Refresh(graph);
-        if (selectedPowerNodeIndicator != null)
-            powerInfoPaneDisplay.Configure(selectedPowerNodeIndicator, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
+        RefreshPowerInfoDisplays();
         SetDiscoveryText(GameManager.I.gameData.levelState.delta.powerGraph);
+    }
+    public void RefreshPowerInfoDisplays() {
+        if (selectedPowerNodeIndicator != null) {
+            powerInfoPaneDisplay.Configure(selectedPowerNodeIndicator, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
+        } else if (mousedOverPowerNodeIndicator != null) {
+            powerInfoPaneDisplay.Configure(mousedOverPowerNodeIndicator, GameManager.I.gameData.levelState.delta.powerGraph, powerOverlay);
+        }
     }
     public void RefreshCyberGraph(CyberGraph graph) {
         cyberOverlay.cam = cam;
         UpdateHackPath();
         cyberOverlay.Refresh(graph);
         cyberOverlay.RefreshHackTerminal();
+        RefreshCyberInfoDisplays();
+        // HandleCyberDeckChange(selectedCyberNodeIndicator);
+        SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
+    }
+    public void RefreshCyberInfoDisplays() {
         if (selectedCyberNodeIndicator != null) {
             cyberdeckController.Refresh(selectedCyberNodeIndicator);
             cyberInfoPaneDisplay.Configure(selectedCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
+        } else if (mousedOverCyberNodeIndicator != null) {
+            cyberInfoPaneDisplay.Configure(mousedOverCyberNodeIndicator, GameManager.I.gameData.levelState.delta.cyberGraph, cyberOverlay);
         }
-        HandleCyberDeckChange(selectedCyberNodeIndicator);
-        SetDiscoveryText(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
     public void RefreshAlarmGraph(AlarmGraph graph) {
         alarmOverlay.cam = cam;
         alarmOverlay.Refresh(graph);
-        if (selectedAlarmNodeIndicator != null)
-            alarmInfoPaneDisplay.Configure(selectedAlarmNodeIndicator, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
+        RefreshAlarmInfoDisplays();
         SetDiscoveryText(GameManager.I.gameData.levelState.delta.alarmGraph);
+    }
+    public void RefreshAlarmInfoDisplays() {
+        if (selectedAlarmNodeIndicator != null) {
+            alarmInfoPaneDisplay.Configure(selectedAlarmNodeIndicator, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
+        } else if (mousedOverAlarmNodeIndicator != null) {
+            alarmInfoPaneDisplay.Configure(mousedOverAlarmNodeIndicator, GameManager.I.gameData.levelState.delta.alarmGraph, alarmOverlay);
+        }
     }
     public void HandleOverlayChange(OverlayType type, bool enabled) {
         selectedAlarmNodeIndicator = null;
@@ -274,39 +295,53 @@ public class OverlayHandler : MonoBehaviour {
         if (selectedNode != indicator) {
             Toolbox.RandomizeOneShot(audioSource, nodeSelectSound);
         }
-        SetSelectedNode(indicator);
+        SetSelectedNode(indicator); // sets node and notifies clearsighter
         selectionIndicator.ActivateSelection(indicator);
         mouseOverIndicator.HideSelection();
-        cyberOverlay.NeighborButtonMouseExit();
-        powerOverlay.NeighborButtonMouseExit();
-        alarmOverlay.NeighborButtonMouseExit();
-        RectTransform infoPane = null;
         switch (indicator) {
             case NeoCyberNodeIndicator cybernode:
                 selectedCyberNodeIndicator = cybernode;
                 if (GameManager.I.playerManualHacker.deployed && GameManager.I.playerManualHacker.targetNode == null) {
                     GameManager.I.playerManualHacker.Connect(cybernode.node);
                 }
-                infoPane = cyberNodeInfoRect;
                 RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
                 break;
             case PowerNodeIndicator powernode:
                 selectedPowerNodeIndicator = powernode;
-                infoPane = powerNodeInfoRect;
                 RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
                 break;
             case AlarmNodeIndicator alarmnode:
                 selectedAlarmNodeIndicator = alarmnode;
-                infoPane = alarmNodeInfoRect;
                 RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
                 break;
         }
+        ShowInfoPaneForIndicator(indicator);
+        CutsceneManager.I.HandleTrigger($"node_select_{indicator.node.nodeTitle}");
+    }
+
+    void ShowInfoPaneForIndicator<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
+        RectTransform infoPane = null;
+        switch (indicator) {
+            case NeoCyberNodeIndicator cybernode:
+                infoPane = cyberNodeInfoRect;
+                break;
+            case PowerNodeIndicator powernode:
+                infoPane = powerNodeInfoRect;
+                break;
+            case AlarmNodeIndicator alarmnode:
+                infoPane = alarmNodeInfoRect;
+                break;
+            default:
+                infoPane = null;
+                break;
+        }
+        Debug.Log($"show info pane: {infoPane} {activeInfoPane}");
         if (infoPane != activeInfoPane) {
             ShowInfoPane(infoPane);
             activeInfoPane = infoPane;
         }
-        CutsceneManager.I.HandleTrigger($"node_select_{indicator.node.nodeTitle}");
     }
+
     public void HackOriginSelectCallback(NeoCyberNodeIndicator newOrigin) {
         if (newOrigin == selectedHackOrigin) return;
         if (selectedHackOrigin != null) {
@@ -334,25 +369,55 @@ public class OverlayHandler : MonoBehaviour {
         }
     }
 
-    void HandleCyberDeckChange(NeoCyberNodeIndicator cyberIndicator) {
-        if (cyberIndicator == null) {
-            MaybeHideCyberdeck();
-        } else {
-            CyberNode node = cyberIndicator.node;
-            MaybeHideCyberdeck();
-        }
-    }
-    void MaybeHideCyberdeck() {
-        if (GameManager.I.gameData.levelState.delta.cyberGraph.ActiveNetworkActions().Count > 0) {
-            cyberdeckController.ShowOnlyProgress();
-        } else {
-            cyberdeckController.Hide();
-        }
-    }
+    // void HandleCyberDeckChange(NeoCyberNodeIndicator cyberIndicator) {
+    //     if (cyberIndicator == null) {
+    //         // MaybeHideCyberdeck();
+    //     } else {
+    //         // CyberNode node = cyberIndicator.node;
+    //         // MaybeHideCyberdeck();
+    //     }
+    // }
+    // void MaybeHideCyberdeck() {
+    //     if (GameManager.I.gameData.levelState.delta.cyberGraph.ActiveNetworkActions().Count > 0) {
+    //         cyberdeckController.ShowOnlyProgress();
+    //     } else {
+    //         cyberdeckController.Hide();
+    //     }
+    // }
     public void NodeMouseOverCallback<T, U>(NodeIndicator<T, U> indicator) where T : Node<T> where U : Graph<T, U> {
+        mousedOverNode = indicator;
+
+        cyberOverlay.NeighborButtonMouseExit();
+        powerOverlay.NeighborButtonMouseExit();
+        alarmOverlay.NeighborButtonMouseExit();
+
         if (indicator != selectedNode && indicator != selectedHackOrigin) {
             mouseOverIndicator.ActivateSelection(indicator);
             Toolbox.RandomizeOneShot(audioSource, mouseOverSound);
+        }
+
+        mousedOverAlarmNodeIndicator = null;
+        mousedOverCyberNodeIndicator = null;
+        mousedOverPowerNodeIndicator = null;
+        if (selectedNode == null) {
+            switch (indicator) {
+                case NeoCyberNodeIndicator cybernode:
+                    mousedOverCyberNodeIndicator = cybernode;
+                    // RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
+                    RefreshCyberInfoDisplays();
+                    break;
+                case PowerNodeIndicator powernode:
+                    mousedOverPowerNodeIndicator = powernode;
+                    // RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
+                    RefreshPowerInfoDisplays();
+                    break;
+                case AlarmNodeIndicator alarmnode:
+                    mousedOverAlarmNodeIndicator = alarmnode;
+                    RefreshAlarmInfoDisplays();
+                    // RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
+                    break;
+            }
+            ShowInfoPaneForIndicator(indicator);
         }
     }
 
@@ -361,8 +426,13 @@ public class OverlayHandler : MonoBehaviour {
         OnSelectedNodeChange?.Invoke(selected);
     }
     public void NodeMouseExitCallback() {
-        mouseOverNode = null;
         mouseOverIndicator.HideSelection();
+        mousedOverAlarmNodeIndicator = null;
+        mousedOverCyberNodeIndicator = null;
+        mousedOverPowerNodeIndicator = null;
+        if (selectedNode == null) {
+            ShowInfoPane(null);
+        }
     }
     public void InfoPaneDoneButtonCallback() {
         ShowInfoPane(null);
@@ -402,6 +472,7 @@ public class OverlayHandler : MonoBehaviour {
         } else if (infoPane != null) {
             showInfoRoutine = StartCoroutine(EaseInInfoPane(true, infoPane));
         }
+        activeInfoPane = infoPane;
     }
 
     IEnumerator EaseInInfoPane(bool value, RectTransform infoPaneRect) {

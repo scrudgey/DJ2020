@@ -128,6 +128,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             foreach (NetworkAction action in completedActions) {
                 actions.Remove(action);
                 NetworkActionComplete?.Invoke(action);
+                CutsceneManager.I.HandleTrigger($"software_complete_{action.softwareTemplate.name}");
             }
         }
 
@@ -261,6 +262,7 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
         if (discoverFile && !node.datafileVisibility) {
             value = true;
             node.datafileVisibility = true;
+            CutsceneManager.I.HandleTrigger($"file_discover_{node.payData.filename}");
         }
         return value;
     }

@@ -84,11 +84,10 @@ public class LevelBootstrapper : MonoBehaviour {
         PlayerState playerState = PlayerState.DefaultState();
 
         playerState.allItems = new List<ItemTemplate> {
-
+            ItemTemplate.LoadItem("fence_cutters")
         };
         playerState.softwareTemplates = new List<SoftwareScriptableTemplate>{
             SoftwareScriptableTemplate.Load("scan"),
-            SoftwareScriptableTemplate.Load("crack"),
             SoftwareScriptableTemplate.Load("exploit"),
             SoftwareScriptableTemplate.Load("scanData"),
         }.Select(template => template.ToTemplate()).ToList();

@@ -27,28 +27,17 @@ public class CyberdeckUIController : MonoBehaviour {
     OverlayHandler handler;
     CyberGraph graph;
     void Start() {
-        // shown = false;
         state = State.hidden;
-        // ShowHideRect(false);
     }
     public void Initialize(OverlayHandler handler, CyberGraph graph) {
         this.handler = handler;
         this.graph = graph;
         PopulateSoftwareButtons();
         PopulateHackIndicators(new Dictionary<CyberNode, List<NetworkAction>>());
-        // graph.NetworkActionsChanged += HandleNetworkActionChange;
-        // graph.NetworkActionUpdate += HandleNetworkActionUpdate;
-    }
-    void OnDestroy() {
-        // graph.NetworkActionsChanged -= HandleNetworkActionChange;
-        // graph.NetworkActionUpdate -= HandleNetworkActionUpdate;
     }
     public void Refresh(NeoCyberNodeIndicator indicator) {
         this.indicator = indicator;
         if (indicator == null) return;
-        // foreach (SoftwareButton button in buttons.Concat(builtInButtons)) {
-        //     button.Configure(indicator.node, graph);
-        // }
     }
 
     public void Show() {

@@ -8,19 +8,16 @@ namespace Items {
     public class ItemInstance {
         [JsonConverter(typeof(ScriptableObjectJsonConverter<ItemTemplate>))]
         public ItemTemplate template;
-        protected bool consumable;
-        public bool toggleable;
-        public bool subweapon;
         public int count = 1;
-        public int maxCount = 1;
-
-
+        public int maxCount;
         public ItemInstance(ItemTemplate template) {
             this.template = template;
+            count = template.maxCount;
+            maxCount = template.maxCount;
         }
         public ItemUseResult Use(ItemHandler handler, PlayerInput input) {
             if (count > 0) {
-                if (consumable) {
+                if (template.consumable) {
                     count -= 1;
                 }
                 return DoUse(handler, input);
@@ -30,8 +27,6 @@ namespace Items {
         }
 
         protected virtual ItemUseResult DoUse(ItemHandler handler, PlayerInput input) => ItemUseResult.Empty();
-        public virtual bool EnablesManualHack() => false;
-        public virtual bool EnablesBurglary() => false;
         public static ItemInstance FactoryLoad(ItemTemplate baseItem) {
             if (baseItem == null) return null;
             return baseItem switch {
@@ -39,6 +34,7 @@ namespace Items {
                 RocketLauncherData rocketData => new RocketLauncherItem(rocketData),
                 C4Data c4Data => new C4(c4Data),
                 IRGoggleData goggles => new IRGoggles(goggles),
+                FenceCutterTemplate fenceCutterTemplate => new FenceCutterItem(fenceCutterTemplate),
                 ItemTemplate itemData => itemData.shortName switch {
                     "deck" => new CyberDeck(itemData),
                     "tools" => new BurglarTools(itemData),

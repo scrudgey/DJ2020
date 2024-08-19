@@ -284,7 +284,7 @@ public class Toolbox {
             source.outputAudioMixerGroup = sfxMixer.FindMatchingGroups("General")[0];
         }
         source.rolloffMode = AudioRolloffMode.Logarithmic;
-        source.minDistance = 0.1f;
+        source.minDistance = 0.75f;
         source.maxDistance = 23f;
         source.spatialBlend = 1f;
         source.spread = 0.2f;
@@ -1256,6 +1256,13 @@ public class Toolbox {
             "y" => localPoint.y > 0 ? new Vector3(localPoint.x, bounds.extents.y, localPoint.z) : new Vector3(localPoint.x, -bounds.extents.y, localPoint.z),
             "z" => localPoint.z > 0 ? new Vector3(localPoint.x, localPoint.y, bounds.extents.z) : new Vector3(localPoint.x, localPoint.y, -bounds.extents.z)
         };
+    }
+
+    public static float DecayingSin(float t, float tau, float freq) {
+        return Mathf.Sin(t * freq) * Mathf.Exp((-1f * t) / tau);
+    }
+    public static float DecayingCos(float t, float tau, float freq) {
+        return Mathf.Cos(t * freq) * Mathf.Exp((-1f * t) / tau);
     }
 }
 

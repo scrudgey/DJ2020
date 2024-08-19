@@ -74,6 +74,10 @@ public class Skin {
     public Octet<Sprite[]> swordHolster = new Octet<Sprite[]>();
     public Octet<Sprite[]> swordSwing = new Octet<Sprite[]>();
 
+    // fence cutter
+    public Octet<Sprite[]> fenceCutterIdle = new Octet<Sprite[]>();
+    public Octet<Sprite[]> fenceCutterCut = new Octet<Sprite[]>();
+
     // skeleton
     public Octet<Sprite[]> skeletonSprites = new Octet<Sprite[]>();
 
@@ -241,6 +245,8 @@ public class Skin {
         Sprite[] rifleSprites = loadSprites(name, "rifle");
 
         Sprite[] swordSprites = loadSprites(name, "Sword");
+
+        Sprite[] fenceCutterSprites = loadSprites(name, "Fence-cutter");
 
         Sprite[] headSprites = loadSprites(name, "head");
 
@@ -573,6 +579,20 @@ public class Skin {
             skin.swordSwing[Direction.up] = new Sprite[] { swordSprites[38], swordSprites[39], swordSprites[29] };
         }
 
+        if (name == "Jack") {
+            skin.fenceCutterIdle[Direction.down] = new Sprite[] { fenceCutterSprites[0] };
+            skin.fenceCutterIdle[Direction.rightDown] = new Sprite[] { fenceCutterSprites[3] };
+            skin.fenceCutterIdle[Direction.right] = new Sprite[] { fenceCutterSprites[6] };
+            skin.fenceCutterIdle[Direction.rightUp] = new Sprite[] { fenceCutterSprites[9] };
+            skin.fenceCutterIdle[Direction.up] = new Sprite[] { fenceCutterSprites[10] }; // TODO
+
+            skin.fenceCutterCut[Direction.down] = new Sprite[] { fenceCutterSprites[1], fenceCutterSprites[2] };
+            skin.fenceCutterCut[Direction.rightDown] = new Sprite[] { fenceCutterSprites[4], fenceCutterSprites[5] };
+            skin.fenceCutterCut[Direction.right] = new Sprite[] { fenceCutterSprites[7], fenceCutterSprites[8] };
+            skin.fenceCutterCut[Direction.rightUp] = new Sprite[] { fenceCutterSprites[9] }; // TODO
+            skin.fenceCutterCut[Direction.up] = new Sprite[] { fenceCutterSprites[11], fenceCutterSprites[12] }; // TODO
+        }
+
         // data
         skin.unarmedSpriteData = torsoSpriteData.ToArray();
         skin.pistolSpriteData = pistolSpriteData.ToArray();
@@ -591,6 +611,7 @@ public class Skin {
             skin.shotgunSpriteData = shotgunSpriteData.ToArray();
             skin.swordSpriteData = swordSpriteData.ToArray();
             AddSpriteDataToDictionary(skin, swordSpriteData, "Sword");
+            AddSpriteDataToDictionary(skin, swordSpriteData, "Fence-cutter");
         }
 
         return skin;
@@ -656,9 +677,19 @@ public class Skin {
             return unarmedHandsUp;
         } else if (input.wavingArm) {
             return unarmedUse;
-        } else if (input.activeItem != null && input.activeItem is RocketLauncherItem) {
-            return unarmedUse;
+        } else if (input.itemInput.activeItem != null) {
+            if (input.itemInput.activeItem is RocketLauncherItem) {
+                return unarmedUse;
+            } else if (input.itemInput.activeItem is FenceCutterItem) {
+                switch (input.itemInput.state) {
+                    case ItemHandler.State.idle:
+                        return fenceCutterIdle;
+                    case ItemHandler.State.inUse:
+                        return fenceCutterCut;
+                }
+            }
         }
+
         // gun states
         if (input.gunInput.gunType == GunType.sword || input.gunInput.fromGunType == GunType.sword) {
             switch (input.gunInput.gunState) {

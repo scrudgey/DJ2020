@@ -172,10 +172,11 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
 
 
         List<ItemTemplate> allItems = new List<ItemTemplate> {
+            ItemTemplate.LoadItem("fence_cutters"),
             ItemTemplate.LoadItem("C4"),
             ItemTemplate.LoadItem("rocket"),
             ItemTemplate.LoadItem("goggles"),
-            ItemTemplate.LoadItem("grenade"),
+            // ItemTemplate.LoadItem("grenade"),
             // ItemTemplate.LoadItem("deck"),
         };
 

@@ -569,7 +569,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     _inputTorque = Vector3.zero;
                 }
 
-                ItemUseResult itemresult = itemHandler.SetInputs(input);
+                ItemUseResult itemresult = itemHandler?.SetInputs(input);
                 HandleItemUseResult(itemresult);
 
                 if (input.Fire.AimPressed) {
@@ -597,9 +597,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                         playerInput = input,
                         activeItem = itemHandler?.activeItem
                     };
-                    burglar?.SetInputs(manualHackInput);
-
-                    // bool gunHolstered = gunHandler.HasGun();
                     bool gunHolstered = gunHandler?.gunInstance == null;
                     if (interactor != null) {
                         ItemUseResult interactorResult = interactor.SetInputs(input, gunHolstered);
@@ -1749,6 +1746,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             gunAnimationInput = meleeHandler.BuildAnimationInput();
         }
 
+        AnimationInput.ItemHandlerInput itemHandlerInput = AnimationInput.ItemHandlerInput.None();
+        if (itemHandler != null) {
+            itemHandlerInput = itemHandler.BuildAnimationInput();
+        }
+
         return new AnimationInput {
             orientation = Toolbox.DirectionFromAngle(angle),
             isMoving = isMoving(),
@@ -1761,6 +1763,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             state = state,
             playerInputs = _lastInput,
             gunInput = gunAnimationInput,
+            itemInput = itemHandlerInput,
             camDir = camDir,
             cameraRotation = OrbitCamera.transform.rotation,
             lookAtDirection = lookAtDirection,
@@ -1769,7 +1772,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             hitState = hitState,
             velocity = Motor.Velocity,
             wavingArm = waveArmTimer > 0f,
-            activeItem = itemHandler?.activeItem,
             isSpeaking = speechTextController?.IsSpeaking() ?? false,
             armsRaised = armsRaised,
             lightProbeColor = lightLevelProbe?.currentSpriteColor ?? Color.white

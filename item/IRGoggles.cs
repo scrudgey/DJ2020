@@ -9,7 +9,6 @@ namespace Items {
         public IRGoggleData goggleData;
         public IRGoggles(IRGoggleData baseItem) : base(baseItem) {
             this.goggleData = baseItem;
-            toggleable = true;
         }
     }
 }

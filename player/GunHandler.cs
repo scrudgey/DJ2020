@@ -39,7 +39,6 @@ public class GunHandler : MonoBehaviour, IBindable<GunHandler>, IInputReceiver, 
     public bool nonAnimatedReload;
     public GameObject tamperEvidenceObject;
     public AudioClip[] reachForHolsterSound;
-    // int numberOfShellsPerReload;
     public bool isSwitchingWeapon;
     GunType fromGunType;
     GunType toGunType;

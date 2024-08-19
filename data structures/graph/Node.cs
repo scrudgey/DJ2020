@@ -12,6 +12,7 @@ public class Node<U> : IMarkerProvider where U : Node<U> {
     public string nodeTitle;
     public bool enabled;
     public Vector3 position;
+    public Vector3 anchorPosition;
     public NodeVisibility visibility;
     public EdgeVisibility minimumEdgeVisibility;
     public NodeVisibility minimumNodeVisibility;

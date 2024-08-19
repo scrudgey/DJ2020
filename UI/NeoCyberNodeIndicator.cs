@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Easings;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -36,6 +37,9 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     public GameObject hackButton;
     public GameObject hackOriginIndicator;
     public GameObject stopHackButton;
+    public RectTransform circle;
+    public Image circleImage;
+    Coroutine circleRoutine;
     void Start() {
         SetHackOrigin(false);
         hackButton.SetActive(false);
@@ -66,7 +70,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         }
     }
     public override void SetGraphicalState(CyberNode node) {
-        if (node.visibility == NodeVisibility.mystery) {
+        if (node.GetVisibility() == NodeVisibility.mystery) {
             SetMysteryState(node);
             return;
         }
@@ -90,34 +94,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         outlineImage.color = nodeColor;
         lockWidget.gameObject.SetActive(false);
         dataWidget.gameObject.SetActive(false);
-        // lockWidget2.SetActive(node.lockLevel > 0);
         lockWidget2.SetActive(false);
-
-        // if (overlayHandler.selectedCyberNodeIndicator != null &&
-        //     nodeStatus == CyberNodeStatus.compromised &&
-        //     overlayHandler.selectedHackOrigin != this &&
-        //     overlayHandler.selectedCyberNodeIndicator != this) {
-        //     List<CyberNode> path = graph.GetPath(node, overlayHandler.selectedCyberNodeIndicator.node);
-        //     if (path.Count <= 3) {
-        //         hackButton.SetActive(true);
-        //     } else hackButton.SetActive(false);
-        // } else {
-        //     hackButton.SetActive(false);
-        // }
-
-        // lockWidget.SetColor(nodeColor);
-        // dataWidget.SetColor(nodeColor);
-
-        // lockWidget.gameObject.SetActive(node.lockLevel > 0);
-        // if (node.lockLevel > 0) {
-        //     lockWidget.SetLockLevel(node.lockLevel);
-        // }
-
-        // if (node.type == CyberNodeType.datanode) {
-        //     dataWidget.gameObject.SetActive(!node.dataStolen);
-        // } else {
-        //     dataWidget.gameObject.SetActive(false);
-        // }
 
         SetNetworkActionProgress();
     }
@@ -191,14 +168,24 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         progressBarRect.sizeDelta = new Vector2(width, 50f);
     }
     public void SetHackOrigin(bool value) {
-        hackOriginIndicator.SetActive(value);
-        // hackButton.SetActive(!value);
-        // stopHackButton.SetActive(value);
+        if (value) {
+            ShowCircle();
+        } else {
+            HideCircle();
+        }
     }
-    // public void HackButtonCallback() {
-    //     overlayHandler.HackOriginSelectCallback(this);
-    // }
-    // public void StophackButtonCallback() {
-    //     overlayHandler.HackOriginSelectCallback(null);
-    // }
+    void ShowCircle() {
+        circleImage.enabled = true;
+        Color color = circleImage.color;
+        circleRoutine = StartCoroutine(Toolbox.Ease(null, 1f, 0f, 1f, PennerDoubleAnimation.Linear, (amount) => {
+            circle.localScale = amount * Vector3.one;
+            circleImage.color = new Color(color.r, color.g, color.b, 1f - amount);
+        }, unscaledTime: true, looping: true));
+    }
+    void HideCircle() {
+        if (circleRoutine != null) {
+            StopCoroutine(circleRoutine);
+        }
+        circleImage.enabled = false;
+    }
 }

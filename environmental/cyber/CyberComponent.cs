@@ -6,6 +6,11 @@ public class CyberComponent : GraphNodeComponent<CyberComponent, CyberNode> {
     public CyberNodeType nodeType;
     public int lockLevel;
     public Action OnDestroyCallback;
+
+    public bool setPaydata;
+    public PayData payData;
+
+    public ObjectiveData objective;
     public override CyberNode NewNode() {
         CyberNode node = base.NewNode();
         node.type = nodeType;

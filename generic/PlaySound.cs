@@ -18,21 +18,23 @@ public class PlaySound : MonoBehaviour {
     public float randomPitchWidth = 0.2f;
     private int currentNumberOfParticles;
     public bool jukebox;
-    private void Play() {
+    public void Play() {
         if (cooldownTimer > 0)
             return;
         if (Random.Range(0, 1f) < probability) {
-            if (jukebox) {
-                Toolbox.AudioSpeaker(transform.position, sounds, volume: volume);
-            } else {
-                Toolbox.RandomizeOneShot(audioSource, sounds, randomPitchWidth: randomPitchWidth);
-
-            }
+            DoPlay();
             if (repeat == RepeatType.once) {
                 Destroy(this);
             } else if (repeat == RepeatType.cooldown) {
                 cooldownTimer = cooldownInterval;
             }
+        }
+    }
+    public void DoPlay() {
+        if (jukebox) {
+            Toolbox.AudioSpeaker(transform.position, sounds, volume: volume);
+        } else {
+            Toolbox.RandomizeOneShot(audioSource, sounds, randomPitchWidth: randomPitchWidth);
         }
     }
 

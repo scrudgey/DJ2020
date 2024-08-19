@@ -6,18 +6,18 @@ using UnityEngine.UI;
 public class NodeUtilityInterfaceDisplay : MonoBehaviour {
     [Header("button")]
     public TextMeshProUGUI titleText;
-    public Button onButton;
-    public TextMeshProUGUI onButtonText;
-    public Button offButton;
-    public TextMeshProUGUI offButtonText;
+    // public Button onButton;
+    // public TextMeshProUGUI onButtonText;
+    // public Button offButton;
+    // public TextMeshProUGUI offButtonText;
     [Header("image")]
-    public Image background;
+    // public Image background;
     public TextMeshProUGUI statusText;
-    [Header("colors")]
-    public Color green;
-    public Color black;
-    public Color backgroundDisabled;
-    public Color backgroundEnabled;
+    // [Header("colors")]
+    // public Color green;
+    // public Color black;
+    // public Color backgroundDisabled;
+    // public Color backgroundEnabled;
     public Color textDisabled;
     public Color textEnabled;
     bool value;
@@ -56,7 +56,7 @@ public class NodeUtilityInterfaceDisplay : MonoBehaviour {
             // offButtonText.color = green;
 
 
-            background.color = backgroundEnabled;
+            // background.color = backgroundEnabled;
             statusText.color = textEnabled;
             statusText.text = "ENABLED";
 
@@ -73,7 +73,7 @@ public class NodeUtilityInterfaceDisplay : MonoBehaviour {
             // offButtonText.color = black;
 
 
-            background.color = backgroundDisabled;
+            // background.color = backgroundDisabled;
             statusText.color = textDisabled;
             statusText.text = "DISABLED";
         }

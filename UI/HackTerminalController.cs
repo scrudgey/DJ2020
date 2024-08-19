@@ -34,11 +34,12 @@ public class HackTerminalController : MonoBehaviour {
     CyberNodeStatus currentCyberNodeStatus;
     NodeVisibility currentNodeVisibility;
     int currentLockLevel;
+    Coroutine showRoutine;
     public void ConfigureHackTerminal(NeoCyberNodeIndicator hackOrigin, NeoCyberNodeIndicator hackTarget, List<CyberNode> path) {
         bool changeDetected = this.hackOrigin != hackOrigin || this.hackTarget != hackTarget;
-        if (changeDetected) {
-            terminalAnimation.Clear();
-        }
+        // if (changeDetected) {
+        //     terminalAnimation.Clear();
+        // }
         this.hackOrigin = hackOrigin;
         this.hackTarget = hackTarget;
         this.path = path;
@@ -71,12 +72,12 @@ public class HackTerminalController : MonoBehaviour {
         }
         if (hackTarget != null) {
             ShowButtons();
-            if (changeDetected) {
-                terminalAnimation.DrawBasicNodePrompt(hackTarget.node);
-            }
+            // if (changeDetected) {
+            //     terminalAnimation.DrawBasicNodePrompt(hackTarget.node);
+            // }
         }
         if (hackOrigin == null && hackTarget == null) {
-            terminalAnimation.Clear();
+            // terminalAnimation.Clear();
             HideButtons();
         }
     }
@@ -104,32 +105,32 @@ public class HackTerminalController : MonoBehaviour {
         isHidden = true;
     }
     void DoShowRoutine(bool value, CyberNode target) {
-        if (gameObject.activeInHierarchy) {
-            if (value) {
-                terminalAnimation.ShowThenPrompt(ShowRect(true), target);
-            } else {
-                showRectRoutine = StartCoroutine(ShowRect(false));
-            }
+        if (value) {
+            // terminalAnimation.ShowThenPrompt(ShowRect(true), target);
+            showRectRoutine = StartCoroutine(ShowRect(true));
+        } else {
+            showRectRoutine = StartCoroutine(ShowRect(false));
         }
     }
 
     IEnumerator ShowRect(bool value) {
         float startValue = rectTransform.rect.height;
-        float finalValue = value ? 365f : 0f;
+        float finalValue = value ? 250f : 0f;
         return Toolbox.Ease(null, 0.25f, startValue, finalValue, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
-            rectTransform.sizeDelta = new Vector2(505f, amount);
+            rectTransform.sizeDelta = new Vector2(350f, amount);
         }, unscaledTime: true);
     }
 
     public void HackButtonCallback() {
         GameManager.I.ShowMenu(MenuType.softwareModal);
+        CutsceneManager.I.HandleTrigger("hack_software_open");
     }
     public void DeploySoftware(SoftwareState state) {
         if (!state.template.infiniteCharges)
             state.charges -= 1;
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
-        terminalAnimation.HandleSoftwareCallback(state);
+        // terminalAnimation.HandleSoftwareCallback(state);
         Toolbox.RandomizeOneShot(audioSource, state.template.deploySounds.ToArray());
     }
 
@@ -149,7 +150,8 @@ public class HackTerminalController : MonoBehaviour {
             path = downloadPath,
         };
         GameManager.I.AddNetworkAction(networkAction);
-        terminalAnimation.HandleDownload(payData);
+        // terminalAnimation.HandleDownload(payData);
+
         // else if (effect.type == SoftwareEffect.Type.download) {
         //     networkAction.title = $"downloading {node.payData.filename}...";
         //     if (node.isManualHackerTarget) {
@@ -159,6 +161,6 @@ public class HackTerminalController : MonoBehaviour {
     }
     public void UtilityButtonCallback() {
         GameManager.I.SetCyberNodeUtilityState(hackTarget.node, false);
-        terminalAnimation.HandleUtility();
+        // terminalAnimation.HandleUtility();
     }
 }

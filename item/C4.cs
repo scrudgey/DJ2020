@@ -9,8 +9,7 @@ namespace Items {
         public C4(C4Data baseItem) : base(baseItem) {
             this.c4Data = baseItem;
             maxCount = GameManager.I.gameData.playerState.PerkNumberOfExplosives();
-            count = GameManager.I.gameData.playerState.PerkNumberOfExplosives();
-            consumable = true;
+            count = maxCount;
         }
         protected override ItemUseResult DoUse(ItemHandler handler, PlayerInput input) {
             base.DoUse(handler, input);

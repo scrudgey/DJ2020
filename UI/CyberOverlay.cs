@@ -175,28 +175,14 @@ public class CyberOverlay : GraphOverlay<CyberGraph, CyberNode, NeoCyberNodeIndi
         RefreshEdgeGraphicState();
     }
 
-
-    // public void DrawThreat(NetworkAction networkAction) {
-    //     if (networkAction.path.ToHashSet().Count > 1) {
-    //         DrawMatchingAntsOnPath(networkAction);
-    //     }
-    // }
-    // public void EraseThreat(NetworkAction networkAction) {
-    //     if (networkAction.path.ToHashSet().Count > 1) {
-    //         EraseMatchingAntsOnPath(networkAction);
-    //         RefreshEdgeGraphicState();
-    //     }
-    // }
     void DrawMarchingAntsForAllActiveActions() {
-
         foreach (NetworkAction action in graph.ActiveNetworkActions()) {
-            // if (action.path.ToHashSet().Count < 2) continue; // no path / path to player cyberdeck
             DrawMatchingAntsOnPath(action);
         }
         if (audioSourceNetworkActions.isPlaying && graph.ActiveNetworkActions().Count == 0) {
             audioSourceNetworkActions.Stop();
         } else if (!audioSourceNetworkActions.isPlaying && graph.ActiveNetworkActions().Count > 0) {
-            Debug.Log("play process sound");
+            // Debug.Log("play process sound");
             audioSourceNetworkActions.clip = networkActionSound[0];
             audioSourceNetworkActions.Play();
         }

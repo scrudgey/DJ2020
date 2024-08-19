@@ -33,6 +33,7 @@ public record ItemUseResult {
     };
 }
 public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
+    public enum State { idle, inUse };
     public Action<ItemHandler> OnValueChanged { get; set; }
     public List<ItemInstance> items = new List<ItemInstance>();
     public int index;
@@ -40,10 +41,15 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
     public AudioSource audioSource;
     public AudioClip[] emptyUse;
     public RocketLauncher rocketLauncher;
+    public GunHandler gunHandler;
+    public CharacterController characterController;
     public readonly float SUSPICION_TIMEOUT = 1.5f;
-
+    Vector3 direction;
+    State state;
     void Awake() {
         audioSource = Toolbox.SetUpAudioSource(gameObject);
+        audioSource.minDistance = 0.5f;
+        audioSource.maxDistance = 1f;
     }
     void Start() {
         OnItemEnter(activeItem);
@@ -77,7 +83,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         }
         if (input.selectItem != null) {
             ItemInstance instance = items.Where(item => item != null).Where(item => item.template == input.selectItem).FirstOrDefault();
-            if (activeItem == instance && instance.toggleable) {
+            if (activeItem == instance && instance.template.toggleable) {
                 ClearItem();
             } else {
                 SwitchToItem(instance);
@@ -120,17 +126,16 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
         return result;
     }
     public void EvictSubweapon() {
-        if (activeItem != null && activeItem.subweapon) {
+        if (activeItem != null && activeItem.template.subweapon) {
             ClearItem();
         }
     }
     void OnItemEnter(ItemInstance item) {
         if (item == null)
             return;
-        // TODO
-        // if (item.subweapon) { 
-        //     gunHandler?.SwitchToGun(-1);
-        // }
+        if (item.template.subweapon) {
+            gunHandler?.Holster();
+        }
         switch (item) {
             case RocketLauncherItem rocketItem:
                 Toolbox.RandomizeOneShot(audioSource, rocketItem.rocketData.deploySound);
@@ -186,5 +191,37 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
                 Physics.IgnoreCollision(myCollider, grenadeCollider, true);
             }
         }
+    }
+    public AnimationInput.ItemHandlerInput BuildAnimationInput() {
+        return new AnimationInput.ItemHandlerInput {
+            activeItem = activeItem,
+            state = state
+        };
+    }
+
+    public void FenceCutterSnip() {
+        state = State.inUse;
+    }
+    public void DoFenceCut() {
+        if (activeItem != null && activeItem is FenceCutterItem) {
+            FenceCutterItem fenceCutter = (FenceCutterItem)activeItem;
+            fenceCutter.PlaySnipSound(this);
+        }
+        Ray ray = new Ray(transform.position, characterController.direction);
+        RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetLayerMask(Layer.def, Layer.obj));
+        Debug.DrawRay(ray.origin, ray.direction, Color.red, 1f);
+        foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
+            if (hit.transform.IsChildOf(transform.root))
+                continue;
+            if (hit.collider.isTrigger)
+                continue;
+            CuttableFence fence = hit.transform.root.GetComponentInChildren<CuttableFence>();
+            if (fence != null) {
+                fence.TakeDamage(25, ray.direction);
+            }
+        }
+    }
+    public void EndFenceCut() {
+        state = State.idle;
     }
 }

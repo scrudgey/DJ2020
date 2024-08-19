@@ -55,17 +55,17 @@ public class Burglar : MonoBehaviour {
 
     void OnTriggerExit(Collider other) => RemoveInteractive(other);
 
-    public void SetInputs(ManualHackInput inputs) {
-        // Debug.Log($"{inputs.playerInput.useItem} {GameManager.I.inputMode}");
-        if (inputs.activeItem?.EnablesBurglary() ?? false) {
-            if (inputs.playerInput.useItem && inputs.activeItem.EnablesBurglary()) {
-                BurgleTargetData data = ActiveTarget();
-                if (data == null) return;
-                characterController.TransitionToState(CharacterState.burgle);
-                GameManager.I.StartBurglar(data);
-            }
-        }
-    }
+    // public void SetInputs(ManualHackInput inputs) {
+    // Debug.Log($"{inputs.playerInput.useItem} {GameManager.I.inputMode}");
+    // if (inputs.activeItem?.EnablesBurglary() ?? false) {
+    //     if (inputs.playerInput.useItem && inputs.activeItem.EnablesBurglary()) {
+    //         BurgleTargetData data = ActiveTarget();
+    //         if (data == null) return;
+    //         characterController.TransitionToState(CharacterState.burgle);
+    //         GameManager.I.StartBurglar(data);
+    //     }
+    // }
+    // }
 
     public List<AttackSurface> GetVulnerableNodes() => cyberComponents
         .ToList()

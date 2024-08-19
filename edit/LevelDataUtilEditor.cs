@@ -249,8 +249,17 @@ public class LevelDataUtilEditor : Editor {
             .Where(component => component.nodeType == CyberNodeType.datanode).ToList();
 
         foreach (ObjectiveData objective in template.AllObjectives().Where(objective => objective is ObjectiveData)) {
-            objective.spawnPointLocations = cyberDataStores.Select(component => component.transform.position).ToList();
-            objective.potentialSpawnPoints = cyberDataStores.Select(component => component.idn).ToList();
+            List<CyberComponent> targetComponents = GameObject.FindObjectsOfType<CyberComponent>()
+                .Where(component => component.nodeType == CyberNodeType.datanode && component.objective == objective).ToList();
+
+            if (targetComponents.Count > 0) {
+                objective.spawnPointLocations = targetComponents.Select(component => component.transform.position).ToList();
+                objective.potentialSpawnPoints = targetComponents.Select(component => component.idn).ToList();
+            } else {
+                objective.spawnPointLocations = cyberDataStores.Select(component => component.transform.position).ToList();
+                objective.potentialSpawnPoints = cyberDataStores.Select(component => component.idn).ToList();
+            }
+
             EditorUtility.SetDirty(objective);
         }
 

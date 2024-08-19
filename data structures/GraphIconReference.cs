@@ -69,7 +69,7 @@ public class GraphIconReference : ScriptableObject {
         if (nodeStatus == CyberNodeStatus.compromised && node.type != CyberNodeType.WAN) {
             return skullAndBonesIcon;
         }
-        if (node.visibility < NodeVisibility.known) {
+        if (node.GetVisibility() < NodeVisibility.known) {
             return mysteryIcon;
         }
         switch (node.type) {
