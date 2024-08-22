@@ -123,6 +123,7 @@ public abstract class GraphOverlay<T, U, V> : MonoBehaviour where T : Graph<U, T
     public abstract void SetEdgeState(LineRenderer renderer, U node1, U node2);
 
     protected void SetLinePositions(LineRenderer renderer, U node1, U node2) {
+        // Debug.Log("here");
         List<Vector3> points;
         if (node1.straightLine || node2.straightLine) {
             points = new List<Vector3>() {

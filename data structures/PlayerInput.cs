@@ -59,6 +59,7 @@ public struct PlayerInput {
     public void ApplyInputMask(InputProfile profile) {
         if (!profile.allowPlayerFireInput) {
             Fire = FireInputs.none;
+            useItem = false;
         }
         if (!profile.allowPlayerMovement) {
             MoveAxisForward = 0;
@@ -72,7 +73,6 @@ public struct PlayerInput {
             reload = false;
             selectgun = 0;
             actionButtonPressed = false;
-            useItem = false;
             moveDirection = Vector3.zero;
             orientTowardPoint = Vector3.zero;
             orientTowardDirection = Vector3.zero;

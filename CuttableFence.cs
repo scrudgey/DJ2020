@@ -56,5 +56,7 @@ public class CuttableFence : MonoBehaviour {
         intactFence.SetActive(false);
         sabotagedFence.SetActive(true);
         Toolbox.AudioSpeaker(transform.position, brokenFenceSound);
+
+        CutsceneManager.I.HandleTrigger($"fence cut {gameObject.name}");
     }
 }

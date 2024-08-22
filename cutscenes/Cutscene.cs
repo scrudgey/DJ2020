@@ -96,8 +96,13 @@ public abstract class Cutscene {
         float timer = 0f;
         Vector3 initialPosition;
         if (state == CameraState.normal) {
+            CutsceneManager.I.playerListener.enabled = true;
+            CutsceneManager.I.cameraListener.enabled = false;
             initialPosition = characterCamera.lastTargetPosition;
         } else {
+
+            CutsceneManager.I.playerListener.enabled = false;
+            CutsceneManager.I.cameraListener.enabled = true;
             initialPosition = characterCamera.transform.position;
         }
         Quaternion initialRotation = characterCamera.transform.rotation;
@@ -184,7 +189,7 @@ public abstract class Cutscene {
         yield return characterCamera.DoZoom(targetOrthographicSize, duration);
     }
 
-    protected IEnumerator MoveCharacter(CharacterController controller, string key, float speedCoefficient = 1f) {
+    protected IEnumerator MoveCharacter(CharacterController controller, string key, float speedCoefficient = 1f, bool crawling = false) {
         ScriptSceneLocation data = CutsceneManager.I.worldLocations[key];
         TaskMoveToKey task = new TaskMoveToKey(controller.transform, "walkToKey", new HashSet<int>(), controller);
         task.speedCoefficient = speedCoefficient;
@@ -195,9 +200,19 @@ public abstract class Cutscene {
         PlayerInput input = PlayerInput.none;
         while (result != TaskState.success) {
             result = task.DoEvaluate(ref input);
+            if (crawling) {
+                input.CrouchDown = true;
+            }
             controller.SetInputs(input);
             yield return null;
         }
+    }
+
+    protected void SelectItem(CharacterController controller) {
+        // PlayerInput input = PlayerInput.none;
+        // input.selectItem = -1;
+        ItemHandler handler = controller.GetComponentInChildren<ItemHandler>();
+        handler.ClearItem();
     }
 
     protected void CharacterLookAt(CharacterController controller, string key) {

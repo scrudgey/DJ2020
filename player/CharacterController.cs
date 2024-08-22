@@ -457,6 +457,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         if (moveInputVector != Vector3.zero) {
             crouchStick = false;
         }
+
         if (input.moveDirection != Vector3.zero) {
             moveInputVector = Vector3.ClampMagnitude(input.moveDirection, 1f);
         } else if (moveInputVector.y != 0 && moveInputVector.x != 0) {

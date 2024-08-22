@@ -297,6 +297,8 @@ public class UIController : MonoBehaviour {
         return routine;
     }
     public void HideCutsceneDialogue() {
+        tutorialText.text = "";
+
         cutsceneDialogueCanvas.enabled = false;
     }
     public void ShowKeyMenu(List<DoorLock> doorLocks) {

@@ -21,15 +21,17 @@ class TutorialCutscene : Cutscene {
 
         mentorObject = CutsceneManager.I.SpawnNPC("mentorSpawn", mentorTemplate);
         mentorController = mentorObject.GetComponent<CharacterController>();
+        SphereRobotAI mentorAI = mentorObject.GetComponent<SphereRobotAI>();
+        mentorAI.enabled = false;
 
-        // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
-        // mentorObject.transform.position = mentorLockpickData.transform.position;
-        // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
-        // mentorObject.SetActive(true);
+        ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
+        mentorObject.transform.position = mentorLockpickData.transform.position;
+        mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
+        mentorObject.SetActive(true);
 
-        yield return FromStartToGreet();
+        // yield return FromStartToGreet();
 
-        yield return GreetHackSequence();
+        // yield return GreetHackSequence();
 
         yield return FenceAndNetworks();
 
@@ -304,19 +306,101 @@ class TutorialCutscene : Cutscene {
         HighlightLocation("lockpick");
         yield return WaitForTrigger("lockpick2");
         yield return WaitForFocus();
+        Time.timeScale = 1;
         yield return RotateIsometricCamera(IsometricOrientation.NE, playerCharacterController.transform.position);
         HideLocationHighlight();
+        yield return new WaitForSecondsRealtime(0.5f);
+        yield return MoveCharacter(playerCharacterController, "lockpick", 0.5f);
+        yield return CameraIsometricZoom(2f, 0.5f);
 
         yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Alright. Did you remember to bring the fence cutters? Time to bring them out.");
         inputProfile = InputProfile.allowNone with {
             allowePlayerItemSelect = true,
+            allowCameraControl = true
         };
         GameManager.I.uiController.ShowTutorialText("Hold X to open inventory menu. Select fence cutters and release X.");
 
-        yield return WaitForTrigger("item_select_fence_cutters");
+        yield return WaitForTrigger("item_select_fence cutters");
+        inputProfile = InputProfile.allowNone;
+        GameManager.I.uiController.HideCutsceneDialogue();
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Perfect. Now cut a hole in this fence big enough for us to crawl through.");
+        inputProfile = InputProfile.allowNone with {
+            allowCameraControl = true,
+            allowPlayerFireInput = true
+        };
+        GameManager.I.uiController.ShowTutorialText("With the fence cutters selected, click on the fence to cut.");
+        yield return WaitForTrigger("fence cut fence_wall");
         inputProfile = InputProfile.allowNone;
 
         GameManager.I.uiController.HideCutsceneDialogue();
+        yield return new WaitForSecondsRealtime(0.5f);
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Let's go. Follow me.");
+        GameManager.I.disablePlayerInput = true;
+        yield return MoveCharacter(mentorController, "crawlpoint1", crawling: true);
+        yield return MoveCharacter(mentorController, "hide1", speedCoefficient: 0.6f);
+        yield return MoveCamera("hide", 1f, CameraState.normal);
+
+        SelectItem(playerCharacterController);
+        yield return MoveCharacter(playerCharacterController, "crawlpoint1", crawling: true);
+        yield return MoveCharacter(playerCharacterController, "hide2", speedCoefficient: 0.6f);
+        GameManager.I.disablePlayerInput = false;
+
+        yield return new WaitForSecondsRealtime(0.75f);
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Okay, careful now. See that camera over there?");
+        yield return MoveCamera("camera", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
+        yield return CameraIsometricZoom(4.5f, 0.5f);
+        yield return new WaitForSecondsRealtime(0.75f);
+
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "It's pointing right at the door we want. If we move in now, they'll spot us right away.");
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Let's scope out the situation a bit. Turn on your alarm network display.");
+
+        GameManager.I.uiController.ShowOverlayControls(true);
+        GameManager.I.uiController.ShowOverlayButtonHighlight(true);
+        yield return WaitForTrigger("overlay_change_3");
+        GameManager.I.uiController.ShowOverlayButtonHighlight(false);
+        yield return new WaitForSecondsRealtime(0.25f);
+        GameManager.I.uiController.SetOverlayButtonInteractible(false);
+        yield return MoveCamera("camera", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
+
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Just as I thought. It's wired right in to the central alarm system. If it spots us, security will be on us quick.");
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "There might be an easy way to take it out. Change your overlay to the power network.");
+        GameManager.I.uiController.SetOverlayButtonInteractible(true);
+        GameManager.I.uiController.ShowOverlayButtonHighlight(true);
+        yield return WaitForTrigger("overlay_change_1");
+        GameManager.I.uiController.ShowOverlayButtonHighlight(false);
+        GameManager.I.uiController.SetOverlayButtonInteractible(false);
+
+        yield return new WaitForSecondsRealtime(0.75f);
+        yield return MoveCamera("powerbox", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "It's getting power from that power relay. Take it out and the camera will shut down. Let's move.");
+
+        yield return LeaveFocus();
+        GameManager.I.uiController.SetOverlayButtonInteractible(true);
+
+        GameManager.I.uiController.ShowStatusBar(false);
+        GameManager.I.uiController.ShowAppearanceInfo(false);
+        GameManager.I.uiController.ShowVisibilityInfo(false);
+
+        HighlightLocation("power");
+
+        CutsceneManager.I.StartCoroutine(MoveCharacter(mentorController, "mentor_power", speedCoefficient: 0.4f));
+        yield return WaitForTrigger("power");
+        inputProfile = InputProfile.allowNone with {
+            allowCameraControl = true
+        };
+        GameManager.I.uiController.ShowTutorialText("Mouse over the power relay and click on the <sprite name=\"screwdriver\"> icon to open the burglar view");
+        HideLocationHighlight();
+
+        yield return WaitForTrigger("burglar_open");
+        inputProfile.allowBurglarInterface = false;
+        yield return new WaitForSecondsRealtime(0.75f);
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Alright. Use your screwdriver to remove those screws.");
+        // GameManager.I.uiController.tutorialBurglarInterrupt = false;
+        inputProfile.allowBurglarInterface = true;
+
+
+
+
 
         // yield return MoveCamera("lockpick", 1.5f, CameraState.normal, zoomInput, PennerDoubleAnimation.ExpoEaseOut);
         // yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Hey Jack, get over here! I need you to open this lock.");
@@ -350,54 +434,6 @@ class TutorialCutscene : Cutscene {
         // Time.timeScale = 1f;
 
 
-        yield return MoveCharacter(mentorController, "hide1", speedCoefficient: 0.4f);
-        yield return MoveCharacter(playerCharacterController, "hide2", speedCoefficient: 0.4f);
-        yield return new WaitForSecondsRealtime(0.75f);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Okay, careful now. See that camera over there?");
-        yield return MoveCamera("camera", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
-        yield return new WaitForSecondsRealtime(0.75f);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "It's pointing right at the door we want. If we move in now, they'll spot us right away.");
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Let's scope out the situation a bit. Turn on your alarm network display.");
-        GameManager.I.uiController.ShowOverlayControls(true);
-        GameManager.I.uiController.ShowOverlayButtonHighlight(true);
-        yield return WaitForTrigger("overlay_change_3");
-        GameManager.I.uiController.ShowOverlayButtonHighlight(false);
-        yield return new WaitForSecondsRealtime(0.25f);
-        GameManager.I.uiController.SetOverlayButtonInteractible(false);
-
-
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Just as I thought. It's wired right in to the central alarm system. If it spots us, security will be on us quick.");
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "There might be an easy way to take it out. Change your overlay to the power network.");
-        GameManager.I.uiController.SetOverlayButtonInteractible(true);
-        GameManager.I.uiController.ShowOverlayButtonHighlight(true);
-        yield return WaitForTrigger("overlay_change_1");
-        GameManager.I.uiController.ShowOverlayButtonHighlight(false);
-        GameManager.I.uiController.SetOverlayButtonInteractible(false);
-
-        yield return new WaitForSecondsRealtime(0.75f);
-        yield return MoveCamera("powerbox", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "It's getting power from that power relay. Take it out and the camera will shut down. Let's move.");
-
-        yield return LeaveFocus();
-        GameManager.I.uiController.SetOverlayButtonInteractible(true);
-
-        GameManager.I.uiController.ShowStatusBar(false);
-        GameManager.I.uiController.ShowAppearanceInfo(false);
-        GameManager.I.uiController.ShowVisibilityInfo(false);
-
-        HighlightLocation("power");
-
-        CutsceneManager.I.StartCoroutine(MoveCharacter(mentorController, "mentor_power", speedCoefficient: 0.4f));
-        yield return WaitForTrigger("power");
-        GameManager.I.uiController.ShowTutorialText("Mouse over the power relay and click on the <sprite name=\"screwdriver\"> icon to open the burglar view");
-        HideLocationHighlight();
-
-        yield return WaitForTrigger("burglar_open");
-        inputProfile.allowBurglarInterface = false;
-        yield return new WaitForSecondsRealtime(0.75f);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("mentor", mentorPortrait, "Alright. Use your screwdriver to remove those screws.");
-        // GameManager.I.uiController.tutorialBurglarInterrupt = false;
-        inputProfile.allowBurglarInterface = true;
     }
 
     void HideBasicUI() {

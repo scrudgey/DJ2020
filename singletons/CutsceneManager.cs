@@ -7,6 +7,8 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     public Dictionary<string, ScriptSceneLocation> worldLocations;
     public Dictionary<string, ScriptSceneCameraPosition> cameraLocations;
     public static Action<string> OnTrigger;
+    public AudioListener cameraListener;
+    public AudioListener playerListener;
     Stack<Cutscene> cutscenesAwaitingFocus = new Stack<Cutscene>();
     Cutscene cutsceneWithFocus;
 
@@ -51,10 +53,10 @@ public class CutsceneManager : Singleton<CutsceneManager> {
             }
 
             GameManager.I.uiController.HideUI();
-            AudioListener cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
-            AudioListener playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
-            playerListener.enabled = false;
-            cameraListener.enabled = true;
+            cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
+            playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
+            // playerListener.enabled = false;
+            // cameraListener.enabled = true;
 
             Time.timeScale = 0;
         } else {

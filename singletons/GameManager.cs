@@ -91,6 +91,7 @@ public partial class GameManager : Singleton<GameManager> {
     public MeleeHandler playerMeleeHandler;
     public ManualHacker playerManualHacker;
     public ItemHandler playerItemHandler;
+    public bool disablePlayerInput;
     float rebuildNavMeshTimer;
     NavMeshData m_NavMesh;
 
@@ -473,7 +474,8 @@ public partial class GameManager : Singleton<GameManager> {
             UpdateReportTickets();
             UpdateGraphs();
             InputProfile inputProfile = CutsceneManager.I.runningCutscene()?.inputProfile ?? InputProfile.allowAll;
-            DoInputs(inputProfile);
+            if (!disablePlayerInput)
+                DoInputs(inputProfile);
         } else {
             if (resetMouseControl) {
                 Cursor.lockState = CursorLockMode.None;
@@ -551,7 +553,6 @@ public partial class GameManager : Singleton<GameManager> {
         PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
         playerInput.ApplyInputMask(inputProfile);
 
-        // TODO: probably a better way of handling this
         if (Time.timeScale > 0) {
 
             if (gameData.levelState != null)

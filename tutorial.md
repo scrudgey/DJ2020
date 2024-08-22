@@ -188,6 +188,8 @@ overlay:
 
 # fence cutter
 
+consistent visibility of UI elements
+
 show disconnect button and indicate for 1 or 2 seconds
 instead of picking lock on fence, use fence cutter
 
@@ -199,8 +201,8 @@ fence cutters:
     * draw fence cutter spritesheet
     * draw fence cutter icon
     * create fence cutter template
-        create sprites for UR
-        regenerate sprite sheet without head
+        * create sprites for UR
+        * regenerate sprite sheet without head
     * selecting fence cutter changes skin to use fence cutter spritesheet
     * sprite data for fence cutter
     * animation for fence cutter
@@ -208,8 +210,9 @@ fence cutters:
     * F activates fence cutter
     * fences have health and take multiple cuts
     * when fence is cut, a gap is opened toward ground
+    * click is item use- all usable items are gun exclusive
 
     tamper evidence is created
     when fence cutters selected, fences are highlightable
     when fence takes damage, a health bar appears
-    click is item use- all usable items are gun exclusive
+    wire up other fences

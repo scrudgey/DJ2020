@@ -111,7 +111,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             CutsceneManager.I.HandleTrigger($"item_select_null");
         }
     }
-    void ClearItem() {
+    public void ClearItem() {
         SwitchToItem(null);
         index = items.IndexOf(null);
     }
@@ -208,7 +208,7 @@ public class ItemHandler : MonoBehaviour, IBindable<ItemHandler> {
             fenceCutter.PlaySnipSound(this);
         }
         Ray ray = new Ray(transform.position, characterController.direction);
-        RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetLayerMask(Layer.def, Layer.obj));
+        RaycastHit[] hits = Physics.RaycastAll(ray, 1f, LayerUtil.GetLayerMask(Layer.bulletPassThrough));
         Debug.DrawRay(ray.origin, ray.direction, Color.red, 1f);
         foreach (RaycastHit hit in hits.OrderBy(h => h.distance)) {
             if (hit.transform.IsChildOf(transform.root))

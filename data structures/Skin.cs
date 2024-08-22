@@ -584,13 +584,13 @@ public class Skin {
             skin.fenceCutterIdle[Direction.rightDown] = new Sprite[] { fenceCutterSprites[3] };
             skin.fenceCutterIdle[Direction.right] = new Sprite[] { fenceCutterSprites[6] };
             skin.fenceCutterIdle[Direction.rightUp] = new Sprite[] { fenceCutterSprites[9] };
-            skin.fenceCutterIdle[Direction.up] = new Sprite[] { fenceCutterSprites[10] }; // TODO
+            skin.fenceCutterIdle[Direction.up] = new Sprite[] { fenceCutterSprites[12] };
 
             skin.fenceCutterCut[Direction.down] = new Sprite[] { fenceCutterSprites[1], fenceCutterSprites[2] };
             skin.fenceCutterCut[Direction.rightDown] = new Sprite[] { fenceCutterSprites[4], fenceCutterSprites[5] };
             skin.fenceCutterCut[Direction.right] = new Sprite[] { fenceCutterSprites[7], fenceCutterSprites[8] };
-            skin.fenceCutterCut[Direction.rightUp] = new Sprite[] { fenceCutterSprites[9] }; // TODO
-            skin.fenceCutterCut[Direction.up] = new Sprite[] { fenceCutterSprites[11], fenceCutterSprites[12] }; // TODO
+            skin.fenceCutterCut[Direction.rightUp] = new Sprite[] { fenceCutterSprites[10], fenceCutterSprites[11] };
+            skin.fenceCutterCut[Direction.up] = new Sprite[] { fenceCutterSprites[13], fenceCutterSprites[14] };
         }
 
         // data
