@@ -13,6 +13,8 @@ public class BurglarCanvasController : MonoBehaviour {
     Mode mode;
     BurgleTargetData data;
     BurglarToolType selectedTool;
+    bool preventCloseButton;
+    bool preventButtons;
     public RectTransform mainCanvas;
     // public RectTransform mainRect;
     public RawImage rawImage;
@@ -43,6 +45,8 @@ public class BurglarCanvasController : MonoBehaviour {
     public WireCutterToolIndicator wireCutterImage;
     [Header("buttons")]
     public GameObject returnCameraButton;
+    public GameObject handToolButton;
+    public GameObject closeButton;
     [Header("tools")]
     public GameObject keyringButton;
     public GameObject probeToolButton;
@@ -116,6 +120,8 @@ public class BurglarCanvasController : MonoBehaviour {
         foreach (Transform child in uiElementsContainer) {
             if (child.name == "panelButton") continue;
             if (child.gameObject == returnCameraButton) continue;
+            if (child.gameObject == handToolButton) continue;
+            if (child.gameObject == closeButton) continue;
             if (child.gameObject == elementHighlight.gameObject) continue;
             Destroy(child.gameObject);
         }
@@ -169,6 +175,8 @@ public class BurglarCanvasController : MonoBehaviour {
         foreach (Transform child in uiElementsContainer) {
             if (child.name == "panelButton") continue;
             if (child.gameObject == returnCameraButton) continue;
+            if (child.gameObject == handToolButton) continue;
+            if (child.gameObject == closeButton) continue;
             if (child.gameObject == elementHighlight.gameObject) continue;
             Destroy(child.gameObject);
         }
@@ -350,8 +358,8 @@ public class BurglarCanvasController : MonoBehaviour {
         }
     }
     public void DoneButtonCallback() {
-
-        CloseBurglar();
+        if (!preventCloseButton)
+            CloseBurglar();
     }
 
     public void ClickHeld(AttackSurfaceElement element) {
@@ -424,7 +432,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 elementHighlightText.enabled = false;
             } else {
                 SetCamera(result.changeCamera);
-                ShowReturnButton();
+                ShowReturnButton(true);
                 ShowCyberDeck(true);
             }
         }
@@ -500,12 +508,14 @@ public class BurglarCanvasController : MonoBehaviour {
         quad.transform.localScale = initialScale;
 
         SetCamera(changeCamera);
-        ShowReturnButton();
+        ShowReturnButton(true);
         ShowCyberDeck(true);
+
+        CutsceneManager.I.HandleTrigger("circuit_view");
     }
 
-    void ShowReturnButton() {
-        returnCameraButton.SetActive(true);
+    public void ShowReturnButton(bool value) {
+        returnCameraButton.SetActive(value);
     }
     public void ReturnButtonCallback() {
         if (selectedTool == BurglarToolType.usb) {
@@ -616,6 +626,9 @@ public class BurglarCanvasController : MonoBehaviour {
         if (selectedToolTextRoutine != null) {
             StopCoroutine(selectedToolTextRoutine);
         }
+        if (preventButtons) {
+            return;
+        }
         if (toolName.ToLower().Contains("none")) {
             selectedToolText.text = "";
         } else {
@@ -626,9 +639,20 @@ public class BurglarCanvasController : MonoBehaviour {
         if (selectedToolTextRoutine != null) {
             StopCoroutine(selectedToolTextRoutine);
         }
+        if (preventButtons) {
+            return;
+        }
         // selectedToolText.text = selectedTool.ToString();
         selectedToolText.text = "";
     }
+
+    public void HandToolButtonCallback() {
+        if (preventButtons) {
+            return;
+        }
+        ToolSelectCallback("none");
+    }
+
     public void ToolSelectCallback(string toolName) {
         if (rejectClickTimeout > 0) return;
         // this is just so that we can properly wire up the buttons in unity editor.
@@ -785,7 +809,7 @@ public class BurglarCanvasController : MonoBehaviour {
                 keycardButton.SetActive(false);
                 break;
         }
-
+        handToolButton.SetActive(selectedTool != BurglarToolType.none);
         CutsceneManager.I.HandleTrigger($"burglartool_{toolType}");
     }
 
@@ -873,5 +897,17 @@ public class BurglarCanvasController : MonoBehaviour {
         }
         Vector2 finalPosition = new Vector3(rect.anchoredPosition.x, endY);
         rect.anchoredPosition = finalPosition;
+    }
+
+    public void PreventClose(bool value) {
+        preventCloseButton = value;
+        closeButton.SetActive(!value);
+    }
+    public void PreventButtons(bool value) {
+        preventButtons = value;
+        if (selectedToolTextRoutine != null) {
+            StopCoroutine(selectedToolTextRoutine);
+        }
+        selectedToolText.text = "";
     }
 }

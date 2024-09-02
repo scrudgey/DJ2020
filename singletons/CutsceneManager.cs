@@ -52,7 +52,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
                 yield return null;
             }
 
-            GameManager.I.uiController.HideUI();
+            GameManager.I.uiController.HideUI(hideKeySelect: false);
             cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
             playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
             // playerListener.enabled = false;

@@ -8,18 +8,30 @@ using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 
 public class IndicatorUIController : MonoBehaviour {
+    public enum Origin { top, bottom }
     public enum Direction { right, up, left, down }
     public Canvas myCanvas;
     public RectTransform[] indicatorRectTransforms;
     Dictionary<RectTransform, Image> indicators;
+    public RectTransform lineRendererTopOrigin;
+    public RectTransform lineRendererBottomOrigin;
     // public Image[] indicators;
     [Header("specifics")]
     public RectTransform dialogueIndicator;
     public RectTransform cyberInfoIndicatorAnchor;
     public RectTransform hackIndicatorAnchor;
     public RectTransform hackButtonIndicator;
+    public RectTransform downloadButtonIndicator;
+    public RectTransform handButtonIndicator;
     public UILineRenderer lineRenderer;
     public RectTransform lineRendererRectTransform;
+    public RectTransform keyMenuIndicator;
+    [Header("burglar positions")]
+    public RectTransform probeIndicator;
+    public RectTransform lockpickIndicator;
+    public RectTransform screwdriverIndicator;
+    public RectTransform wirecuttersIndicator;
+
     Coroutine coroutine;
     Coroutine lineCoroutine;
     // Vector3 offset;
@@ -32,12 +44,12 @@ public class IndicatorUIController : MonoBehaviour {
     void Start() {
         indicators = indicatorRectTransforms.ToDictionary(rect => rect, rect => rect.GetComponentInChildren<Image>());
     }
-    public void DrawLine(RectTransform target, Vector3 offset, UIController uIController) {
+    public void DrawLine(RectTransform target, Vector3 offset, UIController uIController, Origin origin = Origin.top) {
         if (lineCoroutine != null) {
             StopCoroutine(lineCoroutine);
         }
         this.uiController = uIController;
-        lineCoroutine = StartCoroutine(drawLine(target.position + offset));
+        lineCoroutine = StartCoroutine(drawLine(target.position + offset, origin));
     }
     public void ShowIndicators(RectTransform[] targets, Vector3[] offsets, Direction[] directions) {
         HideAllIndicators();
@@ -113,7 +125,13 @@ public class IndicatorUIController : MonoBehaviour {
         }, unscaledTime: true, looping: true);
     }
 
-    IEnumerator drawLine(Vector3 basePosition) {
+    IEnumerator drawLine(Vector3 basePosition, Origin origin) {
+        Vector3 originPosition = origin switch {
+            Origin.bottom => lineRendererBottomOrigin.position,
+            Origin.top => lineRendererTopOrigin.position
+        };
+        lineRendererRectTransform.position = originPosition;
+
         Vector2 lineRendererTarget = basePosition - lineRendererRectTransform.position;
         float distance = lineRendererTarget.magnitude;
         Vector3 direction = lineRendererTarget.normalized;

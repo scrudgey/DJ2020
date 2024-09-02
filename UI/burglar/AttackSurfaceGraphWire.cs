@@ -49,5 +49,6 @@ public class AttackSurfaceGraphWire : AttackSurfaceElement { //, INodeBinder<Pow
         if (isAlarm) {
             GameManager.I.SetAlarmEdgeDisabled(fromId, toId);
         }
+        CutsceneManager.I.HandleTrigger($"wire_cut");
     }
 }

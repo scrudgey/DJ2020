@@ -47,6 +47,19 @@ instruction: click on door to open
 * when door is opened, focus, mentor runs through
 * control camera orientation when moving camera.
 * disable overlay controls after getting right overlay
+    * draw fence cutter spritesheet
+    * draw fence cutter icon
+    * create fence cutter template
+        * create sprites for UR
+        * regenerate sprite sheet without head
+    * selecting fence cutter changes skin to use fence cutter spritesheet
+    * sprite data for fence cutter
+    * animation for fence cutter
+    * connect up item handler - animation - item use
+    * F activates fence cutter
+    * fences have health and take multiple cuts
+    * when fence is cut, a gap is opened toward ground
+    * click is item use- all usable items are gun exclusive
 
 
 set zoom when panning back to character control.
@@ -158,19 +171,71 @@ third person view leading in to any camera moment
     * bttons dont work
     * utility box shows over other
 * fix camera movement
+* instead of picking lock on fence, use fence cutter
 
-arrows appear over the software modal
+# power hacking
+
+* can select tools and do some burglar type stuff even when input disabled
+* disallow closing burglar interface
+* move interrupt control right after triggers to prevent illegal state
+* "camera" position
+* bigger/better hand cursor
+* disable "return button" in cutscene
+* hand tool button
+. hand tool button icon in tutorial text
+* prevent player from walking into camera view
+* better close button
+. can change tools during dialogue
+
+# door hacking
+
+* disable randomizer
+* slip the latch
+
+# interior
+
+* meet up with mentor
+* "okay, we know where the target is. let's go."
+* mentor moves up to lab door
+* if player grabs loot:
+    * mentor: say line about taking something for ourselves
+* if player grabs key:
+    * mentor: good, i'm sure that key will come in handy.
+* player moves up to door
+    * if they have key: move to key tutorial
+    * if they dont have key: 
+* key menu did not show up
+* burglar option showed up
+* too much dialogue
+*  location highlight for lab door
+
+camera movement allowed during dialogue
+prevent using the key menu during dialogue
+prevent using key / burglar while walking up to door
+show status bar / key flying to status bar
+connecting to lab moves the camera to a strange place initially
+
+# laboratory
+
+introduce breaking passwords
+change overlay UI to indicate locks better?
+disappearing central alarm
+first dialogue redundant
+
+move "download" and "utility" to the cyber node info
+make hack display only for software
 
 
 
 
-hack sfx louder
-sfx / fx for exploit success
-characters face the right directions
-    mentor looks at router before pointing it out
-    mentor and player look at building correctly or look around
-dialogue about network view tour
-overlay:
+
+
+
+
+
+overlay polish:
+    sfx / fx for exploit success
+    hack sfx louder
     when mousing over in cyber view, highlight path as dotted line, highlight start and end points, show hops in big number over target node
     hack panel buttons don't make sense grouped with attacker and not on the target
     some text doesn't fit in node info
@@ -182,37 +247,18 @@ overlay:
         no obvious way- but the little "x" button? does that work? escape key?
         cannot walk around when any node selected
         hitting "x" closes display, but leaves cyberdeck attached and hack display active
+burglar polish:
+    better wires
+    "return button" doesn't work because multitool is in the way
 
 
+cutscenes todo:
+    arrows appear over the software modal
+    consistent increasing selection of UI elements
+    show disconnect button and indicate for 1 or 2 seconds
+    fix up graphics for weapon wheel menu
+    characters face the right directions
+        mentor looks at router before pointing it out
+        mentor and player look at building correctly or look around
 
 
-# fence cutter
-
-consistent visibility of UI elements
-
-show disconnect button and indicate for 1 or 2 seconds
-instead of picking lock on fence, use fence cutter
-
-guns and items:
-    only one gun or item allowed out at all times.
-    fix up graphics for quick select menu
-
-fence cutters:
-    * draw fence cutter spritesheet
-    * draw fence cutter icon
-    * create fence cutter template
-        * create sprites for UR
-        * regenerate sprite sheet without head
-    * selecting fence cutter changes skin to use fence cutter spritesheet
-    * sprite data for fence cutter
-    * animation for fence cutter
-    * connect up item handler - animation - item use
-    * F activates fence cutter
-    * fences have health and take multiple cuts
-    * when fence is cut, a gap is opened toward ground
-    * click is item use- all usable items are gun exclusive
-
-    tamper evidence is created
-    when fence cutters selected, fences are highlightable
-    when fence takes damage, a health bar appears
-    wire up other fences

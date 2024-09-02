@@ -236,4 +236,6 @@ public abstract class Cutscene {
             locationHighlight.gameObject.SetActive(false);
         }
     }
+
+
 }

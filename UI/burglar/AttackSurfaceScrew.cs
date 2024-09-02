@@ -31,6 +31,7 @@ public class AttackSurfaceScrew : AttackSurfaceElement {
                 if (totalRotation > ROTATION_LIMIT) {
                     unscrewed = true;
                     uiElement.gameObject.SetActive(false);
+                    CutsceneManager.I.HandleTrigger("unscrew");
                     return BurglarAttackResult.None with {
                         success = true,
                         feedbackText = "Screw removed",

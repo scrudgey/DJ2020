@@ -19,6 +19,7 @@ public class AttackSurfaceLatch : AttackSurfaceElement {
             bool doPush = door.state == Door.DoorState.closed;
             if (doPush) {
                 door.PushOpenSlightly(data.burglar.transform);
+                CutsceneManager.I.HandleTrigger("latch_bypass");
                 return BurglarAttackResult.None with {
                     success = true,
                     feedbackText = "Door latch bypassed"

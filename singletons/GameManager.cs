@@ -209,15 +209,18 @@ public partial class GameManager : Singleton<GameManager> {
             CursorType.pointer => new PointerData() {
                 // mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
                 // hotSpot = new Vector2(8, 8),
-                mouseCursor = Resources.Load("sprites/UI/elements/Cursor32") as Texture2D,
+                // mouseCursor = Resources.Load("sprites/UI/elements/Cursor32") as Texture2D,
+                mouseCursor = Resources.Load("sprites/UI/cursor/pointer_blue") as Texture2D,
                 hotSpot = new Vector2(0, 0),
                 cursorMode = CursorMode.Auto
             },
             CursorType.hand => new PointerData() {
                 // mouseCursor = Resources.Load("sprites/UI/elements/Aimpoint/Cursor/Aimpoint16 5") as Texture2D,
                 // hotSpot = new Vector2(8, 8),
-                mouseCursor = Resources.Load("sprites/UI/elements/Hand") as Texture2D,
+                // mouseCursor = Resources.Load("sprites/UI/elements/Hand") as Texture2D,
+                mouseCursor = Resources.Load("sprites/UI/cursor/hand_blue") as Texture2D,
                 hotSpot = new Vector2(12, 0),
+                // hotSpot = new Vector2(224, 507),
                 cursorMode = CursorMode.Auto
             },
             CursorType.gun => new PointerData {
@@ -652,6 +655,7 @@ public partial class GameManager : Singleton<GameManager> {
         if (transitionCharacter)
             playerCharacterController.TransitionToState(CharacterState.normal);
         TransitionToInputMode(InputMode.gun);
+        CutsceneManager.I.HandleTrigger("burglar_close");
     }
     public void ShowMissionSelectMenu() {
         ShowMenu(MenuType.missionSelect);

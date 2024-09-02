@@ -17,10 +17,11 @@ public class AttackSurfaceUIElement : IBinder<AttackSurfaceElement> {
     public BurgleTargetData data;
     public Image[] buttonImages;
     public UIProgressPip[] progressPips;
-
+    public string elementName;
     public void Initialize(BurglarCanvasController controller, AttackSurfaceElement element) {
         this.controller = controller;
         this.element = element;
+        this.elementName = element.name;
         HideProgress();
         SetPosition();
     }

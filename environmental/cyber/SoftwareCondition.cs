@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using UnityEngine;
 [System.Serializable]
 public class SoftwareCondition {
     public enum Type { nodeType, unlocked, nodeKnown, manualHack, locked, uncompromised, nodeUnknown, fileUnknown, edgesUnknown, anyUnknown }
@@ -22,7 +22,12 @@ public class SoftwareCondition {
             case Type.nodeKnown:
                 return target.visibility > NodeVisibility.mystery;
             case Type.manualHack:
-                return origin?.idn == "cyberdeck" && path.Count <= 1;
+                // Debug.Log($"origin: {origin} path: {path.Count}");
+                // Debug.Log($"{origin.idn}");
+                foreach (CyberNode node in path) {
+                    Debug.Log($"path: {node.idn}");
+                }
+                return origin?.idn == "cyberdeck" && path.Count <= 2;
             case Type.locked:
                 return target.lockLevel > 0;
             case Type.uncompromised:

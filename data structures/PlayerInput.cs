@@ -61,6 +61,9 @@ public struct PlayerInput {
             Fire = FireInputs.none;
             useItem = false;
         }
+        if (!profile.allowBurglarButton) {
+            Fire.cursorData.attackSurface = null;
+        }
         if (!profile.allowPlayerMovement) {
             MoveAxisForward = 0;
             MoveAxisRight = 0;

@@ -4020,6 +4020,11 @@ tune gibbing
 tune destructible wall gibs
 
 
+fence cutters:
+    tamper evidence is created
+    when fence cutters selected, fences are highlightable
+    when fence takes damage, a health bar appears
+    wire up other fences
 
 
 
@@ -4059,15 +4064,20 @@ character view:
     tune how it plays
     items
 
+
+
+
+
+
+
+
+
+
+atlassian
 bonus 20% non neg
 base 250
 rsus 
 total 400
-
-
-
-
-
 Sep 3 - 
 3 interview 5 hr
 1.
@@ -4084,6 +4094,34 @@ systems design- same as before 2x long
 
 3. personal
 
+fool lovers devil
 
 
-the fool the lovers teh devil
+
+
+visa
+lead sys architect
+logistics: hybrid capacity: every tue/wed; every other week tue/wed/thur
+
+~1.5 hour
+2x 45min
+hiring manager
+tech interview
+
+round 2
+2x tech interview (45 minute)
+
+compens. listed base 163k-237k; bonus + equity
+10-12%;
+163k - 237k 237
+equity: 2step proc 
+
+237*1.12 = 265
+let know if offer
+
+new team; hiring 2 openings
+indiaoutsorce
+cmm solutions
+full RTO: foresee no
+
+!4cups chariot knightpentacles

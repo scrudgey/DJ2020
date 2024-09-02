@@ -614,7 +614,10 @@ public class Toolbox {
     }
 
     public static IEnumerator ChainCoroutines(params IEnumerator[] coroutines) {
+        // yield return null;
+
         foreach (IEnumerator coroutine in coroutines) {
+            // Debug.Log("chaining corotuine " + coroutine);
             yield return coroutine;
         }
     }

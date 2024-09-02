@@ -121,7 +121,7 @@ public class UIController : MonoBehaviour {
     public void UpdateWithPlayerInput(ref PlayerInput input, InputProfile inputProfile) {
         burglarCanvasGroup.interactable = inputProfile.allowBurglarInterface;
         // if (tutorialBurglarInterrupt) return;
-        if (burglarCanvas != null && burglarCanvas.enabled)
+        if (burglarCanvas != null && burglarCanvas.enabled && inputProfile.allowBurglarInterface)
             burglarCanvasController?.UpdateWithInput(input);
 
         aimIndicatorHandler.gameObject.SetActive(!input.revealWeaponWheel);
@@ -208,9 +208,10 @@ public class UIController : MonoBehaviour {
     public void HideSoftwareDeployModal() {
         softwareModalController.gameObject.SetActive(false);
     }
-    public void HideUI() {
+    public void HideUI(bool hideKeySelect = true) {
         HideVRStats();
-        keySelectMenu.Hide();
+        if (hideKeySelect)
+            keySelectMenu.Hide();
         if (canvas != null)
             canvas.enabled = false;
         if (gunDisplayCanvas != null)
@@ -291,14 +292,14 @@ public class UIController : MonoBehaviour {
         // Debug.Log("[cutscene] hide cutscene text");
     }
 
-    public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content) {
-        IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content, this);
+    public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content, CutsceneDialogueController.Location location = CutsceneDialogueController.Location.bottom) {
+        IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content, this, location: location);
+        Debug.Log("enabling cutscene dialogue canvas");
         cutsceneDialogueCanvas.enabled = true;
         return routine;
     }
     public void HideCutsceneDialogue() {
         tutorialText.text = "";
-
         cutsceneDialogueCanvas.enabled = false;
     }
     public void ShowKeyMenu(List<DoorLock> doorLocks) {
@@ -361,9 +362,9 @@ public class UIController : MonoBehaviour {
         indicatorCanvas.enabled = true;
         indicatorUIController.ShowIndicators(targets, offsets, directions);
     }
-    public void DrawLine(RectTransform target, Vector3 offset) {
+    public void DrawLine(RectTransform target, Vector3 offset, IndicatorUIController.Origin origin = IndicatorUIController.Origin.top) {
         indicatorCanvas.enabled = true;
-        indicatorUIController.DrawLine(target, offset, this);
+        indicatorUIController.DrawLine(target, offset, this, origin: origin);
     }
     public void HideAllIndicators() {
         indicatorUIController.HideAllIndicators();

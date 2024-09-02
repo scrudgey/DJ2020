@@ -143,6 +143,7 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
             transform.position = Vector3.Lerp(towardCameraPosition, cornerPosition, amount);
         });
         state = State.open;
+        CutsceneManager.I.HandleTrigger("panel_open");
     }
 
     IEnumerator ClosePanelRoutine() {

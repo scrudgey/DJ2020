@@ -235,6 +235,7 @@ public class Door : Interactive {
         } else {
             Vector3 indicatorPosition = GameManager.I.playerPosition + -0.1f * GameManager.I.characterCamera.transform.forward + 1.2f * Vector3.up;
             GameObject obj = PoolManager.I.GetPool(lockIndicatorPrefab).GetObject(indicatorPosition);
+            CutsceneManager.I.HandleTrigger("locked_door");
         }
         return ItemUseResult.Empty() with {
             waveArm = true,

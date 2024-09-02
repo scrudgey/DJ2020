@@ -25,7 +25,7 @@ public class LootObject : Interactive {
             GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(data.lootName));
 
         onCollect?.Invoke();
-
+        CutsceneManager.I.HandleTrigger("got_loot");
         return ItemUseResult.Empty() with {
             crouchDown = crouchDown,
             waveArm = waveArm

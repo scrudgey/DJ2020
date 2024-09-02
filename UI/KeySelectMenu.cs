@@ -85,6 +85,7 @@ public class KeySelectMenu : MonoBehaviour {
         GameManager.I.playerCharacterController.HandleItemUseResult(itemUseResult);
         Hide();
         Toolbox.RandomizeOneShot(audioSource, hideSounds);
+        CutsceneManager.I.HandleTrigger("key_menu_used");
     }
     public void Show(int numberEntries) {
         if (routine != null) {

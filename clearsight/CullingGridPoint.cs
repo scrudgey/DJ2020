@@ -88,7 +88,8 @@ public class CullingGridPoint {
                         IsometricOrientation.SW => Color.green,
                         IsometricOrientation.NW => Color.clear
                     };
-                    Debug.DrawRay(position, 10f * ray.direction, Color.white, 120);
+                    if (orientation == IsometricOrientation.SW)
+                        Debug.DrawRay(position, 10f * ray.direction, color, 5);
                 }
 
                 TagSystem tagSystem = cullingComponent.GetComponent<TagSystem>();

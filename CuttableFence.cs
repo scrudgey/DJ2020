@@ -32,7 +32,7 @@ public class CuttableFence : MonoBehaviour {
     }
 
     IEnumerator shakeFence() {
-        Vector3 direction = intactFenceMeshTransform.forward;
+        Vector3 direction = gibEmitPoint.forward;
         float timer = 0f;
         float duration = 0.3f;
         while (timer < duration) {

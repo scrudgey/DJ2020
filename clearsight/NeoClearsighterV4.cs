@@ -454,14 +454,14 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
             if (result.collider == null) {
                 (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPoint);
 
-                // Debug.DrawLine(origin, origin + displacement, Color.green);
+                Debug.DrawLine(origin, origin + displacement, Color.green);
                 // point.DrawRay(orientation);
                 IsometricOrientation orientation = (IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
                 foreach (string idn in point.GetInterlopers(orientation)) {
                     hits.Add((point.floor, idn));
                 }
                 foreach (string zoneIdn in point.GetRooftopZones(orientation)) {
-                    // Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
+                    Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
                     roofZoneHits.Add(zoneIdn);
                 }
             } else {

@@ -23,6 +23,7 @@ public class Key : Interactive {
             GameManager.I.AddSuspicionRecord(SuspicionRecord.lootSuspicion(lootName));
 
         }
+        CutsceneManager.I.HandleTrigger("got_key");
         return ItemUseResult.Empty() with { crouchDown = true };
     }
     public override string ResponseString() {
