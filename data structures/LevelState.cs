@@ -115,8 +115,8 @@ public class LevelState : PerkIdConstants {
         }
     }
 
-    public int totalNumberKeys() {
-        int numberPasswords = delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.password).Count();
-        return delta.keys.Count + numberPasswords;
-    }
+    public int TotalNumberKeys() => delta.keys.Count + NumberPasswords();
+
+    public int NumberPasswords() => delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.password).Count();
+
 }

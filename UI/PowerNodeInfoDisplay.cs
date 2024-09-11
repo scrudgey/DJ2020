@@ -27,7 +27,7 @@ public class PowerNodeInfoDisplay : NodeInfoPaneDisplay<PowerGraph, PowerNode, P
     public override void ConfigureMysteryNode() {
         title.text = "unknown";
         icon.sprite = mysteryIcon;
-        lockStatus.text = "";
+        // lockStatus.text = "";
         nodeTypeText.text = "";
         poweredText.text = "";
 

@@ -219,11 +219,12 @@ connecting to lab moves the camera to a strange place initially
 
 introduce breaking passwords
 change overlay UI to indicate locks better?
+    move "download" and "utility" and "password" to the cyber node info
+        use iconography for password
+    make hack display only for software
 disappearing central alarm
 first dialogue redundant
 
-move "download" and "utility" to the cyber node info
-make hack display only for software
 
 
 
@@ -233,20 +234,6 @@ make hack display only for software
 
 
 
-overlay polish:
-    sfx / fx for exploit success
-    hack sfx louder
-    when mousing over in cyber view, highlight path as dotted line, highlight start and end points, show hops in big number over target node
-    hack panel buttons don't make sense grouped with attacker and not on the target
-    some text doesn't fit in node info
-    neighbor buttons
-    change hops display to be more prominent- it is most important.
-    change software interface
-    disconnect
-        the problem was the friction created once being in hack mode and trying to leave.
-        no obvious way- but the little "x" button? does that work? escape key?
-        cannot walk around when any node selected
-        hitting "x" closes display, but leaves cyberdeck attached and hack display active
 burglar polish:
     better wires
     "return button" doesn't work because multitool is in the way
@@ -260,5 +247,6 @@ cutscenes todo:
     characters face the right directions
         mentor looks at router before pointing it out
         mentor and player look at building correctly or look around
-
+        mentor at lab door facing away
+    can use wheel menu during dialogue
 

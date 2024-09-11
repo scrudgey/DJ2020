@@ -3,53 +3,56 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 public class HackTerminalController : MonoBehaviour {
     public AudioSource audioSource;
     public RectTransform rectTransform;
-    // public TextMeshProUGUI terminalContent;
     public TerminalAnimation terminalAnimation;
     public NeoCyberNodeIndicator hackOrigin;
     public NeoCyberNodeIndicator hackTarget;
+    [Header("hack buttons")]
+    public Transform buttonContainer;
+    public GameObject buttonPrefab;
     [Header("title")]
     public TextMeshProUGUI attackerTitle;
     public Image attackerIcon;
     public TextMeshProUGUI numberHops;
-    [Header("modal")]
-    public SoftwareModalController modalController;
-
-
-    [Header("buttons")]
-    public GameObject downloadButton;
-    public GameObject passwordButton;
-    public GameObject utilityButton;
-    public TextMeshProUGUI utilityButtonText;
+    // [Header("modal")]
+    // public SoftwareModalController modalController;
     [Header("sounds")]
     public AudioClip[] showTerminalSounds;
-
-    Coroutine showRectRoutine;
-    bool isHidden;
+    public AudioClip[] changeInterfaceSounds;
     public List<CyberNode> path;
+    [Header("interface")]
+    public RectTransform buttonBarRect;
+    public RectTransform softwareViewRect;
+    public SoftwareView softwareView;
+    public GameObject lockBox;
+    public CanvasGroup buttonGroup;
+
+
     CyberNodeStatus currentCyberNodeStatus;
     NodeVisibility currentNodeVisibility;
     int currentLockLevel;
     Coroutine showRoutine;
+    Coroutine showRectRoutine;
+    bool isHidden;
+    Coroutine interfaceRoutine;
+
+    SoftwareButton activeSelector;
+
     public void ConfigureHackTerminal(NeoCyberNodeIndicator hackOrigin, NeoCyberNodeIndicator hackTarget, List<CyberNode> path) {
         bool changeDetected = this.hackOrigin != hackOrigin || this.hackTarget != hackTarget;
-        // if (changeDetected) {
-        //     terminalAnimation.Clear();
-        // }
         this.hackOrigin = hackOrigin;
         this.hackTarget = hackTarget;
         this.path = path;
 
-        // Debug.Log($"{GameManager.I.gameData.levelState == null} {GameManager.I.gameData.levelState.plan == null} {GameManager.I.gameData.levelState.plan.softwareTemplates == null} {GameManager.I.gameData.playerState.cyberdeck == null}");
-        // Debug.Log($"{GameManager.I.gameData.playerState.cyberdeck.intrinsicSoftware}");
-        // List<SoftwareState> softwareStates = GameManager.I.gameData.levelState.plan.softwareTemplates.Where(template => template != null).Select(template => template.toState())
-        //         .Concat(GameManager.I.gameData.playerState.cyberdeck.intrinsicSoftware.Select(template => template.ToTemplate().toState())).ToList();
+        UpdateLockBox();
 
-        modalController.Initialize(this, GameManager.I.gameData.levelState.delta.softwareStates);
+        // modalController.Initialize(this, GameManager.I.gameData.levelState.delta.softwareStates);
+        PopulateSoftwareSelectors(GameManager.I.gameData.levelState.delta.softwareStates);
 
         if (hackTarget != null) {
             CyberNodeStatus nodeStatus = hackTarget.node.getStatus();
@@ -70,30 +73,6 @@ public class HackTerminalController : MonoBehaviour {
             attackerIcon.sprite = hackOrigin.iconImage.sprite;
             numberHops.text = $"distance: {path.Count - 1}/{2}";
         }
-        if (hackTarget != null) {
-            ShowButtons();
-            // if (changeDetected) {
-            //     terminalAnimation.DrawBasicNodePrompt(hackTarget.node);
-            // }
-        }
-        if (hackOrigin == null && hackTarget == null) {
-            // terminalAnimation.Clear();
-            HideButtons();
-        }
-    }
-    void ShowButtons() {
-        passwordButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery && hackTarget.node.lockLevel > 0);
-        downloadButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery &&
-                                    hackTarget.node.lockLevel == 0 &&
-                                    hackTarget.node.payData != null &&
-                                    !hackTarget.node.dataStolen &&
-                                    hackTarget.node.type == CyberNodeType.datanode);
-        utilityButton.SetActive(hackTarget.node.visibility > NodeVisibility.mystery && hackTarget.node.lockLevel == 0 && hackTarget.node.type == CyberNodeType.utility);
-    }
-    void HideButtons() {
-        passwordButton.SetActive(false);
-        downloadButton.SetActive(false);
-        utilityButton.SetActive(false);
     }
     public void Show(CyberNode target) {
         DoShowRoutine(true, target);
@@ -106,16 +85,20 @@ public class HackTerminalController : MonoBehaviour {
     }
     void DoShowRoutine(bool value, CyberNode target) {
         if (value) {
-            // terminalAnimation.ShowThenPrompt(ShowRect(true), target);
             showRectRoutine = StartCoroutine(ShowRect(true));
         } else {
             showRectRoutine = StartCoroutine(ShowRect(false));
         }
     }
+    void UpdateLockBox() {
+        int numberActions = GameManager.I.gameData?.levelState?.delta?.cyberGraph?.networkActions?.Values.SelectMany(x => x).Count() ?? 0;
+        lockBox.SetActive(numberActions > 0);
+        buttonGroup.interactable = numberActions == 0;
+    }
 
     IEnumerator ShowRect(bool value) {
         float startValue = rectTransform.rect.height;
-        float finalValue = value ? 250f : 0f;
+        float finalValue = value ? 375f : 0f;
         return Toolbox.Ease(null, 0.25f, startValue, finalValue, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             rectTransform.sizeDelta = new Vector2(350f, amount);
         }, unscaledTime: true);
@@ -130,37 +113,69 @@ public class HackTerminalController : MonoBehaviour {
             state.charges -= 1;
         NetworkAction networkAction = state.template.ToNetworkAction(path, hackTarget.node);
         GameManager.I.AddNetworkAction(networkAction);
-        // terminalAnimation.HandleSoftwareCallback(state);
         Toolbox.RandomizeOneShot(audioSource, state.template.deploySounds.ToArray());
+        UpdateLockBox();
     }
 
-    public void PasswordButtonCallback() {
-        Debug.Log("password");
-    }
-    public void DownloadButtonCallback() {
-        PayData payData = hackTarget.node.payData;
-        List<CyberNode> downloadPath = GameManager.I.gameData.levelState.delta.cyberGraph.GetPathToNearestDownloadPoint(hackTarget.node);
-        NetworkAction networkAction = new NetworkAction() {
-            title = $"downloading {payData.filename}...",
-            softwareTemplate = SoftwareTemplate.Download(),
-            lifetime = 2f,
-            toNode = hackTarget.node,
-            timerRate = 1f,
-            payData = payData,
-            path = downloadPath,
-        };
-        GameManager.I.AddNetworkAction(networkAction);
-        // terminalAnimation.HandleDownload(payData);
+    void PopulateSoftwareSelectors(List<SoftwareState> softwareStates) {
+        foreach (Transform child in buttonContainer) {
+            Destroy(child.gameObject);
+        }
+        CyberNode target = hackTarget?.node ?? null;
+        CyberNode origin = hackOrigin?.node ?? null;
+        softwareView.Initialize(target, origin, path);
 
-        // else if (effect.type == SoftwareEffect.Type.download) {
-        //     networkAction.title = $"downloading {node.payData.filename}...";
-        //     if (node.isManualHackerTarget) {
-        //         networkAction.fromPlayerNode = true;
-        //     }
-        // } 
+        // spawn buttons
+        foreach (SoftwareState state in softwareStates) {
+            CreateSoftwareSelector(state, target, origin);
+        }
     }
-    public void UtilityButtonCallback() {
-        GameManager.I.SetCyberNodeUtilityState(hackTarget.node, false);
-        // terminalAnimation.HandleUtility();
+    SoftwareButton CreateSoftwareSelector(SoftwareState softwareState, CyberNode target, CyberNode origin) {
+        GameObject obj = GameObject.Instantiate(buttonPrefab);
+        SoftwareButton selector = obj.GetComponent<SoftwareButton>();
+        bool softwareEnabled = false;
+        if (target != null) {
+            softwareEnabled = softwareState.EvaluateCondition(target, origin, path) && softwareState.charges > 0;
+        }
+        selector.Initialize(softwareState, SoftwareButtonClicked, softwareEnabled);
+        selector.transform.SetParent(buttonContainer, false);
+        // selectorIndicators.Add(softwareState.template.name, obj.GetComponent<RectTransform>());
+        return selector;
+    }
+
+    public void SoftwareButtonClicked(SoftwareButton button) {
+        CyberNode target = hackTarget?.node ?? null;
+        CyberNode origin = hackOrigin?.node ?? null;
+        softwareView.Initialize(target, origin, path);
+        softwareView.DisplayState(button.state);
+        activeSelector = button;
+        ChangeInterfacePanel(showHackButtons: false);
+    }
+    public void SoftwareDeployCallback() {
+        // GameManager.I.CloseMenu();
+        ChangeInterfacePanel(showHackButtons: true);
+        if (activeSelector != null) {
+            DeploySoftware(activeSelector.state);
+            CutsceneManager.I.HandleTrigger($"software_deploy_{activeSelector.state.template.name}");
+        }
+    }
+    public void BackButtonCallback() {
+        ChangeInterfacePanel(showHackButtons: true);
+    }
+
+    void ChangeInterfacePanel(bool showHackButtons = true) {
+        if (interfaceRoutine != null) {
+            StopCoroutine(interfaceRoutine);
+        }
+        interfaceRoutine = StartCoroutine(MoveInterfaces(showHackButtons: showHackButtons));
+        Toolbox.RandomizeOneShot(audioSource, changeInterfaceSounds);
+    }
+    IEnumerator MoveInterfaces(bool showHackButtons = true) {
+        float initialAmount = buttonBarRect.anchoredPosition.x;
+        float finalAmount = showHackButtons ? 0f : -350f;
+        yield return Toolbox.Ease(null, 0.2f, initialAmount, finalAmount, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
+            buttonBarRect.anchoredPosition = new Vector2(amount, 0f);
+            softwareViewRect.anchoredPosition = new Vector2(amount + 350f, 0f);
+        });
     }
 }

@@ -82,7 +82,7 @@ public class EscapeMenuController : MonoBehaviour {
         } else {
             currentLoots += data.levelState.delta.levelAcquiredLoot.Count;
             currentData += data.levelState.delta.levelAcquiredPaydata.Count;
-            currentKeys = data.levelState.totalNumberKeys();
+            currentKeys = data.levelState.TotalNumberKeys();
 
             objectiveController.Initialize(data.levelState);
             mapDisplayView.Initialize(data.levelState, sceneData);

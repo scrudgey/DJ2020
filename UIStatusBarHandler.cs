@@ -33,7 +33,7 @@ public class UIStatusBarHandler : MonoBehaviour {
         currentCredits = data.playerState.credits + data.levelState?.delta.levelAcquiredCredits ?? 0;
         currentLoots = data.playerState.loots.Count + data.levelState?.delta.levelAcquiredLoot.Count ?? 0;
         currentData = data.playerState.payDatas.Count + data.levelState?.delta.levelAcquiredPaydata.Count ?? 0;
-        currentKeys = data.levelState?.totalNumberKeys() ?? 0;
+        currentKeys = data.levelState?.TotalNumberKeys() ?? 0;
         SetTextAmounts();
     }
 
@@ -102,7 +102,7 @@ public class UIStatusBarHandler : MonoBehaviour {
 
         IEnumerator destroyer = Toolbox.CoroutineFunc(() => Destroy(obj));
 
-        IEnumerator routine = Toolbox.ChainCoroutines(toCoroutine(rectTransform, finalPosition), destroyer, incremeter, PulseStatusAmount(data.type));
+        IEnumerator routine = Toolbox.ChainCoroutines(toCoroutine(data, rectTransform, finalPosition), destroyer, incremeter, PulseStatusAmount(data.type));
         StartCoroutine(routine);
     }
 
@@ -118,9 +118,16 @@ public class UIStatusBarHandler : MonoBehaviour {
         yield return Toolbox.Ease(null, 0.5f, 2f, 1f, PennerDoubleAnimation.BounceEaseOut, (amount) => target.localScale = amount * Vector3.one, unscaledTime: true);
     }
 
-    IEnumerator toCoroutine(RectTransform rectTransform, Vector3 finalPosition) {
-        Vector3 initialPosition = rectTransform.position;
-        Vector3 displacement = finalPosition - rectTransform.position;
+    IEnumerator toCoroutine(StatusUpdateData data, RectTransform rectTransform, Vector3 finalPosition) {
+        Vector3 initialPosition;
+        Vector3 displacement;
+        if (data.increment > 0) {
+            initialPosition = rectTransform.position;
+            displacement = finalPosition - rectTransform.position;
+        } else {
+            initialPosition = finalPosition;
+            displacement = rectTransform.position - initialPosition;
+        }
         yield return Toolbox.Ease(null, 0.5f, 0f, 1f, PennerDoubleAnimation.ExpoEaseIn, (amount) =>
             rectTransform.position = initialPosition + (amount * displacement), unscaledTime: true
         );

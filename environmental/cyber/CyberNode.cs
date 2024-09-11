@@ -13,9 +13,13 @@ public class CyberNode : Node<CyberNode> {
     public int lockLevel;
     public bool dataSink;
     public bool dataStolen;
-    public bool utilityActive;
     public bool datafileVisibility;
     public CyberNodeStatus status;
+
+    public bool utilityActive;
+    public string utilityEnabledText = "ENABLED";
+    public string utilityDisabledText = "DISABLED";
+
     [System.NonSerialized]
     [XmlIgnore]
     public Action OnDataStolen;

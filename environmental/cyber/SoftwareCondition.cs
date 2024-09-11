@@ -24,9 +24,9 @@ public class SoftwareCondition {
             case Type.manualHack:
                 // Debug.Log($"origin: {origin} path: {path.Count}");
                 // Debug.Log($"{origin.idn}");
-                foreach (CyberNode node in path) {
-                    Debug.Log($"path: {node.idn}");
-                }
+                // foreach (CyberNode node in path) {
+                // Debug.Log($"path: {node.idn}");
+                // }
                 return origin?.idn == "cyberdeck" && path.Count <= 2;
             case Type.locked:
                 return target.lockLevel > 0;

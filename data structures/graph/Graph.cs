@@ -247,11 +247,11 @@ public class Graph<T, W> where T : Node<T> where W : Graph<T, W> {
         edgeVisibility[(id1, id2)] = visibility;
         edgeVisibility[(id2, id1)] = visibility;
         if (visibility == EdgeVisibility.known) {
-            if (nodes[id1].visibility < NodeVisibility.mystery) {
-                nodes[id1].visibility = NodeVisibility.mystery;
+            if (nodes[id1].visibility < NodeVisibility.known) {
+                nodes[id1].visibility = NodeVisibility.known;
             }
-            if (nodes[id2].visibility < NodeVisibility.mystery) {
-                nodes[id2].visibility = NodeVisibility.mystery;
+            if (nodes[id2].visibility < NodeVisibility.known) {
+                nodes[id2].visibility = NodeVisibility.known;
             }
         }
     }

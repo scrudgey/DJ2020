@@ -77,6 +77,9 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
         CyberNodeStatus nodeStatus = node.getStatus();
 
         iconImage.sprite = icons.CyberNodeSprite(node);
+        if (node.type == CyberNodeType.datanode && !node.datafileVisibility) {
+            iconImage.sprite = icons.iconDataUnknown;
+        }
         if (node.type == CyberNodeType.datanode && node.dataStolen) {
             iconImage.enabled = false;
         }

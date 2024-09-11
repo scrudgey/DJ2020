@@ -67,6 +67,7 @@ public class SoftwareEffect {
                 break;
             case Type.unlock:
                 node.lockLevel = 0;
+                node.datafileVisibility = true;
                 if (node.visibility == NodeVisibility.unknown || node.visibility == NodeVisibility.mystery) {
                     node.visibility = NodeVisibility.known;
                 }

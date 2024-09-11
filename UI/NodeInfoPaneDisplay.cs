@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public abstract class NodeInfoPaneDisplay<T, U, V> : MonoBehaviour where T : Graph<U, T> where U : Node<U> where V : NodeIndicator<U, T> {
     public TextMeshProUGUI title;
-    public TextMeshProUGUI lockStatus;
+    // public TextMeshProUGUI lockStatus;
     public Image icon;
     public GameObject neighborContainer;
     public Transform neighborbuttonContainer;

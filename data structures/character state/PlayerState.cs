@@ -155,14 +155,14 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         WeaponState sword = new WeaponState(swordTemplate);
 
         List<WeaponState> allGuns = new List<WeaponState> {
-            new WeaponState( gunState1),
-            new WeaponState( gunState2),
-            new WeaponState( gunState3),
-            new WeaponState( gunState4),
-            new WeaponState( gunState5),
-            new WeaponState( gunState6),
-            new WeaponState( gunState7),
-            new WeaponState( gunState8),
+            new (gunState1),
+            new (gunState2),
+            new (gunState3),
+            new (gunState4),
+            new (gunState5),
+            new (gunState6),
+            new (gunState7),
+            new (gunState8),
             sword
         };
 
@@ -229,13 +229,13 @@ public record PlayerState : ISkinState, ICharacterHurtableState, PerkIdConstants
         List<string> perks = new List<string>();
 
         List<SoftwareScriptableTemplate> softwareScriptableTemplates = new List<SoftwareScriptableTemplate>{
-            SoftwareScriptableTemplate.Load("virus_scan"),
+            SoftwareScriptableTemplate.Load("scanData"),
+            // SoftwareScriptableTemplate.Load("virus_scan"),
             SoftwareScriptableTemplate.Load("scan"),
             SoftwareScriptableTemplate.Load("crack"),
             SoftwareScriptableTemplate.Load("exploit"),
-            SoftwareScriptableTemplate.Load("scanData"),
-            SoftwareScriptableTemplate.Load("scanEdges"),
-            SoftwareScriptableTemplate.Load("scanNode"),
+            // SoftwareScriptableTemplate.Load("scanEdges"),
+            // SoftwareScriptableTemplate.Load("scanNode"),
         };
         List<SoftwareTemplate> softwareTemplates = softwareScriptableTemplates.Select(template => template.ToTemplate()).ToList();
 

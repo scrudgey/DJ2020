@@ -215,7 +215,7 @@ public partial class GameManager : Singleton<GameManager> {
     // }
 
     public void DiscoverNode<U>(U node,
-                                NodeVisibility newNodeVisibility = NodeVisibility.unknown,
+                                NodeVisibility newNodeVisibility = NodeVisibility.known,
                                 bool discoverEdges = false,
                                 bool discoverFile = false) where U : Node<U> {
         bool doSfx = node switch {

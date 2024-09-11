@@ -5,7 +5,8 @@ using Easings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class MontageViewController : MonoBehaviour {
+public class MontageViewController : MonoBehaviour
+{
     enum Phase { start, restaurant, bar, club }
     Phase phase;
     public NeoAfterActionReport afterActionReport;
@@ -60,7 +61,8 @@ public class MontageViewController : MonoBehaviour {
 
     // public Tactic[] tactics; // TODO: change!
     Action continueButtonCallback;
-    public void Initialize() {
+    public void Initialize()
+    {
         phase = Phase.start;
         gameObject.SetActive(false);
         bodyRect.sizeDelta = new Vector2(1000f, 50f);
@@ -85,33 +87,39 @@ public class MontageViewController : MonoBehaviour {
         clubButton.SetActive(GameManager.I.gameData.playerState.FencesAvailableToUnlock().Count > 0);
 
     }
-    public void Finish() {
+    public void Finish()
+    {
         gameObject.SetActive(false);
         afterActionReport.MontageFinishedCallback();
     }
-    public void StartSequence() {
+    public void StartSequence()
+    {
         gameObject.SetActive(true);
         StartCoroutine(Toolbox.ChainCoroutines(
-            Toolbox.Ease(null, 0.3f, 50f, 780f, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 0.3f, 50f, 780f, PennerDoubleAnimation.Linear, (amount) =>
+            {
                 bodyRect.sizeDelta = new Vector2(1000f, amount);
             }, unscaledTime: true),
             Toolbox.CoroutineFunc(() => worldmapView.ShowText())
         ));
     }
-    public void RestaurantButtonCallback() {
+    public void RestaurantButtonCallback()
+    {
         phase = Phase.restaurant;
         InitializeRestaurant();
         StartMontage();
         StartCoroutine(RestaurantSequence());
     }
-    public void BarButtonCallback() {
+    public void BarButtonCallback()
+    {
         phase = Phase.bar;
         InitializeBar();
 
         StartMontage();
         StartCoroutine(BarSequence());
     }
-    public void ClubButtonCallback() {
+    public void ClubButtonCallback()
+    {
         phase = Phase.club;
         InitializeClub();
         StartMontage();
@@ -126,33 +134,39 @@ public class MontageViewController : MonoBehaviour {
     // public void MapButtonMouseExit() {
     //     worldmapView.StopHighlight();
     // }
-    void StartMontage() {
+    void StartMontage()
+    {
         mapPanel.SetActive(false);
         montagePanel.SetActive(true);
         plainText.text = "";
     }
 
-    void InitializeBar() {
+    void InitializeBar()
+    {
         List<Tactic> availableTactics = GameManager.I.gameData.playerState.TacticsAvailableToUnlock();
 
         List<Tactic> targetTactics = new List<Tactic>();
-        while (targetTactics.Count < 3 && availableTactics.Count > 0) {
+        while (targetTactics.Count < 3 && availableTactics.Count > 0)
+        {
             Tactic tactic = Toolbox.RandomFromList(availableTactics);
             targetTactics.Add(tactic);
             availableTactics.Remove(tactic);
         }
         int i = 0;
-        foreach (Tactic tactic in targetTactics) {
+        foreach (Tactic tactic in targetTactics)
+        {
             barButtons[i].Initialize(this, tactic);
             i++;
         }
-        while (i < 3) {
+        while (i < 3)
+        {
             barButtons[i].gameObject.SetActive(false);
             i++;
         }
     }
 
-    void InitializeRestaurant() {
+    void InitializeRestaurant()
+    {
         barImageHolder.SetActive(false);
         restaurantImageHolder.SetActive(true);
         chibiJack.SetParent(restaurantJackHolder.transform);
@@ -160,7 +174,8 @@ public class MontageViewController : MonoBehaviour {
         // restaurantSign.text = "Sizzling Hot\nSquid on a Stick";
         restaurantSign.text = Toolbox.RandomFromList(randomRestaurantNames);
     }
-    void InitializeClub() {
+    void InitializeClub()
+    {
         barImageHolder.SetActive(false);
         clubImageHolder.SetActive(true);
         chibiJack.SetParent(clubJackHolder.transform);
@@ -180,24 +195,28 @@ public class MontageViewController : MonoBehaviour {
         StartCoroutine(PulseLight(light1, 0f));
         StartCoroutine(PulseLight(light2, 2f));
 
-        while (targetTactics.Count < 3 && availableTactics.Count > 0) {
+        while (targetTactics.Count < 3 && availableTactics.Count > 0)
+        {
             LootBuyerData tactic = Toolbox.RandomFromList(availableTactics);
             targetTactics.Add(tactic);
             availableTactics.Remove(tactic);
         }
         int i = 0;
-        foreach (LootBuyerData tactic in targetTactics) {
+        foreach (LootBuyerData tactic in targetTactics)
+        {
             // Debug.Log($"configuring club montage button {i} {tactic}");
             clubMontageButtons[i].Initialize(this, tactic);
             i++;
         }
-        while (i < 3) {
+        while (i < 3)
+        {
             // Debug.Log($"disabling club montage button {i}");
             clubMontageButtons[i].gameObject.SetActive(false);
             i++;
         }
     }
-    public void BarMontageButtonCallback(BarMontageButton montageButton) {
+    public void BarMontageButtonCallback(BarMontageButton montageButton)
+    {
         // Debug.Log($"unlock {montageButton.tactic.name}");
         barButtonsHolder.SetActive(false);
         reactionTextHolder.SetActive(true);
@@ -207,13 +226,15 @@ public class MontageViewController : MonoBehaviour {
         StartCoroutine(Toolbox.ChainCoroutines(
             Toolbox.BlitText(reactionText, montageButton.tactic.vendorIntroduction, interval: 0.02f),
             new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 continueButtonCallback = () => ContinueToReactionImage(montageButton.tactic);
                 continueButton.SetActive(true);
             })
         ));
     }
-    public void ClubMontageButtonCallback(ClubMontageButton montageButton) {
+    public void ClubMontageButtonCallback(ClubMontageButton montageButton)
+    {
         clubButtonsHolder.SetActive(false);
         reactionTextHolder.SetActive(true);
 
@@ -223,14 +244,16 @@ public class MontageViewController : MonoBehaviour {
         StartCoroutine(Toolbox.ChainCoroutines(
             Toolbox.BlitText(reactionText, montageButton.lootBuyerData.introduction, interval: 0.02f),
             new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 continueButtonCallback = () => ContinueToReactionImage(montageButton.lootBuyerData);
                 continueButton.SetActive(true);
             })
         ));
     }
 
-    void ContinueToReactionImage(Tactic tactic) {
+    void ContinueToReactionImage(Tactic tactic)
+    {
         continueButton.SetActive(false);
         barImageHolder.SetActive(false);
         reactionTextHolder.SetActive(false);
@@ -241,14 +264,16 @@ public class MontageViewController : MonoBehaviour {
         StartCoroutine(Toolbox.ChainCoroutines(
             Toolbox.BlitText(plainText, $"Cheers! You have unlocked tactic: {tactic.title}!\nTo use it, call {tactic.vendorName} during mission planning.", interval: 0.02f),
             new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 continueButtonCallback = ContinueToClose;
                 continueButton.SetActive(true);
             })
         ));
     }
 
-    void ContinueToReactionImage(LootBuyerData fence) {
+    void ContinueToReactionImage(LootBuyerData fence)
+    {
         continueButton.SetActive(false);
         barImageHolder.SetActive(false);
         reactionTextHolder.SetActive(false);
@@ -259,18 +284,21 @@ public class MontageViewController : MonoBehaviour {
         StartCoroutine(Toolbox.ChainCoroutines(
             Toolbox.BlitText(plainText, $"Cheers! You have unlocked fence: {fence.buyerName}!", interval: 0.02f),
             new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 continueButtonCallback = ContinueToClose;
                 continueButton.SetActive(true);
             })
         ));
     }
 
-    void ContinueToClose() {
+    void ContinueToClose()
+    {
         Finish();
     }
 
-    IEnumerator BarSequence() {
+    IEnumerator BarSequence()
+    {
         barCutaway.enabled = true;
         plainTextHolder.SetActive(true);
         barButtonsHolder.SetActive(false);
@@ -280,25 +308,30 @@ public class MontageViewController : MonoBehaviour {
         yield return Toolbox.ChainCoroutines(
             new WaitForSecondsRealtime(2f),
             Toolbox.CoroutineFunc(() => { chibiJackAnimation.enabled = true; }),
-            Toolbox.Ease(null, 1.5f, -400, -122, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 1.5f, -400, -122, PennerDoubleAnimation.Linear, (amount) =>
+            {
                 chibiJack.anchoredPosition = new Vector2(amount, -100);
             }, unscaledTime: true),
             Toolbox.CoroutineFunc(() => barCutaway.enabled = false),
-            Toolbox.Ease(null, 1.5f, -122, 267, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 1.5f, -122, 267, PennerDoubleAnimation.Linear, (amount) =>
+            {
                 chibiJack.anchoredPosition = new Vector2(amount, -100);
             }, unscaledTime: true),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 chibiJackAnimation.enabled = false;
                 chibiJackImage.sprite = chibiJackIdleSprite;
             }),
             new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 plainTextHolder.SetActive(false);
                 barButtonsHolder.SetActive(true);
             })
         );
     }
-    IEnumerator ClubSequence() {
+    IEnumerator ClubSequence()
+    {
         plainTextHolder.SetActive(true);
         barButtonsHolder.SetActive(false);
         chibiJack.anchoredPosition = new Vector2(-304, 160);
@@ -307,24 +340,28 @@ public class MontageViewController : MonoBehaviour {
         yield return Toolbox.ChainCoroutines(
             new WaitForSecondsRealtime(1f),
             Toolbox.CoroutineFunc(() => { chibiJackAnimation.enabled = true; }),
-            Toolbox.Ease(null, 3f, 0, 1, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 3f, 0, 1, PennerDoubleAnimation.Linear, (amount) =>
+            {
                 float y = 160 + (-58 - 160) * amount;
                 float x = -304 + (235 - -304) * amount;
                 chibiJack.anchoredPosition = new Vector2(x, y);
             }, unscaledTime: true),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 chibiJackAnimation.enabled = false;
                 chibiJackImage.sprite = chibiJackIdleSprite;
             }),
             new WaitForSecondsRealtime(0.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 plainTextHolder.SetActive(false);
                 clubButtonsHolder.SetActive(true);
             })
         );
     }
 
-    IEnumerator RestaurantSequence() {
+    IEnumerator RestaurantSequence()
+    {
         plainTextHolder.SetActive(true);
         barButtonsHolder.SetActive(false);
         chibiJack.anchoredPosition = new Vector2(-429, -152f);
@@ -333,21 +370,25 @@ public class MontageViewController : MonoBehaviour {
         yield return Toolbox.ChainCoroutines(
             new WaitForSecondsRealtime(2f),
             Toolbox.CoroutineFunc(() => { chibiJackAnimation.enabled = true; }),
-            Toolbox.Ease(null, 2.5f, -429, 57, PennerDoubleAnimation.Linear, (amount) => {
+            Toolbox.Ease(null, 2.5f, -429, 57, PennerDoubleAnimation.Linear, (amount) =>
+            {
                 chibiJack.anchoredPosition = new Vector2(amount, -152f);
             }, unscaledTime: true),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 chibiJackAnimation.enabled = false;
                 chibiJackImage.sprite = chibiJackIdleSprite;
             }),
             new WaitForSecondsRealtime(1.5f),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 restaurantImageHolder.SetActive(false);
                 restaurantReactionHolder.SetActive(true);
                 plainTextHolder.SetActive(true);
             }),
             Toolbox.BlitText(plainText, "Got food!\n+1 skill point"),
-            Toolbox.CoroutineFunc(() => {
+            Toolbox.CoroutineFunc(() =>
+            {
                 // GameManager.I.gameData.playerState.bonusHealth += 10;
                 // GameManager.I.gameData.playerState.health = GameManager.I.gameData.playerState.fullHealthAmount();
                 GameManager.I.gameData.playerState.skillpoints += 1;
@@ -357,19 +398,23 @@ public class MontageViewController : MonoBehaviour {
         );
     }
 
-    IEnumerator rotateLaserBundle(RectTransform laserBundle) {
+    IEnumerator rotateLaserBundle(RectTransform laserBundle)
+    {
         float time = 0;
         float dutyCycle = 4f;
         float hangtime = 0f;
         Quaternion origRotation = laserBundle.rotation;
-        while (true) {
+        while (true)
+        {
             time += Time.unscaledDeltaTime;
             float angle = 50f * Mathf.Sin(time);
             laserBundle.rotation = origRotation * Quaternion.Euler(0f, 0f, angle);
-            if (time > dutyCycle) {
+            if (time > dutyCycle)
+            {
                 time = 0f;
                 laserBundle.rotation = origRotation;
-                while (hangtime < dutyCycle) {
+                while (hangtime < dutyCycle)
+                {
                     hangtime += Time.unscaledDeltaTime;
                     yield return null;
                 }
@@ -379,15 +424,18 @@ public class MontageViewController : MonoBehaviour {
         }
     }
 
-    IEnumerator blinkLasers(GameObject bundle1, GameObject bundle2) {
+    IEnumerator blinkLasers(GameObject bundle1, GameObject bundle2)
+    {
         float time = 0f;
         float duration = 1f;
         bool cycle = true;
         bool flicker1 = true;
         bool flicker2 = true;
-        while (true) {
+        while (true)
+        {
             time += Time.unscaledDeltaTime;
-            if (time > duration) {
+            if (time > duration)
+            {
                 time -= duration;
                 cycle = !cycle;
             }
@@ -400,13 +448,15 @@ public class MontageViewController : MonoBehaviour {
         }
     }
 
-    IEnumerator PulseLight(Image image, float phase) {
+    IEnumerator PulseLight(Image image, float phase)
+    {
         Color originalColor = image.color;
         // return Toolbox.Ease(null, 5f, originalColor.a, 0f, PennerDoubleAnimation.CircEaseOut, (amount) => {
         //     image.color = new Color(originalColor.r, originalColor.g, originalColor.b, amount);
         // }, unscaledTime: true, looping: true);
         float timer = phase;
-        while (true) {
+        while (true)
+        {
             timer += Time.unscaledDeltaTime;
             float amount = originalColor.a * Mathf.Abs((float)Mathf.Sin(timer));
             image.color = new Color(originalColor.r, originalColor.g, originalColor.b, amount);
@@ -415,7 +465,8 @@ public class MontageViewController : MonoBehaviour {
     }
 
 
-    public void ContinueButtonClicked() {
+    public void ContinueButtonClicked()
+    {
         continueButtonCallback?.Invoke();
     }
 
@@ -435,6 +486,7 @@ public class MontageViewController : MonoBehaviour {
         "sushi burrito",
         "biryani bucket",
         "frozen hummus hut",
-        "New York style sushi"
+        "New York style sushi",
+        "Tandoori Sushi"
     };
 }

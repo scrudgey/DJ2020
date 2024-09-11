@@ -60,9 +60,9 @@ public class AlarmComponent : GraphNodeComponent<AlarmComponent, AlarmNode>, INo
         }
 
         if (node.overallEnabled) {
-            EnableSource();
+            // EnableSource();
         } else {
-            DisableSource();
+            // DisableSource();
             GameManager.I.SetAlarmNodeTriggered(node, false);
         }
     }

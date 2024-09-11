@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
+using System.Linq;
+
 [System.Serializable]
 public record GameData {
     public string filename;
@@ -115,4 +117,10 @@ public record GameData {
     static public string SaveGameRootDirectory() => System.IO.Path.Join(Application.persistentDataPath, "saveGames");
     static public string SaveGamePath(string filename) => System.IO.Path.Join(SaveGameRootDirectory(), filename.ToLower());
     string SaveGamePath() => System.IO.Path.Join(SaveGameRootDirectory(), filename.ToLower());
+
+    public int numberPasswords() =>
+         levelState.NumberPasswords();
+
 }
+
+

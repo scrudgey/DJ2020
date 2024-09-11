@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-    // public CyberNodeInfoPaneDisplay display;
     public Button button;
     Action<string> neighborClick;
     Action<string> neighborMouseover;
@@ -21,7 +20,8 @@ public class NeighborButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         neighborMouseExit = display.NeighborButtonMouseExit;
         this.idn = neighbor.idn;
         this.edgeVisibility = visibility;
-        text.text = neighbor.idn.Substring(0, Math.Min(10, neighbor.idn.Length));
+        // text.text = neighbor.idn.Substring(0, Math.Min(10, neighbor.idn.Length));
+        text.text = neighbor.nodeTitle;
         if (visibility == EdgeVisibility.unknown) {
             MakeInactive();
         }

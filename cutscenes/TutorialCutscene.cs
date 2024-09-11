@@ -13,7 +13,6 @@ class TutorialCutscene : Cutscene {
     Vector2 zoomInput = new Vector2(0f, 5f);
     bool hasKey = false;
 
-
     public TutorialCutscene(NPCTemplate mentorTemplate, Sprite mentorPortrait) {
         this.mentorTemplate = mentorTemplate;
         this.mentorPortrait = mentorPortrait;
@@ -32,22 +31,22 @@ class TutorialCutscene : Cutscene {
         // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
         // mentorObject.SetActive(true);
 
-        ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_power"];
-        mentorObject.transform.position = mentorLockpickData.transform.position;
-        mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
-        mentorObject.SetActive(true);
+        // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_power"];
+        // mentorObject.transform.position = mentorLockpickData.transform.position;
+        // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
+        // mentorObject.SetActive(true);
 
 
-        // yield return FromStartToGreet();
+        yield return FromStartToGreet();
 
-        // yield return GreetHackSequence();
+        yield return GreetHackSequence();
 
-        // yield return Fence();
+        yield return Fence();
+        // 
+        yield return PowerHack();
 
-        // yield return PowerHack();
-
-        // yield return EnterDoor();
-        yield return new WaitForSecondsRealtime(1);
+        yield return EnterDoor();
+        // yield return new WaitForSecondsRealtime(1);
         yield return Interior();
 
         yield return Laboratory();
@@ -457,7 +456,8 @@ class TutorialCutscene : Cutscene {
         Time.timeScale = 1;
         inputProfile = InputProfile.allowNone with {
             allowCameraControl = true,
-            allowPlayerFireInput = true
+            allowPlayerFireInput = true,
+            allowBurglarButton = true
         };
         GameManager.I.uiController.ShowTutorialText("Mouse over the power relay and click on the <sprite name=\"screwdriver\"> icon to open the burglar view");
         HideLocationHighlight();
@@ -497,13 +497,13 @@ class TutorialCutscene : Cutscene {
 
         yield return WaitForTrigger("unscrew");
         yield return WaitForTrigger("unscrew");
-        inputProfile.allowBurglarInterface = false;
-        burglarCanvas.PreventButtons(true);
-        yield return new WaitForSecondsRealtime(0.5f);
+        // inputProfile.allowBurglarInterface = false;
+        // burglarCanvas.PreventButtons(true);
+        // yield return new WaitForSecondsRealtime(0.5f);
         GameManager.I.uiController.HideCutsceneText();
         // GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.handButtonIndicator, Vector3.zero);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Great, now put the screwdriver away.");
-        inputProfile.allowBurglarInterface = true;
+        // yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Great, now put the screwdriver away.");
+        // inputProfile.allowBurglarInterface = true;
         burglarCanvas.PreventButtons(false);
 
         GameManager.I.uiController.ShowTutorialText("Press escape or click the hand button <sprite name=\"hand\"> to put the screwdriver away.");
@@ -578,6 +578,7 @@ class TutorialCutscene : Cutscene {
         yield return MoveCamera("camera2", 1.5f, CameraState.normal, Vector2.zero, PennerDoubleAnimation.ExpoEaseOut);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Excellent work. The camera's offline. Now, let's move quickly. The longer we're in here, the higher the risk of someone noticing. Let's grab the data and get out.");
         yield return LeaveFocus();
+        GameManager.I.SetOverlay(OverlayType.none);
         HideBasicUI();
     }
     IEnumerator WanderPrevention() {
@@ -609,7 +610,8 @@ class TutorialCutscene : Cutscene {
         Time.timeScale = 1;
         inputProfile = InputProfile.allowNone with {
             allowCameraControl = true,
-            allowPlayerFireInput = true
+            allowPlayerFireInput = true,
+            allowBurglarButton = true
         };
         GameManager.I.uiController.ShowTutorialText("Mouse over the door and click on the <sprite name=\"screwdriver\"> icon to open the burglar view");
         HideLocationHighlight();
@@ -705,8 +707,9 @@ class TutorialCutscene : Cutscene {
         yield return WaitForTrigger("locked_door");
         GameManager.I.uiController.ShowStatusBar(true);
         GameManager.I.uiController.HideCutsceneDialogue();
-        GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.keyMenuIndicator, Vector3.zero);
         inputProfile = inputProfile with { allowCameraControl = false };
+        yield return new WaitForSecondsRealtime(0.5f);
+        GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.keyMenuIndicator, Vector3.zero);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Since you just tried a locked door, the key menu opened up here. How do you know if the key works in the lock? You gotta try it out!");
         inputProfile = inputProfile with { allowCameraControl = true };
         // TODO: indicate key menu
@@ -776,6 +779,12 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.downloadButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
         GameManager.I.uiController.ShowTutorialText("Click the Download... button");
 
+        // TODO: disconnect, close overlay, put away item
+        // TODO: mentor notices, car pulls up etc0
+    }
+
+    IEnumerator Conclusion() {
+        yield return null;
     }
 
     void HideBasicUI() {

@@ -36,7 +36,7 @@ public class AlarmNodeInfoDisplay : NodeInfoPaneDisplay<AlarmGraph, AlarmNode, A
 
         title.text = "unknown";
         icon.sprite = mysteryIcon;
-        lockStatus.text = "";
+        // lockStatus.text = "";
         nodeTypeText.text = "";
         triggeredText.text = "";
 

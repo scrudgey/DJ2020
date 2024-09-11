@@ -3,19 +3,26 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNode, NeoCyberNodeIndicator> {
     public TextMeshProUGUI type;
     public TextMeshProUGUI status;
     public NodeDataInfoDisplay dataInfoDisplay;
     public NodeUtilityInterfaceDisplay utilityInterfaceDisplay;
+    [Header("locks")]
+    public GameObject lockedPane;
+    public GameObject lockPaneBottom;
+    public TextMeshProUGUI passwordButtonNumber;
+    public Button passwordButton;
+    public GameObject unlockedPane;
     [Header("colors")]
     public Color invulnerableColor;
     public Color vulnerableColor;
     public Color compromisedColor;
-    public GameObject lockBlock;
 
     public override void ConfigureNode() {
+        // indicator.componen
         type.text = indicator.node.type switch {
             CyberNodeType.datanode => "data store",
             CyberNodeType.normal => "",
@@ -24,14 +31,19 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
             CyberNodeType.WAN => "internet"
         };
         status.text = $"{indicator.node.getStatus()}";
-        if (indicator.node.lockLevel > 0) {
-            lockStatus.text = $"LOCKED";
+
+        if (node.lockLevel > 0) {
+            lockedPane.SetActive(true);
+            unlockedPane.SetActive(false);
         } else {
-            lockStatus.text = $"ACCESS GRANTED";
+            lockedPane.SetActive(false);
+            unlockedPane.SetActive(true);
         }
-        // lockStatus.text = $"lock: {indicator.node.lockLevel}";
-        // lockBlock.SetActive(indicator.node.lockLevel > 0);
-        lockBlock.SetActive(false);
+
+        int numberPasswords = GameManager.I.gameData.numberPasswords();
+        lockPaneBottom.SetActive(numberPasswords > 0);
+        passwordButtonNumber.text = $"{numberPasswords}";
+        passwordButton.interactable = numberPasswords > 0;
 
         Color statusColor = indicator.node.getStatus() switch {
             CyberNodeStatus.invulnerable => invulnerableColor,
@@ -43,13 +55,13 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
         title.color = statusColor;
         type.color = statusColor;
         status.color = statusColor;
+        dataInfoDisplay.Configure(node);
 
-        if (node.datafileVisibility && indicator.node.type == CyberNodeType.datanode && indicator.node.payData != null) {
-            dataInfoDisplay.Configure(indicator.node.payData, indicator.node.dataStolen);
+        if (node.type == CyberNodeType.datanode && node.payData != null) {
             dataInfoDisplay.gameObject.SetActive(true);
             utilityInterfaceDisplay.gameObject.SetActive(false);
-        } else if (indicator.node.type == CyberNodeType.utility) {
-            utilityInterfaceDisplay.Configure(indicator.node);
+        } else if (node.type == CyberNodeType.utility) {
+            utilityInterfaceDisplay.Configure(node);
             dataInfoDisplay.gameObject.SetActive(false);
             utilityInterfaceDisplay.gameObject.SetActive(true);
         } else {
@@ -63,7 +75,6 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
         icon.sprite = mysteryIcon;
         type.text = $"???";
         status.text = "";
-        lockStatus.text = "";
 
         icon.color = mysteryColor;
         title.color = mysteryColor;
@@ -72,5 +83,15 @@ public class CyberNodeInfoPaneDisplay : NodeInfoPaneDisplay<CyberGraph, CyberNod
 
         dataInfoDisplay.gameObject.SetActive(false);
         utilityInterfaceDisplay.gameObject.SetActive(false);
+    }
+
+    public void PasswordDataButtonCallback() {
+        PayData passwordData = GameManager.I.gameData.levelState.delta.levelAcquiredPaydata.Where(data => data.type == PayData.DataType.password).FirstOrDefault();
+        if (passwordData != null) {
+            node.lockLevel = 0;
+            node.datafileVisibility = true;
+            GameManager.I.RemovePayData(passwordData, node.position);
+            GameManager.I.RefreshCyberGraph();
+        }
     }
 }

@@ -25,6 +25,18 @@ public partial class GameManager : Singleton<GameManager> {
         });
     }
 
+    public void RemovePayData(PayData data, Vector3 position) {
+        gameData.levelState.delta.levelAcquiredPaydata.Remove(data);
+        OnPayDataChange?.Invoke(data, gameData);
+        StatusUpdateData.StatusType statusType = data.type == PayData.DataType.password ? StatusUpdateData.StatusType.passwordData : StatusUpdateData.StatusType.data;
+        OnGameStateChange?.Invoke(new StatusUpdateData() {
+            type = statusType,
+            increment = -1,
+            originLocation = position
+        });
+        // TODO: reverse status icon fly toward target
+    }
+
     public void AddCredits(int amount, Vector3 position) {
         gameData.levelState.delta.levelAcquiredCredits += amount;
         // OnItemPickup?.Invoke(1, $"{amount}");
