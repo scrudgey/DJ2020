@@ -19,8 +19,8 @@ focus
 player and mentor appear running down an alley
 dialogue: "this is the place. follow my lead and we should be in and out with the score in minutes."
 stick with me kid, this should be a milk run.
-
 ease that transition from cutscene back to normal cam
+
 * reduce the amount of UI on screen
     * remove appearance status
     * remove overlay bar
@@ -32,18 +32,16 @@ ease that transition from cutscene back to normal cam
     * crawl through a gap in the fence
 * rain effect should travel with camera focus
     * ladder / interaction
-
 * mentor runs up to locked chainlink fence
 * dialogue: "come up over here and open this lock"
 * leave focus
 * focus on door (with arrow?)
-
 * player opens burglar menu
 * pause interactions on burglar canvas 
 * dialogue: explains / walks through lockpicking
-when door is open, "good work. it's unlocked"
+. when door is open, "good work. it's unlocked"
 * close burglar
-instruction: click on door to open
+* instruction: click on door to open
 * when door is opened, focus, mentor runs through
 * control camera orientation when moving camera.
 * disable overlay controls after getting right overlay
@@ -60,12 +58,6 @@ instruction: click on door to open
     * fences have health and take multiple cuts
     * when fence is cut, a gap is opened toward ground
     * click is item use- all usable items are gun exclusive
-
-
-set zoom when panning back to character control.
-
-
-
 * focus
 * door opens
 * mentor runs through, up to hide behind advance position of dumpster
@@ -79,6 +71,7 @@ set zoom when panning back to character control.
 * switch to power overlay
 * "yes, right there. if we take out that power relay it should cut the power to the camera. remember to always look for the holes in security."
 
+
 move up to the power relay and open burglar view
 mentor walks you through cutting the power, and the camera goes down
 "that's it, let's go."
@@ -88,14 +81,6 @@ when you get inside, he goes through another door into the computer room
 walks you through taking out the cyberdeck, stealing the file
 "great! what did i tell you kid,
 
-
-# interdict bad controls
-prevent closing the burglar menu
-prevent running down the street wrong way
-prevent taking gun out (no gun?)
-pause hack software selector while cutscene dialogue is active
-taking out cyberdeck early?
-third person view leading in to any camera moment
 
 
 # v2
@@ -208,45 +193,44 @@ third person view leading in to any camera moment
 * burglar option showed up
 * too much dialogue
 *  location highlight for lab door
+* show status bar / key flying to status bar
+
+# laboratory
+
+* change overlay UI to indicate locks better?
+    * move "download" and "utility" and "password" to the cyber node info
+        * use iconography for password
+    * make hack display only for software
+* disappearing central alarm
+* first dialogue redundant
+* fix up cutscene now
+* indicator sort order = 200
+. introduce breaking passwords
+* arrows appear over the software modal
+
 
 camera movement allowed during dialogue
 prevent using the key menu during dialogue
 prevent using key / burglar while walking up to door
-show status bar / key flying to status bar
 connecting to lab moves the camera to a strange place initially
-
-# laboratory
-
-introduce breaking passwords
-change overlay UI to indicate locks better?
-    move "download" and "utility" and "password" to the cyber node info
-        use iconography for password
-    make hack display only for software
-disappearing central alarm
-first dialogue redundant
-
-
-
-
-
-
-
-
-
-
-burglar polish:
-    better wires
-    "return button" doesn't work because multitool is in the way
-
-
+show disconnect button and indicate for 1 or 2 seconds
+ 
 cutscenes todo:
-    arrows appear over the software modal
     consistent increasing selection of UI elements
-    show disconnect button and indicate for 1 or 2 seconds
     fix up graphics for weapon wheel menu
     characters face the right directions
         mentor looks at router before pointing it out
         mentor and player look at building correctly or look around
         mentor at lab door facing away
-    can use wheel menu during dialogue
 
+disallow taking out gun
+
+
+# interdict bad controls
+prevent closing the burglar menu
+prevent running down the street wrong way
+prevent taking gun out (no gun?)
+pause hack software selector while cutscene dialogue is active
+taking out cyberdeck early?
+third person view leading in to any camera moment
+can use wheel menu during dialogue

@@ -42,6 +42,7 @@ public class HackTerminalController : MonoBehaviour {
     Coroutine interfaceRoutine;
 
     SoftwareButton activeSelector;
+    public Dictionary<string, RectTransform> selectorIndicators;
 
     public void ConfigureHackTerminal(NeoCyberNodeIndicator hackOrigin, NeoCyberNodeIndicator hackTarget, List<CyberNode> path) {
         bool changeDetected = this.hackOrigin != hackOrigin || this.hackTarget != hackTarget;
@@ -118,6 +119,7 @@ public class HackTerminalController : MonoBehaviour {
     }
 
     void PopulateSoftwareSelectors(List<SoftwareState> softwareStates) {
+        selectorIndicators = new Dictionary<string, RectTransform>();
         foreach (Transform child in buttonContainer) {
             Destroy(child.gameObject);
         }
@@ -139,7 +141,7 @@ public class HackTerminalController : MonoBehaviour {
         }
         selector.Initialize(softwareState, SoftwareButtonClicked, softwareEnabled);
         selector.transform.SetParent(buttonContainer, false);
-        // selectorIndicators.Add(softwareState.template.name, obj.GetComponent<RectTransform>());
+        selectorIndicators.Add(softwareState.template.name, obj.GetComponent<RectTransform>());
         return selector;
     }
 
@@ -149,6 +151,7 @@ public class HackTerminalController : MonoBehaviour {
         softwareView.Initialize(target, origin, path);
         softwareView.DisplayState(button.state);
         activeSelector = button;
+        CutsceneManager.I.HandleTrigger($"software_view_{button.state.template.name}");
         ChangeInterfacePanel(showHackButtons: false);
     }
     public void SoftwareDeployCallback() {
@@ -170,6 +173,7 @@ public class HackTerminalController : MonoBehaviour {
         interfaceRoutine = StartCoroutine(MoveInterfaces(showHackButtons: showHackButtons));
         Toolbox.RandomizeOneShot(audioSource, changeInterfaceSounds);
     }
+
     IEnumerator MoveInterfaces(bool showHackButtons = true) {
         float initialAmount = buttonBarRect.anchoredPosition.x;
         float finalAmount = showHackButtons ? 0f : -350f;

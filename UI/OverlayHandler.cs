@@ -160,10 +160,12 @@ public class OverlayHandler : MonoBehaviour {
         selectedAlarmNodeIndicator = null;
         selectedCyberNodeIndicator = null;
         selectedPowerNodeIndicator = null;
+        HackOriginSelectCallback(null);
+        GameManager.I.playerManualHacker.Disconnect();
+
         switch (type) {
             case OverlayType.none:
             default:
-                // GameManager.I.playerManualHacker.Disconnect();
                 if (GameManager.I.playerItemHandler.activeItem is CyberDeck) {
                     GameManager.I.SetOverlay(OverlayType.limitedCyber);
                     return;
@@ -183,12 +185,10 @@ public class OverlayHandler : MonoBehaviour {
                 cyberOverlay.gameObject.SetActive(false);
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "None";
-                closeButtonObject.SetActive(false);
+                nodeDiscoveryBox.SetActive(false);
                 cyberdeckController.Hide();
                 break;
             case OverlayType.power:
-                // GameManager.I.playerManualHacker.Disconnect();
-
                 foreach (Image image in colorImages) {
                     image.color = powerOverlayColors.enabledColor;
                 }
@@ -200,7 +200,7 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = "Power";
                 powerOverlay.OnOverlayActivate();
-                closeButtonObject.SetActive(true);
+                nodeDiscoveryBox.SetActive(true);
                 cyberdeckController.Hide();
                 break;
             case OverlayType.limitedCyber:
@@ -216,11 +216,9 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(false);
                 titleText.text = type == OverlayType.cyber ? "Network" : "None";
                 cyberOverlay.OnOverlayActivate();
-                closeButtonObject.SetActive(true);
+                nodeDiscoveryBox.SetActive(true);
                 break;
             case OverlayType.alarm:
-                // GameManager.I.playerManualHacker.Disconnect();
-
                 foreach (Image image in colorImages) {
                     image.color = alarmOverlayColors.enabledColor;
                 }
@@ -232,7 +230,7 @@ public class OverlayHandler : MonoBehaviour {
                 alarmOverlay.gameObject.SetActive(true);
                 titleText.text = "Alarm";
                 alarmOverlay.OnOverlayActivate();
-                closeButtonObject.SetActive(true);
+                nodeDiscoveryBox.SetActive(true);
                 cyberdeckController.Hide();
                 break;
         }
@@ -255,7 +253,6 @@ public class OverlayHandler : MonoBehaviour {
     }
 
     public void SetDiscoveryText<T, U>(Graph<T, U> graph) where U : Graph<T, U> where T : Node<T> {
-        nodeDiscoveryBox.SetActive(true);
         int knownNodes = graph.nodes.Values.Where(node => node.visibility >= NodeVisibility.mystery).Count();
         int totalNodes = graph.nodes.Count();
         nodesDiscoveredText.text = $"discovered: {knownNodes}/{totalNodes}";
@@ -403,18 +400,15 @@ public class OverlayHandler : MonoBehaviour {
             switch (indicator) {
                 case NeoCyberNodeIndicator cybernode:
                     mousedOverCyberNodeIndicator = cybernode;
-                    // RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
                     RefreshCyberInfoDisplays();
                     break;
                 case PowerNodeIndicator powernode:
                     mousedOverPowerNodeIndicator = powernode;
-                    // RefreshPowerGraph(GameManager.I.gameData.levelState.delta.powerGraph);
                     RefreshPowerInfoDisplays();
                     break;
                 case AlarmNodeIndicator alarmnode:
                     mousedOverAlarmNodeIndicator = alarmnode;
                     RefreshAlarmInfoDisplays();
-                    // RefreshAlarmGraph(GameManager.I.gameData.levelState.delta.alarmGraph);
                     break;
             }
             ShowInfoPaneForIndicator(indicator);
@@ -423,6 +417,7 @@ public class OverlayHandler : MonoBehaviour {
 
     void SetSelectedNode(INodeCameraProvider selected) {
         selectedNode = selected;
+        closeButtonObject.SetActive(selected != null);
         OnSelectedNodeChange?.Invoke(selected);
     }
     public void NodeMouseExitCallback() {
@@ -478,7 +473,7 @@ public class OverlayHandler : MonoBehaviour {
     IEnumerator EaseInInfoPane(bool value, RectTransform infoPaneRect) {
         float y = infoPaneRect.anchoredPosition.y;
         float startX = infoPaneRect.anchoredPosition.x;
-        float finishX = value ? -575 : -14;
+        float finishX = value ? -570 : -14;
         // Debug.Log($"[info pane] ease info pane: {value} {infoPaneRect} {startX}->{finishX}");
         yield return Toolbox.Ease(null, 0.5f, startX, finishX, PennerDoubleAnimation.ExpoEaseOut, (amount) => {
             infoPaneRect.anchoredPosition = new Vector2(amount, y);
@@ -488,5 +483,7 @@ public class OverlayHandler : MonoBehaviour {
     public void CloseButtonCallback() {
         SetSelectedNode(null);
         GameManager.I.SetOverlay(OverlayType.none);
+        HackOriginSelectCallback(null);
+        GameManager.I.playerManualHacker.Disconnect();
     }
 }

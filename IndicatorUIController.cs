@@ -21,11 +21,13 @@ public class IndicatorUIController : MonoBehaviour {
     public RectTransform cyberInfoIndicatorAnchor;
     public RectTransform hackIndicatorAnchor;
     public RectTransform hackButtonIndicator;
+    public RectTransform deployButtonIndicator;
     public RectTransform downloadButtonIndicator;
     public RectTransform handButtonIndicator;
     public UILineRenderer lineRenderer;
     public RectTransform lineRendererRectTransform;
     public RectTransform keyMenuIndicator;
+    public RectTransform lockedCybernodeIndicator;
     [Header("burglar positions")]
     public RectTransform probeIndicator;
     public RectTransform lockpickIndicator;
@@ -59,7 +61,7 @@ public class IndicatorUIController : MonoBehaviour {
 
         if (targets.Length > 0) {
             Canvas otherCanvas = targets[0].GetComponentInParent<Canvas>();
-            myCanvas.sortingOrder = otherCanvas.sortingOrder;
+            myCanvas.sortingOrder = otherCanvas.sortingOrder + 1;
         }
 
         for (int i = 0; i < targets.Length; i++) {

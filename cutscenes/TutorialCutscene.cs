@@ -26,10 +26,10 @@ class TutorialCutscene : Cutscene {
         SphereRobotAI mentorAI = mentorObject.GetComponent<SphereRobotAI>();
         mentorAI.enabled = false;
 
-        // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
-        // mentorObject.transform.position = mentorLockpickData.transform.position;
-        // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
-        // mentorObject.SetActive(true);
+        ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
+        mentorObject.transform.position = mentorLockpickData.transform.position;
+        mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
+        mentorObject.SetActive(true);
 
         // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_power"];
         // mentorObject.transform.position = mentorLockpickData.transform.position;
@@ -37,7 +37,7 @@ class TutorialCutscene : Cutscene {
         // mentorObject.SetActive(true);
 
 
-        yield return FromStartToGreet();
+        // yield return FromStartToGreet();
 
         yield return GreetHackSequence();
 
@@ -167,7 +167,6 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.cyberInfoIndicatorAnchor, Vector3.zero);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "This display shows info about your current target."); // TODO
 
-        // GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.hackIndicatorAnchor, Vector3.zero, IndicatorUIController.Direction.right);
         GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.hackIndicatorAnchor, Vector3.zero);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Your cyberdeck is how you launch attacks against the target."); // TODO
         GameManager.I.uiController.HideAllIndicators();
@@ -191,27 +190,22 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.HideCutsceneText();
         yield return new WaitForSecondsRealtime(1f);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Alright, this node is probably connected to the target building. We need to scan it to reveal its connections.");
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.hackButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
-        GameManager.I.uiController.ShowTutorialText("Click the Hack... button to open the hack software interface");
-        yield return WaitForTrigger("hack_software_open");
+
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.overlayHandler.cyberOverlay.hackTerminalController.selectorIndicators["scan"], Vector3.left * 20f, IndicatorUIController.Direction.right);
+        GameManager.I.uiController.ShowTutorialText("Select the scan software");
+        yield return WaitForTrigger("software_view_scan");
         GameManager.I.uiController.HideAllIndicators();
-        GameManager.I.uiController.HideCutsceneText();
-
-        // TODO: disable software interface
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "I loaded up your cyberdeck with some basic software. Use the scan software.\n[EDITOR'S NOTE: this whole interface will change at some point]");
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.softwareModalController.selectorIndicators["scan"], Vector3.left * 200f, IndicatorUIController.Direction.right);
-        // TODO: enable software interface
-
+        GameManager.I.uiController.ShowTutorialText("Click the Deploy button ");
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.deployButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
         yield return WaitForTrigger("software_deploy_scan");
+        GameManager.I.uiController.HideCutsceneText();
         GameManager.I.uiController.HideAllIndicators();
-
         yield return WaitForTrigger("software_complete_scan");
+
         inputProfile = inputProfile with {
             allowCameraControl = false
         };
-        // (Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput)
-        // yield return MoveCamera("router2", 0.5f, CameraState.normal);
-        // yield return RotateIsometricCamera(IsometricOrientation.NE, "router2")
+        yield return RotateIsometricCamera(IsometricOrientation.NW, playerCharacterController.transform.position);
         yield return new WaitForSecondsRealtime(0.5f);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Bingo. There's our way in.");
         yield return new WaitForSecondsRealtime(0.5f);
@@ -235,18 +229,15 @@ class TutorialCutscene : Cutscene {
         yield return WaitForTrigger("node_select_router");
         GameManager.I.uiController.HideAllIndicators();
 
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.hackButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
-        GameManager.I.uiController.ShowTutorialText("Click on the Hack... button to open the hack software interface");
 
-        yield return WaitForTrigger("hack_software_open");
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.overlayHandler.cyberOverlay.hackTerminalController.selectorIndicators["exploit"], Vector3.left * 20f, IndicatorUIController.Direction.right);
+        GameManager.I.uiController.ShowTutorialText("Select the exploit software");
+        yield return WaitForTrigger("software_view_exploit");
         GameManager.I.uiController.HideAllIndicators();
-        GameManager.I.uiController.HideCutsceneText();
-
-        // TODO: disable software interface
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.softwareModalController.selectorIndicators["exploit"], Vector3.left * 200f, IndicatorUIController.Direction.right);
-        // TODO: enable software interface
-
+        GameManager.I.uiController.ShowTutorialText("Click the Deploy button");
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.deployButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
         yield return WaitForTrigger("software_deploy_exploit");
+        GameManager.I.uiController.HideCutsceneText();
         GameManager.I.uiController.HideAllIndicators();
         yield return WaitForTrigger("software_complete_exploit");
 
@@ -254,13 +245,13 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.ShowTutorialText("Click on the router node (<sprite name=\"polygon\">) to connect to it.");
         yield return WaitForTrigger("node_select_router 2");
 
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.hackButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
-        GameManager.I.uiController.ShowTutorialText("Click on the Hack... button and use the scan software");
-        yield return WaitForTrigger("hack_software_open");
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.overlayHandler.cyberOverlay.hackTerminalController.selectorIndicators["scan"], Vector3.left * 20f, IndicatorUIController.Direction.right);
+        yield return WaitForTrigger("software_view_scan");
         GameManager.I.uiController.HideAllIndicators();
-        GameManager.I.uiController.HideCutsceneText();
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.softwareModalController.selectorIndicators["scan"], Vector3.left * 200f, IndicatorUIController.Direction.right);
+        GameManager.I.uiController.ShowTutorialText("Click the Deploy button");
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.deployButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
         yield return WaitForTrigger("software_deploy_scan");
+        GameManager.I.uiController.HideCutsceneText();
         GameManager.I.uiController.HideAllIndicators();
         yield return WaitForTrigger("software_complete_scan");
 
@@ -401,9 +392,6 @@ class TutorialCutscene : Cutscene {
         GameManager.I.uiController.ShowVisibilityInfo(false);
 
 
-
-
-
         // yield return MoveCamera("lockpick", 1.5f, CameraState.normal, zoomInput, PennerDoubleAnimation.ExpoEaseOut);
         // yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Hey Jack, get over here! I need you to open this lock.");
         // yield return CutsceneManager.I.LeaveFocus(this);
@@ -471,11 +459,6 @@ class TutorialCutscene : Cutscene {
 
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "This is a probe / decoder. It can bypass door latches and decode combination padlocks.", location: CutsceneDialogueController.Location.top);
 
-        // GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.screwdriverIndicator, Vector3.zero, IndicatorUIController.Origin.bottom);
-
-        // yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "This is a basic screwdriver for removing screws.", location: CutsceneDialogueController.Location.top);
-
-
         GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.lockpickIndicator, Vector3.zero, IndicatorUIController.Origin.bottom);
 
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "This the lockpick. It can unlock tumbler locks that use a physical key.", location: CutsceneDialogueController.Location.top);
@@ -497,13 +480,7 @@ class TutorialCutscene : Cutscene {
 
         yield return WaitForTrigger("unscrew");
         yield return WaitForTrigger("unscrew");
-        // inputProfile.allowBurglarInterface = false;
-        // burglarCanvas.PreventButtons(true);
-        // yield return new WaitForSecondsRealtime(0.5f);
         GameManager.I.uiController.HideCutsceneText();
-        // GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.handButtonIndicator, Vector3.zero);
-        // yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Great, now put the screwdriver away.");
-        // inputProfile.allowBurglarInterface = true;
         burglarCanvas.PreventButtons(false);
 
         GameManager.I.uiController.ShowTutorialText("Press escape or click the hand button <sprite name=\"hand\"> to put the screwdriver away.");
@@ -517,7 +494,7 @@ class TutorialCutscene : Cutscene {
 
         RectTransform panelElement = GameObject.FindObjectsOfType<AttackSurfaceUIElement>()
                     .Where(element => element.elementName == "panel").Select(element => element.GetComponent<RectTransform>()).First();
-        GameManager.I.uiController.DrawLine(panelElement, Vector3.zero);
+        GameManager.I.uiController.DrawLine(panelElement, Vector3.zero, IndicatorUIController.Origin.top);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Now let's pop that panel open and see what we can see.");
         inputProfile.allowBurglarInterface = true;
         burglarCanvas.PreventButtons(false);
@@ -673,13 +650,11 @@ class TutorialCutscene : Cutscene {
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Okay. We know where the target is, so let's get moving.");
         yield return LeaveFocus();
 
-        // yield return MoveCharacter(mentorController, "mentor_labdoor");
         CutsceneManager.I.StartCoroutine(MoveCharacter(mentorController, "mentor_labdoor", speedCoefficient: 0.75f));
         HighlightLocation("labdoor");
         yield return WaitForTrigger("labdoor");
         HideLocationHighlight();
 
-        // yield return Toolbox.RunJobRepeatedly(() => WaitForKey())
         if (hasKey) {
 
         } else {
@@ -697,7 +672,6 @@ class TutorialCutscene : Cutscene {
 
         yield return WaitForFocus();
         Time.timeScale = 1f;
-        // yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Great. Let's try the key in the lab door here.");
         inputProfile = InputProfile.allowAll with {
             allowPlayerMovement = false,
             allowBurglarButton = false
@@ -751,25 +725,27 @@ class TutorialCutscene : Cutscene {
             allowCameraControl = true
         };
         GameManager.I.uiController.HideCutsceneDialogue();
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Our objective is in that datastore but it's password protected. Let's crack the password.");
-
         GameManager.I.uiController.ShowTutorialText("Click on the datastore node (<sprite name=\"data_objective\">) to connect to it.");
         yield return WaitForTrigger("node_select_terminal");
         GameManager.I.uiController.HideCutsceneText();
 
         yield return new WaitForSecondsRealtime(1f);
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.hackButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
-        GameManager.I.uiController.ShowTutorialText("Click the Hack... button to open the hack software interface");
-        yield return WaitForTrigger("hack_software_open");
+
+        GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.lockedCybernodeIndicator, Vector3.zero);
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "The datastore is locked. We need to unlock it before we can download the objective data.");
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "You can unlock cyber nodes with password data (symbol), but since we don't have any, let's crack it with your cyberdeck.");
+
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.overlayHandler.cyberOverlay.hackTerminalController.selectorIndicators["tumbler"], Vector3.left * 20f, IndicatorUIController.Direction.right);
+        GameManager.I.uiController.ShowTutorialText("Select the tumbler software");
+        yield return WaitForTrigger("software_view_tumbler");
         GameManager.I.uiController.HideAllIndicators();
-        GameManager.I.uiController.HideCutsceneText();
-
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.softwareModalController.selectorIndicators["tumbler"], Vector3.left * 200f, IndicatorUIController.Direction.right);
-
+        GameManager.I.uiController.ShowTutorialText("Click the Deploy button");
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.deployButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
         yield return WaitForTrigger("software_deploy_tumbler");
+        GameManager.I.uiController.HideCutsceneText();
         GameManager.I.uiController.HideAllIndicators();
-
         yield return WaitForTrigger("software_complete_tumbler");
+
         inputProfile = inputProfile with {
             allowCameraControl = false
         };
@@ -777,7 +753,11 @@ class TutorialCutscene : Cutscene {
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "The node's wide open. Let's grab that datafile and get out of here.");
 
         GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.downloadButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
-        GameManager.I.uiController.ShowTutorialText("Click the Download... button");
+        GameManager.I.uiController.ShowTutorialText("Click the download button");
+
+        yield return WaitForTrigger("download_started");
+        GameManager.I.uiController.HideCutsceneText();
+        GameManager.I.uiController.HideAllIndicators();
 
         // TODO: disconnect, close overlay, put away item
         // TODO: mentor notices, car pulls up etc0

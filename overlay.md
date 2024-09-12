@@ -52,15 +52,16 @@
 * change hack panel
     * a collection of software buttons with charges / names visible
 * prevent double-launching software
+* better disconnect button
+    * hide until there is a selection
+* fix other network displays
+* close hack inteface when disconnecting
+* sfx for changing interface
+* hack sfx louder
 
-fix other network displays
-better disconnect button
-close hack inteface when disconnecting
 ideally: keep some notion of consistent node when changing overlays
 
 overlay polish:
-    * sfx for changing interface
-    * hack sfx louder
     sfx / fx for exploit success
     sfx / fx for unlock
     when mousing over in cyber view, highlight path as dotted line, highlight start and end points, show hops in big number over target node

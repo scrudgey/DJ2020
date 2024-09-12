@@ -162,7 +162,7 @@ public abstract class Cutscene {
 
             yield return null;
         }
-        yield return new WaitForSecondsRealtime(0.1f);
+        yield return new WaitForSecondsRealtime(0.2f);
     }
     protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput, Func<double, double, double, double, double> easing) {
         float timer = 0f;

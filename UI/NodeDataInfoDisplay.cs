@@ -102,5 +102,6 @@ public class NodeDataInfoDisplay : MonoBehaviour {
             path = downloadPath,
         };
         GameManager.I.AddNetworkAction(networkAction);
+        CutsceneManager.I.HandleTrigger("download_started");
     }
 }
