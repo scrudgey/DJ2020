@@ -25,11 +25,11 @@ public abstract class Cutscene {
     }
 
     protected IEnumerator WaitForFocus() {
-        Debug.Log("start wait for focus");
+        // Debug.Log("start wait for focus");
         yield return CutsceneManager.I.RequestFocus(this);
-        Debug.Log($"wait until cutscene has focus {this}");
+        // Debug.Log($"wait until cutscene has focus {this}");
         yield return new WaitUntil(() => this.hasFocus);
-        Debug.Log($"got focus");
+        // Debug.Log($"got focus");
     }
 
     protected IEnumerator LeaveFocus() {

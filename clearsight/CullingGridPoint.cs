@@ -93,7 +93,7 @@ public class CullingGridPoint {
                 }
 
                 TagSystem tagSystem = cullingComponent.GetComponent<TagSystem>();
-                if (tagSystem != null && tagSystem.data.invisibleOnPlayerFloor) {
+                if (tagSystem != null && (tagSystem.data.invisibleOnPlayerFloor || tagSystem.data.hvacDuct)) {
 
                 } else {
                     cullingComponents.Add(cullingComponent);

@@ -372,7 +372,7 @@ public class LevelDataUtilEditor : Editor {
 
             cullingComponent.idn = System.Guid.NewGuid().ToString();
             cullingComponent.Initialize(sceneData);
-            cullingComponent.floor = sceneData.GetCullingFloorForPosition(cullingComponent.adjustedPosition);
+            cullingComponent.floor = sceneData.GetCullingFloorForPosition(cullingComponent.adjustedPosition, debug: cullingComponent.debug);
             cullingComponent.rooftopZoneIdn = "-1";
             if (tagSystem != null && tagSystem.data.invisibleOnPlayerFloor) {
                 cullingComponent.floor += 1;

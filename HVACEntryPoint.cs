@@ -6,6 +6,7 @@ public class HVACEntryPoint : Interactive {
     public HVACNetwork network;
     public HVACElement startElement;
     public AttackSurfaceVentCover ventCover;
+    public Transform entryPoint;
     public override ItemUseResult DoAction(Interactor interactor) {
         ItemUseResult result = ItemUseResult.Empty() with {
             hvacUseResult = HvacUseResult.Empty() with {
@@ -17,8 +18,8 @@ public class HVACEntryPoint : Interactive {
         return result;
     }
 
-    public override bool AllowInteraction() {
-        // return true;
-        return ventCover == null || ventCover.state == AttackSurfaceVentCover.State.closed;
-    }
+    // public override bool AllowInteraction() {
+    //     // return true;
+    //     return ventCover == null || ventCover.state == AttackSurfaceVentCover.State.closed;
+    // }
 }

@@ -293,7 +293,7 @@ public class InputController : Singleton<InputController> {
         }
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-
+        // Vector2 unscaledMouseDelta = mouseDelta;
         if ((mouseDelta - previousMouseDelta).magnitude > 50f) mouseDelta = Vector2.zero; // HACK
 
         mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
@@ -326,6 +326,7 @@ public class InputController : Singleton<InputController> {
             MoveAxisForward = inputVector.y,
             MoveAxisRight = inputVector.x,
             mouseDelta = _smoothMouse,
+            // unsmoothedMouseDelta = unscaledMouseDelta,
             CameraRotation = OrbitCamera.isometricRotation,
             JumpDown = jumpPressedThisFrame,
             jumpHeld = jumpHeld,

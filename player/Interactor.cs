@@ -30,8 +30,8 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
     public Action<InteractorTargetData> OnActionDone;
     public InteractorTargetData cursorTarget;
     public AttackSurface selectedAttackSurface;
-
     public CharacterController characterController;
+
 
     public void SetCursorData(CursorData cursorData) {
         cursorTarget = cursorData.highlightableTargetData;
@@ -43,19 +43,23 @@ public class Interactor : MonoBehaviour, IBindable<Interactor> {
         if (doAction && (inputs.Fire.cursorData.highlightableTargetData?.targetIsInRange ?? false)) {
             Interactive cursorInteractive = cursorTarget?.target.GetComponent<Interactive>();
             if (cursorInteractive != null && cursorInteractive.interactible) {
-                ItemUseResult result = cursorInteractive.DoActionAndUpdateState(this);
-                OnValueChanged?.Invoke(this);
-                if (result.showKeyMenu) {
-                    GameManager.I.uiController.ShowKeyMenu(result.doorlocks);
-                }
-                if (!cursorInteractive.interactible) {
-                    cursorTarget = null;
-                }
-                return result;
+                return DoInteraction(cursorInteractive);
             }
             return ItemUseResult.Empty();
         } else
             return ItemUseResult.Empty();
+    }
+
+    public ItemUseResult DoInteraction(Interactive interactive) {
+        ItemUseResult result = interactive.DoActionAndUpdateState(this);
+        OnValueChanged?.Invoke(this);
+        if (result.showKeyMenu) {
+            GameManager.I.uiController.ShowKeyMenu(result.doorlocks);
+        }
+        if (!interactive.interactible) {
+            cursorTarget = null;
+        }
+        return result;
     }
 
     public void HandleInteractButtonCallback(AttackSurface attackSurface) {

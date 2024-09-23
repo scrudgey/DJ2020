@@ -209,28 +209,74 @@ walks you through taking out the cyberdeck, stealing the file
 * arrows appear over the software modal
 
 
-camera movement allowed during dialogue
-prevent using the key menu during dialogue
-prevent using key / burglar while walking up to door
-connecting to lab moves the camera to a strange place initially
-show disconnect button and indicate for 1 or 2 seconds
- 
-cutscenes todo:
-    consistent increasing selection of UI elements
-    fix up graphics for weapon wheel menu
-    characters face the right directions
-        mentor looks at router before pointing it out
-        mentor and player look at building correctly or look around
-        mentor at lab door facing away
+. camera movement allowed during dialogue
+. connecting to lab moves the camera to a strange place initially
+. show disconnect button and indicate for 1 or 2 seconds
 
+
+prevent using the key menu during dialogue
+prevent using key while walking up to door
+password data icon
+ 
+
+# the dramatic conclusion
+
+rain stops
+possibilities:
+    they come, kill the guy, leave
+    the player must escape while a firefight ensues
+    they come from both directions and light the place up
+    place explosive beforehand:
+    escape through a vent
+
+
+
+
+
+
+
+# cutscenes todo
+consistent increasing selection of UI elements
+fix up graphics for weapon wheel menu
+characters face the right directions
+    mentor looks at router before pointing it out
+    mentor and player look at building correctly or look around
+    mentor at lab door facing away
+    when hiding behind planter, look at door 
+escape menu viability
+
+draw portrait for player character
 disallow taking out gun
 
+interdict bad controls
+    prevent closing the burglar menu
+    prevent running down the street wrong way
+    prevent taking gun out (no gun?)
+    pause hack software selector while cutscene dialogue is active
+    taking out cyberdeck early?
+    third person view leading in to any camera moment
+    can use wheel menu during dialogue
+    prevent burglar interface power relay before we get tehre
 
-# interdict bad controls
-prevent closing the burglar menu
-prevent running down the street wrong way
-prevent taking gun out (no gun?)
-pause hack software selector while cutscene dialogue is active
-taking out cyberdeck early?
-third person view leading in to any camera moment
-can use wheel menu during dialogue
+initial flicker
+"bingo, there's our way in" camera rotation abrupt
+move network button indicator
+remove "pop that panel"
+symbol for hand tool
+mentor shoves me with the door
+
+
+
+
+
+
+# fixing the air duct
+
+* and the same button appears when we mouse over in normal view
+* when in hvac, camera position is wrong
+* when in hvac aim, less easing on aim
+* when in hvac, culling is wrong
+* hide enter button until vent is open
+
+show enter button in burglar view
+vent looks weird when removing

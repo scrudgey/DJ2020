@@ -454,6 +454,7 @@ public class SphereRobotAI : IBinder<SightCone>, IDamageReceiver, IListener, IHi
     void PerceivePlayerObject(Collider other, bool byPassVisibilityCheck = false) {
         if (GameManager.I.playerCharacterController.state == CharacterState.hvac || GameManager.I.playerCharacterController.state == CharacterState.hvacAim)
             return;
+        if (stateMachine == null || stateMachine.currentState == null) return;
         float distance = Vector3.Distance(transform.position, other.bounds.center);
         if (byPassVisibilityCheck || GameManager.I.IsPlayerVisible(distance) || stateMachine.currentState is SphereInvestigateState) {
             stateMachine.currentState.OnObjectPerceived(other);

@@ -18,9 +18,8 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
     public Color color;
     [Header("buttons")]
     public Button interactButton;
-    // public Button keyButton;
     public RectTransform interactButtonRect;
-    // public RectTransform keyButtonRect;
+    public RectTransform enterButtonRect;
     public AttackSurface currentAttackSurface;
     void Awake() {
         blitTextCoroutine = null;
@@ -29,6 +28,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (!InteractorTargetData.Equality(currentInteractorTarget, interactor.cursorTarget)) {
             currentInteractorTarget?.target?.DisableOutline();
             currentInteractorTarget = interactor.cursorTarget;
+            Debug.Log(currentInteractorTarget);
             currentInteractorTarget?.target?.EnableOutline();
 
             if (currentInteractorTarget == null) {
@@ -39,20 +39,29 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
                 } else {
                     Disable();
                 }
-                // if (currentInteractorTarget.target.doorLocks != null && currentInteractorTarget.target.doorLocks.Count > 0) {
-                //     keyButton.gameObject.SetActive(true);
-                // } else {
-                //     keyButton.gameObject.SetActive(false);
-                // }
             }
         }
-        if (currentAttackSurface != interactor.selectedAttackSurface) {
-            currentAttackSurface?.DisableOutline();
+
+        if (currentAttackSurface != null && currentAttackSurface != interactor.selectedAttackSurface) {
+            currentAttackSurface.DisableOutline();
         }
+
         currentAttackSurface = interactor.selectedAttackSurface;
-        if (currentAttackSurface != null) {
-            currentAttackSurface.EnableOutline();
+
+        if (currentInteractorTarget != null && currentInteractorTarget.target != null) {
+            Debug.Log($"{currentInteractorTarget != null} && {currentInteractorTarget.target != null} && {currentInteractorTarget.target is HVACEntryPoint}");
+        }
+
+        if (currentInteractorTarget != null && currentInteractorTarget.target != null && currentInteractorTarget.target is HVACEntryPoint point) {
+            Vector3 screenPoint = cam.WorldToScreenPoint(point.entryPoint.position);
+            enterButtonRect.gameObject.SetActive(true);
+            interactButton.gameObject.SetActive(false);
+            enterButtonRect.position = screenPoint;
+        } else if (currentAttackSurface != null) {
+            enterButtonRect.gameObject.SetActive(false);
             interactButton.gameObject.SetActive(true);
+
+            currentAttackSurface.EnableOutline();
 
             Vector3 screenPoint = cam.WorldToScreenPoint(currentAttackSurface.attackElementRoot.position);
             interactButtonRect.position = screenPoint;
@@ -62,9 +71,9 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             interactible &= Vector3.Distance(currentAttackSurface.attackElementRoot.position, GameManager.I.playerPosition) < currentAttackSurface.interactionDistance;
             interactButton.interactable = interactible;
         } else {
+            enterButtonRect.gameObject.SetActive(false);
             interactButton.gameObject.SetActive(false);
         }
-
     }
     void DataChanged() {
         if (currentInteractorTarget == null) {
@@ -110,9 +119,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (blitTextCoroutine != null) {
             StopCoroutine(blitTextCoroutine);
         }
-        if (currentInteractorTarget != null) {
-            currentInteractorTarget.target.DisableOutline();
-        }
+        currentInteractorTarget?.target.DisableOutline();
     }
     void Enable(string actionText) {
         if (blitTextCoroutine != null) {
@@ -131,9 +138,10 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
             target.HandleInteractButtonCallback(currentAttackSurface);
         }
     }
-    public void KeyButtonCallback() {
-        if (currentInteractorTarget != null) {
-            Debug.Log($"key callback");
+    public void EnterButtonCallback() {
+        if (currentInteractorTarget != null && currentInteractorTarget.target != null && currentInteractorTarget.target is HVACEntryPoint) {
+            ItemUseResult result = target.DoInteraction(currentInteractorTarget.target);
+            GameManager.I.playerCharacterController.HandleItemUseResult(result);
         }
     }
     public IEnumerator BlitCalloutText(string actionText) {

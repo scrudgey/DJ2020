@@ -15,6 +15,7 @@ public struct PlayerInput {
     public float MoveAxisForward;
     public float MoveAxisRight;
     public Vector2 mouseDelta;
+    // public Vector2 unsmoothedMouseDelta;
     public Quaternion CameraRotation;
     public bool JumpDown;
     public bool jumpHeld;

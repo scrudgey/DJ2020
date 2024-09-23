@@ -257,9 +257,6 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
 
     public void UpdateWithInput(CameraInput input, bool debug = false) {
         if (Camera == null) return;
-        if (debug) {
-            Debug.Log("entering debug");
-        }
         CameraState camState = input.cameraState;
         currentAttractor = null;
 
@@ -551,8 +548,7 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
         Vector2 cursorPosition = Mouse.current.position.ReadValue();
         Vector2 cursorPositionNormalized = new Vector2(cursorPosition.x / horizontalPixels, cursorPosition.y / verticalPixels) + new Vector2(0f, -0.5f);
 
-        Quaternion cameraRotation = Quaternion.identity;
-        cameraRotation = input.targetRotation;
+        Quaternion cameraRotation = input.targetRotation;
 
         // update PlanarDirection to snap to nearest of 4 quadrants
         Quaternion closestCardinal = Toolbox.SnapToClosestRotation(cameraRotation, cardinalDirections.Keys.ToList());
@@ -566,8 +562,9 @@ public class CharacterCamera : MonoBehaviour, IInputReceiver, IBindable<Characte
             targetDistance = 0f,
             targetPosition = input.targetPosition,
             orthographicSize = 4f,
-            distanceMovementSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
-            followingSharpness = (float)PennerDoubleAnimation.ExpoEaseOut(transitionTime, 10, 1, 1),
+            rotationSharpness = 1000f,
+            distanceMovementSharpness = 1000f,
+            followingSharpness = 1000f,
             minDistance = 0
         };
     }

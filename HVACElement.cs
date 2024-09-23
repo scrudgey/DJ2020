@@ -6,6 +6,7 @@ public class HVACElement : MonoBehaviour {
     public Transform crawlpoint;
     public bool dismountOnEnter;
     public Rigidbody grate;
+    public Transform cameraPosition;
 
     public AudioSource audioSource;
     public AudioClip[] impactGrateSound;
@@ -19,9 +20,7 @@ public class HVACElement : MonoBehaviour {
         if (grate == null) {
             controller.TransitionToState(CharacterState.normal);
         } else {
-            // GameManager.I.ShowGrateKickCutscene(this, controller);
             CutsceneManager.I.StartCutscene(new KickOutHVACGrateCutscene(this));
-            grate = null;
         }
     }
 

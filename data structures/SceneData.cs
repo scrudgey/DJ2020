@@ -37,9 +37,12 @@ public class SceneData : ScriptableObject {
     //     return path;
     // }
 
-    public int GetCullingFloorForPosition(Vector3 position) {
+    public int GetCullingFloorForPosition(Vector3 position, bool debug = false) {
         int index = -1;
         foreach (float floorHeight in floorHeights) {
+            if (debug) {
+                Debug.Log($"{floorHeight} {position} {index} {floorHeight >= position.y}");
+            }
             if (floorHeight >= position.y) {
                 return index;
             }

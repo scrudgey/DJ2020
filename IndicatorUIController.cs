@@ -28,6 +28,8 @@ public class IndicatorUIController : MonoBehaviour {
     public RectTransform lineRendererRectTransform;
     public RectTransform keyMenuIndicator;
     public RectTransform lockedCybernodeIndicator;
+    public RectTransform disconnectIndicator;
+
     [Header("burglar positions")]
     public RectTransform probeIndicator;
     public RectTransform lockpickIndicator;

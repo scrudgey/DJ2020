@@ -60,6 +60,7 @@
 * hack sfx louder
 
 ideally: keep some notion of consistent node when changing overlays
+make map data take effect
 
 overlay polish:
     sfx / fx for exploit success

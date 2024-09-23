@@ -42,6 +42,7 @@ public class TagSystemData {
     public bool dontCullFromAbove;
     // if true, don't wait for interloper- go invisible like an above floor when player on my floor
     public bool invisibleOnPlayerFloor;
+    public bool hvacDuct;
 
 }
 public class TagSystem : MonoBehaviour {

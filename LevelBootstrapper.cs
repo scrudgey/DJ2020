@@ -10,7 +10,6 @@ public class LevelBootstrapper : MonoBehaviour {
     public bool spawnNPCs;
     public LevelTemplate levelTemplate;
     public bool VRMission;
-    // public bool world;
     void Start() {
         StartCoroutine(Toolbox.WaitForSceneLoadingToFinish(Initialize));
     }
@@ -30,13 +29,6 @@ public class LevelBootstrapper : MonoBehaviour {
                 BootStrapTutorial();
                 break;
         }
-        // if (world) {
-        //     BootStrapWorld();
-        // } else if (VRMission) {
-        //     BootStrapVR();
-        // } else {
-        //     BootStrapMission();
-        // }
     }
 
     void BootStrapVR() {

@@ -162,6 +162,7 @@ public class OverlayHandler : MonoBehaviour {
         selectedPowerNodeIndicator = null;
         HackOriginSelectCallback(null);
         GameManager.I.playerManualHacker.Disconnect();
+        CutsceneManager.I.HandleTrigger("disconnect");
 
         switch (type) {
             case OverlayType.none:
@@ -485,5 +486,6 @@ public class OverlayHandler : MonoBehaviour {
         GameManager.I.SetOverlay(OverlayType.none);
         HackOriginSelectCallback(null);
         GameManager.I.playerManualHacker.Disconnect();
+        CutsceneManager.I.HandleTrigger("disconnect");
     }
 }

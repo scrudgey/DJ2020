@@ -26,27 +26,32 @@ class TutorialCutscene : Cutscene {
         SphereRobotAI mentorAI = mentorObject.GetComponent<SphereRobotAI>();
         mentorAI.enabled = false;
 
-        ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
-        mentorObject.transform.position = mentorLockpickData.transform.position;
-        mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
-        mentorObject.SetActive(true);
+        // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_greet"];
+        // mentorObject.transform.position = mentorLockpickData.transform.position;
+        // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
+        // mentorObject.SetActive(true);
 
         // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_power"];
         // mentorObject.transform.position = mentorLockpickData.transform.position;
         // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
         // mentorObject.SetActive(true);
 
+        // mentor_interior
+        // ScriptSceneLocation mentorLockpickData = CutsceneManager.I.worldLocations["mentor_interior"];
+        // mentorObject.transform.position = mentorLockpickData.transform.position;
+        // mentorController.Motor.SetPosition(mentorLockpickData.transform.position, bypassInterpolation: true);
+        // mentorObject.SetActive(true);
 
-        // yield return FromStartToGreet();
+        yield return FromStartToGreet();
 
         yield return GreetHackSequence();
 
         yield return Fence();
-        // 
+        // // 
         yield return PowerHack();
 
         yield return EnterDoor();
-        // yield return new WaitForSecondsRealtime(1);
+        // yield return new WaitForSecondsRealtime(3);
         yield return Interior();
 
         yield return Laboratory();
@@ -308,6 +313,12 @@ class TutorialCutscene : Cutscene {
         yield return LeaveFocus();
         HideBasicUI();
         GameManager.I.uiController.ShowOverlayControls(true);
+
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.disconnectIndicator, Vector3.zero, IndicatorUIController.Direction.up);
+        GameManager.I.uiController.ShowTutorialText("Click the disconnect button");
+        yield return WaitForTrigger("disconnect");
+        GameManager.I.uiController.HideAllIndicators();
+        GameManager.I.uiController.HideCutsceneText();
     }
 
     IEnumerator Fence() {
@@ -672,6 +683,7 @@ class TutorialCutscene : Cutscene {
 
         yield return WaitForFocus();
         Time.timeScale = 1f;
+
         inputProfile = InputProfile.allowAll with {
             allowPlayerMovement = false,
             allowBurglarButton = false
@@ -685,13 +697,11 @@ class TutorialCutscene : Cutscene {
         yield return new WaitForSecondsRealtime(0.5f);
         GameManager.I.uiController.DrawLine(GameManager.I.uiController.indicatorUIController.keyMenuIndicator, Vector3.zero);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Since you just tried a locked door, the key menu opened up here. How do you know if the key works in the lock? You gotta try it out!");
-        inputProfile = inputProfile with { allowCameraControl = true };
         // TODO: indicate key menu
         GameManager.I.uiController.ShowTutorialText("Click on the door to reveal the key menu\nClick on the key button to use the key in the lock");
         yield return WaitForTrigger("key_menu_used");
         GameManager.I.uiController.HideCutsceneDialogue();
-        inputProfile = inputProfile with { allowCameraControl = false };
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Using the right key in a locked door draws a lot less attention than trying to pick it. Makes it look like you belong there. Guards hassle you less.");
+        yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Using the key in a door draws a lot less attention. Makes it look like you belong there. Guards hassle you less.");
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "Even just knowing the key code can help you sometimes. Some runners like to cut their own keys or make their own keycards while on a mission.");
         inputProfile = inputProfile with { allowCameraControl = true };
         yield return LeaveFocus();
@@ -752,7 +762,7 @@ class TutorialCutscene : Cutscene {
         yield return new WaitForSecondsRealtime(1f);
         yield return GameManager.I.uiController.ShowCutsceneDialogue("the mentor", mentorPortrait, "The node's wide open. Let's grab that datafile and get out of here.");
 
-        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.downloadButtonIndicator, Vector3.zero, IndicatorUIController.Direction.right);
+        GameManager.I.uiController.ShowIndicator(GameManager.I.uiController.indicatorUIController.downloadButtonIndicator, Vector3.zero, IndicatorUIController.Direction.up);
         GameManager.I.uiController.ShowTutorialText("Click the download button");
 
         yield return WaitForTrigger("download_started");

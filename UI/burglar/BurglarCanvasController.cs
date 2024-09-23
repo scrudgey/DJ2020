@@ -570,6 +570,7 @@ public class BurglarCanvasController : MonoBehaviour {
         feedback.DoWriteMany(writes);
     }
     public void MouseOverUIElementCallback(AttackSurfaceElement element) {
+        if (element == null || element.uiElement == null) return;
         mouseOverElement = true;
         if (selectedElement != element && selectedTool != BurglarToolType.usb && selectedTool != BurglarToolType.none && mouseOverTimeout <= 0) {
             mouseOverTimeout = 0.75f;

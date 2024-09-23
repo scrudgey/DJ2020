@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 public class NeoClearsighterV4 : IBinder<CharacterCamera> {
     enum State { normal, showAll, aboveOnly }
-    enum FloorState { visible, invisible }
+    enum FloorState { visible, invisible, hvacVisible, hvacInvisible }
     State state;
     static readonly int BATCHSIZE = 50000;
     readonly static int jobBatchSize = 18;
@@ -83,15 +83,7 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
     }
 
     override public void HandleValueChanged(CharacterCamera cam) {
-        // the problem is: during normal game, the target position is the character followtransform which is an offset
-        // but clearsighter needs the foot location.
         targetPosition = cam.cullingTargetPosition;
-        // // TODO hack: fix later
-        // if (CutsceneManager.I.cutsceneIsRunning()) {
-
-        // } else {
-        //     targetPosition -= new Vector3(0f, 1.31f, 0f);
-        // }
     }
 
     public void Initialize(Transform focus, CharacterCamera characterCamera, CharacterController characterController, SceneData sceneData, string sceneName) {
@@ -211,11 +203,12 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
         int j = 0;
         commandQueue.Clear();
 
-        // playerPosition = followTransform.position;
         playerPosition = targetPosition;
         RectifyPlayerFloor();
 
         if (state == State.normal) {
+
+            HandleHVACOnPlayerFloor();
 
             yield return GatherRaycastResults();
 
@@ -251,6 +244,9 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
         // set floor and roof zone
         int newPlayerFloor = cullingVolume.GetFloorIndexPosition(playerPosition);
         int transitionFloor = cullingVolume.GetTransitionFloor(playerPosition, betweenFloorBuffer);
+        if (characterController.state == CharacterState.hvac) {
+            transitionFloor = -99;
+        }
         if (transitionFloor != playerBetweenFloorLow) {
             resetFloorCulling = true;
         }
@@ -297,10 +293,39 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
     }
     IEnumerator RefreshAllFloorsAbovePlayer() {
         int k = 0;
+
+        // hide or show all floors above the player
         for (int i = cullingVolume.floorHeights.Count; i > playerFloor - 1; i--) {
             yield return RefreshFloorState(i, k);
         }
     }
+    void HandleHVACOnPlayerFloor() {
+        // hide or show hvac ducts on player floor
+        Dictionary<int, FloorState> floorStates = floorStatesPerRoofZone[playerRoofZone];
+
+        FloorState desiredState;
+        if (characterController.state == CharacterState.hvac) {
+            desiredState = FloorState.hvacVisible;
+        } else {
+            desiredState = FloorState.hvacInvisible;
+        }
+        if (floorStates[playerFloor] != desiredState) {
+            List<CullingComponent> floorComponents = cullingComponentsByZoneAndFloors[playerRoofZone][playerFloor];
+            for (int j = 0; j < floorComponents.Count; j++) {
+                CullingComponent cullingComponent = floorComponents[j];
+
+                if (!cullingComponent.data.hvacDuct) continue;
+                if (desiredState == FloorState.hvacInvisible) {
+                    cullingComponent.ChangeState(CullingComponent.CullingState.above);
+                } else if (desiredState == FloorState.hvacVisible) {
+                    cullingComponent.ChangeState(CullingComponent.CullingState.normal);
+                }
+            }
+            // Debug.Log($"{zoneId}\t{floorIndex}\t{desiredState}");
+            floorStates[playerFloor] = desiredState;
+        }
+    }
+
     IEnumerator RefreshFloorState(int floorIndex, int k) {
         foreach (KeyValuePair<string, Dictionary<int, FloorState>> kvp in floorStatesPerRoofZone) {
             string zoneId = kvp.Key;
@@ -332,10 +357,8 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
 
                     if (desiredState == FloorState.visible) {
                         if (!activeInterlopers.ContainsKey(cullingComponent)) {
-                            // activeInterlopers.Remove(cullingComponent);
                             cullingComponent.ChangeState(CullingComponent.CullingState.normal);
                         }
-                        // cullingComponent.ChangeState(CullingComponent.CullingState.normal);
                     } else if (desiredState == FloorState.invisible) {
                         if (activeInterlopers.ContainsKey(cullingComponent)) {
                             activeInterlopers.Remove(cullingComponent);
@@ -454,14 +477,14 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
             if (result.collider == null) {
                 (Vector3 origin, Vector3 displacement) = point.rayCastOriginAndDirection(followPoint);
 
-                Debug.DrawLine(origin, origin + displacement, Color.green);
+                // Debug.DrawLine(origin, origin + displacement, Color.green);
                 // point.DrawRay(orientation);
                 IsometricOrientation orientation = (IsometricOrientation)(((int)characterCamera.currentOrientation + 3) % 4);
                 foreach (string idn in point.GetInterlopers(orientation)) {
                     hits.Add((point.floor, idn));
                 }
                 foreach (string zoneIdn in point.GetRooftopZones(orientation)) {
-                    Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
+                    // Debug.DrawLine(followPoint, point.position + (2 * Vector3.up), Color.green);
                     roofZoneHits.Add(zoneIdn);
                 }
             } else {
@@ -473,7 +496,8 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
         // enqueue culling commands
         foreach ((int pointFloor, string idn) in hits) {
             CullingComponent cullingComponent = cullingComponents[idn];
-            if (floorStatesPerRoofZone[cullingComponent.rooftopZoneIdn][cullingComponent.floor] != FloorState.visible) continue;
+            FloorState floorState = floorStatesPerRoofZone[cullingComponent.rooftopZoneIdn][cullingComponent.floor];
+            if (floorState != FloorState.visible && floorState != FloorState.hvacVisible && floorState != FloorState.hvacInvisible) continue;
             // if (cullingComponent.floor != playerFloor && cullingComponent.floor != playerBetweenFloorHigh - 1) continue;
             if (cullingComponent.data.dontCullFromAbove && pointFloor > cullingComponent.floor) continue; // don't allow things above to call this an interloper
             commandQueue.Add(new CullingCommand(cullingComponent, CullingCommand.Command.interloper));
@@ -494,7 +518,8 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
     IEnumerator ApplyCommands(Vector3 playerPosition) {
         foreach (CullingCommand command in commandQueue) {
             if (command.command == CullingCommand.Command.interloper) {
-                if (floorStatesPerRoofZone[command.component.rooftopZoneIdn][command.component.floor] != FloorState.visible) continue;
+                FloorState floorState = floorStatesPerRoofZone[command.component.rooftopZoneIdn][command.component.floor];
+                if (floorState != FloorState.visible && floorState != FloorState.hvacVisible && floorState != FloorState.hvacInvisible) continue;
                 command.component.ApplyInterloper(playerPosition);
             } else if (command.command == CullingCommand.Command.above) {
                 command.component.ChangeState(CullingComponent.CullingState.above);
@@ -527,7 +552,8 @@ public class NeoClearsighterV4 : IBinder<CharacterCamera> {
         foreach (CullingComponent key in keys) {
             activeInterlopers[key] -= 1;
             if (activeInterlopers[key] <= 0) {
-                if (floorStatesPerRoofZone[key.rooftopZoneIdn][key.floor] == FloorState.visible)
+                FloorState floorState = floorStatesPerRoofZone[key.rooftopZoneIdn][key.floor];
+                if (floorState == FloorState.visible || floorState == FloorState.hvacVisible || floorState == FloorState.hvacInvisible)
                     key.StopCulling();
                 keysToRemove.Add(key);
             }

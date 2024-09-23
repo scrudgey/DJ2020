@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using KinematicCharacterController;
+using UnityEditorInternal;
 using UnityEngine;
 public enum CharacterState {
     normal,
@@ -920,8 +921,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     Vector3 projectedCameraForward = Vector3.ProjectOnPlane(aimCameraRotation * Vector3.forward, Vector3.up);
                     Quaternion levelRotation = Quaternion.LookRotation(projectedCameraForward, Vector3.up);
 
-                    if (gunHandler.HasGun()) {
+                    if (gunHandler.HasGun() || state == CharacterState.hvacAim) {
                         currentRotation = levelRotation;
+                        Debug.Log(currentRotation);
                     } else {
                         currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
                     }
@@ -936,7 +938,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                     aimCameraRotation = Quaternion.Euler(currentRotationEulerAngles);
 
                     lookAtDirection = Vector3.Lerp(lookAtDirection, aimCameraRotation * Vector3.forward, 0.05f);
-
                 }
                 break;
             case CharacterState.normal:
@@ -1695,11 +1696,14 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         Vector2 finalLastWallInput = wallPressRatchet ? lastWallInput : Vector2.zero;
 
         CameraState camState = CameraState.normal;
+        Vector3 targetPosition = cameraFollowTransform.position;
+        Vector3 cullingPosition = transform.position;
 
         if (state == CharacterState.overlayView) {
             camState = CameraState.overlayView;
         } else if (state == CharacterState.hvacAim) {
             camState = CameraState.firstPerson;
+            targetPosition -= 1.25f * Vector3.up;
         } else if (state == CharacterState.aim) {
             camState = CameraState.aim;
         } else if (state == CharacterState.wallPress || state == CharacterState.popout) {
@@ -1707,6 +1711,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         } else if (state == CharacterState.burgle) {
             camState = CameraState.burgle;
         }
+
+        // if (state == CharacterState.hvac) {
+        //     cullingPosition -= 1.25f * Vector3.up;
+        // }
 
         CameraInput input = new CameraInput {
             deltaTime = Time.deltaTime,
@@ -1720,8 +1728,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             popoutParity = popoutParity,
             targetRotation = aimCameraRotation,
             targetTransform = cameraFollowTransform,
-            targetPosition = cameraFollowTransform.position,
-            cullingTargetPosition = transform.position,
+            targetPosition = targetPosition,
+            cullingTargetPosition = cullingPosition,
             atLeftEdge = atLeftEdge,
             atRightEdge = atRightEdge,
             currentAttackSurface = currentAttackSurface
