@@ -207,67 +207,9 @@ walks you through taking out the cyberdeck, stealing the file
 * indicator sort order = 200
 . introduce breaking passwords
 * arrows appear over the software modal
-
-
 . camera movement allowed during dialogue
 . connecting to lab moves the camera to a strange place initially
 . show disconnect button and indicate for 1 or 2 seconds
-
-
-prevent using the key menu during dialogue
-prevent using key while walking up to door
-password data icon
- 
-
-# the dramatic conclusion
-
-rain stops
-possibilities:
-    they come, kill the guy, leave
-    the player must escape while a firefight ensues
-    they come from both directions and light the place up
-    place explosive beforehand:
-    escape through a vent
-
-
-
-
-
-
-
-# cutscenes todo
-consistent increasing selection of UI elements
-fix up graphics for weapon wheel menu
-characters face the right directions
-    mentor looks at router before pointing it out
-    mentor and player look at building correctly or look around
-    mentor at lab door facing away
-    when hiding behind planter, look at door 
-escape menu viability
-
-draw portrait for player character
-disallow taking out gun
-
-interdict bad controls
-    prevent closing the burglar menu
-    prevent running down the street wrong way
-    prevent taking gun out (no gun?)
-    pause hack software selector while cutscene dialogue is active
-    taking out cyberdeck early?
-    third person view leading in to any camera moment
-    can use wheel menu during dialogue
-    prevent burglar interface power relay before we get tehre
-
-initial flicker
-"bingo, there's our way in" camera rotation abrupt
-move network button indicator
-remove "pop that panel"
-symbol for hand tool
-mentor shoves me with the door
-
-
-
-
 
 
 # fixing the air duct
@@ -277,6 +219,101 @@ mentor shoves me with the door
 * when in hvac aim, less easing on aim
 * when in hvac, culling is wrong
 * hide enter button until vent is open
+* show enter button in burglar view
+* vent looks weird when removing
+. mentor_escape
+. player_escape
+. npc_spawn_1
+. npc_spwan_2
+. cam position: ambush
+. reference to car
+. reference to light
+. reference to NPC template
+* guard npc is wrong?
+* guard npc face the right direction
+* camera follow mentor walking
+* orient toward point not working
+* rotate camera before mentor moves or stops
+* light brighter / verify light is working
+* "alright, let's go"
+* mentor moves out to mentor_escape position and camera follows
+* pan over to security guards in vehicle down the street
+* perspective cam shot 
+* "hey! stop right there!"
+* pan back to mentor 
+* mentor (radio) "kid, they don't know you're with me. i work alone. stay out of sight and try to escape if you can."
+* guards approaching mentor
+* pan back to player, under cutscene control
+* player runs through door to hvac room
 
-show enter button in burglar view
-vent looks weird when removing
+
+# the dramatic conclusion
+
+* rain stops
+    . particles and soun
+. music stops 
+. theme starts
+    . either a new type of music controller with two tracks, or enqueue two music controllers
+* they don't know you're with me, try to escape
+* camera pans back to guards
+* player is instructed to open vent grate
+* player is instructed to crawl through vent
+. fix extraction cutscene
+* shut the closet door
+* instruct to remove vent after screws
+. -"no hardening at all"
+* mentor shoves me with the door
+* pillar culling box
+* see those green wires
+* light in alcove
+. fix trigger points
+* hvac still not working
+. invisible alarm central
+* move network button indicator
+* symbol for hand tool
+
+
+password data icon
+indicate key menu
+
+
+# cutscenes todo
+
+draw texture / graphics for power relay
+mentor does not leave network segment right away
+draw "box ▮" while blitting dialogue text
+fix sprite unknown polygon image
+disconnect button overlaps item display
+characters face the right directions
+    mentor looks at router before pointing it out
+    mentor and player look at building correctly or look around
+    mentor at lab door facing away
+    when hiding behind planter, look at door 
+
+
+# tutorial finalization
+escape menu viability
+consistent increasing selection of UI elements
+initial flicker
+"bingo, there's our way in" camera rotation abrupt
+interdict bad controls
+    disallow taking out gun
+    prevent closing the burglar menu
+    prevent running down the street wrong way
+    prevent taking gun out (no gun?)
+    pause hack software selector while cutscene dialogue is active
+    taking out cyberdeck early?
+    third person view leading in to any camera moment
+    can use wheel menu during dialogue
+    prevent burglar interface power relay before we get tehre
+    prevent taking item out before cyberdeck sequence
+    prevent using the key menu during dialogue
+    prevent using key while walking up to door
+    prevent using burglar mode while walking up to door
+
+
+
+# gameplay elements
+fix up graphics for weapon wheel menu
+make character heads bob a little bit as they talk?
+redraw jack portrait

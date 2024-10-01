@@ -39,6 +39,7 @@ public class LevelTemplate : ScriptableObject {
     public List<LevelTemplate> unlockLevels;
 
     [Header("gameplay parameters")]
+    public bool showExtractionCutscene = true;
     public SensitivityLevel sensitivityLevel;
     public GraphVisibilityDefault cyberGraphVisibilityDefault;
     public GraphVisibilityDefault alarmGraphVisibiltyDefault;

@@ -10,5 +10,6 @@ public enum MusicTrack {
     moistPlace,
     shopNGo,
     sympatheticDetonation,
-    bestLaidPlans
+    bestLaidPlans,
+    theme
 }

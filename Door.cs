@@ -163,6 +163,11 @@ public class Door : Interactive {
         OnStateEnter(tempInitialState, newState);
         // Debug.Log($"{tempInitialState} -> {newState}");
     }
+    public void CloseDoor() {
+        ChangeState(DoorState.closing);
+        targetAngle = 0f;
+        angularSpeed = manipulationSpeed;
+    }
 
     void OnStateEnter(DoorState fromState, DoorState toState) {
         switch (toState) {

@@ -792,9 +792,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
         }
 
         if (result.hvacUseResult.activateHVAC) {
-            _activeHVACNetwork = result.hvacUseResult.hVACNetwork;
-            _currentHVACNode = result.hvacUseResult.startElement;
-            TransitionToState(CharacterState.hvac);
+            ActivateHVAC(result.hvacUseResult.hVACNetwork, result.hvacUseResult.startElement);
         } else if (result.hvacUseResult.dismountElement != null) {
             if (_currentHVACNode == result.hvacUseResult.dismountElement) {
                 DismountHVAC(_currentHVACNode);
@@ -809,6 +807,13 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             });
         }
 
+    }
+
+    public void ActivateHVAC(HVACNetwork network, HVACElement startElement) {
+        _activeHVACNetwork = network;
+        _currentHVACNode = startElement;
+        TransitionToState(CharacterState.hvac);
+        CutsceneManager.I.HandleTrigger("enter_hvac");
     }
 
     public void HandleSwitchWeapon(int index) {
@@ -923,7 +928,6 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
                     if (gunHandler.HasGun() || state == CharacterState.hvacAim) {
                         currentRotation = levelRotation;
-                        Debug.Log(currentRotation);
                     } else {
                         currentRotation = Quaternion.Lerp(currentRotation, levelRotation, 0.05f);
                     }

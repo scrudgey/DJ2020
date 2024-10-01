@@ -59,7 +59,7 @@ public class AmbienceManager : Singleton<AmbienceManager> {
         // find all zones that contain the target point
         HashSet<AmbientZone> containedZones = new HashSet<AmbientZone>();
         foreach (AmbientZone zone in zones) {
-            if (zone.activeZone.bounds.Contains(targetPosition)) {
+            if (zone.enabled && zone.activeZone.bounds.Contains(targetPosition)) {
                 containedZones.Add(zone);
             } else {
                 Stop(zone);

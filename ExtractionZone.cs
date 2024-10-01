@@ -5,7 +5,6 @@ using UnityEngine;
 public class ExtractionZone : MapMarker {
     public MeshRenderer meshRenderer;
     public bool isActive;
-    public bool showCutscene;
     public Collider myCollider;
     void Awake() {
         if (isActive) {
@@ -21,9 +20,6 @@ public class ExtractionZone : MapMarker {
         isActive = true;
         meshRenderer.enabled = true;
         StartCoroutine(PulseExtractionZone());
-        if (showCutscene) {
-            CutsceneManager.I.StartCutscene(new ExtractionZoneCutscene(this));
-        }
     }
 
     public void DisableExtractionZone() {

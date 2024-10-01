@@ -22,25 +22,15 @@ public class CyberdeckHackProgressBar : MonoBehaviour {
 
     public void Initialize(NetworkAction action) {
         this.networkAction = action;
-        // if (action.effect.type == SoftwareEffect.Type.download) {
-        // progressBar.gameObject.SetActive(false);
-        // } else {
         progressBarOpposite.gameObject.SetActive(false);
-        // }
 
         targetIcon.sprite = icons.CyberNodeSprite(action.toNode);
         targetNameCaption.text = action.toNode.nodeTitle;
 
-        // if (action.fromPlayerNode) {
-        //     leftIconObject.SetActive(false);
-        //     leftIcon.enabled = true;
-        //     leftIcon.sprite = playerSprite;
-        // } else {
         leftIconObject.SetActive(true);
         leftIcon.enabled = false;
         leftNodeIcon.sprite = icons.CyberNodeSprite(action.path[action.path.Count - 1]);
         leftNameCaption.text = action.path[action.path.Count - 1].nodeTitle;
-        // }
     }
     public void HandleNetworkActionChange(NetworkAction action) {
         this.networkAction = action;

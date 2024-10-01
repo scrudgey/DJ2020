@@ -8,8 +8,7 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CullingComponent : MonoBehaviour
-{
+public class CullingComponent : MonoBehaviour {
     public bool debug;
     public bool dontCull;
     public SceneData sceneData;
@@ -31,31 +30,25 @@ public class CullingComponent : MonoBehaviour
 
     RooftopZone[] rooftopZones;
 
-    public void Initialize(SceneData sceneData, bool isDynamic = false)
-    {
+    public void Initialize(SceneData sceneData, bool isDynamic = false) {
         if (initialized) return;
         this.sceneData = sceneData;
         this.isDynamic = isDynamic;
 
         TagSystem system = GetComponent<TagSystem>();
-        if (system != null)
-        {
+        if (system != null) {
             data = system.data;
-        }
-        else
-        {
+        } else {
             data = new TagSystemData();
         }
 
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
-        if (renderers.Length > 0)
-        {
+        if (renderers.Length > 0) {
             Bounds tmpBounds = renderers[0].bounds;
 
             this.handlers = new Dictionary<Renderer, SubRenderHandler>();
             this.handlerList = new List<SubRenderHandler>();
-            foreach (Renderer renderer in renderers)
-            {
+            foreach (Renderer renderer in renderers) {
                 // if (renderer is ParticleSystemRenderer) continue;    
                 if (renderer is TrailRenderer) continue;
                 if (renderer is LineRenderer) continue;
@@ -65,23 +58,17 @@ public class CullingComponent : MonoBehaviour
             }
             this.bounds = tmpBounds;
             Transform findAnchor = transform.Find("anchor");
-            if (findAnchor != null)
-            {
+            if (findAnchor != null) {
                 this.adjustedPosition = findAnchor.position;
-            }
-            else
-            {
+            } else {
                 this.adjustedPosition = tmpBounds.center;
                 // this.adjustedPosition.y -= tmpBounds.extents.y;
             }
-        }
-        else
-        {
+        } else {
             this.handlers = new Dictionary<Renderer, SubRenderHandler>();
             this.handlerList = new List<SubRenderHandler>();
         }
-        if (isDynamic)
-        {
+        if (isDynamic) {
             rooftopZoneIdn = "-1";
             rooftopZones = GameObject.FindObjectsOfType<RooftopZone>();
             StartCoroutine(Toolbox.RunJobRepeatedly(() => UpdateRoofZone()));
@@ -89,22 +76,18 @@ public class CullingComponent : MonoBehaviour
         initialized = true;
     }
 
-    IEnumerator UpdateRoofZone()
-    {
+    IEnumerator UpdateRoofZone() {
         Vector3 position = transform.position;
         floor = sceneData.GetCullingFloorForPosition(position);
-        foreach (RooftopZone zone in rooftopZones)
-        {
-            if (zone.ContainsGeometry(position))
-            {
+        foreach (RooftopZone zone in rooftopZones) {
+            if (zone.ContainsGeometry(position)) {
                 rooftopZoneIdn = zone.idn;
                 break;
             }
         }
         yield return waiter;
     }
-    public void AddSubRenderHandler(Renderer renderer)
-    {
+    public void AddSubRenderHandler(Renderer renderer) {
         SubRenderHandler handler = new SubRenderHandler(renderer, this);
         handlers[renderer] = handler;
         hasCutaway |= handler.isCutaway;
@@ -113,18 +96,14 @@ public class CullingComponent : MonoBehaviour
     // public void RemoveSubRenderHandler(Renderer renderer) {
     //     handlers.Remove(renderer);
     // }
-    public void ApplyInterloper(Vector3 playerPosition)
-    {
+    public void ApplyInterloper(Vector3 playerPosition) {
         ChangeState(CullingComponent.CullingState.interloper);
     }
-    public void StopCulling()
-    {
+    public void StopCulling() {
         ChangeState(CullingComponent.CullingState.normal);
     }
-    public void ChangeState(CullingState toState)
-    {
-        switch (toState)
-        {
+    public void ChangeState(CullingState toState) {
+        switch (toState) {
             case CullingState.normal:
                 Visible();
                 break;
@@ -137,37 +116,27 @@ public class CullingComponent : MonoBehaviour
         }
         state = toState;
     }
-    public bool IsAbove(int playerFloor)
-    {
+    public bool IsAbove(int playerFloor) {
         return floor > playerFloor;
     }
-    void Invisible()
-    {
+    void Invisible() {
         if (dontCull) return;
-        foreach (SubRenderHandler handler in handlers.Values)
-        {
+        foreach (SubRenderHandler handler in handlers.Values) {
             handler.TotallyInvisible(debug);
         }
     }
-    void Cutaway()
-    {
+    void Cutaway() {
         if (dontCull) return;
-        foreach (SubRenderHandler handler in handlers.Values)
-        {
-            if (handler.data.partialTransparentIsInvisible)
-            {
+        foreach (SubRenderHandler handler in handlers.Values) {
+            if (handler.data.partialTransparentIsInvisible) {
                 handler.TotallyInvisible(debug);
-            }
-            else
-            {
+            } else {
                 handler.CutawayInvisible(hasCutaway, debug);
             }
         }
     }
-    void Visible()
-    {
-        foreach (SubRenderHandler handler in handlers.Values)
-        {
+    void Visible() {
+        foreach (SubRenderHandler handler in handlers.Values) {
             handler.Visible(debug);
         }
     }

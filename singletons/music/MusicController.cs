@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Easings;
 using UnityEngine;
@@ -62,6 +63,9 @@ public class MusicController : Singleton<MusicController> {
         }},
         {MusicTrack.bestLaidPlans, new string[]{
             "The Best Laid Plans Get Knocked Up LOOP - VER 2.0 - DJ3 2024"
+        }},
+        {MusicTrack.theme, new string[]{
+            "Data Jack MAIN THEME - VER 1.0 orig LOOP - DJ3 2024"
         }}
     };
     public AudioSource[] audioSources;
@@ -100,6 +104,17 @@ public class MusicController : Singleton<MusicController> {
         SimpleMusicController simpleMusicController = new SimpleMusicController(track, audioSources);
         EnqueueMix(simpleMusicController);
     }
+    public void PlayMultiple(params MusicMixController[] controllers) {
+        StopAllMixes();
+        foreach (MusicMixController controller in controllers) {
+            EnqueueMix(controller);
+        }
+    }
+    void Update() {
+        if (controllers.Count > 0) {
+            controllers.Peek().Update();
+        }
+    }
 
     void StopAllMixes() {
         while (controllers.Count > 0) {
@@ -114,6 +129,16 @@ public class MusicController : Singleton<MusicController> {
         }
         controllers.Push(controller);
         controller.Play();
+    }
+
+    public void PopMix(MusicMixController controller) {
+        if (controllers.Count > 0 && controllers.Peek() == controller) {
+            // controllers.Peek().Pause();
+            controllers.Pop();
+        }
+        if (controllers.Count > 0) {
+            controllers.Peek().Play();
+        }
     }
 
 }

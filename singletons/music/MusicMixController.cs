@@ -14,6 +14,7 @@ public abstract class MusicMixController {
     public abstract void Play();
     public abstract void Stop();
     public abstract void Pause();
+    public abstract void Update();
 
     protected void SetTrackVolume(int index, float target) {
         if (targetVolumes[index] == target) {

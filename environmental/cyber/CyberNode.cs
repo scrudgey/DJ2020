@@ -51,6 +51,7 @@ public class CyberNode : Node<CyberNode> {
         GameManager.I.AddPayDatas(payData, position);
         dataStolen = true;
         OnDataStolen?.Invoke();
+        CutsceneManager.I.HandleTrigger("download_complete");
     }
 }
 

@@ -20,6 +20,10 @@ public record BurglarAttackResult {
     public Camera changeCamera;
     public Renderer changeCameraQuad;
 
+    public bool activateHVACNetwork;
+    public HVACNetwork HVACNetwork;
+    public HVACElement HVACStartElement;
+
     public static BurglarAttackResult None => new BurglarAttackResult {
         success = false,
         feedbackText = "",

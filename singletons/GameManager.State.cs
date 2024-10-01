@@ -117,9 +117,11 @@ public partial class GameManager : Singleton<GameManager> {
             CloseBurglar();
         uiController.LogMessage($"Objectives complete, proceed to extraction");
         gameData.levelState.delta.phase = LevelDelta.MissionPhase.extractionSuccess;
-        ActivateExtractionPoint();
-        uiController.DisplayObjectiveCompleteMessage("Objectives\ncomplete", "proceed to\nextraction point");
+        ExtractionZone zone = ActivateExtractionPoint();
+        if (gameData.levelState.template.showExtractionCutscene)
+            CutsceneManager.I.StartCutscene(new ExtractionZoneCutscene(zone));
     }
+
     public void FailObjective(Objective objective) {
         if (GameManager.I.isLoadingLevel) return;
         HandleObjectiveFailed();
@@ -135,7 +137,7 @@ public partial class GameManager : Singleton<GameManager> {
         uiController.DisplayObjectiveCompleteMessage("Objectives\nfailed", "proceed to\nextraction point");
     }
 
-    void ActivateExtractionPoint() {
+    ExtractionZone ActivateExtractionPoint() {
         Debug.Log($"activate extraction point plan: {gameData.levelState.plan.extractionPointIdn}");
         if (gameData.levelState.plan.extractionPointIdn != "") { // default
             foreach (ExtractionZone zone in GameObject.FindObjectsOfType<ExtractionZone>()) {
@@ -146,11 +148,15 @@ public partial class GameManager : Singleton<GameManager> {
                     if (zone.ContainsPlayerLocation(playerObject.transform.position)) {
                         zone.HandlePlayerActivation();
                     }
-                    return;
+                    return zone;
                 }
             }
         }
         Debug.Log("[extraction] defaulting random extraction point");
-        GameObject.FindObjectOfType<ExtractionZone>()?.EnableExtractionZone();
+        ExtractionZone z = GameObject.FindObjectOfType<ExtractionZone>();
+        if (z != null) {
+            z.EnableExtractionZone();
+        }
+        return z;
     }
 }

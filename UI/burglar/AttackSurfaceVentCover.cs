@@ -17,12 +17,16 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
     public GameObject[] obscuredElements;
     public MeshRenderer[] obscuredRenderers;
     public Interactive hvacEntryPoint;
+    public AttackSurfaceHVACEntry attackSurfaceHVACEntry;
     Vector3 initialPosition;
     Quaternion initialRotation;
     Vector3 initialScale;
     void Start() {
         state = State.closed;
-        hvacEntryPoint.interactible = false;
+        if (hvacEntryPoint != null)
+            hvacEntryPoint.interactible = false;
+        if (attackSurfaceHVACEntry != null)
+            attackSurfaceHVACEntry.gameObject.SetActive(false);
         initialPosition = transform.position;
         initialRotation = transform.rotation;
         initialScale = transform.localScale;
@@ -79,7 +83,10 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
             if (renderer == null) continue;
             renderer.enabled = true;
         }
-        hvacEntryPoint.interactible = true;
+        if (hvacEntryPoint != null)
+            hvacEntryPoint.interactible = true;
+        if (attackSurfaceHVACEntry != null)
+            attackSurfaceHVACEntry.gameObject.SetActive(true);
         StartCoroutine(RemovePanelRoutine(camera));
     }
     public void ReplacePanel() {
@@ -97,7 +104,10 @@ public class AttackSurfaceVentCover : AttackSurfaceElement {
                 if (renderer == null) continue;
                 renderer.enabled = false;
             }
-        hvacEntryPoint.interactible = false;
+        if (hvacEntryPoint != null)
+            hvacEntryPoint.interactible = false;
+        if (attackSurfaceHVACEntry != null)
+            attackSurfaceHVACEntry.gameObject.SetActive(false);
         StartCoroutine(ClosePanelRoutine());
     }
 

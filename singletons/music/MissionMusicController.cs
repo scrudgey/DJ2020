@@ -42,13 +42,18 @@ public class MissionMusicController : MusicMixController {
 
     public override void Play() {
         GameManager.OnSuspicionChange += HandleSuspicionChange;
-        audioSources.ToList().ForEach(audiosource => audiosource.volume = 0f);
+        audioSources.ToList().ForEach(audiosource => {
+            audiosource.volume = 0f;
+            audiosource.loop = true;
+        });
         foreach (var x in audioSources.Zip(subtracks, Tuple.Create)) {
             x.Item1.Stop();
             x.Item1.clip = x.Item2;
             x.Item1.Play();
         }
         HandleSuspicionChange();
+    }
+    public override void Update() {
     }
 
     void HandleSuspicionChange() {

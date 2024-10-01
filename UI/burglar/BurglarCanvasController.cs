@@ -441,6 +441,11 @@ public class BurglarCanvasController : MonoBehaviour {
             finishing = true;
             StartCoroutine(WaitAndCloseMenu(1.5f));
         }
+
+        if (result.activateHVACNetwork) {
+            GameManager.I.CloseBurglar();
+            GameManager.I.playerCharacterController.ActivateHVAC(result.HVACNetwork, result.HVACStartElement);
+        }
     }
 
     IEnumerator zoomIntoCamera(Renderer quad, Camera changeCamera) {

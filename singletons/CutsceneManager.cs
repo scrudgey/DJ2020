@@ -38,9 +38,9 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     }
 
     public IEnumerator RequestFocus(Cutscene requester) {
-        // Debug.Log($"cutsceneWithFocus: {cutsceneWithFocus}");
+        Debug.Log($"cutsceneWithFocus: {cutsceneWithFocus}");
         if (cutsceneWithFocus == null) {
-            // Debug.Log("grant focus immediately");
+            Debug.Log($"grant focus immediately to {requester}");
             requester.hasFocus = true;
             cutsceneWithFocus = requester;
 
@@ -61,12 +61,18 @@ public class CutsceneManager : Singleton<CutsceneManager> {
             Time.timeScale = 0;
         } else {
             cutscenesAwaitingFocus.Push(requester);
-            // Debug.Log($"request focus: wait in line {cutscenesAwaitingFocus.Count}");
+            Debug.Log($"request focus: wait in line {cutscenesAwaitingFocus.Count}");
+            foreach (Cutscene x in cutscenesAwaitingFocus) {
+                Debug.Log($"queue: {x}");
+            }
         }
     }
 
     public IEnumerator LeaveFocus(Cutscene requester) {
-        if (cutsceneWithFocus == null) {
+        if (!requester.hasFocus) {
+            yield return null;
+        } else if (cutsceneWithFocus == null) {
+            Debug.Log($"leave focus: no cutscene with focus. returning");
             yield return null;
         } else {
             if (cutsceneWithFocus == requester) {
@@ -74,6 +80,12 @@ public class CutsceneManager : Singleton<CutsceneManager> {
 
                 cutsceneWithFocus.hasFocus = false;
                 cutsceneWithFocus = null;
+
+                Debug.Log($"leave focus: cutsceneWithFocus == requester");
+                Debug.Log($"leave focus: queue: {cutscenesAwaitingFocus.Count}");
+                foreach (Cutscene x in cutscenesAwaitingFocus) {
+                    Debug.Log($"queue: {x}");
+                }
 
                 if (cutscenesAwaitingFocus.Count > 0) {
                     Cutscene nextCutscene = cutscenesAwaitingFocus.Pop();
@@ -86,13 +98,14 @@ public class CutsceneManager : Singleton<CutsceneManager> {
                     AudioListener playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
                     cameraListener.enabled = false;
                     playerListener.enabled = true;
+                    Debug.Log($"leave focus: finishing");
                 }
             }
         }
     }
 
     public GameObject SpawnObject(string locationId, GameObject prefab, string lookAtId) {
-        Vector3 lookAtPoint = CutsceneManager.I.worldLocations[lookAtId].transform.position;
+        Vector3 lookAtPoint = worldLocations[lookAtId].transform.position;
         GameObject obj = null;
         if (worldLocations.ContainsKey(locationId)) {
             ScriptSceneLocation location = worldLocations[locationId];
@@ -110,7 +123,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     }
 
     public GameObject SpawnNPC(string locationId, NPCTemplate template) {
-        Vector3 location = CutsceneManager.I.worldLocations[locationId].transform.position;
+        Vector3 location = worldLocations[locationId].transform.position;
         GameObject obj = NPCSpawnPoint.SpawnNPC(template, location, null, null);
 
         foreach (Collider collider in obj.GetComponentsInChildren<Collider>()) {
@@ -121,7 +134,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     }
 
     public void NPCLookAt(CharacterController character, string locationId) {
-        Vector3 location = CutsceneManager.I.worldLocations[locationId].transform.position;
+        Vector3 location = worldLocations[locationId].transform.position;
         Vector3 direction = location - character.transform.position;
         direction.y = 0;
         // character.direction = direction;

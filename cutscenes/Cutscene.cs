@@ -92,7 +92,7 @@ public abstract class Cutscene {
         ScriptSceneCameraPosition data = CutsceneManager.I.cameraLocations[idn];
         yield return MoveCamera(data.transform.position, data.transform.rotation, duration, state, Vector2.zero, easing);
     }
-    protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, bool debug = false) {
+    protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, bool debug = false, float buffer = 0.1f) {
         float timer = 0f;
         Vector3 initialPosition;
         if (state == CameraState.normal) {
@@ -118,6 +118,7 @@ public abstract class Cutscene {
             // Debug.Break();
             yield return null;
         }
+        yield return new WaitForSecondsRealtime(buffer);
         SetCameraPosition(targetPosition, targetRotation, state, debug: debug);
     }
     protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput) {
@@ -189,7 +190,7 @@ public abstract class Cutscene {
         yield return characterCamera.DoZoom(targetOrthographicSize, duration);
     }
 
-    protected IEnumerator MoveCharacter(CharacterController controller, string key, float speedCoefficient = 1f, bool crawling = false) {
+    protected IEnumerator MoveCharacter(CharacterController controller, string key, float speedCoefficient = 1f, bool crawling = false, bool cameraFollows = false) {
         ScriptSceneLocation data = CutsceneManager.I.worldLocations[key];
         TaskMoveToKey task = new TaskMoveToKey(controller.transform, "walkToKey", new HashSet<int>(), controller);
         task.speedCoefficient = speedCoefficient;
@@ -204,6 +205,23 @@ public abstract class Cutscene {
                 input.CrouchDown = true;
             }
             controller.SetInputs(input);
+            if (cameraFollows) {
+                CameraInput camInput = new CameraInput {
+                    deltaTime = Time.unscaledDeltaTime,
+                    wallNormal = Vector2.zero,
+                    lastWallInput = Vector2.zero,
+                    crouchHeld = false,
+                    cameraState = CameraState.normal,
+                    targetData = CursorData.none,
+                    playerDirection = playerCharacterController.direction,
+                    popoutParity = PopoutParity.left,
+                    ignoreAttractor = true,
+                    targetPosition = controller.transform.position + Vector3.up,
+                    cullingTargetPosition = controller.transform.position,
+                };
+                characterCamera.UpdateWithInput(camInput);
+                characterCamera.SetInputs(PlayerInput.none);
+            }
             yield return null;
         }
     }
@@ -217,8 +235,12 @@ public abstract class Cutscene {
 
     protected void CharacterLookAt(CharacterController controller, string key) {
         ScriptSceneLocation data = CutsceneManager.I.worldLocations[key];
+        Vector3 orientTowardPoint = data.transform.position;
+        orientTowardPoint.y = controller.transform.position.y;
         PlayerInput input = PlayerInput.none;
         input.lookAtPosition = data.transform.position;
+        input.orientTowardPoint = orientTowardPoint;
+        input.snapToLook = true;
         controller.SetInputs(input);
     }
 

@@ -48,15 +48,15 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
 
         currentAttackSurface = interactor.selectedAttackSurface;
 
-        if (currentInteractorTarget != null && currentInteractorTarget.target != null) {
-            Debug.Log($"{currentInteractorTarget != null} && {currentInteractorTarget.target != null} && {currentInteractorTarget.target is HVACEntryPoint}");
-        }
+        // if (currentInteractorTarget != null && currentInteractorTarget.target != null) {
+        //     Debug.Log($"{currentInteractorTarget != null} && {currentInteractorTarget.target != null} && {currentInteractorTarget.target is HVACEntryPoint}");
+        // }
 
         if (currentInteractorTarget != null && currentInteractorTarget.target != null && currentInteractorTarget.target is HVACEntryPoint point) {
-            Vector3 screenPoint = cam.WorldToScreenPoint(point.entryPoint.position);
-            enterButtonRect.gameObject.SetActive(true);
+            // Vector3 screenPoint = cam.WorldToScreenPoint(point.entryPoint.position);
+            // enterButtonRect.gameObject.SetActive(true);
             interactButton.gameObject.SetActive(false);
-            enterButtonRect.position = screenPoint;
+            // enterButtonRect.position = screenPoint;
         } else if (currentAttackSurface != null) {
             enterButtonRect.gameObject.SetActive(false);
             interactButton.gameObject.SetActive(true);

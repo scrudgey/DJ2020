@@ -7,9 +7,13 @@ using UnityEngine;
 
 public class SimpleMusicController : MusicMixController {
     public AudioClip subtrack;
-    public SimpleMusicController(MusicTrack track, AudioSource[] audioSources) {
+    bool looping;
+    bool isPlaying;
+    float playTime;
+    public SimpleMusicController(MusicTrack track, AudioSource[] audioSources, bool looping = true) {
         this.track = track;
         this.audioSources = audioSources;
+        this.looping = looping;
 
         // LoadTrack();
         string path = MusicController.MusicSingleResourcePath(track);
@@ -21,9 +25,16 @@ public class SimpleMusicController : MusicMixController {
         targetVolumes[1] = -1;
         targetVolumes[2] = -1;
         targetVolumes[3] = -1;
+
     }
 
     public override void Play() {
+        if (!looping) {
+            audioSources[0].loop = false;
+        } else {
+            audioSources[0].loop = true;
+        }
+        isPlaying = true;
         audioSources[0].Stop();
         audioSources[0].clip = subtrack;
         SetTrackVolume(0, 1);
@@ -39,9 +50,21 @@ public class SimpleMusicController : MusicMixController {
             audiosource.volume = 0f;
             audiosource.Stop();
         });
+        isPlaying = false;
     }
 
     public override void Pause() {
-        throw new NotImplementedException();
+        isPlaying = false;
+
+        // throw new NotImplementedException();
+    }
+    public override void Update() {
+        if (isPlaying) {
+            playTime += Time.unscaledDeltaTime;
+        }
+        if (!looping && playTime > subtrack.length) {
+            Stop();
+            MusicController.I.PopMix(this);
+        }
     }
 }
