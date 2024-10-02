@@ -304,15 +304,15 @@ public class LegsAnimation : IBinder<CharacterController>, ISkinStateLoader {
         }
 
         headAnimation.transform.position = absoluteWorldPosition;
-        torsoAnimation.transform.position += 0.001f * directionToCamera;
+        torsoAnimation.transform.position += 0.0001f * directionToCamera;
         if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.localPosition = Vector3.zero;
 
         if (torsoSpriteData != null && torsoSpriteData.headInFrontOfTorso) {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder + 100;
-            headAnimation.transform.position += 0.002f * input.directionToCamera;
+            headAnimation.transform.position += 0.0002f * input.directionToCamera;
         } else {
             headAnimation.spriteRenderer.sortingOrder = spriteRenderer.sortingOrder - 100;
-            headAnimation.transform.position -= 0.002f * input.directionToCamera;
+            headAnimation.transform.position -= 0.0002f * input.directionToCamera;
         }
         if (torsoAnimation.rocketLauncher != null) torsoAnimation.rocketLauncher.transform.position += 0.004f * input.directionToCamera;
     }

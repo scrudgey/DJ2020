@@ -114,6 +114,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     private Vector3 _wallJumpNormal;
     private Vector3 _internalVelocityAdd = Vector3.zero;
     private Vector3 snapToDirection = Vector2.zero;
+    private bool snapFreeLook;
     public bool isCrouching = false;
     public bool crouchStick = false;
     public bool isRunning = false;
@@ -444,6 +445,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     public void SetInputs(PlayerInput input) {
         // Handle ladder transitions
         timeInState += Time.deltaTime;
+        if (snapFreeLook != input.snapFreeLook) {
+            Debug.Log($"setting snapfreelook {input.snapFreeLook}");
+        }
+        snapFreeLook = input.snapFreeLook;
         if (waveArmTimer > 0f) {
             waveArmTimer -= Time.deltaTime;
         }
@@ -645,10 +650,10 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
 
                 if (input.snapToLook) {
                     if (input.lookAtPosition != Vector3.zero) {
-                        snapToDirection = input.lookAtPosition - transform.position;
+                        snapToDirection = (input.lookAtPosition - transform.position).normalized;
                     }
                     if (input.lookAtDirection != Vector3.zero) {
-                        snapToDirection = input.lookAtDirection;
+                        snapToDirection = input.lookAtDirection.normalized;
                     }
                 }
 
@@ -732,6 +737,20 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 SetCapsuleDimensions(defaultRadius, 0.4f, 0.2f);
                 break;
             case CharacterState.hvac:
+                if (input.orientTowardDirection != Vector3.zero) {
+                    slewLookVector = input.orientTowardDirection;
+                } else if (input.orientTowardPoint != Vector3.zero) {
+                    slewLookVector = input.orientTowardPoint - transform.position;
+                }
+                if (input.snapToLook) {
+                    if (input.lookAtPosition != Vector3.zero) {
+                        snapToDirection = input.lookAtPosition - transform.position;
+                    }
+                    if (input.lookAtDirection != Vector3.zero) {
+                        snapToDirection = input.lookAtDirection;
+                    }
+                }
+
                 if (interactor != null) {
                     ItemUseResult interactorResult = interactor.SetInputs(input, true);
                     HandleItemUseResult(interactorResult);
@@ -741,6 +760,20 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 break;
             case CharacterState.hvacAim:
+                if (input.orientTowardDirection != Vector3.zero) {
+                    slewLookVector = input.orientTowardDirection;
+                } else if (input.orientTowardPoint != Vector3.zero) {
+                    slewLookVector = input.orientTowardPoint - transform.position;
+                }
+                if (input.snapToLook) {
+                    if (input.lookAtPosition != Vector3.zero) {
+                        snapToDirection = input.lookAtPosition - transform.position;
+                    }
+                    if (input.lookAtDirection != Vector3.zero) {
+                        snapToDirection = input.lookAtDirection;
+                    }
+                }
+
                 _moveInputVector = _moveAxis.y * Motor.CharacterForward;
 
                 _moveInputVector.y = 0;
@@ -905,8 +938,15 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             case CharacterState.aim:
                 if (snapToDirection != Vector3.zero) {
                     Vector3 target = snapToDirection;
-                    target.y = 0;
-                    currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                    if (snapFreeLook) {
+                        transform.LookAt(transform.position + snapToDirection);
+                        currentRotation = transform.rotation;
+                        Debug.Log($"snap free look snapping to {transform.position + snapToDirection} {currentRotation}");
+                    } else {
+                        Debug.Log($"hvac snap to direction");
+                        target.y = 0;
+                        currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                    }
                     aimCameraRotation = currentRotation;
                 } else {
                     // apply input torque from mouse delta
@@ -978,7 +1018,11 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 currentRotation = Quaternion.LookRotation(smoothedLookDirection, Vector3.up);
                 break;
             case CharacterState.hvac:
-                if (_targetHVACNode != null) {
+                if (snapToDirection != Vector3.zero) {
+                    Vector3 target = snapToDirection;
+                    target.y = 0;
+                    currentRotation = Quaternion.LookRotation(target, Vector3.up);
+                } else if (_targetHVACNode != null) {
                     Vector3 lookDirection = (_targetHVACNode.crawlpoint.position - Motor.TransientPosition).normalized;
                     currentRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
                 }
@@ -1707,7 +1751,8 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             camState = CameraState.overlayView;
         } else if (state == CharacterState.hvacAim) {
             camState = CameraState.firstPerson;
-            targetPosition -= 1.25f * Vector3.up;
+            targetPosition = transform.position + 0.10f * Vector3.up;
+            // targetPosition -= 1.25f * Vector3.up;
         } else if (state == CharacterState.aim) {
             camState = CameraState.aim;
         } else if (state == CharacterState.wallPress || state == CharacterState.popout) {

@@ -230,7 +230,6 @@ public class UIController : MonoBehaviour {
             cutsceneDialogueCanvas.enabled = false;
         if (indicatorCanvas != null)
             indicatorCanvas.enabled = false;
-        Debug.Log("hide UI");
     }
     public void ShowUI(bool hideCutsceneText = true) {
         if (canvas != null)

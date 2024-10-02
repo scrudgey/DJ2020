@@ -83,6 +83,7 @@ public partial class GameManager : Singleton<GameManager> {
     public InputMode inputMode {
         get { return _inputMode; }
     }
+    public bool doPlayerInput = true;
     public bool showDebugRays;
     public UIController uiController;
     public CharacterCamera characterCamera;
@@ -556,7 +557,7 @@ public partial class GameManager : Singleton<GameManager> {
         PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
         playerInput.ApplyInputMask(inputProfile);
 
-        if (Time.timeScale > 0) {
+        if (Time.timeScale > 0 && doPlayerInput) {
 
             if (gameData.levelState != null)
                 uiController?.UpdateWithPlayerInput(ref playerInput, inputProfile);

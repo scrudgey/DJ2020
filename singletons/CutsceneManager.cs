@@ -38,8 +38,13 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     }
 
     public IEnumerator RequestFocus(Cutscene requester) {
-        Debug.Log($"cutsceneWithFocus: {cutsceneWithFocus}");
-        if (cutsceneWithFocus == null) {
+        if (requester.hasFocus) {
+            Debug.Log($"request focus: {requester} already has focus. returning.");
+            yield return null;
+        } else if (cutscenesAwaitingFocus.Contains(requester)) {
+            Debug.Log($"request focus: {requester} already in queue. returning.");
+            yield return null;
+        } else if (cutsceneWithFocus == null) {
             Debug.Log($"grant focus immediately to {requester}");
             requester.hasFocus = true;
             cutsceneWithFocus = requester;
@@ -70,6 +75,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
 
     public IEnumerator LeaveFocus(Cutscene requester) {
         if (!requester.hasFocus) {
+            Debug.Log($"leave focus: requester already does not have focus. returning.");
             yield return null;
         } else if (cutsceneWithFocus == null) {
             Debug.Log($"leave focus: no cutscene with focus. returning");

@@ -272,9 +272,10 @@ walks you through taking out the cyberdeck, stealing the file
 * move network button indicator
 * symbol for hand tool
 
-
 password data icon
 indicate key menu
+
+fix isometric -> free cam transition
 
 
 # cutscenes todo
@@ -310,10 +311,19 @@ interdict bad controls
     prevent using the key menu during dialogue
     prevent using key while walking up to door
     prevent using burglar mode while walking up to door
-
+    prevent using software while in dialogue
 
 
 # gameplay elements
 fix up graphics for weapon wheel menu
 make character heads bob a little bit as they talk?
 redraw jack portrait
+
+
+scheduling with brett
+opportunistic hire
+not posting role- data science sec.
+    no JD trad
+    workday system
+role posted- general application, triggers workday
+template JV

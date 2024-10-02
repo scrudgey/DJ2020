@@ -107,7 +107,6 @@ public abstract class Cutscene {
         }
         Quaternion initialRotation = characterCamera.transform.rotation;
         while (timer < duration) {
-
             float completion = timer / duration;
 
             Vector3 position = Vector3.Lerp(initialPosition, targetPosition, completion);
@@ -242,6 +241,24 @@ public abstract class Cutscene {
         input.orientTowardPoint = orientTowardPoint;
         input.snapToLook = true;
         controller.SetInputs(input);
+    }
+
+    protected void CharacterSnapFreeLookAt(CharacterController controller, string key) {
+        ScriptSceneLocation data = CutsceneManager.I.worldLocations[key];
+        Vector3 orientTowardPoint = data.transform.position;
+        CharacterSnapFreeLookAt(controller, orientTowardPoint);
+    }
+    protected void CharacterSnapFreeLookAt(CharacterController controller, Vector3 position) {
+        // Vector3 orientTowardPoint = position;
+        // orientTowardPoint.y = controller.transform.position.y;
+        PlayerInput input = PlayerInput.none;
+        input.lookAtPosition = position;
+        // input.orientTowardPoint = orientTowardPoint;
+        input.snapToLook = true;
+        input.snapFreeLook = true;
+        controller.SetInputs(input);
+        CameraInput cameraInput = controller.BuildCameraInput();
+        characterCamera.UpdateWithInput(cameraInput);
     }
 
     protected void HighlightLocation(string idn) {

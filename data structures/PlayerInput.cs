@@ -39,6 +39,7 @@ public struct PlayerInput {
     public Vector3 lookAtDirection;
     public Vector3 lookAtPosition;
     public bool snapToLook;
+    public bool snapFreeLook;
     public bool preventWallPress;
     public Vector2 zoomInput;
     public bool aimWeapon;
