@@ -58,7 +58,7 @@ class TruckCutscene : Cutscene {
         CutsceneManager.I.NPCLookAt(driver, "door");
 
         yield return new WaitForSecondsRealtime(2f);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("punk", driverPortrait, "Check it out! The old warehouse is open!");
+        yield return ShowCutsceneDialogue("punk", driverPortrait, "Check it out! The old warehouse is open!");
         yield return MoveCamera("door", 1f, CameraState.free);
         yield return new WaitForSecondsRealtime(1.75f);
         yield return MoveCamera("truck3", 1f, CameraState.free);
@@ -70,7 +70,7 @@ class TruckCutscene : Cutscene {
             yield return waiter;
         }
         yield return new WaitForSecondsRealtime(2f);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("punk", driverPortrait, "Looks like an old chem research lab, so watch out for drugs and toxins!");
+        yield return ShowCutsceneDialogue("punk", driverPortrait, "Looks like an old chem research lab, so watch out for drugs and toxins!");
         GameManager.I.AddSuspicionRecord(SuspicionRecord.snoopingSuspicion());
     }
 }

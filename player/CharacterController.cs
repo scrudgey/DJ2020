@@ -1099,7 +1099,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
     void TakeFallDamage(float fallVelocity) {
         if (state == CharacterState.superJump && fallVelocity > -22f) return;
         if (superJumpEnabled && fallVelocity > -15) return;
-
+        // Debug.Log($"fall damage: {fallVelocity}");
         Damage damage = new ExplosionDamage(75f, Vector3.up, transform.position, transform.position);
         foreach (IDamageReceiver receiver in GetComponentsInChildren<IDamageReceiver>()) {
             receiver.TakeDamage(damage);
@@ -1123,7 +1123,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             // if (fallTime > 0) {
             //     Debug.Log($"integrated fall time: {fallTime} {fallVelocity}");
             // }
-            if (fallVelocity < -10f) {
+            if (fallVelocity < -13f) {
                 TakeFallDamage(fallVelocity);
                 TransitionToState(CharacterState.landStun);
             }

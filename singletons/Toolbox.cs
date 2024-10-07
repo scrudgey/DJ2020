@@ -663,10 +663,11 @@ public class Toolbox {
         } else return value;
     }
 
-    public static IEnumerator BlitText(TextMeshProUGUI textMesh, string content, float interval = 0.05f) {
+    public static IEnumerator BlitText(TextMeshProUGUI textMesh, string content, float interval = 0.05f, string trailer = "") {
         float timer = 0f;
         int index = 0;
         bool foundTag = false;
+        textMesh.text = "";
         while (index < content.Length) {
             timer += Time.unscaledDeltaTime;
             if (timer > interval) {
@@ -686,8 +687,12 @@ public class Toolbox {
                 substring += "</color>";
             }
             textMesh.text = substring;
+            if (trailer != "") {
+                textMesh.text = textMesh.text + trailer;
+            }
             yield return null;
         }
+        textMesh.text = content;
     }
     public static IEnumerator TypeText(TextMeshProUGUI text, string prefix, string totalText, bool typedInput = false) {
 

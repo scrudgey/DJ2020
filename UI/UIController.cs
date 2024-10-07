@@ -291,12 +291,12 @@ public class UIController : MonoBehaviour {
         // Debug.Log("[cutscene] hide cutscene text");
     }
 
-    public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content, CutsceneDialogueController.Location location = CutsceneDialogueController.Location.bottom) {
-        IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content, this, location: location);
-        Debug.Log("enabling cutscene dialogue canvas");
-        cutsceneDialogueCanvas.enabled = true;
-        return routine;
-    }
+    // public IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content, CutsceneDialogueController.Location location = CutsceneDialogueController.Location.bottom) {
+    //     IEnumerator routine = cutsceneDialogueController.Initialize(name, portrait, content, this, location: location);
+    //     Debug.Log("enabling cutscene dialogue canvas");
+    //     cutsceneDialogueCanvas.enabled = true;
+    //     return routine;
+    // }
     public void HideCutsceneDialogue() {
         tutorialText.text = "";
         cutsceneDialogueCanvas.enabled = false;

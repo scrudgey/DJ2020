@@ -13,6 +13,7 @@ public class LevelTemplate : ScriptableObject {
     public enum GraphVisibilityDefault { all, none, partial }
 
     [Header("level and scene")]
+    public bool isTutorial;
     public int worldmapPoint;
     public string levelName;
     public string readableMissionName;

@@ -14,6 +14,6 @@ class AbandonedLabIntroCutscene : Cutscene {
         yield return WaitForTrigger("labIntro");
         yield return WaitForFocus();
         yield return MoveCamera("door", 1f, state: CameraState.normal, PennerDoubleAnimation.ExpoEaseOut);
-        yield return GameManager.I.uiController.ShowCutsceneDialogue("Ishikawa", portrait, "This is the place. See if you can bypass the door lock to get in.");
+        yield return ShowCutsceneDialogue("Ishikawa", portrait, "This is the place. See if you can bypass the door lock to get in.");
     }
 }

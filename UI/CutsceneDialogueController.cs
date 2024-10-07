@@ -19,13 +19,13 @@ public class CutsceneDialogueController : MonoBehaviour {
                 break;
         }
     }
-    public IEnumerator Initialize(string name, Sprite portrait, string content, UIController uIController, Location location = Location.bottom) {
+    public IEnumerator Initialize(string name, Sprite portrait, string content, UIController uIController, Location location = Location.bottom, string trailer = "") {
         SetLocation(location);
         uIController.cutsceneDialogueEnabled = true;
         continueButton.SetActive(false);
         storeDialogueController.SetImages(portrait);
         storeDialogueController.Initialize(GameManager.I.gameData.filename, name);
-        yield return storeDialogueController.CutsceneDialogue(content);
+        yield return storeDialogueController.CutsceneDialogue(content, trailer: trailer);
         yield return WaitForContinue();
         GameManager.I.uiController.HideCutsceneDialogue();
         uIController.cutsceneDialogueEnabled = false;

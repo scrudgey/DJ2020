@@ -2,14 +2,14 @@
 
 # goals to hit
 
-movement
-crawl
-quick inventory menu
+. movement
+. crawl
+. quick inventory menu
 burglar view: lock picking
-burglar view: cutting wires
-security cameras
-stealing data with 
-third person mode?
+. burglar view: cutting wires
+. security cameras
+. stealing data with 
+. third person mode?
 
 # script
 
@@ -258,10 +258,10 @@ walks you through taking out the cyberdeck, stealing the file
 * camera pans back to guards
 * player is instructed to open vent grate
 * player is instructed to crawl through vent
-. fix extraction cutscene
+* fix extraction cutscene
 * shut the closet door
 * instruct to remove vent after screws
-. -"no hardening at all"
+* -"no hardening at all"
 * mentor shoves me with the door
 * pillar culling box
 * see those green wires
@@ -271,32 +271,34 @@ walks you through taking out the cyberdeck, stealing the file
 . invisible alarm central
 * move network button indicator
 * symbol for hand tool
-
-password data icon
-indicate key menu
-
-fix isometric -> free cam transition
-
-
-# cutscenes todo
-
-draw texture / graphics for power relay
-mentor does not leave network segment right away
-draw "box ▮" while blitting dialogue text
-fix sprite unknown polygon image
-disconnect button overlaps item display
-characters face the right directions
-    mentor looks at router before pointing it out
-    mentor and player look at building correctly or look around
-    mentor at lab door facing away
-    when hiding behind planter, look at door 
+. password data icon
+    . put in tutorial dialogue
+. indicate key menu
+    . hide inicator
+* fix isometric -> free cam transition
+. mentor does not leave network segment right away
+. "bingo, there's our way in" camera rotation abrupt
+* draw "box ▮" while blitting dialogue text
+. fix sprite unknown polygon image
+* "click on"
+* disconnect button overlaps item display
+* draw texture / graphics for power relay
+. characters face the right directions
+    . mentor looks at router before pointing it out
+    . mentor and player look at building correctly or look around
+    . mentor at lab door facing away
+    . when hiding behind planter, look at door 
+* cutscene death
+* consistent increasing selection of UI elements
+* escape menu viability
+    * just don't show abort option
 
 
 # tutorial finalization
-escape menu viability
-consistent increasing selection of UI elements
+
+explain the suspicion meter?
 initial flicker
-"bingo, there's our way in" camera rotation abrupt
+
 interdict bad controls
     disallow taking out gun
     prevent closing the burglar menu
@@ -313,12 +315,20 @@ interdict bad controls
     prevent using burglar mode while walking up to door
     prevent using software while in dialogue
 
+# system
+
+exit to neighborhood
+enter from title screen
+
+
+
+
 
 # gameplay elements
 fix up graphics for weapon wheel menu
 make character heads bob a little bit as they talk?
 redraw jack portrait
-
+"you have no keys" / "you have no data"
 
 scheduling with brett
 opportunistic hire
@@ -327,3 +337,16 @@ not posting role- data science sec.
     workday system
 role posted- general application, triggers workday
 template JV
+
+
+brett 45min
+    free after noon
+chris & nick
+
+offer at crowdstrike
+E07- senior
+base - north of $200k
+bonus- consistent 10-12% quarterly          12%      - 246.4
+equity- RSU > 500,000 / 4 years = 125,000            - 371.4
+
+

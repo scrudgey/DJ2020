@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 public class StoreDialogueController : MonoBehaviour {
@@ -35,20 +36,15 @@ public class StoreDialogueController : MonoBehaviour {
         dialogueRightSpacer.minWidth = 150f;
         BlitDialogue(dialogue);
     }
-    public IEnumerator ShopownerCoroutine(string dialogue) {
-        dialogueLeftSpacer.minWidth = 20f;
-        dialogueRightSpacer.minWidth = 150f;
-        return BlitDialogueText(dialogue);
-    }
     public void SetPlayerDialogue(string dialogue) {
         dialogueLeftSpacer.minWidth = 150f;
         dialogueRightSpacer.minWidth = 20f;
         BlitDialogue(dialogue);
     }
-    public IEnumerator PlayerCoroutine(string dialogue) {
-        dialogueLeftSpacer.minWidth = 150f;
-        dialogueRightSpacer.minWidth = 20f;
-        return BlitDialogueText(dialogue);
+    public IEnumerator ShopownerCoroutine(string dialogue) {
+        dialogueLeftSpacer.minWidth = 20f;
+        dialogueRightSpacer.minWidth = 150f;
+        return CutsceneDialogue(dialogue);
     }
     public void MoveDialogueBox(bool playerSide) {
         if (playerSide) {
@@ -63,7 +59,7 @@ public class StoreDialogueController : MonoBehaviour {
         if (blitTextRoutine != null) {
             StopCoroutine(blitTextRoutine);
         }
-        blitTextRoutine = StartCoroutine(BlitDialogueText(content));
+        blitTextRoutine = StartCoroutine(CutsceneDialogue(content));
     }
     public void Clear() {
         if (blitTextRoutine != null) {
@@ -71,33 +67,13 @@ public class StoreDialogueController : MonoBehaviour {
         }
         dialogueText.text = "";
     }
-
-    public IEnumerator BlitDialogueText(string content) {
-        // Debug.Log($"blit dialogue text {content}");
-        dialogueText.text = "";
-        int index = 0;
-        float timer = 0f;
-        float blitInterval = 0.025f;
-        audioSource.clip = blitSound;
-        audioSource.Play();
-        while (index < content.Length) {
-            timer += Time.unscaledDeltaTime;
-            if (timer >= blitInterval) {
-                index += 1;
-                timer -= blitInterval;
-                dialogueText.text = content.Substring(0, index);
-            }
-            yield return null;
-        }
-        audioSource.Stop();
-        dialogueText.text = content;
-        blitTextRoutine = null;
-    }
-
-    public IEnumerator CutsceneDialogue(string content) {
+    public IEnumerator CutsceneDialogue(string content, string trailer = "") {
         dialogueLeftSpacer.minWidth = 20f;
         dialogueRightSpacer.minWidth = 150f;
-        return BlitDialogueText(content);
+        audioSource.clip = blitSound;
+        audioSource.Play();
+        yield return Toolbox.BlitText(dialogueText, content, interval: 0.025f, trailer: "▮");
+        audioSource.Stop();
     }
 
 

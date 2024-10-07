@@ -15,6 +15,8 @@ public class EscapeMenuObjectiveController : MonoBehaviour {
     public TextMeshProUGUI missionTagline;
     public TextMeshProUGUI missionStatusText;
 
+    public GameObject abortButton;
+
     public void Initialize(LevelState levelState) {
         foreach (Transform child in objectivesContainer) {
             if (child.gameObject == bonusObjectiveHeader) continue;
@@ -46,6 +48,9 @@ public class EscapeMenuObjectiveController : MonoBehaviour {
             missionStatusText.text = "status: failed";
         } else {
             missionStatusText.text = "status: active";
+        }
+        if (levelState.template.isTutorial) {
+            abortButton.SetActive(false);
         }
     }
 }

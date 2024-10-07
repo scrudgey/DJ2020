@@ -100,10 +100,9 @@ public abstract class Cutscene {
             CutsceneManager.I.cameraListener.enabled = false;
             initialPosition = characterCamera.lastTargetPosition;
         } else {
-
             CutsceneManager.I.playerListener.enabled = false;
             CutsceneManager.I.cameraListener.enabled = true;
-            initialPosition = characterCamera.transform.position;
+            initialPosition = characterCamera.lastTargetPosition - (5 * characterCamera.transform.forward);
         }
         Quaternion initialRotation = characterCamera.transform.rotation;
         while (timer < duration) {
@@ -274,6 +273,14 @@ public abstract class Cutscene {
         if (locationHighlight != null) {
             locationHighlight.gameObject.SetActive(false);
         }
+    }
+
+    protected IEnumerator ShowCutsceneDialogue(string name, Sprite portrait, string content,
+            CutsceneDialogueController.Location location = CutsceneDialogueController.Location.bottom,
+            string trailer = "") {
+        IEnumerator routine = GameManager.I.uiController.cutsceneDialogueController.Initialize(name, portrait, content, GameManager.I.uiController, location: location, trailer: trailer);
+        GameManager.I.uiController.cutsceneDialogueCanvas.enabled = true;
+        return routine;
     }
 
 

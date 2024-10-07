@@ -56,13 +56,9 @@ public class CutsceneManager : Singleton<CutsceneManager> {
             while (GameManager.I.uiController == null) {
                 yield return null;
             }
-
             GameManager.I.uiController.HideUI(hideKeySelect: false);
             cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
-            playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
-            // playerListener.enabled = false;
-            // cameraListener.enabled = true;
-
+            playerListener = GameManager.I.playerObject.GetComponentInChildren<AudioListener>();
             Time.timeScale = 0;
         } else {
             cutscenesAwaitingFocus.Push(requester);
@@ -101,7 +97,7 @@ public class CutsceneManager : Singleton<CutsceneManager> {
                     GameManager.I.uiController.ShowUI(hideCutsceneText: false);
                     Time.timeScale = 1;
                     AudioListener cameraListener = GameManager.I.characterCamera.GetComponent<AudioListener>();
-                    AudioListener playerListener = GameManager.I.playerObject.GetComponent<AudioListener>();
+                    AudioListener playerListener = GameManager.I.playerObject.GetComponentInChildren<AudioListener>();
                     cameraListener.enabled = false;
                     playerListener.enabled = true;
                     Debug.Log($"leave focus: finishing");
