@@ -39,10 +39,11 @@ public abstract class Cutscene {
     public abstract IEnumerator DoCutscene();
 
 
-    protected IEnumerator WaitForTrigger(string idn) {
+    protected IEnumerator WaitForTrigger(params string[] idn) {
         bool trigger = false;
+        HashSet<string> values = new HashSet<string>(idn);
         Action<string> callback = (string triggerId) => {
-            trigger |= triggerId == idn;
+            trigger |= values.Contains(triggerId);
             // Debug.Log($"process incoming trigger: {triggerId}, {triggerId} == {idn}\t trigger: {trigger}");
         };
         CutsceneManager.OnTrigger += callback;

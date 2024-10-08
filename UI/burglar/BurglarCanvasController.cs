@@ -660,6 +660,11 @@ public class BurglarCanvasController : MonoBehaviour {
     }
 
     public void ToolSelectCallback(string toolName) {
+        InputProfile inputProfile = CutsceneManager.I.runningCutscene()?.inputProfile ?? InputProfile.allowAll;
+        if (!inputProfile.allowBurglarInterface && toolName != "none") {
+            return;
+        }
+
         if (rejectClickTimeout > 0) return;
         // this is just so that we can properly wire up the buttons in unity editor.
         BurglarToolType toolType = toolName switch {

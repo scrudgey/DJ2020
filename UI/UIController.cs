@@ -259,6 +259,9 @@ public class UIController : MonoBehaviour {
     public void ShowInteractiveHighlight() {
         interactiveHighlightCanvas.enabled = true;
     }
+    public void HideInteractiveHighlight() {
+        interactiveHighlightCanvas.enabled = false;
+    }
     public void ShowSaveIndicator() {
         // saveIndicatorController.ShowSaveIndicator();
     }
@@ -309,9 +312,11 @@ public class UIController : MonoBehaviour {
         statusBarCanvas.enabled = value;
     }
     public void ShowAppearanceInfo(bool value) {
+        canvas.enabled = value;
         suspicionIndicatorHandler.gameObject.SetActive(value);
     }
     public void ShowVisibilityInfo(bool value) {
+        canvas.enabled = value;
         visibilityUIHandler.gameObject.SetActive(value);
     }
     public void ShowOverlayControls(bool value) {

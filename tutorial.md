@@ -292,28 +292,33 @@ walks you through taking out the cyberdeck, stealing the file
 * consistent increasing selection of UI elements
 * escape menu viability
     * just don't show abort option
+* explain the suspicion meter?
 
 
 # tutorial finalization
 
-explain the suspicion meter?
-initial flicker
+? initial flicker
 
 interdict bad controls
-    disallow taking out gun
-    prevent closing the burglar menu
-    prevent running down the street wrong way
-    prevent taking gun out (no gun?)
+    . prevent closing the burglar menu
+    * prevent running down the street wrong way
+    . disallow taking out gun
+    * prevent taking cyberdeck out before cyberdeck sequence
+    . taking out cyberdeck early
+    . player could shoot mentor if they hop the fence with gun?
+    ? third person view leading in to any camera moment?
+    . prevent burglar interface power relay before we get tehre
+    . can use wheel menu during dialogue
+    . prevent using burglar mode while walking up to door
+    
     pause hack software selector while cutscene dialogue is active
-    taking out cyberdeck early?
-    third person view leading in to any camera moment
-    can use wheel menu during dialogue
-    prevent burglar interface power relay before we get tehre
-    prevent taking item out before cyberdeck sequence
     prevent using the key menu during dialogue
     prevent using key while walking up to door
-    prevent using burglar mode while walking up to door
-    prevent using software while in dialogue
+
+
+    third person view in air duct is broken
+    allowburglarinterface false before concluding door segment ?
+    can leave the lab
 
 # system
 

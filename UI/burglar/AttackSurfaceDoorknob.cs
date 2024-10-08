@@ -17,6 +17,7 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
             bool success = !IsLocked();
             door.ActivateDoorknob(data.burglar.transform.position, data.burglar.transform, doorLocks);
             if (success) {
+                CutsceneManager.I.HandleTrigger("doorknob");
                 return BurglarAttackResult.None with {
                     finish = success,
                 };
@@ -27,7 +28,6 @@ public class AttackSurfaceDoorknob : AttackSurfaceElement {
                         lockPositions.Add(doorLock.transform.position);
                     }
                 }
-
                 return BurglarAttackResult.None with {
                     finish = success,
                     success = false,

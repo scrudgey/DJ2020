@@ -895,6 +895,9 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
                 }
                 break;
         }
+        if (index != 0 && index != -1) {
+            CutsceneManager.I.HandleTrigger("gun_drawn");
+        }
     }
 
     Vector2 InputThreshold(Vector2 input) {

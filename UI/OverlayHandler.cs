@@ -487,5 +487,8 @@ public class OverlayHandler : MonoBehaviour {
         HackOriginSelectCallback(null);
         GameManager.I.playerManualHacker.Disconnect();
         CutsceneManager.I.HandleTrigger("disconnect");
+        RefreshCyberInfoDisplays();
+        RefreshPowerInfoDisplays();
+        RefreshAlarmInfoDisplays();
     }
 }
