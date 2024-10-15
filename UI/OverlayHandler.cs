@@ -63,6 +63,8 @@ public class OverlayHandler : MonoBehaviour {
     public CyberdeckUIController cyberdeckController;
     public NeoCyberNodeIndicator selectedHackOrigin;
     public List<CyberNode> hackOriginToPathTarget;
+    public bool overrideDisconnectButton;
+    public CanvasGroup canvasGroup;
     RectTransform activeInfoPane;
     Coroutine showInfoRoutine;
     bool bound;
@@ -161,6 +163,8 @@ public class OverlayHandler : MonoBehaviour {
         selectedCyberNodeIndicator = null;
         selectedPowerNodeIndicator = null;
         HackOriginSelectCallback(null);
+        NodeMouseExitCallback();
+
         GameManager.I.playerManualHacker.Disconnect();
         CutsceneManager.I.HandleTrigger("disconnect");
 
@@ -418,7 +422,11 @@ public class OverlayHandler : MonoBehaviour {
 
     void SetSelectedNode(INodeCameraProvider selected) {
         selectedNode = selected;
-        closeButtonObject.SetActive(selected != null);
+        if (overrideDisconnectButton) {
+            closeButtonObject.SetActive(false);
+        } else {
+            closeButtonObject.SetActive(selected != null);
+        }
         OnSelectedNodeChange?.Invoke(selected);
     }
     public void NodeMouseExitCallback() {
@@ -451,6 +459,8 @@ public class OverlayHandler : MonoBehaviour {
         RefreshCyberGraph(GameManager.I.gameData.levelState.delta.cyberGraph);
     }
     public void ShowInfoPane(RectTransform infoPane) {
+        if (activeInfoPane == infoPane) return;
+
         if (showInfoRoutine != null) {
             StopCoroutine(showInfoRoutine);
         }
@@ -490,5 +500,6 @@ public class OverlayHandler : MonoBehaviour {
         RefreshCyberInfoDisplays();
         RefreshPowerInfoDisplays();
         RefreshAlarmInfoDisplays();
+        NodeMouseExitCallback();
     }
 }

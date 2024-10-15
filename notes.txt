@@ -4068,6 +4068,13 @@ burglar polish:
     better wires
     "return button" doesn't work because multitool is in the way
 
+fix up graphics for weapon wheel menu
+make character heads bob a little bit as they talk?
+redraw jack portrait
+"you have no keys" / "you have no data"
+wire cutting
+software view
+
 
 
 symbols
@@ -4081,6 +4088,40 @@ symbols
 
 
 
+
+
+
+
+
+
+credit acceptance
+    leader in nonprime auto finances- less than perfect credit customers 1972
+    auto dealerships- 12k across US
+    publicly traded. 2.8B revenue
+    CEO since 2004/2021
+
+    modernize operations- AI / ML decision making?
+    optimize platforms
+    fraud detection / customer service
+
+    3 roles available:
+        leader of ML 
+            building models
+            extensive experience w tools, etc.
+        leader of AI solutions
+            business oriented
+            nontechnical stakeholders dealing with
+        principal engineer ML/AI platform
+            high scale distributed platforms
+            deploying complex models
+            SOVA? techniques
+            cloud platform AWS / azure / GCP
+
+    pay scale?
+        up to 417k / 
+            salary?x 
+            rsu?
+            bonus?
 
 
 

@@ -30,7 +30,7 @@ public class SoftwareButton : MonoBehaviour {
         this.template = template;
         icon.sprite = template.icon;
         levelCaption.text = template.infiniteCharges ? "-" : $"{template.maxCharges}";
-        caption.text = state.template.name;
+        caption.text = template.name;
     }
 
     public void Initialize(SoftwareState state, Action<SoftwareButton> callback, bool enabled) {

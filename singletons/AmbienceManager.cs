@@ -59,7 +59,7 @@ public class AmbienceManager : Singleton<AmbienceManager> {
         // find all zones that contain the target point
         HashSet<AmbientZone> containedZones = new HashSet<AmbientZone>();
         foreach (AmbientZone zone in zones) {
-            if (zone.enabled && zone.activeZone.bounds.Contains(targetPosition)) {
+            if (zone != null && zone.enabled && zone.activeZone.bounds.Contains(targetPosition)) {
                 containedZones.Add(zone);
             } else {
                 Stop(zone);
@@ -75,6 +75,7 @@ public class AmbienceManager : Singleton<AmbienceManager> {
         // order by distances
         List<AmbientZone> sortedZones = distances.OrderByDescending(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
         foreach (AmbientZone zone in sortedZones) {
+            if (zone == null) continue;
             if (playingAmbientZones[zone] != null) {
                 AudioSource audioSource = playingAmbientZones[zone];
                 SetVolume(zone, audioSource);
@@ -110,6 +111,7 @@ public class AmbienceManager : Singleton<AmbienceManager> {
     }
 
     void Stop(AmbientZone zone) {
+        if (zone == null) return;
         if (playingAmbientZones[zone] != null) {
             AudioSource audioSource = playingAmbientZones[zone];
             zone.Stop();

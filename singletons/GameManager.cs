@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,7 +93,7 @@ public partial class GameManager : Singleton<GameManager> {
     public MeleeHandler playerMeleeHandler;
     public ManualHacker playerManualHacker;
     public ItemHandler playerItemHandler;
-    public bool disablePlayerInput;
+    // public bool disablePlayerInput;
     float rebuildNavMeshTimer;
     NavMeshData m_NavMesh;
 
@@ -103,24 +104,49 @@ public partial class GameManager : Singleton<GameManager> {
         showConsole.action.performed += HandleShowConsleAction;
         escapeAction.action.performed += HandleEscapeAction;
     }
-    public void StartNewGame(string filename) {
+    public void StartNewGame(string filename, bool doTutorial) {
         timePlayed = 0f;
 
         GameData data = GameData.DefaultState() with {
             filename = filename
         };
 
+        PlayerState playerState = PlayerState.DefaultState();
+        playerState.allItems = new List<ItemTemplate> {
+            ItemTemplate.LoadItem("fence_cutters")
+        };
+        playerState.softwareTemplates = new List<SoftwareScriptableTemplate>{
+            SoftwareScriptableTemplate.Load("scan"),
+            SoftwareScriptableTemplate.Load("exploit"),
+            SoftwareScriptableTemplate.Load("scanData"),
+        }.Select(template => template.ToTemplate()).ToList();
+
+        LevelTemplate levelTemplate = LevelTemplate.LoadResource("tutorial");
+        LevelPlan levelPlan = LevelPlan.Default(playerState);
+        data.playerState = playerState;
+
         gameData = data;
-        StartNewDay();
+        SetDailyProceduralValues();
+        SaveGameData();
+
+        // start the game state
+        if (doTutorial) {
+            LoadMission(levelTemplate, levelPlan, doCutscene: false);
+        } else {
+            StartNewDay();
+        }
     }
     public void StartNewDay() {
+        SetDailyProceduralValues();
+
+        SaveGameData();
+        ReturnToApartment();
+    }
+    public void SetDailyProceduralValues() {
         SetMarketData();
         SetDealData();
         SetFenceData();
         SetGunsForSale();
-
-        SaveGameData();
-        ReturnToApartment();
     }
 
     public void LoadGame(GameData loadData) {
@@ -478,8 +504,7 @@ public partial class GameManager : Singleton<GameManager> {
             UpdateReportTickets();
             UpdateGraphs();
             InputProfile inputProfile = CutsceneManager.I.runningCutscene()?.inputProfile ?? InputProfile.allowAll;
-            if (!disablePlayerInput)
-                DoInputs(inputProfile);
+            DoInputs(inputProfile);
         } else {
             if (resetMouseControl) {
                 Cursor.lockState = CursorLockMode.None;
@@ -556,7 +581,7 @@ public partial class GameManager : Singleton<GameManager> {
 
         PlayerInput playerInput = InputController.I.HandleCharacterInput(uiclick, escapePressedThisFrame);
         playerInput.ApplyInputMask(inputProfile);
-
+        // Debug.Log($"considering input: {Time.timeScale} {doPlayerInput} {inputProfile}");
         if (Time.timeScale > 0 && doPlayerInput) {
 
             if (gameData.levelState != null)
@@ -742,6 +767,13 @@ public partial class GameManager : Singleton<GameManager> {
         LoadScene("Apartment", () => {
             Debug.Log("return to apartment callback");
             StartWorld("Apartment");
+        });
+    }
+    public void StartNewGameBarSequence() {
+        LoadScene("Street", () => {
+            StartWorld("Street");
+            BarCutscene barCutscene = BarCutscene.fromResources();
+            CutsceneManager.I.StartCutscene(barCutscene);
         });
     }
 

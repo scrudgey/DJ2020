@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,10 @@ public class EscapeMenuController : MonoBehaviour {
 
     public GameObject characterTab;
     public Button characterTabButton;
+    [Header("modal")]
+    public GameObject modalDialogObject;
+    public CanvasGroup nonModalCanvasGroup;
+    public Action modalAcceptCallback;
 
     [Header("objective")]
     public EscapeMenuObjectiveController objectiveController;
@@ -58,6 +63,7 @@ public class EscapeMenuController : MonoBehaviour {
 
     void Awake() {
         myCanvas.enabled = false;
+        modalDialogObject.SetActive(false);
         DestroyImmediate(UIEditorCamera);
     }
     public void Initialize(GameData data, string sceneName) {
@@ -105,8 +111,19 @@ public class EscapeMenuController : MonoBehaviour {
         GameManager.I.PlayUISound(closeSounds);
     }
     public void AbortButtonCallback() {
-        GameManager.I.CloseMenu();
-        GameManager.I.HandleObjectiveFailed();
+        ShowModal(DoAbort);
+    }
+
+    void DoAbort() {
+        if (GameManager.I.gameData.levelState.template.isTutorial) {
+            CutsceneManager.I.StopAllCutscenes();
+            Sprite jackPortrait = Resources.Load<Sprite>("sprites/portraits/Jack") as Sprite;
+            CutsceneManager.I.StartCutscene(new AbortTutorialCutscene(jackPortrait));
+            GameManager.I.CloseMenu();
+        } else {
+            GameManager.I.CloseMenu();
+            GameManager.I.HandleObjectiveFailed();
+        }
     }
     public void HandleEscapeAction(InputAction.CallbackContext ctx) {
         ContinueButtonCallback();
@@ -179,5 +196,20 @@ public class EscapeMenuController : MonoBehaviour {
         characterTabButton.colors = normalTabColors;
 
         target.colors = selectedTabColors;
+    }
+
+    public void ShowModal(Action callback) {
+        modalAcceptCallback = callback;
+        modalDialogObject.SetActive(true);
+        nonModalCanvasGroup.interactable = false;
+    }
+    public void ModalAcceptButtonCallback() {
+        modalDialogObject.SetActive(false);
+        nonModalCanvasGroup.interactable = true;
+        modalAcceptCallback?.Invoke();
+    }
+    public void ModalCancelButtonCallback() {
+        modalDialogObject.SetActive(false);
+        nonModalCanvasGroup.interactable = true;
     }
 }

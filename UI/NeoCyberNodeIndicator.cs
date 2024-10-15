@@ -134,6 +134,7 @@ public class NeoCyberNodeIndicator : NodeIndicator<CyberNode, CyberGraph> {
     }
 
     public override void OnPointerClick(PointerEventData pointerEventData) {
+        if (!overlayHandler.canvasGroup.interactable) return;
         if (!node.notClickable) {
             if (GameManager.I.activeOverlayType == OverlayType.limitedCyber) {
                 GameManager.I.SetOverlay(OverlayType.cyber);

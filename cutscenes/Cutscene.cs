@@ -16,13 +16,21 @@ public abstract class Cutscene {
     public bool isPlaying;
     public InputProfile inputProfile = InputProfile.allowNone;
     LocationHighlight locationHighlight;
+    public Coroutine myCoroutine;
     public IEnumerator Play() {
         isPlaying = true;
         yield return DoCutscene();
         // request unfocus
         isPlaying = false;
         yield return LeaveFocus();
+        Cleanup();
     }
+    public void Stop() {
+        CutsceneManager.I.StopCoroutine(myCoroutine);
+        isPlaying = false;
+        Cleanup();
+    }
+
 
     protected IEnumerator WaitForFocus() {
         // Debug.Log("start wait for focus");
@@ -38,7 +46,9 @@ public abstract class Cutscene {
 
     public abstract IEnumerator DoCutscene();
 
+    public virtual void Cleanup() {
 
+    }
     protected IEnumerator WaitForTrigger(params string[] idn) {
         bool trigger = false;
         HashSet<string> values = new HashSet<string>(idn);
@@ -54,7 +64,7 @@ public abstract class Cutscene {
         CutsceneManager.OnTrigger -= callback;
     }
 
-    protected void SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false, bool debug = false) {
+    protected CameraInput SetCameraPosition(Vector3 position, Quaternion rotation, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false, bool debug = false) {
         CursorData targetData = CursorData.none;
         targetData.screenPositionNormalized = HALFSIES;
 
@@ -78,6 +88,11 @@ public abstract class Cutscene {
         };
         characterCamera.transitionTime = 1f;
         characterCamera.UpdateWithInput(input, debug: debug);
+        return input;
+    }
+    protected void SetCameraPosition(CameraInput cameraInput) {
+        characterCamera.transitionTime = 1f;
+        characterCamera.UpdateWithInput(cameraInput);
     }
 
     protected void SetCameraPosition(string idn, CameraState state, float orthographicSize = 1f, bool snapToOrthographicSize = false, bool snapToPosition = false) {
@@ -85,9 +100,9 @@ public abstract class Cutscene {
         SetCameraPosition(data.transform.position, data.transform.rotation, state, orthographicSize: orthographicSize, snapToOrthographicSize: snapToOrthographicSize, snapToPosition: snapToPosition);
     }
 
-    protected IEnumerator MoveCamera(string idn, float duration, CameraState state) {
+    protected IEnumerator MoveCamera(string idn, float duration, CameraState state, float buffer = 0.1f) {
         ScriptSceneCameraPosition data = CutsceneManager.I.cameraLocations[idn];
-        yield return MoveCamera(data.transform.position, data.transform.rotation, duration, state);
+        yield return MoveCamera(data.transform.position, data.transform.rotation, duration, state, buffer: buffer);
     }
     protected IEnumerator MoveCamera(string idn, float duration, CameraState state, Func<double, double, double, double, double> easing) {
         ScriptSceneCameraPosition data = CutsceneManager.I.cameraLocations[idn];
@@ -106,19 +121,25 @@ public abstract class Cutscene {
             initialPosition = characterCamera.lastTargetPosition - (5 * characterCamera.transform.forward);
         }
         Quaternion initialRotation = characterCamera.transform.rotation;
+        CameraInput cameraInput = CameraInput.None();
         while (timer < duration) {
             float completion = timer / duration;
 
             Vector3 position = Vector3.Lerp(initialPosition, targetPosition, completion);
             Quaternion rotation = Quaternion.Lerp(initialRotation, targetRotation, completion);
             // Debug.Log($"{timer}\t{duration}\t{completion}\t{targetPosition} -> {position}");
-            SetCameraPosition(position, rotation, state);
+            cameraInput = SetCameraPosition(position, rotation, state);
             timer += Time.unscaledDeltaTime;
             // Debug.Break();
             yield return null;
         }
-        yield return new WaitForSecondsRealtime(buffer);
         SetCameraPosition(targetPosition, targetRotation, state, debug: debug);
+
+        timer = 0f;
+        while (timer < buffer) {
+            timer += Time.unscaledDeltaTime;
+            SetCameraPosition(cameraInput);
+        }
     }
     protected IEnumerator MoveCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, CameraState state, Vector2 zoomInput) {
         return MoveCamera(targetPosition, targetRotation, duration, state, zoomInput, PennerDoubleAnimation.Linear);

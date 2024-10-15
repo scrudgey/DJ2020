@@ -16,6 +16,7 @@ public class TitleController : MonoBehaviour {
     public Canvas alertCanvas;
     public AlertCanvasHandler alertCanvasHandler;
     public LoadGameMenuController loadGameMenuController;
+    public NewGameMenuController newGameMenuController;
     public Canvas vrMenuCanvas;
     public Color logoTintColor;
 
@@ -34,8 +35,6 @@ public class TitleController : MonoBehaviour {
     Coroutine introCoroutine;
     bool menusStarted;
     void Start() {
-
-
         introCoroutine = StartCoroutine(DoIntro());
         mainMenu.SetActive(false);
         VRCanvas.enabled = false;
@@ -62,6 +61,7 @@ public class TitleController : MonoBehaviour {
         }
     }
     public void NewGameCallback() {
+        newGameMenuController.Initialize();
         mainMenu.SetActive(false);
         newGameCanvas.enabled = true;
     }
@@ -71,9 +71,9 @@ public class TitleController : MonoBehaviour {
     }
     public void LoadGameCallback() {
         // show load menu
+        loadGameMenuController.Initialize();
         mainMenu.SetActive(false);
         loadGameCanvas.enabled = true;
-        loadGameMenuController.Initialize();
     }
     public void CloseLoadMenu() {
         mainMenu.SetActive(true);

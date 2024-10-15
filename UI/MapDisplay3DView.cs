@@ -178,8 +178,12 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
         }
 
         foreach (MapMarkerData data in mapDisplay3Dgenerator.mapData) {
+            // Debug.Log($"{data.markerType} {data.idn} {plan.insertionPointIdn}");
             if (data.markerType == MapMarkerData.MapMarkerType.objective || data.markerType == MapMarkerData.MapMarkerType.anchor) continue;
-            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && mode == Mode.mission) continue;
+            if (data.markerType == MapMarkerData.MapMarkerType.insertionPoint && mode == Mode.mission) {
+                indicators[data].gameObject.SetActive(false);
+                continue;
+            }
             if (plan != null) {
                 if (data.markerType == MapMarkerData.MapMarkerType.extractionPoint && data.idn != plan.extractionPointIdn) {
                     if (indicators.ContainsKey(data))
@@ -202,6 +206,7 @@ public class MapDisplay3DView : IBinder<MapDisplay3DGenerator> {
                 };
                 indicator.Configure(indicatorText, data.markerType, data.markerIcon);
                 indicators[data] = indicator;
+                // Debug.Log($"spawning map marker indicator: {indicatorText}");
             }
             indicators[data].SetPosition(data.worldPosition, mapDisplay3Dgenerator, markerContainer);
         }

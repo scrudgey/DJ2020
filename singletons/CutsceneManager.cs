@@ -12,11 +12,11 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     Stack<Cutscene> cutscenesAwaitingFocus = new Stack<Cutscene>();
     Cutscene cutsceneWithFocus;
 
-    List<Coroutine> runningCutscenes;
+    List<Cutscene> runningCutscenes = new List<Cutscene>();
     public void InitializeSceneReferences() {
         Debug.Log("[cutscene] clearing OnTrigger");
         OnTrigger = null;
-        runningCutscenes = new List<Coroutine>();
+        runningCutscenes = new List<Cutscene>();
         cutscenesAwaitingFocus = new Stack<Cutscene>();
         worldLocations = GameObject.FindObjectsOfType<ScriptSceneLocation>().ToDictionary(x => x.idn, x => x);
         cameraLocations = GameObject.FindObjectsOfType<ScriptSceneCameraPosition>().ToDictionary(x => x.idn, x => x);
@@ -29,11 +29,13 @@ public class CutsceneManager : Singleton<CutsceneManager> {
         return cutsceneWithFocus;
     }
     public void StartCutscene(Cutscene cutscene) {
-        runningCutscenes.Add(StartCoroutine(cutscene.Play()));
+        Coroutine coroutine = StartCoroutine(cutscene.Play());
+        cutscene.myCoroutine = coroutine;
+        runningCutscenes.Add(cutscene);
     }
 
     public void HandleTrigger(string idn) {
-        Debug.Log($"[cutscene manager] trigger: {idn}");
+        // Debug.Log($"[cutscene manager] trigger: {idn}");
         OnTrigger?.Invoke(idn);
     }
 
@@ -63,9 +65,9 @@ public class CutsceneManager : Singleton<CutsceneManager> {
         } else {
             cutscenesAwaitingFocus.Push(requester);
             Debug.Log($"request focus: wait in line {cutscenesAwaitingFocus.Count}");
-            foreach (Cutscene x in cutscenesAwaitingFocus) {
-                Debug.Log($"queue: {x}");
-            }
+            // foreach (Cutscene x in cutscenesAwaitingFocus) {
+            //     Debug.Log($"queue: {x}");
+            // }
         }
     }
 
@@ -83,11 +85,11 @@ public class CutsceneManager : Singleton<CutsceneManager> {
                 cutsceneWithFocus.hasFocus = false;
                 cutsceneWithFocus = null;
 
-                Debug.Log($"leave focus: cutsceneWithFocus == requester");
-                Debug.Log($"leave focus: queue: {cutscenesAwaitingFocus.Count}");
-                foreach (Cutscene x in cutscenesAwaitingFocus) {
-                    Debug.Log($"queue: {x}");
-                }
+                // Debug.Log($"leave focus: cutsceneWithFocus == requester");
+                // Debug.Log($"leave focus: queue: {cutscenesAwaitingFocus.Count}");
+                // foreach (Cutscene x in cutscenesAwaitingFocus) {
+                //     Debug.Log($"queue: {x}");
+                // }
 
                 if (cutscenesAwaitingFocus.Count > 0) {
                     Cutscene nextCutscene = cutscenesAwaitingFocus.Pop();
@@ -146,6 +148,18 @@ public class CutsceneManager : Singleton<CutsceneManager> {
     public void NPCClearPoints(CharacterController character) {
         SphereRobotAI ai = character.GetComponent<SphereRobotAI>();
         ai.ChangeState(new SphereClearPointsState(ai, character, FindObjectsOfType<ClearPoint>(), speed: 0.5f));
+    }
+
+    public void StopAllCutscenes() {
+        foreach (Cutscene runningCutscene in runningCutscenes) {
+            runningCutscene.Stop();
+        }
+        foreach (Cutscene cutscene in cutscenesAwaitingFocus) {
+            cutscene.Stop();
+        }
+        cutsceneWithFocus = null;
+        runningCutscenes = new List<Cutscene>();
+        cutscenesAwaitingFocus = new Stack<Cutscene>();
     }
 }
 

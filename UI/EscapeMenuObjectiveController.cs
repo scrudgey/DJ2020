@@ -49,8 +49,8 @@ public class EscapeMenuObjectiveController : MonoBehaviour {
         } else {
             missionStatusText.text = "status: active";
         }
-        if (levelState.template.isTutorial) {
-            abortButton.SetActive(false);
-        }
+        // if (levelState.template.isTutorial) {
+        //     abortButton.SetActive(false);
+        // }
     }
 }

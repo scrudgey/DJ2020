@@ -1126,7 +1126,7 @@ public class CharacterController : MonoBehaviour, ICharacterController, IPlayerS
             // if (fallTime > 0) {
             //     Debug.Log($"integrated fall time: {fallTime} {fallVelocity}");
             // }
-            if (fallVelocity < -13f) {
+            if (fallVelocity < -15f) {
                 TakeFallDamage(fallVelocity);
                 TransitionToState(CharacterState.landStun);
             }

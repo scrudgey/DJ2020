@@ -293,13 +293,7 @@ walks you through taking out the cyberdeck, stealing the file
 * escape menu viability
     * just don't show abort option
 * explain the suspicion meter?
-
-
-# tutorial finalization
-
-? initial flicker
-
-interdict bad controls
+* interdict bad controls
     . prevent closing the burglar menu
     * prevent running down the street wrong way
     . disallow taking out gun
@@ -310,30 +304,54 @@ interdict bad controls
     . prevent burglar interface power relay before we get tehre
     . can use wheel menu during dialogue
     . prevent using burglar mode while walking up to door
-    
-    pause hack software selector while cutscene dialogue is active
-    prevent using the key menu during dialogue
-    prevent using key while walking up to door
+    . prevent using the key menu during dialogue
+    . prevent using key while walking up to door
+    . pause hack software selector while cutscene dialogue is active
+    . hide disconnect button
+    . allowburglarinterface false before concluding door segment ?
+    * key segment is broken in some way
+    * ▮
+    * disconnect button uninteractible color
+    * can click status bar during dialogue
+    * (status bar appears after closing escape menu)
+    * can cut through other fences.
+    * mentor portait
+    *.* can leave the lab
+    . attack surface on closet door
+    . third person view in air duct is broken
+* enter from title screen
+* initial flicker
+* UI changes-
+    - outline text
+    . move visibility meter
+. datafile visibility on map should be set?
+* possible to cut the wrong fence?
+* pulling out gun by the fence- weird behavior
+* insertion point on map is wrong
+* escapability
+* exit to neighborhood
+* changing into third person view before dialogues like cyberdeck sequence
+    * verify this works: start of interior
+* verify wander correction
+. when starting a new game, toggle for skipping tutorial / intro
+. bar cutscene
+
+# tutorial finalization
+exploit can be used early: fix this after tuning software 
+camera data location?
+pulling gun before door allowed me to burglar door early?
+
+camera movement is jumpy
 
 
-    third person view in air duct is broken
-    allowburglarinterface false before concluding door segment ?
-    can leave the lab
-
-# system
-
-exit to neighborhood
-enter from title screen
 
 
 
 
 
-# gameplay elements
-fix up graphics for weapon wheel menu
-make character heads bob a little bit as they talk?
-redraw jack portrait
-"you have no keys" / "you have no data"
+
+
+
 
 scheduling with brett
 opportunistic hire
@@ -354,4 +372,7 @@ base - north of $200k
 bonus- consistent 10-12% quarterly          12%      - 246.4
 equity- RSU > 500,000 / 4 years = 125,000            - 371.4
 
+8,534 * 2 = 17068 
 
+13528/mo
+7,549 monthly -> rule of 28% -> 26,960 monthly gross -> 323,520 annual gross (accurate)

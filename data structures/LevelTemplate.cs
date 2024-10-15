@@ -67,7 +67,7 @@ public class LevelTemplate : ScriptableObject {
     }
     public static LevelTemplate LoadResource(string name) {
         string path = $"data/missions/{name}/{name}";
-        Debug.Log($"template path: {path}");
+        // Debug.Log($"template path: {path}");
         return Resources.Load<LevelTemplate>(path) as LevelTemplate;
     }
 

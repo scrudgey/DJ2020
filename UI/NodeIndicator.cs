@@ -55,6 +55,8 @@ public class NodeIndicator<T, U> : MonoBehaviour, IPointerEnterHandler, IPointer
         onMouseExit?.Invoke(this);
     }
     public virtual void OnPointerClick(PointerEventData pointerEventData) {
+        if (!overlayHandler.canvasGroup.interactable) return;
+
         overlayHandler.NodeSelectCallback(this);
     }
 

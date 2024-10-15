@@ -10,6 +10,8 @@ public class PowerSource : PoweredComponent {
         return node;
     }
     public override void OnDestroy() {
+        if (GameManager.I.isLoadingLevel) return;
+
         base.OnDestroy();
         GameManager.I?.SetPowerNodeState(this, false);
     }

@@ -36,4 +36,8 @@ public struct CameraInput {
 
     public AttackSurface currentAttackSurface;
     public bool ignoreAttractor;
+
+    public static CameraInput None() {
+        return new CameraInput();
+    }
 }

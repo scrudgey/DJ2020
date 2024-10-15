@@ -72,7 +72,7 @@ public class StoreDialogueController : MonoBehaviour {
         dialogueRightSpacer.minWidth = 150f;
         audioSource.clip = blitSound;
         audioSource.Play();
-        yield return Toolbox.BlitText(dialogueText, content, interval: 0.025f, trailer: "▮");
+        yield return Toolbox.BlitText(dialogueText, content, interval: 0.025f, trailer: "<sprite name=\"rect\">");
         audioSource.Stop();
     }
 

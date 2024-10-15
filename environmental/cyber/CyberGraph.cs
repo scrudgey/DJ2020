@@ -263,6 +263,11 @@ public class CyberGraph : Graph<CyberNode, CyberGraph> {
             value = true;
             node.datafileVisibility = true;
             CutsceneManager.I.HandleTrigger($"file_discover_{node.payData.filename}");
+            foreach (ObjectiveDelta objective in GameManager.I.gameData.levelState.delta.AllObjectives()) {
+                if (objective.targetIdn == node.idn) {
+                    objective.visibility = Objective.Visibility.known;
+                }
+            }
         }
         return value;
     }

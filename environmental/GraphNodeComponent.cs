@@ -50,6 +50,7 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         GameManager.I?.SetNodeEnabled<U>(node, true);
     }
     void OnDisable() {
+        if (GameManager.I.isLoadingLevel) return;
         DisableSource();
     }
     void OnEnable() {
@@ -57,6 +58,8 @@ public abstract class GraphNodeComponent<T, U> : MonoBehaviour where T : GraphNo
         EnableSource();
     }
     virtual public void OnDestroy() {
+        if (GameManager.I.isLoadingLevel) return;
+
         DisableSource();
     }
 

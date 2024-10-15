@@ -49,11 +49,11 @@ public partial class GameManager : Singleton<GameManager> {
         SceneData sceneData = SceneData.loadSceneData(template.sceneName);
         LoadScene(template.sceneName, () => StartVRMission(state, sceneData));
     }
-    public void LoadMission(LevelTemplate template, LevelPlan plan) {
+    public void LoadMission(LevelTemplate template, LevelPlan plan, bool doCutscene = true) {
         Debug.Log("GameMananger: load mission");
         gameData.levelState = LevelState.Instantiate(template, plan, gameData.playerState);
         gameData.playerState.ResetTemporaryState(plan);
-        LoadScene(template.initialScene.name, () => StartMission(gameData.levelState, template.initialScene));
+        LoadScene(template.initialScene.name, () => StartMission(gameData.levelState, template.initialScene, doCutscene: doCutscene));
     }
 
     public void StartVRMission(VRMissionState state, SceneData sceneData) {
@@ -81,7 +81,7 @@ public partial class GameManager : Singleton<GameManager> {
         Debug.Log($"GameMananger: start mission {state.template.levelName}");
 
         LoadSkyboxForScene(sceneData);
-        GameManager.I.gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
+        gameData.levelState.delta.strikeTeamBehavior = state.template.strikeTeamBehavior;
 
         InitializeLevel(state.plan, sceneData);
         playerCharacterController.OnCharacterDead += HandlePlayerDead;
@@ -200,6 +200,7 @@ public partial class GameManager : Singleton<GameManager> {
         if (doCutscene)
             CutsceneManager.I.StartCutscene(new StartMissionCutscene());
 
+        // TODO: better way of handling level scripts
         foreach (ScriptInitializer script in GameObject.FindObjectsOfType<ScriptInitializer>()) {
             script.StartCutscene();
         }
@@ -239,6 +240,8 @@ public partial class GameManager : Singleton<GameManager> {
         LoadSkyboxForScene(sceneData);
         // MusicController.I.LoadTrack(MusicTrack.antiAnecdote);
         MusicController.I.PlaySimpleTrack(MusicTrack.sympatheticDetonation);
+        CutsceneManager.I.InitializeSceneReferences();
+
         TransitionToPhase(GamePhase.world);
     }
 
@@ -362,6 +365,10 @@ public partial class GameManager : Singleton<GameManager> {
         List<string> scenesToLoad = new List<string> { targetScene };
 
         if (unloadAll) {
+            AmbienceManager.I.Stop();
+            Time.timeScale = 1f;
+            CutsceneManager.I.StopAllCutscenes();
+
             int sceneCount = SceneManager.sceneCount;
             for (int i = 0; i < sceneCount; i++) {
                 string activeSceneName = SceneManager.GetSceneAt(i).name;
@@ -552,7 +559,7 @@ public partial class GameManager : Singleton<GameManager> {
             PowerNode node = GetPowerNode(component.idn);
             component.node = node;
             foreach (INodeBinder<PowerNode> binder in component.GetComponentsInChildren<INodeBinder<PowerNode>>(true)) {
-                // Debug.Log($"{component}\t{component.idn}\t{node}\t{binder}");
+                Debug.Log($"{component}\t{component.idn}\t{node}\t{binder}");
                 binder.Bind(node);
             }
         }

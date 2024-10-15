@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
@@ -62,7 +63,10 @@ public class UIController : MonoBehaviour {
     public CanvasGroup burglarCanvasGroup;
     public RectTransform overlayButtonHighlight;
     public CanvasGroup overlayButtonGroup;
+    public CanvasGroup overlayGroup;
     public bool cutsceneDialogueEnabled;
+    public CanvasGroup keyMenuButtonGroup;
+    public static Action onUIChange;
     Coroutine overlayButtonHighlightRoutine;
     bool burglarMode;
     void Awake() {
@@ -254,7 +258,7 @@ public class UIController : MonoBehaviour {
         if (GameManager.I.gameData.phase == GamePhase.vrMission) {
             ShowVRStats();
         }
-        Debug.Log("show UI");
+        onUIChange?.Invoke();
     }
     public void ShowInteractiveHighlight() {
         interactiveHighlightCanvas.enabled = true;
