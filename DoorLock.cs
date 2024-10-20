@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 [System.Serializable]
 public class DoorLock : MonoBehaviour {

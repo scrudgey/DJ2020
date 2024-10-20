@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 public class HackTerminalController : MonoBehaviour {

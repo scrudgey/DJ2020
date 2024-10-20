@@ -5,7 +5,6 @@ using System.Linq;
 using AI;
 using Easings;
 using Items;
-using UnityEditor;
 using UnityEngine;
 
 class BarCutscene : Cutscene {

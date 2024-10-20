@@ -495,7 +495,8 @@ public class OverlayHandler : MonoBehaviour {
         SetSelectedNode(null);
         GameManager.I.SetOverlay(OverlayType.none);
         HackOriginSelectCallback(null);
-        GameManager.I.playerManualHacker.Disconnect();
+        if (GameManager.I != null && GameManager.I.playerManualHacker != null)
+            GameManager.I.playerManualHacker.Disconnect();
         CutsceneManager.I.HandleTrigger("disconnect");
         RefreshCyberInfoDisplays();
         RefreshPowerInfoDisplays();

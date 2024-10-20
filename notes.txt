@@ -4068,14 +4068,14 @@ burglar polish:
     better wires
     "return button" doesn't work because multitool is in the way
 
+redraw jack portrait
+redraw steam page assets
+
 fix up graphics for weapon wheel menu
 make character heads bob a little bit as they talk?
-redraw jack portrait
 "you have no keys" / "you have no data"
 wire cutting
 software view
-
-
 
 symbols
     screwdriver
@@ -4084,6 +4084,117 @@ symbols
     question
     data_objective
     data_password
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+chris bissell - data platform
+hypothetical system design scenario
+discussion - no expected end goal
+big data / ML systems
+    recommender / fraud /
+domain knowledge - engineering tools
+
+north star hypothetical use case
+"build crowdstrike from scratch"
+focused on data sciene
+
+    I.
+    incoming data sets-
+        telemetry : installed sensors on machines - event streams: 1st party data
+        cloud trail logs : 3rd party data
+        PB of data / trillions of events
+
+    II.
+    stop breaches
+    leverage ML to create detections
+    run inference against streaming data
+
+working closely with chris bissell
+talked with brett about this
+
+queryable data system
+data science ecosystem
+
+question: data platform: what do / responsibility
+    upgrade the data science ecosystem
+    upgrade the platform
+question: my role?
+easel
+birds eye view of the ds at the company
+enablement of multiple DS teams- build increasingly general models
+someone who can handle a lot of different things
+    constant and huge stack of problems to attack
+    stakeholder management- building consensus around architecture- customer value
+
+
+chris.bissell@crowdstrike
+
+
+jeff 
+5 years DS
+brett works with
+
+
+joe
+brett-partner
+threat research
+data
+data science architect
+
+"stop breaches"
+MS
+detection ML czar
+detection models
+model monitoring
+    ground truth
+    at scale performant
+
+ML ops workflow
+DS develop models
+ROC curve
+
+what is your background?
+    MS:
+        anti spyware - acquisition windows defender telemetry
+        DDOS
+been at crowdstrike  7 years
+UEBA: 0.01% anomaly detection rate
+    ML detection
+
+AB comparatives
+human scale
+
+
+
+
+
+cloud native
+observability and telemetry
+default 5 day engagement
+incident response:
+    deploy product in half day: deploy EDR- 80-90% coverage in 4 hr
+
+
+
 
 
 

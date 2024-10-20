@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 public class DoorRandomizer : MonoBehaviour {
     public DoorRandomizerTemplate template;
@@ -47,13 +46,13 @@ public class DoorRandomizer : MonoBehaviour {
             outerDeadbolt.SetActive(deadboltEnabled);
     }
 
-#if UNITY_EDITOR
+    // #if UNITY_EDITOR
 
-    private void OnDrawGizmos() {
-        GUIStyle myStyle = new GUIStyle();
-        myStyle.normal.textColor = template.color;
-        Handles.Label(transform.position, $"{template.doorName}", myStyle);
-    }
-#endif
+    //     private void OnDrawGizmos() {
+    //         GUIStyle myStyle = new GUIStyle();
+    //         myStyle.normal.textColor = template.color;
+    //         Handles.Label(transform.position, $"{template.doorName}", myStyle);
+    //     }
+    // #endif
 
 }

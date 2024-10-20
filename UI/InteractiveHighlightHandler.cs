@@ -28,7 +28,7 @@ public class InteractiveHighlightHandler : IBinder<Interactor> {
         if (!InteractorTargetData.Equality(currentInteractorTarget, interactor.cursorTarget)) {
             currentInteractorTarget?.target?.DisableOutline();
             currentInteractorTarget = interactor.cursorTarget;
-            Debug.Log(currentInteractorTarget);
+            // Debug.Log(currentInteractorTarget);
             currentInteractorTarget?.target?.EnableOutline();
 
             if (currentInteractorTarget == null) {

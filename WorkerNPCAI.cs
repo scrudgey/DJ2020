@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using KinematicCharacterController;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -522,15 +521,15 @@ public class WorkerNPCAI : IBinder<SightCone>, IListener, IHitstateSubscriber, I
     }
 
 
-#if UNITY_EDITOR
-    void OnDrawGizmos() {
-        if (stateMachine != null) {
-            string labelText = $"state: {stateMachine.currentStateName}";
-            Handles.Label(transform.position, labelText);
+    // #if UNITY_EDITOR
+    //     void OnDrawGizmos() {
+    //         if (stateMachine != null) {
+    //             string labelText = $"state: {stateMachine.currentStateName}";
+    //             Handles.Label(transform.position, labelText);
 
-            // string customName = "Relic\\MaskedSpider.png";
-            // Gizmos.DrawIcon(getLocationOfInterest(), customName, true);
-        }
-    }
-#endif
+    //             // string customName = "Relic\\MaskedSpider.png";
+    //             // Gizmos.DrawIcon(getLocationOfInterest(), customName, true);
+    //         }
+    //     }
+    // #endif
 }

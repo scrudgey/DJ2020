@@ -129,6 +129,7 @@ public abstract class Cutscene {
             Quaternion rotation = Quaternion.Lerp(initialRotation, targetRotation, completion);
             // Debug.Log($"{timer}\t{duration}\t{completion}\t{targetPosition} -> {position}");
             cameraInput = SetCameraPosition(position, rotation, state);
+            SetCameraPosition(cameraInput);
             timer += Time.unscaledDeltaTime;
             // Debug.Break();
             yield return null;

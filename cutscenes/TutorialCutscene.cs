@@ -5,7 +5,6 @@ using System.Linq;
 using AI;
 using Easings;
 using Items;
-using UnityEditor;
 using UnityEngine;
 
 class TutorialCutscene : Cutscene {
@@ -695,6 +694,7 @@ class TutorialCutscene : Cutscene {
         yield return MoveCharacter(playerCharacterController, "wanderback", speedCoefficient: 1.2f);
         yield return ShowCutsceneDialogue("the mentor", mentorPortrait, "You go wandering off like that and it could blow the whole mission! Now pay attention!");
         yield return MyLeaveFocus();
+        GameManager.I.uiController.HideInteractiveHighlight();
     }
 
     IEnumerator LabWanderPrevention() {

@@ -335,14 +335,12 @@ walks you through taking out the cyberdeck, stealing the file
 * verify wander correction
 . when starting a new game, toggle for skipping tutorial / intro
 . bar cutscene
+. pulling gun before door allowed me to burglar door early?
+. camera movement is jumpy
+
 
 # tutorial finalization
 exploit can be used early: fix this after tuning software 
-camera data location?
-pulling gun before door allowed me to burglar door early?
-
-camera movement is jumpy
-
 
 
 

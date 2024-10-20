@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Easings;
 using KinematicCharacterController;
-using UnityEditorInternal;
 using UnityEngine;
 public enum CharacterState {
     normal,

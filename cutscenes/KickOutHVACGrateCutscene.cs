@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Easings;
-using UnityEditor;
 using UnityEngine;
 
 class KickOutHVACGrateCutscene : Cutscene {

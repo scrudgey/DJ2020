@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Easings;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -116,10 +115,10 @@ public class PerkButton : MonoBehaviour {
     }
 
 
-#if UNITY_EDITOR
-    private void OnDrawGizmos() {
-        Handles.Label(transform.position, $"{perk.readableName}");
+    // #if UNITY_EDITOR
+    //     private void OnDrawGizmos() {
+    //         Handles.Label(transform.position, $"{perk.readableName}");
 
-    }
-#endif
+    //     }
+    // #endif
 }
